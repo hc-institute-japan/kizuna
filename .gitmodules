@@ -1,0 +1,3 @@
+[submodule "dnas/lobby/zomes/profiles"]
+	path = dnas/lobby/zomes/profiles
+	url = https://github.com/holochain-open-dev/profiles-module.git
