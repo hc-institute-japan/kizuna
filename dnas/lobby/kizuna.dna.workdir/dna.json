@@ -1,0 +1,10 @@
+{
+  "name": "kizuna-dna",
+  "uuid": "",
+  "properties": null,
+  "zomes": {
+    "request": {
+      "wasm_path": "../target/wasm32-unknown-unknown/release/request.wasm"
+    }
+  }
+}

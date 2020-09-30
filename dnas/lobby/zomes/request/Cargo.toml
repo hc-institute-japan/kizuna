@@ -1,0 +1,14 @@
+[package]
+name = "request"
+version = "0.0.1"
+authors = [ "nkgardose" ]
+edition = "2018"
+
+[lib]
+name = "request"
+crate-type = [ "cdylib", "rlib" ]
+
+[dependencies]
+serde = "=1.0.104"
+hdk3 = { path = "../../../../../holochain/crates/hdk" }
+derive_more = "0.99.9"
