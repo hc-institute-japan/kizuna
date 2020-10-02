@@ -6,7 +6,7 @@ use hdk3::prelude::{
     *,
 };
 use entries::contacts;
-use contacts::{ContactsInfo, Profile, UsernameWrapper, BlockedWrapper, ContactsWrapper, BooleanWrapper};
+use contacts::{ContactsInfo, Profile, UsernameWrapper, BlockedWrapper, ContactsWrapper, BooleanWrapper, AgentIdWrapper};
 
 
 mod entries;
@@ -45,14 +45,14 @@ fn list_blocked(_: ()) -> ExternResult<BlockedWrapper> {
 }
 
 #[hdk_extern]
-fn in_contacts(username: UsernameWrapper) -> ExternResult<BooleanWrapper> {
-    Ok(contacts::handlers::in_contacts(username)?)
+fn in_contacts(agent_id: AgentIdWrapper) -> ExternResult<BooleanWrapper> {
+    Ok(contacts::handlers::in_contacts(agent_id)?)
 }
 
-// #[hdk_extern]
-// fn get_agent_pubkey_from_username(username: UsernameWrapper) -> ExternResult<AgentPubKey> {
-//     Ok(contacts::handlers::get_agent_pubkey_from_username(username)?)
-// }
+#[hdk_extern]
+fn get_agent_pubkey_from_username(username: UsernameWrapper) -> ExternResult<AgentPubKey> {
+    Ok(contacts::handlers::get_agent_pubkey_from_username(username)?)
+}
 
 // #[hdk_extern]
 // fn test_query(_: ()) -> ExternResult<Element> {

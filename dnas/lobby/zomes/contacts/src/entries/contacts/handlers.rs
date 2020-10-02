@@ -6,7 +6,7 @@ use hdk3::prelude::{
 };
 use super::{
     ContactsInfo,
-    // AgentIdWrapper,
+    AgentIdWrapper,
     ContactsWrapper,
     BlockedWrapper,
     UsernameWrapper,
@@ -18,20 +18,19 @@ use crate::{utils::to_timestamp};
 // GENERAL: Probably better to commit the ContactsInfo entry at init callback.
 
 pub(crate) fn add_contact(username: UsernameWrapper) -> ExternResult<Profile> {
-    // implement once username_address() is implemented
-    // let contact_agent_pubkey = username_address(username.0.clone())?;
+    let contact_agent_pubkey = get_agent_pubkey_from_username(username.clone())?;
 
     let maybe_contacts_info_elements_components = query_contact_info_elements()?;
-    let added_profile = Profile::new(username.0.clone());
-
+    let added_profile = Profile::new(contact_agent_pubkey.clone(), username.0.clone());
+    
     match maybe_contacts_info_elements_components {
         Some(contacts_info_elements_components) => {
             let mut contacts_info = contacts_info_elements_components.1;
             let signed_header_hash = contacts_info_elements_components.0.into_inner();
-
+            
             // check if the address to be added is already existing and return right away if it does
-            if let false = contacts_info.contacts.iter().any(|v| v == &username.0) {
-                contacts_info.contacts.push(username.0.clone());
+            if let false = contacts_info.contacts.iter().any(|v| v.to_owned() == contact_agent_pubkey.clone()) {
+                contacts_info.contacts.push(contact_agent_pubkey);
                 update_entry!(signed_header_hash.1, contacts_info.clone())?;
                 // debug!("Tatsuya Sato here. {:#?}", contacts_info)?;
                 Ok(added_profile)
@@ -41,7 +40,7 @@ pub(crate) fn add_contact(username: UsernameWrapper) -> ExternResult<Profile> {
         },
         _ => {
             let mut new_contacts = ContactsInfo::new(to_timestamp(sys_time!()?))?;
-            new_contacts.contacts.push(username.0.clone());
+            new_contacts.contacts.push(contact_agent_pubkey);
             create_entry!(new_contacts.clone())?;
             Ok(added_profile)
         },
@@ -49,8 +48,7 @@ pub(crate) fn add_contact(username: UsernameWrapper) -> ExternResult<Profile> {
 }
 
 pub(crate) fn remove_contact(username: UsernameWrapper) -> ExternResult<Profile> {
-    // implement once username_address() is implemented
-    // let contact_agent_pubkey = username_address(username.0.clone())?;
+    let contact_agent_pubkey = get_agent_pubkey_from_username(username.clone())?;
 
     let maybe_contacts_info_elements_components = query_contact_info_elements()?;
 
@@ -60,11 +58,11 @@ pub(crate) fn remove_contact(username: UsernameWrapper) -> ExternResult<Profile>
             let signed_header_hash = contacts_info_elements_components.0.into_inner();
 
             // check if the address to be removed exist in the contacts
-            if let true = contacts_info.contacts.iter().any(|v| v == &username.0) {
-                contacts_info.contacts.retain(|v| v != &username.0);
+            if let true = contacts_info.contacts.iter().any(|v| v == &contact_agent_pubkey) {
+                contacts_info.contacts.retain(|v| v != &contact_agent_pubkey);
                 update_entry!(signed_header_hash.1, contacts_info.clone())?;
                 // debug!("Tatsuya Sato here. {:#?}", contacts_info)?;
-                let removed_profile = Profile::new(username.0);
+                let removed_profile = Profile::new(contact_agent_pubkey ,username.0);
                 Ok(removed_profile)
             } else {
                 return Err(HdkError::Wasm(WasmError::Zome(
@@ -73,7 +71,7 @@ pub(crate) fn remove_contact(username: UsernameWrapper) -> ExternResult<Profile>
             }
         },
         _ => {
-            // is it better to commit and return an empty ContactsInfo?
+            // TODO: commit empty ContactsInfo at init to avoid this error 
             Err(HdkError::Wasm(WasmError::Zome(
                 "{\"code\": \"404\", \"message\": \"This agent has no contacts yet\"}".to_owned()
             )))
@@ -82,18 +80,17 @@ pub(crate) fn remove_contact(username: UsernameWrapper) -> ExternResult<Profile>
 }
 
 pub(crate) fn block_contact(username: UsernameWrapper) -> ExternResult<Profile> {
-    // implement once username_address() is implemented
-    // let contact_agent_pubkey = username_address(username.0.clone())?;
+    let contact_agent_pubkey = get_agent_pubkey_from_username(username.clone())?;
 
-    // let agent_pubkey = agent_info!()?.agent_latest_pubkey;
-    // if agent_pubkey == contact_agent_pubkey {
-    //     return Err(HdkError::Wasm(WasmError::Zome(
-    //         "{\"code\": \"302\", \"message\": \"Cannot block own agent pubkey\"}".to_owned()
-    //     )))
-    // }
+    let agent_pubkey = agent_info!()?.agent_latest_pubkey;
+    if agent_pubkey == contact_agent_pubkey {
+        return Err(HdkError::Wasm(WasmError::Zome(
+            "{\"code\": \"302\", \"message\": \"Cannot block own agent pubkey\"}".to_owned()
+        )))
+    }
 
     let maybe_contacts_info_elements_components = query_contact_info_elements()?;
-    let blocked_profile = Profile::new(username.0.clone());
+    let blocked_profile = Profile::new(contact_agent_pubkey.clone() ,username.0.clone());
 
     match maybe_contacts_info_elements_components {
         Some(contacts_info_elements_components) => {
@@ -101,12 +98,12 @@ pub(crate) fn block_contact(username: UsernameWrapper) -> ExternResult<Profile> 
             let signed_header_hash = contacts_info_elements_components.0.into_inner();
 
             // check if the contact is already in the blocked list
-            if let false = contacts_info.blocked.iter().any(|v| v == &username.0) {
-                contacts_info.blocked.push(username.0.clone());
+            if let false = contacts_info.blocked.iter().any(|v| v == &contact_agent_pubkey) {
+                contacts_info.blocked.push(contact_agent_pubkey.clone());
 
                 // check if the contact is in the list of and remove it
-                if let true = contacts_info.contacts.iter().any(|v| v == &username.0) {
-                    contacts_info.contacts.retain(|v| v != &username.0);
+                if let true = contacts_info.contacts.iter().any(|v| v == &contact_agent_pubkey) {
+                    contacts_info.contacts.retain(|v| v != &contact_agent_pubkey);
                 }
 
                 update_entry!(signed_header_hash.1, contacts_info.clone())?;
@@ -116,7 +113,7 @@ pub(crate) fn block_contact(username: UsernameWrapper) -> ExternResult<Profile> 
         },
         _ => {
             let mut new_contacts = ContactsInfo::new(to_timestamp(sys_time!()?))?;
-            new_contacts.blocked.push(username.0.clone());
+            new_contacts.blocked.push(contact_agent_pubkey);
             create_entry!(new_contacts.clone())?;
             Ok(blocked_profile)
         },
@@ -124,8 +121,7 @@ pub(crate) fn block_contact(username: UsernameWrapper) -> ExternResult<Profile> 
 }
 
 pub(crate) fn unblock_contact(username: UsernameWrapper) -> ExternResult<Profile> {
-    // implement once username_address() is implemented
-    // let contact_agent_pubkey = username_address(username.0.clone())?;
+    let contact_agent_pubkey = get_agent_pubkey_from_username(username.clone())?;
 
     let maybe_contacts_info_elements_components = query_contact_info_elements()?;
 
@@ -135,11 +131,11 @@ pub(crate) fn unblock_contact(username: UsernameWrapper) -> ExternResult<Profile
             let signed_header_hash = contacts_info_elements_components.0.into_inner();
 
             // check if the contact is in the blocked list
-            if let true = contacts_info.blocked.iter().any(|v| v == &username.0) {
-                contacts_info.blocked.retain(|v| v != &username.0);
+            if let true = contacts_info.blocked.iter().any(|v| v == &contact_agent_pubkey) {
+                contacts_info.blocked.retain(|v| v != &contact_agent_pubkey);
                 update_entry!(signed_header_hash.1, contacts_info.clone())?;
                 // debug!("Tatsuya Sato here. {:#?}", contacts_info)?;
-                let unblocked_profile = Profile::new(username.0);
+                let unblocked_profile = Profile::new(contact_agent_pubkey ,username.0);
                 Ok(unblocked_profile)
             } else {
                 return Err(HdkError::Wasm(WasmError::Zome(
@@ -191,12 +187,12 @@ pub(crate) fn list_blocked() -> ExternResult<BlockedWrapper> {
 }
 
 // change arg to AgentIdWrapper
-pub(crate) fn in_contacts(username: UsernameWrapper) -> ExternResult<BooleanWrapper> {
+pub(crate) fn in_contacts(agent_id: AgentIdWrapper) -> ExternResult<BooleanWrapper> {
     let contacts_list = list_contacts()?.0;
     if contacts_list.len() == 0 {
         Ok(BooleanWrapper(false))
     } else {
-        if contacts_list.iter().any(|pubkey| pubkey == &username.0) {
+        if contacts_list.iter().any(|pubkey| pubkey == &agent_id.0) {
             Ok(BooleanWrapper(true))
         } else {
             Ok(BooleanWrapper(false))
@@ -205,27 +201,23 @@ pub(crate) fn in_contacts(username: UsernameWrapper) -> ExternResult<BooleanWrap
 }
 
 // HELPER FUNCTION
-// fn get_agent_pubkey_from_username(username: UsernameWrapper) -> ExternResult<AgentPubKey> {
-//     let zome_info = zome_info!()?;
-//     let my_agent_pubkey = agent_info!()?.agent_latest_pubkey;
-//     let function_name = zome::FunctionName("get_agent_pubkey_from_username".to_owned());
-//     debug!("Tatsuya Sato working until here1")?;
-//     let payload: SerializedBytes = username.try_into()?;
-//     debug!("Tatsuya Sato working until here2")?;
-//     match call_remote!(my_agent_pubkey, zome_info.zome_name, function_name, None, payload)? {
-//         ZomeCallResponse::Ok(output) => {
-//             debug!("Tatsuya Sato debugging, {:#?}", output)?;
-//             let sb = output.into_inner();
-//             let maybe_agent_pubkey: AgentPubKey = sb.try_into()?;
-//             Ok(maybe_agent_pubkey)
-//         },
-//         ZomeCallResponse::Unauthorized => {
-//             Err(HdkError::Wasm(WasmError::Zome(
-//                 "{\"code\": \"401\", \"message\": \"This agent has no proper authorization\"}".to_owned()
-//             )))
-//         },
-//     }
-// }
+pub(crate) fn get_agent_pubkey_from_username(username: UsernameWrapper) -> ExternResult<AgentPubKey> {
+    let my_agent_pubkey = agent_info!()?.agent_latest_pubkey;
+    let function_name = zome::FunctionName("get_agent_pubkey_from_username".to_owned());
+    let payload: SerializedBytes = username.try_into()?;
+    match call_remote!(my_agent_pubkey, "profiles".into(), function_name, None, payload)? {
+        ZomeCallResponse::Ok(output) => {
+            let sb = output.into_inner();
+            let maybe_agent_pubkey: AgentPubKey = sb.try_into()?;
+            Ok(maybe_agent_pubkey)
+        },
+        ZomeCallResponse::Unauthorized => {
+            Err(HdkError::Wasm(WasmError::Zome(
+                "{\"code\": \"401\", \"message\": \"This agent has no proper authorization\"}".to_owned()
+            )))
+        },
+    }
+}
 
 fn query_contact_info_elements() -> ExternResult<Option<(element::SignedHeaderHashed, ContactsInfo)>> {
     let filter = QueryFilter::new()

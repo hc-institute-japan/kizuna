@@ -7,7 +7,7 @@ const orchestrator = new Orchestrator();
 // differentiated by UUID, nicknamed "alice" and "bobbo"
 const config = Config.gen({
     alice: Config.dna('../kizuna.dna.gz', null),
-    bobbo: Config.dna('../kizuna.dna.gz', null),
+    bobby: Config.dna('../kizuna.dna.gz', null),
   })
   
 
