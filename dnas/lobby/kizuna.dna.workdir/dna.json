@@ -4,7 +4,13 @@
   "properties": null,
   "zomes": {
     "request": {
-      "wasm_path": "../target/wasm32-unknown-unknown/release/request.wasm"
+      "wasm_path": "../../../../holochain/target/wasm32-unknown-unknown/release/request.wasm"
+    },
+    "profiles": {
+      "wasm_path": "../../../../holochain/target/wasm32-unknown-unknown/release/profiles.wasm"
+    },
+    "contacts": {
+      "wasm_path": "../../../../holochain/target/wasm32-unknown-unknown/release/contacts.wasm"
     }
   }
 }
