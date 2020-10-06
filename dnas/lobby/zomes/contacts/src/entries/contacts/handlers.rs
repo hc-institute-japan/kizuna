@@ -65,16 +65,12 @@ pub(crate) fn remove_contact(username: UsernameWrapper) -> ExternResult<Profile>
                 let removed_profile = Profile::new(contact_agent_pubkey ,username.0);
                 Ok(removed_profile)
             } else {
-                return Err(HdkError::Wasm(WasmError::Zome(
-                    "{\"code\": \"404\", \"message\": \"This address wasn't found in contacts\"}".to_owned()
-                )))
+                return crate::error("{\"code\": \"404\", \"message\": \"This address wasn't found in contacts\"}")
             }
         },
         _ => {
             // TODO: commit empty ContactsInfo at init to avoid this error 
-            Err(HdkError::Wasm(WasmError::Zome(
-                "{\"code\": \"404\", \"message\": \"This agent has no contacts yet\"}".to_owned()
-            )))
+            crate::error("{\"code\": \"404\", \"message\": \"This agent has no contacts yet\"}")
         },
     }
 }
@@ -84,9 +80,7 @@ pub(crate) fn block_contact(username: UsernameWrapper) -> ExternResult<Profile> 
 
     let agent_pubkey = agent_info!()?.agent_latest_pubkey;
     if agent_pubkey == contact_agent_pubkey {
-        return Err(HdkError::Wasm(WasmError::Zome(
-            "{\"code\": \"302\", \"message\": \"Cannot block own agent pubkey\"}".to_owned()
-        )))
+        return crate::error("{\"code\": \"302\", \"message\": \"Cannot block own agent pubkey\"}")
     }
 
     let maybe_contacts_info_elements_components = query_contact_info_elements()?;
@@ -138,16 +132,12 @@ pub(crate) fn unblock_contact(username: UsernameWrapper) -> ExternResult<Profile
                 let unblocked_profile = Profile::new(contact_agent_pubkey ,username.0);
                 Ok(unblocked_profile)
             } else {
-                return Err(HdkError::Wasm(WasmError::Zome(
-                    "{\"code\": \"404\", \"message\": \"The contact is not in the list of blocked contacts\"}".to_owned()
-                )))
+                return crate::error("{\"code\": \"404\", \"message\": \"The contact is not in the list of blocked contacts\"}")
             }
         },
         _ => {
             // is it better to commit and return an empty ContactsInfo?
-            Err(HdkError::Wasm(WasmError::Zome(
-                "{\"code\": \"404\", \"message\": \"This agent has no contacts yet\"}".to_owned()
-            )))
+            crate::error("{\"code\": \"404\", \"message\": \"This agent has no contacts yet\"}")
         },
     }
 }
@@ -212,9 +202,7 @@ pub(crate) fn get_agent_pubkey_from_username(username: UsernameWrapper) -> Exter
             Ok(maybe_agent_pubkey)
         },
         ZomeCallResponse::Unauthorized => {
-            Err(HdkError::Wasm(WasmError::Zome(
-                "{\"code\": \"401\", \"message\": \"This agent has no proper authorization\"}".to_owned()
-            )))
+            crate::error("{\"code\": \"401\", \"message\": \"This agent has no proper authorization\"}")
         },
     }
 }
@@ -251,9 +239,7 @@ fn query_contact_info_elements() -> ExternResult<Option<(element::SignedHeaderHa
                 _ => {
                     // This means that the ElementEntry was a variant other than Present
                     // TODO: edit Error
-                    Err(HdkError::Wasm(WasmError::Zome(
-                        "contacts info entry is either inaccessible or not existing.".to_owned()
-                    )))
+                    crate::error("contacts info entry is either inaccessible or not existing.")
                 }
             }
         },
