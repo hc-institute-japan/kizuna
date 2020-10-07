@@ -48,10 +48,32 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4785bdd1c96b2a846b2bd7cc02e86b6b3dbf14e7e53446c4f54c92a361040822"
 
 [[package]]
+name = "chrono"
+version = "0.4.19"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "670ad68c9088c2a963aaa298cb369688cf3f9465ce5e2d4ca10e6e0098a1ce73"
+dependencies = [
+ "libc",
+ "num-integer",
+ "num-traits",
+ "time",
+ "winapi",
+]
+
+[[package]]
 name = "constant_time_eq"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "245097e9a4535ee1e3e3931fcfcd55a796a44c643e8596ff6566d68f09b87bbc"
+
+[[package]]
+name = "contacts"
+version = "0.0.1"
+dependencies = [
+ "derive_more",
+ "hdk3 0.0.1",
+ "serde",
+]
 
 [[package]]
 name = "derive_more"
@@ -62,6 +84,19 @@ dependencies = [
  "proc-macro2 1.0.19",
  "quote 1.0.7",
  "syn 1.0.39",
+]
+
+[[package]]
+name = "fixt"
+version = "0.0.1"
+source = "git+https://github.com/holochain/holochain.git?branch=develop#f051d5607ac8d343e1c98b5e59da6f901e674f1d"
+dependencies = [
+ "holochain_serialized_bytes",
+ "paste 0.1.12",
+ "rand",
+ "serde",
+ "strum",
+ "strum_macros",
 ]
 
 [[package]]
@@ -84,7 +119,7 @@ checksum = "fc587bc0ec293155d5bfa6b9891ec18a1e330c234f896ea47fbada4cadbe47e6"
 dependencies = [
  "cfg-if",
  "libc",
- "wasi",
+ "wasi 0.9.0+wasi-snapshot-preview1",
 ]
 
 [[package]]
@@ -99,11 +134,25 @@ dependencies = [
 [[package]]
 name = "hdk3"
 version = "0.0.1"
+source = "git+https://github.com/holochain/holochain.git?branch=develop#f051d5607ac8d343e1c98b5e59da6f901e674f1d"
 dependencies = [
- "hdk3_derive",
- "holo_hash",
+ "hdk3_derive 0.0.1 (git+https://github.com/holochain/holochain.git?branch=develop)",
+ "holo_hash 0.0.1 (git+https://github.com/holochain/holochain.git?branch=develop)",
  "holochain_wasmer_guest",
- "holochain_zome_types",
+ "holochain_zome_types 0.0.1 (git+https://github.com/holochain/holochain.git?branch=develop)",
+ "serde",
+ "serde_bytes",
+ "thiserror",
+]
+
+[[package]]
+name = "hdk3"
+version = "0.0.1"
+dependencies = [
+ "hdk3_derive 0.0.1",
+ "holo_hash 0.0.1",
+ "holochain_wasmer_guest",
+ "holochain_zome_types 0.0.1",
  "serde",
  "serde_bytes",
  "thiserror",
@@ -112,8 +161,20 @@ dependencies = [
 [[package]]
 name = "hdk3_derive"
 version = "0.0.1"
+source = "git+https://github.com/holochain/holochain.git?branch=develop#f051d5607ac8d343e1c98b5e59da6f901e674f1d"
 dependencies = [
- "holochain_zome_types",
+ "holochain_zome_types 0.0.1 (git+https://github.com/holochain/holochain.git?branch=develop)",
+ "paste 1.0.0",
+ "proc-macro2 1.0.19",
+ "quote 1.0.7",
+ "syn 1.0.39",
+]
+
+[[package]]
+name = "hdk3_derive"
+version = "0.0.1"
+dependencies = [
+ "holochain_zome_types 0.0.1",
  "paste 1.0.0",
  "proc-macro2 1.0.19",
  "quote 1.0.7",
@@ -132,10 +193,24 @@ dependencies = [
 [[package]]
 name = "holo_hash"
 version = "0.0.1"
+source = "git+https://github.com/holochain/holochain.git?branch=develop#f051d5607ac8d343e1c98b5e59da6f901e674f1d"
 dependencies = [
  "base64",
  "blake2b_simd",
- "fixt",
+ "fixt 0.0.1 (git+https://github.com/holochain/holochain.git?branch=develop)",
+ "holochain_serialized_bytes",
+ "rand",
+ "serde",
+ "serde_bytes",
+]
+
+[[package]]
+name = "holo_hash"
+version = "0.0.1"
+dependencies = [
+ "base64",
+ "blake2b_simd",
+ "fixt 0.0.1",
  "holochain_serialized_bytes",
  "rand",
  "serde",
@@ -144,9 +219,9 @@ dependencies = [
 
 [[package]]
 name = "holochain_serialized_bytes"
-version = "0.0.43"
+version = "0.0.45"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d61a43f9efb00384b2e35c8690774423be81f4675c3849d757ad45e74bf853f1"
+checksum = "adca869d80860a04757af4fc011d49505594365391a6e3a04105e8f88b9c32e1"
 dependencies = [
  "holochain_serialized_bytes_derive",
  "rmp-serde",
@@ -159,9 +234,9 @@ dependencies = [
 
 [[package]]
 name = "holochain_serialized_bytes_derive"
-version = "0.0.43"
+version = "0.0.45"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ec23054c743a2a9f7e76603abf52c06c530735bd36f35a92df2d6498f79f60d6"
+checksum = "2dbbf84d56f0a0cb00e5532fd4d40b1d42ffb403a1a964d8eeedc4d40131e208"
 dependencies = [
  "quote 0.6.13",
  "syn 0.15.44",
@@ -169,9 +244,9 @@ dependencies = [
 
 [[package]]
 name = "holochain_wasmer_common"
-version = "0.0.45"
+version = "0.0.46"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0367dabf82b157d98dc6080edc94034bce8d6cc6fc276bfbee06005d58380397"
+checksum = "6ee46b8c29e3823cd71f62d6be4f524943f3ee4e8df25f2e758b5feb576636d2"
 dependencies = [
  "holochain_serialized_bytes",
  "serde",
@@ -180,9 +255,9 @@ dependencies = [
 
 [[package]]
 name = "holochain_wasmer_guest"
-version = "0.0.45"
+version = "0.0.46"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c1cb68124704cee9c6755775216352bb4287e6fdc0c5223e62284dc11447dcd4"
+checksum = "d25baad68477da31c444f4c036f8c9da5c129024aa23041e6d3c2fa42c3cdff4"
 dependencies = [
  "holochain_serialized_bytes",
  "holochain_wasmer_common",
@@ -192,9 +267,24 @@ dependencies = [
 [[package]]
 name = "holochain_zome_types"
 version = "0.0.1"
+source = "git+https://github.com/holochain/holochain.git?branch=develop#f051d5607ac8d343e1c98b5e59da6f901e674f1d"
 dependencies = [
- "fixt",
- "holo_hash",
+ "fixt 0.0.1 (git+https://github.com/holochain/holochain.git?branch=develop)",
+ "holo_hash 0.0.1 (git+https://github.com/holochain/holochain.git?branch=develop)",
+ "holochain_serialized_bytes",
+ "serde",
+ "serde_bytes",
+ "strum",
+ "subtle",
+ "thiserror",
+]
+
+[[package]]
+name = "holochain_zome_types"
+version = "0.0.1"
+dependencies = [
+ "fixt 0.0.1",
+ "holo_hash 0.0.1",
  "holochain_serialized_bytes",
  "serde",
  "serde_bytes",
@@ -224,6 +314,16 @@ name = "libc"
 version = "0.2.76"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "755456fae044e6fa1ebbbd1b3e902ae19e73097ed4ed87bb79934a867c007bc3"
+
+[[package]]
+name = "num-integer"
+version = "0.1.43"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8d59457e662d541ba17869cf51cf177c0b5f0cbf476c66bdc90bf1edac4f875b"
+dependencies = [
+ "autocfg",
+ "num-traits",
+]
 
 [[package]]
 name = "num-traits"
@@ -293,6 +393,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "profiles"
+version = "0.0.1"
+dependencies = [
+ "chrono",
+ "derive_more",
+ "hdk3 0.0.1 (git+https://github.com/holochain/holochain.git?branch=develop)",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
 name = "quote"
 version = "0.6.13"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -356,7 +467,7 @@ name = "request"
 version = "0.0.1"
 dependencies = [
  "derive_more",
- "hdk3",
+ "hdk3 0.0.1",
  "serde",
 ]
 
@@ -504,6 +615,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "time"
+version = "0.1.44"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6db9e6914ab8b1ae1c260a4ae7a49b6c5611b40328a735b21862567685e73255"
+dependencies = [
+ "libc",
+ "wasi 0.10.0+wasi-snapshot-preview1",
+ "winapi",
+]
+
+[[package]]
 name = "unicode-segmentation"
 version = "1.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -526,3 +648,31 @@ name = "wasi"
 version = "0.9.0+wasi-snapshot-preview1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "cccddf32554fecc6acb585f82a32a72e28b48f8c4c1883ddfeeeaa96f7d8e519"
+
+[[package]]
+name = "wasi"
+version = "0.10.0+wasi-snapshot-preview1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1a143597ca7c7793eff794def352d41792a93c481eb1042423ff7ff72ba2c31f"
+
+[[package]]
+name = "winapi"
+version = "0.3.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5c839a674fcd7a98952e593242ea400abe93992746761e38641405d28b00f419"
+dependencies = [
+ "winapi-i686-pc-windows-gnu",
+ "winapi-x86_64-pc-windows-gnu",
+]
+
+[[package]]
+name = "winapi-i686-pc-windows-gnu"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ac3b87c63620426dd9b991e5ce0329eff545bccbbb34f3be09ff6fb6ab51b7b6"
+
+[[package]]
+name = "winapi-x86_64-pc-windows-gnu"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "712e227841d057c1ee1cd2fb22fa7e5a5461ae8e48fa2ca79ec42cfc1931183f"
