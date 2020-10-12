@@ -6,7 +6,7 @@ use request::{handlers, AgentKey, AgentKeyWrapper, Members, Payload, PayloadWrap
 
 mod entries;
 
-use hdk3::prelude::{EntryDef, *};
+use hdk3::prelude::*;
 
 #[hdk_extern]
 fn send_request(sender: AgentKeyWrapper) -> ExternResult<Payload> {
@@ -21,4 +21,20 @@ fn accept_request(sender: AgentKeyWrapper) -> ExternResult<Payload> {
 #[hdk_extern]
 fn get_agent_key(_: ()) -> ExternResult<AgentKey> {
     Ok(handlers::get_agent_key(())?)
+}
+
+#[hdk_extern]
+fn create_cap_grant(_: ()) -> ExternResult<()> {
+    let mut functions = HashSet::new();
+    functions.insert((zome_info!()?.zome_name, "receive_request".into()));
+    functions.insert((zome_info!()?.zome_name, "send_request".into()));
+    functions.insert((zome_info!()?.zome_name, "accept_request".into()));
+
+    debug!("LOG: Creating cap grant")?;
+    create_cap_grant!(CapGrantEntry {
+        tag: "".into(),
+        access: ().into(),
+        functions
+    })?;
+    Ok(())
 }
