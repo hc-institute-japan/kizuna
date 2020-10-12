@@ -8,6 +8,7 @@ use holochain_zome_types::test_utils::fake_cap_secret;
 entry_defs![Payload::entry_def(), Request::entry_def()];
 
 pub(crate) fn send_request(sender: AgentKeyWrapper) -> ExternResult<Payload> {
+    debug!("send_request")?;
     let function_name = zome::FunctionName("receive_request".to_owned());
     match call_remote!(
         sender.0.clone(),
@@ -57,7 +58,7 @@ pub(crate) fn get_agent_key(_: ()) -> ExternResult<AgentKey> {
 
 #[hdk_extern]
 fn receive_request(payload: PayloadWrapper) -> ExternResult<Payload> {
-    debug!("receive_request");
+    debug!("receive_request")?;
     match payload.code.as_str() {
         "request_accepted" => {
             /*

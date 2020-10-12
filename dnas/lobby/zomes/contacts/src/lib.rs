@@ -1,18 +1,20 @@
 #![allow(unused_imports)]
 #![allow(dead_code)]
+use contacts::{
+    AgentIdWrapper, BlockedWrapper, BooleanWrapper, ContactsInfo, ContactsWrapper, Profile,
+    UsernameWrapper,
+};
+use entries::contacts;
 use hdk3::prelude::{
     // element::ElementEntry,
     EntryDef,
     *,
 };
-use entries::contacts;
-use contacts::{ContactsInfo, Profile, UsernameWrapper, BlockedWrapper, ContactsWrapper, BooleanWrapper, AgentIdWrapper};
-
 
 mod entries;
 mod utils;
 
-entry_defs![ ContactsInfo::entry_def() ];
+entry_defs![ContactsInfo::entry_def()];
 
 #[hdk_extern]
 fn add_contact(username: UsernameWrapper) -> ExternResult<Profile> {
@@ -51,7 +53,9 @@ fn in_contacts(agent_id: AgentIdWrapper) -> ExternResult<BooleanWrapper> {
 
 #[hdk_extern]
 fn get_agent_pubkey_from_username(username: UsernameWrapper) -> ExternResult<AgentPubKey> {
-    Ok(contacts::handlers::get_agent_pubkey_from_username(username)?)
+    Ok(contacts::handlers::get_agent_pubkey_from_username(
+        username,
+    )?)
 }
 
 // #[hdk_extern]
@@ -75,3 +79,7 @@ fn get_agent_pubkey_from_username(username: UsernameWrapper) -> ExternResult<Age
 //     debug!("Tatsuya Sato testing query, {:#?}", element_vec)?;
 //     Ok(element_vec.0[0].clone())
 // }
+
+pub fn error<T>(reason: &str) -> ExternResult<T> {
+    Err(HdkError::Wasm(WasmError::Zome(String::from(reason))))
+}
