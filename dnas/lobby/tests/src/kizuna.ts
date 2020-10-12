@@ -28,6 +28,11 @@ module.exports = (orchestrator) => {
       null
     );
 
+    console.log(pubKey)
+
+    // await conductor.call("alice", "request", "create_cap_grant", null);
+    await conductor.call("neil", "request", "create_cap_grant", null);
+
     const receive = await conductor.call(
       "alice",
       "request",
