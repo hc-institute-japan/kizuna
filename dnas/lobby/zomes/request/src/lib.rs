@@ -7,32 +7,14 @@ use hdk3::prelude::*;
 
 #[hdk_extern]
 fn init(_: ()) -> ExternResult<InitCallbackResult> {
-    // grant unrestricted access to accept_cap_claim so other agents can send us claims
-    let mut functions: GrantedFunctions = HashSet::new();
-    functions.insert((zome_info!()?.zome_name, "accept_cap_claim".into()));
-
-    let mut x: GrantedFunctions = HashSet::new();
-    x.insert((zome_info!()?.zome_name, "receive_request".into()));
-
-    create_cap_grant!(CapGrantEntry {
-        tag: "".into(),
-        access: ().into(),
-        functions,
-    })?;
-    create_cap_grant!(CapGrantEntry {
-        tag: "".into(),
-        access: ().into(),
-        functions: x,
-    })?;
-
-    Ok(InitCallbackResult::Pass)
+    Ok(handlers::init(())?)
 }
 
 #[hdk_extern]
 fn accept_cap_claim(claim: CapClaim) -> ExternResult<HeaderHash> {
-    debug!("Starting accepting_cap_claim...")?;
+    debug!("-- [ACCEPT_CAP_CLAIM] --\n")?;
 
-    debug!("Ending accepting_cap_claim...")?;
+    debug!("-- [END ACCEPT_CAP_CLAIM] --\n")?;
     Ok(create_cap_claim!(claim)?)
 }
 
@@ -85,26 +67,7 @@ fn receive_request(agent: AgentPubKey) -> ExternResult<()> {
 
 #[hdk_extern]
 fn get_cap_claims(_: ()) -> ExternResult<Claims> {
-    debug!("Starting get_cap_claim...")?;
-    let query_result = query!(QueryFilter::new().include_entries(true))?;
-
-    debug!("the query results are... {:#?}", query_result)?;
-
-    let cap_vector: Vec<CapClaim> = query_result
-        .0
-        .into_iter()
-        .filter_map(|el| {
-            let entry: Result<Option<CapClaim>, SerializedBytesError> =
-                el.into_inner().1.to_app_option();
-            match entry {
-                Ok(Some(cap_claim)) => Some(cap_claim),
-                _ => None,
-            }
-        })
-        .collect();
-    debug!("Ending get_cap_claim....")?;
-
-    Ok(Claims(cap_vector))
+    Ok(handlers::get_cap_claims(())?)
 }
 
 #[hdk_extern]
