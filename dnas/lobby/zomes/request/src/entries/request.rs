@@ -2,7 +2,10 @@ pub mod handlers;
 
 use hdk3::prelude::*;
 #[derive(serde::Serialize, serde::Deserialize, SerializedBytes)]
-pub struct CapFor(CapSecret, AgentPubKey);
+pub struct CapFor {
+    cap_secret: CapSecret,
+    agent_pub_key: AgentPubKey
+}
 
 #[derive(serde::Serialize, serde::Deserialize, SerializedBytes)]
 pub struct Claims(pub Vec<CapClaim>);
@@ -10,13 +13,8 @@ pub struct Claims(pub Vec<CapClaim>);
 pub struct Test {
     pub test: String,
 }
-
-impl Test {
-    pub fn new(test: String) -> Self {
-        Test { test }
-    }
+#[derive(serde::Serialize, serde::Deserialize, SerializedBytes)]
+pub struct Payload {
+    pub code: String,
+    pub message: String
 }
-
-// impl Claims {
-//     fn new(cap_claims: Vec<CapClaim>) -> Self(cap_claims);
-// }
