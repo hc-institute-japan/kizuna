@@ -1,9 +1,7 @@
-use super::{CapFor, Claims};
+use super::{CapFor, Payload, Claims};
 use hdk3::prelude::*;
 
 pub(crate) fn init(_: ()) -> ExternResult<InitCallbackResult> {
-    debug!("-- [INIT] --\n")?;
-    // grant unrestricted access to accept_cap_claim so other agents can send us claims
     let mut functions: GrantedFunctions = HashSet::new();
     functions.insert((zome_info!()?.zome_name, "accept_cap_claim".into()));
 
@@ -21,80 +19,55 @@ pub(crate) fn init(_: ()) -> ExternResult<InitCallbackResult> {
         functions: x,
     })?;
 
-    debug!("-- [END_INIT] --\n")?;
     Ok(InitCallbackResult::Pass)
 }
 
+pub(crate) fn accept_cap_claim(claim: CapClaim) -> ExternResult<HeaderHash> {
+    Ok(create_cap_claim!(claim)?)
+}
+
 pub(crate) fn get_cap_claims(_: ()) -> ExternResult<Claims> {
-    debug!("-- [GET_CAP_CLAIMS] --\n")?;
+    let query_result = query!(
+        QueryFilter::new()
+        .entry_type(EntryType::CapClaim)
+        .include_entries(true)
+    )?;
 
-    let query_result = query!(QueryFilter::new().include_entries(true))?;
-
-    let cap_vector: Vec<CapClaim> = query_result
+    let result: Vec<CapClaim> = query_result
         .0
         .into_iter()
-        .filter_map(|el| {
-            let entry: Result<Option<CapClaim>, SerializedBytesError> =
-                el.into_inner().1.to_app_option();
-            match entry {
-                Ok(Some(cap_claim)) => Some(cap_claim),
+        .filter_map(|e| 
+            match e.header() {
+                Header::Create(_create) => Some(e.clone().into_inner().1.into_option().unwrap().as_cap_claim().unwrap().to_owned()),
                 _ => None,
-            }
-        })
+            })
         .collect();
-    debug!("-- [END GET_CAP_CLAIMS] --\n")?;
-    Ok(Claims(cap_vector))
+
+    Ok(Claims(result))
 }
 
-pub(crate) fn send_request(agent: AgentPubKey) -> ExternResult<()> {
-    call_remote!(
-        agent,
-        zome_info!()?.zome_name,
-        "receive_request".to_string().into(),
-        None,
-        agent_info!()?.agent_latest_pubkey.try_into()?
-    )?;
-    Ok(())
-}
-
-pub(crate) fn create_grant_entry(secret: CapSecret) -> ExternResult<CapGrantEntry> {
-    let mut functions: GrantedFunctions = HashSet::new();
-    let this_zome = zome_info!()?.zome_name;
-    functions.insert((this_zome, "needs_cap_claim".into()));
-    Ok(CapGrantEntry {
-        tag: "".into(),
-        access: secret.into(),
-        functions,
-    })
-}
-
-pub(crate) fn send_message(cap_for: CapFor) -> ExternResult<ZomeCallResponse> {
-    let result: ZomeCallResponse = call_remote!(
-        cap_for.1,
+pub(crate) fn send_message(cap_for: CapFor) -> ExternResult<Payload> {
+    match call_remote!(
+        cap_for.agent_pub_key,
         zome_info!()?.zome_name,
         "needs_cap_claim".to_string().into(),
-        Some(cap_for.0),
+        Some(cap_for.cap_secret),
         ().try_into()?
-    )?;
-    Ok(result)
+    )? {
+        ZomeCallResponse::Ok(payload) => Ok(payload.into_inner().try_into()?),
+        ZomeCallResponse::Unauthorized => Err(HdkError::Wasm(WasmError::Zome(
+            "{\"code\": \"000\", \"message\": \"[Unauthorized] Accept Request\"}".to_owned(),
+        )))
+    }
 }
 
 pub(crate) fn receive_request(agent: AgentPubKey) -> ExternResult<()> {
     let tag = String::from("has_cap_claim");
-    debug!("-- [RECEIVE_REQUEST] --\n")?;
-
-    debug!("\n\n\n\n\n")?;
-
-    // make a new secret
     let secret = generate_cap_secret!()?;
-
-    debug!("Secret: {:#?}", secret)?;
-    // grant the secret as assigned (can only be used by the intended agent)
     let mut functions: GrantedFunctions = HashSet::new();
     let this_zome = zome_info!()?.zome_name;
+    
     functions.insert((this_zome.clone(), "needs_cap_claim".into()));
-
-    debug!("Functions: {:#?}", functions)?;
 
     create_cap_grant!(CapGrantEntry {
         access: (secret, agent.clone()).into(),
@@ -102,22 +75,13 @@ pub(crate) fn receive_request(agent: AgentPubKey) -> ExternResult<()> {
         tag: tag.clone(),
     })?;
 
-    debug!("\n\n\n\n\n")?;
-    debug!("-- [END RECEIVE_REQUEST] --\n")?;
-
-    match call_remote!(
+    call_remote!(
         agent,
         this_zome,
-        "xd".into(),
+        "accept_cap_claim".into(),
         None,
         CapClaim::new(tag, agent_info!()?.agent_latest_pubkey, secret).try_into()?
-    )? {
-        ZomeCallResponse::Ok(_) => {
-            debug!("Inside ZomaCallResponse")?;
-            Ok(())
-        }
-        ZomeCallResponse::Unauthorized => Err(HdkError::Wasm(WasmError::Zome(
-            "{\"code\": \"000\", \"message\": \"[Unauthorized] Accept Request\"}".to_owned(),
-        ))),
-    }
+    )?;
+
+    Ok(())
 }

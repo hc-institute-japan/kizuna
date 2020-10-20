@@ -6,22 +6,20 @@ const request = (orchestrator: Orchestrator<unknown>, config: any) => {
   orchestrator.registerScenario('Request Testing', async (s, t) => {
     const { conductor } = await s.players({ conductor: config });
     await conductor.spawn();
-    const [alice_hash, alice_pubkey] = conductor.cellId('alice');
-    const [bobby_hash, bobby_pubkey] = conductor.cellId('bobby');
+    const [_aliceHash, _alicePubKey] = conductor.cellId('alice');
+    const [_bobbyHash, bobbyPubKey] = conductor.cellId('bobby');
     await conductor.call('alice', "request", "init", null);
     await conductor.call('bobby', "request", "init", null);
+    await conductor.call('alice', 'request', 'receive_request', bobbyPubKey)
+    const b_claims = await conductor.call('bobby', 'request','get_cap_claims', null)
 
-    await conductor.call('alice', "request", "send_request", bobby_pubkey);
-    // const result = await conductor.call('alice', "request", "get_cap_claims", null) 
-    // console.log('Results: ')
-
-    // console.log(result);
-
-    // console.log("End Results: ")
-
-    // const test = await conductor.call('bobby', "request", "is_updating", null)  
-    // console.log(test)
-    
+    const result = await conductor.call('bobby', 'request', 'send_message', {cap_secret: b_claims[0].secret, agent_pub_key: bobbyPubKey})
+    t.deepEqual(result.code, "test");
+    t.deepEqual(result.message, "working");
+    t.deepEqual(result, {
+      code: "test", 
+      message: "working"}
+    );
   })
 }
 
