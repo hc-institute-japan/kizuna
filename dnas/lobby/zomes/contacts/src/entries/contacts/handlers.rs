@@ -217,7 +217,7 @@ pub(crate) fn get_agent_pubkey_from_username(
     let payload: SerializedBytes = username.try_into()?;
     match call_remote!(
         my_agent_pubkey,
-        "profiles".into(),
+        "usernames".into(),
         function_name,
         None,
         payload
