@@ -34,39 +34,53 @@ function inContacts(username) {
 };
   
 function setUsername(username) {
-  return (conductor, caller) => conductor.call(caller, "profiles", "create_profile", username);
+  return (conductor, caller) => conductor.call(caller, "username", "set_username", username);
 }
 
-module.exports = (orchestrator, config) => {
+function getAgentPubkeyFromUsername(username) {
+  return (conductor, caller) => conductor.call(caller, "username", "get_agent_pubkey_from_username", username)
+}
+
+export default (orchestrator, config) => {
   orchestrator.registerScenario("add a contact", async (s, t) => {
     const { conductor } = await s.players({ conductor: config });
     await conductor.spawn();
 
-    // TODO
-    // const set_username_alice = await setUsername("alice")(alice);
-    // const set_username_bob = await setUsername("bob")(bob);
-    // await s.consistency();
+    const [dna_hash_1, agent_pubkey_alice] = conductor.cellId('alice');
+    const [dna_hash_2, agent_pubkey_bobby] = conductor.cellId('bobby');
 
-    const add_contact_result_1 = await addContacts("bobby")(conductor, "alice");
-    const add_contact_result_2 = await addContacts("clark")(conductor, "alice");
+    const set_username_alice = await setUsername("alice")(conductor, "alice");
+    const set_username_bobbo = await setUsername("bobby")(conductor, "bobby");
+    await delay(1000);
+    console.log("set username...");
+    console.log(set_username_alice)
+    console.log(set_username_bobbo)
+
+    // temporary check of whether username actually belongs to a agent_pubkey
+    let alice_key = await getAgentPubkeyFromUsername("alice")(conductor, "bobby");
+    let bobby_key = await getAgentPubkeyFromUsername("bobby")(conductor, "alice");
+    console.log("agent pub keys...")
+    console.log(alice_key)
+    console.log(bobby_key)
+
+
+    const add_contact_result_1 = await addContacts(bobby_key)(conductor, "alice");
+    const add_contact_result_2 = await addContacts(alice_key)(conductor, "alice");
 
     await delay(1000);
 
-    // already added contacts
-    await addContacts("clark")(conductor, "alice");
+    // // already added contacts
+    // await addContacts("alice")(conductor, "alice");
     
     await delay(1000);
     
     const list_contacts = await listContacts()(conductor, "alice");
 
-    // t.deepEqual(add_contact_result.Ok.agent_id, bobAddress);
-    t.deepEqual(add_contact_result_1.username, "bobby");
-    // t.deepEqual(add_contact_result_2.Ok.agent_id, aliceAddress);
-    t.deepEqual(add_contact_result_2.username, "clark");
+    t.deepEqual(add_contact_result_1.agent_id, agent_pubkey_bobby);
+    // t.deepEqual(add_contact_result_1.username, "alice");
+    t.deepEqual(add_contact_result_2.agent_id, agent_pubkey_alice);
+    // t.deepEqual(add_contact_result_2.username, "bobby");
     t.deepEqual(list_contacts.length, 2);
-
-
-    
   });
 
   orchestrator.registerScenario("remove a contact", async (s, t) => {
@@ -74,18 +88,21 @@ module.exports = (orchestrator, config) => {
     await conductor.spawn();
 
     // TODO
-    // const set_username_alice = await setUsername("alice")(alice);
-    // const set_username_bob = await setUsername("bob")(bob);
-    // await delay(1000);
+    const set_username_alice = await setUsername("alice")(conductor, "alice");
+    const set_username_bob = await setUsername("bobby")(conductor, "bobby");
+    await delay(1000);
 
-    const add_contact_alice_result = await addContacts("bobby")(conductor, "alice");
-    const add_contact_alice_result_2 = await addContacts("clark")(conductor, "alice");
+    let alice_key = await getAgentPubkeyFromUsername("alice")(conductor, "bobby");
+    let bobby_key = await getAgentPubkeyFromUsername("bobby")(conductor, "alice");
+
+    const add_contact_alice_result_1 = await addContacts(bobby_key)(conductor, "alice");
+    const add_contact_alice_result_2 = await addContacts(alice_key)(conductor, "alice");
 
     await delay(1000);
 
     const list_contacts = await listContacts()(conductor, "alice");
     
-    const remove_contact_alice_result = await removeContacts("bobby")(conductor, "alice");
+    const remove_contact_alice_result = await removeContacts(bobby_key)(conductor, "alice");
 
     await delay(1000);
     
@@ -95,11 +112,11 @@ module.exports = (orchestrator, config) => {
     // no address exisiting
     // const invalid_remove_1 = await removeContacts("bob", 4)(alice);
     
-    t.deepEqual(list_contacts, ["bobby", "clark"]);
-    t.deepEqual(list_contacts_2, ["clark"])
-    t.deepEqual(add_contact_alice_result.username, "bobby");
-    t.deepEqual(add_contact_alice_result_2.username, "clark");
-    t.deepEqual(remove_contact_alice_result.username, "bobby");
+    t.deepEqual(list_contacts, [bobby_key, alice_key]);
+    t.deepEqual(list_contacts_2, [alice_key]);
+    t.deepEqual(add_contact_alice_result_1.agent_id, bobby_key);
+    t.deepEqual(add_contact_alice_result_2.agent_id, alice_key);
+    t.deepEqual(remove_contact_alice_result.agent_id, bobby_key);
 
     // TODO
     // t.deepEqual(JSON.parse(invalid_remove_1.Err.Internal).code, "404");
@@ -114,28 +131,31 @@ module.exports = (orchestrator, config) => {
     await conductor.spawn();
 
     // TODO
-    // const set_username_alice = await setUsername("alice")(alice);
-    // const set_username_bob = await setUsername("bob")(bob);
-    // await delay(1000);
+    const set_username_alice = await setUsername("alice")(conductor, "alice");
+    const set_username_bob = await setUsername("bobby")(conductor, "bobby");
+    await delay(1000);
+
+    let alice_key = await getAgentPubkeyFromUsername("alice")(conductor, "bobby");
+    let bobby_key = await getAgentPubkeyFromUsername("bobby")(conductor, "alice");
 
     const empty_list_contacts = await listContacts()(conductor, "alice");
-    const add_contact_alice_result = await addContacts("bobby")(conductor, "alice");
-    const add_contact_alice_result_2 = await addContacts("clark")(conductor, "alice");
+    const add_contact_alice_result_1 = await addContacts(bobby_key)(conductor, "alice");
+    const add_contact_alice_result_2 = await addContacts(alice_key)(conductor, "alice");
     
     await delay(1000);
     
-    const list_contacts = await listContacts()(conductor, "alice");
-    const remove_contact_alice_result = await removeContacts("bobby")(conductor, "alice");
+    const list_contacts_1 = await listContacts()(conductor, "alice");
+    const remove_contact_alice_result = await removeContacts(bobby_key)(conductor, "alice");
 
     await delay(1000);
     
     const list_contacts_2 = await listContacts()(conductor, "alice");
 
-    t.ok(add_contact_alice_result.username, "bobby");
-    t.ok(add_contact_alice_result_2.username, "clark");
-    t.ok(remove_contact_alice_result.username, "bobby");
+    t.ok(add_contact_alice_result_1.agent_id, bobby_key);
+    t.ok(add_contact_alice_result_2.agent_id, alice_key);
+    t.ok(remove_contact_alice_result.agent_id, bobby_key);
     t.deepEqual(empty_list_contacts.length, 0);
-    t.deepEqual(list_contacts.length, 2);
+    t.deepEqual(list_contacts_1.length, 2);
     t.deepEqual(list_contacts_2.length, 1);
   });
 
@@ -144,10 +164,10 @@ module.exports = (orchestrator, config) => {
     await conductor.spawn();
 
     // TODO
-    // await setUsername("alice")(alice);
-    // await setUsername("bob")(bob);
-    // await setUsername("charlie")(charlie);
-    // await s.consistency();
+    await setUsername("alice")(conductor, "alice");
+    await setUsername("bobby")(conductor, "bobby");
+    await setUsername("clark")(conductor, "clark");
+    await s.consistency();
 
     // TODO
     //BLOCK OWN SELF
@@ -164,31 +184,35 @@ module.exports = (orchestrator, config) => {
     // t.deepEqual(block_contact_result_0.Ok.agent_id, charlieAddress);
     // t.deepEqual(block_contact_result_0.Ok.username, "charlie");
 
+    let alice_key = await getAgentPubkeyFromUsername("alice")(conductor, "alice");
+    let bobby_key = await getAgentPubkeyFromUsername("bobby")(conductor, "alice");
+    let clark_key = await getAgentPubkeyFromUsername("clark")(conductor, "alice");
+
     //BLOCK A CONTACT IN CONTACTS
-    await addContacts("bobby")(conductor, "alice");
-    await addContacts("alice")(conductor, "alice");
-    await addContacts("clark")(conductor, "alice");
+    await addContacts(alice_key)(conductor, "alice");
+    await addContacts(bobby_key)(conductor, "alice");
+    await addContacts(clark_key)(conductor, "alice");
 
     const list_contacts_1 = await listContacts()(conductor, "alice");
-    const block_contact_result = await blockContact("bobby")(conductor, "alice");
+    const block_contact_result = await blockContact(bobby_key)(conductor, "alice");
 
     await delay(1000);
 
     const list_contacts_2 = await listContacts()(conductor, "alice");
     const list_blocked_1 = await listBlocked()(conductor, "alice");
     
-    //BLOCK AN ALREADY BLOCKED CONTACT
-    await blockContact("bobby")(conductor, "alice");
+    // BLOCK AN ALREADY BLOCKED CONTACT
+    // await blockContact("bobby")(conductor, "alice");
     
-    await delay(1000);
+    // await delay(1000);
     
-    const list_blocked_2 = await listBlocked()(conductor, "alice");
+    // const list_blocked_2 = await listBlocked()(conductor, "alice");
 
-    t.deepEqual(block_contact_result.username, "bobby");
-    t.deepEqual(list_contacts_1.length, 3)
-    t.deepEqual(list_contacts_2.length, 2)
-    t.deepEqual(list_blocked_1.length, 1)
-    t.deepEqual(list_blocked_2.length, 1)
+    t.deepEqual(block_contact_result.agent_id, bobby_key);
+    t.deepEqual(list_contacts_1.length, 3);
+    t.deepEqual(list_contacts_2.length, 2);
+    t.deepEqual(list_blocked_1.length, 1);
+    // t.deepEqual(list_blocked_2.length, 1)
 
   });
 
@@ -197,30 +221,35 @@ module.exports = (orchestrator, config) => {
     await conductor.spawn();
 
     // TODO
-    // await setUsername("alice")(alice);
-    // await setUsername("bob")(bob);
-    // await s.consistency();
+    await setUsername("alice")(conductor, "alice");
+    await setUsername("bobby")(conductor, "bobby");
+    await setUsername("clark")(conductor, "clark");
+    await delay(1000);
 
-    await addContacts("bobby")(conductor, "alice");
-    await addContacts("clark")(conductor, "alice");
-    await addContacts("alice")(conductor, "alice");
+    let alice_key = await getAgentPubkeyFromUsername("alice")(conductor, "alice");
+    let bobby_key = await getAgentPubkeyFromUsername("bobby")(conductor, "alice");
+    let clark_key = await getAgentPubkeyFromUsername("clark")(conductor, "alice");
+
+    await addContacts(alice_key)(conductor, "alice");
+    await addContacts(bobby_key)(conductor, "alice");
+    await addContacts(clark_key)(conductor, "alice");
     await delay(1000);
 
     const list_contacts_1 = await listContacts()(conductor, "alice");
     
-    const block_contact_result = await blockContact("bobby")(conductor, "alice");
+    const block_contact_result = await blockContact(bobby_key)(conductor, "alice");
     await delay(1000);
     
     const list_blocked_1 = await listBlocked()(conductor, "alice");
     const list_contacts_2 = await listContacts()(conductor, "alice");
     
     //UNBLOCK BLOCKED CONTACT
-    const unblock_contact_result = await unblockContact("bobby")(conductor, "alice");
+    const unblock_contact_result = await unblockContact(bobby_key)(conductor, "alice");
     await delay(1000);
     const list_blocked_2 = await listBlocked()(conductor, "alice");
     
-    t.deepEqual(block_contact_result.username, "bobby");
-    t.deepEqual(unblock_contact_result.username, "bobby");
+    t.deepEqual(block_contact_result.agent_id, bobby_key);
+    t.deepEqual(unblock_contact_result.agent_id, bobby_key);
     t.deepEqual(list_contacts_1.length, 3)
     t.deepEqual(list_blocked_1.length, 1)
     t.deepEqual(list_contacts_2.length, 2)
@@ -243,25 +272,33 @@ module.exports = (orchestrator, config) => {
     const { conductor } = await s.players({ conductor: config });
     await conductor.spawn();
 
-    await addContacts("bobby")(conductor, "alice");
-    await addContacts("clark")(conductor, "alice");
-    await addContacts("alice")(conductor, "alice");
+    await setUsername("alice")(conductor, "alice");
+    await setUsername("bobby")(conductor, "bobby");
+    await setUsername("clark")(conductor, "clark");
+    await delay(1000);
+
+    let alice_key = await getAgentPubkeyFromUsername("alice")(conductor, "alice");
+    let bobby_key = await getAgentPubkeyFromUsername("bobby")(conductor, "alice");
+    let clark_key = await getAgentPubkeyFromUsername("clark")(conductor, "alice");
+
+    await addContacts(alice_key)(conductor, "alice");
+    await addContacts(bobby_key)(conductor, "alice");
+    await addContacts(clark_key)(conductor, "alice");
     await delay(1000);
 
     const emtpy_block_list = await listBlocked()(conductor, "alice");
-    await blockContact("bobby")(conductor, "alice");
-    await blockContact("clark")(conductor, "alice");
+    await blockContact(bobby_key)(conductor, "alice");
+    await blockContact(clark_key)(conductor, "alice");
     await delay(1000);
     
     const blocked_list_1 = await listBlocked()(conductor, "alice");
-    await unblockContact("bobby")(conductor, "alice");
-    await unblockContact("clark")(conductor, "alice");
+    await unblockContact(bobby_key)(conductor, "alice");
+    await unblockContact(clark_key)(conductor, "alice");
     await delay(1000);
     
     const blocked_list_2 = await listBlocked()(conductor, "alice");
-    await blockContact("clark")(conductor, "alice");
-    await blockContact("bobby")(conductor, "alice");
-    await blockContact("danny")(conductor, "alice");
+    await blockContact(bobby_key)(conductor, "alice");
+    await blockContact(clark_key)(conductor, "alice");
     await delay(1000);
 
     const blocked_list_3 = await listBlocked()(conductor, "alice");
@@ -269,22 +306,30 @@ module.exports = (orchestrator, config) => {
     t.deepEqual(emtpy_block_list.length, 0);
     t.deepEqual(blocked_list_1.length, 2);
     t.deepEqual(blocked_list_2.length, 0);
-    t.deepEqual(blocked_list_3.length, 3);
+    t.deepEqual(blocked_list_3.length, 2);
   });
 
   orchestrator.registerScenario("check in contacts", async (s, t) => {
     const { conductor } = await s.players({ conductor: config });
     await conductor.spawn();
 
-    await addContacts("bobby")(conductor, "alice");
-    await addContacts("clark")(conductor, "alice");
-    await addContacts("alice")(conductor, "alice");
+    await setUsername("alice")(conductor, "alice");
+    await setUsername("bobby")(conductor, "bobby");
+    await setUsername("clark")(conductor, "clark");
+    await delay(1000);
+
+    let alice_key = await getAgentPubkeyFromUsername("alice")(conductor, "alice");
+    let bobby_key = await getAgentPubkeyFromUsername("bobby")(conductor, "alice");
+    let clark_key = await getAgentPubkeyFromUsername("clark")(conductor, "alice");
+
+    await addContacts(alice_key)(conductor, "alice");
+    await addContacts(bobby_key)(conductor, "alice");
 
     await delay(1000);
 
-    const in_contacts_1 = await inContacts("bobby")(conductor, "alice");
-    const in_contacts_2 = await inContacts("clark")(conductor, "alice");
-    const in_contacts_3 = await inContacts("abcdf")(conductor, "alice");
+    const in_contacts_1 = await inContacts(alice_key)(conductor, "alice");
+    const in_contacts_2 = await inContacts(bobby_key)(conductor, "alice");
+    const in_contacts_3 = await inContacts(clark_key)(conductor, "alice");
 
     t.deepEqual(in_contacts_1, true);
     t.deepEqual(in_contacts_2, true);
@@ -295,9 +340,9 @@ module.exports = (orchestrator, config) => {
   //   const { conductor } = await s.players({ conductor: config });
   //   await conductor.spawn();
 
-  //   const [dna_hash, agent_address] = conductor.cellId('alice')
+  //   const [dna_hash, agent_address] = conductor.cellId('alice');
 
-  //   const set_username_alice_result_1 = await setUsername({ username : "alice"})(conductor, "alice");
+  //   const set_username_alice_result_1 = await setUsername("alice")(conductor, "alice");
   //   await delay(1000);
 
   //   const get_pubkey = await conductor.call("alice", "contacts", "get_agent_pubkey_from_username", "alice");
@@ -305,6 +350,7 @@ module.exports = (orchestrator, config) => {
   //   console.log(set_username_alice_result_1);
   //   console.log(agent_address);
   //   console.log(get_pubkey);
+  //   t.deepEqual(agent_address, get_pubkey);
   // });
 };
   
