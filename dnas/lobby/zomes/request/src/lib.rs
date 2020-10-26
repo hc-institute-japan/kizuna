@@ -1,26 +1,42 @@
-#![allow(unused_imports)]
-#![allow(dead_code)]
-
-use entries::{members, test, HashWrapper, PayloadWrapper};
-use test::{Payload, Test, TestInfo};
-
 mod entries;
-// pub mod request;
-
-use hdk3::prelude::call_remote;
-use hdk3::prelude::AgentInfo;
-use hdk3::prelude::Path;
-
-use derive_more::{From, Into};
-use hdk3::prelude::zome;
-use hdk3::prelude::CapSecret;
+use entries::request;
+use request::{
+    handlers, 
+    CapFor, 
+    Payload, 
+    Claims
+};
 use hdk3::prelude::*;
 
-use link::Link;
+#[hdk_extern]
+fn init(_: ()) -> ExternResult<InitCallbackResult> {
+    Ok(handlers::init(())?)
+}
 
-// To-do
-// 1. request_to_chat // ok
-// 2. accept_request // ok
-// 3. fetch_requests // ok
-// 4. delete_requests // ok
-// 5. receive // incomplete
+#[hdk_extern]
+fn needs_cap_claim(_: ()) -> ExternResult<Payload> {
+    Ok(Payload {
+        code: "test".to_owned(),
+        message: "working".to_owned()
+    })
+}
+
+#[hdk_extern]
+fn send_request_to_chat(agent: AgentPubKey) -> ExternResult<HeaderHash> {
+    Ok(handlers::send_request_to_chat(agent)?)
+}
+
+#[hdk_extern]
+fn receive_request_to_chat(agent: AgentPubKey) -> ExternResult<CapClaim> {
+    Ok(handlers::receive_request_to_chat(agent)?)
+}
+
+#[hdk_extern]
+fn get_cap_claims(_: ()) -> ExternResult<Claims> {
+    Ok(handlers::get_cap_claims(())?)
+}
+
+#[hdk_extern]
+fn try_cap_claim(cap_for: CapFor) -> ExternResult<Payload> {
+    Ok(handlers::try_cap_claim(cap_for)?)
+}
