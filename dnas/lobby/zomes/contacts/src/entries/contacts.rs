@@ -4,9 +4,6 @@ pub mod handlers;
 
 #[derive(Deserialize, Serialize, SerializedBytes)]
 pub struct BooleanWrapper(pub bool);
-
-#[derive(Deserialize, Serialize, SerializedBytes)]
-pub struct AgentIdWrapper(pub AgentPubKey);
 #[derive(Deserialize, Serialize, SerializedBytes, Clone)]
 pub struct UsernameWrapper(pub String);
 
@@ -19,14 +16,15 @@ pub struct BlockedWrapper(pub Vec<AgentPubKey>);
 #[derive(Deserialize, Serialize, Clone, Debug, SerializedBytes)]
 pub struct Profile {
     agent_id: AgentPubKey,
-    username: String,
+    // TODO: bring this field back once 397 issue is fixed.
+    // username: String,
 }
 
 impl Profile {
-    pub fn new(agent_id: AgentPubKey, username: String) -> Self {
+    pub fn new(agent_id: AgentPubKey) -> Self {
         Profile {
             agent_id: agent_id,
-            username,
+            // username,
         }
     }
 }

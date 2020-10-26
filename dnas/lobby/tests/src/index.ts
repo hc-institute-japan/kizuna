@@ -10,9 +10,10 @@ const orchestrator = new Orchestrator();
 const config = Config.gen({
   alice: Config.dna("../kizuna.dna.gz", null),
   bobby: Config.dna("../kizuna.dna.gz", null),
+  clark: Config.dna("../kizuna.dna.gz", null)
 });
 
-// contacts(orchestrator, config);
-request(orchestrator, config);
+contacts(orchestrator, config);
+// request(orchestrator, config);
 
 orchestrator.run();

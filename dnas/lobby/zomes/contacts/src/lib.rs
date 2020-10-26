@@ -1,9 +1,14 @@
 #![allow(unused_imports)]
 #![allow(dead_code)]
 use contacts::{
-    AgentIdWrapper, BlockedWrapper, BooleanWrapper, ContactsInfo, ContactsWrapper, Profile,
+    BlockedWrapper,
+    BooleanWrapper,
+    ContactsInfo,
+    ContactsWrapper,
+    Profile,
     UsernameWrapper,
 };
+use crate::utils::to_timestamp;
 use entries::contacts;
 use hdk3::prelude::{
     // element::ElementEntry,
@@ -16,24 +21,26 @@ mod utils;
 
 entry_defs![ContactsInfo::entry_def()];
 
+// temporarily passing agent_pubkey instead of username because of #397 in holochain/holochain
+// TODO: change back to username once issue is fixed.
 #[hdk_extern]
-fn add_contact(username: UsernameWrapper) -> ExternResult<Profile> {
-    Ok(contacts::handlers::add_contact(username)?)
+fn add_contact(agent_pubkey: AgentPubKey) -> ExternResult<Profile> {
+    Ok(contacts::handlers::add_contact(agent_pubkey)?)
 }
 
 #[hdk_extern]
-fn remove_contact(username: UsernameWrapper) -> ExternResult<Profile> {
-    Ok(contacts::handlers::remove_contact(username)?)
+fn remove_contact(agent_pubkey: AgentPubKey) -> ExternResult<Profile> {
+    Ok(contacts::handlers::remove_contact(agent_pubkey)?)
 }
 
 #[hdk_extern]
-fn block_contact(username: UsernameWrapper) -> ExternResult<Profile> {
-    Ok(contacts::handlers::block_contact(username)?)
+fn block_contact(agent_pubkey: AgentPubKey) -> ExternResult<Profile> {
+    Ok(contacts::handlers::block_contact(agent_pubkey)?)
 }
 
 #[hdk_extern]
-fn unblock_contact(username: UsernameWrapper) -> ExternResult<Profile> {
-    Ok(contacts::handlers::unblock_contact(username)?)
+fn unblock_contact(agent_pubkey: AgentPubKey) -> ExternResult<Profile> {
+    Ok(contacts::handlers::unblock_contact(agent_pubkey)?)
 }
 
 #[hdk_extern]
@@ -47,38 +54,9 @@ fn list_blocked(_: ()) -> ExternResult<BlockedWrapper> {
 }
 
 #[hdk_extern]
-fn in_contacts(agent_id: AgentIdWrapper) -> ExternResult<BooleanWrapper> {
-    Ok(contacts::handlers::in_contacts(agent_id)?)
+fn in_contacts(agent_pubkey: AgentPubKey) -> ExternResult<BooleanWrapper> {
+    Ok(contacts::handlers::in_contacts(agent_pubkey)?)
 }
-
-// #[hdk_extern]
-// fn get_agent_pubkey_from_username(username: UsernameWrapper) -> ExternResult<AgentPubKey> {
-//     Ok(contacts::handlers::get_agent_pubkey_from_username(
-//         username,
-//     )?)
-// }
-
-// #[hdk_extern]
-// fn test_query(_: ()) -> ExternResult<Element> {
-//     let filter = QueryFilter::new();
-//     let with_entry_filter = filter.include_entries(true);
-//     let entry_filter = with_entry_filter.entry_type(EntryType::App(AppEntryType::new(EntryDefIndex::from(0), ZomeId::from(0), EntryVisibility::Private)));
-//     let query_result = query!(entry_filter)?;
-//     let filtered_header: Vec<Element> = query_result.0
-//     .into_iter()
-//     .filter_map(|e| {
-//         let header = e.header();
-//         match header {
-//             Header::Create(_create) => Some(e),
-//             Header::Update(_update) => Some(e),
-//             _ => None,
-//         }
-//     })
-//     .collect();
-//     let element_vec = ElementVec(filtered_header);
-//     debug!("Tatsuya Sato testing query, {:#?}", element_vec)?;
-//     Ok(element_vec.0[0].clone())
-// }
 
 pub fn error<T>(reason: &str) -> ExternResult<T> {
     Err(HdkError::Wasm(WasmError::Zome(String::from(reason))))
