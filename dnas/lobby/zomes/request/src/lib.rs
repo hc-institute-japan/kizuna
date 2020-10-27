@@ -1,40 +1,38 @@
-#![allow(unused_imports)]
-#![allow(dead_code)]
-
 use entries::request;
-use request::{handlers, AgentKey, AgentKeyWrapper, Members, Payload, PayloadWrapper};
-
+use request::{handlers, CapFor, Payload, Claims};
 mod entries;
-
 use hdk3::prelude::*;
 
 #[hdk_extern]
-fn send_request(sender: AgentKeyWrapper) -> ExternResult<Payload> {
-    Ok(handlers::send_request(sender)?)
+fn init(_: ()) -> ExternResult<InitCallbackResult> {
+    Ok(handlers::init(())?)
 }
 
 #[hdk_extern]
-fn accept_request(sender: AgentKeyWrapper) -> ExternResult<Payload> {
-    Ok(handlers::accept_request(sender)?)
+fn accept_cap_claim(claim: CapClaim) -> ExternResult<HeaderHash> {
+    Ok(handlers::accept_cap_claim(claim)?)
 }
 
 #[hdk_extern]
-fn get_agent_key(_: ()) -> ExternResult<AgentKey> {
-    Ok(handlers::get_agent_key(())?)
+fn needs_cap_claim(_: ()) -> ExternResult<Payload> {
+    Ok(Payload {
+        code: "test".to_owned(),
+        message: "working".to_owned()
+    })
 }
 
 #[hdk_extern]
-fn create_cap_grant(_: ()) -> ExternResult<()> {
-    let mut functions = HashSet::new();
-    functions.insert((zome_info!()?.zome_name, "receive_request".into()));
-    functions.insert((zome_info!()?.zome_name, "send_request".into()));
-    functions.insert((zome_info!()?.zome_name, "accept_request".into()));
-
-    debug!("LOG: Creating cap grant")?;
-    create_cap_grant!(CapGrantEntry {
-        tag: "".into(),
-        access: ().into(),
-        functions
-    })?;
-    Ok(())
+fn send_message(cap_for: CapFor) -> ExternResult<Payload> {
+    Ok(handlers::send_message(cap_for)?)
 }
+
+#[hdk_extern]
+fn receive_request(agent: AgentPubKey) -> ExternResult<()> {
+    Ok(handlers::receive_request(agent)?)
+}
+
+#[hdk_extern]
+fn get_cap_claims(_: ()) -> ExternResult<Claims> {
+    Ok(handlers::get_cap_claims(())?)
+}
+

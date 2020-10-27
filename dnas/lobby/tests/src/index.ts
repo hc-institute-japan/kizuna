@@ -1,5 +1,7 @@
 import { Orchestrator } from "@holochain/tryorama";
 import { Config } from "@holochain/tryorama";
+import request from './request'
+import contacts from './contacts'
 
 const orchestrator = new Orchestrator();
 
@@ -10,7 +12,7 @@ const config = Config.gen({
   bobby: Config.dna("../kizuna.dna.gz", null),
 });
 
-require("./kizuna")(orchestrator, config);
-// require('./contacts')(orchestrator, config);
+// contacts(orchestrator, config);
+request(orchestrator, config);
 
 orchestrator.run();

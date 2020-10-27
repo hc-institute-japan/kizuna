@@ -1,115 +1,87 @@
-#![allow(unused_imports)]
-#![allow(dead_code)]
-
-use super::{AgentKey, AgentKeyWrapper, Members, Payload, PayloadWrapper, Request};
+use super::{CapFor, Payload, Claims};
 use hdk3::prelude::*;
-use holochain_zome_types::test_utils::fake_cap_secret;
 
-entry_defs![Payload::entry_def(), Request::entry_def()];
+pub(crate) fn init(_: ()) -> ExternResult<InitCallbackResult> {
+    let mut functions: GrantedFunctions = HashSet::new();
+    functions.insert((zome_info!()?.zome_name, "accept_cap_claim".into()));
 
-pub(crate) fn send_request(sender: AgentKeyWrapper) -> ExternResult<Payload> {
-    debug!("send_request")?;
-    let function_name = zome::FunctionName("receive_request".to_owned());
-    match call_remote!(
-        sender.0.clone(),
-        zome_info!()?.zome_name,
-        function_name,
-        None,
-        PayloadWrapper {
-            sender: AgentKey::new(sender.0.clone()),
-            code: "request_received".to_owned(),
-            members: Members::new(vec![agent_info!()?.agent_latest_pubkey, sender.0.clone()])
-        }
-        .try_into()?
-    )? {
-        ZomeCallResponse::Ok(output) => Ok(output.into_inner().try_into()?),
-        ZomeCallResponse::Unauthorized => Err(HdkError::Wasm(WasmError::Zome(
-            "{\"code\": \"000\", \"message\": \"[Unauthorized] Send Request\"}".to_owned(),
-        ))),
-    }
+    let mut x: GrantedFunctions = HashSet::new();
+    x.insert((zome_info!()?.zome_name, "receive_request".into()));
+
+    create_cap_grant!(CapGrantEntry {
+        tag: "".into(),
+        access: ().into(),
+        functions,
+    })?;
+    create_cap_grant!(CapGrantEntry {
+        tag: "".into(),
+        access: ().into(),
+        functions: x,
+    })?;
+
+    Ok(InitCallbackResult::Pass)
 }
 
-pub(crate) fn accept_request(sender: AgentKeyWrapper) -> ExternResult<Payload> {
+pub(crate) fn accept_cap_claim(claim: CapClaim) -> ExternResult<HeaderHash> {
+    Ok(create_cap_claim!(claim)?)
+}
+
+pub(crate) fn get_cap_claims(_: ()) -> ExternResult<Claims> {
+    let query_result = query!(
+        QueryFilter::new()
+        .entry_type(EntryType::CapClaim)
+        .include_entries(true)
+    )?;
+
+    let result: Vec<CapClaim> = query_result
+        .0
+        .into_iter()
+        .filter_map(|e| 
+            match e.header() {
+                Header::Create(_create) => Some(e.clone().into_inner().1.into_option().unwrap().as_cap_claim().unwrap().to_owned()),
+                _ => None,
+            })
+        .collect();
+
+    Ok(Claims(result))
+}
+
+pub(crate) fn send_message(cap_for: CapFor) -> ExternResult<Payload> {
     match call_remote!(
-        sender.0.clone(),
+        cap_for.agent_pub_key,
         zome_info!()?.zome_name,
-        zome::FunctionName("receive_request".to_owned()),
-        None,
-        PayloadWrapper {
-            sender: AgentKey::new(sender.0.clone()),
-            code: "request_accepted".to_owned(),
-            members: Members::new(vec![agent_info!()?.agent_latest_pubkey, sender.0.clone()])
-        }
-        .try_into()?
+        "needs_cap_claim".to_string().into(),
+        Some(cap_for.cap_secret),
+        ().try_into()?
     )? {
-        ZomeCallResponse::Ok(output) => Ok(output.into_inner().try_into()?),
+        ZomeCallResponse::Ok(payload) => Ok(payload.into_inner().try_into()?),
         ZomeCallResponse::Unauthorized => Err(HdkError::Wasm(WasmError::Zome(
             "{\"code\": \"000\", \"message\": \"[Unauthorized] Accept Request\"}".to_owned(),
-        ))),
+        )))
     }
 }
 
-/**
- * Temporary, to get agent pub key
- */
-pub(crate) fn get_agent_key(_: ()) -> ExternResult<AgentKey> {
-    Ok(AgentKey::new(agent_info!()?.agent_initial_pubkey))
+pub(crate) fn receive_request(agent: AgentPubKey) -> ExternResult<()> {
+    let tag = String::from("has_cap_claim");
+    let secret = generate_cap_secret!()?;
+    let mut functions: GrantedFunctions = HashSet::new();
+    let this_zome = zome_info!()?.zome_name;
+    
+    functions.insert((this_zome.clone(), "needs_cap_claim".into()));
+
+    create_cap_grant!(CapGrantEntry {
+        access: (secret, agent.clone()).into(),
+        functions,
+        tag: tag.clone(),
+    })?;
+
+    call_remote!(
+        agent,
+        this_zome,
+        "accept_cap_claim".into(),
+        None,
+        CapClaim::new(tag, agent_info!()?.agent_latest_pubkey, secret).try_into()?
+    )?;
+
+    Ok(())
 }
-
-#[hdk_extern]
-fn receive_request(payload: PayloadWrapper) -> ExternResult<Payload> {
-    debug!("receive_request")?;
-    match payload.code.as_str() {
-        "request_accepted" => {
-            /*
-                hdk:call to contacts function
-            */
-
-            Ok(Payload {
-                sender: payload.sender.agent_key,
-                code: "request_accepted".to_owned(),
-                members: payload.members,
-            })
-        }
-        "request_received" => {
-            /*
-                Do emit signal here
-            */
-            let agent_key = payload.sender.clone();
-
-            /*
-               Temporary auto-accept implemetation for testing purposes
-            */
-            match call_remote!(
-                agent_key.agent_key,
-                zome_info!()?.zome_name,
-                zome::FunctionName("request_accepted".to_owned()),
-                None,
-                PayloadWrapper {
-                    code: "request_accepted".to_owned(),
-                    sender: payload.sender.clone(),
-                    members: payload.members
-                }
-                .try_into()?
-            )? {
-                ZomeCallResponse::Ok(output) => Ok(output.into_inner().try_into()?),
-                ZomeCallResponse::Unauthorized => Err(HdkError::Wasm(WasmError::Zome(
-                    "{\"code\": \"000\", \"message\": \"[Unauthorized] receive_request\"}"
-                        .to_owned(),
-                ))),
-            }
-            // Ok(Payload {
-            //     code: "request_received".to_owned(),
-            //     sender: payload.sender.agent_key,
-            //     members: Members::new(vec![]),
-            // })
-        }
-        _ => Ok(Payload {
-            code: "request_denied".to_owned(),
-            sender: payload.sender.agent_key,
-            members: Members::new(vec![]),
-        }),
-    }
-}
-
-// Some(fake_cap_secret())
