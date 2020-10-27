@@ -51,12 +51,12 @@ fn in_contacts(agent_id: AgentIdWrapper) -> ExternResult<BooleanWrapper> {
     Ok(contacts::handlers::in_contacts(agent_id)?)
 }
 
-#[hdk_extern]
-fn get_agent_pubkey_from_username(username: UsernameWrapper) -> ExternResult<AgentPubKey> {
-    Ok(contacts::handlers::get_agent_pubkey_from_username(
-        username,
-    )?)
-}
+// #[hdk_extern]
+// fn get_agent_pubkey_from_username(username: UsernameWrapper) -> ExternResult<AgentPubKey> {
+//     Ok(contacts::handlers::get_agent_pubkey_from_username(
+//         username,
+//     )?)
+// }
 
 // #[hdk_extern]
 // fn test_query(_: ()) -> ExternResult<Element> {

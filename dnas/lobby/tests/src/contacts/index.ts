@@ -37,7 +37,7 @@ function setUsername(username) {
   return (conductor, caller) => conductor.call(caller, "profiles", "create_profile", { username: username });
 }
 
-module.exports = (orchestrator, config) => {
+export default (orchestrator, config) => {
   orchestrator.registerScenario("add a contact", async (s, t) => {
     const { conductor } = await s.players({ conductor: config });
     await conductor.spawn();

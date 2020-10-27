@@ -22,17 +22,16 @@ pub struct Profile {
     username: String,
 }
 
-
 impl Profile {
-    pub fn new (agent_id: AgentPubKey, username: String) -> Self {
+    pub fn new(agent_id: AgentPubKey, username: String) -> Self {
         Profile {
             agent_id: agent_id,
-            username
+            username,
         }
     }
 }
 
-#[hdk_entry(id="contacts", visibility="private")]
+#[hdk_entry(id = "contacts", visibility = "private")]
 #[derive(Clone, Debug)]
 pub struct ContactsInfo {
     agent_id: AgentPubKey,
@@ -53,7 +52,11 @@ impl ContactsInfo {
     }
 
     // change this once get agent pubkey from username is working.
-    pub fn from(timestamp: Timestamp, contacts: Vec<AgentPubKey>, blocked: Vec<AgentPubKey>) -> Result<Self, SerializedBytesError> {
+    pub fn from(
+        timestamp: Timestamp,
+        contacts: Vec<AgentPubKey>,
+        blocked: Vec<AgentPubKey>,
+    ) -> Result<Self, SerializedBytesError> {
         let agent_info = agent_info!()?;
         Ok(ContactsInfo {
             agent_id: agent_info.agent_latest_pubkey,
@@ -63,4 +66,3 @@ impl ContactsInfo {
         })
     }
 }
-
