@@ -6,8 +6,8 @@
     "request": {
       "wasm_path": "../target/wasm32-unknown-unknown/release/request.wasm"
     },
-    "profiles": {
-      "wasm_path": "../target/wasm32-unknown-unknown/release/profiles.wasm"
+    "username": {
+      "wasm_path": "../target/wasm32-unknown-unknown/release/username.wasm"
     },
     "contacts": {
       "wasm_path": "../target/wasm32-unknown-unknown/release/contacts.wasm"
