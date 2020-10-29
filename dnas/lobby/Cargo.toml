@@ -2,7 +2,8 @@
 members = [
     "zomes/request",
     "zomes/contacts",
-    "zomes/username"
+    "zomes/username",
+    "zomes/p2pmessage"
 ]
 
 [profile.dev]

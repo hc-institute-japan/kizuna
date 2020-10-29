@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "TRYORAMA_LOG_LEVEL=info RUST_LOG=debug RUST_BACKTRACE=1 TRYORAMA_HOLOCHAIN_PATH=\"holochain\" ts-node src/index.ts",
+    "test": "TRYORAMA_LOG_LEVEL=info RUST_LOG=error RUST_BACKTRACE=1 TRYORAMA_HOLOCHAIN_PATH=\"holochain\" ts-node src/index.ts",
     "split": "TRYORAMA_LOG_LEVEL=info RUST_LOG=debug RUST_BACKTRACE=1 TRYORAMA_HOLOCHAIN_PATH=\"holochain\"",
     "build": "concurrently \"cd .. && cargo build --release --target wasm32-unknown-unknown\" \"cd .. && dna-util -c ./kizuna.dna.workdir\""
   },
@@ -18,7 +18,7 @@
     "typescript": "^3.9.6"
   },
   "devDependencies": {
-    "@holochain/tryorama": "git://github.com/holochain/tryorama#rsm",
+    "@holochain/tryorama": "guillemcordoba/tryorama#rsm",
     "@types/lodash": "^4.14.158",
     "@types/node": "^14.0.14"
   }

@@ -4,15 +4,20 @@ version: 2.1
 jobs:
   build-and-test:
     docker:
-      - image: guillemcordoba/rsm
+      - image: guillemcordoba/rsm:latest
     steps:
       - checkout
+      - run:
+          name: "pull-submodules"
+          command: |
+            git submodule init
+            git submodule update --remote
       - run:
           name: build-holochain
           working_directory: ~/project/dnas/lobby
           command: | 
             CARGO_TARGET_DIR=target cargo build --release --target wasm32-unknown-unknown
-            dna-util -c testlab.dna.workdir/
+            dna-util -c kizuna.dna.workdir/
       - run:
           name: test-holochain
           working_directory: ~/project/dnas/lobby/tests

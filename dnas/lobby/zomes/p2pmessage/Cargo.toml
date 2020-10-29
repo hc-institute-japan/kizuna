@@ -1,2 +1,15 @@
+[package]
+name = "p2pmessage"
+version = "0.0.1"
+authors = [ "hcij" ]
+edition = "2018"
+
+[lib]
+name = "p2pmessage"
+crate-type = [ "cdylib", "rlib" ]
+
 [dependencies]
-p2pmessage = {git = "https://github.com/hc-institute-japan/p2pmessage-zome", package = "p2pmessage"}
+serde = "=1.0.104"
+hdk3 = { git = "https://github.com/holochain/holochain.git", branch = "develop" }
+p2pmessage = {git = "https://github.com/hc-institute-japan/p2pmessage-zome", branch="main", package = "p2pmessage"}
+derive_more = "0.99.9"
