@@ -77,6 +77,9 @@ pub(crate) fn send_request_to_chat(agent: AgentPubKey) -> ExternResult<HeaderHas
 pub(crate) fn receive_request_to_chat(claim_from: ClaimFrom) -> ExternResult<CapClaim> {
     // commit the claim received from sender
     create_cap_claim!(claim_from.0)?;    
+    // TATS: possible solutions I haven't tried yet.
+    // 1. try the new call host_fn.
+    // 2. (this should only be a temporary solution): move the in_contacts function here in request zome.
     let in_contacts = match call_remote!(
         agent_info!()?.agent_latest_pubkey,
         "contacts".into(),
@@ -111,6 +114,5 @@ fn create_cap_grant_and_return_claim(agent: AgentPubKey) -> ExternResult<CapClai
         tag: tag.clone(),
     })?;
 
-    // TOOD: must let the sender also create capclaim for the receiver to be able to send back message
     Ok(CapClaim::new(tag, agent_info!()?.agent_latest_pubkey, secret))
 }
