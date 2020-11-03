@@ -3,7 +3,8 @@ use entries::request;
 use request::{
     handlers, 
     CapFor, 
-    Payload, 
+    Payload,
+    ClaimFrom, 
     Claims
 };
 use hdk3::prelude::*;
@@ -27,8 +28,8 @@ fn send_request_to_chat(agent: AgentPubKey) -> ExternResult<HeaderHash> {
 }
 
 #[hdk_extern]
-fn receive_request_to_chat(agent: AgentPubKey) -> ExternResult<CapClaim> {
-    Ok(handlers::receive_request_to_chat(agent)?)
+fn receive_request_to_chat(claim_from: ClaimFrom) -> ExternResult<CapClaim> {
+    Ok(handlers::receive_request_to_chat(claim_from)?)
 }
 
 #[hdk_extern]
@@ -39,4 +40,8 @@ fn get_cap_claims(_: ()) -> ExternResult<Claims> {
 #[hdk_extern]
 fn try_cap_claim(cap_for: CapFor) -> ExternResult<Payload> {
     Ok(handlers::try_cap_claim(cap_for)?)
+}
+
+pub fn error<T>(reason: &str) -> ExternResult<T> {
+    Err(HdkError::Wasm(WasmError::Zome(String::from(reason))))
 }

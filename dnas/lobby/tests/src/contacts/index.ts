@@ -1,45 +1,16 @@
+import {
+  addContacts,
+  removeContacts,
+  blockContact,
+  unblockContact,
+  listContacts,
+  listBlocked,
+  inContacts,
+  setUsername,
+  getAgentPubkeyFromUsername
+} from '../functions';
+
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
-
-function addContacts(username) {
-    return (conductor, caller) =>
-      conductor.call(caller, "contacts", "add_contact", username);
-};
-  
-function removeContacts(username) {
-  return (conductor, caller) =>
-  conductor.call(caller, "contacts", "remove_contact", username);
-};
-
-function blockContact(username) {
-  return (conductor, caller) =>
-  conductor.call(caller, "contacts", "block_contact", username);
-};
-
-  
-function unblockContact(username) {
-  return (conductor, caller) =>
-  conductor.call(caller, "contacts", "unblock_contact", username);
-};
-
-function listContacts() {
-  return (conductor, caller) => conductor.call(caller, "contacts", "list_contacts", null);
-};
-
-function listBlocked() {
-  return (conductor, caller) => conductor.call(caller, "contacts", "list_blocked", null);
-};
-
-function inContacts(username) {
-  return (conductor, caller) => conductor.call(caller, "contacts", "in_contacts", username)
-};
-  
-function setUsername(username) {
-  return (conductor, caller) => conductor.call(caller, "username", "set_username", username);
-}
-
-function getAgentPubkeyFromUsername(username) {
-  return (conductor, caller) => conductor.call(caller, "username", "get_agent_pubkey_from_username", username)
-}
 
 export default (orchestrator, config) => {
   orchestrator.registerScenario("add a contact", async (s, t) => {
@@ -342,15 +313,9 @@ export default (orchestrator, config) => {
 
   //   const [dna_hash, agent_address] = conductor.cellId('alice');
 
-  //   const set_username_alice_result_1 = await setUsername("alice")(conductor, "alice");
-  //   await delay(1000);
-
-  //   const get_pubkey = await conductor.call("alice", "contacts", "get_agent_pubkey_from_username", "alice");
-  //   console.log("tatsuya1");
+  //   const set_username_alice_result_1 = await conductor.call("alice", "contacts", "get_zome_id", null)
+  //   console.log("this is the zome_id");
   //   console.log(set_username_alice_result_1);
-  //   console.log(agent_address);
-  //   console.log(get_pubkey);
-  //   t.deepEqual(agent_address, get_pubkey);
   // });
 };
   

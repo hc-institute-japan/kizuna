@@ -1,4 +1,4 @@
-use super::{CapFor, Payload, Claims};
+use super::{CapFor, Payload, Claims, BooleanWrapper, ClaimFrom};
 use hdk3::prelude::*;
 
 pub(crate) fn init(_: ()) -> ExternResult<InitCallbackResult> {
@@ -26,6 +26,7 @@ pub(crate) fn get_cap_claims(_: ()) -> ExternResult<Claims> {
         .into_iter()
         .filter_map(|e| 
             match e.header() {
+                // avoid using unwrap.
                 Header::Create(_create) => Some(e.clone().into_inner().1.into_option().unwrap().as_cap_claim().unwrap().to_owned()),
                 // TODO: handle updated and deleted CapClaims when the need arises.
                 _ => None,
@@ -51,12 +52,16 @@ pub(crate) fn try_cap_claim(cap_for: CapFor) -> ExternResult<Payload> {
 }
 
 pub(crate) fn send_request_to_chat(agent: AgentPubKey) -> ExternResult<HeaderHash> {
+    // create a grant and claim to receive message from the receiver
+    let cap_claim = create_cap_grant_and_return_claim(agent.clone())?;
+    let my_key = agent_info!()?.agent_latest_pubkey;
+    let claim_from = ClaimFrom(cap_claim, my_key);
     match call_remote!(
         agent.clone(),
         zome_info!()?.zome_name,
         "receive_request_to_chat".to_string().into(),
         None,
-        agent_info!()?.agent_latest_pubkey.try_into()?
+        claim_from.try_into()?
     )? {
         ZomeCallResponse::Ok(payload) => {
             let claim: CapClaim = payload.into_inner().try_into()?;
@@ -68,16 +73,37 @@ pub(crate) fn send_request_to_chat(agent: AgentPubKey) -> ExternResult<HeaderHas
     }
 }
 
-pub(crate) fn receive_request_to_chat(agent: AgentPubKey) -> ExternResult<CapClaim> {
-    // TODO: check if the sender is in contacts.
 
-    // tag can be improved probably
-    let tag = String::from("has_cap_claim");
+pub(crate) fn receive_request_to_chat(claim_from: ClaimFrom) -> ExternResult<CapClaim> {
+    // commit the claim received from sender
+    create_cap_claim!(claim_from.0)?;    
+    let in_contacts = match call_remote!(
+        agent_info!()?.agent_latest_pubkey,
+        "contacts".into(),
+        "in_contacts".into(),
+        None,
+        claim_from.1.clone().try_into()?
+    )? {
+        ZomeCallResponse::Ok(output) => {
+            let bool_wrapper: BooleanWrapper = output.into_inner().try_into()?;
+            Ok(bool_wrapper)
+        },
+        ZomeCallResponse::Unauthorized => crate::error("unauthorized access")
+    };
+    if let true = in_contacts?.0 {
+        Ok(create_cap_grant_and_return_claim(claim_from.1)?)
+    } else {
+        // currently blocks any attempt to message if not in conctacts.
+        crate::error("agent is not in the contacts")
+    }
+}
+
+fn create_cap_grant_and_return_claim(agent: AgentPubKey) -> ExternResult<CapClaim> {
+    let tag = String::from("receive_message");
     let secret = generate_cap_secret!()?;
-    let this_zome = zome_info!()?.zome_name;
     
     let mut functions: GrantedFunctions = HashSet::new();
-    functions.insert((this_zome.clone(), "needs_cap_claim".into()));
+    functions.insert(("request".into(), "needs_cap_claim".into()));
 
     create_cap_grant!(CapGrantEntry {
         access: (secret, agent.clone()).into(),

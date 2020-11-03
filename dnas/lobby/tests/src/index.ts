@@ -13,7 +13,7 @@ const config = Config.gen({
   clark: Config.dna("../kizuna.dna.gz", null)
 });
 
-contacts(orchestrator, config);
-// request(orchestrator, config);
+// contacts(orchestrator, config);
+request(orchestrator, config);
 
 orchestrator.run();
