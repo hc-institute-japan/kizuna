@@ -10,6 +10,6 @@ crate-type = [ "cdylib", "rlib" ]
 
 [dependencies]
 serde = "=1.0.104"
-hdk3 = { git = "https://github.com/holochain/holochain.git", branch = "develop" }
-p2pmessage = {git = "https://github.com/hc-institute-japan/p2pmessage-zome", branch="main", package = "p2pmessage"}
+hdk3 = { git = "https://github.com/holochain/holochain.git", branch = "call" }
+p2pmessage = {git = "https://github.com/hc-institute-japan/p2pmessage-zome", branch="access-by-request-zome", package = "p2pmessage"}
 derive_more = "0.99.9"

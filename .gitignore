@@ -2,4 +2,6 @@
 #
 .DS_Store
 target/
-
+.cargo/
+.dnas/lobby/target/
+.dnas/lobby/tests/node_modules/

@@ -4,16 +4,16 @@
   "properties": null,
   "zomes": {
     "request": {
-      "wasm_path": "../target/wasm32-unknown-unknown/release/request.wasm"
+      "wasm_path": "../../../../holochain/target/wasm32-unknown-unknown/release/request.wasm"
     },
     "username": {
-      "wasm_path": "../target/wasm32-unknown-unknown/release/username.wasm"
+      "wasm_path": "../../../../holochain/target/wasm32-unknown-unknown/release/username.wasm"
     },
     "contacts": {
-      "wasm_path": "../target/wasm32-unknown-unknown/release/contacts.wasm"
+      "wasm_path": "../../../../holochain/target/wasm32-unknown-unknown/release/contacts.wasm"
     },
     "p2pmessage": {
-      "wasm_path": "../target/wasm32-unknown-unknown/release/p2pmessage.wasm"
+      "wasm_path": "../../../../holochain/target/wasm32-unknown-unknown/release/p2pmessage.wasm"
     }
   }
 }
