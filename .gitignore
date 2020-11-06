@@ -5,3 +5,5 @@ target/
 .cargo/
 .dnas/lobby/target/
 .dnas/lobby/tests/node_modules/
+.wasm_target/
+.wasm_cache/

@@ -6,6 +6,7 @@ use super::{
 };
 use hdk3::prelude::*;
 use hdk3::host_fn::call::call;
+use hex;
 
 pub(crate) fn init(_: ()) -> ExternResult<InitCallbackResult> {
     let mut functions: GrantedFunctions = HashSet::new();
@@ -113,17 +114,25 @@ pub(crate) fn receive_request_to_chat(claim_from: ClaimFrom) -> ExternResult<Cap
 }
 
 fn create_cap_grant_and_return_claim(agent: AgentPubKey) -> ExternResult<CapClaim> {
-    let tag = String::from(format!("receive_message_{:?}", agent.to_string()));
-    let secret = generate_cap_secret!()?;
-    
+
+    debug!(format!("the agentpubkey is {:?}", hex::encode(agent.get_core_bytes())))?;
+
     let mut functions: GrantedFunctions = HashSet::new();
     functions.insert(("p2pmessage".into(), "receive_message".into()));
+    let secret = generate_cap_secret!()?;
 
     create_cap_grant!(CapGrantEntry {
         access: (secret, agent.clone()).into(),
         functions,
-        tag: tag.clone(),
+        tag: String::from(format!(
+            "grant_to_receive_message_from_{}", 
+            hex::encode(agent.get_core_bytes())
+        )),
     })?;
 
+    let tag = String::from(format!(
+        "claim_to_send_message_to_{}", 
+        hex::encode(agent_info!()?.agent_latest_pubkey.get_core_bytes())
+    ));
     Ok(CapClaim::new(tag, agent_info!()?.agent_latest_pubkey, secret))
 }
