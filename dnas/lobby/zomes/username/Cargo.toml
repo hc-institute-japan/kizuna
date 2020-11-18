@@ -1,14 +1,15 @@
 [package]
-name = "contacts"
+name = "username"
 version = "0.0.1"
 authors = [ "hcij" ]
 edition = "2018"
 
 [lib]
-name = "contacts"
+name = "username"
 crate-type = [ "cdylib", "rlib" ]
 
 [dependencies]
-serde = "=1.0.104"
+derive_more = "0"
+serde = "1"
 hdk3 = { git = "https://github.com/holochain/holochain.git", branch = "develop" }
-derive_more = "0.99.9"
+username = {git = "https://github.com/holochain-open-dev/username-zome", package = "username"}

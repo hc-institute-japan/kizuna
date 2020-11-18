@@ -4,9 +4,6 @@ pub mod handlers;
 
 #[derive(Deserialize, Serialize, SerializedBytes)]
 pub struct BooleanWrapper(pub bool);
-
-#[derive(Deserialize, Serialize, SerializedBytes)]
-pub struct AgentIdWrapper(pub AgentPubKey);
 #[derive(Deserialize, Serialize, SerializedBytes, Clone)]
 pub struct UsernameWrapper(pub String);
 
@@ -19,20 +16,20 @@ pub struct BlockedWrapper(pub Vec<AgentPubKey>);
 #[derive(Deserialize, Serialize, Clone, Debug, SerializedBytes)]
 pub struct Profile {
     agent_id: AgentPubKey,
-    username: String,
+    // TODO: bring this field back once 397 issue is fixed.
+    // username: String,
 }
 
-
 impl Profile {
-    pub fn new (agent_id: AgentPubKey, username: String) -> Self {
+    pub fn new(agent_id: AgentPubKey) -> Self {
         Profile {
             agent_id: agent_id,
-            username
+            // username,
         }
     }
 }
 
-#[hdk_entry(id="contacts", visibility="private")]
+#[hdk_entry(id = "contacts", visibility = "private")]
 #[derive(Clone, Debug)]
 pub struct ContactsInfo {
     agent_id: AgentPubKey,
@@ -53,7 +50,11 @@ impl ContactsInfo {
     }
 
     // change this once get agent pubkey from username is working.
-    pub fn from(timestamp: Timestamp, contacts: Vec<AgentPubKey>, blocked: Vec<AgentPubKey>) -> Result<Self, SerializedBytesError> {
+    pub fn from(
+        timestamp: Timestamp,
+        contacts: Vec<AgentPubKey>,
+        blocked: Vec<AgentPubKey>,
+    ) -> Result<Self, SerializedBytesError> {
         let agent_info = agent_info!()?;
         Ok(ContactsInfo {
             agent_id: agent_info.agent_latest_pubkey,
@@ -63,4 +64,3 @@ impl ContactsInfo {
         })
     }
 }
-

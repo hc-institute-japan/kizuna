@@ -1,3 +1,0 @@
-[submodule "dnas/lobby/zomes/username"]
-	path = dnas/lobby/zomes/username
-	url = https://github.com/holochain-open-dev/username-zome
