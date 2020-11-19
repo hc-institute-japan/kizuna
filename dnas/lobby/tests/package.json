@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@holochain/conductor-api": "git+https://github.com/holochain/holochain-conductor-api.git",
     "concurrently": "^5.3.0",
     "lodash": "^4.17.19",
     "tape": "^5.0.1",

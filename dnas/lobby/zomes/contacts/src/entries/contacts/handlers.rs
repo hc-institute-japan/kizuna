@@ -13,12 +13,13 @@ use hdk3::prelude::*;
 
 // GENERAL: Probably better to commit the ContactsInfo entry at init callback.
 
-pub(crate) fn add_contact(agent_pubkey: AgentPubKey) -> ExternResult<Profile> {
-    // let contact_agent_pubkey = get_agent_pubkey_from_username(username.clone())?;
+pub(crate) fn add_contact(username: UsernameWrapper) -> ExternResult<Profile> {
+    let agent_pubkey = get_agent_pubkey_from_username(username.clone())?;
 
     let maybe_contacts_info_elements_components = query_contact_info_elements()?;
-    let added_profile = Profile::new(agent_pubkey.clone());
+    let added_profile = Profile::new(agent_pubkey.clone(), username.0);
     match maybe_contacts_info_elements_components {
+        // ContactsInfo already existing
         Some(contacts_info_elements_components) => {
             let mut contacts_info = contacts_info_elements_components.1;
             let signed_header_hash = contacts_info_elements_components.0.into_inner();
@@ -30,13 +31,13 @@ pub(crate) fn add_contact(agent_pubkey: AgentPubKey) -> ExternResult<Profile> {
             {
                 contacts_info.contacts.push(agent_pubkey);
                 update_entry!(signed_header_hash.1, contacts_info.clone())?;
-                // debug!("Tatsuya Sato here. {:#?}", contacts_info)?;
                 Ok(added_profile)
             } else {
                 Ok(added_profile)
             }
         }
         _ => {
+            // ContactsInfo not yet existing
             let mut new_contacts = ContactsInfo::new(to_timestamp(sys_time!()?))?;
             new_contacts.contacts.push(agent_pubkey);
             create_entry!(new_contacts.clone())?;
@@ -45,10 +46,11 @@ pub(crate) fn add_contact(agent_pubkey: AgentPubKey) -> ExternResult<Profile> {
     }
 }
 
-pub(crate) fn remove_contact(agent_pubkey: AgentPubKey) -> ExternResult<Profile> {
-    // let contact_agent_pubkey = get_agent_pubkey_from_username(username.clone())?;
+pub(crate) fn remove_contact(username: UsernameWrapper) -> ExternResult<Profile> {
+    let agent_pubkey = get_agent_pubkey_from_username(username.clone())?;
 
     let maybe_contacts_info_elements_components = query_contact_info_elements()?;
+    let removed_profile = Profile::new(agent_pubkey.clone(), username.0);
 
     match maybe_contacts_info_elements_components {
         Some(contacts_info_elements_components) => {
@@ -65,33 +67,26 @@ pub(crate) fn remove_contact(agent_pubkey: AgentPubKey) -> ExternResult<Profile>
                     .contacts
                     .retain(|v| v != &agent_pubkey);
                 update_entry!(signed_header_hash.1, contacts_info.clone())?;
-                // debug!("Tatsuya Sato here. {:#?}", contacts_info)?;
-                let removed_profile = Profile::new(agent_pubkey);
                 Ok(removed_profile)
-            } else {
-                return crate::error(
-                    "{\"code\": \"404\", \"message\": \"This address wasn't found in contacts\"}",
-                );
-            }
+            } else { return Ok(removed_profile) }
         }
         _ => {
-            // TODO: commit empty ContactsInfo at init to avoid this error
-            crate::error("{\"code\": \"404\", \"message\": \"This agent has no contacts yet\"}")
+            let new_contacts = ContactsInfo::new(to_timestamp(sys_time!()?))?;
+            create_entry!(new_contacts.clone())?;
+            Ok(removed_profile)
         }
     }
 }
 
-pub(crate) fn block_contact(agent_pubkey: AgentPubKey) -> ExternResult<Profile> {
-    // let contact_agent_pubkey = get_agent_pubkey_from_username(username.clone())?;
+pub(crate) fn block_contact(username: UsernameWrapper) -> ExternResult<Profile> {
+    let agent_pubkey = get_agent_pubkey_from_username(username.clone())?;
 
     let my_agent_pubkey = agent_info!()?.agent_latest_pubkey;
-    if my_agent_pubkey == agent_pubkey {
-        return crate::error("{\"code\": \"302\", \"message\": \"Cannot block own agent pubkey\"}");
-    }
+    if my_agent_pubkey == agent_pubkey { return Ok(Profile::default()) }
 
     let maybe_contacts_info_elements_components = query_contact_info_elements()?;
-    let blocked_profile = Profile::new(agent_pubkey.clone());
-
+    let blocked_profile = Profile::new(agent_pubkey.clone(), username.0);
+    debug!("Tatsuya Sato here. {:#?}", blocked_profile)?;
     match maybe_contacts_info_elements_components {
         Some(contacts_info_elements_components) => {
             let mut contacts_info = contacts_info_elements_components.1;
@@ -117,11 +112,8 @@ pub(crate) fn block_contact(agent_pubkey: AgentPubKey) -> ExternResult<Profile> 
                 }
 
                 update_entry!(signed_header_hash.1, contacts_info.clone())?;
-                // debug!("Tatsuya Sato here. {:#?}", contacts_info)?;
                 Ok(blocked_profile)
-            } else {
-                Ok(blocked_profile)
-            }
+            } else { Ok(blocked_profile) }
         }
         _ => {
             let mut new_contacts = ContactsInfo::new(to_timestamp(sys_time!()?))?;
@@ -132,11 +124,11 @@ pub(crate) fn block_contact(agent_pubkey: AgentPubKey) -> ExternResult<Profile> 
     }
 }
 
-pub(crate) fn unblock_contact(agent_pubkey: AgentPubKey) -> ExternResult<Profile> {
-    // let contact_agent_pubkey = get_agent_pubkey_from_username(username.clone())?;
+pub(crate) fn unblock_contact(username: UsernameWrapper) -> ExternResult<Profile> {
+    let agent_pubkey = get_agent_pubkey_from_username(username.clone())?;
 
     let maybe_contacts_info_elements_components = query_contact_info_elements()?;
-
+    let unblocked_profile = Profile::new(agent_pubkey.clone(), username.0);
     match maybe_contacts_info_elements_components {
         Some(contacts_info_elements_components) => {
             let mut contacts_info = contacts_info_elements_components.1;
@@ -150,16 +142,15 @@ pub(crate) fn unblock_contact(agent_pubkey: AgentPubKey) -> ExternResult<Profile
             {
                 contacts_info.blocked.retain(|v| v != &agent_pubkey);
                 update_entry!(signed_header_hash.1, contacts_info.clone())?;
-                // debug!("Tatsuya Sato here. {:#?}", contacts_info)?;
-                let unblocked_profile = Profile::new(agent_pubkey);
                 Ok(unblocked_profile)
             } else {
-                return crate::error("{\"code\": \"404\", \"message\": \"The contact is not in the list of blocked contacts\"}");
+                return Ok(unblocked_profile)
             }
         }
         _ => {
-            // is it better to commit and return an empty ContactsInfo?
-            crate::error("{\"code\": \"404\", \"message\": \"This agent has no contacts yet\"}")
+            let new_contacts = ContactsInfo::new(to_timestamp(sys_time!()?))?;
+            create_entry!(new_contacts.clone())?;
+            Ok(unblocked_profile)
         }
     }
 }
@@ -263,26 +254,17 @@ fn query_contact_info_elements() -> ExternResult<Option<(element::SignedHeaderHa
 }
 
 
-// pub(crate) fn get_agent_pubkey_from_username(
-//     username: UsernameWrapper,
-// ) -> ExternResult<AgentPubKey> {
-//     let my_agent_pubkey = agent_info!()?.agent_latest_pubkey;
-//     let function_name = zome::FunctionName("get_agent_pubkey_from_username".to_owned());
-//     let payload: SerializedBytes = username.try_into()?;
-//     match call_remote!(
-//         my_agent_pubkey,
-//         "usernames".into(),
-//         function_name,
-//         None,
-//         payload
-//     )? {
-//         ZomeCallResponse::Ok(output) => {
-//             let sb = output.into_inner();
-//             let maybe_agent_pubkey: AgentPubKey = sb.try_into()?;
-//             Ok(maybe_agent_pubkey)
-//         }
-//         ZomeCallResponse::Unauthorized => crate::error(
-//             "{\"code\": \"401\", \"message\": \"This agent has no proper authorization\"}",
-//         ),
-//     }
-// }
+pub(crate) fn get_agent_pubkey_from_username(
+    username: UsernameWrapper,
+) -> ExternResult<AgentPubKey> {
+    let function_name = zome::FunctionName("get_agent_pubkey_from_username".to_owned());
+    // needs to handle error from get_agent_pubkey_from_username in UI
+    let agent_pubkey = hdk3::prelude::call(
+        None,
+        "username".into(),
+        function_name,
+        None,
+        username
+    )?;
+    Ok(agent_pubkey)
+}
