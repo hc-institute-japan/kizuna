@@ -59,8 +59,8 @@ fn in_contacts(agent_pubkey: AgentPubKey) -> ExternResult<BooleanWrapper> {
 }
 
 #[hdk_extern]
-fn get_key(username: UsernameWrapper) -> ExternResult<AgentPubKey> {
-    Ok(contacts::handlers::get_agent_pubkey_from_username(username)?)
+fn in_blocked(agent_pubkey: AgentPubKey) -> ExternResult<BooleanWrapper> {
+    Ok(contacts::handlers::in_blocked(agent_pubkey)?)
 }
 
 pub fn error<T>(reason: &str) -> ExternResult<T> {

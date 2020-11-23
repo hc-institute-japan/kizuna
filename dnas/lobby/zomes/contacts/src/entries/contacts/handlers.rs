@@ -11,8 +11,6 @@ use super::{
 use crate::utils::to_timestamp;
 use hdk3::prelude::*;
 
-// GENERAL: Probably better to commit the ContactsInfo entry at init callback.
-
 pub(crate) fn add_contact(username: UsernameWrapper) -> ExternResult<Profile> {
     let agent_pubkey = get_agent_pubkey_from_username(username.clone())?;
 
@@ -195,6 +193,19 @@ pub(crate) fn in_contacts(agent_pubkey: AgentPubKey) -> ExternResult<BooleanWrap
         Ok(BooleanWrapper(false))
     } else {
         if contacts_list.iter().any(|pubkey| pubkey == &agent_pubkey) {
+            Ok(BooleanWrapper(true))
+        } else {
+            Ok(BooleanWrapper(false))
+        }
+    }
+}
+
+pub(crate) fn in_blocked(agent_pubkey: AgentPubKey) -> ExternResult<BooleanWrapper> {
+    let blocked_list = list_blocked()?.0;
+    if blocked_list.len() == 0 {
+        Ok(BooleanWrapper(false))
+    } else {
+        if blocked_list.iter().any(|pubkey| pubkey == &agent_pubkey) {
             Ok(BooleanWrapper(true))
         } else {
             Ok(BooleanWrapper(false))
