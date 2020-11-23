@@ -13,18 +13,17 @@ pub struct ContactsWrapper(pub Vec<AgentPubKey>);
 #[derive(Deserialize, Serialize, SerializedBytes)]
 pub struct BlockedWrapper(pub Vec<AgentPubKey>);
 
-#[derive(Deserialize, Serialize, Clone, Debug, SerializedBytes)]
+#[derive(Deserialize, Serialize, Clone, Debug, SerializedBytes, Default)]
 pub struct Profile {
-    agent_id: AgentPubKey,
-    // TODO: bring this field back once 397 issue is fixed.
-    // username: String,
+    agent_id: Option<AgentPubKey>,
+    username: Option<String>,
 }
 
 impl Profile {
-    pub fn new(agent_id: AgentPubKey) -> Self {
+    pub fn new(agent_id: AgentPubKey, username: String) -> Self {
         Profile {
-            agent_id: agent_id,
-            // username,
+            agent_id: Some(agent_id),
+            username: Some(username),
         }
     }
 }
@@ -49,7 +48,6 @@ impl ContactsInfo {
         })
     }
 
-    // change this once get agent pubkey from username is working.
     pub fn from(
         timestamp: Timestamp,
         contacts: Vec<AgentPubKey>,
