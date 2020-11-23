@@ -24,23 +24,23 @@ entry_defs![ContactsInfo::entry_def()];
 // temporarily passing agent_pubkey instead of username because of #397 in holochain/holochain
 // TODO: change back to username once issue is fixed.
 #[hdk_extern]
-fn add_contact(agent_pubkey: AgentPubKey) -> ExternResult<Profile> {
-    Ok(contacts::handlers::add_contact(agent_pubkey)?)
+fn add_contact(username: UsernameWrapper) -> ExternResult<Profile> {
+    Ok(contacts::handlers::add_contact(username)?)
 }
 
 #[hdk_extern]
-fn remove_contact(agent_pubkey: AgentPubKey) -> ExternResult<Profile> {
-    Ok(contacts::handlers::remove_contact(agent_pubkey)?)
+fn remove_contact(username: UsernameWrapper) -> ExternResult<Profile> {
+    Ok(contacts::handlers::remove_contact(username)?)
 }
 
 #[hdk_extern]
-fn block_contact(agent_pubkey: AgentPubKey) -> ExternResult<Profile> {
-    Ok(contacts::handlers::block_contact(agent_pubkey)?)
+fn block_contact(username: UsernameWrapper) -> ExternResult<Profile> {
+    Ok(contacts::handlers::block_contact(username)?)
 }
 
 #[hdk_extern]
-fn unblock_contact(agent_pubkey: AgentPubKey) -> ExternResult<Profile> {
-    Ok(contacts::handlers::unblock_contact(agent_pubkey)?)
+fn unblock_contact(username: UsernameWrapper) -> ExternResult<Profile> {
+    Ok(contacts::handlers::unblock_contact(username)?)
 }
 
 #[hdk_extern]
@@ -56,6 +56,11 @@ fn list_blocked(_: ()) -> ExternResult<BlockedWrapper> {
 #[hdk_extern]
 fn in_contacts(agent_pubkey: AgentPubKey) -> ExternResult<BooleanWrapper> {
     Ok(contacts::handlers::in_contacts(agent_pubkey)?)
+}
+
+#[hdk_extern]
+fn in_blocked(agent_pubkey: AgentPubKey) -> ExternResult<BooleanWrapper> {
+    Ok(contacts::handlers::in_blocked(agent_pubkey)?)
 }
 
 pub fn error<T>(reason: &str) -> ExternResult<T> {
