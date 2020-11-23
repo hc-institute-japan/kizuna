@@ -29,8 +29,12 @@ function listBlocked() {
   return (conductor, caller) => conductor.call(caller, "contacts", "list_blocked", null);
 };
 
-function inContacts(username) {
-  return (conductor, caller) => conductor.call(caller, "contacts", "in_contacts", username)
+function inContacts(agentPubKey) {
+  return (conductor, caller) => conductor.call(caller, "contacts", "in_contacts", agentPubKey)
+};
+
+function inBlocked(agentPubKey) {
+  return (conductor, caller) => conductor.call(caller, "contacts", "in_blocked", agentPubKey)
 };
   
 function setUsername(username) {
@@ -283,9 +287,6 @@ export default (orchestrator, config) => {
     await setUsername("clark_123")(conductor, "clark");
     await delay(1000);
 
-    let alice_key = await getAgentPubkeyFromUsername("alice_123")(conductor, "alice");
-    let bobby_key = await getAgentPubkeyFromUsername("bobby_123")(conductor, "alice");
-
     await addContacts("alice_123")(conductor, "alice");
     await addContacts("bobby_123")(conductor, "alice");
 
@@ -298,6 +299,33 @@ export default (orchestrator, config) => {
     t.deepEqual(in_contacts_1, true);
     t.deepEqual(in_contacts_2, true);
     t.deepEqual(in_contacts_3, false);
+  });
+
+  orchestrator.registerScenario("check in blocked list", async (s, t) => {
+    const { conductor } = await s.players({ conductor: config });
+    await conductor.spawn();
+
+    const [dna_hash_1, agent_pubkey_alice] = conductor.cellId('alice');
+    const [dna_hash_2, agent_pubkey_bobby] = conductor.cellId('bobby');
+    const [dna_hash_3, agent_pubkey_clark] = conductor.cellId('clark');
+
+    await setUsername("alice_123")(conductor, "alice");
+    await setUsername("bobby_123")(conductor, "bobby");
+    await setUsername("clark_123")(conductor, "clark");
+    await delay(1000);
+
+    await blockContact("bobby_123")(conductor, "alice");
+    await blockContact("clark_123")(conductor, "alice");
+
+    await delay(1000);
+
+    const in_contacts_1 = await inBlocked(agent_pubkey_alice)(conductor, "alice");
+    const in_contacts_2 = await inBlocked(agent_pubkey_bobby)(conductor, "alice");
+    const in_contacts_3 = await inBlocked(agent_pubkey_clark)(conductor, "alice");
+
+    t.deepEqual(in_contacts_1, false);
+    t.deepEqual(in_contacts_2, true);
+    t.deepEqual(in_contacts_3, true);
   });
 };
   
