@@ -1,0 +1,15 @@
+[package]
+name = "p2pmessageasync"
+version = "0.0.1"
+authors = [ "hcij" ]
+edition = "2018"
+
+[lib]
+name = "p2pmessageasync"
+crate-type = [ "cdylib", "rlib" ]
+
+[dependencies]
+serde = "=1.0.104"
+hdk3 = { git = "https://github.com/holochain/holochain.git", rev = "60292dc6aa8413866da6f44d8af11c7bd600608a" }
+derive_more = "0.99.9"
+hex = "0.4.2"

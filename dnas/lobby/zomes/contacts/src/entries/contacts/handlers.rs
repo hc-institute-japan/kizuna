@@ -11,6 +11,20 @@ use super::{
 use crate::utils::to_timestamp;
 use hdk3::prelude::*;
 
+#[hdk_extern]
+fn init(_: ()) -> ExternResult<InitCallbackResult> {
+    let mut functions: GrantedFunctions = HashSet::new();
+    functions.insert((zome_info!()?.zome_name, "in_blocked".into()));
+
+    create_cap_grant!(CapGrantEntry {
+        tag: "".into(),
+        access: ().into(),
+        functions,
+    })?;
+
+    Ok(InitCallbackResult::Pass)
+}
+
 pub(crate) fn add_contact(username: UsernameWrapper) -> ExternResult<Profile> {
     let agent_pubkey = get_agent_pubkey_from_username(username.clone())?;
 
@@ -201,6 +215,7 @@ pub(crate) fn in_contacts(agent_pubkey: AgentPubKey) -> ExternResult<BooleanWrap
 }
 
 pub(crate) fn in_blocked(agent_pubkey: AgentPubKey) -> ExternResult<BooleanWrapper> {
+    debug!(format!("nicko entered in_blocked with argument {:?}", agent_pubkey.clone()))?;
     let blocked_list = list_blocked()?.0;
     if blocked_list.len() == 0 {
         Ok(BooleanWrapper(false))

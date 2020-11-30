@@ -2,6 +2,7 @@ import { Orchestrator } from "@holochain/tryorama";
 import { Config } from "@holochain/tryorama";
 import request from './request'
 import contacts from './contacts'
+import p2pmessageasync from "./p2pmessageasync";
 
 const orchestrator = new Orchestrator();
 
@@ -13,7 +14,8 @@ const config = Config.gen({
   clark: Config.dna("../kizuna.dna.gz", null)
 });
 
-contacts(orchestrator, config);
+// contacts(orchestrator, config);
 // request(orchestrator, config);
+p2pmessageasync(orchestrator, config);
 
 orchestrator.run();

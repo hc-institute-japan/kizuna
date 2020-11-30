@@ -3,7 +3,8 @@ members = [
     "zomes/request",
     "zomes/contacts",
     "zomes/username",
-    "zomes/p2pmessage"
+    "zomes/p2pmessage",
+    "zomes/p2pmessageasync"
 ]
 
 [profile.dev]
