@@ -4,7 +4,7 @@ version: 2.1
 jobs:
   build-and-test:
     docker:
-      - image: guillemcordoba/rsm:latest
+      - image: circleci/holochain-rsm-docker:60292d
     steps:
       - checkout
       - run:
