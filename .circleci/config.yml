@@ -4,7 +4,7 @@ version: 2.1
 jobs:
   build-and-test:
     docker:
-      - image: tatssato/holochain-rsm-docker:latest
+      - image: guillemcordoba/rsm:latest
     steps:
       - checkout
       - run:
