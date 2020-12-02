@@ -4,7 +4,7 @@ version: 2.1
 jobs:
   build-and-test:
     docker:
-      - image: circleci/holochain-rsm-docker:60292d
+      - image: tatssato/holochain-rsm-docker:latest
     steps:
       - checkout
       - run:
