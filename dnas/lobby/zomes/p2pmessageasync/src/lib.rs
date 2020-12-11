@@ -4,21 +4,18 @@ mod utils;
 use entries::message;
 
 use message::{
-    MessageEntry,
     InboxMessageEntry,
     Inbox,
-    Outbox,
     MessageInput,
     MessageOutput,
     MessageListWrapper,
-    MessageOutputOption
+    BooleanWrapper
+    // MessageOutputOption
 };
 
 entry_defs![
-    MessageEntry::entry_def(),
     InboxMessageEntry::entry_def(),
-    Inbox::entry_def(),
-    Outbox::entry_def()
+    Inbox::entry_def()
 ];
 
 pub fn error<T>(reason: &str) -> ExternResult<T> {
@@ -36,11 +33,6 @@ fn fetch_inbox(_: ()) -> ExternResult<MessageListWrapper> {
 }
 
 #[hdk_extern]
-fn fetch_outbox(_: ()) -> ExternResult<MessageListWrapper> {
-    message::handlers::fetch_outbox()
-}
-
-#[hdk_extern]
-fn acknowledge_async(message_input: MessageOutput) -> ExternResult<MessageOutputOption> {
-    message::handlers::acknowledge_async(message_input)
+fn notify_delivery(message_input: MessageOutput) -> ExternResult<BooleanWrapper> {
+    message::handlers::notify_delivery(message_input)
 }
