@@ -7,10 +7,10 @@ use message::{
     InboxMessageEntry,
     Inbox,
     MessageInput,
-    MessageOutput,
+    MessageParameter,
     MessageListWrapper,
-    BooleanWrapper
-    // MessageOutputOption
+    BooleanWrapper,
+    Reply
 };
 
 entry_defs![
@@ -23,7 +23,7 @@ pub fn error<T>(reason: &str) -> ExternResult<T> {
 }
 
 #[hdk_extern]
-fn send_message_async(message_input: MessageInput) -> ExternResult<MessageOutput> {
+fn send_message_async(message_input: MessageInput) -> ExternResult<MessageParameter> {
     message::handlers::send_message_async(message_input)
 }
 
@@ -33,6 +33,11 @@ fn fetch_inbox(_: ()) -> ExternResult<MessageListWrapper> {
 }
 
 #[hdk_extern]
-fn notify_delivery(message_input: MessageOutput) -> ExternResult<BooleanWrapper> {
+fn notify_delivery(message_input: MessageParameter) -> ExternResult<BooleanWrapper> {
     message::handlers::notify_delivery(message_input)
+}
+
+#[hdk_extern]
+fn reply_to_message(reply_input: Reply) -> ExternResult<MessageParameter> {
+    message::handlers::reply_to_message(reply_input)
 }

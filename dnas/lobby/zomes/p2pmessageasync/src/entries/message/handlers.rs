@@ -8,11 +8,11 @@ use super::{
     InboxMessageEntry,
     Inbox,
     MessageInput,
-    MessageOutput,
+    MessageParameter,
     MessageListWrapper,
     BooleanWrapper,
-    // MessageOutputOption,
-    Status
+    // MessageParameterOption,
+    Status, Reply
 };
 
 
@@ -36,7 +36,7 @@ fn init(_: ()) -> ExternResult<InitCallbackResult> {
     Ok(InitCallbackResult::Pass)
 }
 
-pub(crate) fn send_message_async(message_input: MessageInput) -> ExternResult<MessageOutput> {
+pub(crate) fn send_message_async(message_input: MessageInput) -> ExternResult<MessageParameter> {
 
     if let true = is_user_blocked(message_input.receiver.clone())? {
         return crate::error("You cannot send a message to a contact you have blocked.")
@@ -52,6 +52,7 @@ pub(crate) fn send_message_async(message_input: MessageInput) -> ExternResult<Me
         payload: message_input.payload,
         time_sent: Timestamp(now.as_secs() as i64, now.subsec_nanos()),
         time_received: None,
+        reply_to: None,
         status: Status::Sent
     };
 
@@ -68,9 +69,44 @@ pub(crate) fn send_message_async(message_input: MessageInput) -> ExternResult<Me
         LinkTag::new(agent_info!()?.agent_latest_pubkey.to_string())
     )?;
 
-    let message_output = MessageOutput::from_inbox_entry(message, Status::Sent);
+    let message_output = MessageParameter::from_inbox_entry(message, Status::Sent);
 
     Ok(message_output)
+}
+
+pub(crate) fn reply_to_message(reply_input: Reply) -> ExternResult<MessageParameter> {
+    if let true = is_user_blocked(reply_input.replied_message.receiver.clone())? {
+        return crate::error("You cannot send a message to a contact you have blocked.")
+    };
+
+    // construct replied message hash
+    let replied_message = InboxMessageEntry::from_parameter(reply_input.replied_message.clone(), Status::Sent);
+    let replied_message_hash = hash_entry!(replied_message)?;
+
+    let now = sys_time!()?;
+    let message = InboxMessageEntry {
+        author: agent_info!()?.agent_latest_pubkey,
+        receiver: reply_input.replied_message.author.clone(),
+        payload: reply_input.reply,
+        time_sent: Timestamp(now.as_secs() as i64, now.subsec_nanos()),
+        time_received: None,
+        reply_to: Some(replied_message_hash),
+        status: Status::Sent
+    };
+
+    create_entry!(&message)?;
+    let receiver_inbox = Inbox::new(reply_input.replied_message.author.clone());
+    
+    create_link!(
+        hash_entry!(&receiver_inbox)?,
+        hash_entry!(&message)?,
+        LinkTag::new(agent_info!()?.agent_latest_pubkey.to_string())
+    )?;
+
+    let message_output = MessageParameter::from_inbox_entry(message, Status::Sent);
+
+    Ok(message_output)
+
 }
 
 pub(crate) fn fetch_inbox() -> ExternResult<MessageListWrapper> {
@@ -80,7 +116,7 @@ pub(crate) fn fetch_inbox() -> ExternResult<MessageListWrapper> {
     // get all messages linked to inbox
     let links = get_links!(agent_inbox_hash)?;
 
-    let mut message_list: Vec<MessageOutput> = Vec::new();
+    let mut message_list: Vec<MessageParameter> = Vec::new();
     for link in links.into_inner().into_iter() {
         match get!(link.target)? {
             Some(element) => {
@@ -94,11 +130,11 @@ pub(crate) fn fetch_inbox() -> ExternResult<MessageListWrapper> {
 
                 match try_from_element(element) {
                     Ok(message_entry) => {
-                        // create MessageOutput
-                        let mut message_output = MessageOutput::from_inbox_entry(message_entry, Status::Delivered);
+                        // create MessageParameter
+                        let mut message_parameter = MessageParameter::from_inbox_entry(message_entry, Status::Delivered);
 
                         // check message status 
-                        match message_output.status.clone() {
+                        match message_parameter.status.clone() {
                             // message bound to author when author is offline when receiver tried to call remote
                             // confirming receipt of receiver
                             // update message in source chain
@@ -107,11 +143,12 @@ pub(crate) fn fetch_inbox() -> ExternResult<MessageListWrapper> {
 
                                 // construct original entry
                                 let original_message = InboxMessageEntry {
-                                    author: message_output.author.clone(),
-                                    receiver: message_output.receiver.clone(),
-                                    payload: message_output.payload.clone(),
-                                    time_sent: message_output.time_sent.clone(),
+                                    author: message_parameter.author.clone(),
+                                    receiver: message_parameter.receiver.clone(),
+                                    payload: message_parameter.payload.clone(),
+                                    time_sent: message_parameter.time_sent.clone(),
                                     time_received: None,
+                                    reply_to: message_parameter.reply_to.clone(),
                                     status: Status::Delivered,
                                 };
                                 
@@ -126,8 +163,8 @@ pub(crate) fn fetch_inbox() -> ExternResult<MessageListWrapper> {
                                     Some(element) => {
                                         update_entry!(
                                             element.header_address().to_owned(), 
-                                            InboxMessageEntry::from_output(
-                                                message_output.clone(), 
+                                            InboxMessageEntry::from_parameter(
+                                                message_parameter.clone(), 
                                                 Status::Sent
                                             )
                                         )?;
@@ -143,12 +180,12 @@ pub(crate) fn fetch_inbox() -> ExternResult<MessageListWrapper> {
                             Status::Delivered => {
                                 // complete fields
                                 let now = sys_time!()?;
-                                message_output.time_received = Some(Timestamp(now.as_secs() as i64, now.subsec_nanos()));
+                                message_parameter.time_received = Some(Timestamp(now.as_secs() as i64, now.subsec_nanos()));
 
                                 // use call_remote to notify sender of receipt
-                                let payload: SerializedBytes = message_output.clone().try_into()?;
+                                let payload: SerializedBytes = message_parameter.clone().try_into()?;
                                 match call_remote!(
-                                    message_output.clone().author,
+                                    message_parameter.clone().author,
                                     zome_info!()?.zome_name,
                                     "notify_delivery".into(),
                                     None,
@@ -165,7 +202,7 @@ pub(crate) fn fetch_inbox() -> ExternResult<MessageListWrapper> {
                                         ()
                                     }
                                 }
-                                message_list.push(message_output)
+                                message_list.push(message_parameter)
                             },
                             _ =>  return crate::error("Could not convert entry")
                         }
@@ -194,7 +231,7 @@ fn is_user_blocked(agent_pubkey: AgentPubKey) -> ExternResult<bool> {
     }
 }
 
-pub(crate) fn notify_delivery(message_entry: MessageOutput) -> ExternResult<BooleanWrapper> {
+pub(crate) fn notify_delivery(message_entry: MessageParameter) -> ExternResult<BooleanWrapper> {
     // get original message stored in source chain
     let original_message = InboxMessageEntry {
         author: message_entry.author.clone(),
@@ -202,6 +239,7 @@ pub(crate) fn notify_delivery(message_entry: MessageOutput) -> ExternResult<Bool
         payload: message_entry.payload.clone(),
         time_sent: message_entry.time_sent.clone(),
         time_received: None,
+        reply_to: message_entry.reply_to.clone(),
         status: Status::Delivered,
     };
     
@@ -215,7 +253,7 @@ pub(crate) fn notify_delivery(message_entry: MessageOutput) -> ExternResult<Bool
         Some(element) => {
             update_entry!(
                 element.header_address().to_owned(), 
-                InboxMessageEntry::from_output(
+                InboxMessageEntry::from_parameter(
                     message_entry.clone(), 
                     Status::Sent
                 )
@@ -241,13 +279,13 @@ pub(crate) fn notify_delivery(message_entry: MessageOutput) -> ExternResult<Bool
 //         .include_entries(true)
 //     )?;
 
-//     let message_vec: Vec<MessageOutput> = query_result.0
+//     let message_vec: Vec<MessageParameter> = query_result.0
 //         .into_iter()
 //         .filter_map(|el| {
 //             let entry = try_from_element(el);
 //             match entry {
 //                 Ok(message_entry) => {
-//                     let message_output = MessageOutput::from_entry(message_entry);
+//                     let message_output = MessageParameter::from_entry(message_entry);
 //                     Some(message_output)
 //                 },
 //                 _ => None
@@ -277,7 +315,7 @@ pub(crate) fn notify_delivery(message_entry: MessageOutput) -> ExternResult<Bool
 
 //     let mut agent_messages_hashmap = std::collections::HashMap::new();
 //     for agent in deduped_agents {
-//         let message_list: Vec<MessageOutput> = Vec::new();
+//         let message_list: Vec<MessageParameter> = Vec::new();
 //         agent_messages_hashmap.insert(agent, message_list);                                                                                                                                                                               
 //     };
 
@@ -287,7 +325,7 @@ pub(crate) fn notify_delivery(message_entry: MessageOutput) -> ExternResult<Bool
 //             let entry = try_from_element(el);
 //             match entry {
 //                 Ok(message_entry) => {
-//                     let message_output = MessageOutput::from_entry(message_entry);
+//                     let message_output = MessageParameter::from_entry(message_entry);
 //                     if agent_messages_hashmap.contains_key(&message_output.author) {
 //                         if let Some(vec) = agent_messages_hashmap.get_mut(&message_output.author) {
 //                             &vec.push(message_output.clone());
@@ -332,7 +370,7 @@ pub(crate) fn notify_delivery(message_entry: MessageOutput) -> ExternResult<Bool
 //         .include_entries(true)
 //     )?;
 
-//     let mut message_output_vec: Vec<MessageOutput> = Vec::new();
+//     let mut message_output_vec: Vec<MessageParameter> = Vec::new();
 //     for element in query_result.0 {
 //         let entry = try_from_element::<MessageEntry>(element);
 //         match entry {
@@ -341,7 +379,7 @@ pub(crate) fn notify_delivery(message_entry: MessageOutput) -> ExternResult<Bool
 //                 || (message_output_vec.len() <= batch_size && message_range.last_message_timestamp_seconds - message_entry.time_sent.0 < timegap) {
 //                     if message_entry.author == message_range.author {
 //                         if message_entry.time_sent.0 <= message_range.last_message_timestamp_seconds {
-//                             let message_output = MessageOutput::from_entry(message_entry);
+//                             let message_output = MessageParameter::from_entry(message_entry);
 //                             message_output_vec.push(message_output);
 //                         }
 //                     };
