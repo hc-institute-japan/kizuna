@@ -28,7 +28,7 @@ pub(crate) fn add_contact(username: UsernameWrapper) -> ExternResult<Profile> {
                 .any(|v| v.to_owned() == agent_pubkey.clone())
             {
                 contacts_info.contacts.push(agent_pubkey);
-                update_entry!(signed_header_hash.1, contacts_info.clone())?;
+                update_entry(signed_header_hash.1, contacts_info.clone())?;
                 Ok(added_profile)
             } else {
                 Ok(added_profile)
@@ -36,9 +36,9 @@ pub(crate) fn add_contact(username: UsernameWrapper) -> ExternResult<Profile> {
         }
         _ => {
             // ContactsInfo not yet existing
-            let mut new_contacts = ContactsInfo::new(to_timestamp(sys_time!()?))?;
+            let mut new_contacts = ContactsInfo::new(to_timestamp(sys_time()?))?;
             new_contacts.contacts.push(agent_pubkey);
-            create_entry!(new_contacts.clone())?;
+            create_entry(new_contacts.clone())?;
             Ok(added_profile)
         }
     }
@@ -64,13 +64,13 @@ pub(crate) fn remove_contact(username: UsernameWrapper) -> ExternResult<Profile>
                 contacts_info
                     .contacts
                     .retain(|v| v != &agent_pubkey);
-                update_entry!(signed_header_hash.1, contacts_info.clone())?;
+                update_entry(signed_header_hash.1, contacts_info.clone())?;
                 Ok(removed_profile)
             } else { return Ok(removed_profile) }
         }
         _ => {
-            let new_contacts = ContactsInfo::new(to_timestamp(sys_time!()?))?;
-            create_entry!(new_contacts.clone())?;
+            let new_contacts = ContactsInfo::new(to_timestamp(sys_time()?))?;
+            create_entry(new_contacts.clone())?;
             Ok(removed_profile)
         }
     }
@@ -79,12 +79,11 @@ pub(crate) fn remove_contact(username: UsernameWrapper) -> ExternResult<Profile>
 pub(crate) fn block_contact(username: UsernameWrapper) -> ExternResult<Profile> {
     let agent_pubkey = get_agent_pubkey_from_username(username.clone())?;
 
-    let my_agent_pubkey = agent_info!()?.agent_latest_pubkey;
+    let my_agent_pubkey = agent_info()?.agent_latest_pubkey;
     if my_agent_pubkey == agent_pubkey { return Ok(Profile::default()) }
 
     let maybe_contacts_info_elements_components = query_contact_info_elements()?;
     let blocked_profile = Profile::new(agent_pubkey.clone(), username.0);
-    debug!("Tatsuya Sato here. {:#?}", blocked_profile)?;
     match maybe_contacts_info_elements_components {
         Some(contacts_info_elements_components) => {
             let mut contacts_info = contacts_info_elements_components.1;
@@ -109,14 +108,14 @@ pub(crate) fn block_contact(username: UsernameWrapper) -> ExternResult<Profile> 
                         .retain(|v| v != &agent_pubkey);
                 }
 
-                update_entry!(signed_header_hash.1, contacts_info.clone())?;
+                update_entry(signed_header_hash.1, contacts_info.clone())?;
                 Ok(blocked_profile)
             } else { Ok(blocked_profile) }
         }
         _ => {
-            let mut new_contacts = ContactsInfo::new(to_timestamp(sys_time!()?))?;
+            let mut new_contacts = ContactsInfo::new(to_timestamp(sys_time()?))?;
             new_contacts.blocked.push(agent_pubkey);
-            create_entry!(new_contacts.clone())?;
+            create_entry(new_contacts.clone())?;
             Ok(blocked_profile)
         }
     }
@@ -139,15 +138,15 @@ pub(crate) fn unblock_contact(username: UsernameWrapper) -> ExternResult<Profile
                 .any(|v| v == &agent_pubkey)
             {
                 contacts_info.blocked.retain(|v| v != &agent_pubkey);
-                update_entry!(signed_header_hash.1, contacts_info.clone())?;
+                update_entry(signed_header_hash.1, contacts_info.clone())?;
                 Ok(unblocked_profile)
             } else {
                 return Ok(unblocked_profile)
             }
         }
         _ => {
-            let new_contacts = ContactsInfo::new(to_timestamp(sys_time!()?))?;
-            create_entry!(new_contacts.clone())?;
+            let new_contacts = ContactsInfo::new(to_timestamp(sys_time()?))?;
+            create_entry(new_contacts.clone())?;
             Ok(unblocked_profile)
         }
     }
@@ -223,7 +222,7 @@ fn query_contact_info_elements() -> ExternResult<Option<(element::SignedHeaderHa
             EntryVisibility::Private,
         )))
         .include_entries(true);
-    let query_result = query!(filter)?;
+    let query_result = query(filter)?;
     let filtered_elements: Vec<Element> = query_result
         .0
         .into_iter()
