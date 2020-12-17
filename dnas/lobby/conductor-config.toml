@@ -11,7 +11,7 @@ public_address = 'HcScjN8wBwrn3tuyg89aab3a69xsIgdzmX5P9537BqQZ5A7TEZu7qCY4Xzzjhm
 test_agent = true
 
 [[dnas]]
-file = '/Users/neilsongardose/Documents/projects/holo/Kizuna/dnas/lobby/kizuna.dna.workdir/dna.json'
+file = '/Users/neilsongardose/Documents/repositories/holochain/Kizuna/dnas/lobby/kizuna.dna.workdir/dna.json'
 hash = 'QmenMMEwQJDqJmEuj33ZaDUQeLJ7QGXi8FxnZdXT2eXSLu'
 id = 'hc-run-dna'
 
