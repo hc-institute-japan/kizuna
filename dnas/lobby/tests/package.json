@@ -18,7 +18,8 @@
     "typescript": "^3.9.6"
   },
   "devDependencies": {
-    "@holochain/tryorama": "guillemcordoba/tryorama#rsm",
+    "@holochain/conductor-api": "git+https://github.com/holochain/holochain-conductor-api.git",
+    "@holochain/tryorama": "https://github.com/holochain/tryorama.git#rsm",
     "@types/lodash": "^4.14.158",
     "@types/node": "^14.0.14"
   }
