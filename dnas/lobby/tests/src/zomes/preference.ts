@@ -86,22 +86,29 @@ const preference = (orchestrator, config) => {
 
         let preference = null
 
-        preference = await call(conductor, 'alice', 'preference', 'get_per_agent_preference')
         await call(conductor, 'alice', 'preference', 'set_per_agent_preference', { typing_indicator: [bob_pubkey] })
 
         preference = await call(conductor, 'alice', 'preference', 'get_per_agent_preference')
 
+        t.deepEqual(preference, { typing_indicator: [bob_pubkey], read_receipt: [] })
+
         await call(conductor, 'alice', 'preference', 'set_per_agent_preference', { typing_indicator: [charlie_pubkey, diego_pubkey], read_receipt: [diego_pubkey] })
-
-        await call(conductor, 'alice', 'preference', 'set_per_agent_preference', { read_receipt: [ethan_pubkey] })
-
-
 
         preference = await call(conductor, 'alice', 'preference', 'get_per_agent_preference')
 
+        t.deepEqual(preference, { typing_indicator: [bob_pubkey, charlie_pubkey, diego_pubkey], read_receipt: [diego_pubkey] })
+
+        await call(conductor, 'alice', 'preference', 'set_per_agent_preference', { read_receipt: [ethan_pubkey] })
+
+        preference = await call(conductor, 'alice', 'preference', 'get_per_agent_preference')
 
         t.deepEqual(preference, { typing_indicator: [bob_pubkey, charlie_pubkey, diego_pubkey], read_receipt: [diego_pubkey, ethan_pubkey] })
 
+        await call(conductor, 'alice', 'preference', 'set_per_agent_preference', {})
+
+        preference = await call(conductor, 'alice', 'preference', 'get_per_agent_preference')
+
+        t.deepEqual(preference, { typing_indicator: [bob_pubkey, charlie_pubkey, diego_pubkey], read_receipt: [diego_pubkey, ethan_pubkey] })
 
     });
 
@@ -109,6 +116,31 @@ const preference = (orchestrator, config) => {
         const { conductor } = await s.players({ conductor: config })
         await conductor.spawn()
 
+        let preference = null
+
+        await call(conductor, 'alice', 'preference', 'set_per_group_preference', { typing_indicator: ["test_string"] })
+
+        preference = await call(conductor, 'alice', 'preference', 'get_per_group_preference')
+
+        t.deepEqual(preference, { typing_indicator: ["test_string"], read_receipt: [] })
+
+        await call(conductor, 'alice', 'preference', 'set_per_group_preference', { typing_indicator: ["test_string_1", "test_string_2"], read_receipt: ["test_string_2"] })
+
+        preference = await call(conductor, 'alice', 'preference', 'get_per_group_preference')
+
+        t.deepEqual(preference, { typing_indicator: ["test_string", "test_string_1", "test_string_2"], read_receipt: ["test_string_2"] })
+
+        await call(conductor, 'alice', 'preference', 'set_per_group_preference', { read_receipt: ["test_string_3"] })
+
+        preference = await call(conductor, 'alice', 'preference', 'get_per_group_preference')
+
+        t.deepEqual(preference, { typing_indicator: ["test_string", "test_string_1", "test_string_2"], read_receipt: ["test_string_2", "test_string_3"] })
+
+        await call(conductor, 'alice', 'preference', 'set_per_group_preference', {})
+
+        preference = await call(conductor, 'alice', 'preference', 'get_per_group_preference')
+
+        t.deepEqual(preference, { typing_indicator: ["test_string", "test_string_1", "test_string_2"], read_receipt: ["test_string_2", "test_string_3"] })
 
     });
 }
