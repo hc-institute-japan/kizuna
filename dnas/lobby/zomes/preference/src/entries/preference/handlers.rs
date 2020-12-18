@@ -4,17 +4,17 @@ use super::*;
 
 #[hdk_extern]
 fn init(_: ()) -> ExternResult<InitCallbackResult> {
-    create_entry!(Preference {
+    create_entry(Preference {
         typing_indicator: true,
         read_receipt: true
     })?;
 
-    create_entry!(PerAgentPreference {
+    create_entry(PerAgentPreference {
         typing_indicator: Vec::new(),
         read_receipt: Vec::new()
     })?;
 
-    create_entry!(PerGroupPreference {
+    create_entry(PerGroupPreference {
         typing_indicator: Vec::new(),
         read_receipt: Vec::new()
     })?;
@@ -23,10 +23,10 @@ fn init(_: ()) -> ExternResult<InitCallbackResult> {
 }
 
 fn fetch_preference() -> ExternResult<(element::SignedHeaderHashed, Preference)> {
-    let query_result = query!(QueryFilter::new()
+    let query_result = query(QueryFilter::new()
         .entry_type(EntryType::App(AppEntryType::new(
             EntryDefIndex::from(0),
-            zome_info!()?.zome_id,
+            zome_info()?.zome_id,
             EntryVisibility::Private
         )))
         .include_entries(true))?;
@@ -55,7 +55,7 @@ pub(crate) fn get_preference() -> ExternResult<PreferenceWrapper> {
 pub(crate) fn set_preference(preference: PreferenceIO) -> ExternResult<()> {
     match fetch_preference() {
         Ok(unwrapped_preference) => {
-            update_entry!(
+            update_entry(
                 unwrapped_preference.0.into_inner().1,
                 Preference {
                     typing_indicator: match preference.typing_indicator {
@@ -75,10 +75,10 @@ pub(crate) fn set_preference(preference: PreferenceIO) -> ExternResult<()> {
 }
 
 fn fetch_per_agent_preference() -> ExternResult<(element::SignedHeaderHashed, PerAgentPreference)> {
-    let query_result = query!(QueryFilter::new()
+    let query_result = query(QueryFilter::new()
         .entry_type(EntryType::App(AppEntryType::new(
             EntryDefIndex::from(1),
-            zome_info!()?.zome_id,
+            zome_info()?.zome_id,
             EntryVisibility::Private
         )))
         .include_entries(true))?;
@@ -111,7 +111,7 @@ pub(crate) fn set_per_agent_preference(
 ) -> ExternResult<()> {
     match fetch_per_agent_preference() {
         Ok(unwrapped_preference) => {
-            update_entry!(
+            update_entry(
                 unwrapped_preference.0.into_inner().1,
                 PerAgentPreference {
                     typing_indicator: match per_agent_preference.clone().typing_indicator {
@@ -147,10 +147,10 @@ pub(crate) fn set_per_agent_preference(
 }
 
 fn fetch_per_group_preference() -> ExternResult<(element::SignedHeaderHashed, PerGroupPreference)> {
-    let query_result = query!(QueryFilter::new()
+    let query_result = query(QueryFilter::new()
         .entry_type(EntryType::App(AppEntryType::new(
             EntryDefIndex::from(2),
-            zome_info!()?.zome_id,
+            zome_info()?.zome_id,
             EntryVisibility::Private
         )))
         .include_entries(true))?;
@@ -183,7 +183,7 @@ pub(crate) fn set_per_group_preference(
 ) -> ExternResult<()> {
     match fetch_per_group_preference() {
         Ok(unwrapped_preference) => {
-            update_entry!(
+            update_entry(
                 unwrapped_preference.0.into_inner().1,
                 PerGroupPreference {
                     typing_indicator: match per_group_preference.clone().typing_indicator {
