@@ -23,14 +23,7 @@ const orchestrator = new Orchestrator();
 
 
 contacts(orchestrator, config, installable);
-// preference(orchestrator, Config.gen({
-//   alice: Config.dna('../kizuna.dna.gz', null),
-//   bobby: Config.dna('../kizuna.dna.gz', null),
-//   charlie: Config.dna('../kizuna.dna.gz', null),
-//   diego: Config.dna('../kizuna.dna.gz', null),
-//   ethan: Config.dna('../kizuna.dna.gz', null),
-// })
-// )
+preference(orchestrator, config, installable);
 
 
 // request(orchestrator, config);
