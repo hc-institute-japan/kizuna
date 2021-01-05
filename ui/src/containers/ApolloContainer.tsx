@@ -1,9 +1,7 @@
-import React from 'react';
-import {ApolloProvider} from '@apollo/client';
-import apolloClient from '../connection/apolloClient';
+import React from "react";
 
-const ApolloContainer: React.FC = ({children}) => (
-  <ApolloProvider client={apolloClient}>{children}</ApolloProvider>
-);
+const ApolloContainer: React.FC = ({ children }) => {
+  return <div>{children}</div>;
+};
 
 export default ApolloContainer;

@@ -358,21 +358,21 @@ dependencies = [
 [[package]]
 name = "p2pmessage"
 version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop#95e577ddbf9398407360716c1f332b63d396ebfe"
 dependencies = [
  "derive_more",
- "hdk3 0.0.1 (git+https://github.com/holochain/holochain.git?rev=60292d)",
- "hex",
+ "hdk3 0.0.1 (git+https://github.com/holochain/holochain.git?rev=60292dc6aa8413866da6f44d8af11c7bd600608a)",
+ "p2pmessage 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop)",
  "serde",
 ]
 
 [[package]]
 name = "p2pmessage"
 version = "0.0.1"
+source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop#95e577ddbf9398407360716c1f332b63d396ebfe"
 dependencies = [
  "derive_more",
- "hdk3 0.0.1 (git+https://github.com/holochain/holochain.git?rev=60292dc6aa8413866da6f44d8af11c7bd600608a)",
- "p2pmessage 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop)",
+ "hdk3 0.0.1 (git+https://github.com/holochain/holochain.git?rev=60292d)",
+ "hex",
  "serde",
 ]
 
@@ -690,21 +690,21 @@ checksum = "f7fe0bb3479651439c9112f72b6c505038574c9fbb575ed1bf3b797fa39dd564"
 [[package]]
 name = "username"
 version = "0.0.1"
-source = "git+https://github.com/holochain-open-dev/username-zome#c30780975020f2df0f39e6c8d1840ab1b76b2bf2"
-dependencies = [
- "derive_more",
- "hdk3 0.0.1 (git+https://github.com/holochain/holochain.git?rev=60292d)",
- "serde",
-]
-
-[[package]]
-name = "username"
-version = "0.0.1"
 dependencies = [
  "derive_more",
  "hdk3 0.0.1 (git+https://github.com/holochain/holochain.git?rev=60292dc6aa8413866da6f44d8af11c7bd600608a)",
  "serde",
  "username 0.0.1 (git+https://github.com/holochain-open-dev/username-zome)",
+]
+
+[[package]]
+name = "username"
+version = "0.0.1"
+source = "git+https://github.com/holochain-open-dev/username-zome#c30780975020f2df0f39e6c8d1840ab1b76b2bf2"
+dependencies = [
+ "derive_more",
+ "hdk3 0.0.1 (git+https://github.com/holochain/holochain.git?rev=60292d)",
+ "serde",
 ]
 
 [[package]]
