@@ -1,16 +1,16 @@
 import {ApolloClient, InMemoryCache, ApolloLink} from '@apollo/client';
 import {SchemaLink} from '@apollo/client/link/schema';
 import {makeExecutableSchema} from '@graphql-tools/schema';
-import {callZome} from './holochainClient';
-import resolvers from './resolvers';
-import typeDefs from './typeDefs';
+import {callZome, getAgentId} from './holochainClient';
+import resolvers from '../graphql/resolvers';
+import typeDefs from '../graphql/schemas';
 
 const schemaLink = new SchemaLink({
   schema: makeExecutableSchema({
     typeDefs,
     resolvers,
   }),
-  context: {callZome},
+  context: {callZome, getAgentId},
 });
 
 const links = [];
@@ -21,7 +21,7 @@ const link = ApolloLink.from(links);
 
 const apolloClient = new ApolloClient({
   link,
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({addTypename: false}),
   connectToDevTools: true,
 });
 
