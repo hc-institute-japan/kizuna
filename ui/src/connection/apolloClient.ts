@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 import {ApolloClient, InMemoryCache, ApolloLink} from '@apollo/client';
 import {SchemaLink} from '@apollo/client/link/schema';
 import {makeExecutableSchema} from '@graphql-tools/schema';
@@ -12,11 +13,25 @@ const schemaLink = new SchemaLink({
   }),
   context: {callZome, getAgentId},
 });
+=======
+// import { ApolloClient, InMemoryCache, ApolloLink } from "@apollo/client";
+// import { SchemaLink } from "@apollo/client/link/schema";
+// import { makeExecutableSchema } from "@graphql-tools/schema";
+// // import { callZome, getAgentId } from "./holochainClient";
+// // import resolvers from "../graphql/resolvers";
+// // import typeDefs from "../graphql/schemas";
 
-const links = [];
+// const schemaLink = new SchemaLink({
+//   schema: makeExecutableSchema({}),
+//   context: {},
+// });
+>>>>>>> Stashed changes
 
-links.push(schemaLink);
+// const links = [];
 
+// links.push(schemaLink);
+
+<<<<<<< Updated upstream
 const link = ApolloLink.from(links);
 
 const apolloClient = new ApolloClient({
@@ -26,3 +41,8 @@ const apolloClient = new ApolloClient({
 });
 
 export default apolloClient;
+=======
+// const apolloClient = new ApolloClient({
+//   links,
+// });
+>>>>>>> Stashed changes
