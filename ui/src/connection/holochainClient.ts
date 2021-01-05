@@ -1,13 +1,13 @@
-import {AppApi, AppWebsocket} from '@holochain/conductor-api';
+import { AppApi, AppWebsocket } from "@holochain/conductor-api";
 
-let client: AppApi;
+let client: any;
 
 const init = async () => {
   if (client) {
     return client;
   }
   try {
-    client = await AppWebsocket.connect('ws://localhost:8888');
+    client = await AppWebsocket.connect("ws://localhost:8888");
   } catch (error) {
     console.error(error);
     throw error;
@@ -26,7 +26,7 @@ interface CallZomeConfig {
 export const getAgentId = async () => {
   await init();
   try {
-    const info = await client.appInfo({app_id: 'test-app'});
+    const info = await client.appInfo({ app_id: "test-app" });
     return info.cell_data[0][0][1];
   } catch (e) {
     console.warn(e);
@@ -35,7 +35,7 @@ export const getAgentId = async () => {
 
 export const callZome = async (config: any) => {
   await init();
-  const info = await client.appInfo({app_id: 'test-app'});
+  const info = await client.appInfo({ app_id: "test-app" });
   const {
     cap = null,
     cellId = info.cell_data[0][0],
