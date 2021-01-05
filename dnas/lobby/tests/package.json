@@ -4,19 +4,22 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "TRYORAMA_LOG_LEVEL=info RUST_LOG=debug RUST_BACKTRACE=1 TRYORAMA_HOLOCHAIN_PATH=\"holochain\" ts-node src/index.ts",
-    "split": "TRYORAMA_LOG_LEVEL=info RUST_LOG=debug RUST_BACKTRACE=1 TRYORAMA_HOLOCHAIN_PATH=\"holochain\""
+    "test": "TRYORAMA_LOG_LEVEL=info RUST_LOG=error RUST_BACKTRACE=1 TRYORAMA_HOLOCHAIN_PATH=\"holochain\" ts-node src/index.ts",
+    "split": "TRYORAMA_LOG_LEVEL=info RUST_LOG=debug RUST_BACKTRACE=1 TRYORAMA_HOLOCHAIN_PATH=\"holochain\"",
+    "build": "concurrently \"cd .. && cargo build --release --target wasm32-unknown-unknown\" \"cd .. && dna-util -c ./kizuna.dna.workdir\""
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "concurrently": "^5.3.0",
     "lodash": "^4.17.19",
     "tape": "^5.0.1",
     "ts-node": "^8.10.2",
     "typescript": "^3.9.6"
   },
   "devDependencies": {
-    "@holochain/tryorama": "git://github.com/holochain/tryorama#rsm",
+    "@holochain/conductor-api": "git+https://github.com/holochain/holochain-conductor-api.git",
+    "@holochain/tryorama": "https://github.com/holochain/tryorama.git#rsm",
     "@types/lodash": "^4.14.158",
     "@types/node": "^14.0.14"
   }
