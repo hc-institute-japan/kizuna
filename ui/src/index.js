@@ -8,10 +8,15 @@
 
 import React from 'react';
 import 'react-native-get-random-values';
-import ApolloContainer from './containers/ApolloContainer';
+import Container from './containers/Container';
+import MainNavigator from './navigators/MainNavigator';
 global.Buffer = global.Buffer || require('buffer').Buffer;
 const App: () => React$Node = () => {
-  return <ApolloContainer />;
+  return (
+    <Container>
+      <MainNavigator />
+    </Container>
+  );
 };
 
 export default App;
