@@ -3,9 +3,6 @@
   "uuid": "",
   "properties": null,
   "zomes": {
-    "request": {
-      "wasm_path": "../../../../holochain/target/wasm32-unknown-unknown/release/request.wasm"
-    },
     "username": {
       "wasm_path": "../../../../holochain/target/wasm32-unknown-unknown/release/username.wasm"
     },
