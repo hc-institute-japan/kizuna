@@ -38,7 +38,7 @@ pub struct ContactsInfo {
 }
 
 impl ContactsInfo {
-    pub fn new(timestamp: Timestamp) -> Result<Self, SerializedBytesError> {
+    pub fn new(timestamp: Timestamp) -> Result<Self, HdkError> {
         let agent_info = agent_info()?;
         Ok(ContactsInfo {
             agent_id: agent_info.agent_latest_pubkey,
@@ -52,7 +52,7 @@ impl ContactsInfo {
         timestamp: Timestamp,
         contacts: Vec<AgentPubKey>,
         blocked: Vec<AgentPubKey>,
-    ) -> Result<Self, SerializedBytesError> {
+    ) -> Result<Self, HdkError> {
         let agent_info = agent_info()?;
         Ok(ContactsInfo {
             agent_id: agent_info.agent_latest_pubkey,
