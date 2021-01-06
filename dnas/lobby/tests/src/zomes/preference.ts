@@ -9,7 +9,7 @@ const call = async (conductor, zome, zomeFunction, payload: any = {}) =>
 
 const preference = (orchestrator, config, installable) => {
     orchestrator.registerScenario("Get and set global preference", async (s, t) => {
-        const [alice] = await s.players([config, config]);
+        const [alice] = await s.players([config]);
         const [alice_lobby_happ] = await alice.installAgentsHapps(installable);
         const alice_conductor = alice_lobby_happ[0].cells[0];
     
@@ -122,7 +122,7 @@ const preference = (orchestrator, config, installable) => {
     });
 
     orchestrator.registerScenario("Get and set per group preference", async (s, t) => {
-        const [alice] = await s.players([config, config]);
+        const [alice] = await s.players([config]);
         const [alice_lobby_happ] = await alice.installAgentsHapps(installable);
         const alice_conductor = alice_lobby_happ[0].cells[0];
 

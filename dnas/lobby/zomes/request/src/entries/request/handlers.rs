@@ -53,7 +53,7 @@ pub(crate) fn send_request_to_chat(agent: AgentPubKey) -> ExternResult<HeaderHas
         "receive_request_to_chat".to_string().into(),
         None,
         agent_info()?.agent_latest_pubkey.try_into()?
-    )?
+    );
     Ok(create_cap_claim(claim))
 }
 
