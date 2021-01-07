@@ -21,7 +21,7 @@ const install3Agents: InstallAgentsHapps = [
 
 const installables = {
   two: install2Agents,
-  theee: install3Agents
+  three: install3Agents
 };
 
 const orchestrator = new Orchestrator();
