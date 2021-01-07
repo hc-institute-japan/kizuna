@@ -8,6 +8,8 @@ import preference from './zomes/preference'
 const config = Config.gen();
 const kizuna = path.join('../kizuna.dna.gz');
 
+const installAgent: InstallAgentsHapps = [[[kizuna]]] 
+
 const install2Agents: InstallAgentsHapps = [
   [[kizuna]],
   [[kizuna]]
@@ -20,6 +22,7 @@ const install3Agents: InstallAgentsHapps = [
 ] 
 
 const installables = {
+  one: installAgent,
   two: install2Agents,
   three: install3Agents
 };
@@ -29,8 +32,8 @@ const orchestrator = new Orchestrator();
 
 
 
-contacts(orchestrator, config, installables);
-// preference(orchestrator, config, installable);
+// contacts(orchestrator, config, installables);
+preference(orchestrator, config, installables);
 
 
 // request(orchestrator, config);
