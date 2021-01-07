@@ -1,4 +1,4 @@
-import { AppApi, AppWebsocket } from "@holochain/conductor-api";
+import { AppWebsocket } from "@holochain/conductor-api";
 
 let client: any;
 
