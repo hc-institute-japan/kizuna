@@ -1,20 +1,27 @@
+import { Action } from "redux";
+import { ThunkAction as Thunk } from "redux-thunk";
+import { RootState } from "../redux/reducers";
+
+export type ThunkAction = Thunk<void, RootState, unknown, Action<string>>;
+
 export interface Profile {
-    id: string;
-    username: string;
+  id: string;
+  username: string;
 }
 
 export interface Message {
-    id: string;
-    sender: string;
-    message: string;
+  id: string;
+  sender: string;
+  message: string;
+  timestamp: Date;
 }
 
 export interface Conversation {
-    id: string;
-    name: string;
-    src: string;
-    sender?: string;
-    messages: Message[]
+  id: string;
+  name: string;
+  src: string;
+  sender?: string;
+  messages: Message[];
 }
 
-export type Conversations = Conversation[]
+export type Conversations = Conversation[];

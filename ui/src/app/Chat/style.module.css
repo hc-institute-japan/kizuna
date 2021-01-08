@@ -1,0 +1,10 @@
+.chat {
+  /* background: var(--ion-background-color); */
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat > ion-item {
+  --background: var(--ion-background-color);
+}

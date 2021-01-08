@@ -1,7 +1,7 @@
 import { ProfileActionTypes, ProfileState } from "./types";
 
 const initialState: ProfileState = {
-  username: "",
+  username: "seulgibear",
 };
 
 export default (state = initialState, action: ProfileActionTypes) => {

@@ -5,6 +5,7 @@
   "dependencies": {
     "@apollo/client": "^3.3.6",
     "@capacitor/core": "2.4.5",
+    "@capacitor/ios": "^2.4.5",
     "@holochain/conductor-api": "^0.0.1-dev.15",
     "@ionic/react": "^5.0.7",
     "@ionic/react-router": "^5.0.7",
