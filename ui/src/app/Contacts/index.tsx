@@ -1,8 +1,8 @@
-import { IonTab } from "@ionic/react";
+import { IonPage, IonTab } from "@ionic/react";
 import React from "react";
 
 const Contacts = () => {
-  return <IonTab tab="contacts"></IonTab>;
+  return <IonPage ></IonPage>;
 };
 
 export default Contacts;
