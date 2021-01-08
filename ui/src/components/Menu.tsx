@@ -7,11 +7,7 @@ import {
   IonListHeader,
   IonMenu,
   IonMenuToggle,
-  IonNote,
 } from "@ionic/react";
-
-import React from "react";
-import { useLocation } from "react-router-dom";
 import {
   archiveOutline,
   archiveSharp,
@@ -27,6 +23,10 @@ import {
   warningOutline,
   warningSharp,
 } from "ionicons/icons";
+import React from "react";
+import { useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
+import { RootState } from "../redux/reducers";
 import "./Menu.css";
 
 interface AppPage {
@@ -79,13 +79,14 @@ const labels = ["Family", "Friends", "Notes", "Work", "Travel", "Reminders"];
 
 const Menu: React.FC = () => {
   const location = useLocation();
+  const { username } = useSelector((state: RootState) => state.profile);
 
   return (
     <IonMenu contentId="main" type="overlay">
       <IonContent>
         <IonList id="inbox-list">
-          <IonListHeader>Inbox</IonListHeader>
-          <IonNote>hi@ionicframework.com</IonNote>
+          <IonListHeader>{username}</IonListHeader>
+
           {appPages.map((appPage, index) => {
             return (
               <IonMenuToggle key={index} autoHide={false}>

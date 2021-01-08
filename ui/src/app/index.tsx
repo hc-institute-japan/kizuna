@@ -1,4 +1,5 @@
 /* Core CSS required for Ionic components to work properly */
+import { setupConfig } from "@ionic/react";
 import "@ionic/react/css/core.css";
 import "@ionic/react/css/display.css";
 import "@ionic/react/css/flex-utils.css";
@@ -14,8 +15,9 @@ import "@ionic/react/css/typography.css";
 import React from "react";
 /* Theme variables */
 import "../theme/variables.css";
-import Auth from "./Auth";
 
+import Auth from "./Auth";
+setupConfig({ mode: "md" });
 const App: React.FC = () => <Auth />;
 
 export default App;

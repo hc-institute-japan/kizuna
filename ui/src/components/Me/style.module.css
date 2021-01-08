@@ -1,0 +1,15 @@
+.me {
+  align-self: flex-end;
+  background: var(--ion-color-primary);
+  border-radius: 8px;
+  margin-bottom: 0.2rem;
+  padding-left: 0.8rem;
+  padding-right: 0.8rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  max-width: 90%;
+}
+
+.me ion-text {
+  color: var(--ion-color-primary-contrast);
+}
