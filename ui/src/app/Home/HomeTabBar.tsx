@@ -1,40 +1,40 @@
 import {
-  IonContent,
   IonIcon,
-  IonPage,
+  IonLabel,
+
   IonRouterOutlet,
   IonTabBar,
   IonTabButton,
-  IonTabs,
+  IonTabs
 } from "@ionic/react";
-import { call, person, settings } from "ionicons/icons";
+import { chatbox, person } from "ionicons/icons";
 import React from "react";
-import { Redirect, Route } from "react-router";
+import { Route, Switch } from "react-router";
 import Contacts from "../Contacts";
 import Conversations from "../Conversations";
 
 const HomeTabBar = () => {
-  return (
-    <IonPage>
-      <IonContent>
-        <IonTabs>
-          <IonRouterOutlet>
-            <Route path="/home/conversations" component={Conversations} exact />
-            <Route path="/home/contacts" component={Contacts} exact />
-            <Redirect from="/home" to="/home/conversations" />
-          </IonRouterOutlet>
 
-          <IonTabBar slot="bottom">
-            <IonTabButton tab="conversations" href="/conversations">
-              <IonIcon icon={call} />
-            </IonTabButton>
-            <IonTabButton tab="contacts" href="/contacts">
-              <IonIcon icon={person} />
-            </IonTabButton>
-          </IonTabBar>
-        </IonTabs>
-      </IonContent>
-    </IonPage>
+  return (
+    <IonTabs>
+      <IonRouterOutlet>
+        <Route path="/:tab(home)" component={Conversations} exact />
+        <Route path="/:tab(home/contacts)" component={Contacts} exact />
+      </IonRouterOutlet>
+
+      <IonTabBar slot="bottom">
+        <IonTabButton tab="conversations" href="/home">
+          <IonIcon icon={chatbox} />
+          <IonLabel>Messaging</IonLabel>
+        </IonTabButton>
+        <IonTabButton tab="contacts" href="/home/contacts">
+          <IonIcon icon={person} />
+          <IonLabel>
+            Contacts
+            </IonLabel>
+        </IonTabButton>
+      </IonTabBar>
+    </IonTabs>
   );
 };
 
