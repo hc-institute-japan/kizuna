@@ -12,10 +12,16 @@
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
+	<key>ManualInitAudioDevice</key>
+  	<string>$MANUAL_INIT_AUDIO_DEVICE</string>
 	<key>CFBundleName</key>
 	<string>$(PRODUCT_NAME)</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>This Application uses your wireless headphones and microphone to make calls.</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
+	<key>NSContactsUsageDescription</key>
+	<string>This Application needs access to your contacts in order to be able to call them.</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
 	<key>CFBundleURLTypes</key>
