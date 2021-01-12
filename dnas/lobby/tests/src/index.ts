@@ -1,27 +1,39 @@
-import { Config, Orchestrator } from '@holochain/tryorama';
-import request from './zomes/request'
+import { Config, Orchestrator, InstallAgentsHapps } from '@holochain/tryorama';
+import path from 'path';
+
 import contacts from './zomes/contacts'
 import preference from './zomes/preference'
+// import request from './zomes/request'
+
+const config = Config.gen();
+const kizuna = path.join('../kizuna.dna.gz');
+
+const installAgent: InstallAgentsHapps = [[[kizuna]]] 
+
+const install2Agents: InstallAgentsHapps = [
+  [[kizuna]],
+  [[kizuna]]
+] 
+
+const install3Agents: InstallAgentsHapps = [
+  [[kizuna]],
+  [[kizuna]],
+  [[kizuna]]
+] 
+
+const installables = {
+  one: installAgent,
+  two: install2Agents,
+  three: install3Agents
+};
 
 const orchestrator = new Orchestrator();
 
-const config = Config.gen({
-  alice: Config.dna("../kizuna.dna.gz", null),
-  bobby: Config.dna("../kizuna.dna.gz", null),
-  clark: Config.dna("../kizuna.dna.gz", null)
-});
 
 
 
-contacts(orchestrator, config);
-preference(orchestrator, Config.gen({
-  alice: Config.dna('../kizuna.dna.gz', null),
-  bobby: Config.dna('../kizuna.dna.gz', null),
-  charlie: Config.dna('../kizuna.dna.gz', null),
-  diego: Config.dna('../kizuna.dna.gz', null),
-  ethan: Config.dna('../kizuna.dna.gz', null),
-})
-)
+contacts(orchestrator, config, installables);
+preference(orchestrator, config, installables);
 
 
 // request(orchestrator, config);
