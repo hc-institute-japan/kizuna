@@ -11,11 +11,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "concurrently": "^5.3.0",
     "@holochain/conductor-api": "git+https://github.com/holochain/holochain-conductor-api.git",
     "@holochain/tryorama": "^0.4.0-dev.1",
     "@types/lodash": "^4.14.158",
     "@types/node": "^14.0.14",
+    "concurrently": "^5.3.0",
     "lodash": "^4.17.19",
     "tape": "^5.0.1",
     "ts-node": "^8.10.2",
