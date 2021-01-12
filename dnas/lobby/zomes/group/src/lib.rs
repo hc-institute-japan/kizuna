@@ -5,6 +5,7 @@ use hdk3::prelude::*;
 mod entries;
 mod utils;
 mod test_utils;
+mod signals;
 
 use entries::group::{
     Group,
@@ -13,12 +14,21 @@ use entries::group::{
     GroupSecretKey
 };
 
+use crate::signals::{
+
+    SignalPayload
+};
+
 use entries::group;
+
 
 entry_defs![Group::entry_def(),GroupMembers::entry_def(), GroupSecretKey::entry_def() ];
 
 #[hdk_extern]
 fn recv_remote_signal(signal: SerializedBytes) -> ExternResult<()> {
+
+    // when we send signals using fn remote_signal we first wrapped into a struct SignalDetails 
+
     emit_signal(&signal)?;
     Ok(())
 }
