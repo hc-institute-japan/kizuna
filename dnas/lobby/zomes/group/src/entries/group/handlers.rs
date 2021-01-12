@@ -9,6 +9,13 @@ use super::{
     SecretHash,
 };
 
+
+use crate::signals::{
+
+    SignalDetails,
+    SignalGroupMembersData
+};
+
 use crate::utils::to_timestamp;
 
 pub(crate)fn create_group(create_group_input: CreateGroupInput )->ExternResult<Group>{
@@ -99,8 +106,11 @@ pub fn add_initial_members(add_member_input:AddInitialMembersInput) ->ExternResu
 
     //[for all added agents]
     //send remote signal with GroupMembers entry hash
+    
+    let signal_group_members_data = SignalGroupMembersData::new(group_members_entry_hash)?;    
+
     remote_signal(
-        &group_members_entry_hash,
+        &signal_group_members_data,
         members,
     )?;
 
