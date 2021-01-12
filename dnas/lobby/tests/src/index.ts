@@ -4,6 +4,7 @@ import path from 'path';
 import contacts from './zomes/contacts'
 import preference from './zomes/preference'
 // import request from './zomes/request'
+import group from './zomes/group'
 
 const config = Config.gen();
 const kizuna = path.join('../kizuna.dna.gz');
@@ -24,15 +25,23 @@ const installables = {
   theee: install3Agents
 };
 
+
+
+const installation: InstallAgentsHapps = [
+  [[kizuna]]
+];
+
 const orchestrator = new Orchestrator();
 
 
 
 
-contacts(orchestrator, config, installables);
+//contacts(orchestrator, config, installables);
 // preference(orchestrator, config, installable);
-
-
 // request(orchestrator, config);
+
+
+
+group(orchestrator, config,installation);
 
 orchestrator.run();

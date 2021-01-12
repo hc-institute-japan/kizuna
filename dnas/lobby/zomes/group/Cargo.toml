@@ -1,0 +1,14 @@
+[package]
+name = "group"
+version = "0.0.1"
+authors = [ "manuel_puentes" ]
+edition = "2018"
+
+[lib]
+name = "group"
+crate-type = [ "cdylib", "rlib" ]
+
+[dependencies]
+serde = "=1.0.104"
+hdk3 = { git = "https://github.com/holochain/holochain.git", rev="3675b5" }
+derive_more = "0.99.9"
