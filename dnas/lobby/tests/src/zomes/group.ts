@@ -1,4 +1,13 @@
 
+
+function signalHandler(signal) {
+
+    console.log("we have a new signal incoming");
+    console.log(signal.data.payload)
+
+};
+
+
 export default (orchestrator, config, installation) => {
 
 
@@ -8,7 +17,11 @@ export default (orchestrator, config, installation) => {
 
         const [[alice_happ]] = await alice.installAgentsHapps(installation);
 
-        
+        alice.setSignalHandler(
+            (signal)=>{
+                signalHandler(signal);
+            }
+        );
 
         const alicePubKey = alice_happ.agent;
 
@@ -20,11 +33,17 @@ export default (orchestrator, config, installation) => {
     
         });
         
+        let group_members = await alice_happ.cells[0].call("group","get_group_members",create_group);
+
 
         console.log("output");
         
         console.log(create_group);
 
+        console.log("group_members");
+
+        console.log(group_members);
+        
         console.log("end_output");
 
     })

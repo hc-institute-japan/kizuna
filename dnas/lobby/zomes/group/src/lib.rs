@@ -4,6 +4,7 @@ use hdk3::prelude::*;
 
 mod entries;
 mod utils;
+mod test_utils;
 
 use entries::group::{
     Group,
@@ -25,4 +26,10 @@ fn recv_remote_signal(signal: SerializedBytes) -> ExternResult<()> {
 #[hdk_extern]
 fn create_group(create_group_input: CreateGroupInput) -> ExternResult<Group>{
     group::handlers::create_group(create_group_input)
+}
+
+// testing methods 
+#[hdk_extern]
+fn get_group_members(group:Group)->HdkResult<GroupMembers>{
+    test_utils::get_group_members(group)
 }
