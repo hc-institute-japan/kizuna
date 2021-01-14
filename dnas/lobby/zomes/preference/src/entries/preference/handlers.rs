@@ -36,10 +36,10 @@ fn fetch_preference() -> ExternResult<(element::SignedHeaderHashed, Preference)>
             let maybe_preference: Option<Preference> = element.1.to_app_option()?;
             match maybe_preference {
                 Some(preference) => Ok((element.0, preference)),
-                _ => crate::error("No entry found for global preference. "),
+                _ => crate::err("104","No entry found for global preference."),
             }
         }
-        None => crate::error("qeqwe"),
+        None => crate::err("104","No entry found for global preference."),
     }
 }
 
@@ -49,7 +49,7 @@ pub(crate) fn get_preference() -> ExternResult<PreferenceWrapper> {
             typing_indicator: unwrapped_preference.1.typing_indicator,
             read_receipt: unwrapped_preference.1.read_receipt,
         })),
-        _ => crate::error("Something went wrong"),
+        _ => crate::err("104","No entry found for global preference."),
     }
 }
 
@@ -71,7 +71,7 @@ pub(crate) fn set_preference(preference: PreferenceIO) -> ExternResult<Preferenc
             )?;
             Ok(PreferenceWrapper(new_preference))
         }
-        _ => crate::error("Something went wrong"),
+        _ => crate::err("104","No entry found for global preference."),
     }
 }
 
@@ -90,10 +90,12 @@ fn fetch_per_agent_preference() -> ExternResult<(element::SignedHeaderHashed, Pe
 
             match maybe_preference {
                 Some(preference) => Ok((element.0, preference)),
-                _ => crate::error("Something went wrong"),
+                _ => crate::err("104","No entry found for per agent preference."),
+
             }
         }
-        None => crate::error("Something went wrong"),
+        None => crate::err("104","No entry found for per agent preference."),
+
     }
 }
 
@@ -103,7 +105,8 @@ pub(crate) fn get_per_agent_preference() -> ExternResult<PerAgentPreferenceWrapp
             typing_indicator: unwrapped_preference.1.typing_indicator,
             read_receipt: unwrapped_preference.1.read_receipt,
         })),
-        _ => crate::error("Something went wrong"),
+        _ => crate::err("104","No entry found for per agent preference."),
+
     }
 }
 
@@ -143,7 +146,7 @@ pub(crate) fn set_per_agent_preference(
             )?;
             Ok(PerAgentPreferenceWrapper(new_preference))
         }
-        _ => crate::error("Something went wrong"),
+        _ => crate::err("104","No entry found for per agent preference."),
     }
 }
 
@@ -162,10 +165,11 @@ fn fetch_per_group_preference() -> ExternResult<(element::SignedHeaderHashed, Pe
 
             match maybe_preference {
                 Some(preference) => Ok((element.0, preference)),
-                _ => crate::error("Something went wrong"),
+                _ => crate::err("104","No entry found for per grou preference."),
+
             }
         }
-        None => crate::error("Something went wrong"),
+        None => crate::err("104","No entry found for per grou preference."),
     }
 }
 
@@ -175,7 +179,7 @@ pub(crate) fn get_per_group_preference() -> ExternResult<PerGroupPreferenceWrapp
             typing_indicator: unwrapped_preference.1.typing_indicator,
             read_receipt: unwrapped_preference.1.read_receipt,
         })),
-        _ => crate::error("Something went wrong"),
+        _ => crate::err("104","No entry found for per grou preference."),
     }
 }
 
@@ -215,6 +219,7 @@ pub(crate) fn set_per_group_preference(
             )?;
             Ok(PerGroupPreferenceWrapper(new_preference))
         }
-        _ => crate::error("Something went wrong"),
+        _ => crate::err("104","No entry found for per grou preference."),
+
     }
 }
