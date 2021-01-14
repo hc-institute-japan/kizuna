@@ -42,6 +42,7 @@ fn fetch_preference() -> ExternResult<(element::SignedHeaderHashed, Preference)>
         None => crate::error("qeqwe"),
     }
 }
+
 pub(crate) fn get_preference() -> ExternResult<PreferenceWrapper> {
     match fetch_preference() {
         Ok(unwrapped_preference) => Ok(PreferenceWrapper(Preference {
@@ -65,8 +66,7 @@ pub(crate) fn set_preference(preference: PreferenceIO) -> ExternResult<Preferenc
                     _ => unwrapped_preference.1.read_receipt,
                 }
             };
-            update_entry(
-                unwrapped_preference.0.into_inner().1,
+            create_entry(
                 &new_preference
             )?;
             Ok(PreferenceWrapper(new_preference))
@@ -138,8 +138,7 @@ pub(crate) fn set_per_agent_preference(
                     _ => unwrapped_preference.1.read_receipt.clone(),
                 },
             };
-            update_entry(
-                unwrapped_preference.0.into_inner().1,
+            create_entry(
                 &new_preference
             )?;
             Ok(PerAgentPreferenceWrapper(new_preference))
@@ -211,8 +210,7 @@ pub(crate) fn set_per_group_preference(
                     _ => unwrapped_preference.1.read_receipt.clone(),
                 }
             };
-            update_entry(
-                unwrapped_preference.0.into_inner().1,
+            create_entry(
                 &new_preference
             )?;
             Ok(PerGroupPreferenceWrapper(new_preference))
