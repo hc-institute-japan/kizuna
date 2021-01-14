@@ -32,42 +32,42 @@ const preference = (orchestrator, config, installables: Installables) => {
       /**
        * Set both typing and receipt to false
        */
-      await call(alice_conductor, "preference", "set_preference", {
+      preference = await call(alice_conductor, "preference", "set_preference", {
         typing_indicator: false,
         read_receipt: false,
       });
-      preference = await call(alice_conductor, "preference", "get_preference");
+
       t.deepEqual(preference, createPreference(false, false));
 
       /**
        * Set both typing to false and receipt to true
        */
-      await call(alice_conductor, "preference", "set_preference", {
+      preference = await call(alice_conductor, "preference", "set_preference", {
         typing_indicator: false,
         read_receipt: true,
       });
-      preference = await call(alice_conductor, "preference", "get_preference");
+
       t.deepEqual(preference, createPreference(false, true));
 
       /**
        * Set both typing to true and receipt to false
        */
 
-      await call(alice_conductor, "preference", "set_preference", {
+      preference = await call(alice_conductor, "preference", "set_preference", {
         typing_indicator: true,
         read_receipt: false,
       });
-      preference = await call(alice_conductor, "preference", "get_preference");
+
       t.deepEqual(preference, createPreference(true, false));
 
       /**
        * Set typing to false
        */
 
-      await call(alice_conductor, "preference", "set_preference", {
+      preference = await call(alice_conductor, "preference", "set_preference", {
         read_receipt: true,
       });
-      preference = await call(alice_conductor, "preference", "get_preference");
+
       t.deepEqual(preference, createPreference(true, true));
 
       // TATS: this test is failing with timeout.
@@ -75,10 +75,10 @@ const preference = (orchestrator, config, installables: Installables) => {
        * Set receipt to true
        */
 
-      await call(alice_conductor, "preference", "set_preference", {
+      preference = await call(alice_conductor, "preference", "set_preference", {
         typing_indicator: false,
       });
-      preference = await call(alice_conductor, "preference", "get_preference");
+
       t.deepEqual(preference, createPreference(false, true));
     }
   );
@@ -128,14 +128,13 @@ const preference = (orchestrator, config, installables: Installables) => {
 
       let preference = null;
 
-      await call(alice_conductor, "preference", "set_per_agent_preference", {
-        typing_indicator: [bobby_pubkey],
-      });
-
       preference = await call(
         alice_conductor,
         "preference",
-        "get_per_agent_preference"
+        "set_per_agent_preference",
+        {
+          typing_indicator: [bobby_pubkey],
+        }
       );
 
       t.deepEqual(preference, {
@@ -143,15 +142,14 @@ const preference = (orchestrator, config, installables: Installables) => {
         read_receipt: [],
       });
 
-      await call(alice_conductor, "preference", "set_per_agent_preference", {
-        typing_indicator: [clark_pubkey, diego_pubkey],
-        read_receipt: [diego_pubkey],
-      });
-
       preference = await call(
         alice_conductor,
         "preference",
-        "get_per_agent_preference"
+        "set_per_agent_preference",
+        {
+          typing_indicator: [clark_pubkey, diego_pubkey],
+          read_receipt: [diego_pubkey],
+        }
       );
 
       t.deepEqual(preference, {
@@ -159,14 +157,13 @@ const preference = (orchestrator, config, installables: Installables) => {
         read_receipt: [diego_pubkey],
       });
 
-      await call(alice_conductor, "preference", "set_per_agent_preference", {
-        read_receipt: [ethan_pubkey],
-      });
-
       preference = await call(
         alice_conductor,
         "preference",
-        "get_per_agent_preference"
+        "set_per_agent_preference",
+        {
+          read_receipt: [ethan_pubkey],
+        }
       );
 
       t.deepEqual(preference, {
@@ -200,14 +197,13 @@ const preference = (orchestrator, config, installables: Installables) => {
 
       let preference = null;
 
-      await call(alice_conductor, "preference", "set_per_group_preference", {
-        typing_indicator: ["test_string"],
-      });
-
       preference = await call(
         alice_conductor,
         "preference",
-        "get_per_group_preference"
+        "set_per_group_preference",
+        {
+          typing_indicator: ["test_string"],
+        }
       );
 
       t.deepEqual(preference, {
@@ -215,15 +211,14 @@ const preference = (orchestrator, config, installables: Installables) => {
         read_receipt: [],
       });
 
-      await call(alice_conductor, "preference", "set_per_group_preference", {
-        typing_indicator: ["test_string_1", "test_string_2"],
-        read_receipt: ["test_string_2"],
-      });
-
       preference = await call(
         alice_conductor,
         "preference",
-        "get_per_group_preference"
+        "set_per_group_preference",
+        {
+          typing_indicator: ["test_string_1", "test_string_2"],
+          read_receipt: ["test_string_2"],
+        }
       );
 
       t.deepEqual(preference, {
@@ -231,14 +226,13 @@ const preference = (orchestrator, config, installables: Installables) => {
         read_receipt: ["test_string_2"],
       });
 
-      await call(alice_conductor, "preference", "set_per_group_preference", {
-        read_receipt: ["test_string_3"],
-      });
-
       preference = await call(
         alice_conductor,
         "preference",
-        "get_per_group_preference"
+        "set_per_group_preference",
+        {
+          read_receipt: ["test_string_3"],
+        }
       );
 
       t.deepEqual(preference, {
@@ -246,14 +240,12 @@ const preference = (orchestrator, config, installables: Installables) => {
         read_receipt: ["test_string_2", "test_string_3"],
       });
 
-      await call(alice_conductor, "preference", "set_per_group_preference", {});
-
       preference = await call(
         alice_conductor,
         "preference",
-        "get_per_group_preference"
+        "set_per_group_preference",
+        {}
       );
-
       t.deepEqual(preference, {
         typing_indicator: ["test_string", "test_string_1", "test_string_2"],
         read_receipt: ["test_string_2", "test_string_3"],
