@@ -44,31 +44,32 @@ fn fetch_preference() -> ExternResult<(element::SignedHeaderHashed, Preference)>
 }
 pub(crate) fn get_preference() -> ExternResult<PreferenceWrapper> {
     match fetch_preference() {
-        Ok(unwrapped_preference) => Ok(PreferenceWrapper(PreferenceIO {
-            typing_indicator: Some(unwrapped_preference.1.typing_indicator),
-            read_receipt: Some(unwrapped_preference.1.read_receipt),
+        Ok(unwrapped_preference) => Ok(PreferenceWrapper(Preference {
+            typing_indicator: unwrapped_preference.1.typing_indicator,
+            read_receipt: unwrapped_preference.1.read_receipt,
         })),
         _ => crate::error("Something went wrong"),
     }
 }
 
-pub(crate) fn set_preference(preference: PreferenceIO) -> ExternResult<()> {
+pub(crate) fn set_preference(preference: PreferenceIO) -> ExternResult<PreferenceWrapper> {
     match fetch_preference() {
         Ok(unwrapped_preference) => {
+            let new_preference = Preference {
+                typing_indicator: match preference.typing_indicator {
+                    Some(boolean) => boolean,
+                    _ => unwrapped_preference.1.typing_indicator,
+                },
+                read_receipt: match preference.read_receipt {
+                    Some(boolean) => boolean,
+                    _ => unwrapped_preference.1.read_receipt,
+                }
+            };
             update_entry(
                 unwrapped_preference.0.into_inner().1,
-                &Preference {
-                    typing_indicator: match preference.typing_indicator {
-                        Some(boolean) => boolean,
-                        _ => unwrapped_preference.1.typing_indicator,
-                    },
-                    read_receipt: match preference.read_receipt {
-                        Some(boolean) => boolean,
-                        _ => unwrapped_preference.1.read_receipt,
-                    }
-                }
+                &new_preference
             )?;
-            Ok(())
+            Ok(PreferenceWrapper(new_preference))
         }
         _ => crate::error("Something went wrong"),
     }
@@ -98,9 +99,9 @@ fn fetch_per_agent_preference() -> ExternResult<(element::SignedHeaderHashed, Pe
 
 pub(crate) fn get_per_agent_preference() -> ExternResult<PerAgentPreferenceWrapper> {
     match fetch_per_agent_preference() {
-        Ok(unwrapped_preference) => Ok(PerAgentPreferenceWrapper(PerAgentPreferenceIO {
-            typing_indicator: Some(unwrapped_preference.1.typing_indicator),
-            read_receipt: Some(unwrapped_preference.1.read_receipt),
+        Ok(unwrapped_preference) => Ok(PerAgentPreferenceWrapper(PerAgentPreference {
+            typing_indicator: unwrapped_preference.1.typing_indicator,
+            read_receipt: unwrapped_preference.1.read_receipt,
         })),
         _ => crate::error("Something went wrong"),
     }
@@ -108,39 +109,40 @@ pub(crate) fn get_per_agent_preference() -> ExternResult<PerAgentPreferenceWrapp
 
 pub(crate) fn set_per_agent_preference(
     per_agent_preference: PerAgentPreferenceIO,
-) -> ExternResult<()> {
+) -> ExternResult<PerAgentPreferenceWrapper> {
     match fetch_per_agent_preference() {
         Ok(unwrapped_preference) => {
+            let new_preference = PerAgentPreference {
+                typing_indicator: match per_agent_preference.clone().typing_indicator {
+                    Some(agents) => {
+                        unwrapped_preference
+                            .1
+                            .typing_indicator
+                            .clone()
+                            .into_iter()
+                            .chain(agents)
+                            .collect::<Vec<AgentPubKey>>()
+                    }
+                    _ => unwrapped_preference.1.typing_indicator.clone(),
+                },
+                read_receipt: match per_agent_preference.clone().read_receipt {
+                    Some(agents) => {
+                        unwrapped_preference
+                            .1
+                            .read_receipt
+                            .clone()
+                            .into_iter()
+                            .chain(agents)
+                            .collect::<Vec<AgentPubKey>>()
+                    }
+                    _ => unwrapped_preference.1.read_receipt.clone(),
+                },
+            };
             update_entry(
                 unwrapped_preference.0.into_inner().1,
-                &PerAgentPreference {
-                    typing_indicator: match per_agent_preference.clone().typing_indicator {
-                        Some(agents) => {
-                            unwrapped_preference
-                                .1
-                                .typing_indicator
-                                .clone()
-                                .into_iter()
-                                .chain(agents)
-                                .collect::<Vec<AgentPubKey>>()
-                        }
-                        _ => unwrapped_preference.1.typing_indicator.clone(),
-                    },
-                    read_receipt: match per_agent_preference.clone().read_receipt {
-                        Some(agents) => {
-                            unwrapped_preference
-                                .1
-                                .read_receipt
-                                .clone()
-                                .into_iter()
-                                .chain(agents)
-                                .collect::<Vec<AgentPubKey>>()
-                        }
-                        _ => unwrapped_preference.1.read_receipt.clone(),
-                    },
-                }
+                &new_preference
             )?;
-            Ok(())
+            Ok(PerAgentPreferenceWrapper(new_preference))
         }
         _ => crate::error("Something went wrong"),
     }
@@ -170,9 +172,9 @@ fn fetch_per_group_preference() -> ExternResult<(element::SignedHeaderHashed, Pe
 
 pub(crate) fn get_per_group_preference() -> ExternResult<PerGroupPreferenceWrapper> {
     match fetch_per_group_preference() {
-        Ok(unwrapped_preference) => Ok(PerGroupPreferenceWrapper(PerGroupPreferenceIO {
-            typing_indicator: Some(unwrapped_preference.1.typing_indicator),
-            read_receipt: Some(unwrapped_preference.1.read_receipt),
+        Ok(unwrapped_preference) => Ok(PerGroupPreferenceWrapper(PerGroupPreference {
+            typing_indicator: unwrapped_preference.1.typing_indicator,
+            read_receipt: unwrapped_preference.1.read_receipt,
         })),
         _ => crate::error("Something went wrong"),
     }
@@ -180,39 +182,40 @@ pub(crate) fn get_per_group_preference() -> ExternResult<PerGroupPreferenceWrapp
 
 pub(crate) fn set_per_group_preference(
     per_group_preference: PerGroupPreferenceIO,
-) -> ExternResult<()> {
+) -> ExternResult<PerGroupPreferenceWrapper> {
     match fetch_per_group_preference() {
         Ok(unwrapped_preference) => {
+            let new_preference = PerGroupPreference {
+                typing_indicator: match per_group_preference.clone().typing_indicator {
+                    Some(agents) => {
+                        unwrapped_preference
+                            .1
+                            .typing_indicator
+                            .clone()
+                            .into_iter()
+                            .chain(agents)
+                            .collect::<Vec<String>>()
+                    }
+                    _ => unwrapped_preference.1.typing_indicator.clone(),
+                },
+                read_receipt: match per_group_preference.clone().read_receipt {
+                    Some(agents) => {
+                        unwrapped_preference
+                            .1
+                            .read_receipt
+                            .clone()
+                            .into_iter()
+                            .chain(agents)
+                            .collect::<Vec<String>>()
+                    }
+                    _ => unwrapped_preference.1.read_receipt.clone(),
+                }
+            };
             update_entry(
                 unwrapped_preference.0.into_inner().1,
-                &PerGroupPreference {
-                    typing_indicator: match per_group_preference.clone().typing_indicator {
-                        Some(agents) => {
-                            unwrapped_preference
-                                .1
-                                .typing_indicator
-                                .clone()
-                                .into_iter()
-                                .chain(agents)
-                                .collect::<Vec<String>>()
-                        }
-                        _ => unwrapped_preference.1.typing_indicator.clone(),
-                    },
-                    read_receipt: match per_group_preference.clone().read_receipt {
-                        Some(agents) => {
-                            unwrapped_preference
-                                .1
-                                .read_receipt
-                                .clone()
-                                .into_iter()
-                                .chain(agents)
-                                .collect::<Vec<String>>()
-                        }
-                        _ => unwrapped_preference.1.read_receipt.clone(),
-                    },
-                }
+                &new_preference
             )?;
-            Ok(())
+            Ok(PerGroupPreferenceWrapper(new_preference))
         }
         _ => crate::error("Something went wrong"),
     }
