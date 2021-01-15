@@ -3,8 +3,9 @@
 use super::{
     BlockedWrapper,
     BooleanWrapper,
-    ContactsInfo,
     ContactsWrapper,
+    Contact,
+    ContactType,
     Profile,
     UsernameWrapper,
 };
@@ -12,257 +13,205 @@ use crate::utils::to_timestamp;
 use hdk3::prelude::*;
 
 pub(crate) fn add_contact(username: UsernameWrapper) -> ExternResult<Profile> {
+    // return Err if the given username is not linked to any agent
     let agent_pubkey = get_agent_pubkey_from_username(username.clone())?;
 
-    let maybe_contacts_info_elements_components = query_contact_info_elements()?;
-    let added_profile = Profile::new(agent_pubkey.clone(), username.0);
-    match maybe_contacts_info_elements_components {
-        // ContactsInfo already existing
-        Some(contacts_info_elements_components) => {
-            let mut contacts_info = contacts_info_elements_components.1;
-            let signed_header_hash = contacts_info_elements_components.0.into_inner();
-            // check if the address to be added is already existing and return right away if it does
-            if let false = contacts_info
-                .contacts
-                .iter()
-                .any(|v| v.to_owned() == agent_pubkey.clone())
-            {
-                contacts_info.contacts.push(agent_pubkey);
-                update_entry(signed_header_hash.1, &contacts_info.clone())?;
-                Ok(added_profile)
-            } else {
-                Ok(added_profile)
-            }
-        }
-        _ => {
-            // ContactsInfo not yet existing
-            let mut new_contacts = ContactsInfo::new(to_timestamp(sys_time()?))?;
-            new_contacts.contacts.push(agent_pubkey);
-            create_entry(&new_contacts.clone())?;
-            Ok(added_profile)
+    let maybe_latest_contact = get_latest_contact_info(&agent_pubkey)?;
+    let profile: Profile = Profile::new(agent_pubkey.clone(), username.0);
+    if let Some(contact) = maybe_latest_contact {
+        match contact.contact_type {
+            ContactType::Add => {
+                // return the given username and agent pubkey right away
+                return Ok(profile)
+            },
+            ContactType::Block => {
+                // return Profile but with both fields set to None
+                return Ok(Profile::default())
+            },
+            _ => (),
         }
     }
+    let added_contact = Contact::new(
+        to_timestamp(sys_time()?),
+        agent_pubkey,
+        ContactType::Add
+    );
+    create_entry(&added_contact)?;
+    Ok(profile)
 }
 
 pub(crate) fn remove_contact(username: UsernameWrapper) -> ExternResult<Profile> {
     let agent_pubkey = get_agent_pubkey_from_username(username.clone())?;
 
-    let maybe_contacts_info_elements_components = query_contact_info_elements()?;
-    let removed_profile = Profile::new(agent_pubkey.clone(), username.0);
+    let maybe_latest_contact = get_latest_contact_info(&agent_pubkey)?;
+    let profile: Profile = Profile::new(agent_pubkey.clone(), username.0);
+    
+    if let Some(contact) = maybe_latest_contact {
+        match contact.contact_type {
+            // return the given profile if removed or unblocked
+            ContactType::Remove | ContactType::Unblock => { return Ok(profile) },
+            // return empty Profile if given username is blocked
+            ContactType::Block => { return Ok(Profile::default()) },
+            _ => (),
 
-    match maybe_contacts_info_elements_components {
-        Some(contacts_info_elements_components) => {
-            let mut contacts_info = contacts_info_elements_components.1;
-            let signed_header_hash = contacts_info_elements_components.0.into_inner();
-
-            // check if the address to be removed exist in the contacts
-            if let true = contacts_info
-                .contacts
-                .iter()
-                .any(|v| v == &agent_pubkey)
-            {
-                contacts_info
-                    .contacts
-                    .retain(|v| v != &agent_pubkey);
-                update_entry(signed_header_hash.1, &contacts_info.clone())?;
-                Ok(removed_profile)
-            } else { return Ok(removed_profile) }
         }
-        _ => {
-            let new_contacts = ContactsInfo::new(to_timestamp(sys_time()?))?;
-            create_entry(&new_contacts.clone())?;
-            Ok(removed_profile)
-        }
+    } else {
+        // if None return Profile with given arg
+        return Ok(profile)
     }
+    let removed_contact = Contact::new(
+        to_timestamp(sys_time()?),
+        agent_pubkey,
+        ContactType::Remove,
+    );
+    create_entry(&removed_contact)?;
+    Ok(profile)
 }
 
 pub(crate) fn block_contact(username: UsernameWrapper) -> ExternResult<Profile> {
     let agent_pubkey = get_agent_pubkey_from_username(username.clone())?;
+    let me = agent_info()?.agent_latest_pubkey;
 
-    let my_agent_pubkey = agent_info()?.agent_latest_pubkey;
-    if my_agent_pubkey == agent_pubkey { return Ok(Profile::default()) }
+    // return right away if trying to block oneself
+    if me == agent_pubkey { return Ok(Profile::default()) }
 
-    let maybe_contacts_info_elements_components = query_contact_info_elements()?;
-    let blocked_profile = Profile::new(agent_pubkey.clone(), username.0);
-    match maybe_contacts_info_elements_components {
-        Some(contacts_info_elements_components) => {
-            let mut contacts_info = contacts_info_elements_components.1;
-            let signed_header_hash = contacts_info_elements_components.0.into_inner();
+    let maybe_latest_contact = get_latest_contact_info(&agent_pubkey)?;
+    let profile: Profile = Profile::new(agent_pubkey.clone(), username.0);
+    
+    if let Some(contact) = maybe_latest_contact {
+        match contact.contact_type {
+            // return the given username and pubkey if already blocked
+            ContactType::Block => { return Ok(profile) },
+            _ => (),
 
-            // check if the contact is already in the blocked list
-            if let false = contacts_info
-                .blocked
-                .iter()
-                .any(|v| v == &agent_pubkey)
-            {
-                contacts_info.blocked.push(agent_pubkey.clone());
-
-                // check if the contact is in the list of and remove it
-                if let true = contacts_info
-                    .contacts
-                    .iter()
-                    .any(|v| v == &agent_pubkey)
-                {
-                    contacts_info
-                        .contacts
-                        .retain(|v| v != &agent_pubkey);
-                }
-
-                update_entry(signed_header_hash.1, &contacts_info.clone())?;
-                Ok(blocked_profile)
-            } else { Ok(blocked_profile) }
-        }
-        _ => {
-            let mut new_contacts = ContactsInfo::new(to_timestamp(sys_time()?))?;
-            new_contacts.blocked.push(agent_pubkey);
-            create_entry(&new_contacts.clone())?;
-            Ok(blocked_profile)
         }
     }
+    // in other cases always block the given username
+    let blocked_contact = Contact::new(
+        to_timestamp(sys_time()?),
+        agent_pubkey,
+        ContactType::Block,
+    );
+    create_entry(&blocked_contact)?;
+    Ok(profile)
 }
 
 pub(crate) fn unblock_contact(username: UsernameWrapper) -> ExternResult<Profile> {
     let agent_pubkey = get_agent_pubkey_from_username(username.clone())?;
 
-    let maybe_contacts_info_elements_components = query_contact_info_elements()?;
-    let unblocked_profile = Profile::new(agent_pubkey.clone(), username.0);
-    match maybe_contacts_info_elements_components {
-        Some(contacts_info_elements_components) => {
-            let mut contacts_info = contacts_info_elements_components.1;
-            let signed_header_hash = contacts_info_elements_components.0.into_inner();
-
-            // check if the contact is in the blocked list
-            if let true = contacts_info
-                .blocked
-                .iter()
-                .any(|v| v == &agent_pubkey)
-            {
-                contacts_info.blocked.retain(|v| v != &agent_pubkey);
-                update_entry(signed_header_hash.1, &contacts_info.clone())?;
-                Ok(unblocked_profile)
-            } else {
-                return Ok(unblocked_profile)
-            }
+    let maybe_latest_contact = get_latest_contact_info(&agent_pubkey)?;
+    let profile: Profile = Profile::new(agent_pubkey.clone(), username.0); 
+    
+    if let Some(contact) = maybe_latest_contact {
+        match contact.contact_type {
+            // return the given username and pubkey if already unblocked
+            ContactType::Unblock | ContactType::Remove => { return Ok(profile) },
+            ContactType::Add => { return Ok(Profile::default()) },
+            _ => (),
         }
-        _ => {
-            let new_contacts = ContactsInfo::new(to_timestamp(sys_time()?))?;
-            create_entry(&new_contacts.clone())?;
-            Ok(unblocked_profile)
-        }
-    }
-}
-
-pub(crate) fn list_contacts() -> ExternResult<ContactsWrapper> {
-    let maybe_contacts_info_elements_components = query_contact_info_elements()?;
-
-    match maybe_contacts_info_elements_components {
-        Some(contacts_info_elements_components) => {
-            let contacts_info = contacts_info_elements_components.1;
-            let contacts = ContactsWrapper(contacts_info.contacts);
-            Ok(contacts)
-        }
-        _ => {
-            // TODO: change to Vec<AgentPubKey>
-            let empty_contacts = ContactsWrapper(Vec::default());
-            Ok(empty_contacts)
-        }
-    }
-}
-
-pub(crate) fn list_blocked() -> ExternResult<BlockedWrapper> {
-    let maybe_contacts_info_elements_components = query_contact_info_elements()?;
-
-    match maybe_contacts_info_elements_components {
-        Some(contacts_info_elements_components) => {
-            let contacts_info = contacts_info_elements_components.1;
-            let contacts = BlockedWrapper(contacts_info.blocked);
-            Ok(contacts)
-        }
-        _ => {
-            // TODO: change to Vec<AgentPubKey>
-            let empty_blocked = BlockedWrapper(Vec::default());
-            Ok(empty_blocked)
-        }
-    }
-}
-
-pub(crate) fn in_contacts(agent_pubkey: AgentPubKey) -> ExternResult<BooleanWrapper> {
-    let contacts_list = list_contacts()?.0;
-    if contacts_list.len() == 0 {
-        Ok(BooleanWrapper(false))
     } else {
-        if contacts_list.iter().any(|pubkey| pubkey == &agent_pubkey) {
-            Ok(BooleanWrapper(true))
-        } else {
-            Ok(BooleanWrapper(false))
-        }
+        return Ok(profile)
     }
+
+    let unblocked_contact = Contact::new(
+        to_timestamp(sys_time()?),
+        agent_pubkey,
+        ContactType::Unblock,
+    );
+    create_entry(&unblocked_contact)?;
+    Ok(profile)    
 }
 
-pub(crate) fn in_blocked(agent_pubkey: AgentPubKey) -> ExternResult<BooleanWrapper> {
-    let blocked_list = list_blocked()?.0;
-    if blocked_list.len() == 0 {
-        Ok(BooleanWrapper(false))
-    } else {
-        if blocked_list.iter().any(|pubkey| pubkey == &agent_pubkey) {
-            Ok(BooleanWrapper(true))
-        } else {
-            Ok(BooleanWrapper(false))
-        }
-    }
-}
+// pub(crate) fn list_contacts() -> ExternResult<ContactsWrapper> {
+//     let maybe_contacts_info_elements_components = query_contact_info_elements()?;
+
+//     match maybe_contacts_info_elements_components {
+//         Some(contacts_info_elements_components) => {
+//             let contacts_info = contacts_info_elements_components.1;
+//             let contacts = ContactsWrapper(contacts_info.contacts);
+//             Ok(contacts)
+//         }
+//         _ => {
+//             // TODO: change to Vec<AgentPubKey>
+//             let empty_contacts = ContactsWrapper(Vec::default());
+//             Ok(empty_contacts)
+//         }
+//     }
+// }
+
+// pub(crate) fn list_blocked() -> ExternResult<BlockedWrapper> {
+//     let maybe_contacts_info_elements_components = query_contact_info_elements()?;
+
+//     match maybe_contacts_info_elements_components {
+//         Some(contacts_info_elements_components) => {
+//             let contacts_info = contacts_info_elements_components.1;
+//             let contacts = BlockedWrapper(contacts_info.blocked);
+//             Ok(contacts)
+//         }
+//         _ => {
+//             // TODO: change to Vec<AgentPubKey>
+//             let empty_blocked = BlockedWrapper(Vec::default());
+//             Ok(empty_blocked)
+//         }
+//     }
+// }
+
+// pub(crate) fn in_contacts(agent_pubkey: AgentPubKey) -> ExternResult<BooleanWrapper> {
+//     let contacts_list = list_contacts()?.0;
+//     if contacts_list.len() == 0 {
+//         Ok(BooleanWrapper(false))
+//     } else {
+//         if contacts_list.iter().any(|pubkey| pubkey == &agent_pubkey) {
+//             Ok(BooleanWrapper(true))
+//         } else {
+//             Ok(BooleanWrapper(false))
+//         }
+//     }
+// }
+
+// pub(crate) fn in_blocked(agent_pubkey: AgentPubKey) -> ExternResult<BooleanWrapper> {
+//     let blocked_list = list_blocked()?.0;
+//     if blocked_list.len() == 0 {
+//         Ok(BooleanWrapper(false))
+//     } else {
+//         if blocked_list.iter().any(|pubkey| pubkey == &agent_pubkey) {
+//             Ok(BooleanWrapper(true))
+//         } else {
+//             Ok(BooleanWrapper(false))
+//         }
+//     }
+// }
 
 // HELPER FUNCTION
-fn query_contact_info_elements() -> ExternResult<Option<(element::SignedHeaderHashed, ContactsInfo)>>
-{
+pub fn get_latest_contact_info(
+    agent_pubkey: &AgentPubKey
+) -> ExternResult<Option<Contact>> {
     let filter = QueryFilter::new()
-        .entry_type(EntryType::App(AppEntryType::new(
-            EntryDefIndex::from(0),
-            ZomeId::from(0),
-            EntryVisibility::Private,
-        )))
-        .include_entries(true);
+    .entry_type(EntryType::App(AppEntryType::new(
+        EntryDefIndex::from(0),
+        ZomeId::from(0),
+        EntryVisibility::Private,
+    )))
+    .include_entries(true)
+    .header_type(HeaderType::Create);
     let query_result = query(filter)?;
-    let filtered_elements: Vec<Element> = query_result
+    let maybe_latest_contact = query_result
         .0
         .into_iter()
         .filter_map(|e| {
-            let header = e.header();
-            match header {
-                Header::Create(_create) => Some(e),
-                Header::Update(_update) => Some(e),
-                _ => None,
+            if let Ok(Some(contact)) = e.into_inner().1.to_app_option::<Contact>() {
+                if &contact.agent_id == agent_pubkey {
+                    return Some(contact)
+                } else {
+                    return None
+                }
+            } else {
+                None
             }
         })
-        .collect();
-    match filtered_elements.len() {
-        0 => Ok(None),
-        _ => {
-            // Is the index 0 enough to assure that we are getting the latest ContactsInfo entry from the source chain?
-            let contacts_info_elements = filtered_elements.get(0);
-            match contacts_info_elements {
-                Some(el) => {
-                    let contacts_info_elements_components = el.clone().into_inner();
-                    let maybe_contacts_info: Option<ContactsInfo> = contacts_info_elements_components.1.to_app_option()?;
-                    match maybe_contacts_info {
-                        Some(contacts_info) => {
-                            Ok(Some((contacts_info_elements_components.0, contacts_info)))
-                        },
-                        _ => {
-                            // This means that the ElementEntry was a variant other than Present
-                            // TODO: edit Error
-                            crate::error("contacts info entry is either inaccessible or not existing.")
-                        }
-                    }
-                },
-                _ => {
-                    Ok(None)
-                }
-            }
-        }
-    }
-}
-
+        .max_by_key(|c| c.created);
+    Ok(maybe_latest_contact)
+} 
 
 pub(crate) fn get_agent_pubkey_from_username(
     username: UsernameWrapper,
