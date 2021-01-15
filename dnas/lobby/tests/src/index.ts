@@ -1,19 +1,41 @@
-import { Orchestrator } from "@holochain/tryorama";
-import { Config } from "@holochain/tryorama";
-import request from './request'
-import contacts from './contacts'
+import { Config, Orchestrator, InstallAgentsHapps } from '@holochain/tryorama';
+import path from 'path';
+
+import contacts from './zomes/contacts'
+import preference from './zomes/preference'
+// import request from './zomes/request'
+
+const config = Config.gen();
+const kizuna = path.join('../kizuna.dna.gz');
+
+const installAgent: InstallAgentsHapps = [[[kizuna]]] 
+
+const install2Agents: InstallAgentsHapps = [
+  [[kizuna]],
+  [[kizuna]]
+] 
+
+const install3Agents: InstallAgentsHapps = [
+  [[kizuna]],
+  [[kizuna]],
+  [[kizuna]]
+] 
+
+const installables = {
+  one: installAgent,
+  two: install2Agents,
+  three: install3Agents
+};
 
 const orchestrator = new Orchestrator();
 
-// Configure a conductor with two identical DNAs,
-// differentiated by UUID, nicknamed "alice" and "bobbo"
-const config = Config.gen({
-  alice: Config.dna("../kizuna.dna.gz", null),
-  bobby: Config.dna("../kizuna.dna.gz", null),
-  clark: Config.dna("../kizuna.dna.gz", null)
-});
 
-contacts(orchestrator, config);
+
+
+contacts(orchestrator, config, installables);
+preference(orchestrator, config, installables);
+
+
 // request(orchestrator, config);
 
 orchestrator.run();

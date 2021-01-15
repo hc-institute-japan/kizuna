@@ -3,9 +3,6 @@
   "uuid": "",
   "properties": null,
   "zomes": {
-    "request": {
-      "wasm_path": "../target/wasm32-unknown-unknown/release/request.wasm"
-    },
     "username": {
       "wasm_path": "../target/wasm32-unknown-unknown/release/username.wasm"
     },
@@ -14,6 +11,9 @@
     },
     "p2pmessage": {
       "wasm_path": "../target/wasm32-unknown-unknown/release/p2pmessage.wasm"
+    },
+    "preference": {
+      "wasm_path": "../target/wasm32-unknown-unknown/release/preference.wasm"
     }
   }
 }
