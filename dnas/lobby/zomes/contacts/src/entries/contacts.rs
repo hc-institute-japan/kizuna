@@ -28,37 +28,28 @@ impl Profile {
     }
 }
 
-#[hdk_entry(id = "contacts", visibility = "private")]
-#[derive(Clone, Debug)]
-pub struct ContactsInfo {
-    agent_id: AgentPubKey,
-    timestamp: Timestamp,
-    contacts: Vec<AgentPubKey>,
-    blocked: Vec<AgentPubKey>,
+#[derive(Clone, Debug, Deserialize, Serialize, SerializedBytes)]
+pub enum ContactType {
+	Add,
+	Remove,
+	Block,
+	Unblock
 }
 
-impl ContactsInfo {
-    pub fn new(timestamp: Timestamp) -> Result<Self, HdkError> {
-        let agent_info = agent_info()?;
-        Ok(ContactsInfo {
-            agent_id: agent_info.agent_latest_pubkey,
-            timestamp,
-            contacts: Vec::default(),
-            blocked: Vec::default(),
-        })
-    }
+#[hdk_entry(id = "contact", visibility = "private")]
+#[derive(Clone, Debug)]
+pub struct Contact {
+    agent_id: AgentPubKey,
+    created: Timestamp,
+    contact_type: ContactType
+}
 
-    pub fn from(
-        timestamp: Timestamp,
-        contacts: Vec<AgentPubKey>,
-        blocked: Vec<AgentPubKey>,
-    ) -> Result<Self, HdkError> {
-        let agent_info = agent_info()?;
-        Ok(ContactsInfo {
-            agent_id: agent_info.agent_latest_pubkey,
-            timestamp,
-            contacts,
-            blocked,
-        })
+impl Contact {
+    pub fn new(timestamp: Timestamp, agent_id: AgentPubKey, contact_type: ContactType) -> Self {
+        Contact {
+            agent_id,
+            created: timestamp,
+            contact_type
+        }
     }
 }
