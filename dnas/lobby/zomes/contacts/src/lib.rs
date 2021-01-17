@@ -1,10 +1,9 @@
 #![allow(unused_imports)]
 #![allow(dead_code)]
 use contacts::{
-    BlockedWrapper,
+    AgentPubKeyWrapper,
     BooleanWrapper,
     Contact,
-    ContactsWrapper,
     Profile,
     UsernameWrapper,
 };
@@ -39,25 +38,25 @@ fn unblock_contact(username: UsernameWrapper) -> ExternResult<Profile> {
     Ok(contacts::handlers::unblock_contact(username)?)
 }
 
-// #[hdk_extern]
-// fn list_contacts(_: ()) -> ExternResult<ContactsWrapper> {
-//     Ok(contacts::handlers::list_contacts()?)
-// }
+#[hdk_extern]
+fn list_contacts(_: ()) -> ExternResult<AgentPubKeyWrapper> {
+    Ok(contacts::handlers::list_added()?)
+}
 
-// #[hdk_extern]
-// fn list_blocked(_: ()) -> ExternResult<BlockedWrapper> {
-//     Ok(contacts::handlers::list_blocked()?)
-// }
+#[hdk_extern]
+fn list_blocked(_: ()) -> ExternResult<AgentPubKeyWrapper> {
+    Ok(contacts::handlers::list_blocked()?)
+}
 
-// #[hdk_extern]
-// fn in_contacts(agent_pubkey: AgentPubKey) -> ExternResult<BooleanWrapper> {
-//     Ok(contacts::handlers::in_contacts(agent_pubkey)?)
-// }
+#[hdk_extern]
+fn in_contacts(agent_pubkey: AgentPubKey) -> ExternResult<BooleanWrapper> {
+    Ok(contacts::handlers::in_contacts(agent_pubkey)?)
+}
 
-// #[hdk_extern]
-// fn in_blocked(agent_pubkey: AgentPubKey) -> ExternResult<BooleanWrapper> {
-//     Ok(contacts::handlers::in_blocked(agent_pubkey)?)
-// }
+#[hdk_extern]
+fn in_blocked(agent_pubkey: AgentPubKey) -> ExternResult<BooleanWrapper> {
+    Ok(contacts::handlers::in_blocked(agent_pubkey)?)
+}
 
 pub fn error<T>(reason: &str) -> ExternResult<T> {
     Err(HdkError::Wasm(WasmError::Zome(String::from(reason))))

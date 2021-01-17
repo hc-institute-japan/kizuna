@@ -149,33 +149,44 @@ export default (orchestrator, config, installables) => {
     t.deepEqual(unblock_then_remove.username, "bobby_123");
   });
 
-  // orchestrator.registerScenario("list contacts", async (s, t) => {
-  //   const [conductor] = await s.players([config]);
-  //   const [[alice_lobby_happ], [bobby_lobby_happ]] = await conductor.installAgentsHapps(installables.two);
-  //   const [alice_conductor] = alice_lobby_happ.cells;
-  //   const [bobby_conductor] = bobby_lobby_happ.cells;
+  orchestrator.registerScenario("list contacts", async (s, t) => {
+    const [conductor] = await s.players([config]);
+    const [[alice_lobby_happ], [bobby_lobby_happ], [clark_lobby_happ]] = await conductor.installAgentsHapps(installables.three);
+    const [alice_conductor] = alice_lobby_happ.cells;
+    const [bobby_conductor] = bobby_lobby_happ.cells;
+    const [clark_conductor] = clark_lobby_happ.cells;
 
-  //   await setUsername("alice_123")(alice_conductor);
-  //   await setUsername("bobby_123")(bobby_conductor);
-  //   await delay(1000);
+    await setUsername("alice_123")(alice_conductor);
+    await setUsername("bobby_123")(bobby_conductor);
+    await setUsername("clark_123")(clark_conductor);
+    await delay(1000);
 
-  //   const empty_list_contacts = await listContacts()(alice_conductor);
-  //   await addContact("alice_123")(alice_conductor);
-  //   await addContact("bobby_123")(alice_conductor);
+    const empty_list_contacts = await listContacts()(alice_conductor);
+    await addContact("alice_123")(alice_conductor);
+    await addContact("bobby_123")(alice_conductor);
+    await addContact("clark_123")(alice_conductor);
     
-  //   await delay(1000);
+    const list_contacts_1 = await listContacts()(alice_conductor);
+    await removeContact("bobby_123")(alice_conductor);
     
-  //   const list_contacts_1 = await listContacts()(alice_conductor);
-  //   await removeContact("bobby_123")(alice_conductor);
-
-  //   await delay(1000);
+    const list_contacts_2 = await listContacts()(alice_conductor);
+    await blockContact("clark_123")(alice_conductor);
     
-  //   const list_contacts_2 = await listContacts()(alice_conductor);
+    const list_contacts_3 = await listContacts()(alice_conductor);
+    await addContact("bobby_123")(alice_conductor);
 
-  //   t.deepEqual(empty_list_contacts.length, 0);
-  //   t.deepEqual(list_contacts_1.length, 2);
-  //   t.deepEqual(list_contacts_2.length, 1);
-  // });
+    const list_contacts_4 = await listContacts()(alice_conductor);
+    await removeContact("bobby_123")(alice_conductor);
+    
+    const list_contacts_5 = await listContacts()(alice_conductor);
+
+    t.deepEqual(empty_list_contacts.length, 0);
+    t.deepEqual(list_contacts_1.length, 3);
+    t.deepEqual(list_contacts_2.length, 2);
+    t.deepEqual(list_contacts_3.length, 1);
+    t.deepEqual(list_contacts_4.length, 2);
+    t.deepEqual(list_contacts_5.length, 1);
+  });
 
   orchestrator.registerScenario("block contact", async (s, t) => {
     const [conductor] = await s.players([config]);
@@ -289,104 +300,72 @@ export default (orchestrator, config, installables) => {
     t.deepEqual(unblocked_then_unblock.username, "bobby_123");
   });
 
-  // orchestrator.registerScenario("list blocked contacts", async (s, t) => {
-  //   const [condcutor] = await s.players([config]);
-  //   const [[alice_lobby_happ], [bobby_lobby_happ], [clark_lobby_happ]] = await condcutor.installAgentsHapps(installables.three);
-  //   const [alice_conductor] = alice_lobby_happ.cells;
-  //   const [bobby_conductor] = bobby_lobby_happ.cells;
-  //   const [clark_conductor] = clark_lobby_happ.cells;
+  orchestrator.registerScenario("list blocked", async (s, t) => {
+    const [conductor] = await s.players([config]);
+    const [[alice_lobby_happ], [bobby_lobby_happ], [clark_lobby_happ]] = await conductor.installAgentsHapps(installables.three);
+    const [alice_conductor] = alice_lobby_happ.cells;
+    const [bobby_conductor] = bobby_lobby_happ.cells;
+    const [clark_conductor] = clark_lobby_happ.cells;
 
-  //   await setUsername("alice_123")(alice_conductor);
-  //   await setUsername("bobby_123")(bobby_conductor);
-  //   await setUsername("clark_123")(clark_conductor);
-  //   await delay(1000);
+    await setUsername("alice_123")(alice_conductor);
+    await setUsername("bobby_123")(bobby_conductor);
+    await setUsername("clark_123")(clark_conductor);
+    await delay(1000);
 
-  //   await addContact("alice_123")(alice_conductor);
-  //   await addContact("bobby_123")(alice_conductor);
-  //   await addContact("clark_123")(alice_conductor);
-  //   await delay(1000);
-
-  //   const emtpy_block_list = await listBlocked()(alice_conductor);
-  //   await blockContact("bobby_123")(alice_conductor);
-  //   await blockContact("clark_123")(alice_conductor);
-  //   await delay(1000);
+    const empty_list_blocked = await listBlocked()(alice_conductor);
+    await blockContact("bobby_123")(alice_conductor);
+    await blockContact("clark_123")(alice_conductor);
     
-  //   const blocked_list_1 = await listBlocked()(alice_conductor);
-  //   await unblockContact("bobby_123")(alice_conductor);
-  //   await unblockContact("clark_123")(alice_conductor);
-  //   await delay(1000);
+    const list_blocked_1 = await listBlocked()(alice_conductor);
+    await unblockContact("bobby_123")(alice_conductor);
     
-  //   const blocked_list_2 = await listBlocked()(alice_conductor);
-  //   await blockContact("bobby_123")(alice_conductor);
-  //   await blockContact("clark_123")(alice_conductor);
-  //   await delay(1000);
-
-  //   const blocked_list_3 = await listBlocked()(alice_conductor);
-
-  //   t.deepEqual(emtpy_block_list.length, 0);
-  //   t.deepEqual(blocked_list_1.length, 2);
-  //   t.deepEqual(blocked_list_2.length, 0);
-  //   t.deepEqual(blocked_list_3.length, 2);
-  // });
-
-  // orchestrator.registerScenario("check in contacts", async (s, t) => {
-  //   const [conductor] = await s.players([config]);
-  //   const [[alice_lobby_happ], [bobby_lobby_happ], [clark_lobby_happ]] = await conductor.installAgentsHapps(installables.three);
-  //   const [alice_conductor] = alice_lobby_happ.cells;
-  //   const [bobby_conductor] = bobby_lobby_happ.cells;
-  //   const [clark_conductor] = clark_lobby_happ.cells;
+    const list_blocked_2 = await listBlocked()(alice_conductor);
+    await unblockContact("clark_123")(alice_conductor);
     
-  //   const [dna_hash_1, agent_pubkey_alice] = alice_conductor.cellId;
-  //   const [dna_hash_2, agent_pubkey_bobby] = bobby_conductor.cellId;
-  //   const [dna_hash_3, agent_pubkey_clark] = clark_conductor.cellId;
+    const list_blocked_3 = await listBlocked()(alice_conductor);
+    await blockContact("bobby_123")(alice_conductor);
 
-  //   await setUsername("alice_123")(alice_conductor);
-  //   await setUsername("bobby_123")(bobby_conductor);
-  //   await setUsername("clark_123")(clark_conductor);
-  //   await delay(1000);
-
-  //   await addContact("alice_123")(alice_conductor);
-  //   await addContact("bobby_123")(alice_conductor);
-
-  //   await delay(1000);
-
-  //   const in_contacts_1 = await inContacts(agent_pubkey_alice)(alice_conductor);
-  //   const in_contacts_2 = await inContacts(agent_pubkey_bobby)(alice_conductor);
-  //   const in_contacts_3 = await inContacts(agent_pubkey_clark)(alice_conductor);
-
-  //   t.deepEqual(in_contacts_1, true);
-  //   t.deepEqual(in_contacts_2, true);
-  //   t.deepEqual(in_contacts_3, false);
-  // });
-
-  // orchestrator.registerScenario("check in blocked list", async (s, t) => {
-  //   const [conductor] = await s.players([config]);
-  //   const [[alice_lobby_happ], [bobby_lobby_happ], [clark_lobby_happ]] = await conductor.installAgentsHapps(installables.three);
-  //   const [alice_conductor] = alice_lobby_happ.cells;
-  //   const [bobby_conductor] = bobby_lobby_happ.cells;
-  //   const [clark_conductor] = clark_lobby_happ.cells;
+    const list_blocked_4 = await listBlocked()(alice_conductor);
+    await blockContact("clark_123")(alice_conductor);
     
-  //   const [dna_hash_1, agent_pubkey_alice] = alice_conductor.cellId;
-  //   const [dna_hash_2, agent_pubkey_bobby] = bobby_conductor.cellId;
-  //   const [dna_hash_3, agent_pubkey_clark] = clark_conductor.cellId;
+    const list_blocked_5 = await listBlocked()(alice_conductor);
 
-  //   await setUsername("alice_123")(alice_conductor);
-  //   await setUsername("bobby_123")(bobby_conductor);
-  //   await setUsername("clark_123")(clark_conductor);
-  //   await delay(1000);
+    t.deepEqual(empty_list_blocked.length, 0);
+    t.deepEqual(list_blocked_1.length, 2);
+    t.deepEqual(list_blocked_2.length, 1);
+    t.deepEqual(list_blocked_3.length, 0);
+    t.deepEqual(list_blocked_4.length, 1);
+    t.deepEqual(list_blocked_5.length, 2);
+  });
 
-  //   await blockContact("bobby_123")(alice_conductor);
-  //   await blockContact("clark_123")(alice_conductor);
+  orchestrator.registerScenario("check in blocked list", async (s, t) => {
+    const [conductor] = await s.players([config]);
+    const [[alice_lobby_happ], [bobby_lobby_happ], [clark_lobby_happ]] = await conductor.installAgentsHapps(installables.three);
+    const [alice_conductor] = alice_lobby_happ.cells;
+    const [bobby_conductor] = bobby_lobby_happ.cells;
+    const [clark_conductor] = clark_lobby_happ.cells;
+    
+    const [dna_hash_1, agent_pubkey_alice] = alice_conductor.cellId;
+    const [dna_hash_2, agent_pubkey_bobby] = bobby_conductor.cellId;
+    const [dna_hash_3, agent_pubkey_clark] = clark_conductor.cellId;
 
-  //   await delay(1000);
+    await setUsername("alice_123")(alice_conductor);
+    await setUsername("bobby_123")(bobby_conductor);
+    await setUsername("clark_123")(clark_conductor);
+    await delay(1000);
 
-  //   const in_contacts_1 = await inBlocked(agent_pubkey_alice)(alice_conductor);
-  //   const in_contacts_2 = await inBlocked(agent_pubkey_bobby)(alice_conductor);
-  //   const in_contacts_3 = await inBlocked(agent_pubkey_clark)(alice_conductor);
+    await blockContact("bobby_123")(alice_conductor);
+    await blockContact("clark_123")(alice_conductor);
 
-  //   t.deepEqual(in_contacts_1, false);
-  //   t.deepEqual(in_contacts_2, true);
-  //   t.deepEqual(in_contacts_3, true);
-  // });
+    await delay(1000);
+
+    const in_contacts_1 = await inBlocked(agent_pubkey_alice)(alice_conductor);
+    const in_contacts_2 = await inBlocked(agent_pubkey_bobby)(alice_conductor);
+    const in_contacts_3 = await inBlocked(agent_pubkey_clark)(alice_conductor);
+
+    t.deepEqual(in_contacts_1, false);
+    t.deepEqual(in_contacts_2, true);
+    t.deepEqual(in_contacts_3, true);
+  });
 };
   
