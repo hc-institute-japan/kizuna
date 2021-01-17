@@ -8,10 +8,7 @@ pub struct BooleanWrapper(pub bool);
 pub struct UsernameWrapper(pub String);
 
 #[derive(Deserialize, Serialize, SerializedBytes)]
-pub struct ContactsWrapper(pub Vec<AgentPubKey>);
-
-#[derive(Deserialize, Serialize, SerializedBytes)]
-pub struct BlockedWrapper(pub Vec<AgentPubKey>);
+pub struct AgentPubKeyWrapper(pub Vec<AgentPubKey>);
 
 #[derive(Deserialize, Serialize, Clone, Debug, SerializedBytes, Default)]
 pub struct Profile {
@@ -28,7 +25,7 @@ impl Profile {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize, SerializedBytes)]
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize, SerializedBytes)]
 pub enum ContactType {
 	Add,
 	Remove,
