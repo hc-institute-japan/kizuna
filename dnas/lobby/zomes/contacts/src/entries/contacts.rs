@@ -8,7 +8,7 @@ pub struct BooleanWrapper(pub bool);
 pub struct UsernameWrapper(pub String);
 
 #[derive(Deserialize, Serialize, SerializedBytes)]
-pub struct AgentPubKeyWrapper(pub Vec<AgentPubKey>);
+pub struct AgentPubKeysWrapper(pub Vec<AgentPubKey>);
 
 #[derive(Deserialize, Serialize, Clone, Debug, SerializedBytes, Default)]
 pub struct Profile {

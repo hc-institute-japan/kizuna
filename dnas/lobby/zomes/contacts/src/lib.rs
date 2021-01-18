@@ -1,7 +1,7 @@
 #![allow(unused_imports)]
 #![allow(dead_code)]
 use contacts::{
-    AgentPubKeyWrapper,
+    AgentPubKeysWrapper,
     BooleanWrapper,
     Contact,
     Profile,
@@ -39,12 +39,12 @@ fn unblock_contact(username: UsernameWrapper) -> ExternResult<Profile> {
 }
 
 #[hdk_extern]
-fn list_contacts(_: ()) -> ExternResult<AgentPubKeyWrapper> {
+fn list_added(_: ()) -> ExternResult<AgentPubKeysWrapper> {
     Ok(contacts::handlers::list_added()?)
 }
 
 #[hdk_extern]
-fn list_blocked(_: ()) -> ExternResult<AgentPubKeyWrapper> {
+fn list_blocked(_: ()) -> ExternResult<AgentPubKeysWrapper> {
     Ok(contacts::handlers::list_blocked()?)
 }
 
