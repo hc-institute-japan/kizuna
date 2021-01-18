@@ -8,7 +8,7 @@ use std::collections::{
 
 use super::{
     BooleanWrapper,
-    AgentPubKeyWrapper,
+    AgentPubKeysWrapper,
     Contact,
     ContactType,
     Profile,
@@ -129,11 +129,11 @@ pub(crate) fn unblock_contact(username: UsernameWrapper) -> ExternResult<Profile
 
 
 
-pub(crate) fn list_added() -> ExternResult<AgentPubKeyWrapper> {
+pub(crate) fn list_added() -> ExternResult<AgentPubKeysWrapper> {
     Ok(list_added_or_blocked(ContactType::Add)?)
 }
 
-pub(crate) fn list_blocked() -> ExternResult<AgentPubKeyWrapper> {
+pub(crate) fn list_blocked() -> ExternResult<AgentPubKeysWrapper> {
     Ok(list_added_or_blocked(ContactType::Block)?)
 }
 
@@ -221,7 +221,7 @@ fn query_contacts() -> ExternResult<Vec<Contact>> {
     Ok(contacts)
 }
 
-fn list_added_or_blocked(filter: ContactType) -> ExternResult<AgentPubKeyWrapper> {
+fn list_added_or_blocked(filter: ContactType) -> ExternResult<AgentPubKeysWrapper> {
     let mut agents_to_contact_types: HashMap<AgentPubKey, Vec<Contact>> = std::collections::HashMap::new();
     let sorted_contacts = query_contacts()?;
 
@@ -258,5 +258,5 @@ fn list_added_or_blocked(filter: ContactType) -> ExternResult<AgentPubKeyWrapper
         })
         .collect();
     
-    Ok(AgentPubKeyWrapper(filtered_agents))
+    Ok(AgentPubKeysWrapper(filtered_agents))
 }

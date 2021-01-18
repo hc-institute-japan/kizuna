@@ -23,8 +23,8 @@ function unblockContact(username) {
   conductor.call("contacts", "unblock_contact", username);
 };
 
-function listContacts() {
-  return (conductor) => conductor.call("contacts", "list_contacts", null);
+function listAdded() {
+  return (conductor) => conductor.call("contacts", "list_added", null);
 };
 
 function listBlocked() {
@@ -41,10 +41,6 @@ function inBlocked(agentPubKey) {
   
 function setUsername(username) {
   return (conductor) => conductor.call("username", "set_username", username);
-}
-
-function getAgentPubkeyFromUsername(username) {
-  return (conductor) => conductor.call("username", "get_agent_pubkey_from_username", username)
 }
 
 export default (orchestrator, config, installables) => {
@@ -149,7 +145,7 @@ export default (orchestrator, config, installables) => {
     t.deepEqual(unblock_then_remove.username, "bobby_123");
   });
 
-  orchestrator.registerScenario("list contacts", async (s, t) => {
+  orchestrator.registerScenario("list added", async (s, t) => {
     const [conductor] = await s.players([config]);
     const [[alice_lobby_happ], [bobby_lobby_happ], [clark_lobby_happ]] = await conductor.installAgentsHapps(installables.three);
     const [alice_conductor] = alice_lobby_happ.cells;
@@ -161,31 +157,31 @@ export default (orchestrator, config, installables) => {
     await setUsername("clark_123")(clark_conductor);
     await delay(1000);
 
-    const empty_list_contacts = await listContacts()(alice_conductor);
+    const empty_list_added = await listAdded()(alice_conductor);
     await addContact("alice_123")(alice_conductor);
     await addContact("bobby_123")(alice_conductor);
     await addContact("clark_123")(alice_conductor);
     
-    const list_contacts_1 = await listContacts()(alice_conductor);
+    const list_added_1 = await listAdded()(alice_conductor);
     await removeContact("bobby_123")(alice_conductor);
     
-    const list_contacts_2 = await listContacts()(alice_conductor);
+    const list_added_2 = await listAdded()(alice_conductor);
     await blockContact("clark_123")(alice_conductor);
     
-    const list_contacts_3 = await listContacts()(alice_conductor);
+    const list_added_3 = await listAdded()(alice_conductor);
     await addContact("bobby_123")(alice_conductor);
 
-    const list_contacts_4 = await listContacts()(alice_conductor);
+    const list_added_4 = await listAdded()(alice_conductor);
     await removeContact("bobby_123")(alice_conductor);
     
-    const list_contacts_5 = await listContacts()(alice_conductor);
+    const list_added_5 = await listAdded()(alice_conductor);
 
-    t.deepEqual(empty_list_contacts.length, 0);
-    t.deepEqual(list_contacts_1.length, 3);
-    t.deepEqual(list_contacts_2.length, 2);
-    t.deepEqual(list_contacts_3.length, 1);
-    t.deepEqual(list_contacts_4.length, 2);
-    t.deepEqual(list_contacts_5.length, 1);
+    t.deepEqual(empty_list_added.length, 0);
+    t.deepEqual(list_added_1.length, 3);
+    t.deepEqual(list_added_2.length, 2);
+    t.deepEqual(list_added_3.length, 1);
+    t.deepEqual(list_added_4.length, 2);
+    t.deepEqual(list_added_5.length, 1);
   });
 
   orchestrator.registerScenario("block contact", async (s, t) => {
