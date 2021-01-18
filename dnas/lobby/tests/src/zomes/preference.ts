@@ -131,6 +131,17 @@ const preference = (orchestrator, config, installables: Installables) => {
       preference = await call(
         alice_conductor,
         "preference",
+        "get_per_agent_preference"
+      );
+
+      t.deepEqual(preference, {
+        typing_indicator: [],
+        read_receipt: [],
+      });
+
+      preference = await call(
+        alice_conductor,
+        "preference",
         "set_per_agent_preference",
         {
           typing_indicator: [bobby_pubkey],
@@ -153,7 +164,7 @@ const preference = (orchestrator, config, installables: Installables) => {
       );
 
       t.deepEqual(preference, {
-        typing_indicator: [bobby_pubkey, clark_pubkey, diego_pubkey],
+        typing_indicator: [clark_pubkey, diego_pubkey],
         read_receipt: [diego_pubkey],
       });
 
@@ -167,21 +178,20 @@ const preference = (orchestrator, config, installables: Installables) => {
       );
 
       t.deepEqual(preference, {
-        typing_indicator: [bobby_pubkey, clark_pubkey, diego_pubkey],
-        read_receipt: [diego_pubkey, ethan_pubkey],
+        typing_indicator: [clark_pubkey, diego_pubkey],
+        read_receipt: [ethan_pubkey],
       });
-
-      await call(alice_conductor, "preference", "set_per_agent_preference", {});
 
       preference = await call(
         alice_conductor,
         "preference",
-        "get_per_agent_preference"
+        "set_per_agent_preference",
+        {}
       );
 
       t.deepEqual(preference, {
-        typing_indicator: [bobby_pubkey, clark_pubkey, diego_pubkey],
-        read_receipt: [diego_pubkey, ethan_pubkey],
+        typing_indicator: [clark_pubkey, diego_pubkey],
+        read_receipt: [ethan_pubkey],
       });
     }
   );
@@ -196,6 +206,17 @@ const preference = (orchestrator, config, installables: Installables) => {
       const alice_conductor = alice_lobby_happ[0].cells[0];
 
       let preference = null;
+
+      preference = await call(
+        alice_conductor,
+        "preference",
+        "get_per_group_preference"
+      );
+
+      t.deepEqual(preference, {
+        typing_indicator: [],
+        read_receipt: [],
+      });
 
       preference = await call(
         alice_conductor,
@@ -222,7 +243,7 @@ const preference = (orchestrator, config, installables: Installables) => {
       );
 
       t.deepEqual(preference, {
-        typing_indicator: ["test_string", "test_string_1", "test_string_2"],
+        typing_indicator: ["test_string_1", "test_string_2"],
         read_receipt: ["test_string_2"],
       });
 
@@ -236,8 +257,8 @@ const preference = (orchestrator, config, installables: Installables) => {
       );
 
       t.deepEqual(preference, {
-        typing_indicator: ["test_string", "test_string_1", "test_string_2"],
-        read_receipt: ["test_string_2", "test_string_3"],
+        typing_indicator: ["test_string_1", "test_string_2"],
+        read_receipt: ["test_string_3"],
       });
 
       preference = await call(
@@ -247,8 +268,8 @@ const preference = (orchestrator, config, installables: Installables) => {
         {}
       );
       t.deepEqual(preference, {
-        typing_indicator: ["test_string", "test_string_1", "test_string_2"],
-        read_receipt: ["test_string_2", "test_string_3"],
+        typing_indicator: ["test_string_1", "test_string_2"],
+        read_receipt: ["test_string_3"],
       });
     }
   );
