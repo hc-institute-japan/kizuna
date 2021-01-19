@@ -45,8 +45,8 @@ pub struct SecretHash(pub XSalsa20Poly1305KeyRef);
 
 #[derive(Debug, Clone, Serialize, Deserialize, SerializedBytes)]
 pub struct GroupSecretKey{
-    group_hash:EntryHash,
-    key_hash:XSalsa20Poly1305KeyRef
+    group_hash: EntryHash,
+    key_hash: XSalsa20Poly1305KeyRef
 }
 
 entry_def!(GroupSecretKey 
@@ -62,7 +62,7 @@ entry_def!(GroupSecretKey
 #[derive(Debug, Clone, Serialize, Deserialize, SerializedBytes)]
 pub struct GroupMembers {
     group_hash: EntryHash, // this should not change -> checked with validation
-    secret_hash: SecretHash,//this is the hash where the encription_key its storages
+    secret_hash: SecretHash, // this is the hash where the encription_key its storages
     members: Vec<AgentPubKey>
 }
 

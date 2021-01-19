@@ -24,22 +24,27 @@ pub(crate)fn create_group(create_group_input: CreateGroupInput )->ExternResult<G
     let group_name : String = create_group_input.name;
     let group_members : Vec<AgentPubKey> = create_group_input.members;
 
+    // TODO: !(group members < 2) should be checked in validations too
+    // TODO: check if creator AgentPubKey is not included in the members.
+    // if included, remove it before this if condt.
     if  !(group_name.eq(& String::from("")) || group_members.len() < 2) {
         
-        let group:Group = Group{
+        let group: Group = Group {
             name: group_name,
             created: to_timestamp(sys_time()?),
             creator: agent_info()?.agent_latest_pubkey,
         };
         
         // commit group entry
-        create_entry(&group.clone())?;
+        create_entry(&group)?;
         
         // call `TryFromRandom` to generate symmetric key
+        // TODO: change implementation once the actual key 
+        // is stored in LAIR.
         let key_hash: XSalsa20Poly1305KeyRef = SecretBoxKeyRef:: try_from_random()?;
 
         let group_secret_key: GroupSecretKey = GroupSecretKey{
-            group_hash: hash_entry(&group.clone())?,
+            group_hash: hash_entry(&group)?,
             key_hash: key_hash.clone(),
         };    
 
@@ -49,7 +54,7 @@ pub(crate)fn create_group(create_group_input: CreateGroupInput )->ExternResult<G
         //call fn add_initial_members(add_members_input)
         add_initial_members(AddInitialMembersInput{
             invitee: group_members,
-            group_entry_hash: hash_entry(&group.clone())?,
+            group_entry_hash: hash_entry(&group)?,
             secret_hash: SecretHash(key_hash),
         })?;
 
@@ -62,20 +67,20 @@ pub(crate)fn create_group(create_group_input: CreateGroupInput )->ExternResult<G
 
 pub fn add_initial_members(add_member_input:AddInitialMembersInput) ->ExternResult<HeaderHash>{
 
-    let group_hash:EntryHash = add_member_input.group_entry_hash;
-    let secret_hash:SecretHash = add_member_input.secret_hash;
-    let members:Vec<AgentPubKey> = add_member_input.invitee;
+    let group_hash: EntryHash = add_member_input.group_entry_hash;
+    let secret_hash: SecretHash = add_member_input.secret_hash;
+    let members: Vec<AgentPubKey> = add_member_input.invitee;
 
     //initialize GroupMembers with args given
-    let group_members:GroupMembers = GroupMembers{
-        group_hash:group_hash.clone(),
-        secret_hash:secret_hash,
-        members:members.clone(),
+    let group_members: GroupMembers = GroupMembers{
+        group_hash: group_hash.clone(),
+        secret_hash: secret_hash,
+        members: members.clone(),
     };
 
     //commit GroupMembers entry with members
-    let group_members_header_hash = create_entry(&group_members.clone())?;
-    let group_members_entry_hash = hash_entry(&group_members.clone())?;
+    let group_members_header_hash = create_entry(&group_members)?;
+    let group_members_entry_hash = hash_entry(&group_members)?;
 
 
     //link Group -> GroupMembers tag "members
@@ -95,7 +100,7 @@ pub fn add_initial_members(add_member_input:AddInitialMembersInput) ->ExternResu
 
     //[for all newly added agent]
     //link from each member to GroupMembers entry tag "member"
-    for agent in members.clone(){
+    for agent in members.clone() {
 
         create_link(
             agent.into(),
