@@ -5,129 +5,68 @@ use std::collections::{
     hash_map,
 };
 
-
 use super::{
     BooleanWrapper,
     AgentPubKeysWrapper,
     Contact,
     ContactType,
-    Profile,
-    UsernameWrapper,
 };
-use crate::utils::to_timestamp;
+
+use crate::{
+    error,
+    utils::to_timestamp,
+};
+
 use hdk3::prelude::*;
 
-pub(crate) fn add_contact(username: UsernameWrapper) -> ExternResult<Profile> {
-    // return Err if the given username is not linked to any agent
-    let agent_pubkey = get_agent_pubkey_from_username(username.clone())?;
-
-    let maybe_latest_contact = get_latest_contact_info(&agent_pubkey)?;
-    let profile: Profile = Profile::new(agent_pubkey.clone(), username.0);
-    if let Some(contact) = maybe_latest_contact {
-        match contact.contact_type {
-            ContactType::Add => {
-                // return the given username and agent pubkey right away
-                return Ok(profile)
-            },
-            ContactType::Block => {
-                // return Profile but with both fields set to None
-                return Ok(Profile::default())
-            },
-            _ => (),
-        }
-    }
+pub(crate) fn add_contacts(agent_ids: AgentPubKeysWrapper) -> ExternResult<AgentPubKeysWrapper> {
+    check_latest_state(&agent_ids, ContactType::Add)?;
     let added_contact = Contact::new(
         to_timestamp(sys_time()?),
-        agent_pubkey,
+        agent_ids.0.clone(),
         ContactType::Add
     );
     create_entry(&added_contact)?;
-    Ok(profile)
+    Ok(agent_ids)
 }
 
-pub(crate) fn remove_contact(username: UsernameWrapper) -> ExternResult<Profile> {
-    let agent_pubkey = get_agent_pubkey_from_username(username.clone())?;
+pub(crate) fn remove_contacts(agent_ids: AgentPubKeysWrapper) -> ExternResult<AgentPubKeysWrapper> {
+    check_latest_state(&agent_ids, ContactType::Remove)?;
 
-    let maybe_latest_contact = get_latest_contact_info(&agent_pubkey)?;
-    let profile: Profile = Profile::new(agent_pubkey.clone(), username.0);
-    
-    if let Some(contact) = maybe_latest_contact {
-        match contact.contact_type {
-            // return the given profile if removed or unblocked
-            ContactType::Remove | ContactType::Unblock => { return Ok(profile) },
-            // return empty Profile if given username is blocked
-            ContactType::Block => { return Ok(Profile::default()) },
-            _ => (),
-
-        }
-    } else {
-        // if None return Profile with given arg
-        return Ok(profile)
-    }
     let removed_contact = Contact::new(
         to_timestamp(sys_time()?),
-        agent_pubkey,
+        agent_ids.0.clone(),
         ContactType::Remove,
     );
     create_entry(&removed_contact)?;
-    Ok(profile)
+    Ok(agent_ids)
 }
 
-pub(crate) fn block_contact(username: UsernameWrapper) -> ExternResult<Profile> {
-    let agent_pubkey = get_agent_pubkey_from_username(username.clone())?;
+pub(crate) fn block_contacts(agent_ids: AgentPubKeysWrapper) -> ExternResult<AgentPubKeysWrapper> {
     let me = agent_info()?.agent_latest_pubkey;
+    // return err right away if trying to block oneself
+    if let true = agent_ids.0.contains(&me) { return error("cannot block yourself") }
 
-    // return right away if trying to block oneself
-    if me == agent_pubkey { return Ok(Profile::default()) }
-
-    let maybe_latest_contact = get_latest_contact_info(&agent_pubkey)?;
-    let profile: Profile = Profile::new(agent_pubkey.clone(), username.0);
-    
-    if let Some(contact) = maybe_latest_contact {
-        match contact.contact_type {
-            // return the given username and pubkey if already blocked
-            ContactType::Block => { return Ok(profile) },
-            _ => (),
-
-        }
-    }
-    // in other cases always block the given username
+    check_latest_state(&agent_ids, ContactType::Block)?;
     let blocked_contact = Contact::new(
         to_timestamp(sys_time()?),
-        agent_pubkey,
+        agent_ids.0.clone(),
         ContactType::Block,
     );
     create_entry(&blocked_contact)?;
-    Ok(profile)
+    Ok(agent_ids)
 }
 
-pub(crate) fn unblock_contact(username: UsernameWrapper) -> ExternResult<Profile> {
-    let agent_pubkey = get_agent_pubkey_from_username(username.clone())?;
-
-    let maybe_latest_contact = get_latest_contact_info(&agent_pubkey)?;
-    let profile: Profile = Profile::new(agent_pubkey.clone(), username.0); 
-    
-    if let Some(contact) = maybe_latest_contact {
-        match contact.contact_type {
-            // return the given username and pubkey if already unblocked
-            ContactType::Unblock | ContactType::Remove => { return Ok(profile) },
-            ContactType::Add => { return Ok(Profile::default()) },
-            _ => (),
-        }
-    } else {
-        return Ok(profile)
-    }
-
+pub(crate) fn unblock_contacts(agent_ids: AgentPubKeysWrapper) -> ExternResult<AgentPubKeysWrapper> {
+    check_latest_state(&agent_ids, ContactType::Unblock)?;
     let unblocked_contact = Contact::new(
         to_timestamp(sys_time()?),
-        agent_pubkey,
+        agent_ids.0.clone(),
         ContactType::Unblock,
     );
     create_entry(&unblocked_contact)?;
-    Ok(profile)    
+    Ok(agent_ids)    
 }
-
-
 
 pub(crate) fn list_added() -> ExternResult<AgentPubKeysWrapper> {
     Ok(list_added_or_blocked(ContactType::Add)?)
@@ -164,39 +103,80 @@ pub(crate) fn in_blocked(agent_pubkey: AgentPubKey) -> ExternResult<BooleanWrapp
 }
 
 // HELPER FUNCTION
-fn get_latest_contact_info(
-    agent_pubkey: &AgentPubKey
-) -> ExternResult<Option<Contact>> {
-    let maybe_contacts = query_contacts()?
+fn check_latest_state(
+    agent_pubkeys: &AgentPubKeysWrapper,
+    check_for: ContactType
+) -> ExternResult<()> {
+    let mut agents_to_contact_type: HashMap<AgentPubKey, Option<Contact>> = std::collections::HashMap::new();
+    let sorted_contacts = query_contacts()?;
+
+    for agent in &agent_pubkeys.0 {
+        let maybe_contacts = sorted_contacts
+        .clone()
         .into_iter()
         .filter_map(|c| {
-            if &c.agent_id == agent_pubkey { Some(c) } else { None }
+            if c.agent_ids.contains(&agent) { Some(c) } else { None }
         })
         .collect::<Vec<Contact>>();
-    // can return index 0 as query() orders from latest to oldest
-    // max_by_key() could be used which is more accurate but also expensive
-    // NOTE: can break with breaking change on query
-    if let Some(c) = maybe_contacts.get(0) {
-        Ok(Some(c.to_owned()))
-    } else {
-        Ok(None)
+        // can return index 0 as query() orders from latest to oldest
+        // max_by_key() could be used which is more accurate but also expensive
+        // NOTE: can break with breaking change on query
+        if let Some(c) = maybe_contacts.get(0) {
+            agents_to_contact_type.insert(agent.to_owned(), Some(c.to_owned()));
+        } else {
+            agents_to_contact_type.insert(agent.to_owned(), None);
+        }
     }
-} 
 
-fn get_agent_pubkey_from_username(
-    username: UsernameWrapper,
-) -> ExternResult<AgentPubKey> {
-    let function_name = zome::FunctionName("get_agent_pubkey_from_username".to_owned());
-    // needs to handle error from get_agent_pubkey_from_username in UI
-    let agent_pubkey = hdk3::prelude::call(
-        None,
-        "username".into(),
-        function_name,
-        None,
-        &username
-    )?;
-    Ok(agent_pubkey)
-}
+    match check_for {
+        ContactType::Add => {
+            for agent_contact in agents_to_contact_type {
+                if let Some(contact) = agent_contact.1 {
+                    match contact.contact_type {
+                        ContactType::Add => return error("agent already added"),
+                        ContactType::Block => return error("agent is blocked"),
+                        _ => (),
+                    }
+                }
+            }
+        },
+        ContactType::Remove => {
+            for agent_contact in agents_to_contact_type {
+                if let Some(contact) = agent_contact.1 {
+                    match contact.contact_type {
+                        ContactType::Remove | ContactType::Unblock => return error("agent is not added"),
+                        ContactType::Block => return error("agent is blocked"),
+                        _ => (),
+            
+                    }
+                } else { return error("agent is not added") }
+            }
+        },
+        ContactType::Block => {
+            for agent_contact in agents_to_contact_type {
+                if let Some(contact) = agent_contact.1 {
+                    if let ContactType::Block = contact.contact_type {
+                        return error("this agent is already blocked")
+                    }
+                }
+            }
+        },
+        ContactType::Unblock => {
+            for agent_contact in agents_to_contact_type {
+                if let Some(contact) = agent_contact.1 {
+                    match contact.contact_type {
+                        ContactType::Block => (),
+                        _ => return error("agent is not blocked"),
+                    }
+                } else {
+                    return error("agent is not blocked")
+                }
+            }
+        },
+    }
+
+    Ok(())
+} 
 
 fn query_contacts() -> ExternResult<Vec<Contact>> {
     let filter = QueryFilter::new()
@@ -225,18 +205,20 @@ fn list_added_or_blocked(filter: ContactType) -> ExternResult<AgentPubKeysWrappe
     let mut agents_to_contact_types: HashMap<AgentPubKey, Vec<Contact>> = std::collections::HashMap::new();
     let sorted_contacts = query_contacts()?;
 
-    for contact in sorted_contacts {
-        let maybe_agent_contact = agents_to_contact_types.entry(contact.agent_id.clone());
-        match maybe_agent_contact {
-            hash_map::Entry::Occupied(o) => {
-                let contact_types: &mut Vec<Contact> = o.into_mut();
-                contact_types.push(contact);
-            },
-            hash_map::Entry::Vacant(v) => {
-                let mut new_contact_types: Vec<Contact> = Vec::new();
-                new_contact_types.insert(0, contact);
-                v.insert(new_contact_types);
-            },
+    for contact in &sorted_contacts {
+        for agent_id in &contact.agent_ids {
+            let maybe_agent_contact = agents_to_contact_types.entry(agent_id.to_owned());
+            match maybe_agent_contact {
+                hash_map::Entry::Occupied(o) => {
+                    let contact_types: &mut Vec<Contact> = o.into_mut();
+                    contact_types.push(contact.to_owned());
+                },
+                hash_map::Entry::Vacant(v) => {
+                    let mut new_contact_types: Vec<Contact> = Vec::new();
+                    new_contact_types.insert(0, contact.to_owned());
+                    v.insert(new_contact_types);
+                },
+            }
         }
     };
 
@@ -246,9 +228,9 @@ fn list_added_or_blocked(filter: ContactType) -> ExternResult<AgentPubKeysWrappe
             let latest_status = agent_contact_types.1.into_iter().max_by_key(|c| c.created);
             if let Some(c) = latest_status {
                 if ContactType::Add == filter && ContactType::Add == c.contact_type  {
-                    return Some(c.agent_id)
+                    return Some(agent_contact_types.0)
                 } else if ContactType::Block == filter  && ContactType::Block == c.contact_type {
-                    return Some(c.agent_id)
+                    return Some(agent_contact_types.0)
                 } else {
                     None
                 }

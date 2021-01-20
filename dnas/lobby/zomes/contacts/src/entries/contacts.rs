@@ -4,26 +4,9 @@ pub mod handlers;
 
 #[derive(Deserialize, Serialize, SerializedBytes)]
 pub struct BooleanWrapper(pub bool);
-#[derive(Deserialize, Serialize, SerializedBytes, Clone)]
-pub struct UsernameWrapper(pub String);
 
 #[derive(Deserialize, Serialize, SerializedBytes)]
 pub struct AgentPubKeysWrapper(pub Vec<AgentPubKey>);
-
-#[derive(Deserialize, Serialize, Clone, Debug, SerializedBytes, Default)]
-pub struct Profile {
-    agent_id: Option<AgentPubKey>,
-    username: Option<String>,
-}
-
-impl Profile {
-    pub fn new(agent_id: AgentPubKey, username: String) -> Self {
-        Profile {
-            agent_id: Some(agent_id),
-            username: Some(username),
-        }
-    }
-}
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize, SerializedBytes)]
 pub enum ContactType {
@@ -36,15 +19,15 @@ pub enum ContactType {
 #[hdk_entry(id = "contact", visibility = "private")]
 #[derive(Clone, Debug)]
 pub struct Contact {
-    agent_id: AgentPubKey,
+    agent_ids: Vec<AgentPubKey>,
     created: Timestamp,
     contact_type: ContactType
 }
 
 impl Contact {
-    pub fn new(timestamp: Timestamp, agent_id: AgentPubKey, contact_type: ContactType) -> Self {
+    pub fn new(timestamp: Timestamp, agent_ids: Vec<AgentPubKey>, contact_type: ContactType) -> Self {
         Contact {
-            agent_id,
+            agent_ids,
             created: timestamp,
             contact_type
         }
