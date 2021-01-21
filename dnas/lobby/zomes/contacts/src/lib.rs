@@ -1,55 +1,46 @@
 #![allow(unused_imports)]
 #![allow(dead_code)]
 use contacts::{
-    BlockedWrapper,
+    AgentPubKeysWrapper,
     BooleanWrapper,
-    ContactsInfo,
-    ContactsWrapper,
-    Profile,
-    UsernameWrapper,
+    Contact,
 };
 use crate::utils::to_timestamp;
 use entries::contacts;
-use hdk3::prelude::{
-    // element::ElementEntry,
-    EntryDef,
-    *,
-};
+use hdk3::prelude::*;
 
 mod entries;
 mod utils;
 
-entry_defs![ContactsInfo::entry_def()];
+entry_defs![Contact::entry_def()];
 
-// temporarily passing agent_pubkey instead of username because of #397 in holochain/holochain
-// TODO: change back to username once issue is fixed.
 #[hdk_extern]
-fn add_contact(username: UsernameWrapper) -> ExternResult<Profile> {
-    Ok(contacts::handlers::add_contact(username)?)
+fn add_contacts(agent_ids: AgentPubKeysWrapper) -> ExternResult<AgentPubKeysWrapper> {
+    Ok(contacts::handlers::add_contacts(agent_ids)?)
 }
 
 #[hdk_extern]
-fn remove_contact(username: UsernameWrapper) -> ExternResult<Profile> {
-    Ok(contacts::handlers::remove_contact(username)?)
+fn remove_contacts(agent_ids: AgentPubKeysWrapper) -> ExternResult<AgentPubKeysWrapper> {
+    Ok(contacts::handlers::remove_contacts(agent_ids)?)
 }
 
 #[hdk_extern]
-fn block_contact(username: UsernameWrapper) -> ExternResult<Profile> {
-    Ok(contacts::handlers::block_contact(username)?)
+fn block_contacts(agent_ids: AgentPubKeysWrapper) -> ExternResult<AgentPubKeysWrapper> {
+    Ok(contacts::handlers::block_contacts(agent_ids)?)
 }
 
 #[hdk_extern]
-fn unblock_contact(username: UsernameWrapper) -> ExternResult<Profile> {
-    Ok(contacts::handlers::unblock_contact(username)?)
+fn unblock_contacts(agent_ids: AgentPubKeysWrapper) -> ExternResult<AgentPubKeysWrapper> {
+    Ok(contacts::handlers::unblock_contacts(agent_ids)?)
 }
 
 #[hdk_extern]
-fn list_contacts(_: ()) -> ExternResult<ContactsWrapper> {
-    Ok(contacts::handlers::list_contacts()?)
+fn list_added(_: ()) -> ExternResult<AgentPubKeysWrapper> {
+    Ok(contacts::handlers::list_added()?)
 }
 
 #[hdk_extern]
-fn list_blocked(_: ()) -> ExternResult<BlockedWrapper> {
+fn list_blocked(_: ()) -> ExternResult<AgentPubKeysWrapper> {
     Ok(contacts::handlers::list_blocked()?)
 }
 
