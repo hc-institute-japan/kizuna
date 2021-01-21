@@ -12,4 +12,5 @@
 
 .others ion-text {
   color: var(--ion-color-light-contrast);
+  font-size: 1.1rem;
 }

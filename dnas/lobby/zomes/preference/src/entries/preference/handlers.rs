@@ -53,6 +53,16 @@ pub(crate) fn get_preference() -> ExternResult<PreferenceWrapper> {
 }
 
 pub(crate) fn set_preference(preference: PreferenceIO) -> ExternResult<()> {
+    match (preference.typing_indicator, preference.read_receipt) {
+        (Some(typing_indicator), Some(read_receipt)) => {
+
+        },
+        _ => {
+            
+        }
+        
+    }
+    
     match fetch_preference() {
         Ok(unwrapped_preference) => {
             update_entry!(

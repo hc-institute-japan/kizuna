@@ -1,8 +1,17 @@
-import { IonContent, IonList, IonPage } from "@ionic/react";
-import React from "react";
+import {
+  IonContent,
+  IonFab,
+  IonFabButton,
+  IonIcon,
+  IonList,
+  IonPage,
+} from "@ionic/react";
+import { add } from "ionicons/icons";
+import React, { useState } from "react";
 import Conversation from "../../components/Conversation";
 import Toolbar from "../../components/Toolbar";
 import { Conversations as ConversationsType } from "../../utils/types";
+import NewChatModal from "./NewChatModal";
 import styles from "./style.module.css";
 
 const conversations: ConversationsType = [
@@ -32,14 +41,14 @@ const conversations: ConversationsType = [
         id: "14",
         sender: "seulgibear",
         message:
-          "I'm composing this message to 'simulate' a long message just to see if the spacing and whatnots are correct lmao wtf",
+          "Hey, this is James. We met at Sandra’s party on Saturday, and she gave me your number",
         timestamp: new Date(),
       },
       {
         id: "1",
         sender: "Akira",
         message:
-          "I'm composing this message to 'simulate' a long message just to see if the spacing and whatnots are correct lmao wtf",
+          "Hey, Jane! I was going to watch that movie you recommended, but I can’t think of the name. Do you remember what it’s called?",
         timestamp: new Date(),
       },
     ],
@@ -65,6 +74,12 @@ const conversations: ConversationsType = [
 ];
 
 const Conversations: React.FC = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleOnClick = () => {
+    setIsOpen(true);
+  };
+
   return (
     <IonPage>
       <Toolbar onChange={() => {}} />
@@ -77,6 +92,12 @@ const Conversations: React.FC = () => {
             />
           ))}
         </IonList>
+        <NewChatModal isOpen={isOpen} onCancel={() => setIsOpen(false)} />
+        <IonFab vertical="bottom" horizontal="end">
+          <IonFabButton>
+            <IonIcon icon={add} onClick={handleOnClick} />
+          </IonFabButton>
+        </IonFab>
       </IonContent>
     </IonPage>
   );
