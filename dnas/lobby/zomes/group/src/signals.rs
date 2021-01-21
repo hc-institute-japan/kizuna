@@ -3,25 +3,20 @@ use timestamp::Timestamp;
 
 use crate::utils::to_timestamp;
 
-#[derive(Serialize, Deserialize, SerializedBytes)]
-
-//Signal Details is a warpper for all the signals we can send from the happ
+// Signal Details is a warpper for all the signals we can send from the happ
+#[derive(Serialize, Deserialize, SerializedBytes,Clone)]
 pub(crate) struct SignalDetails{
-
     name: String,
     payload: SignalPayload
 }
-
-
-//here we add all the signal_types we add in the future
-#[derive(Serialize, Deserialize, SerializedBytes)]
+// Here we add all the signal_types we add in the future
+#[derive(Serialize, Deserialize, SerializedBytes,Clone)]
 pub(crate)enum  SignalPayload{
 
     SignalGroupMembersData(SignalGroupMembersData),
 
 }
-
-#[derive(Serialize, Deserialize, SerializedBytes)]
+#[derive(Serialize, Deserialize, SerializedBytes,Clone)]
 pub(crate) struct SignalGroupMembersData{
 
     group_members_hash: EntryHash ,

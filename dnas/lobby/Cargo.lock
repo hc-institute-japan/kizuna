@@ -73,7 +73,7 @@ name = "contacts"
 version = "0.0.1"
 dependencies = [
  "derive_more",
- "hdk3",
+ "hdk3 0.0.1 (git+https://github.com/holochain/holochain.git?rev=3675b5)",
  "serde",
 ]
 
@@ -105,6 +105,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "fixt"
+version = "0.0.1"
+source = "git+https://github.com/holochain/holochain?rev=3675b58#3675b588de0aaf7eb9dc852b4012f3cfa5a27df7"
+dependencies = [
+ "holochain_serialized_bytes",
+ "lazy_static",
+ "parking_lot",
+ "paste",
+ "rand",
+ "rand_core",
+ "serde",
+ "strum",
+ "strum_macros",
+]
+
+[[package]]
 name = "getrandom"
 version = "0.1.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -120,7 +136,8 @@ name = "group"
 version = "0.0.1"
 dependencies = [
  "derive_more",
- "hdk3",
+ "hc_utils",
+ "hdk3 0.0.1 (git+https://github.com/holochain/holochain?rev=3675b58)",
  "serde",
 ]
 
@@ -131,14 +148,40 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d7afe4a420e3fe79967a00898cc1f4db7c8a49a9333a29f8a4bd76a253d5cd04"
 
 [[package]]
+name = "hc_utils"
+version = "0.1.0"
+source = "git+https://github.com/holochain/hc-utils?branch=develop#cddc40c4ae4cbabe0c3c0e021dba612065ca75e9"
+dependencies = [
+ "hdk3 0.0.1 (git+https://github.com/holochain/holochain?rev=3675b58)",
+ "holo_hash 0.0.1 (git+https://github.com/holochain/holochain?rev=3675b58)",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
 name = "hdk3"
 version = "0.0.1"
 source = "git+https://github.com/holochain/holochain.git?rev=3675b5#3675b588de0aaf7eb9dc852b4012f3cfa5a27df7"
 dependencies = [
- "hdk3_derive",
- "holo_hash",
+ "hdk3_derive 0.0.1 (git+https://github.com/holochain/holochain.git?rev=3675b5)",
+ "holo_hash 0.0.1 (git+https://github.com/holochain/holochain.git?rev=3675b5)",
  "holochain_wasmer_guest",
- "holochain_zome_types",
+ "holochain_zome_types 0.0.1 (git+https://github.com/holochain/holochain.git?rev=3675b5)",
+ "paste",
+ "serde",
+ "serde_bytes",
+ "thiserror",
+]
+
+[[package]]
+name = "hdk3"
+version = "0.0.1"
+source = "git+https://github.com/holochain/holochain?rev=3675b58#3675b588de0aaf7eb9dc852b4012f3cfa5a27df7"
+dependencies = [
+ "hdk3_derive 0.0.1 (git+https://github.com/holochain/holochain?rev=3675b58)",
+ "holo_hash 0.0.1 (git+https://github.com/holochain/holochain?rev=3675b58)",
+ "holochain_wasmer_guest",
+ "holochain_zome_types 0.0.1 (git+https://github.com/holochain/holochain?rev=3675b58)",
  "paste",
  "serde",
  "serde_bytes",
@@ -150,7 +193,19 @@ name = "hdk3_derive"
 version = "0.0.1"
 source = "git+https://github.com/holochain/holochain.git?rev=3675b5#3675b588de0aaf7eb9dc852b4012f3cfa5a27df7"
 dependencies = [
- "holochain_zome_types",
+ "holochain_zome_types 0.0.1 (git+https://github.com/holochain/holochain.git?rev=3675b5)",
+ "paste",
+ "proc-macro2 1.0.24",
+ "quote 1.0.7",
+ "syn 1.0.54",
+]
+
+[[package]]
+name = "hdk3_derive"
+version = "0.0.1"
+source = "git+https://github.com/holochain/holochain?rev=3675b58#3675b588de0aaf7eb9dc852b4012f3cfa5a27df7"
+dependencies = [
+ "holochain_zome_types 0.0.1 (git+https://github.com/holochain/holochain?rev=3675b58)",
  "paste",
  "proc-macro2 1.0.24",
  "quote 1.0.7",
@@ -179,7 +234,21 @@ source = "git+https://github.com/holochain/holochain.git?rev=3675b5#3675b588de0a
 dependencies = [
  "base64",
  "blake2b_simd",
- "fixt",
+ "fixt 0.0.1 (git+https://github.com/holochain/holochain.git?rev=3675b5)",
+ "holochain_serialized_bytes",
+ "rand",
+ "serde",
+ "serde_bytes",
+]
+
+[[package]]
+name = "holo_hash"
+version = "0.0.1"
+source = "git+https://github.com/holochain/holochain?rev=3675b58#3675b588de0aaf7eb9dc852b4012f3cfa5a27df7"
+dependencies = [
+ "base64",
+ "blake2b_simd",
+ "fixt 0.0.1 (git+https://github.com/holochain/holochain?rev=3675b58)",
  "holochain_serialized_bytes",
  "rand",
  "serde",
@@ -238,8 +307,24 @@ name = "holochain_zome_types"
 version = "0.0.1"
 source = "git+https://github.com/holochain/holochain.git?rev=3675b5#3675b588de0aaf7eb9dc852b4012f3cfa5a27df7"
 dependencies = [
- "fixt",
- "holo_hash",
+ "fixt 0.0.1 (git+https://github.com/holochain/holochain.git?rev=3675b5)",
+ "holo_hash 0.0.1 (git+https://github.com/holochain/holochain.git?rev=3675b5)",
+ "holochain_serialized_bytes",
+ "paste",
+ "serde",
+ "serde_bytes",
+ "strum",
+ "subtle",
+ "thiserror",
+]
+
+[[package]]
+name = "holochain_zome_types"
+version = "0.0.1"
+source = "git+https://github.com/holochain/holochain?rev=3675b58#3675b588de0aaf7eb9dc852b4012f3cfa5a27df7"
+dependencies = [
+ "fixt 0.0.1 (git+https://github.com/holochain/holochain?rev=3675b58)",
+ "holo_hash 0.0.1 (git+https://github.com/holochain/holochain?rev=3675b58)",
  "holochain_serialized_bytes",
  "paste",
  "serde",
@@ -301,7 +386,7 @@ version = "0.0.1"
 source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop#3c80bba5a6c1fefc0d72c2b0c97310a0f5a207c5"
 dependencies = [
  "derive_more",
- "hdk3",
+ "hdk3 0.0.1 (git+https://github.com/holochain/holochain.git?rev=3675b5)",
  "serde",
  "thiserror",
 ]
@@ -311,7 +396,7 @@ name = "p2pmessage"
 version = "0.0.1"
 dependencies = [
  "derive_more",
- "hdk3",
+ "hdk3 0.0.1 (git+https://github.com/holochain/holochain.git?rev=3675b5)",
  "p2pmessage 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop)",
  "serde",
 ]
@@ -357,7 +442,7 @@ name = "preference"
 version = "0.0.1"
 dependencies = [
  "derive_more",
- "hdk3",
+ "hdk3 0.0.1 (git+https://github.com/holochain/holochain.git?rev=3675b5)",
  "hex",
  "serde",
 ]
@@ -624,7 +709,7 @@ version = "0.0.1"
 source = "git+https://github.com/holochain-open-dev/username-zome#4ec501d3ea7d7419073ab368013d52f55f8495a8"
 dependencies = [
  "derive_more",
- "hdk3",
+ "hdk3 0.0.1 (git+https://github.com/holochain/holochain.git?rev=3675b5)",
  "serde",
  "thiserror",
 ]
@@ -634,7 +719,7 @@ name = "username"
 version = "0.0.1"
 dependencies = [
  "derive_more",
- "hdk3",
+ "hdk3 0.0.1 (git+https://github.com/holochain/holochain.git?rev=3675b5)",
  "serde",
  "username 0.0.1 (git+https://github.com/holochain-open-dev/username-zome)",
 ]
