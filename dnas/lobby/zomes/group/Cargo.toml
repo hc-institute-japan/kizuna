@@ -9,6 +9,8 @@ name = "group"
 crate-type = [ "cdylib", "rlib" ]
 
 [dependencies]
-serde = "=1.0.104"
-hdk3 = { git = "https://github.com/holochain/holochain.git", rev="3675b5" }
-derive_more = "0.99.9"
+derive_more = "0"
+serde = "1"
+
+hc_utils = "0"
+hdk3 = "0"

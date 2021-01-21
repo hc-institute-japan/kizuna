@@ -5,13 +5,12 @@ use hdk3::prelude::{
    
 };
 
-
 use crate::entries::group::{
     Group,
     GroupMembers,
 };
 
-pub(crate) fn get_group_members(group:Group)->HdkResult<GroupMembers>{
+pub(crate) fn _get_group_members(group:Group)->HdkResult<GroupMembers>{
     let group_entry_hash:EntryHash = hash_entry(&group)?;
     let links: Links = get_links(group_entry_hash, Some(LinkTag::new("members")))?;
 
