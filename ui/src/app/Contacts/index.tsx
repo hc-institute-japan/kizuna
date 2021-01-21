@@ -1,12 +1,12 @@
 import { IonContent, IonPage } from "@ionic/react";
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
+import ContactsList from "../../components/ContactList";
 import Toolbar from "../../components/Toolbar";
 import { RootState } from "../../redux/reducers";
 import { indexContacts } from "../../utils/helper";
 import AddContactFAB from "./AddContactFAB";
 import AddContactModal from "./AddContactModal";
-import ContactsList from "./ContactsList";
 
 const Contacts: React.FC = () => {
   const { contacts } = useSelector((state: RootState) => state.contacts);

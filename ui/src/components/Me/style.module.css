@@ -12,4 +12,5 @@
 
 .me ion-text {
   color: var(--ion-color-primary-contrast);
+  font-size: 1.1rem;
 }
