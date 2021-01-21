@@ -83,15 +83,15 @@ pub fn create_group(create_group_input: CreateGroupInput )->ExternResult<Group>{
 }
 pub fn add_initial_members(add_member_input:AddInitialMembersInput) ->ExternResult<HeaderHash>{
 
-    let group_hash:EntryHash = add_member_input.group_entry_hash;
-    let secret_hash:SecretHash = add_member_input.secret_hash;
-    let members:Vec<AgentPubKey> = add_member_input.invitee;
+    let group_hash: EntryHash = add_member_input.group_entry_hash;
+    let secret_hash: SecretHash = add_member_input.secret_hash;
+    let members: Vec<AgentPubKey> = add_member_input.invitee;
 
     //initialize GroupMembers with args given
-    let group_members:GroupMembers = GroupMembers{
-        group_hash:group_hash.clone(),
-        secret_hash:secret_hash,
-        members:members.clone(),
+    let group_members: GroupMembers = GroupMembers{
+        group_hash: group_hash.clone(),
+        secret_hash: secret_hash,
+        members: members.clone(),
     };
 
     // commit GroupMembers entry with members
@@ -177,7 +177,7 @@ pub fn _request_secrets(group_members_hashes: HashesWrapper)-> ExternResult<()>{
 
                         let agent_pub_key = agent_info()?.agent_latest_pubkey;
                     
-                        if let Ok(bob_key) = X25519PubKey::try_from(agent_pub_key.get_raw_32()){
+                        if let Ok(agent_key) = X25519PubKey::try_from(agent_pub_key.get_raw_32()){
 
                             //bob_key should be the encription key
 

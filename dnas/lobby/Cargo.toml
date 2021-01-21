@@ -18,3 +18,4 @@ opt-level = "z"
 hc_utils = {git = "https://github.com/holochain/hc-utils", branch = "develop", package = "hc_utils"}
 hdk3 = {git = "https://github.com/holochain/holochain", rev = "3675b58", package = "hdk3"}
 holo_hash = {git = "https://github.com/holochain/holochain", rev = "3675b58", package = "holo_hash"}
+
