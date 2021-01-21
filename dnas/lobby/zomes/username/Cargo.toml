@@ -11,5 +11,7 @@ crate-type = [ "cdylib", "rlib" ]
 [dependencies]
 derive_more = "0"
 serde = "1"
-hdk3 = { git = "https://github.com/holochain/holochain.git", rev = "3675b5" }
+
+hc_utils = "0"
+hdk3 = "0"
 username = {git = "https://github.com/holochain-open-dev/username-zome", package = "username"}
