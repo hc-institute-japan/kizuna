@@ -71,7 +71,9 @@ pub fn create_group(create_group_input: CreateGroupInput )->ExternResult<Group>{
     let key_hash: XSalsa20Poly1305KeyRef = SecretBoxKeyRef:: try_from_random()?;
 
     // TATS: this needs to be encrypted with agent's own private OR symmetric key. Will update you once we decide :D 
+    
     let group_secret_key: GroupSecretKey = GroupSecretKey{
+        // TATS: this should change to HeaderHash once archi changes pushes through.
         group_hash: group_entry_hash.clone(),
         key_hash: key_hash.clone(),
     };    
