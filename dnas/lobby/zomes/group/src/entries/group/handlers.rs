@@ -26,6 +26,7 @@ use crate::utils::to_timestamp;
 
 use hdk3::prelude::link::Link;
 
+// TATS: we may need to add init() function if the architectural changes push through.
 
 pub fn create_group(create_group_input: CreateGroupInput )->ExternResult<Group>{
 
@@ -39,12 +40,17 @@ pub fn create_group(create_group_input: CreateGroupInput )->ExternResult<Group>{
         creator: creator.clone(),
     };
 
-    // we should validate the input before we commit any entry into the dth/source_chain
+    // we should validate the input before we commit any entry into the dht/source_chain
     // this validation its added here could be changed on future into a formal validation rule
     // group_members validation: 
     // creator AgentPubKey is not included here  
     // cannot be empty and must at least include 2 pubkeys
-    // should i add validation to avoid duplicated data // or this is guaranted on front_end?
+    // should i add validation to avoid duplicated data // or this is guaranted on front_end? -> TATS: will talk about this in the meeting. 
+
+    // TATS: we also need to check whether the member field has anyone who the creator of the group blocked.
+    // To do this, just use the call() API to the contacts zome. Please call the list_blocked() in contacts
+    // and it will return you a Vec<AgenPubKey>. As written in the architecture of create_group(), please return Err
+    // if even one member is blocked. 
         
         if group_members.contains(&creator.clone()) || ( group_members.len() < 2 ) {
 
@@ -64,12 +70,14 @@ pub fn create_group(create_group_input: CreateGroupInput )->ExternResult<Group>{
     // call `TryFromRandom` to generate symmetric key
     let key_hash: XSalsa20Poly1305KeyRef = SecretBoxKeyRef:: try_from_random()?;
 
+    // TATS: this needs to be encrypted with agent's own private OR symmetric key. Will update you once we decide :D 
     let group_secret_key: GroupSecretKey = GroupSecretKey{
         group_hash: group_entry_hash.clone(),
         key_hash: key_hash.clone(),
     };    
 
     // store the encrypted secret key on source chain
+    // TATS: this implementation may change based on architecture modification.
     create_entry(&group_secret_key.clone())?;
     
     // call fn add_initial_members(add_members_input)
@@ -83,6 +91,7 @@ pub fn create_group(create_group_input: CreateGroupInput )->ExternResult<Group>{
 }
 pub fn add_initial_members(add_member_input:AddInitialMembersInput) ->ExternResult<HeaderHash>{
 
+    // TATS: should be HeaderHash if the archi changes push thorugh.
     let group_hash: EntryHash = add_member_input.group_entry_hash;
     let secret_hash: SecretHash = add_member_input.secret_hash;
     let members: Vec<AgentPubKey> = add_member_input.invitee;
@@ -100,12 +109,15 @@ pub fn add_initial_members(add_member_input:AddInitialMembersInput) ->ExternResu
 
     // link Group -> GroupMembers tag "members
     create_link(
+        // TATS: since group_hash is gonna be a HeaderHash, make sure to put the EntryHash and not the HeaderHAsh
+        // if the archi changes push through.
         group_hash,
         group_members_entry_hash.clone(),
         LinkTag::new("members"),
     )?;
 
     // link from the GroupMembers to own pubkey with tag "keyholder"
+    // TATS: this may be removed because of architectural changes.
     create_link(
         group_members_entry_hash.clone(),
         agent_info()?.agent_latest_pubkey.into(),
@@ -137,6 +149,8 @@ pub fn add_initial_members(add_member_input:AddInitialMembersInput) ->ExternResu
 
     Ok(group_members_header_hash)
 }
+
+// TATS: depending on the architectural changes, we may not need this function anymore. Sorry manuel...
 pub fn _request_secrets(group_members_hashes: HashesWrapper)-> ExternResult<()>{
 
     //GroupMembers entry hashes
@@ -214,7 +228,7 @@ pub fn get_needed_group_members_hashes(_:())->ExternResult<()>{
     let mut latest_group_members_entries:Vec<GroupMembers> = vec![];
     
     for link in my_linked_groups{
-        
+        // TATS: this may change to getting all the HeaderHash of update versions of a GroupMembers entry in a Group (pls check the architecture)
         //[until we get the latest entry]
         //recrusively get_detail from the linked GroupMembers entry
     
@@ -224,17 +238,17 @@ pub fn get_needed_group_members_hashes(_:())->ExternResult<()>{
 
         let group_members_header_hash:HeaderHash = get_header_address_from_entry_hash(link_target)?;
 
-        let latest_element_entries:ElementEntry = recursively_get_details(group_members_header_hash)?;
+        let latest_element_entry:ElementEntry = recursively_get_details(group_members_header_hash)?;
  
-        if let Some(group_members) = latest_element_entries.to_app_option()?{
+        if let Some(group_members) = latest_element_entry.to_app_option()?{
             
             latest_group_members_entries.push(group_members);
         }
     }
 
-   // return latest Group Members entry of all groups (stored into an homonym  named array )
+   // return latest Group Members entry of all groups (stored into an homonym named array )
 
-   //query source chain for all secrets bob has
+   // query source chain for all secrets bob has
     let my_stored_secrets:Vec<GroupSecretKey> = get_all_my_stored_secrets(())?;
 
     //filter GroupMembers entry that Bob is part of but dont have the secret yet and get their entry hashes
@@ -242,7 +256,8 @@ pub fn get_needed_group_members_hashes(_:())->ExternResult<()>{
 
     let mut needed:bool ;
 
-    //doble for can be removed in future , for optimization purposes
+    // doble for can be removed in future , for optimization purposes
+    // TATS: what do you mean by this?
 
     for group_members in latest_group_members_entries{
 
@@ -264,6 +279,13 @@ pub fn get_needed_group_members_hashes(_:())->ExternResult<()>{
 
     Ok(())
 }
+
+// TATS: this function is about getting the groups an agent is part of 
+// and not getting all the groups that exists in DHT. (sorry for the ambiguity)
+// please check the flow in architecture for specific flow.
+// Also the way to get the latest Group entry changed too 
+// so please check that as well. It's the part where there is 
+// [if ther is an update for Group Entry]
 pub fn get_all_groups(_:())->HdkResult<GroupListOutput>{
 
     let path = Path::from(format!("all_groups"));
@@ -333,7 +355,6 @@ pub fn recursively_get_details(hash:HeaderHash)-> HdkResult<ElementEntry>{
     if let Some(details) = get_details(hash,GetOptions::content())? {
 
         match details{
-    
             Details::Element(element_details) => {
 
                 if element_details.updates.is_empty() {
