@@ -191,7 +191,7 @@ pub fn _request_secrets(group_members_hashes: HashesWrapper)-> ExternResult<()>{
 
                         let agent_pub_key = agent_info()?.agent_latest_pubkey;
                     
-                        if let Ok(agent_key) = X25519PubKey::try_from(agent_pub_key.get_raw_32()){
+                        if let Ok(_agent_key) = X25519PubKey::try_from(agent_pub_key.get_raw_32()){
 
                             //bob_key should be the encription key
 
