@@ -16,7 +16,6 @@ pub struct AgentPubKeys(Vec<AgentPubKey>);
 #[derive(Deserialize, Serialize, SerializedBytes, Clone)]
 pub struct AddInitialMembersInput {
     invitee: Vec<AgentPubKey>,
-    // TATS: this should be HeaderHash if the archi changes push through.
     group_entry_hash: EntryHash,
     secret_hash: SecretHash
 }
@@ -36,8 +35,6 @@ entry_def!(Group
     }
 );
 #[derive(Debug, Clone, Serialize, Deserialize, SerializedBytes)]
-// TATS: this may be gone and we may just use XSalsa20Poly1305KeyRef as it is
-// if the archi changes push through.
 pub struct SecretHash(pub XSalsa20Poly1305KeyRef);
 
 #[derive(Debug, Clone, Serialize, Deserialize, SerializedBytes)]
@@ -57,9 +54,7 @@ entry_def!(GroupSecretKey
 
 #[derive(Debug, Clone, Serialize, Deserialize, SerializedBytes)]
 pub struct GroupMembers {
-    // TATS: should be HeaderHash if the architecture changes pushes through. 
     pub group_hash: EntryHash, // this should not change -> checked with validation
-    // TATS: this will be taken out if the architectural changes push through.
     pub secret_hash: SecretHash,//this is the hash where the encription_key its storages
     pub members: Vec<AgentPubKey>
 }

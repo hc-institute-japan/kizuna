@@ -26,7 +26,6 @@ use crate::utils::to_timestamp;
 
 use hdk3::prelude::link::Link;
 
-// TATS: we may need to add init() function if the architectural changes push through.
 
 pub fn create_group(create_group_input: CreateGroupInput )->ExternResult<Group>{
 
@@ -68,18 +67,14 @@ pub fn create_group(create_group_input: CreateGroupInput )->ExternResult<Group>{
     create_link(all_groups_path_hash, group_entry_hash.clone(), LinkTag::new("group"))?; 
     
     // call `TryFromRandom` to generate symmetric key
-    let key_hash: XSalsa20Poly1305KeyRef = SecretBoxKeyRef:: try_from_random()?;
-
-    // TATS: this needs to be encrypted with agent's own private OR symmetric key. Will update you once we decide :D 
+    let key_hash: XSalsa20Poly1305KeyRef = SecretBoxKeyRef::try_from_random()?; 
     
     let group_secret_key: GroupSecretKey = GroupSecretKey{
-        // TATS: this should change to HeaderHash once archi changes pushes through.
         group_hash: group_entry_hash.clone(),
         key_hash: key_hash.clone(),
     };    
 
     // store the encrypted secret key on source chain
-    // TATS: this implementation may change based on architecture modification.
     create_entry(&group_secret_key.clone())?;
     
     // call fn add_initial_members(add_members_input)
@@ -93,7 +88,6 @@ pub fn create_group(create_group_input: CreateGroupInput )->ExternResult<Group>{
 }
 pub fn add_initial_members(add_member_input:AddInitialMembersInput) ->ExternResult<HeaderHash>{
 
-    // TATS: should be HeaderHash if the archi changes push thorugh.
     let group_hash: EntryHash = add_member_input.group_entry_hash;
     let secret_hash: SecretHash = add_member_input.secret_hash;
     let members: Vec<AgentPubKey> = add_member_input.invitee;
@@ -111,15 +105,12 @@ pub fn add_initial_members(add_member_input:AddInitialMembersInput) ->ExternResu
 
     // link Group -> GroupMembers tag "members
     create_link(
-        // TATS: since group_hash is gonna be a HeaderHash, make sure to put the EntryHash and not the HeaderHAsh
-        // if the archi changes push through.
         group_hash,
         group_members_entry_hash.clone(),
         LinkTag::new("members"),
     )?;
 
     // link from the GroupMembers to own pubkey with tag "keyholder"
-    // TATS: this may be removed because of architectural changes.
     create_link(
         group_members_entry_hash.clone(),
         agent_info()?.agent_latest_pubkey.into(),
@@ -152,7 +143,6 @@ pub fn add_initial_members(add_member_input:AddInitialMembersInput) ->ExternResu
     Ok(group_members_header_hash)
 }
 
-// TATS: depending on the architectural changes, we may not need this function anymore. Sorry manuel...
 pub fn _request_secrets(group_members_hashes: HashesWrapper)-> ExternResult<()>{
 
     //GroupMembers entry hashes
@@ -230,7 +220,6 @@ pub fn get_needed_group_members_hashes(_:())->ExternResult<()>{
     let mut latest_group_members_entries:Vec<GroupMembers> = vec![];
     
     for link in my_linked_groups{
-        // TATS: this may change to getting all the HeaderHash of update versions of a GroupMembers entry in a Group (pls check the architecture)
         //[until we get the latest entry]
         //recrusively get_detail from the linked GroupMembers entry
     
