@@ -4,61 +4,32 @@ pub mod handlers;
 
 #[derive(Deserialize, Serialize, SerializedBytes)]
 pub struct BooleanWrapper(pub bool);
-#[derive(Deserialize, Serialize, SerializedBytes, Clone)]
-pub struct UsernameWrapper(pub String);
 
 #[derive(Deserialize, Serialize, SerializedBytes)]
-pub struct ContactsWrapper(pub Vec<AgentPubKey>);
+pub struct AgentPubKeysWrapper(pub Vec<AgentPubKey>);
 
-#[derive(Deserialize, Serialize, SerializedBytes)]
-pub struct BlockedWrapper(pub Vec<AgentPubKey>);
-
-#[derive(Deserialize, Serialize, Clone, Debug, SerializedBytes, Default)]
-pub struct Profile {
-    agent_id: Option<AgentPubKey>,
-    username: Option<String>,
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize, SerializedBytes)]
+pub enum ContactType {
+	Add,
+	Remove,
+	Block,
+	Unblock
 }
 
-impl Profile {
-    pub fn new(agent_id: AgentPubKey, username: String) -> Self {
-        Profile {
-            agent_id: Some(agent_id),
-            username: Some(username),
-        }
-    }
-}
-
-#[hdk_entry(id = "contacts", visibility = "private")]
+#[hdk_entry(id = "contact", visibility = "private")]
 #[derive(Clone, Debug)]
-pub struct ContactsInfo {
-    agent_id: AgentPubKey,
-    timestamp: Timestamp,
-    contacts: Vec<AgentPubKey>,
-    blocked: Vec<AgentPubKey>,
+pub struct Contact {
+    agent_ids: Vec<AgentPubKey>,
+    created: Timestamp,
+    contact_type: ContactType
 }
 
-impl ContactsInfo {
-    pub fn new(timestamp: Timestamp) -> Result<Self, HdkError> {
-        let agent_info = agent_info()?;
-        Ok(ContactsInfo {
-            agent_id: agent_info.agent_latest_pubkey,
-            timestamp,
-            contacts: Vec::default(),
-            blocked: Vec::default(),
-        })
-    }
-
-    pub fn from(
-        timestamp: Timestamp,
-        contacts: Vec<AgentPubKey>,
-        blocked: Vec<AgentPubKey>,
-    ) -> Result<Self, HdkError> {
-        let agent_info = agent_info()?;
-        Ok(ContactsInfo {
-            agent_id: agent_info.agent_latest_pubkey,
-            timestamp,
-            contacts,
-            blocked,
-        })
+impl Contact {
+    pub fn new(timestamp: Timestamp, agent_ids: Vec<AgentPubKey>, contact_type: ContactType) -> Self {
+        Contact {
+            agent_ids,
+            created: timestamp,
+            contact_type
+        }
     }
 }
