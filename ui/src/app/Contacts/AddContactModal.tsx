@@ -14,7 +14,7 @@ import {
 } from "@ionic/react";
 import React from "react";
 import { IndexedContacts } from "../../redux/contacts/types";
-import { indexContacts } from "../../utils/helper";
+import { indexContacts } from "../../utils/helpers";
 import { Profile } from "../../utils/types";
 import styles from "./style.module.css";
 import { add } from "ionicons/icons";

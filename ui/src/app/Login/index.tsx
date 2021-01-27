@@ -10,10 +10,13 @@ import {
   IonToolbar,
 } from "@ionic/react";
 import React, { useState } from "react";
+import { useIntl } from "react-intl";
 import styles from "./style.module.css";
 
 const Login: React.FC = () => {
-  const [number, setNumber] = useState("");
+  const [username, setUsername] = useState("");
+  const intl = useIntl();
+
   return (
     <IonPage>
       <IonHeader>
@@ -27,15 +30,20 @@ const Login: React.FC = () => {
         <div className={styles.login}>
           <div className={styles.form}>
             <div>
-              <IonLabel className={styles.label}>Phone Number</IonLabel>
+              <IonLabel className={styles.label}>
+                {intl.formatMessage({ id: "app.login.username-label" })}
+              </IonLabel>
+
               <IonInput
-                value={number}
-                onIonChange={(e) => setNumber(e.detail.value!)}
-                placeholder="09451230512"
-              ></IonInput>
+                value={username}
+                onIonChange={(e) => setUsername(e.detail.value!)}
+                placeholder={intl.formatMessage({
+                  id: "app.login.username-placeholder",
+                })}
+              />
             </div>
           </div>
-          <IonButton>Login</IonButton>
+          <IonButton>{intl.formatMessage({ id: "app.login.login" })}</IonButton>
         </div>
       </IonContent>
     </IonPage>

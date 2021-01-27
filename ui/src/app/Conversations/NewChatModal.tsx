@@ -10,7 +10,7 @@ import { useSelector } from "react-redux";
 import ContactsList from "../../components/ContactList";
 import { IndexedContacts } from "../../redux/contacts/types";
 import { RootState } from "../../redux/reducers";
-import { indexContacts } from "../../utils/helper";
+import { indexContacts } from "../../utils/helpers";
 
 interface Props {
   isOpen: boolean;

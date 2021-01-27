@@ -1,0 +1,13 @@
+{
+  "app.landing.login": "Start Messaging",
+  "app.landing.register": "Don't have an account?",
+  "app.login.login": "Login",
+  "app.login.username-label": "Choose your username",
+  "app.login.username-placeholder": "ユーザー名を入力してください...",
+  "app.home.contacts-tab-bar": "Contacts",
+  "app.home.messaging-tab-bar": "Messaging",
+  "app.register.error-invalid-username": "Username must be at least 3 characters and contain 1 alphanumberic character",
+  "app.register.username-label": "Username",
+  "app.register.username-placeholder": "Type your username...",
+  "app.register.register": "Create an account"
+}

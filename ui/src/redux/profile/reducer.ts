@@ -1,12 +1,19 @@
-import { ProfileActionTypes, ProfileState } from "./types";
+import { ProfileActionTypes, ProfileState, SET_USERNAME } from "./types";
 
 const initialState: ProfileState = {
-  username: "seulgibear",
+  username: null,
 };
 
-export default (state = initialState, action: ProfileActionTypes) => {
+const reducer = (state = initialState, action: ProfileActionTypes) => {
   switch (action.type) {
+    case SET_USERNAME:
+      return {
+        ...state,
+        username: action.username,
+      };
     default:
       return state;
   }
 };
+
+export default reducer;

@@ -14,10 +14,11 @@ import { setContacts } from "../../redux/contacts/actions";
 import Contacts from "../Contacts";
 import Conversations from "../Conversations";
 import styles from "./style.module.css";
+import { FormattedMessage } from "react-intl";
 
 interface TabBarItem {
   icon: string;
-  label: string;
+  labelId: string;
   href: string;
   tab: string;
 }
@@ -25,13 +26,13 @@ interface TabBarItem {
 const tabBar: TabBarItem[] = [
   {
     icon: chatbox,
-    label: "Messaging",
+    labelId: "app.home.messaging-tab-bar",
     href: "/home",
     tab: "/home",
   },
   {
     icon: person,
-    label: "Contacts",
+    labelId: "app.home.contacts-tab-bar",
     href: "/home/contacts",
     tab: "/home/contacts",
   },
@@ -94,7 +95,9 @@ const HomeTabBar = () => {
             href={item.href}
           >
             <IonIcon icon={item.icon} />
-            <IonLabel>{item.label}</IonLabel>
+            <IonLabel>
+              <FormattedMessage id={item.labelId} />
+            </IonLabel>
           </IonTabButton>
         ))}
       </IonTabBar>

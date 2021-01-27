@@ -1,7 +1,9 @@
 import { IndexedContacts } from "../redux/contacts/types";
 import { Profile } from "./types";
 
-export const indexContacts = (contacts: Profile[]): IndexedContacts => {
+export const indexContacts: (contacts: Profile[]) => IndexedContacts = (
+  contacts
+) => {
   let indexedContacts: IndexedContacts = {};
   if (contacts.length > 0) {
     let char = contacts[0].username.charAt(0).toUpperCase();
@@ -17,4 +19,15 @@ export const indexContacts = (contacts: Profile[]): IndexedContacts => {
     });
   }
   return indexedContacts;
+};
+
+export const debounce: (callback: () => any, delay?: number) => Function = (
+  callback,
+  delay = 500
+) => {
+  let timeout: NodeJS.Timeout;
+  return () => {
+    clearTimeout(timeout);
+    timeout = setTimeout(callback, delay);
+  };
 };
