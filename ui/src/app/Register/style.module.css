@@ -28,13 +28,6 @@
   font-size: 1.3rem;
 }
 
-.form input {
-  /* width: 100% !important; */
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-  border-bottom: 1px solid var(--ion-color-medium-shade) !important;
-}
-
 .toolbar {
   --background: transparent !important;
   --ion-color-base: transparent !important;

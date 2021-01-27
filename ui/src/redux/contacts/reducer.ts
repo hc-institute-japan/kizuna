@@ -1,4 +1,4 @@
-import { indexContacts } from "../../utils/helper";
+import { indexContacts } from "../../utils/helpers";
 import { Profile } from "../../utils/types";
 import {
   ContactsActionType,
@@ -13,7 +13,7 @@ const initialState: ContactsState = {
   blocked: [],
 };
 
-export default (state = initialState, action: ContactsActionType) => {
+const reducer = (state = initialState, action: ContactsActionType) => {
   switch (action.type) {
     case SET_CONTACTS:
       const contacts = action.contacts.sort((a: Profile, b: Profile) => {
@@ -29,3 +29,5 @@ export default (state = initialState, action: ContactsActionType) => {
       return state;
   }
 };
+
+export default reducer;

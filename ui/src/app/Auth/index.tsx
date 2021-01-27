@@ -1,14 +1,29 @@
+import { useQuery } from "@apollo/client";
 import { isPlatform } from "@ionic/react";
 import React, { useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import ME from "../../graphql/profile/queries/me";
+import { setUsername } from "../../redux/profile/actions";
 import { RootState } from "../../redux/reducers";
 import Home from "../Home";
 import Unauthenticated from "../Unauthenticated";
-declare let window: any;
+
 declare let cordova: any;
 
 const Auth: React.FC = () => {
   const { username } = useSelector((state: RootState) => state.profile);
+  const dispatch = useDispatch();
+  useQuery(ME, {
+    fetchPolicy: "no-cache",
+    onCompleted: (data) => {
+      const { username = null } = { ...data?.me };
+
+      if (username) {
+        dispatch(setUsername(username));
+      }
+    },
+  });
+
   useEffect(() => {
     // Just for iOS devices.
     if (isPlatform("ios")) {
@@ -25,7 +40,6 @@ const Auth: React.FC = () => {
     }
   }, []);
   return username !== null ? <Home /> : <Unauthenticated />;
-  // return <Playground />;
 };
 
 export default Auth;

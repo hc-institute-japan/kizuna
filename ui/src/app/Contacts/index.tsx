@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import ContactsList from "../../components/ContactList";
 import Toolbar from "../../components/Toolbar";
 import { RootState } from "../../redux/reducers";
-import { indexContacts } from "../../utils/helper";
+import { indexContacts } from "../../utils/helpers";
 import AddContactFAB from "./AddContactFAB";
 import AddContactModal from "./AddContactModal";
 

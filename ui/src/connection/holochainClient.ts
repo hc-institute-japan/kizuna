@@ -14,19 +14,19 @@ const init = async () => {
   }
 };
 
-interface CallZomeConfig {
-  cap: any;
-  cell_id: any;
-  zome_name: string;
-  fn_name: string;
-  provenance: any;
-  payload: any;
-}
+// interface CallZomeConfig {
+//   cap: any;
+//   cell_id: any;
+//   zome_name: string;
+//   fn_name: string;
+//   provenance: any;
+//   payload: any;
+// }
 
 export const getAgentId = async () => {
   await init();
   try {
-    const info = await client.appInfo({ app_id: "test-app" });
+    const info = await client.appInfo({ installed_app_id: "test-app" });
     return info.cell_data[0][0][1];
   } catch (e) {
     console.warn(e);
@@ -35,7 +35,8 @@ export const getAgentId = async () => {
 
 export const callZome = async (config: any) => {
   await init();
-  const info = await client.appInfo({ app_id: "test-app" });
+
+  const info = await client.appInfo({ installed_app_id: "test-app" });
   const {
     cap = null,
     cellId = info.cell_data[0][0],

@@ -14,3 +14,7 @@
   flex-direction: column;
   align-items: center;
 }
+
+.register-label {
+  font-size: 0.9rem;
+}
