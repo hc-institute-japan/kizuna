@@ -437,7 +437,7 @@ export default (orchestrator, config, installation) => {
 
         //HERE WE CHECK IF THE GROUP LISTS  HAS THE EXPECTED VALUES
         t.deepEqual(alice_groups_list,[], "this list reamins empty and we  probably change this behavior");
-        //t.deepEqual(bobby_groups_list,[group], "bobby and charlie was added to the group so his group list contain the group on it");
+        t.deepEqual(bobby_groups_list,[group], "bobby and charlie was added to the group so his group list contain the group on it");
         t.deepEqual(charlie_groups_list,[group], "bobby and charlie was added to the group so his group list contain the group on it");
 
 

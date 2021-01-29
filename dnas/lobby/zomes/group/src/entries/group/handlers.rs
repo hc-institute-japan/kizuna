@@ -136,7 +136,7 @@ pub fn add_members(add_member_input: AddMemberInput) -> ExternResult<AgentPubKey
 
 
     //[for all newly added agents]
-    for new_member in new_group_members_from_input.clone(){
+    for new_member in new_group_members.clone(){
         //link from each member to original Group entry tag "member"
         create_link(
             new_member.into(),
@@ -154,6 +154,7 @@ pub fn add_members(add_member_input: AddMemberInput) -> ExternResult<AgentPubKey
         name: signal_name,
         payload: signal_payload,
     };
+
 
     remote_signal(
         &signal.clone(),
