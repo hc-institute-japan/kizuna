@@ -11,8 +11,5 @@ pub(crate) struct SignalDetails{
 // Here we add all the signal_types we add in the future
 #[derive(Serialize, Deserialize, SerializedBytes,Clone)]
 pub(crate)enum  SignalPayload{
-
     AddedToGroup(EntryHash),
-
-
 }

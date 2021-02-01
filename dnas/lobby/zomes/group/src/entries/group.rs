@@ -7,15 +7,13 @@ pub mod handlers;
 #[derive(Serialize, Deserialize, SerializedBytes,Clone)]
 pub struct Group {
     pub name: String, 
-     created: Timestamp,
-     creator: AgentPubKey,
-     members: Vec<AgentPubKey>
+    pub created: Timestamp,
+    pub creator: AgentPubKey,
+    pub members: Vec<AgentPubKey>
 }
 
 impl Group {
-
-    pub fn new(name:String, created:Timestamp, creator:AgentPubKey, members:Vec<AgentPubKey>)-> Self {
-
+    pub fn new(name: String, created: Timestamp, creator: AgentPubKey, members: Vec<AgentPubKey>) -> Self {
         Group{
             name,
             created,
@@ -23,11 +21,10 @@ impl Group {
             members,
         }
     }
-
     //GETTERS
-    pub fn get_group_creation_timestamp(&self)->Timestamp{ self.created.clone() }
-    pub fn get_group_creator(&self)->AgentPubKey{ self.creator.clone() }
-    pub fn get_group_members(&self)->Vec<AgentPubKey>{ self.members.clone() }
+    pub fn get_group_creation_timestamp(&self) -> Timestamp { self.created.clone() }
+    pub fn get_group_creator(&self) -> AgentPubKey { self.creator.clone() }
+    pub fn get_group_members(&self) -> Vec<AgentPubKey> { self.members.clone() }
 }
 
 entry_def!(Group 
@@ -70,24 +67,24 @@ pub struct RemoveMembersInput {
 
 //OUTPUTS TYPES DEFINITION
 #[derive(Deserialize, Serialize, SerializedBytes)]
-pub struct HashesOutput{
-    pub header_hash:HeaderHash,
-    pub entry_hash:EntryHash,
+pub struct HashesOutput {
+    pub header_hash: HeaderHash,
+    pub entry_hash: EntryHash,
 }
 //END OF OUTPUTS TYPES DEFINITION
 
 //WRAPPERS TYPES DEFINITION
 #[derive(Deserialize, Serialize, SerializedBytes)]
-pub struct BlockedWrapper(pub Vec<AgentPubKey>);
+pub struct BlockedWrapper (pub Vec<AgentPubKey>);
 
 #[derive(Deserialize, Serialize, SerializedBytes)]
-pub struct MyGroupListWrapper(pub Vec<Group>);
+pub struct MyGroupListWrapper (pub Vec<Group>);
 
 #[derive(Deserialize, Serialize, SerializedBytes)]
-pub struct AgentPubKeysWrapper(Vec<AgentPubKey>);
+pub struct AgentPubKeysWrapper (Vec<AgentPubKey>);
 #[derive(Deserialize, Serialize, SerializedBytes)]
-pub struct EntryHashWrapper{
-    pub group_hash:EntryHash,
+pub struct EntryHashWrapper {
+    pub group_hash: EntryHash,
 }
 
 //END OF WRAPPERS TYPES DEFINITION

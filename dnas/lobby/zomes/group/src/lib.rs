@@ -30,13 +30,14 @@ entry_defs![
     Path::entry_def()
     ];
 
+// this is only exposed outside of WASM for testing purposes.
 #[hdk_extern]
-pub fn init(_:())-> ExternResult<InitCallbackResult> {
+pub fn init(_: ())-> ExternResult<InitCallbackResult> {
 
     let mut fuctions = HashSet::new();
 
-    let tag:String = "create_group_cap_grant".into(); 
-    let access:CapAccess = CapAccess::Unrestricted;
+    let tag: String = "create_group_cap_grant".into(); 
+    let access: CapAccess = CapAccess::Unrestricted;
     
     let zome_name:ZomeName = zome_info()?.zome_name;
     let function_name:FunctionName = FunctionName("recv_remote_signal".into());
@@ -44,8 +45,8 @@ pub fn init(_:())-> ExternResult<InitCallbackResult> {
     fuctions.insert((zome_name, function_name));
 
     let cap_grant_entry:CapGrantEntry = CapGrantEntry::new(
-        tag,//A string by which to later query for saved grants.
-        access,//Unrestricted access means any external agent can call the extern
+        tag, // A string by which to later query for saved grants.
+        access, // Unrestricted access means any external agent can call the extern
         fuctions,
     );
 
@@ -55,16 +56,20 @@ pub fn init(_:())-> ExternResult<InitCallbackResult> {
 }
 #[hdk_extern]
 fn recv_remote_signal(signal: SerializedBytes) -> ExternResult<()> {
+    // currently only emitting the received signal
+    // TODO: actually work with the received signal
     emit_signal(&signal)?;
     Ok(())
 }
 //TO BE TESTED
 #[hdk_extern]
-fn create_group(create_group_input: CreateGroupInput)-> ExternResult<Group>{
+fn create_group(create_group_input: CreateGroupInput) -> ExternResult<Group> {
     group::handlers::create_group(create_group_input)
 }
+
+// this is only exposed outside of WASM for testing purposes.
 #[hdk_extern]
-fn validate_create_group(data:ValidateData)-> ExternResult<ValidateCallbackResult>{
+fn validate_create_group(data:ValidateData)-> ExternResult<ValidateCallbackResult> {
     //data = { element = { signed_header, entry } , validation_package <Option> }
 
     //1- create is valid if creator pubkey matches the signature
@@ -92,6 +97,15 @@ fn validate_create_group(data:ValidateData)-> ExternResult<ValidateCallbackResul
 
     Ok(ValidateCallbackResult::UnresolvedDependencies(vec![]))
 }
+
+// TATS: implement Update validation for Group entry
+// fn validate_update_group(data: ValidateData) -> ExternResult<ValidateCallbackResult> {
+//     // 1 update is valid if author of Create Header matches the author of the Update Header -> so that only admin can update
+//     // 2 update is only valid if the old_entry’s header is Create
+//     // 4 update is valid only if members > 2
+//     // 3 update is only valid if old_group_name != new_group_name | old_members != new_members
+// }
+
 #[hdk_extern]
 fn add_members(add_member_input:AddMemberInput)->HdkResult<AgentPubKeysWrapper>{
     group::handlers::add_members(add_member_input)
