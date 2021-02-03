@@ -38,31 +38,28 @@ entry_def!(Group
 );
 //END OF GROUP TYPE DEFINITION 
 
+// IO TYPES DEFINITION
+#[derive(Serialize, Deserialize, SerializedBytes,Clone)]
+pub struct UpdateMembersIO {
+    pub members: Vec<AgentPubKey>,
+    pub group_id: EntryHash,
+    pub group_revision_id: HeaderHash,
+}
+
+#[derive(Serialize, Deserialize, SerializedBytes,Clone)]
+pub struct UpdateGroupNameIO {
+    name: String,
+    group_id: EntryHash,
+    group_revision_id: HeaderHash,
+}
+// END OF IO TYPES DEFINITION
+
 //INPUTS TYPES DEFINITION
 #[derive(Serialize, Deserialize, SerializedBytes,Clone)]
 pub struct CreateGroupInput {
     name: String,
     members: Vec<AgentPubKey>   
 }
-#[derive(Serialize, Deserialize, SerializedBytes,Clone)]
-pub struct AddMemberInput {
-    members: Vec<AgentPubKey>,
-    group_id: EntryHash,
-    group_revision_id: HeaderHash,
-}
-#[derive(Serialize, Deserialize, SerializedBytes,Clone)]
-pub struct UpdateGroupNameInput {
-    name: String,
-    group_id: EntryHash,
-    group_revision_id: HeaderHash,
-}
-#[derive(Serialize, Deserialize, SerializedBytes,Clone)]
-pub struct RemoveMembersInput {
-    members: Vec<AgentPubKey>,
-    group_id: EntryHash,
-    group_revision_id: HeaderHash,
-}
-
 //END OF INPUTS TYPES DEFINITION
 
 //OUTPUTS TYPES DEFINITION
@@ -71,6 +68,38 @@ pub struct HashesOutput {
     pub header_hash: HeaderHash,
     pub entry_hash: EntryHash,
 }
+#[derive(Deserialize, Serialize, SerializedBytes)]
+pub struct CreateGroupOutput{
+    pub content: Group,
+    pub group_id: EntryHash,
+    pub group_revision_id: HeaderHash,
+}
+#[derive(Deserialize, Serialize, SerializedBytes)]
+pub struct GroupOutput {
+    group_id: EntryHash,
+    group_revision_id: HeaderHash,
+    latest_name: String,
+    members: Vec<AgentPubKey>,
+    creator: AgentPubKey,
+    created: Timestamp,
+    // group_versions: Vec<Group>,
+}
+
+impl GroupOutput {
+
+    fn new(group: Group, group_id: EntryHash , group_revision_id: HeaderHash) -> GroupOutput{
+
+        GroupOutput {
+
+            group_id: group_id,
+            group_revision_id: group_revision_id,
+            latest_name : group.name,
+            members: group.members, 
+            creator: group.creator,
+            created: group.created,
+        }
+    }
+}
 //END OF OUTPUTS TYPES DEFINITION
 
 //WRAPPERS TYPES DEFINITION
@@ -78,13 +107,13 @@ pub struct HashesOutput {
 pub struct BlockedWrapper (pub Vec<AgentPubKey>);
 
 #[derive(Deserialize, Serialize, SerializedBytes)]
-pub struct MyGroupListWrapper (pub Vec<Group>);
+pub struct MyGroupListWrapper (pub Vec<GroupOutput>);
 
 #[derive(Deserialize, Serialize, SerializedBytes)]
 pub struct AgentPubKeysWrapper (Vec<AgentPubKey>);
+
 #[derive(Deserialize, Serialize, SerializedBytes)]
 pub struct EntryHashWrapper {
     pub group_hash: EntryHash,
 }
-
 //END OF WRAPPERS TYPES DEFINITION
