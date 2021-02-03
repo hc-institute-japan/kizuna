@@ -68,12 +68,19 @@ function getGroupHashes(group){
         conductor.call("group","get_group_entry_and_header_hash",group);
 }
 
+//VAlIDATION FUCNTIONS 
+function runValidationRules(validation_input){
+    return (conductor)=>
+        conductor.call("group","run_validation",validation_input);
+}
+
+
 //THE FUNCTION GET ALL MY GROUPS ITS BEEN IMPLICITLY TESTED BEACUSE IS USED IN ALMOST  ALL THE TESTS AND WE'VE CHECK HIS CORRECT BEHAVIOR
 export default (orchestrator, config, installation) => {
 
     orchestrator.registerScenario ("create group method test", async(s,t) =>{
 
-        const [alice,bobby,charlie] = await s.players([config,config,config]);
+        /*const [alice,bobby,charlie] = await s.players([config,config,config]);
 
         const [[alice_happ]] = await alice.installAgentsHapps(installation);
         const [[bobby_happ]] = await bobby.installAgentsHapps(installation);
@@ -143,10 +150,11 @@ export default (orchestrator, config, installation) => {
         t.equal(charlie_signal_listener.counter, 0, "charlie's signal counter its = 0 because he wasn't added to the group");
         t.deepEqual(charlie_signal_listener.payload, Buffer, "charlie's has not received any payload beacuse he was nos added to the group" );
         
-            
+        */    
     });
     orchestrator.registerScenario ("add members method AND remove members methods test", async(s,t) =>{
 
+        /*
         const [alice,bobby,charlie] = await s.players([config,config,config]);
 
         const [[alice_happ]] = await alice.installAgentsHapps(installation);
@@ -276,10 +284,12 @@ export default (orchestrator, config, installation) => {
         t.deepEqual(bobby_group_list, [], "bobby group list match with the expected value");
         t.deepEqual(charlie_group_list, [updated_group], "charlie group list match with the expected value");
         
+        */
         
     });
     orchestrator.registerScenario ("update group name  method test", async(s,t) =>{
 
+        /*
         const [alice,bobby,charlie] = await s.players([config,config,config]);
 
         const [[alice_happ]] = await alice.installAgentsHapps(installation);
@@ -336,6 +346,165 @@ export default (orchestrator, config, installation) => {
         t.deepEqual(alice_group_list, [updated_group], "alice group list match with the expected value");
         t.deepEqual(bobby_group_list, [updated_group], "bobby group list match with the expected value");
         t.deepEqual(charlie_group_list, [updated_group], "charlie group list match with the expected value");
-
+        */
     });
+    orchestrator.registerScenario ("validate_create_group method test", async(s,t) =>{
+
+        /*
+        const [alice,bobby,charlie] = await s.players([config,config,config]);
+
+        const [[alice_happ]] = await alice.installAgentsHapps(installation);
+        const [[bobby_happ]] = await bobby.installAgentsHapps(installation);
+        const [[charlie_happ]] = await charlie.installAgentsHapps(installation);
+
+        await s.shareAllNodes([alice, bobby, charlie])
+
+        const alicePubKey = alice_happ.agent;
+        const bobbyPubKey = bobby_happ.agent;
+        const charliePubKey = charlie_happ.agent;
+
+        const alice_conductor = alice_happ.cells[0];
+        
+        // 1- CREATE A VALID GOUP 
+
+        let create_group_input = {
+            name: "Group_name",
+            members: [bobbyPubKey,charliePubKey],
+        };
+
+        let create_group_output = await createGroup(create_group_input)(alice_conductor);
+        await delay(1000);
+
+        let validation_input = {
+            validation_type: "create",
+            group_revision_id: create_group_output.group_revision_id,
+        };
+        // 2- CHECK THE VALIDATION RULES OUTPUT ANCd CHECK IF WE GET THE EXPECTED VALUE 
+
+
+        let validation_output = await runValidationRules(validation_input)(alice_conductor);
+        delay(1000);
+
+        t.deepEqual(validation_output, {Valid: null}, "this group pass the validation rules and can be committed and shared through the network");
+
+
+        // 3- CREATE A GROUP WITH INVALID GROUP MEMBERS FIELD (groups cannot be created with less than 2 members apart of you);
+        
+        create_group_input.members = [bobbyPubKey];
+        
+        create_group_output =  await createGroup(create_group_input)(alice_conductor);
+        await delay(1000);
+
+        validation_input.group_revision_id =  create_group_output.group_revision_id;
+
+        // 4- CHECK THE VALIDATION RULES OUTPUT AND CHECK IF WE GET THE EXPECTED VALUE  
+        
+        validation_output = await runValidationRules(validation_input)(alice_conductor);
+        delay(1000);
+
+        t.deepEqual(validation_output, {Invalid: "groups cannot be created with less than 2 members apart of you"},"groups cannot be created with less than 2 members apart of you");
+
+        // 5 - CREATE A GROUP WITH INVALIDA GROUP MEMBERS FIELD (creator AgentPubKey cannot be included in the group members list) 
+
+        create_group_input.members = [alicePubKey,bobbyPubKey,charliePubKey];
+        
+        create_group_output =  await createGroup(create_group_input)(alice_conductor);
+        await delay(1000);
+
+        validation_input.group_revision_id =  create_group_output.group_revision_id;
+        
+        // 6- CHECK THE VALIDATION RULES OUTPUT AND CHECK IF WE GET THE EXPECTED VALUE  
+
+        validation_output = await runValidationRules(validation_input)(alice_conductor);
+        delay(1000);
+
+        t.deepEqual(validation_output, {Invalid: "creator AgentPubKey cannot be included in the group members list"},"creator AgentPubKey cannot be included in the group members list");
+
+        // 7 - CREATE A GROUP WITH INVALIDA GROUP NAME FIELD (the group name must at least contain 1 character and maximun 50 characters)
+        create_group_input.members = [bobbyPubKey,charliePubKey];
+        create_group_input.name = "";
+
+        create_group_output =  await createGroup(create_group_input)(alice_conductor);
+        await delay(1000);
+
+        validation_input.group_revision_id =  create_group_output.group_revision_id;
+
+        // 6- CHECK THE VALIDATION RULES OUTPUT AND CHECK IF WE GET THE EXPECTED VALUE  
+
+        validation_output = await runValidationRules(validation_input)(alice_conductor);
+        delay(1000);
+
+        t.deepEqual(validation_output, {Invalid: "the group name must at least contain 1 character and maximun 50 characters"},"the group name must at least contain 1 character and maximun 50 characters");
+
+        */
+    });
+    orchestrator.registerScenario ("validate_update_group method test", async(s,t) =>{
+
+        
+        const [alice,bobby,charlie] = await s.players([config,config,config]);
+
+        const [[alice_happ]] = await alice.installAgentsHapps(installation);
+        const [[bobby_happ]] = await bobby.installAgentsHapps(installation);
+        const [[charlie_happ]] = await charlie.installAgentsHapps(installation);
+
+        await s.shareAllNodes([alice, bobby, charlie])
+
+        const alicePubKey = alice_happ.agent;
+        const bobbyPubKey = bobby_happ.agent;
+        const charliePubKey = charlie_happ.agent;
+
+        const alice_conductor = alice_happ.cells[0];
+        const bobby_conductor = bobby_happ.cells[0];
+        
+        // 1- CREATE A VALID GOUP 
+
+        let create_group_input = {
+            name: "Group_name",
+            members: [bobbyPubKey],
+        };
+
+        let create_group_output = await createGroup(create_group_input)(alice_conductor);
+        await delay(1000);
+
+
+        // 2- UPDATE THE GROUP ENTRY WITHOUT BEEN THE GROUP ADMIN FOR LATER TRY TO VALIDATE THE NEW ENTRY
+
+        let update_members_io = {
+            members: [ charliePubKey],
+            group_id: create_group_output.group_id,
+            group_revision_id: create_group_output.group_revision_id,
+        };
+
+        await AddGroupMebers(update_members_io)(alice_conductor);
+        await delay(1000);
+
+
+        // 2.1- GET THE LATEST GROUP ENTRY VERSION AND THEIR HASHES
+        
+        let updated_group = await getLatestGroupVertion({group_hash:create_group_output.group_id})(alice_conductor);
+        await delay(1000);
+
+        let updated_group_hashes = await getGroupHashes(updated_group)(alice_conductor);
+        await delay(1000);
+        
+
+        // 3- RUN THE VALIDATION RULES FOR UPDATE GROUP ENTRIES
+
+        let validation_input = {
+            validation_type: "update",
+            group_revision_id: updated_group_hashes.header_hash,
+        };
+
+
+        let validation_output = await runValidationRules(validation_input)(alice_conductor);
+        delay(1000);
+
+
+        console.log("output");
+        console.log(validation_output);
+    
+
+        
+    });
+
 }

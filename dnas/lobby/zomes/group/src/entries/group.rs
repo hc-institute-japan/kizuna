@@ -117,3 +117,12 @@ pub struct EntryHashWrapper {
     pub group_hash: EntryHash,
 }
 //END OF WRAPPERS TYPES DEFINITION
+
+
+//VALIDATION TYPES DEFINITION (this types are created just for testing purposes and can be removed in the future)
+#[derive(Deserialize, Serialize, SerializedBytes)]
+pub struct ValidationInput{
+    pub validation_type: String,
+    pub group_revision_id: HeaderHash,
+}
+//END OF VALIDATION TYPES DEFINITION
