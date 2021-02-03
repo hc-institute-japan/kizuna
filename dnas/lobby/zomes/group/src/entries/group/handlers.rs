@@ -10,14 +10,14 @@ use super::{
     //TYPES USED IN CREATE GROUP: 
     Group,
     CreateGroupInput,
-    MyGroupListWrapper,
-    //TYPES USED IN ADD MEMBERS: 
-    AddMemberInput,
-    AgentPubKeysWrapper,
+    CreateGroupOutput,
+    //TYPES USED IN ADD MEMBERS AND REMOVE MEMBERS: 
+    UpdateMembersIO,
     //TYPES USED IN UPDATE GROUP NAME:
-    UpdateGroupNameInput,
-    //TYPES USED IN REMOVE MEMBERS: 
-    RemoveMembersInput,
+    UpdateGroupNameIO,
+    //TYPES USED IN GET ALL MY GROUPS
+    GroupOutput,
+    MyGroupListWrapper,
     //TYPES USED IN UTILS FUNCTIONS:
     HashesOutput,
 };
@@ -27,18 +27,17 @@ use crate::signals::{
     SignalPayload,
 };
 
-// TATS: return CreateGroupOutput instead of Group
-pub fn create_group(create_group_input: CreateGroupInput) -> ExternResult<Group> {
+pub fn create_group(create_group_input: CreateGroupInput) -> ExternResult<CreateGroupOutput> {
 
     let group_name: String = create_group_input.name;
     let group_members: Vec<AgentPubKey> = create_group_input.members;
     let created: Timestamp = to_timestamp(sys_time()?);
     let creator: AgentPubKey = agent_info()?.agent_latest_pubkey;
 
-    //get my blocked list from the contacs zome 
+    // get my blocked list from the contacs zome 
     let my_blocked_list: Vec<AgentPubKey> = utils::get_my_blocked_list()?.0; 
 
-    //if even one member of the group is in my blocked list we have to return an error
+    // if even one member of the group is in my blocked list we have to return an error
     for member in group_members.clone() {
         if my_blocked_list.contains(&member) {
             return Err(HdkError::Wasm(WasmError::Zome("cannot create group with blocked agents".into())));
@@ -53,49 +52,34 @@ pub fn create_group(create_group_input: CreateGroupInput) -> ExternResult<Group>
     );
 
     // commit group entry
-    let _group_header_hash = create_entry(&group.clone())?;
-    let group_entry_hash:EntryHash = hash_entry(&group.clone())?;
+    let group_revision_id: HeaderHash = create_entry(&group.clone())?;
+    let group_id: EntryHash = hash_entry(&group.clone())?;
 
-    create_link(creator.into(), group_entry_hash.clone(), LinkTag::new("member"))?; 
-
-
-    // for all members: link from each member to Group entry tagged "member" 
-    for member in group_members.clone() {
-        create_link(
-            member.into(),
-            group_entry_hash.clone(),
-            LinkTag::new("member"),
-        )?;
-    }
-
-    // for all added agents: Send remote signal with Group EntryHash 
-    let signal_payload: SignalPayload = SignalPayload::AddedToGroup(group_entry_hash); 
-    let signal_name: String = "added_to_group".into();
-
-    let signal: SignalDetails = SignalDetails {
-        name: signal_name,
-        payload: signal_payload,
-    };
-
-    remote_signal(
-        &signal,
-        group_members,
-    )?;
-
-    Ok(group)   
-}
-
-// TATS: change the input and output (check archi doc)
-pub fn add_members(add_member_input: AddMemberInput) -> ExternResult<AgentPubKeysWrapper>{
+    // link the group admin to the group 
+    create_link(creator.into(), group_id.clone(), LinkTag::new("member"))?;
     
-    let mut new_group_members_from_input: Vec<AgentPubKey> = add_member_input.members;
-    let group_id: EntryHash = add_member_input.group_id;
-    let group_revision_id: HeaderHash = add_member_input.group_revision_id;
+    let signal_payload: SignalPayload = SignalPayload::AddedToGroup(group_id.clone()); 
+    //link all the group members to the group entry with the link tag "member" and send them a signal with the group_id as payload. 
+    link_and_emit_signals(group_members, group_id.clone(), LinkTag::new("member"), signal_payload)?;
 
-    // check whether members field is empty
+    Ok(CreateGroupOutput{
+        content: group,
+        group_id: group_id,
+        group_revision_id: group_revision_id,
+    })   
+}
+pub fn add_members(add_members_input: UpdateMembersIO) -> ExternResult<UpdateMembersIO> {
+    
+    let mut new_group_members_from_input: Vec<AgentPubKey> = add_members_input.members.clone();
+    let group_id: EntryHash = add_members_input.group_id.clone();
+    let group_revision_id: HeaderHash = add_members_input.group_revision_id.clone();
+
+    /*
+    check whether members field is empty (this condition can be removed because the validate_update_group fucntion already  covered this scenario  in the validation(3)
     if new_group_members_from_input.is_empty() {
         return Err(HdkError::Wasm(WasmError::Zome("members field is empty".into())));
     }
+    */
 
     //check if any invitees are blocked and return Err if so.
     let my_blocked_list: Vec<AgentPubKey> = utils::get_my_blocked_list()?.0;
@@ -108,136 +92,70 @@ pub fn add_members(add_member_input: AddMemberInput) -> ExternResult<AgentPubKey
     }
 
     // get most recent Group Entry
-    let latest_group_vertion: Group = get_group_latest_vertion(group_id.clone())?;
-    let mut group_members: Vec<AgentPubKey> =  latest_group_vertion.get_group_members();
+    let latest_group_version: Group = get_group_latest_version(group_id.clone())?;
+    let mut group_members: Vec<AgentPubKey> =  latest_group_version.get_group_members();
     let creator: AgentPubKey = agent_info()?.agent_latest_pubkey;
 
 
-    // TATS: this should be in the validation
-    // this fucntion can only be called by the admin of the group
-    if !creator.eq(&latest_group_vertion.get_group_creator()){
-        return Err(HdkError::Wasm(WasmError::Zome("only the admin of the group can update the group information".into())));
-    }
-
-    // TATS: lets maybe just remove agents that are already added but add the others and proceed.
     // filter the list of members the admin want to add to avoid duplicated members(this probably is validated on ui but i added it here too)
-    for new_member in new_group_members_from_input.clone() {
-        if group_members.contains(&new_member) {
-            return Err(HdkError::Wasm(WasmError::Zome("you're trying to add members who already belongs to this group".into())));
-        }
-    }
+    new_group_members_from_input.retain(|new_member| !group_members.contains(&new_member) );
+
     //this var its used because append method leave empty the vector received as arg
     let new_group_members:Vec<AgentPubKey> =  new_group_members_from_input.clone();
 
     group_members.append(& mut new_group_members_from_input);
 
-    let group_name: String = latest_group_vertion.name;
+    let group_name: String = latest_group_version.name;
     let created: Timestamp = to_timestamp(sys_time()?);
 
     let updated_group: Group = Group::new(group_name, created, creator, group_members.clone());
 
     // update_entry the Group with new members field with original HeaderHash
-    let _group_updated_header_hash: HeaderHash = update_entry(group_revision_id, &updated_group)?;
+    update_entry(group_revision_id, &updated_group)?;
 
+    let signal_payload: SignalPayload = SignalPayload::AddedToGroup(group_id.clone());
 
-    //[for all newly added agents]
-    for new_member in new_group_members.clone(){
-        //link from each member to original Group entry tag "member"
-        create_link(
-            new_member.into(),
-            group_id.clone(),
-            LinkTag::new("member"),
-        )?;
+    //link all the new group members to the group entry with the link tag "member" and send them a signal with the group_id as payload 
+    link_and_emit_signals(new_group_members, group_id, LinkTag::new("member"), signal_payload)?;
 
-    }
-
-    // TATS: make a generic fn for this
-    // for all added agents: Send remote signal with Group EntryHash 
-    let signal_payload: SignalPayload = SignalPayload::AddedToGroup(group_id); 
-    let signal_name: String = "added_to_group".into();
-
-    let signal: SignalDetails = SignalDetails {
-        name: signal_name,
-        payload: signal_payload,
-    };
-
-
-    remote_signal(
-        &signal.clone(),
-        new_group_members,
-    )?;
-
-
-    Ok(AgentPubKeysWrapper(group_members))
+    Ok(add_members_input)
 }
+pub fn remove_members(remove_members_input: UpdateMembersIO)-> ExternResult<UpdateMembersIO> {
 
-pub fn update_group_name(update_group_name_input: UpdateGroupNameInput) -> ExternResult<HeaderHash>{
-
-    let new_group_name:String = update_group_name_input.name;
-    let group_header_hash:HeaderHash = update_group_name_input.group_revision_id;
-    let group_entry_hash:EntryHash = update_group_name_input.group_id;
-
-
-    //1- we've to get the latest group entry vertion for the recived entryhash (group_id)
-    let latest_group_vertion:Group = get_group_latest_vertion(group_entry_hash.clone())?;
-    //2-check whether the new name is the same with old name and return error if so
-    let old_group_name:String = latest_group_vertion.name.clone();
-    let created:Timestamp = to_timestamp(sys_time()?);
-    let creator:AgentPubKey = agent_info()?.agent_latest_pubkey;
-    let members:Vec<AgentPubKey> =  latest_group_vertion.get_group_members();
-
-    if new_group_name.eq(&old_group_name){
-
-        // Err("cannot update with the same group name")
-        return Err(HdkError::Wasm(WasmError::Zome("no fields to update for this entry".into())));
-    }
-
-    let updated_group:Group = Group::new(new_group_name, created, creator, members);
-
-    //we always update the entry from the root_group_header_hash, the header hash for this entry is provided as arg (group_hader_hash)
-    //3-update_entry the Group with new name field with original HeaderHash
-    let group_updated_header_hash:HeaderHash = update_entry(group_header_hash, &updated_group)?;
-
-
-    Ok(group_updated_header_hash)
-}
-pub fn remove_members(remove_members_input: RemoveMembersInput)-> ExternResult<AgentPubKeysWrapper>{
-
-    let members_to_remove:Vec<AgentPubKey> = remove_members_input.members;
-    let group_id:EntryHash = remove_members_input.group_id;
-    let group_revision_id:HeaderHash = remove_members_input.group_revision_id;
+    let members_to_remove: Vec<AgentPubKey> = remove_members_input.members.clone();
+    let group_id: EntryHash = remove_members_input.group_id.clone();
+    let group_revision_id: HeaderHash = remove_members_input.group_revision_id.clone();
     
     //check whether members field is empty
-    if members_to_remove.is_empty() {
-        return Err(HdkError::Wasm(WasmError::Zome("members field is empty".into())));
-    }
+    //(this condition can be removed because the validate_update_group fucntion already  covered this scenario  in the validation(3)
+    /*
+        if members_to_remove.is_empty() {
+            return Err(HdkError::Wasm(WasmError::Zome("members field is empty".into())));
+        }
+
+    */
+
     //get most recent Group Entry
-    let latest_group_vertion:Group = get_group_latest_vertion(group_id.clone())?;
-    let mut group_members:Vec<AgentPubKey> =  latest_group_vertion.get_group_members();
-    let creator:AgentPubKey = agent_info()?.agent_latest_pubkey;
-
-    // TATS: should be in the validation
-    //this fucntion can only be called by the admin of the group
-    if !creator.eq(&latest_group_vertion.get_group_creator()){
-        return Err(HdkError::Wasm(WasmError::Zome("only the admin of the group can update the group information".into())));
-    }
+    let latest_group_version: Group = get_group_latest_version(group_id.clone())?;
+    let mut group_members: Vec<AgentPubKey> =  latest_group_version.get_group_members();
+    
     //remove the members for the group members list
-    for member in members_to_remove.clone(){
-        group_members.retain(|group_member| !group_member.eq(&member));
-    }
-    //update_entry the Group with new members field with original HeaderHash
-    let group_name:String = latest_group_vertion.name;
-    let created:Timestamp = to_timestamp(sys_time()?);
+    group_members.retain(|member| !members_to_remove.contains(&member) );
+    
+    //update_entry the Group with new members field using the  original HeaderHash
+    let creator: AgentPubKey = agent_info()?.agent_latest_pubkey;
+    let group_name: String = latest_group_version.name;
+    let created: Timestamp = to_timestamp(sys_time()?);
 
-    let updated_group:Group = Group::new(group_name, created, creator, group_members.clone());
-    let _group_updated_header_hash:HeaderHash = update_entry(group_revision_id, &updated_group)?;
-
+    let updated_group: Group = Group::new(group_name, created, creator, group_members.clone());
+    
+    update_entry(group_revision_id, &updated_group)?;
 
     //for all removed members we should delete the links between them and the group entry 
     for removed_member in members_to_remove{
         //get links for each removed member
         // TODO: see if looping through all links here is too much of an overload and change implementation if necessary.
-        let groups_linked:Vec<Link> = get_links(removed_member.into(), Some(LinkTag::new("member")))?.into_inner();
+        let groups_linked: Vec<Link> = get_links(removed_member.into(), Some(LinkTag::new("member")))?.into_inner();
 
         //filter all the groups linked to this agent to get the link between this group(group_id) and the agent(AgentPubKey)
         for link in groups_linked {
@@ -249,25 +167,58 @@ pub fn remove_members(remove_members_input: RemoveMembersInput)-> ExternResult<A
         }
     }
 
-    Ok(AgentPubKeysWrapper(group_members))
+    Ok(remove_members_input)
 }
+pub fn update_group_name(update_group_name_input: UpdateGroupNameIO) -> ExternResult<UpdateGroupNameIO> {
+
+    let new_group_name: String = update_group_name_input.name.clone();
+    let group_revision_id: HeaderHash = update_group_name_input.group_revision_id.clone();
+    let group_id: EntryHash = update_group_name_input.group_id.clone();
 
 
-pub fn get_all_my_groups()->ExternResult<MyGroupListWrapper>{
+    //1- we've to get the latest group entry version for the recived entryhash (group_id)
+    let latest_group_version: Group = get_group_latest_version(group_id)?;
+    
+    //2-check whether the new name is the same with old name and return error if so
+    //(this condition can be removed because the validate_update_group fucntion already  covered this scenario  in the validation(3)
+    
+    /*
+    let old_group_name:String = latest_group_version.name.clone();
+    if new_group_name.eq(&old_group_name){
 
-    let my_pub_key:AgentPubKey = agent_info()?.agent_latest_pubkey;
-    // TATS: change the data structure to Vec<GroupOutput> (see archi doc)
-    let mut my_linked_groups_entries:Vec<Group> = vec![];
+        return Err(HdkError::Wasm(WasmError::Zome("no fields to update for this entry".into())));
+    } */
+
+    let created: Timestamp = to_timestamp(sys_time()?);
+    let creator: AgentPubKey = agent_info()?.agent_latest_pubkey;
+    let members: Vec<AgentPubKey> =  latest_group_version.get_group_members();
+
+    let updated_group: Group = Group::new(new_group_name, created, creator, members);
+
+    //we always update the entry from the root_group_header_hash, the header hash for this entry is provided as arg (group_revision_id)
+    //3-update_entry the Group with new name field using original HeaderHash
+    update_entry(group_revision_id, &updated_group)?;
+
+    Ok(update_group_name_input)
+}
+pub fn get_all_my_groups()->ExternResult<MyGroupListWrapper> {
+
+    let my_pub_key: AgentPubKey = agent_info()?.agent_latest_pubkey;
+    let mut my_linked_groups_entries: Vec<GroupOutput> = vec![];
+    let mut group_id: EntryHash;
+    let mut group_revision_id: HeaderHash;
+    let mut group: Group; 
 
     for link in get_links(my_pub_key.into(), Some(LinkTag::new("member")))?.into_inner(){
-
+            
         if let Some(element) = get(link.target.clone(), GetOptions::latest())?{
-            if let Some(group) = element.entry().to_app_option()?{
 
-                my_linked_groups_entries.push(group);
-
-            }
-        }
+            group_id = link.target.clone();
+            group_revision_id = element.header_address().to_owned();
+            group = get_group_latest_version(link.target.clone())?;
+    
+            my_linked_groups_entries.push(GroupOutput::new(group, group_id, group_revision_id));        
+        }   
     }
 
     let output: MyGroupListWrapper = MyGroupListWrapper(my_linked_groups_entries);
@@ -277,7 +228,7 @@ pub fn get_all_my_groups()->ExternResult<MyGroupListWrapper>{
 
 
 //UTILS FUNCTIONS 
-pub fn get_group_entry_and_header_hash(input:Group)->ExternResult<HashesOutput>{
+pub fn get_group_entry_and_header_hash(input:Group)->ExternResult<HashesOutput> {
 
     let entry_hash:EntryHash = hash_entry(&input)?;
 
@@ -294,11 +245,9 @@ pub fn get_group_entry_and_header_hash(input:Group)->ExternResult<HashesOutput>{
 
     return Err(HdkError::Wasm(WasmError::Zome("cannot get hashes for this group".into())));
 }
-
-pub fn get_group_latest_vertion(group_id: EntryHash) -> HdkResult<Group> {
+pub fn get_group_latest_version(group_id: EntryHash) -> HdkResult<Group> {
 
     // 1- we have to get details from the recived entry_hash as arg (group_id)
-    // TATS: change content() to latest(). double check that tests are passing.
     if let Some(details) = get_details(group_id.clone(), GetOptions::latest())? {
 
         match details {
@@ -321,12 +270,11 @@ pub fn get_group_latest_vertion(group_id: EntryHash) -> HdkResult<Group> {
                 //3- having the latest header from this entry, we can get the updated information from this group using "hdk3::get"
                 if let Some(latest_group_entry_hash) =  latest_group_header.entry_hash(){
 
-                    // TATS: changed options to latest()
                     if let Some(latest_group_element) = get(latest_group_entry_hash.clone(), GetOptions::content())? {
 
                         let latest_group_version: Option<Group> = latest_group_element.entry().to_app_option()?;
 
-                        if let Some(group) = latest_group_vertion {
+                        if let Some(group) = latest_group_version {
                             return Ok(group);
                         }
 
@@ -339,13 +287,50 @@ pub fn get_group_latest_vertion(group_id: EntryHash) -> HdkResult<Group> {
             _ => ()
 
         } // match ends
-            
     } // if let ends
         
-    // TATS: what does this error mean?
     return Err(HdkError::Wasm(WasmError::Zome("the given group_id does not exist".into())));
 }
+pub fn link_and_emit_signals(agents: Vec<AgentPubKey>, link_target: EntryHash, link_tag: LinkTag, signal_payload: SignalPayload) -> HdkResult<()> {
 
+    for agent in agents.clone(){
+
+        create_link(
+            agent.into(),
+            link_target.clone(),
+            link_tag.clone(),
+        )?;
+
+    }
+
+    let signal_name: String;
+
+    match signal_payload.clone() {
+        SignalPayload::AddedToGroup(_) => {
+            signal_name = "added_to_group".into();
+        },
+        
+    }
+
+    let signal: SignalDetails = SignalDetails {
+        name: signal_name,
+        payload: signal_payload,
+    };
+    
+    remote_signal(
+        &signal.clone(),
+        agents,
+    )?;
+
+    Ok(())
+}
+pub fn get_group_entry_from_element(element: Element) -> HdkResult<Group> {
+ 
+    if let Some(group) = element.entry().to_app_option()? {
+        return Ok(group)
+    }
+    return Err(HdkError::Wasm(WasmError::Zome("we can't get the entry for the given element".into())));
+}
 
 
 
