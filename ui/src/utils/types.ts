@@ -4,11 +4,6 @@ import { RootState } from "../redux/reducers";
 
 export type ThunkAction = Thunk<void, RootState, unknown, Action<string>>;
 
-export interface Profile {
-  id: string;
-  username: string;
-}
-
 export interface Message {
   id: string;
   sender: string;

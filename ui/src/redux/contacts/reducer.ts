@@ -1,5 +1,5 @@
 import { indexContacts } from "../../utils/helpers";
-import { Profile } from "../../utils/types";
+import { Profile } from "../../redux/profile/types";
 import {
   ContactsActionType,
   ContactsState,

@@ -1,5 +1,5 @@
 import { IndexedContacts } from "../redux/contacts/types";
-import { Profile } from "./types";
+import { Profile } from "../redux/profile/types";
 
 export const indexContacts: (contacts: Profile[]) => IndexedContacts = (
   contacts
@@ -31,3 +31,5 @@ export const debounce: (callback: () => any, delay?: number) => Function = (
     timeout = setTimeout(callback, delay);
   };
 };
+
+export const convertIdtoUInt8Array = (id: number[]) => Uint8Array.from(id);
