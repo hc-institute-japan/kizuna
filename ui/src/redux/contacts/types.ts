@@ -1,4 +1,4 @@
-import { Profile } from "../../utils/types";
+import { Profile } from "../profile/types";
 
 export const SET_CONTACTS = "SET_CONTACTS";
 
