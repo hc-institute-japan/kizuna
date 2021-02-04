@@ -119,7 +119,6 @@
             if group.get_group_members().contains(&group_creator_pub_key.clone()) {
                 return Ok(ValidateCallbackResult::Invalid("creator AgentPubKey cannot be included in the group members list".into())); //validation(4)
             }
-
  
         }    
 
@@ -134,28 +133,32 @@
         // 3 update is only valid if old_group_name != new_group_name | old_members != new_members
         // 4 update is valid only if members > 2 && new name its not empty or more than 50 characters
 
-        let update_header: Header = data.element.header().clone();
         let updated_group_entry: Group = group::handlers::get_group_entry_from_element(data.element.clone())?;
+        let updated_group_header: Header = data.element.header().clone();
 
-        if let Some(prev_header_hash) = data.element.header().prev_header().clone() {
+        if let Header::Update(update_header) = data.element.header().clone() {
 
-            if let Some(prev_element) = get(prev_header_hash.to_owned(), GetOptions::content())? {
+            let group_revision_id: HeaderHash = update_header.original_header_address;
+            let group_id: EntryHash = update_header.original_entry_address;
 
-                let prev_header: Header = prev_element.header().clone();
+            if let Some(original_group_element) = get(group_revision_id, GetOptions::content())?{
 
-                match prev_header.header_type() {
+                let original_group_header: Header = original_group_element.header().to_owned();
+                
+                match original_group_header.header_type() {
                     
                     HeaderType::Create => {
-
-                        let old_group_entry: Group = group::handlers::get_group_entry_from_element(prev_element.clone())?;
+                        
+                        //THIS PREV GROUP ENTRY VERSION SHOULD CONTAIN THE PREV VERSION TO THIS ENTRY, BECAUSE WHEN THE VALIDATIONS ARE RUNNING THE HEADER UPDATE HISTORY DOSENT HAVE THIS UPDATE ON IT YET 
+                        let prev_group_entry_version: Group = group::handlers::get_group_latest_version(group_id)?;
                         let updated_group_name_length: usize = updated_group_entry.name.clone().len();
                         let updated_group_members_length: usize = updated_group_entry.get_group_members().len();
 
-                        if !update_header.author().to_owned().eq(prev_header.author()){
+                        if !original_group_header.author().to_owned().eq(updated_group_header.author()){
                             return Ok(ValidateCallbackResult::Invalid("cannot update a group entry if you are not the group creator (admin)".into())); //validation(2)
                         }
 
-                        if updated_group_entry.name.eq(&old_group_entry.name.clone()) && updated_group_entry.get_group_members().eq(&old_group_entry.get_group_members()) {
+                        if updated_group_entry.name.eq(&prev_group_entry_version.name.clone()) && updated_group_entry.get_group_members().eq(&prev_group_entry_version.get_group_members()) {
                             return Ok(ValidateCallbackResult::Invalid("nothing have been updated since the last commited group version".into())); //validation(3)
                         }
 
@@ -174,7 +177,9 @@
                     
                 }
             }
+
         }
+
 
         Ok(ValidateCallbackResult::Valid)
     }
@@ -212,6 +217,10 @@
     fn get_group_latest_version(group_id: EntryHashWrapper)->ExternResult<Group>{
         group::handlers::get_group_latest_version(group_id.group_hash)
     }
+    
+
+
+
 
 
 
