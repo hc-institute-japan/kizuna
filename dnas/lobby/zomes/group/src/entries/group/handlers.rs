@@ -294,7 +294,7 @@ pub fn get_group_latest_version(group_id: EntryHash) -> ExternResult<Group> {
                 }// end of else statement
             },
             // this case will not happen
-            _ => (return Err(HdkError::Wasm(WasmError::Zome("wierd error".into()))))
+            _ => (),
 
         } // match ends
     } // if let ends
