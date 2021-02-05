@@ -13,7 +13,7 @@ const network = {
   }],
   bootstrap_service: "https://bootstrap.holo.host"
 }
-const config = Config.gen({network});
+const config = Config.gen();
 
 
 const kizuna = path.join('../kizuna.dna.gz');

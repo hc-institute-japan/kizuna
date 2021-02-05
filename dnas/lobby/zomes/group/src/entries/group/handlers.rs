@@ -75,9 +75,7 @@ pub fn add_members(add_members_input: UpdateMembersIO) -> ExternResult<UpdateMem
     let group_id: EntryHash = add_members_input.group_id.clone();
     let group_revision_id: HeaderHash = add_members_input.group_revision_id.clone();
 
-    
-    // check whether members field is empty (this condition can be removed because the validate_update_group fucntion already  covered this scenario  in the validation(3)
-    // TATS: let's have it here just to avoid honest agents making honest mistakes.
+    // check whether members field is empty 
     if new_group_members_from_input.is_empty() {
         return Err(HdkError::Wasm(WasmError::Zome("members field is empty".into())));
     }
@@ -129,8 +127,6 @@ pub fn remove_members(remove_members_input: UpdateMembersIO)-> ExternResult<Upda
     let group_revision_id: HeaderHash = remove_members_input.group_revision_id.clone();
     
     // check whether members field is empty
-    // (this condition can be removed because the validate_update_group fucntion already  covered this scenario  in the validation(3)
-    // TATS: let's have it here just to avoid honest agents making honest mistakes.
     if members_to_remove.is_empty() {
         return Err(HdkError::Wasm(WasmError::Zome("members field is empty".into())));
     }
@@ -180,10 +176,7 @@ pub fn update_group_name(update_group_name_input: UpdateGroupNameIO) -> ExternRe
     // 1 - we've to get the latest group entry version for the recived entryhash (group_id)
     let latest_group_version: Group = get_group_latest_version(group_id)?;
     
-    // 2 - check whether the new name is the same with old name and return error if so
-    // (this condition can be removed because the validate_update_group fucntion already covered this scenario in the validation(3)
-    // // TATS: let's have it here just to avoid honest agents making honest mistakes.
-    
+    // 2 - check whether the new name is the same with old name and return error if so    
     let old_group_name:String = latest_group_version.name.clone();
     if new_group_name.eq(&old_group_name){
         return Err(HdkError::Wasm(WasmError::Zome("the new name and old name of the group are the same.".into())));
@@ -212,8 +205,6 @@ pub fn get_all_my_groups()->ExternResult<MyGroupListWrapper> {
 
     for link in get_links(my_pub_key.into(), Some(LinkTag::new("member")))?.into_inner() {
 
-        // TATS: change this to get_details so that we can check if there is an update or not 
-        // if no update then we dont need to call the get_group_latest_version().
         if let Some(element) = get(link.target.clone(), GetOptions::latest())? {
 
             group_id = link.target.clone();
@@ -249,62 +240,66 @@ pub fn get_group_entry_and_header_hash(input:Group)->ExternResult<HashesOutput> 
 }
 
 pub fn get_group_latest_version(group_id: EntryHash) -> ExternResult<Group> {
-
-    // 1 - we have to get details from the recived entry_hash as arg (group_id)
+    
+    // 1 - we have to get details from the recived entry_hash as arg (group_id), based in the details we get back for this function  we should have one or other behavior
     if let Some(details) = get_details(group_id.clone(), GetOptions::latest())? {
 
         match details {
 
             Details::Entry(group_entry_details) => { 
-                // 2 - filter the latest Header (should be element)
+
                 let group_updates_headers: Vec<Header> = group_entry_details.updates.iter().map(|header_hashed| -> Header{ header_hashed.header().to_owned() }).collect();
-                let group_root_header: Header = group_entry_details.headers[0].header().clone(); // here we storage the root header
-                
-                let mut latest_group_header: Header = group_root_header;
 
-                for header in group_updates_headers{
 
-                    if header.timestamp() > latest_group_header.timestamp(){
+                // CASE # 1 : if the updates field for this entry its empty it means this entry never has been updated, so we can return this group version because we can assure this is the latest group version for the given group_id.
+                if group_updates_headers.is_empty() {
 
-                        latest_group_header = header;
+                    if let Entry::App(group_entry_bytes) = group_entry_details.entry {
+
+                        let group_sb = group_entry_bytes.into_sb();
+                        let latest_group_version: Group = group_sb.try_into()?;
+
+                        return Ok(latest_group_version);
+
                     }
-                }
 
-                // TATS: return the original group entry if there is no update
-                // if latest_group_header.timestamp() == group_root_header.timestamp() {
-                //     let group_entry = group_entry_details.entry;
-                //     if let Entry::App(groupbytes) = group_entry {
-                //         let sb = groupbytes.into_sb();
-                //         let group: Group = sb.try_into()?;
-                //         return Ok(group)
-                //     }
-                // }
+                }else {
 
-                // 3 - having the latest header from this entry, we can get the updated information from this group using "hdk3::get"
-                if let Some(latest_group_entry_hash) =  latest_group_header.entry_hash() {
+                 // CASE # 2 : if the given entry has been updated we will loop through all the updates headers to get the most recent of them. 
 
-                    if let Some(latest_group_element) = get(latest_group_entry_hash.clone(), GetOptions::content())? {
-
-                        let latest_group_version: Option<Group> = latest_group_element.entry().to_app_option()?;
-
-                        if let Some(group) = latest_group_version {
-                            return Ok(group);
+                    let group_root_header: Header = group_entry_details.headers[0].header().clone(); // here we storage the root header
+                    let mut latest_group_header: Header = group_root_header;
+                    
+                    for header in group_updates_headers{
+    
+                        if header.timestamp() > latest_group_header.timestamp(){
+    
+                            latest_group_header = header;
                         }
-
                     }
-                }               
+    
+                    // 3 - having the latest header from this entry, we can get the updated information from this group using "hdk3::get"
+                    if let Some(latest_group_entry_hash) =  latest_group_header.entry_hash() {
+    
+                        if let Some(latest_group_element) = get(latest_group_entry_hash.clone(), GetOptions::content())? {
+    
+                            let latest_group_version: Option<Group> = latest_group_element.entry().to_app_option()?;
+    
+                            if let Some(group) = latest_group_version {
+                                return Ok(group);
+                            }
+    
+                        }
+                    }   
+                }// end of else statement
             },
             // this case will not happen
-            _ => ()
+            _ => (return Err(HdkError::Wasm(WasmError::Zome("wierd error".into()))))
 
         } // match ends
     } // if let ends
         
     return Err(HdkError::Wasm(WasmError::Zome("the given group_id does not exist".into())));
-}
-
-pub fn check_and_get_group_latest_update(group_entry_details: Details) -> ExternResult<Group> {
-    
 }
 
 pub fn link_and_emit_signals(agents: Vec<AgentPubKey>, link_target: EntryHash, link_tag: LinkTag, signal_payload: SignalPayload) -> HdkResult<()> {
