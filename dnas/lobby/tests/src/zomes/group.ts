@@ -80,6 +80,7 @@ export default (orchestrator, config, installation) => {
 
     orchestrator.registerScenario ("create group method test", async(s,t) =>{
 
+        
         const [alice,bobby,charlie] = await s.players([config,config,config]);
 
         const [[alice_happ]] = await alice.installAgentsHapps(installation);
@@ -148,11 +149,12 @@ export default (orchestrator, config, installation) => {
         t.equal(bobby_signal_listener.counter, 1, "bobby's signal counter its = 1 beacuse he was added to the group");
         t.deepEqual(bobby_signal_listener.payload, {AddedToGroup: group_id}, "bobby has received the signal payload from create_group" );
         t.equal(charlie_signal_listener.counter, 0, "charlie's signal counter its = 0 because he wasn't added to the group");
-        t.deepEqual(charlie_signal_listener.payload, Buffer, "charlie's has not received any payload beacuse he was nos added to the group" ); 
+        t.deepEqual(charlie_signal_listener.payload, Buffer, "charlie's has not received any payload beacuse he was nos added to the group" );
+        
     });
     orchestrator.registerScenario ("add members method AND remove members methods test", async(s,t) =>{
 
-        /*
+        
         const [alice,bobby,charlie] = await s.players([config,config,config]);
 
         const [[alice_happ]] = await alice.installAgentsHapps(installation);
@@ -282,12 +284,12 @@ export default (orchestrator, config, installation) => {
         t.deepEqual(bobby_group_list, [], "bobby group list match with the expected value");
         t.deepEqual(charlie_group_list, [updated_group], "charlie group list match with the expected value");
         
-        */
+        
         
     });
     orchestrator.registerScenario ("update group name  method test", async(s,t) =>{
 
-        /*
+        
         const [alice,bobby,charlie] = await s.players([config,config,config]);
 
         const [[alice_happ]] = await alice.installAgentsHapps(installation);
@@ -327,7 +329,7 @@ export default (orchestrator, config, installation) => {
 
         // 3- CHECK IF THE VALUES HAS CHANGED AND THE GROUP STATE ITS THE EXPECTED
 
-        let updated_group = await getLatestGroupVertion({group_hash:group_id})(alice_conductor);
+        let updated_group = await getLatestGroupVertion({group_hash:update_group_name_io.group_id})(alice_conductor);
         await delay(1000);
 
         t.deepEqual(updated_group.name, update_group_name_io.name, "the group name fields match with the expected value");
@@ -337,18 +339,18 @@ export default (orchestrator, config, installation) => {
         // 4- CHECK IF THE GROUP MEMBERS KNOW THEY ARE MEMBERS OF THE GROUP AND IF THE GROUP LIST CONTAINS THE LATEST VERSION OF THE GROUP ENTRIES
 
         let alice_group_list = (await getMyGroupsList(alice_conductor)).map( (group_output)=>  getGroupfromGroupOutput(group_output) );
-        let bobby_group_list = (await getMyGroupsList( bobby_conductor)).map( (group_output)=>  getGroupfromGroupOutput(group_output) );
+        let bobby_group_list = (await getMyGroupsList(bobby_conductor)).map( (group_output)=>  getGroupfromGroupOutput(group_output) );
         let charlie_group_list = (await getMyGroupsList(charlie_conductor)).map( (group_output)=>  getGroupfromGroupOutput(group_output) );
         await delay(1000);
         
         t.deepEqual(alice_group_list, [updated_group], "alice group list match with the expected value");
         t.deepEqual(bobby_group_list, [updated_group], "bobby group list match with the expected value");
         t.deepEqual(charlie_group_list, [updated_group], "charlie group list match with the expected value");
-        */
+        
     });
     orchestrator.registerScenario ("validate_create_group method test", async(s,t) =>{
 
-        /*
+        
         const [alice,bobby,charlie] = await s.players([config,config,config]);
 
         const [[alice_happ]] = await alice.installAgentsHapps(installation);
@@ -400,7 +402,7 @@ export default (orchestrator, config, installation) => {
         validation_output = await runValidationRules(validation_input)(alice_conductor);
         delay(1000);
 
-        t.deepEqual(validation_output, {Invalid: "groups cannot be created with less than 2 members apart of you"},"groups cannot be created with less than 2 members apart of you");
+        t.deepEqual(validation_output, {Invalid: "groups cannot be created with less than 3 members"},"groups cannot be created with less than 3 members");
 
         // 5 - CREATE A GROUP WITH INVALIDA GROUP MEMBERS FIELD (creator AgentPubKey cannot be included in the group members list) 
 
@@ -434,7 +436,7 @@ export default (orchestrator, config, installation) => {
 
         t.deepEqual(validation_output, {Invalid: "the group name must at least contain 1 character and maximun 50 characters"},"the group name must at least contain 1 character and maximun 50 characters");
 
-        */
+        
     });
     orchestrator.registerScenario ("validate_update_group method test", async(s,t) =>{
 
