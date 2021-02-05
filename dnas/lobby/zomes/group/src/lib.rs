@@ -37,6 +37,7 @@
 
         let mut fuctions = HashSet::new();
 
+        // TODO: name may be changed to better suit the context of cap grant.s
         let tag: String = "create_group_cap_grant".into(); 
         let access: CapAccess = CapAccess::Unrestricted;
         
@@ -65,6 +66,7 @@
 
     //VALIDATION RULES
     // this is only exposed outside of WASM for testing purposes.
+    // TATS: what is this?
     #[hdk_extern]
     fn run_validation(validation_input: ValidationInput) -> ExternResult<ValidateCallbackResult> {
 
@@ -72,7 +74,7 @@
         let group_revision_id: HeaderHash = validation_input.group_revision_id;
 
         if let Some(element) = get( group_revision_id, GetOptions::latest())? {
-            // if there is an element related to the received group revision id we sould check what kind of validation we want to run for him 
+            // if there is an element related to the received group revision id we should check what kind of validation we want to run for it
 
             let data: ValidateData = ValidateData {
                 element: element,
@@ -88,6 +90,7 @@
 
         return Ok(ValidateCallbackResult::Valid);
     }
+
     fn validate_create_group(data: ValidateData)-> ExternResult<ValidateCallbackResult> {
         //data = { element = { signed_header, entry } , validation_package <Option> }
         // 1- create is valid if creator pubkey matches the signature
@@ -113,7 +116,7 @@
             }
 
             if group_members_length < 2 {
-                return Ok(ValidateCallbackResult::Invalid("groups cannot be created with less than 2 members apart of you".into())); //validation(3)
+                return Ok(ValidateCallbackResult::Invalid("groups cannot be created with less than 3 members".into())); //validation(3)
             }
         
             if group.get_group_members().contains(&group_creator_pub_key.clone()) {
@@ -124,6 +127,7 @@
 
         Ok(ValidateCallbackResult::Valid)
     }
+
     fn validate_update_group(data: ValidateData) -> ExternResult<ValidateCallbackResult> {
 
         //data = { element = { signed_header, entry } , validation_package <Option> }
@@ -131,30 +135,32 @@
         // 1 update is only valid if the old_entry’s header is Create  
         // 2 update is valid if author of Create Header matches the author of the Update Header -> so that only admin can update
         // 3 update is only valid if old_group_name != new_group_name | old_members != new_members
-        // 4 update is valid only if members > 2 && new name its not empty or more than 50 characters
+        // 4 update is valid only if members > 2 && new name is not empty or more than 50 characters
 
         let updated_group_entry: Group = group::handlers::get_group_entry_from_element(data.element.clone())?;
         let updated_group_header: Header = data.element.header().clone();
 
         if let Header::Update(update_header) = data.element.header().clone() {
-
+            // This is the header address used to update this Group. May or may not be the correct header.
             let group_revision_id: HeaderHash = update_header.original_header_address;
+            // This may or may not be the EntryHash of the first version of the Group Entry.
             let group_id: EntryHash = update_header.original_entry_address;
 
             if let Some(original_group_element) = get(group_revision_id, GetOptions::content())?{
 
-                let original_group_header: Header = original_group_element.header().to_owned();
+                let maybe_group_create_header: Header = original_group_element.header().to_owned();
                 
-                match original_group_header.header_type() {
+                match maybe_group_create_header.header_type() {
                     
                     HeaderType::Create => {
                         
-                        //THIS PREV GROUP ENTRY VERSION SHOULD CONTAIN THE PREV VERSION TO THIS ENTRY, BECAUSE WHEN THE VALIDATIONS ARE RUNNING THE HEADER UPDATE HISTORY DOSENT HAVE THIS UPDATE ON IT YET 
+                        // THIS PREV GROUP ENTRY VERSION SHOULD CONTAIN THE PREV VERSION TO THIS ENTRY, 
+                        // BECAUSE WHEN THE VALIDATIONS ARE RUNNING THE HEADER UPDATE HISTORY DOSENT HAVE THIS UPDATE ON IT YET 
                         let prev_group_entry_version: Group = group::handlers::get_group_latest_version(group_id)?;
                         let updated_group_name_length: usize = updated_group_entry.name.clone().len();
                         let updated_group_members_length: usize = updated_group_entry.get_group_members().len();
 
-                        if !original_group_header.author().to_owned().eq(updated_group_header.author()){
+                        if !maybe_group_create_header.author().to_owned().eq(updated_group_header.author()){
                             return Ok(ValidateCallbackResult::Invalid("cannot update a group entry if you are not the group creator (admin)".into())); //validation(2)
                         }
 
@@ -163,16 +169,16 @@
                         }
 
                         if  updated_group_name_length < 1 || updated_group_name_length > 50 {
-                            return Ok(ValidateCallbackResult::Invalid("the group name must at least contain 1 character and maximun 50 characters".into())); //validation(4.1)
+                            return Ok(ValidateCallbackResult::Invalid("the group name must be 1 to 50 characters length".into())); //validation(4.1)
                         }
 
                         if updated_group_members_length < 2 {
-                            return Ok(ValidateCallbackResult::Invalid("groups cannot be created with less than 2 members apart of you".into())); //validation(4.2)
+                            return Ok(ValidateCallbackResult::Invalid("groups cannot be created with less than 3 members".into())); //validation(4.2)
                         }
 
                     },
                     _=> {
-                        return Ok(ValidateCallbackResult::Invalid("you are trying to update an entry using a header whos type its not Create".into())); // validation (1)
+                        return Ok(ValidateCallbackResult::Invalid("you are trying to update an entry using a header whos type is not Create".into())); // validation (1)
                     }, 
                     
                 }
@@ -190,31 +196,30 @@
         group::handlers::create_group(create_group_input)
     }
     #[hdk_extern]
-    fn add_members(add_members_input: UpdateMembersIO)->HdkResult<UpdateMembersIO> {
+    fn add_members(add_members_input: UpdateMembersIO) -> HdkResult<UpdateMembersIO> {
         group::handlers::add_members(add_members_input)
     }
     #[hdk_extern]
-    fn remove_members(remove_members_input: UpdateMembersIO)-> ExternResult<UpdateMembersIO> {
+    fn remove_members(remove_members_input: UpdateMembersIO) -> ExternResult<UpdateMembersIO> {
         group::handlers::remove_members(remove_members_input)
     }
     #[hdk_extern]
-    fn update_group_name(update_group_name_input: UpdateGroupNameIO)-> ExternResult<UpdateGroupNameIO> {
+    fn update_group_name(update_group_name_input: UpdateGroupNameIO) -> ExternResult<UpdateGroupNameIO> {
         group::handlers::update_group_name(update_group_name_input)
     }
     #[hdk_extern]
-    fn get_all_my_groups(_:())->HdkResult<MyGroupListWrapper>{
+    fn get_all_my_groups(_:()) -> HdkResult<MyGroupListWrapper> {
         group::handlers::get_all_my_groups()
     }
 
-
-
     //UTILS FROM GROUP
     #[hdk_extern]
-    fn get_group_entry_and_header_hash(input: Group)->ExternResult<HashesOutput>{
+    fn get_group_entry_and_header_hash(input: Group) -> ExternResult<HashesOutput> {
         group::handlers::get_group_entry_and_header_hash(input)
     }
+
     #[hdk_extern]
-    fn get_group_latest_version(group_id: EntryHashWrapper)->ExternResult<Group>{
+    fn get_group_latest_version(group_id: EntryHashWrapper) -> ExternResult<Group> {
         group::handlers::get_group_latest_version(group_id.group_hash)
     }
     
