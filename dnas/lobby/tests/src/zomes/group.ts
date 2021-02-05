@@ -80,7 +80,7 @@ export default (orchestrator, config, installation) => {
 
     orchestrator.registerScenario ("create group method test", async(s,t) =>{
 
-        /*const [alice,bobby,charlie] = await s.players([config,config,config]);
+        const [alice,bobby,charlie] = await s.players([config,config,config]);
 
         const [[alice_happ]] = await alice.installAgentsHapps(installation);
         const [[bobby_happ]] = await bobby.installAgentsHapps(installation);
@@ -148,9 +148,7 @@ export default (orchestrator, config, installation) => {
         t.equal(bobby_signal_listener.counter, 1, "bobby's signal counter its = 1 beacuse he was added to the group");
         t.deepEqual(bobby_signal_listener.payload, {AddedToGroup: group_id}, "bobby has received the signal payload from create_group" );
         t.equal(charlie_signal_listener.counter, 0, "charlie's signal counter its = 0 because he wasn't added to the group");
-        t.deepEqual(charlie_signal_listener.payload, Buffer, "charlie's has not received any payload beacuse he was nos added to the group" );
-        
-        */    
+        t.deepEqual(charlie_signal_listener.payload, Buffer, "charlie's has not received any payload beacuse he was nos added to the group" ); 
     });
     orchestrator.registerScenario ("add members method AND remove members methods test", async(s,t) =>{
 

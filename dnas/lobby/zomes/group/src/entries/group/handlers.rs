@@ -59,7 +59,7 @@ pub fn create_group(create_group_input: CreateGroupInput) -> ExternResult<Create
     create_link(creator.into(), group_id.clone(), LinkTag::new("member"))?;
     
     let signal_payload: SignalPayload = SignalPayload::AddedToGroup(group_id.clone()); 
-    //link all the group members to the group entry with the link tag "member" and send them a signal with the group_id as payload. 
+    // link all the group members to the group entry with the link tag "member" and send them a signal with the group_id as payload. 
     link_and_emit_signals(group_members, group_id.clone(), LinkTag::new("member"), signal_payload)?;
 
     Ok(CreateGroupOutput{
@@ -68,18 +68,19 @@ pub fn create_group(create_group_input: CreateGroupInput) -> ExternResult<Create
         group_revision_id: group_revision_id,
     })   
 }
+
 pub fn add_members(add_members_input: UpdateMembersIO) -> ExternResult<UpdateMembersIO> {
     
     let mut new_group_members_from_input: Vec<AgentPubKey> = add_members_input.members.clone();
     let group_id: EntryHash = add_members_input.group_id.clone();
     let group_revision_id: HeaderHash = add_members_input.group_revision_id.clone();
 
-    /*
-    check whether members field is empty (this condition can be removed because the validate_update_group fucntion already  covered this scenario  in the validation(3)
+    
+    // check whether members field is empty (this condition can be removed because the validate_update_group fucntion already  covered this scenario  in the validation(3)
+    // TATS: let's have it here just to avoid honest agents making honest mistakes.
     if new_group_members_from_input.is_empty() {
         return Err(HdkError::Wasm(WasmError::Zome("members field is empty".into())));
     }
-    */
 
     //check if any invitees are blocked and return Err if so.
     let my_blocked_list: Vec<AgentPubKey> = utils::get_my_blocked_list()?.0;
@@ -97,10 +98,10 @@ pub fn add_members(add_members_input: UpdateMembersIO) -> ExternResult<UpdateMem
     let creator: AgentPubKey = agent_info()?.agent_latest_pubkey;
 
 
-    // filter the list of members the admin want to add to avoid duplicated members(this probably is validated on ui but i added it here too)
+    // filter the list of members the admin want to add to avoid duplicated members
     new_group_members_from_input.retain(|new_member| !group_members.contains(&new_member) );
 
-    //this var its used because append method leave empty the vector received as arg
+    // this var is needed because append method leave empty the vector received as arg
     let new_group_members:Vec<AgentPubKey> =  new_group_members_from_input.clone();
 
     group_members.append(& mut new_group_members_from_input);
@@ -120,29 +121,28 @@ pub fn add_members(add_members_input: UpdateMembersIO) -> ExternResult<UpdateMem
 
     Ok(add_members_input)
 }
+
 pub fn remove_members(remove_members_input: UpdateMembersIO)-> ExternResult<UpdateMembersIO> {
 
     let members_to_remove: Vec<AgentPubKey> = remove_members_input.members.clone();
     let group_id: EntryHash = remove_members_input.group_id.clone();
     let group_revision_id: HeaderHash = remove_members_input.group_revision_id.clone();
     
-    //check whether members field is empty
-    //(this condition can be removed because the validate_update_group fucntion already  covered this scenario  in the validation(3)
-    /*
-        if members_to_remove.is_empty() {
-            return Err(HdkError::Wasm(WasmError::Zome("members field is empty".into())));
-        }
+    // check whether members field is empty
+    // (this condition can be removed because the validate_update_group fucntion already  covered this scenario  in the validation(3)
+    // TATS: let's have it here just to avoid honest agents making honest mistakes.
+    if members_to_remove.is_empty() {
+        return Err(HdkError::Wasm(WasmError::Zome("members field is empty".into())));
+    }
 
-    */
-
-    //get most recent Group Entry
+    // get most recent Group Entry
     let latest_group_version: Group = get_group_latest_version(group_id.clone())?;
     let mut group_members: Vec<AgentPubKey> =  latest_group_version.get_group_members();
     
-    //remove the members for the group members list
+    // remove the members for the group members list
     group_members.retain(|member| !members_to_remove.contains(&member) );
     
-    //update_entry the Group with new members field using the  original HeaderHash
+    // update_entry the Group with new members field using the  original HeaderHash
     let creator: AgentPubKey = agent_info()?.agent_latest_pubkey;
     let group_name: String = latest_group_version.name;
     let created: Timestamp = to_timestamp(sys_time()?);
@@ -151,17 +151,17 @@ pub fn remove_members(remove_members_input: UpdateMembersIO)-> ExternResult<Upda
     
     update_entry(group_revision_id, &updated_group)?;
 
-    //for all removed members we should delete the links between them and the group entry 
+    // for all removed members we should delete the links between them and the group entry 
     for removed_member in members_to_remove{
-        //get links for each removed member
+        // get links for each removed member
         // TODO: see if looping through all links here is too much of an overload and change implementation if necessary.
         let groups_linked: Vec<Link> = get_links(removed_member.into(), Some(LinkTag::new("member")))?.into_inner();
 
-        //filter all the groups linked to this agent to get the link between this group(group_id) and the agent(AgentPubKey)
+        // filter all the groups linked to this agent to get the link between this group(group_id) and the agent(AgentPubKey)
         for link in groups_linked {
 
             if link.target.eq(&group_id) {
-                //finnally when we find the link we have to delete it -- delete_link(add_link_header: HeaderHash) -> HdkResult<HeaderHash>
+                // finally when we find the link we have to delete it -- delete_link(add_link_header: HeaderHash) -> HdkResult<HeaderHash>
                 delete_link(link.create_link_hash)?;
             }
         }
@@ -169,6 +169,7 @@ pub fn remove_members(remove_members_input: UpdateMembersIO)-> ExternResult<Upda
 
     Ok(remove_members_input)
 }
+
 pub fn update_group_name(update_group_name_input: UpdateGroupNameIO) -> ExternResult<UpdateGroupNameIO> {
 
     let new_group_name: String = update_group_name_input.name.clone();
@@ -176,18 +177,17 @@ pub fn update_group_name(update_group_name_input: UpdateGroupNameIO) -> ExternRe
     let group_id: EntryHash = update_group_name_input.group_id.clone();
 
 
-    //1- we've to get the latest group entry version for the recived entryhash (group_id)
+    // 1 - we've to get the latest group entry version for the recived entryhash (group_id)
     let latest_group_version: Group = get_group_latest_version(group_id)?;
     
-    //2-check whether the new name is the same with old name and return error if so
-    //(this condition can be removed because the validate_update_group fucntion already  covered this scenario  in the validation(3)
+    // 2 - check whether the new name is the same with old name and return error if so
+    // (this condition can be removed because the validate_update_group fucntion already covered this scenario in the validation(3)
+    // // TATS: let's have it here just to avoid honest agents making honest mistakes.
     
-    /*
     let old_group_name:String = latest_group_version.name.clone();
     if new_group_name.eq(&old_group_name){
-
-        return Err(HdkError::Wasm(WasmError::Zome("no fields to update for this entry".into())));
-    } */
+        return Err(HdkError::Wasm(WasmError::Zome("the new name and old name of the group are the same.".into())));
+    }
 
     let created: Timestamp = to_timestamp(sys_time()?);
     let creator: AgentPubKey = agent_info()?.agent_latest_pubkey;
@@ -195,12 +195,13 @@ pub fn update_group_name(update_group_name_input: UpdateGroupNameIO) -> ExternRe
 
     let updated_group: Group = Group::new(new_group_name, created, creator, members);
 
-    //we always update the entry from the root_group_header_hash, the header hash for this entry is provided as arg (group_revision_id)
-    //3-update_entry the Group with new name field using original HeaderHash
+    // we always update the entry from the root_group_header_hash, the header hash for this entry is provided as arg (group_revision_id)
+    // 3 - update_entry the Group with new name field using original HeaderHash
     update_entry(group_revision_id, &updated_group)?;
 
     Ok(update_group_name_input)
 }
+
 pub fn get_all_my_groups()->ExternResult<MyGroupListWrapper> {
 
     let my_pub_key: AgentPubKey = agent_info()?.agent_latest_pubkey;
@@ -209,9 +210,11 @@ pub fn get_all_my_groups()->ExternResult<MyGroupListWrapper> {
     let mut group_revision_id: HeaderHash;
     let mut group: Group; 
 
-    for link in get_links(my_pub_key.into(), Some(LinkTag::new("member")))?.into_inner(){
-            
-        if let Some(element) = get(link.target.clone(), GetOptions::latest())?{
+    for link in get_links(my_pub_key.into(), Some(LinkTag::new("member")))?.into_inner() {
+
+        // TATS: change this to get_details so that we can check if there is an update or not 
+        // if no update then we dont need to call the get_group_latest_version().
+        if let Some(element) = get(link.target.clone(), GetOptions::latest())? {
 
             group_id = link.target.clone();
             group_revision_id = element.header_address().to_owned();
@@ -226,8 +229,7 @@ pub fn get_all_my_groups()->ExternResult<MyGroupListWrapper> {
     Ok(output)
 }
 
-
-//UTILS FUNCTIONS 
+// UTILS FUNCTIONS 
 pub fn get_group_entry_and_header_hash(input:Group)->ExternResult<HashesOutput> {
 
     let entry_hash:EntryHash = hash_entry(&input)?;
@@ -245,15 +247,15 @@ pub fn get_group_entry_and_header_hash(input:Group)->ExternResult<HashesOutput> 
 
     return Err(HdkError::Wasm(WasmError::Zome("cannot get hashes for this group".into())));
 }
-pub fn get_group_latest_version(group_id: EntryHash) -> HdkResult<Group> {
 
-    // 1- we have to get details from the recived entry_hash as arg (group_id)
+pub fn get_group_latest_version(group_id: EntryHash) -> ExternResult<Group> {
+
+    // 1 - we have to get details from the recived entry_hash as arg (group_id)
     if let Some(details) = get_details(group_id.clone(), GetOptions::latest())? {
 
         match details {
 
             Details::Entry(group_entry_details) => { 
-
                 // 2 - filter the latest Header (should be element)
                 let group_updates_headers: Vec<Header> = group_entry_details.updates.iter().map(|header_hashed| -> Header{ header_hashed.header().to_owned() }).collect();
                 let group_root_header: Header = group_entry_details.headers[0].header().clone(); // here we storage the root header
@@ -267,8 +269,19 @@ pub fn get_group_latest_version(group_id: EntryHash) -> HdkResult<Group> {
                         latest_group_header = header;
                     }
                 }
-                //3- having the latest header from this entry, we can get the updated information from this group using "hdk3::get"
-                if let Some(latest_group_entry_hash) =  latest_group_header.entry_hash(){
+
+                // TATS: return the original group entry if there is no update
+                // if latest_group_header.timestamp() == group_root_header.timestamp() {
+                //     let group_entry = group_entry_details.entry;
+                //     if let Entry::App(groupbytes) = group_entry {
+                //         let sb = groupbytes.into_sb();
+                //         let group: Group = sb.try_into()?;
+                //         return Ok(group)
+                //     }
+                // }
+
+                // 3 - having the latest header from this entry, we can get the updated information from this group using "hdk3::get"
+                if let Some(latest_group_entry_hash) =  latest_group_header.entry_hash() {
 
                     if let Some(latest_group_element) = get(latest_group_entry_hash.clone(), GetOptions::content())? {
 
@@ -279,10 +292,8 @@ pub fn get_group_latest_version(group_id: EntryHash) -> HdkResult<Group> {
                         }
 
                     }
-                }
-                                
+                }               
             },
-            // TATS: we probably should just do nothing here.
             // this case will not happen
             _ => ()
 
@@ -291,6 +302,11 @@ pub fn get_group_latest_version(group_id: EntryHash) -> HdkResult<Group> {
         
     return Err(HdkError::Wasm(WasmError::Zome("the given group_id does not exist".into())));
 }
+
+pub fn check_and_get_group_latest_update(group_entry_details: Details) -> ExternResult<Group> {
+    
+}
+
 pub fn link_and_emit_signals(agents: Vec<AgentPubKey>, link_target: EntryHash, link_tag: LinkTag, signal_payload: SignalPayload) -> HdkResult<()> {
 
     for agent in agents.clone(){
@@ -324,6 +340,7 @@ pub fn link_and_emit_signals(agents: Vec<AgentPubKey>, link_target: EntryHash, l
 
     Ok(())
 }
+
 pub fn get_group_entry_from_element(element: Element) -> HdkResult<Group> {
  
     if let Some(group) = element.entry().to_app_option()? {

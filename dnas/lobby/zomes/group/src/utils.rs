@@ -19,7 +19,7 @@ pub(crate) fn get_my_blocked_list() -> HdkResult<BlockedWrapper> {
     let function_name: FunctionName = FunctionName("list_blocked".to_owned());
 
     let my_blocked_list: BlockedWrapper = call(
-        None,//The cell you want to call (If None will call the current cell).
+        None,// The cell you want to call (If None will call the current cell).
         zome_name,
         function_name,
         None, //The capability secret if required.
