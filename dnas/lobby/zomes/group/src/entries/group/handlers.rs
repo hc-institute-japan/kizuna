@@ -1,3 +1,4 @@
+use element::SignedHeaderHashed;
 use hdk3::prelude::*;
 use hdk3::prelude::link::Link;
 use timestamp::Timestamp;
@@ -205,13 +206,41 @@ pub fn get_all_my_groups()->ExternResult<MyGroupListWrapper> {
 
     for link in get_links(my_pub_key.into(), Some(LinkTag::new("member")))?.into_inner() {
 
-        if let Some(element) = get(link.target.clone(), GetOptions::latest())? {
+        if let Some(details) = get_details(link.target.clone(), GetOptions::latest())? {
 
-            group_id = link.target.clone();
-            group_revision_id = element.header_address().to_owned();
-            group = get_group_latest_version(link.target.clone())?;
+            match details {
+                Details::Entry(group_entry_details) => {
+
+                    // This is the SignedHeaderHashed of the sole Create Header of Group
+                    let group_signed_header_hashed: SignedHeaderHashed = group_entry_details.headers[0].to_owned();
+
+                    group_id = link.target.clone();
+                    group_revision_id = group_signed_header_hashed.header_address().to_owned(); // This is the create header hash of Group
+
+                    if let Entry::App(group_entry_bytes) = group_entry_details.entry {
+
+                        let group_sb: SerializedBytes = group_entry_bytes.into_sb();
+                        let first_ver_group: Group = group_sb.try_into()?;
+                        // get original value of created and creator here
+                        group = first_ver_group;
+
+                    } else { return  Err(HdkError::Wasm(WasmError::Zome("this is a fatal error. Something is wrong with holochain.".into()))) }
+
+                    if !group_entry_details.updates.is_empty() {
+                        let latest_group: Group = get_group_latest_version(link.target.clone())?;
+                        
+                        group.name = latest_group.name; // latest group name
+                        
+                        group.members = latest_group.members; // latest group members
+                    }
+
+                    my_linked_groups_entries.push(GroupOutput::new(group, group_id, group_revision_id));
+
+                },
+                _ => ()
+            }
     
-            my_linked_groups_entries.push(GroupOutput::new(group, group_id, group_revision_id));        
+                
         }   
     }
 
@@ -221,11 +250,11 @@ pub fn get_all_my_groups()->ExternResult<MyGroupListWrapper> {
 }
 
 // UTILS FUNCTIONS 
-pub fn get_group_entry_and_header_hash(input:Group)->ExternResult<HashesOutput> {
+pub fn get_group_entry_and_header_hash(input:Group) -> ExternResult<HashesOutput> {
 
     let entry_hash:EntryHash = hash_entry(&input)?;
 
-    if let Some(element) = get(entry_hash.clone(), GetOptions::content())?{    
+    if let Some(element) = get(entry_hash.clone(), GetOptions::content())? {    
         let header_hash:HeaderHash = element.header_address().to_owned();
 
         let output:HashesOutput = HashesOutput{
@@ -241,7 +270,7 @@ pub fn get_group_entry_and_header_hash(input:Group)->ExternResult<HashesOutput> 
 
 pub fn get_group_latest_version(group_id: EntryHash) -> ExternResult<Group> {
     
-    // 1 - we have to get details from the recived entry_hash as arg (group_id), based in the details we get back for this function  we should have one or other behavior
+    // 1 - we have to get details from the recived entry_hash as arg (group_id), based in the details we get back for this function we should have one or other behavior
     if let Some(details) = get_details(group_id.clone(), GetOptions::latest())? {
 
         match details {
@@ -251,51 +280,43 @@ pub fn get_group_latest_version(group_id: EntryHash) -> ExternResult<Group> {
                 let group_updates_headers: Vec<Header> = group_entry_details.updates.iter().map(|header_hashed| -> Header{ header_hashed.header().to_owned() }).collect();
 
 
-                // CASE # 1 : if the updates field for this entry its empty it means this entry never has been updated, so we can return this group version because we can assure this is the latest group version for the given group_id.
+                // CASE # 1 : if updates field for this entry is empty it means this entry has never been updated, so we can return this group version because we can assure this is the latest group version for the given group_id.
                 if group_updates_headers.is_empty() {
-
                     if let Entry::App(group_entry_bytes) = group_entry_details.entry {
 
-                        let group_sb = group_entry_bytes.into_sb();
+                        let group_sb: SerializedBytes = group_entry_bytes.into_sb();
                         let latest_group_version: Group = group_sb.try_into()?;
 
                         return Ok(latest_group_version);
+                    }
+                }
+
+                // CASE # 2 : if the given entry has been updated we will loop through all the updates headers to get the most recent of them. 
+
+                let group_root_header: Header = group_entry_details.headers[0].header().clone(); // here we storage the root header
+                let mut latest_group_header: Header = group_root_header;
+                
+                for header in group_updates_headers{
+                    if header.timestamp() > latest_group_header.timestamp(){
+                        latest_group_header = header;
+                    }
+                }
+
+                // 3 - having the latest header from this entry, we can get the updated information from this group using "hdk3::get"
+                if let Some(latest_group_entry_hash) =  latest_group_header.entry_hash() {
+
+                    if let Some(latest_group_element) = get(latest_group_entry_hash.clone(), GetOptions::content())? {
+
+                        let latest_group_version: Option<Group> = latest_group_element.entry().to_app_option()?;
+
+                        if let Some(group) = latest_group_version {
+                            return Ok(group);
+                        }
 
                     }
-
-                }else {
-
-                 // CASE # 2 : if the given entry has been updated we will loop through all the updates headers to get the most recent of them. 
-
-                    let group_root_header: Header = group_entry_details.headers[0].header().clone(); // here we storage the root header
-                    let mut latest_group_header: Header = group_root_header;
-                    
-                    for header in group_updates_headers{
-    
-                        if header.timestamp() > latest_group_header.timestamp(){
-    
-                            latest_group_header = header;
-                        }
-                    }
-    
-                    // 3 - having the latest header from this entry, we can get the updated information from this group using "hdk3::get"
-                    if let Some(latest_group_entry_hash) =  latest_group_header.entry_hash() {
-    
-                        if let Some(latest_group_element) = get(latest_group_entry_hash.clone(), GetOptions::content())? {
-    
-                            let latest_group_version: Option<Group> = latest_group_element.entry().to_app_option()?;
-    
-                            if let Some(group) = latest_group_version {
-                                return Ok(group);
-                            }
-    
-                        }
-                    }   
-                }// end of else statement
+                }   
             },
-            // this case will not happen
-            _ => (),
-
+            _ => (), // this case will not happen
         } // match ends
     } // if let ends
         
