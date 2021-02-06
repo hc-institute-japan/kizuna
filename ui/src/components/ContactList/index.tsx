@@ -1,6 +1,6 @@
 import { IonItem, IonItemDivider, IonLabel, IonList } from "@ionic/react";
 import React from "react";
-import { Profile } from "../../utils/types";
+import { Profile } from "../../redux/profile/types";
 import styles from "./style.module.css";
 
 interface Props {

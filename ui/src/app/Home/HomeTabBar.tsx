@@ -7,14 +7,12 @@ import {
   IonTabs,
 } from "@ionic/react";
 import { chatbox, person } from "ionicons/icons";
-import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import React, { useState } from "react";
+import { FormattedMessage } from "react-intl";
 import { Route } from "react-router";
-import { setContacts } from "../../redux/contacts/actions";
 import Contacts from "../Contacts";
 import Conversations from "../Conversations";
 import styles from "./style.module.css";
-import { FormattedMessage } from "react-intl";
 
 interface TabBarItem {
   icon: string;
@@ -40,45 +38,7 @@ const tabBar: TabBarItem[] = [
 
 const HomeTabBar = () => {
   const [selected, setSelected] = useState(tabBar[0].tab);
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(
-      setContacts([
-        {
-          id: "1",
-          username: "Akira Wakabayashi",
-        },
-        {
-          id: "5",
-          username: "Nicko Pangarungan",
-        },
-        {
-          id: "3",
-          username: "Chito Miranda",
-        },
-        {
-          id: "2",
-          username: "Francis Magalona",
-        },
-        {
-          id: "4",
-          username: "Gloc9 Walang Apelyido",
-        },
-        {
-          id: "612",
-          username: "Lauren Tsai",
-        },
-        {
-          id: "1236",
-          username: "Lulu Evans",
-        },
-        {
-          id: "8512",
-          username: "Kang Seulgi",
-        },
-      ])
-    );
-  }, [dispatch]);
+
   return (
     <IonTabs>
       <IonRouterOutlet>

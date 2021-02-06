@@ -1,4 +1,5 @@
 import { AppWebsocket } from "@holochain/conductor-api";
+import React from "react";
 
 let client: any;
 
@@ -13,15 +14,6 @@ const init = async () => {
     throw error;
   }
 };
-
-// interface CallZomeConfig {
-//   cap: any;
-//   cell_id: any;
-//   zome_name: string;
-//   fn_name: string;
-//   provenance: any;
-//   payload: any;
-// }
 
 export const getAgentId = async () => {
   await init();
