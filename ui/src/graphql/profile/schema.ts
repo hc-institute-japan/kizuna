@@ -18,3 +18,5 @@ export default gql`
     setUsername(username: SetUsernameInput!): Profile!
   }
 `;
+
+// getUsername(id: )

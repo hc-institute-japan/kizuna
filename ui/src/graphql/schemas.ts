@@ -1,5 +1,6 @@
 import { gql } from "@apollo/client";
 import ProfileSchema from "./profile/schema";
+import ContactsSchema from "./contacts/schema";
 
 const init = gql`
   type Query {
@@ -11,6 +12,6 @@ const init = gql`
   }
 `;
 
-const typeDefs = [init, ProfileSchema];
+const typeDefs = [init, ProfileSchema, ContactsSchema];
 
 export default typeDefs;

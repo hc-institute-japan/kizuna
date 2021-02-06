@@ -1,4 +1,5 @@
 {
+  "app.contacts.add-message": "{name}が連絡先に追加されました。",
   "app.landing.login": "メッセージングを開始する",
   "app.landing.register": "アカウントをお持ちではありませんか？",
   "app.login.login": "ログインする",
@@ -6,6 +7,8 @@
   "app.login.username-placeholder": "必要なユーザー名を入力してください...",
   "app.home.contacts-tab-bar": "連絡先",
   "app.home.messaging-tab-bar": "メッセージング",
+  "app.menu.logout-label": "ログアウト",
+  "app.menu.settings-label": "設定",
   "app.register.error-invalid-username": "ユーザー名は3文字以上で、1つの英字を含める必要があります",
   "app.register.username-label": "ユーザー名",
   "app.register.username-placeholder": "ユーザー名を入力してください...",

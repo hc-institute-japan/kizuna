@@ -1,5 +1,5 @@
 import { Resolvers } from "@apollo/client";
-import { Profile } from "../../utils/types";
+import { Profile } from "../../redux/profile/types";
 
 const resolvers: Resolvers = {
   Query: {
@@ -36,6 +36,20 @@ const resolvers: Resolvers = {
 
       return profile;
     },
+    // getUsername: async (_obj, { id }, { callZome }) => {
+    //   const res = await callZome({
+    //     zomeName: "username",
+    //     fnName: "get_username",
+    //     payload: convertIdtoUInt8Array(id),
+    //   });
+
+    //   const profile: Profile = {
+    //     id,
+    //     username: res.username,
+    //   };
+
+    //   return profile;
+    // },
   },
 };
 
