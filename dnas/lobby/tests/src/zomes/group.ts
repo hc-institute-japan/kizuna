@@ -68,14 +68,20 @@ function getGroupHashes(group){
         conductor.call("group","get_group_entry_and_header_hash",group);
 }
 
-//VAlIDATION FUCNTIONS 
+// VAlIDATION FUCNTIONS 
 function runValidationRules(validation_input){
     return (conductor)=>
         conductor.call("group","run_validation",validation_input);
 }
 
+// CONTACTS ZOME FNS
+// function blockContact(username) {
+//     return (conductor) =>
+//     conductor.call("contacts", "block_contact", username);
+// };
 
-//THE FUNCTION GET ALL MY GROUPS ITS BEEN IMPLICITLY TESTED BEACUSE IS USED IN ALMOST  ALL THE TESTS AND WE'VE CHECK HIS CORRECT BEHAVIOR
+
+//THE FUNCTION GET ALL MY GROUPS ITS BEEN IMPLICITLY TESTED BEACUSE IS USED IN ALMOST ALL THE TESTS AND WE'VE CHECK HIS CORRECT BEHAVIOR
 export default (orchestrator, config, installation) => {
 
     orchestrator.registerScenario ("create group method test", async(s,t) =>{
@@ -133,7 +139,7 @@ export default (orchestrator, config, installation) => {
         await delay(1000);
         
         
-        // 1- CREATE ONE GROUP WITH A SET OF MEMBERS (I USED JUST ONE AGENT BEACUSE THE VALIDATION ITS IMPLEMENTED IN THE VALIDATE_CREATE_GROUP CALLBACK AND HOLOCHAIN NOT IMPLEMENTED THIS CALLBACKS YET BUT I TESTED BY MISELF AND IT WORK)
+        // 1- CREATE ONE GROUP WITH A SET OF MEMBERS (I USED JUST ONE AGENT BEACUSE THE VALIDATION IS IMPLEMENTED IN THE VALIDATE_CREATE_GROUP CALLBACK AND HOLOCHAIN NOT IMPLEMENTED THIS CALLBACKS YET BUT I TESTED BY MISELF AND IT WORK)
         let create_group_input = {
             name: "Group_name",
             members: [bobbyPubKey],
@@ -152,6 +158,7 @@ export default (orchestrator, config, installation) => {
         t.deepEqual(charlie_signal_listener.payload, Buffer, "charlie's has not received any payload beacuse he was nos added to the group" );
         
     });
+
     orchestrator.registerScenario ("add members method AND remove members methods test", async(s,t) =>{
 
         
@@ -184,6 +191,7 @@ export default (orchestrator, config, installation) => {
             counter:0,
             payload: Buffer,
         }
+
         //SIGNAL HANLDERS ASSIGNMENT
         alice.setSignalHandler(
             (signal)=>{
@@ -213,17 +221,17 @@ export default (orchestrator, config, installation) => {
             members: [bobbyPubKey],
         };
 
-        let {content, group_id, group_revision_id} = await createGroup(create_group_input)(alice_conductor);
+        let {content: original_group_content, group_id, group_revision_id} = await createGroup(create_group_input)(alice_conductor);
         await delay(1000);
 
-        t.deepEqual(content.members, [bobbyPubKey], "the group members fields match with the expected value");
+        t.deepEqual(original_group_content.members, [bobbyPubKey], "the group members fields match with the expected value");
         t.equal(bobby_signal_listener.counter, 1, "bobby's signal counter its = 1 beacuse he was added to the group");
         t.deepEqual(bobby_signal_listener.payload, {AddedToGroup: group_id}, "bobby has received the signal payload from create_group" );
         t.equal(charlie_signal_listener.counter, 0, "charlie's signal counter its = 0 because he wasn't added to the group");
         t.deepEqual(charlie_signal_listener.payload, Buffer, "charlie's has not received any payload beacuse he was nos added to the group" );
 
 
-        // 2- ADD A NEW MEMBER TO THE GROUP WE CREATED WE SEND A LIST WITH MEMBERS ALREADY ARE ADDED TO TEST ALL THE METHOD
+        // 2 - ADD A NEW MEMBER TO THE GROUP WE CREATED WE SEND A LIST WITH MEMBERS ALREADY ARE ADDED TO TEST ALL THE METHOD
         let update_members_io = {
             members: [bobbyPubKey, charliePubKey],
             group_id: group_id,
@@ -250,6 +258,8 @@ export default (orchestrator, config, installation) => {
         let bobby_group_list = (await getMyGroupsList( bobby_conductor)).map( (group_output)=>  getGroupfromGroupOutput(group_output) );
         let charlie_group_list = (await getMyGroupsList(charlie_conductor)).map( (group_output)=>  getGroupfromGroupOutput(group_output) );
         await delay(1000);
+
+        updated_group.created = original_group_content.created;
         
         t.deepEqual(alice_group_list, [updated_group], "alice group list match with the expected value");
         t.deepEqual(bobby_group_list, [updated_group], "bobby group list match with the expected value");
@@ -266,9 +276,10 @@ export default (orchestrator, config, installation) => {
         await removeGroupMembers(update_members_io)(alice_conductor);
         await delay(1000);
 
-        // 6- CHECK IF THE VALUES HAS CHANGED AND THE GROUP STATE ITS THE EXPECTED
+        // 6- CHECK IF THE VALUES HAS CHANGED AND THE GROUP STATE IS THE EXPECTED
 
         updated_group = await getLatestGroupVertion({group_hash:group_id})(alice_conductor);
+        updated_group.created = original_group_content.created
         await delay(1000);
 
         t.deepEqual(updated_group.members, [charliePubKey], "the group members fields match with the expected value");
@@ -313,7 +324,7 @@ export default (orchestrator, config, installation) => {
             members: [bobbyPubKey,charliePubKey],
         };
 
-        let {content, group_id, group_revision_id} = await createGroup(create_group_input)(alice_conductor);
+        let {content: original_group_content, group_id, group_revision_id} = await createGroup(create_group_input)(alice_conductor);
         await delay(1000);
 
         // 2 - UPDATE THE GROUP NAME FROM THE GROUP WE'VE CREATED
@@ -330,6 +341,7 @@ export default (orchestrator, config, installation) => {
         // 3- CHECK IF THE VALUES HAS CHANGED AND THE GROUP STATE ITS THE EXPECTED
 
         let updated_group = await getLatestGroupVertion({group_hash:update_group_name_io.group_id})(alice_conductor);
+        updated_group.created = original_group_content.created;
         await delay(1000);
 
         t.deepEqual(updated_group.name, update_group_name_io.name, "the group name fields match with the expected value");
@@ -438,10 +450,10 @@ export default (orchestrator, config, installation) => {
 
         
     });
-    orchestrator.registerScenario ("validate_update_group method test", async(s,t) =>{
+    // orchestrator.registerScenario ("validate_update_group method test", async(s,t) =>{
 
-        //THIS TESTS CANNOT BE IMPLEMENTED YET, UNTILL HOLOCHAIN DO THE VALIDATION CALLBACKS 
+    //     //THIS TESTS CANNOT BE IMPLEMENTED YET, UNTILL HOLOCHAIN DO THE VALIDATION CALLBACKS 
 
-    });
+    // });
 
 }

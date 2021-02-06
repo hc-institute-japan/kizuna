@@ -64,9 +64,8 @@
         Ok(())
     }
 
-    //VALIDATION RULES
+    // VALIDATION RULES
     // this is only exposed outside of WASM for testing purposes.
-    // TATS: what is this?
     #[hdk_extern]
     fn run_validation(validation_input: ValidationInput) -> ExternResult<ValidateCallbackResult> {
 
