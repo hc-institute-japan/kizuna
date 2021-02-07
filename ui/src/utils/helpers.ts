@@ -37,3 +37,9 @@ export const debounce: (callback: () => any, delay?: number) => Function = (
 export const useAppDispatch = () => useDispatch<ReduxDispatch>();
 
 export const convertIdtoUInt8Array = (id: number[]) => Uint8Array.from(id);
+
+export const convertCamelToSnake = (arg: string) =>
+  arg.replace(/([A-Z])/g, "_$1").toLowerCase();
+
+export const convertSnakeToCamel = (arg: string) =>
+  arg.replace(/([-_]\w)/g, (g) => g[1].toUpperCase());
