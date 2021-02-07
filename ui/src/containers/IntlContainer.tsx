@@ -1,6 +1,6 @@
 import React from "react";
 import { IntlProvider } from "react-intl";
-import messages from "../../lang";
+import messages from "../lang";
 
 const IntlContainer: React.FC = ({ children }) => {
   const locale = "jp";

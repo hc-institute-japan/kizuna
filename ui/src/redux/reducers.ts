@@ -1,8 +1,13 @@
 import { combineReducers } from "redux";
-import ProfileReducer from "./profile/reducer";
-import ContactsReducer from './contacts/reducer'
+import profileReducer from "./profile/reducer";
+import contactsReducer from "./contacts/reducer";
+import signalReducer from "./signal/reducer";
 
-const rootReducer = combineReducers({ profile: ProfileReducer, contacts: ContactsReducer });
+const rootReducer = combineReducers({
+  profile: profileReducer,
+  contacts: contactsReducer,
+  signal: signalReducer,
+});
 
 export type RootState = ReturnType<typeof rootReducer>;
 

@@ -1,4 +1,3 @@
-import { useMutation } from "@apollo/client";
 import {
   IonBackButton,
   IonButton,
@@ -11,14 +10,12 @@ import {
   IonToolbar,
 } from "@ionic/react";
 import React, { useEffect, useState } from "react";
+import { useIntl } from "react-intl";
+import { useDispatch } from "react-redux";
+import { useHistory } from "react-router";
 import HomeInput from "../../components/Input/HomeInput";
 import { isUsernameFormatValid } from "../../utils/regex";
 import styles from "./style.module.css";
-import SET_USERNAME from "../../graphql/profile/mutations/setUsername";
-import { useIntl } from "react-intl";
-import { useDispatch } from "react-redux";
-import { setUsername as setReduxUsername } from "../../redux/profile/actions";
-import { useHistory } from "react-router";
 
 const Register: React.FC = () => {
   const [username, setUsername] = useState<string>("");
@@ -26,19 +23,12 @@ const Register: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const dispatch = useDispatch();
   const history = useHistory();
-  const [set, { loading }] = useMutation(SET_USERNAME, {
-    onCompleted: (data) => {
-      const { username = null } = { ...data.setUsername };
-      dispatch(setReduxUsername(username));
-      if (username) history.push("/");
-    },
-  });
 
-  useEffect(() => {
-    if (loading) {
-      setIsValid(true);
-    }
-  }, [loading]);
+  // useEffect(() => {
+  //   if (loading) {
+  //     setIsValid(true);
+  //   }
+  // }, [loading]);
 
   const intl = useIntl();
 
@@ -57,13 +47,7 @@ const Register: React.FC = () => {
     );
   }, [isValid, intl]);
 
-  const handleOnSubmit = () => {
-    set({
-      variables: {
-        username,
-      },
-    });
-  };
+  const handleOnSubmit = () => {};
 
   return (
     <IonPage>
@@ -100,7 +84,7 @@ const Register: React.FC = () => {
             })}
           </IonButton>
         </div>
-        <IonLoading isOpen={loading} />
+        <IonLoading isOpen={false} />
       </IonContent>
     </IonPage>
   );

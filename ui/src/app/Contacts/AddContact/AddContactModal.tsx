@@ -1,8 +1,6 @@
-import { useQuery } from "@apollo/client";
 import { IonContent, IonList, IonModal } from "@ionic/react";
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import ALL from "../../../graphql/contacts/queries/all";
 import { setContacts } from "../../../redux/contacts/actions";
 import { IndexedContacts } from "../../../redux/contacts/types";
 import { Profile } from "../../../redux/profile/types";
@@ -23,18 +21,6 @@ const AddContactModal: React.FC<Props> = ({ isOpen, onCancel, contacts }) => {
   const [users, setUsers] = useState<Profile[]>([]);
   const [toast, setToast] = useState<string | null>(null);
   const dispatch = useDispatch();
-
-  useQuery(ALL, {
-    onCompleted: (data) => {
-      const { all = [] } = { ...data };
-      setUsers(
-        all.filter(
-          (user: Profile) =>
-            !contacts.find((toRemove) => toRemove.username === user.username)
-        )
-      );
-    },
-  });
 
   let indexedContacts: IndexedContacts = indexContacts(
     users.filter((user) => user.username.includes(filter))
