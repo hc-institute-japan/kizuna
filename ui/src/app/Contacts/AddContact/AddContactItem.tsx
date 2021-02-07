@@ -1,4 +1,3 @@
-import { useMutation } from "@apollo/client";
 import {
   IonButton,
   IonButtons,
@@ -10,7 +9,6 @@ import {
 import { add } from "ionicons/icons";
 import React, { useState } from "react";
 import { Profile } from "../../../redux/profile/types";
-import ADD_CONTACTS from "../../../graphql/contacts/mutations/addContacts";
 
 interface Props {
   contact: Profile;
@@ -19,21 +17,9 @@ interface Props {
 
 const AddContactItem: React.FC<Props> = ({ contact, onCompletion }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [addContacts] = useMutation(ADD_CONTACTS, {
-    onCompleted: (data) => {
-      const { addContacts = null } = { ...data };
-      if (addContacts) {
-        onCompletion(contact);
-      }
-
-      setIsLoading(false);
-    },
-  });
 
   const handleOnClick = (contact: Profile) => {
     setIsLoading(true);
-
-    addContacts({ variables: { contacts: [contact] } });
   };
   return (
     <IonItem lines="none">
