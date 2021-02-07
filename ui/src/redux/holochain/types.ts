@@ -33,4 +33,12 @@ export const FUNCTIONS: FunctionNameType = {
     IN_CONTACTS: "in_contacts",
     IN_BLOCKED: "in_blocked",
   },
+  [ZOMES.PREFERENCE]: {
+    GET_PREFERENCE: "get_preference",
+    SET_PREFERENCE: "set_preference",
+    SET_PER_AGENT_PREFERENCE: "set_per_agent_preference",
+    GET_PER_AGENT_PREFERENCE: "get_per_agent_preference",
+    SET_PER_GROUP_PREFERENCE: "set_per_group_preference",
+    GET_PER_GROUP_PREFERENCE: "get_per_group_preference",
+  },
 };

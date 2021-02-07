@@ -47,6 +47,7 @@ const Menu: React.FC = () => {
       icon: logOutOutline,
     },
   ];
+
   return (
     <IonMenu contentId="main" type="overlay">
       <IonContent className={styles.menu}>
