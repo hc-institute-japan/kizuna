@@ -1,7 +1,9 @@
 import { AgentPubKey, CellId } from "@holochain/conductor-api";
-import { Action } from "redux";
-import { ThunkAction as Thunk } from "redux-thunk";
+import { Dispatch } from "react";
+import { Action, AnyAction } from "redux";
+import { ThunkAction as Thunk, ThunkDispatch } from "redux-thunk";
 import { RootState } from "../redux/reducers";
+import store from "../redux/store";
 
 export interface CallZomeConfig {
   // still undefined
@@ -25,9 +27,6 @@ export type ThunkAction = Thunk<
   HolochainConfig,
   Action<string>
 >;
-export type AsyncThunkAction = Promise<
-  Thunk<Promise<any>, RootState, unknown, Action<string>>
->;
 
 export interface Message {
   id: string;
@@ -43,5 +42,7 @@ export interface Conversation {
   sender?: string;
   messages: Message[];
 }
+
+export type ReduxDispatch = ThunkDispatch<RootState, any, AnyAction>;
 
 export type Conversations = Conversation[];

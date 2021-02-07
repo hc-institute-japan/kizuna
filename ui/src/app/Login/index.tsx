@@ -12,16 +12,14 @@ import {
 } from "@ionic/react";
 import React, { useState } from "react";
 import { useIntl } from "react-intl";
-import { useDispatch } from "react-redux";
-import { useHistory } from "react-router";
 import styles from "./style.module.css";
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState("");
-  const history = useHistory();
+  // const history = useHistory();
 
   const intl = useIntl();
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
   const log = () => {};
   return (

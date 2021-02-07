@@ -4,7 +4,7 @@ const initialState = {
   signal: [],
 };
 
-export default (state = initialState, action: SignalActionType) => {
+const reducer = (state = initialState, action: SignalActionType) => {
   switch (action.type) {
     case SET_SIGNAL:
       return {
@@ -15,3 +15,5 @@ export default (state = initialState, action: SignalActionType) => {
       return state;
   }
 };
+
+export default reducer;

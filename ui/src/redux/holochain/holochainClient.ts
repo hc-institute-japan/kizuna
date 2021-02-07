@@ -1,9 +1,8 @@
-import { AgentPubKey, AppSignal, AppWebsocket } from "@holochain/conductor-api";
-import { applyMiddleware, createStore } from "redux";
+import { AppWebsocket, AppSignal, AgentPubKey } from "@holochain/conductor-api";
 import thunk from "redux-thunk";
-import { CallZomeConfig } from "../utils/types";
-import rootReducer from "./reducers";
-import { SET_SIGNAL } from "./signal/types";
+import { CallZomeConfig } from "../../utils/types";
+import { SET_SIGNAL } from "../signal/types";
+import store from "../store";
 
 let client: null | AppWebsocket = null;
 
@@ -14,7 +13,7 @@ const init: () => any = async () => {
   try {
     client = await AppWebsocket.connect(
       "ws://localhost:8888",
-      15000, // holochain's default timeout
+      4000,
       (signal: AppSignal) =>
         store.dispatch({
           type: SET_SIGNAL,
@@ -68,9 +67,3 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
 };
 
 const modifiedThunk = thunk.withExtraArgument({ callZome, getAgentId });
-
-const store = createStore(rootReducer, applyMiddleware(modifiedThunk));
-
-// export type StoreType = ReturnType<typeof store>;
-
-export default store;

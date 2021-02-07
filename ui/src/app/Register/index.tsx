@@ -11,43 +11,57 @@ import {
 } from "@ionic/react";
 import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
-import { useDispatch } from "react-redux";
 import { useHistory } from "react-router";
 import HomeInput from "../../components/Input/HomeInput";
+import { registerUsername } from "../../redux/profile/actions";
+import { useAppDispatch } from "../../utils/helpers";
 import { isUsernameFormatValid } from "../../utils/regex";
 import styles from "./style.module.css";
 
 const Register: React.FC = () => {
   const [username, setUsername] = useState<string>("");
-  const [isValid, setIsValid] = useState<boolean>(true);
+  const [isValid, setIsValid] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const dispatch = useDispatch();
+  const [loading, setLoading] = useState<boolean>(false);
+  const dispatch = useAppDispatch();
   const history = useHistory();
-
-  // useEffect(() => {
-  //   if (loading) {
-  //     setIsValid(true);
-  //   }
-  // }, [loading]);
 
   const intl = useIntl();
 
   const handleOnChange = (e: CustomEvent) => {
     setUsername(e.detail.value!);
-    setIsValid(isUsernameFormatValid(e.detail.value!));
+    setError(
+      isUsernameFormatValid(e.detail.value!)
+        ? null
+        : intl.formatMessage({
+            id: "app.register.error-invalid-username",
+          })
+    );
   };
 
   useEffect(() => {
-    setError(
-      !isValid
-        ? intl.formatMessage({
-            id: "app.register.error-invalid-username",
-          })
-        : null
-    );
-  }, [isValid, intl]);
+    if (error) {
+      setIsValid(false);
+    } else {
+      if (username.length !== 0) setIsValid(true);
+    }
+  }, [error, username.length]);
 
-  const handleOnSubmit = () => {};
+  const handleOnSubmit = () => {
+    setLoading(true);
+    dispatch(registerUsername(username)).then((res: any) => {
+      if (res) {
+        history.push("/");
+      } else {
+        setError(
+          intl.formatMessage({
+            id: "app.register.error-existing-username",
+          })
+        );
+      }
+      setLoading(false);
+    });
+  };
 
   return (
     <IonPage>
@@ -84,7 +98,7 @@ const Register: React.FC = () => {
             })}
           </IonButton>
         </div>
-        <IonLoading isOpen={false} />
+        <IonLoading isOpen={loading} />
       </IonContent>
     </IonPage>
   );
