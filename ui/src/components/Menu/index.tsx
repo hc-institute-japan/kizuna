@@ -1,19 +1,27 @@
-import React from "react";
 import {
   IonAvatar,
   IonContent,
+  IonIcon,
   IonItem,
   IonItemGroup,
   IonLabel,
   IonList,
   IonMenu,
 } from "@ionic/react";
+import { cogOutline, logOutOutline } from "ionicons/icons";
+import React from "react";
+import { useIntl } from "react-intl";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { setUsername } from "../../redux/profile/actions";
 import { RootState } from "../../redux/reducers";
-import "./Menu.css";
-import { useIntl } from "react-intl";
+import styles from "./style.module.css";
+
+interface MenuItem {
+  onClick(): any;
+  label: string;
+  icon: string;
+}
 
 const Menu: React.FC = () => {
   const history = useHistory();
@@ -21,9 +29,27 @@ const Menu: React.FC = () => {
   const dispatch = useDispatch();
   const intl = useIntl();
 
+  const menuList: MenuItem[] = [
+    {
+      onClick: () => {
+        history.push("/settings");
+      },
+      label: intl.formatMessage({ id: "app.menu.settings-label" }),
+      icon: cogOutline,
+    },
+
+    {
+      onClick: () => {
+        dispatch(setUsername(null));
+        history.push("/");
+      },
+      label: intl.formatMessage({ id: "app.menu.logout-label" }),
+      icon: logOutOutline,
+    },
+  ];
   return (
     <IonMenu contentId="main" type="overlay">
-      <IonContent>
+      <IonContent className={styles.menu}>
         <IonList id="inbox-list" lines="none">
           <IonItemGroup className="ion-no-margin">
             <IonAvatar className="ion-margin">
@@ -37,22 +63,12 @@ const Menu: React.FC = () => {
               <IonLabel>{username}</IonLabel>
             </IonItem>
           </IonItemGroup>
-          <IonItem
-            onClick={() => {
-              dispatch(setUsername(null));
-              history.push("/");
-            }}
-          >
-            {intl.formatMessage({ id: "app.menu.settings-label" })}
-          </IonItem>
-          <IonItem
-            onClick={() => {
-              dispatch(setUsername(null));
-              history.push("/");
-            }}
-          >
-            {intl.formatMessage({ id: "app.menu.logout-label" })}
-          </IonItem>
+          {menuList.map(({ onClick, label, icon }) => (
+            <IonItem key={label} onClick={onClick}>
+              <IonIcon className="ion-margin-end" icon={icon} />
+              <IonLabel>{label}</IonLabel>
+            </IonItem>
+          ))}
         </IonList>
       </IonContent>
     </IonMenu>
