@@ -58,8 +58,8 @@ const Register: React.FC = () => {
             id: "app.register.error-existing-username",
           })
         );
+        setLoading(false);
       }
-      setLoading(false);
     });
   };
 

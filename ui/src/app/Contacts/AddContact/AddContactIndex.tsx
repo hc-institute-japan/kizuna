@@ -21,7 +21,7 @@ const AddContactIndex: React.FC<Props> = ({
       </IonItemDivider>
       {contacts.map((contact) => (
         <AddContactItem
-          key={contact.id}
+          key={JSON.stringify(contact)}
           contact={contact}
           onCompletion={onCompletion}
         />
