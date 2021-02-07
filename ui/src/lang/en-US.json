@@ -10,6 +10,7 @@
   "app.menu.logout-label": "Logout",
   "app.menu.settings-label": "Settings",
   "app.register.error-invalid-username": "Username must be at least 3 characters and contain 1 alphanumberic character",
+  "app.register.error-existing-username": "There's already a username registered for this user",
   "app.register.username-label": "Username",
   "app.register.username-placeholder": "Type your username...",
   "app.register.register": "Create an account"

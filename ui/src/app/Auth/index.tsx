@@ -1,7 +1,6 @@
 import { isPlatform } from "@ionic/react";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useHistory } from "react-router";
 import { fetchMyUsername } from "../../redux/profile/actions";
 import { RootState } from "../../redux/reducers";
 import Home from "../Home";
@@ -11,11 +10,11 @@ declare let cordova: any;
 
 const Auth: React.FC = () => {
   const { username } = useSelector((state: RootState) => state.profile);
-  const history = useHistory();
   const dispatch = useDispatch();
+
   useEffect(() => {
     dispatch(fetchMyUsername());
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     /**

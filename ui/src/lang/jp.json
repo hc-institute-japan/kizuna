@@ -10,6 +10,7 @@
   "app.menu.logout-label": "ログアウト",
   "app.menu.settings-label": "設定",
   "app.register.error-invalid-username": "ユーザー名は3文字以上で、1つの英字を含める必要があります",
+  "app.register.error-existing-username": "このユーザーにはすでにユーザー名が登録されています",
   "app.register.username-label": "ユーザー名",
   "app.register.username-placeholder": "ユーザー名を入力してください...",
   "app.register.register": "アカウントを作成する"
