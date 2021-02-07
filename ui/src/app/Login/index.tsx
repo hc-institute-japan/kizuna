@@ -16,12 +16,10 @@ import styles from "./style.module.css";
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState("");
-  // const history = useHistory();
-
   const intl = useIntl();
-  // const dispatch = useDispatch();
 
-  const log = () => {};
+  const handleOnClick = () => {};
+
   return (
     <IonPage>
       <IonHeader>
@@ -47,7 +45,7 @@ const Login: React.FC = () => {
               />
             </div>
           </div>
-          <IonButton onClick={log}>
+          <IonButton onClick={handleOnClick}>
             {intl.formatMessage({ id: "app.login.login" })}
           </IonButton>
         </div>

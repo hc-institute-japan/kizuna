@@ -1,0 +1,14 @@
+.menu ion-list {
+  background: var(--ion-background-color) !important;
+}
+
+.menu ion-item,
+.menu ion-item-group {
+  --background: var(--ion-background-color) !important;
+}
+
+.menu ion-item:hover,
+.menu ion-item-group:hover {
+  --background: var(--ion-item-background) !important;
+  cursor: pointer;
+}

@@ -3,6 +3,7 @@ import React from "react";
 import { Redirect, Route } from "react-router";
 import Menu from "../../components/Menu";
 import Chat from "../Chat";
+import Settings from "../Settings";
 import HomeTabBar from "./HomeTabBar";
 
 const Home: React.FC = () => (
@@ -12,6 +13,8 @@ const Home: React.FC = () => (
       <Route path="/home" component={HomeTabBar} />
 
       <Route path="/u/:username" component={Chat} />
+      <Route path="/settings" component={Settings} />
+
       <Redirect from="/" to="/home" exact />
     </IonRouterOutlet>
   </IonSplitPane>

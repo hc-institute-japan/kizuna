@@ -24,10 +24,11 @@ export const fetchMyContacts = (): ThunkAction => async (
     const contacts = await Promise.all(
       ids.map(async (id: Uint8Array) => {
         const usernameOutput = await callZome({
-          zomeName: "zomeone",
-          fnName: "get_username",
+          zomeName: ZOMES.USERNAME,
+          fnName: FUNCTIONS[ZOMES.USERNAME].GET_USERNAME,
           payload: id,
         });
+
         if (usernameOutput?.type !== "error")
           return {
             id,
@@ -42,6 +43,7 @@ export const fetchMyContacts = (): ThunkAction => async (
       type: SET_CONTACTS,
       contacts,
     });
+
     return contacts;
   }
   return null;

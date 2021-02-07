@@ -1,7 +1,8 @@
-import { IonContent, IonPage, IonSpinner } from "@ionic/react";
+import { IonContent, IonPage } from "@ionic/react";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import ContactsList from "../../components/ContactList";
+import Spinner from "../../components/Spinner";
 import Toolbar from "../../components/Toolbar";
 import { fetchMyContacts } from "../../redux/contacts/actions";
 import { RootState } from "../../redux/reducers";
@@ -39,7 +40,7 @@ const Contacts: React.FC = () => {
       <Toolbar onChange={(e) => setSearch(e.detail.value!)} />
       <IonContent>
         {loading ? (
-          <IonSpinner name="crescent" />
+          <Spinner name="crescent" />
         ) : contacts.length !== 0 ? (
           <ContactsList contacts={indexedContacts} />
         ) : (
