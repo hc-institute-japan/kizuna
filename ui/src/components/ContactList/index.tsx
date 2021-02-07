@@ -19,7 +19,7 @@ const ContactsList: React.FC<Props> = ({ contacts: indexedContacts }) => (
             <IonLabel>{char}</IonLabel>
           </IonItemDivider>
           {contacts.map((contact) => (
-            <IonItem lines="none" key={contact.id}>
+            <IonItem lines="none" key={JSON.stringify(contact)}>
               <IonLabel>{contact.username}</IonLabel>
             </IonItem>
           ))}

@@ -1,17 +1,32 @@
-import { IonContent, IonPage } from "@ionic/react";
-import React, { useState } from "react";
+import { IonContent, IonPage, IonSpinner } from "@ionic/react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import ContactsList from "../../components/ContactList";
 import Toolbar from "../../components/Toolbar";
+import { fetchMyContacts } from "../../redux/contacts/actions";
 import { RootState } from "../../redux/reducers";
-import { indexContacts } from "../../utils/helpers";
+import { indexContacts, useAppDispatch } from "../../utils/helpers";
 import AddContactFAB from "./AddContact/AddContactFAB";
 import AddContactModal from "./AddContact/AddContactModal";
+import EmptyContacts from "./EmptyContacts";
 
 const Contacts: React.FC = () => {
   const { contacts } = useSelector((state: RootState) => state.contacts);
-  const [isOpen, setIsOpen] = useState(false);
-  const [search, setSearch] = useState("");
+  const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [search, setSearch] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>();
+  const dispatch = useAppDispatch();
+
+  /**
+   * fetch all contacts here
+   */
+
+  useEffect(() => {
+    setLoading(true);
+    dispatch(fetchMyContacts()).then((res: any) => {
+      setLoading(false);
+    });
+  }, [dispatch]);
 
   const indexedContacts = indexContacts(
     contacts.filter((contact) =>
@@ -23,7 +38,14 @@ const Contacts: React.FC = () => {
     <IonPage>
       <Toolbar onChange={(e) => setSearch(e.detail.value!)} />
       <IonContent>
-        <ContactsList contacts={indexedContacts} />
+        {loading ? (
+          <IonSpinner name="crescent" />
+        ) : contacts.length !== 0 ? (
+          <ContactsList contacts={indexedContacts} />
+        ) : (
+          <EmptyContacts />
+        )}
+
         <AddContactModal
           contacts={contacts}
           isOpen={isOpen}

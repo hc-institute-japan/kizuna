@@ -1,5 +1,6 @@
 {
   "app.contacts.add-message": "{name}が連絡先に追加されました。",
+  "app.contacts.empty-contact-list": "点では、連絡先リストは空です。",
   "app.landing.login": "メッセージングを開始する",
   "app.landing.register": "アカウントをお持ちではありませんか？",
   "app.login.login": "ログインする",
