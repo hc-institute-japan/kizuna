@@ -1,8 +1,9 @@
 import { Config, Orchestrator, InstallAgentsHapps, TransportConfigType } from '@holochain/tryorama';
+import { Installables } from "./types";
 import path from 'path';
 
-import contacts from './zomes/contacts'
-import preference from './zomes/preference'
+import contacts from "./zomes/contacts";
+import preference from "./zomes/preference";
 // import request from './zomes/request'
 import group from './zomes/group'
 
@@ -18,42 +19,26 @@ const config = Config.gen();
 
 const kizuna = path.join('../kizuna.dna.gz');
 
-const installAgent: InstallAgentsHapps = [[[kizuna]]] 
+const installAgent: InstallAgentsHapps = [[[kizuna]]];
 
-const install2Agents: InstallAgentsHapps = [
-  [[kizuna]],
-  [[kizuna]]
-] 
+const install2Agents: InstallAgentsHapps = [[[kizuna]], [[kizuna]]];
 
-const install3Agents: InstallAgentsHapps = [
-  [[kizuna]],
-  [[kizuna]],
-  [[kizuna]]
-] 
+const install3Agents: InstallAgentsHapps = [[[kizuna]], [[kizuna]], [[kizuna]]];
 
-const installables = {
+const installables: Installables = {
   one: installAgent,
   two: install2Agents,
-  three: install3Agents
+  three: install3Agents,
 };
-
-
-
-const installation: InstallAgentsHapps = [
-  [[kizuna]]
-];
 
 const orchestrator = new Orchestrator();
 
-
-
-
-// contacts(orchestrator, config, installables);
-// preference(orchestrator, config, installable);
+contacts(orchestrator, config, installables);
+group(orchestrator, config, installables);
+// preference(orchestrator, config, installables);
 // request(orchestrator, config);
 
 
 
-group(orchestrator, config,installation);
 
 orchestrator.run();
