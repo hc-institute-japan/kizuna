@@ -1,11 +1,11 @@
 [package]
-name = "request"
+name = "group"
 version = "0.0.1"
-authors = [ "nkgardose" ]
+authors = [ "manuel_puentes" ]
 edition = "2018"
 
 [lib]
-name = "request"
+name = "group"
 crate-type = [ "cdylib", "rlib" ]
 
 [dependencies]
