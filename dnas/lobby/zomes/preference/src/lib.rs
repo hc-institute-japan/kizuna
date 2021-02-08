@@ -27,12 +27,12 @@ fn get_preference(_: ()) -> ExternResult<PreferenceWrapper> {
 }
 
 #[hdk_extern]
-fn set_preference(preference: PreferenceIO) -> ExternResult<()> {
+fn set_preference(preference: PreferenceIO) -> ExternResult<PreferenceWrapper> {
     handlers::set_preference(preference)
 }
 
 #[hdk_extern]
-fn set_per_agent_preference(preference: PerAgentPreferenceIO) -> ExternResult<()> {
+fn set_per_agent_preference(preference: PerAgentPreferenceIO) -> ExternResult<PerAgentPreferenceWrapper> {
     handlers::set_per_agent_preference(preference)
 }
 
@@ -42,7 +42,7 @@ fn get_per_agent_preference(_: ()) -> ExternResult<PerAgentPreferenceWrapper> {
 }
 
 #[hdk_extern]
-fn set_per_group_preference(preference: PerGroupPreferenceIO) -> ExternResult<()> {
+fn set_per_group_preference(preference: PerGroupPreferenceIO) -> ExternResult<PerGroupPreferenceWrapper> {
     handlers::set_per_group_preference(preference)
 }
 
