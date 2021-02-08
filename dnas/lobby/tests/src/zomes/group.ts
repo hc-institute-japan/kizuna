@@ -78,17 +78,17 @@ function blockContacts(agentPubKeys) {
 
 
 //THE FUNCTION GET ALL MY GROUPS ITS BEEN IMPLICITLY TESTED BEACUSE IS USED IN ALMOST ALL THE TESTS AND WE'VE CHECK HIS CORRECT BEHAVIOR
-export default (orchestrator, config, installation) => {
+export default (orchestrator, config, installables) => {
 
   orchestrator.registerScenario ("create group method test", async(s: ScenarioApi,t) =>{
 
       
     const [alice,bobby,charlie, david] = await s.players([config,config,config,config]);
 
-    const [[alice_happ]] = await alice.installAgentsHapps(installation);
-    const [[bobby_happ]] = await bobby.installAgentsHapps(installation);
-    const [[charlie_happ]] = await charlie.installAgentsHapps(installation);
-    const [[david_happ]] = await david.installAgentsHapps(installation);
+    const [[alice_happ]] = await alice.installAgentsHapps(installables.one);
+    const [[bobby_happ]] = await bobby.installAgentsHapps(installables.one);
+    const [[charlie_happ]] = await charlie.installAgentsHapps(installables.one);
+    const [[david_happ]] = await david.installAgentsHapps(installables.one);
 
     await s.shareAllNodes([alice, bobby, charlie, david])
 
@@ -178,10 +178,10 @@ export default (orchestrator, config, installation) => {
 
     const [alice, bobby, charlie, david] = await s.players([config,config,config,config]);
 
-    const [[alice_happ]] = await alice.installAgentsHapps(installation);
-    const [[bobby_happ]] = await bobby.installAgentsHapps(installation);
-    const [[charlie_happ]] = await charlie.installAgentsHapps(installation);
-    const [[david_happ]] = await david.installAgentsHapps(installation);
+    const [[alice_happ]] = await alice.installAgentsHapps(installables.one);
+    const [[bobby_happ]] = await bobby.installAgentsHapps(installables.one);
+    const [[charlie_happ]] = await charlie.installAgentsHapps(installables.one);
+    const [[david_happ]] = await david.installAgentsHapps(installables.one);
 
     await s.shareAllNodes([alice, bobby, charlie])
 
@@ -360,9 +360,9 @@ export default (orchestrator, config, installation) => {
     
     const [alice,bobby,charlie] = await s.players([config,config,config]);
 
-    const [[alice_happ]] = await alice.installAgentsHapps(installation);
-    const [[bobby_happ]] = await bobby.installAgentsHapps(installation);
-    const [[charlie_happ]] = await charlie.installAgentsHapps(installation);
+    const [[alice_happ]] = await alice.installAgentsHapps(installables.one);
+    const [[bobby_happ]] = await bobby.installAgentsHapps(installables.one);
+    const [[charlie_happ]] = await charlie.installAgentsHapps(installables.one);
 
     await s.shareAllNodes([alice, bobby, charlie])
 
@@ -436,9 +436,9 @@ export default (orchestrator, config, installation) => {
     
     const [alice,bobby,charlie] = await s.players([config,config,config]);
 
-    const [[alice_happ]] = await alice.installAgentsHapps(installation);
-    const [[bobby_happ]] = await bobby.installAgentsHapps(installation);
-    const [[charlie_happ]] = await charlie.installAgentsHapps(installation);
+    const [[alice_happ]] = await alice.installAgentsHapps(installables.one);
+    const [[bobby_happ]] = await bobby.installAgentsHapps(installables.one);
+    const [[charlie_happ]] = await charlie.installAgentsHapps(installables.one);
 
     await s.shareAllNodes([alice, bobby, charlie])
 

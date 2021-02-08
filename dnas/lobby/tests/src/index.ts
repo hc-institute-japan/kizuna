@@ -1,4 +1,5 @@
 import { Config, Orchestrator, InstallAgentsHapps, TransportConfigType } from '@holochain/tryorama';
+import { Installables } from "./types";
 import path from 'path';
 
 import contacts from "./zomes/contacts";
@@ -30,17 +31,11 @@ const installables: Installables = {
   three: install3Agents,
 };
 
-
-
-const installation: InstallAgentsHapps = [
-  [[kizuna]]
-];
-
 const orchestrator = new Orchestrator();
 
-// contacts(orchestrator, config, installables);
-preference(orchestrator, config, installables);
-group(orchestrator, config,installation);
+contacts(orchestrator, config, installables);
+group(orchestrator, config, installables);
+// preference(orchestrator, config, installables);
 // request(orchestrator, config);
 
 
