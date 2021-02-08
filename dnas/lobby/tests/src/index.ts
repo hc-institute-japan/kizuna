@@ -18,6 +18,8 @@ const config = Config.gen();
 
 const kizuna = path.join('../kizuna.dna.gz');
 
+const installAgent: InstallAgentsHapps = [[[kizuna]]] 
+
 const install2Agents: InstallAgentsHapps = [
   [[kizuna]],
   [[kizuna]]
@@ -30,8 +32,9 @@ const install3Agents: InstallAgentsHapps = [
 ] 
 
 const installables = {
+  one: installAgent,
   two: install2Agents,
-  theee: install3Agents
+  three: install3Agents
 };
 
 
