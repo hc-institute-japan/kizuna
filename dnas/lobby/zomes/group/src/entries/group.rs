@@ -64,11 +64,6 @@ pub struct CreateGroupInput {
 
 //OUTPUTS TYPES DEFINITION
 #[derive(Deserialize, Serialize, SerializedBytes)]
-pub struct HashesOutput {
-    pub header_hash: HeaderHash,
-    pub entry_hash: EntryHash,
-}
-#[derive(Deserialize, Serialize, SerializedBytes)]
 pub struct CreateGroupOutput{
     pub content: Group,
     pub group_id: EntryHash,
