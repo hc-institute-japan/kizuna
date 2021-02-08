@@ -48,12 +48,12 @@ const orchestrator = new Orchestrator();
 
 
 
-// contacts(orchestrator, config, installables);
-// preference(orchestrator, config, installable);
+contacts(orchestrator, config, installables);
+preference(orchestrator, config, installables);
+group(orchestrator, config,installation);
 // request(orchestrator, config);
 
 
 
-group(orchestrator, config,installation);
 
 orchestrator.run();
