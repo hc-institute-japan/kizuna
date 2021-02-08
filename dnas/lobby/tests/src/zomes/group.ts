@@ -63,10 +63,6 @@ function signalHandler(signal, signal_listener) {
         signal_listener.payload = signal.data.payload.payload;
     }
 };
-function getGroupHashes(group){
-    return (conductor)=>
-        conductor.call("group","get_group_entry_and_header_hash",group);
-}
 
 // VAlIDATION FUCNTIONS 
 function runValidationRules(validation_input){

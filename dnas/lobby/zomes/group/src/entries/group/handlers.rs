@@ -19,8 +19,6 @@ use super::{
     //TYPES USED IN GET ALL MY GROUPS
     GroupOutput,
     MyGroupListWrapper,
-    //TYPES USED IN UTILS FUNCTIONS:
-    HashesOutput,
 };
 
 use crate::signals::{
@@ -250,24 +248,6 @@ pub fn get_all_my_groups()->ExternResult<MyGroupListWrapper> {
 }
 
 // UTILS FUNCTIONS 
-pub fn get_group_entry_and_header_hash(input:Group) -> ExternResult<HashesOutput> {
-
-    let entry_hash:EntryHash = hash_entry(&input)?;
-
-    if let Some(element) = get(entry_hash.clone(), GetOptions::content())? {    
-        let header_hash:HeaderHash = element.header_address().to_owned();
-
-        let output:HashesOutput = HashesOutput{
-            header_hash,
-            entry_hash,
-        };
-
-        return Ok(output);
-    }
-
-    return Err(HdkError::Wasm(WasmError::Zome("cannot get hashes for this group".into())));
-}
-
 pub fn get_group_latest_version(group_id: EntryHash) -> ExternResult<Group> {
     
     // 1 - we have to get details from the recived entry_hash as arg (group_id), based in the details we get back for this function we should have one or other behavior

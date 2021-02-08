@@ -7,23 +7,22 @@
     use entries::group;
 
     use entries::group::{
-        //TYPES USED IN CREATE GROUP: 
+        // TYPES USED IN CREATE GROUP: 
         Group,
         CreateGroupInput,
         CreateGroupOutput,
-        //TYPES USED IN ADD MEMEBERS AND REMOVE MEMBERS: 
+        // TYPES USED IN ADD MEMEBERS AND REMOVE MEMBERS: 
         UpdateMembersIO,
-        //TYPES USED IN UPDATE GROUP NAME
+        // TYPES USED IN UPDATE GROUP NAME
         UpdateGroupNameIO,
-        //TYPES USED IN GET ALL MY GROUPS
+        // TYPES USED IN GET ALL MY GROUPS
         MyGroupListWrapper,
-        //TYPES USED IN UTILS FUCNTIONS
         EntryHashWrapper,
-        HashesOutput,
-        //TYPES USED IN VALIDATION FUNCTIONS
+        // TYPES USED IN VALIDATION FUNCTIONS
         ValidationInput,
-
+        handlers::get_group_entry_from_element
     };
+
 
 
     entry_defs![
@@ -56,6 +55,7 @@
 
         Ok(InitCallbackResult::Pass)
     }
+
     #[hdk_extern]
     fn recv_remote_signal(signal: SerializedBytes) -> ExternResult<()> {
         // currently only emitting the received signal
@@ -136,7 +136,7 @@
         // 3 update is only valid if old_group_name != new_group_name | old_members != new_members
         // 4 update is valid only if members > 2 && new name is not empty or more than 50 characters
 
-        let updated_group_entry: Group = group::handlers::get_group_entry_from_element(data.element.clone())?;
+        let updated_group_entry: Group = get_group_entry_from_element(data.element.clone())?;
         let updated_group_header: Header = data.element.header().clone();
 
         if let Header::Update(update_header) = data.element.header().clone() {
@@ -194,27 +194,25 @@
     fn create_group(create_group_input: CreateGroupInput) -> ExternResult<CreateGroupOutput> {
         group::handlers::create_group(create_group_input)
     }
+
     #[hdk_extern]
     fn add_members(add_members_input: UpdateMembersIO) -> HdkResult<UpdateMembersIO> {
         group::handlers::add_members(add_members_input)
     }
+
     #[hdk_extern]
     fn remove_members(remove_members_input: UpdateMembersIO) -> ExternResult<UpdateMembersIO> {
         group::handlers::remove_members(remove_members_input)
     }
+
     #[hdk_extern]
     fn update_group_name(update_group_name_input: UpdateGroupNameIO) -> ExternResult<UpdateGroupNameIO> {
         group::handlers::update_group_name(update_group_name_input)
     }
+
     #[hdk_extern]
     fn get_all_my_groups(_:()) -> HdkResult<MyGroupListWrapper> {
         group::handlers::get_all_my_groups()
-    }
-
-    //UTILS FROM GROUP
-    #[hdk_extern]
-    fn get_group_entry_and_header_hash(input: Group) -> ExternResult<HashesOutput> {
-        group::handlers::get_group_entry_and_header_hash(input)
     }
 
     #[hdk_extern]
