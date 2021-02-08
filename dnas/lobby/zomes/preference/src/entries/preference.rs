@@ -39,10 +39,10 @@ pub struct PerGroupPreferenceIO {
 }
 
 #[derive(From, Into, Serialize, Deserialize, SerializedBytes)]
-pub struct PreferenceWrapper(PreferenceIO);
+pub struct PreferenceWrapper(Preference);
 
 #[derive(From, Into, Serialize, Deserialize, SerializedBytes)]
-pub struct PerAgentPreferenceWrapper(PerAgentPreferenceIO);
+pub struct PerAgentPreferenceWrapper(PerAgentPreference);
 
 #[derive(From, Into, Serialize, Deserialize, SerializedBytes)]
-pub struct PerGroupPreferenceWrapper(PerGroupPreferenceIO);
+pub struct PerGroupPreferenceWrapper(PerGroupPreference);
