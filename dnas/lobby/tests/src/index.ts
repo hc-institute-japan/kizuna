@@ -1,13 +1,22 @@
-import { Config, Orchestrator, InstallAgentsHapps } from "@holochain/tryorama";
-import path from "path";
-import { Installables } from "./types";
+import { Config, Orchestrator, InstallAgentsHapps, TransportConfigType } from '@holochain/tryorama';
+import path from 'path';
 
 import contacts from "./zomes/contacts";
 import preference from "./zomes/preference";
 // import request from './zomes/request'
+import group from './zomes/group'
 
+
+const network = {
+  transport_pool: [{
+    type: TransportConfigType.Quic,
+  }],
+  bootstrap_service: "https://bootstrap.holo.host"
+}
 const config = Config.gen();
-const kizuna = path.join("../kizuna.dna.gz");
+
+
+const kizuna = path.join('../kizuna.dna.gz');
 
 const installAgent: InstallAgentsHapps = [[[kizuna]]];
 
@@ -21,11 +30,20 @@ const installables: Installables = {
   three: install3Agents,
 };
 
+
+
+const installation: InstallAgentsHapps = [
+  [[kizuna]]
+];
+
 const orchestrator = new Orchestrator();
 
 // contacts(orchestrator, config, installables);
 preference(orchestrator, config, installables);
-
+group(orchestrator, config,installation);
 // request(orchestrator, config);
+
+
+
 
 orchestrator.run();

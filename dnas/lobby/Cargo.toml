@@ -4,7 +4,8 @@ members = [
     "zomes/p2pmessage",
     # "zomes/request",
     "zomes/username",
-    "zomes/contacts"
+    "zomes/contacts",
+    "zomes/group"
 ]
 
 [profile.dev]
@@ -12,3 +13,9 @@ opt-level = "z"
 
 [profile.release]
 opt-level = "z"
+
+[patch.crates-io]
+hc_utils = {git = "https://github.com/holochain/hc-utils", branch = "develop", package = "hc_utils"}
+hdk3 = {git = "https://github.com/holochain/holochain", rev = "3675b58", package = "hdk3"}
+holo_hash = {git = "https://github.com/holochain/holochain", rev = "3675b58", package = "holo_hash"}
+

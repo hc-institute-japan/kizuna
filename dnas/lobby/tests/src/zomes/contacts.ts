@@ -2,25 +2,24 @@ import { remove } from "lodash";
 
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
-function addContacts(username) {
+function addContacts(agentPubKeys) {
     return (conductor) =>
-      conductor.call("contacts", "add_contacts", username);
-};
-  
-function removeContacts(username) {
-  return (conductor) =>
-  conductor.call("contacts", "remove_contacts", username);
+      conductor.call("contacts", "add_contacts", agentPubKeys);
 };
 
-function blockContacts(username) {
+function removeContacts(agentPubKeys) {
   return (conductor) =>
-  conductor.call("contacts", "block_contacts", username);
+  conductor.call("contacts", "remove_contacts", agentPubKeys);
 };
 
-  
-function unblockContacts(username) {
+function blockContacts(agentPubKeys) {
   return (conductor) =>
-  conductor.call("contacts", "unblock_contacts", username);
+  conductor.call("contacts", "block_contacts", agentPubKeys);
+};
+
+function unblockContacts(agentPubKeys) {
+  return (conductor) =>
+  conductor.call("contacts", "unblock_contacts", agentPubKeys);
 };
 
 function listAdded() {
