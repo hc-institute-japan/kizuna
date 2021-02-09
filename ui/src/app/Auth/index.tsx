@@ -2,7 +2,7 @@ import { isPlatform } from "@ionic/react";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchMyUsername } from "../../redux/profile/actions";
-import { RootState } from "../../redux/reducers";
+import { RootState } from "../../redux/types";
 import Home from "../Home";
 import Unauthenticated from "../Unauthenticated";
 

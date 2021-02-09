@@ -1,4 +1,4 @@
-import { ThunkAction } from "../../utils/types";
+import { ThunkAction } from "../types";
 import { FUNCTIONS, ZOMES } from "../holochain/types";
 import { SET_USERNAME } from "./types";
 

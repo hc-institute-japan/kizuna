@@ -14,7 +14,7 @@ import { useSelector } from "react-redux";
 import { RouteComponentProps, useParams } from "react-router";
 import Me from "../../components/Me";
 import Others from "../../components/Others";
-import { RootState } from "../../redux/reducers";
+import { RootState } from "../../redux/types";
 import { Conversation, Message } from "../../utils/types";
 import styles from "./style.module.css";
 

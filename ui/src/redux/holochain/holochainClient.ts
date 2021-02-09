@@ -1,6 +1,6 @@
 import { AppWebsocket, AppSignal, AgentPubKey } from "@holochain/conductor-api";
 import thunk from "redux-thunk";
-import { CallZomeConfig } from "../../utils/types";
+import { CallZomeConfig } from "../types";
 import { SET_SIGNAL } from "../signal/types";
 import store from "../store";
 
@@ -13,7 +13,7 @@ const init: () => any = async () => {
   try {
     client = await AppWebsocket.connect(
       "ws://localhost:8888",
-      4000,
+      15000, // holochain's default timeout
       (signal: AppSignal) =>
         store.dispatch({
           type: SET_SIGNAL,
@@ -66,4 +66,4 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
   }
 };
 
-const modifiedThunk = thunk.withExtraArgument({ callZome, getAgentId });
+export const modifiedThunk = thunk.withExtraArgument({ callZome, getAgentId });
