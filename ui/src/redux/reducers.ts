@@ -11,6 +11,4 @@ const rootReducer = combineReducers({
   signal: signalReducer,
 });
 
-export type RootState = ReturnType<typeof rootReducer>;
-
 export default rootReducer;

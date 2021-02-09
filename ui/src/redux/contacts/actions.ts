@@ -1,7 +1,7 @@
 import { AgentPubKey } from "@holochain/conductor-api";
 import { FUNCTIONS, ZOMES } from "../../redux/holochain/types";
 import { Profile } from "../../redux/profile/types";
-import { ThunkAction } from "../../utils/types";
+import { ThunkAction } from "../types";
 import { SET_CONTACTS } from "./types";
 
 export const setContacts = (contacts: Profile[]): ThunkAction => (dispatch) =>

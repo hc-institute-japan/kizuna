@@ -14,7 +14,7 @@ import { useIntl } from "react-intl";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { setUsername } from "../../redux/profile/actions";
-import { RootState } from "../../redux/reducers";
+import { RootState } from "../../redux/types";
 import styles from "./style.module.css";
 
 interface MenuItem {

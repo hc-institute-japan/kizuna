@@ -1,30 +1,5 @@
 export const SET_PREFERENCE = "SET_PREFERENCE";
 
-// interface Preference {
-//   readReceipt: boolean;
-//   typingIndicator: boolean;
-// }
-
-// interface PerAgentPreference {
-//   readReceipt: {
-//     [key: string]: true;
-//   };
-
-//   typingIndicator: {
-//     [key: string]: true;
-//   };
-// }
-
-// interface PerGroupPreference {
-//   readReceipt: {
-//     [key: string]: true;
-//   };
-
-//   typingIndicator: {
-//     [key: string]: true;
-//   };
-// }
-
 export interface PreferenceState {
   readReceipt: boolean;
   typingIndicator: boolean;

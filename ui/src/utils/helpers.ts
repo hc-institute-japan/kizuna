@@ -1,7 +1,7 @@
 import { useDispatch } from "react-redux";
 import { IndexedContacts } from "../redux/contacts/types";
 import { Profile } from "../redux/profile/types";
-import { ReduxDispatch } from "./types";
+import { ReduxDispatch } from "../redux/types";
 
 export const indexContacts: (contacts: Profile[]) => IndexedContacts = (
   contacts
@@ -35,8 +35,6 @@ export const debounce: (callback: () => any, delay?: number) => Function = (
 };
 
 export const useAppDispatch = () => useDispatch<ReduxDispatch>();
-
-export const convertIdtoUInt8Array = (id: number[]) => Uint8Array.from(id);
 
 export const convertCamelToSnake = (arg: string) =>
   arg.replace(/([A-Z])/g, "_$1").toLowerCase();

@@ -1,5 +1,5 @@
 import { convertCamelToSnake } from "../../utils/helpers";
-import { ThunkAction } from "../../utils/types";
+import { ThunkAction } from "../types";
 import { FUNCTIONS, ZOMES } from "../holochain/types";
 import { PreferenceParameter, SET_PREFERENCE } from "./types";
 
