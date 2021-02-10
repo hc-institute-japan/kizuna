@@ -96,6 +96,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "file_types"
+version = "0.0.1"
+dependencies = [
+ "derive_more",
+ "hdk3 0.0.1 (git+https://github.com/holochain/holochain?rev=3675b58)",
+ "serde",
+]
+
+[[package]]
 name = "fixt"
 version = "0.0.1"
 source = "git+https://github.com/holochain/holochain.git?rev=3675b5#3675b588de0aaf7eb9dc852b4012f3cfa5a27df7"
@@ -143,6 +152,7 @@ name = "group"
 version = "0.0.1"
 dependencies = [
  "derive_more",
+ "file_types",
  "hc_utils",
  "hdk3 0.0.1 (git+https://github.com/holochain/holochain?rev=3675b58)",
  "serde",
