@@ -6,7 +6,7 @@ use link::Link;
 
 use crate::{
     entries::group::{self, handlers::get_group_latest_version},
-    signals::{SignalDetails, SignalPayload},
+    signals::{SignalDetails, SignalName, SignalPayload},
     utils::{collect, path_from_str, timestamp_to_days, to_timestamp},
 };
 
@@ -83,7 +83,13 @@ pub fn send_message(message_input: GroupMessageInput) -> ExternResult<GroupMessa
 
                             // TODO: please use the SignalDetails format and add the GroupMessageData in the SignalPayload enum variant
                             // to have coherence in code.
-                            remote_signal(&group_message_data, group.members)?;
+                            let signal = SignalDetails {
+                                name: SignalName::GROUP_MESSAGE_DATA.to_owned(),
+                                payload: SignalPayload::GroupMessageData(
+                                    group_message_data.clone(),
+                                ),
+                            };
+                            remote_signal(&signal, group.members)?;
                             Ok(group_message_data)
                         }
                         Err(_) => Err(HdkError::Wasm(WasmError::Zome(
@@ -149,61 +155,9 @@ pub fn get_all_messages(group_hash: EntryHash) -> ExternResult<GroupMessageDataW
     }
 }
 
-// let mut messages = Vec::new();
-// match get_links(path.hash()?, None) {
-//     Ok(timestamp_links) => {
-//         timestamp_links
-//             .into_inner()
-//             .into_iter()
-//             .for_each(|timestamp_link| {
-//                 match get_links(timestamp_link.target, None) {
-//                     Ok(message_links) => {
-//                         message_links
-//                             .into_inner()
-//                             .into_iter()
-//                             .for_each(|message_link| {
-//                                 match get(message_link.target, GetOptions::default()) {
-//                                     Ok(e) => {
-//                                         match e.ok_or("test".to_string()) {
-//                                             Ok(entry) => {
-//                                                 match entry
-//                                                     .entry()
-//                                                     .to_app_option::<GroupMessage>()
-//                                                 {
-//                                                     Ok(e) => {
-//                                                         let group_message = e.unwrap();
-//                                                         match hash_entry(&group_message) {
-//                                                             Ok(hash) => {
-//                                                                 messages.push(
-//                                                                     GroupMessageData {
-//                                                                         id: hash,
-//                                                                         content: group_message,
-//                                                                     },
-//                                                                 );
-//                                                             }
-//                                                             Err(_) => {}
-//                                                         }
-//                                                     }
-//                                                     Err(_) => {}
-//                                                 };
-//                                             }
-//                                             Err(_) => {}
-//                                         };
-//                                     }
-//                                     Err(_) => {}
-//                                 };
-//                             });
-//                     }
-//                     Err(_) => {}
-//                 };
-//             });
-//     }
-//     Err(_) => {}
-// };
-
 pub fn indicate_group_typing(group_typing_detail_data: GroupTypingDetailData) -> ExternResult<()> {
     let signal_detail: SignalDetails = SignalDetails {
-        name: "group_typing_detail".to_owned(),
+        name: SignalName::GROUP_TYPING_DETAIL.to_owned(),
         payload: SignalPayload::GroupTypingDetail(group_typing_detail_data.clone()),
     };
     remote_signal(&signal_detail, group_typing_detail_data.members)?;
@@ -223,7 +177,7 @@ pub fn read_group_message(
         )?;
     }
     let signal_detail = SignalDetails {
-        name: "group_message_read".to_owned(),
+        name: SignalName::GROUP_MESSAGE_READ.to_owned(),
         payload: SignalPayload::GroupMessageRead(group_message_read_data.clone()),
     };
     remote_signal(&signal_detail, group_message_read_data.members.clone())?;

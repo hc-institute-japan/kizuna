@@ -21,6 +21,32 @@ pub enum PayloadInput {
     },
 }
 
+// impl From<PayloadInput> for Payload {
+//     fn from(payload_input: PayloadInput) -> Payload {
+//         match payload_input {
+//             PayloadInput::Text { payload } => Payload::Text { payload },
+//             PayloadInput::File {
+//                 metadata,
+//                 file_type,
+//                 file_bytes,
+//             } => {
+//                 // create_entry(&) <--- GroupFileBytes
+
+//                 let file = Payload::File {
+//                     file_type,
+//                     metadata: FileMetadata {
+//                         file_type: metadata.file_type,
+//                         file_name: metadata.file_name,
+//                         file_size: metadata.file_size,
+//                     },
+//                 };
+
+//                 file
+//             }
+//         }
+//     }
+// }
+
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
 // #[serde(rename_all = "camelCase")]
 pub struct FileMetadata {
