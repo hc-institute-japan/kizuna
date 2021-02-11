@@ -76,6 +76,9 @@ fn recv_remote_signal(signal: SerializedBytes) -> ExternResult<()> {
         SignalPayload::GroupMessageRead(_) => {
             emit_signal(&signal)?;
         }
+        SignalPayload::GroupMessageData(_) => {
+            emit_signal(&signal)?;
+        }
     }
     Ok(())
 }
