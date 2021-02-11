@@ -1,4 +1,6 @@
 #![allow(unused_imports)]
+use file_types::FileMetadata;
+use group::Group;
 use hdk3::{host_fn::remote_signal, prelude::*};
 use link::Link;
 
@@ -9,66 +11,92 @@ use crate::{
 };
 
 use super::{
-    GroupChatFilter, GroupMessage, GroupMessageData, GroupMessageDataWrapper, GroupMessageInput,
-    GroupMessageReadData, GroupTypingDetailData, Payload,
+    GroupChatFilter, GroupFileBytes, GroupMessage, GroupMessageData, GroupMessageDataWrapper,
+    GroupMessageInput, GroupMessageReadData, GroupTypingDetailData, Payload, PayloadInput,
 };
 
 pub fn send_message(message_input: GroupMessageInput) -> ExternResult<GroupMessageData> {
-    // TODO: check if PayloadInput::File and commit GroupFileBytes first so that you
-    // can get the EntryHash of committed GroupFileBytes which will allow you to construct Payload
-    // from PayloadInput
-
-    // GroupMessage entry
-    let message = GroupMessage {
-        group_hash: message_input.group_hash,
-        // TODO: conver PayloadInput to Payload since GroupMessageInput has PayloadInput and not Payload.
-        payload: message_input.payload,
-        created: to_timestamp(sys_time()?),
-        sender: message_input.sender,
-        reply_to: message_input.reply_to,
-    };
-
-    // commit GroupMessage entry
-    create_entry(&message)?;
-
-    let group_hash = message.clone().group_hash.to_string(); // message's group hash as string
-    let days = timestamp_to_days(message.clone().created).to_string(); // group message's timestamp into days as string
-
-    match path_from_str(&[group_hash, days].join(".")).hash() {
-        Ok(hash) => {
-            create_link(
-                hash.clone(),
-                hash_entry(&message.clone())?,
-                LinkTag::new(match message.payload {
-                    Payload::Text { payload: _ } => "text".to_owned(),
-                    Payload::File {
-                        file_name: _,
-                        file_size: _,
-                        file_type: _,
-                        bytes: _,
-                    } => "file".to_owned(),
+    let payload_res = match message_input.clone().payload {
+        PayloadInput::Text { payload } => Ok(Payload::Text { payload }),
+        PayloadInput::File {
+            metadata,
+            file_type,
+            file_bytes,
+        } => {
+            let group_file_bytes = GroupFileBytes(file_bytes);
+            create_entry(&group_file_bytes)?;
+            match hash_entry(&group_file_bytes) {
+                Ok(hash) => Ok(Payload::File {
+                    file_type: file_type,
+                    metadata: FileMetadata {
+                        file_name: metadata.file_name,
+                        file_size: metadata.file_size,
+                        file_type: metadata.file_type,
+                        file_hash: hash,
+                    },
                 }),
-            )?;
-
-            match get_group_latest_version(message.clone().group_hash) {
-                Ok(group) => {
-                    let message_hash = hash_entry(&message.clone())?;
-                    let group_message_data = GroupMessageData {
-                        id: message_hash,
-                        content: message,
-                    };
-
-                    // TODO: please use the SignalDetails format and add the GroupMessageData in the SignalPayload enum variant
-                    // to have coherence in code.
-                    remote_signal(&group_message_data, group.members)?;
-                    Ok(group_message_data)
-                }
                 Err(_) => Err(HdkError::Wasm(WasmError::Zome(
-                    "Cannot get group's latest version".into(),
+                    "Cannot hash file bytes".into(),
                 ))),
             }
         }
-        Err(_) => Err(HdkError::Wasm(WasmError::Zome("Cannot create path".into()))),
+    };
+
+    match payload_res {
+        Ok(payload) => {
+            let message = GroupMessage {
+                group_hash: message_input.group_hash,
+                // TODO: conver PayloadInput to Payload since GroupMessageInput has PayloadInput and not Payload.
+                payload,
+                created: to_timestamp(sys_time()?),
+                sender: message_input.sender,
+                reply_to: message_input.reply_to,
+            };
+
+            // commit GroupMessage entry
+            create_entry(&message)?;
+
+            let group_hash = message.clone().group_hash.to_string(); // message's group hash as string
+            let days = timestamp_to_days(message.clone().created).to_string(); // group message's timestamp into days as string
+
+            match path_from_str(&[group_hash, days].join(".")).hash() {
+                Ok(hash) => {
+                    create_link(
+                        hash.clone(),
+                        hash_entry(&message.clone())?,
+                        LinkTag::new(match message.payload {
+                            Payload::Text { payload: _ } => "text".to_owned(),
+                            Payload::File {
+                                metadata: _,
+                                file_type: _,
+                            } => "file".to_owned(),
+                        }),
+                    )?;
+
+                    match get_group_latest_version(message.clone().group_hash) {
+                        Ok(group) => {
+                            let message_hash = hash_entry(&message.clone())?;
+                            let group_message_data = GroupMessageData {
+                                id: message_hash,
+                                content: message,
+                            };
+
+                            // TODO: please use the SignalDetails format and add the GroupMessageData in the SignalPayload enum variant
+                            // to have coherence in code.
+                            remote_signal(&group_message_data, group.members)?;
+                            Ok(group_message_data)
+                        }
+                        Err(_) => Err(HdkError::Wasm(WasmError::Zome(
+                            "Cannot get group's latest version".into(),
+                        ))),
+                    }
+                }
+                Err(_) => Err(HdkError::Wasm(WasmError::Zome("Cannot create path".into()))),
+            }
+        }
+        Err(_) => Err(HdkError::Wasm(WasmError::Zome(
+            "Cannot convert payload input to payload".into(),
+        ))),
     }
 }
 
