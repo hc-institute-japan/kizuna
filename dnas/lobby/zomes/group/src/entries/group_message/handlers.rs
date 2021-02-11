@@ -7,7 +7,10 @@ use crate::{
     utils::{collect, path_from_str, timestamp_to_days, to_timestamp},
 };
 
-use super::{GroupMessage, GroupMessageData, GroupMessageDataWrapper, GroupMessageInput, Payload};
+use super::{
+    GroupChatFilter, GroupMessage, GroupMessageData, GroupMessageDataWrapper, GroupMessageInput,
+    Payload,
+};
 
 pub fn send_message(message_input: GroupMessageInput) -> ExternResult<GroupMessageData> {
     // GroupMessage entry
@@ -24,7 +27,7 @@ pub fn send_message(message_input: GroupMessageInput) -> ExternResult<GroupMessa
 
     let group_hash = message.clone().group_hash.to_string(); // message's group hash as string
     let days = timestamp_to_days(message.clone().created).to_string(); // group message's timestamp into days as string
-
+    debug!("Asd: {:?}", days);
     match path_from_str(&[group_hash, days].join(".")).hash() {
         Ok(hash) => {
             create_link(
@@ -75,7 +78,7 @@ pub fn get_all_messages(group_hash: EntryHash) -> ExternResult<GroupMessageDataW
                     get(element_link.target, GetOptions::default())
                 })
                 .and_then(|elements| {
-                    let stuff: Vec<GroupMessageData> = elements
+                    Ok(elements
                         .into_iter()
                         .filter_map(|element| match element {
                             Some(entry) => {
@@ -97,8 +100,7 @@ pub fn get_all_messages(group_hash: EntryHash) -> ExternResult<GroupMessageDataW
                             }
                             None => None,
                         })
-                        .collect();
-                    Ok(stuff)
+                        .collect::<Vec<GroupMessageData>>())
                 })
             })
         });
