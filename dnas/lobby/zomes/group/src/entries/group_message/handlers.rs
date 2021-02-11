@@ -57,6 +57,8 @@ pub fn send_message(message_input: GroupMessageInput) -> ExternResult<GroupMessa
                         content: message,
                     };
 
+                    // TODO: please use the SignalDetails format and add the GroupMessageData in the SignalPayload enum variant
+                    // to have coherence in code.
                     remote_signal(&group_message_data, group.members)?;
                     Ok(group_message_data)
                 }
