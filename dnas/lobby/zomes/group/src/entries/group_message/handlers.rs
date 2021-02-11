@@ -4,10 +4,7 @@ use group::Group;
 use hdk3::{host_fn::remote_signal, prelude::*};
 use link::Link;
 
-use super::{
-    GroupMsgBatchFetchFilter,
-    //MessagesByGroup,
-};
+use super::GroupMsgBatchFetchFilter;
 
 use crate::{
     entries::group::{self, handlers::get_group_latest_version},
@@ -189,16 +186,8 @@ pub fn read_group_message(
     Ok(group_message_read_data)
 }
 
-pub fn _get_next_batch_group_messages(_filter: GroupMsgBatchFetchFilter)-> ExternResult<()>{
-
-    //constrcut path group_hash, Path::from(ENTRY_HASH.UNIX_TIMESTAMP_ON_UTC_FORMAT); 
-
-
-    
-
-
-
+pub fn _get_next_batch_group_messages(_filter: GroupMsgBatchFetchFilter) -> ExternResult<()> {
+    //constrcut path group_hash, Path::from(ENTRY_HASH.UNIX_TIMESTAMP_ON_UTC_FORMAT);
 
     Ok(())
 }
-    

@@ -1,10 +1,9 @@
-use hdk3::prelude::*;
-use std::collections::hash_map::HashMap;
 use file_types::{Payload, PayloadInput, PayloadType};
 use hdk3::prelude::timestamp::Timestamp;
+use hdk3::prelude::*;
+use std::collections::hash_map::HashMap;
 
 pub mod handlers;
-
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Hash)]
 pub struct _GroupMessageHash(pub EntryHash);
@@ -44,7 +43,6 @@ pub struct _GroupMessagesContents(pub HashMap<_GroupMessageHash, _GroupMessageCo
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
 pub struct _GroupMessagesOutput(MessagesByGroup, _GroupMessagesContents);
 
-
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
 pub struct GroupMsgBatchFetchFilter {
     group_id: EntryHash,
@@ -55,8 +53,6 @@ pub struct GroupMsgBatchFetchFilter {
     batch_size: u8,
     payload_type: PayloadType,
 }
-
-
 
 // GROUP MESSAGE TYPE DEFINITION, GETTERS, SETTERS, ENTRY_DEF, UTILS ...
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
