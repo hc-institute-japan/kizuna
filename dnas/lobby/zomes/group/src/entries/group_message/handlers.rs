@@ -4,12 +4,13 @@ use link::Link;
 
 use crate::{
     entries::group::{self, handlers::get_group_latest_version},
+    signals::{SignalDetails, SignalPayload},
     utils::{collect, path_from_str, timestamp_to_days, to_timestamp},
 };
 
 use super::{
     GroupChatFilter, GroupMessage, GroupMessageData, GroupMessageDataWrapper, GroupMessageInput,
-    Payload,
+    GroupMessageReadData, GroupTypingDetailData, Payload,
 };
 
 pub fn send_message(message_input: GroupMessageInput) -> ExternResult<GroupMessageData> {
@@ -171,3 +172,32 @@ pub fn get_all_messages(group_hash: EntryHash) -> ExternResult<GroupMessageDataW
 //     }
 //     Err(_) => {}
 // };
+
+pub fn indicate_group_typing(group_typing_detail_data: GroupTypingDetailData) -> ExternResult<()> {
+    let signal_detail: SignalDetails = SignalDetails {
+        name: "group_typing_detail".to_owned(),
+        payload: SignalPayload::GroupTypingDetail(group_typing_detail_data.clone()),
+    };
+    remote_signal(&signal_detail, group_typing_detail_data.members)?;
+    Ok(())
+}
+
+pub fn read_group_message(
+    group_message_read_data: GroupMessageReadData,
+) -> ExternResult<GroupMessageReadData> {
+    let my_agent_pubkey = agent_info()?.agent_latest_pubkey;
+    for message_entry_hash in group_message_read_data.message_ids.clone() {
+        // link GroupMessage -> AgentPubKey to indicate that it is read.
+        create_link(
+            message_entry_hash,
+            my_agent_pubkey.clone().into(),
+            LinkTag::new("read".to_owned()),
+        )?;
+    }
+    let signal_detail = SignalDetails {
+        name: "group_message_read".to_owned(),
+        payload: SignalPayload::GroupMessageRead(group_message_read_data.clone()),
+    };
+    remote_signal(&signal_detail, group_message_read_data.members.clone())?;
+    Ok(group_message_read_data)
+}

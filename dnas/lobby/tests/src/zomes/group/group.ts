@@ -1,7 +1,4 @@
 import { ScenarioApi } from "@holochain/tryorama/lib/api";
-import { Conductor } from "@holochain/tryorama/lib/conductor";
-import { create, update } from "lodash";
-import { validateLocaleAndSetLanguage } from "typescript";
 
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 

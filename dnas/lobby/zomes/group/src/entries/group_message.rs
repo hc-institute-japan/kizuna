@@ -30,7 +30,7 @@ enum Payload {
         bytes: Vec<u8>, // actual bytes of file (15mb limit)
     },
 }
-//GROUP MESSAGE TYPE DEFINITION, GETTERS, SETTERS, ENTRY_DEF, UTILS ...
+// GROUP MESSAGE TYPE DEFINITION, GETTERS, SETTERS, ENTRY_DEF, UTILS ...
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct GroupMessage {
@@ -51,11 +51,11 @@ entry_def!(GroupMessage
         required_validation_type: RequiredValidationType::Element
     }
 );
-//END OF GROUP MESSAGE TYPE DEFINITION
+// END OF GROUP MESSAGE TYPE DEFINITION
 
 // TODO: Define the GroupFileBytes.
 
-//START OF INPUTS TYPES DEFINITION
+// START OF INPUTS TYPES DEFINITION
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
 pub struct GroupMessageInput {
     group_hash: EntryHash,
@@ -67,28 +67,43 @@ pub struct GroupMessageInput {
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
 pub struct GroupChatFilter {
-    // has to be the original EntryHash
+    // has to be the original EntryHash of Group
     group_id: EntryHash,
-    // has to be divideable with no remainder in YYYY/MM/DD/00:00
+    // has to be divideable to result in YYYY/MM/DD/00:00
     date: Timestamp,
-    // This signifies which payload type is desired
-    // to be fetched.
     payload_type: PayloadType,
 }
-//END OF INPUTS TYPES DEFINITION
 
-//OUTPUTS TYPES DEFINITION
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+pub struct GroupTypingDetailData {
+    pub group_id: EntryHash,
+    pub indicated_by: AgentPubKey,
+    pub members: Vec<AgentPubKey>,
+    pub is_typing: bool,
+}
+
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+pub struct GroupMessageReadData {
+    pub group_id: EntryHash,
+    pub message_ids: Vec<EntryHash>,
+    pub reader: AgentPubKey,
+    pub timestamp: Timestamp,
+    pub members: Vec<AgentPubKey>,
+}
+// END OF INPUTS TYPES DEFINITION
+
+// OUTPUTS TYPES DEFINITION
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct GroupMessageData {
     // entry_hash of GroupMessage
-    id: EntryHash,
-    content: GroupMessage,
+    pub id: EntryHash,
+    pub content: GroupMessage,
 }
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 pub struct GroupMessageDataWrapper(Vec<GroupMessageData>);
-//END OF OUTPUTS TYPES DEFINITION
+// END OF OUTPUTS TYPES DEFINITION
 
 // pub struct GroupMessageHash(EntryHash);
 
