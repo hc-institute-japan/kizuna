@@ -1,4 +1,3 @@
-use group_message::{GroupMessage, GroupMessageData, GroupMessageDataWrapper, GroupMessageInput};
 use hdk3::prelude::*;
 
 mod entries;
@@ -6,6 +5,13 @@ mod signals;
 mod utils;
 
 use entries::{group, group_message};
+
+use signals::{SignalDetails, SignalPayload};
+
+use group_message::{
+    GroupMessage, GroupMessageData, GroupMessageDataWrapper, GroupMessageInput,
+    GroupMessageReadData, GroupTypingDetailData,
+};
 
 use entries::group::{
     handlers::get_group_entry_from_element,
@@ -57,9 +63,20 @@ pub fn init(_: ()) -> ExternResult<InitCallbackResult> {
 
 #[hdk_extern]
 fn recv_remote_signal(signal: SerializedBytes) -> ExternResult<()> {
-    // currently only emitting the received signal
-    // TODO: actually work with the received signal
-    emit_signal(&signal)?;
+    let signal_detail: SignalDetails = signal.clone().try_into()?;
+    match signal_detail.payload {
+        SignalPayload::AddedToGroup(_) => {
+            // currently only emitting the received signal
+            // TODO: actually work with the received signal
+            emit_signal(&signal)?;
+        }
+        SignalPayload::GroupTypingDetail(_) => {
+            emit_signal(&signal)?;
+        }
+        SignalPayload::GroupMessageRead(_) => {
+            emit_signal(&signal)?;
+        }
+    }
     Ok(())
 }
 
@@ -253,4 +270,16 @@ fn get_all_messages(group_id: EntryHash) -> ExternResult<GroupMessageDataWrapper
 #[hdk_extern]
 fn send_message(message_input: GroupMessageInput) -> ExternResult<GroupMessageData> {
     group_message::handlers::send_message(message_input)
+}
+
+#[hdk_extern]
+fn indicate_group_typing(group_typing_detail_data: GroupTypingDetailData) -> ExternResult<()> {
+    group_message::handlers::indicate_group_typing(group_typing_detail_data)
+}
+
+#[hdk_extern]
+fn read_group_message(
+    group_message_read_io: GroupMessageReadData,
+) -> ExternResult<GroupMessageReadData> {
+    group_message::handlers::read_group_message(group_message_read_io)
 }

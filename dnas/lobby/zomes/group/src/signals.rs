@@ -1,3 +1,4 @@
+use crate::entries::group_message::{GroupMessageReadData, GroupTypingDetailData};
 use hdk3::prelude::*;
 //use timestamp::Timestamp
 //use crate::utils::to_timestamp;
@@ -13,4 +14,6 @@ pub struct SignalDetails {
 pub enum SignalPayload {
     // TODO: we may want to change the payload to the actual Group in the future.
     AddedToGroup(EntryHash),
+    GroupTypingDetail(GroupTypingDetailData),
+    GroupMessageRead(GroupMessageReadData),
 }
