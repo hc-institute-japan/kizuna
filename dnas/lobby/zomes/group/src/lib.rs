@@ -4,7 +4,14 @@ mod entries;
 mod signals;
 mod utils;
 
-use entries::group;
+use entries::{group, group_message};
+
+use signals::{SignalDetails, SignalPayload};
+
+use group_message::{
+    GroupMessage, GroupMessageData, GroupMessageDataWrapper, GroupMessageInput,
+    GroupMessageReadData, GroupTypingDetailData,
+};
 
 use entries::group::{
     handlers::get_group_entry_from_element,
@@ -23,7 +30,11 @@ use entries::group::{
     ValidationInput,
 };
 
-entry_defs![Group::entry_def(), Path::entry_def()];
+entry_defs![
+    Group::entry_def(),
+    Path::entry_def(),
+    GroupMessage::entry_def()
+];
 
 // this is only exposed outside of WASM for testing purposes.
 #[hdk_extern]
@@ -55,6 +66,20 @@ fn recv_remote_signal(signal: SerializedBytes) -> ExternResult<()> {
     // currently only emitting the received signal
     // TODO: actually work with the received signal
     emit_signal(&signal)?;
+    let signal_detail: SignalDetails = signal.clone().try_into()?;
+    match signal_detail.payload {
+        SignalPayload::AddedToGroup(_) => {
+            // currently only emitting the received signal
+            // TODO: actually work with the received signal
+            emit_signal(&signal)?;
+        }
+        SignalPayload::GroupTypingDetail(_) => {
+            emit_signal(&signal)?;
+        }
+        SignalPayload::GroupMessageRead(_) => {
+            emit_signal(&signal)?;
+        }
+    }
     Ok(())
 }
 
@@ -238,4 +263,26 @@ fn get_all_my_groups(_: ()) -> HdkResult<MyGroupListWrapper> {
 #[hdk_extern]
 fn get_group_latest_version(group_id: EntryHashWrapper) -> ExternResult<Group> {
     group::handlers::get_group_latest_version(group_id.group_hash)
+}
+
+#[hdk_extern]
+fn get_all_messages(group_id: EntryHash) -> ExternResult<GroupMessageDataWrapper> {
+    group_message::handlers::get_all_messages(group_id)
+}
+
+#[hdk_extern]
+fn send_message(message_input: GroupMessageInput) -> ExternResult<GroupMessageData> {
+    group_message::handlers::send_message(message_input)
+}
+
+#[hdk_extern]
+fn indicate_group_typing(group_typing_detail_data: GroupTypingDetailData) -> ExternResult<()> {
+    group_message::handlers::indicate_group_typing(group_typing_detail_data)
+}
+
+#[hdk_extern]
+fn read_group_message(
+    group_message_read_io: GroupMessageReadData,
+) -> ExternResult<GroupMessageReadData> {
+    group_message::handlers::read_group_message(group_message_read_io)
 }

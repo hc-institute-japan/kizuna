@@ -9,14 +9,14 @@ use crate::utils::to_timestamp;
 use super::{
     CreateGroupInput,
     CreateGroupOutput,
-    //TYPES USED IN CREATE GROUP:
+    // TYPES USED IN CREATE GROUP:
     Group,
-    //TYPES USED IN GET ALL MY GROUPS
+    // TYPES USED IN GET ALL MY GROUPS
     GroupOutput,
     MyGroupListWrapper,
-    //TYPES USED IN UPDATE GROUP NAME:
+    // TYPES USED IN UPDATE GROUP NAME:
     UpdateGroupNameIO,
-    //TYPES USED IN ADD MEMBERS AND REMOVE MEMBERS:
+    // TYPES USED IN ADD MEMBERS AND REMOVE MEMBERS:
     UpdateMembersIO,
 };
 
@@ -51,7 +51,7 @@ pub fn create_group(create_group_input: CreateGroupInput) -> ExternResult<Create
 
     let signal_payload: SignalPayload = SignalPayload::AddedToGroup(group_id.clone());
     // link all the group members to the group entry with the link tag "member" and send them a signal with the group_id as payload.
-    link_and_emit_signals(
+    link_and_emit_added_to_group_signals(
         group_members,
         group_id.clone(),
         LinkTag::new("member"),
@@ -77,7 +77,7 @@ pub fn add_members(add_members_input: UpdateMembersIO) -> ExternResult<UpdateMem
         )));
     }
 
-    //check if any invitees are blocked and return Err if so.
+    // check if any invitees are blocked and return Err if so.
     let my_blocked_list: Vec<AgentPubKey> = utils::get_my_blocked_list()?.0;
 
     for member in new_group_members_from_input.clone() {
@@ -111,8 +111,8 @@ pub fn add_members(add_members_input: UpdateMembersIO) -> ExternResult<UpdateMem
 
     let signal_payload: SignalPayload = SignalPayload::AddedToGroup(group_id.clone());
 
-    //link all the new group members to the group entry with the link tag "member" and send them a signal with the group_id as payload
-    link_and_emit_signals(
+    // link all the new group members to the group entry with the link tag "member" and send them a signal with the group_id as payload
+    link_and_emit_added_to_group_signals(
         new_group_members,
         group_id,
         LinkTag::new("member"),
@@ -309,7 +309,7 @@ pub fn get_group_latest_version(group_id: EntryHash) -> ExternResult<Group> {
     )));
 }
 
-pub fn link_and_emit_signals(
+pub fn link_and_emit_added_to_group_signals(
     agents: Vec<AgentPubKey>,
     link_target: EntryHash,
     link_tag: LinkTag,
@@ -319,16 +319,8 @@ pub fn link_and_emit_signals(
         create_link(agent.into(), link_target.clone(), link_tag.clone())?;
     }
 
-    let signal_name: String;
-
-    match signal_payload.clone() {
-        SignalPayload::AddedToGroup(_) => {
-            signal_name = "added_to_group".into();
-        }
-    }
-
     let signal: SignalDetails = SignalDetails {
-        name: signal_name,
+        name: "added_to_group".to_owned(),
         payload: signal_payload,
     };
 
