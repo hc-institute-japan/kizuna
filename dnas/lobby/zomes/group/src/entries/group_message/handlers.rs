@@ -45,12 +45,12 @@ pub fn send_message(message_input: GroupMessageInput) -> ExternResult<GroupMessa
     match payload_res {
         Ok(payload) => {
             let message = GroupMessage {
-                group_hash: message_input.group_hash,
+                group_hash: message_input.clone().group_hash,
                 // TODO: conver PayloadInput to Payload since GroupMessageInput has PayloadInput and not Payload.
                 payload,
                 created: to_timestamp(sys_time()?),
-                sender: message_input.sender,
-                reply_to: message_input.reply_to,
+                sender: message_input.clone().sender,
+                reply_to: message_input.clone().reply_to,
             };
 
             // commit GroupMessage entry
@@ -89,7 +89,21 @@ pub fn send_message(message_input: GroupMessageInput) -> ExternResult<GroupMessa
                                     group_message_data.clone(),
                                 ),
                             };
-                            remote_signal(&signal, group.members)?;
+
+                            remote_signal(
+                                &signal,
+                                [vec![group.clone().creator], group.clone().members]
+                                    .concat()
+                                    .into_iter()
+                                    .filter_map(|agent| {
+                                        if agent != message_input.clone().sender {
+                                            Some(agent)
+                                        } else {
+                                            None
+                                        }
+                                    })
+                                    .collect(),
+                            )?;
                             Ok(group_message_data)
                         }
                         Err(_) => Err(HdkError::Wasm(WasmError::Zome(
