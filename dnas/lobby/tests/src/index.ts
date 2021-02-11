@@ -10,8 +10,7 @@ import path from "path";
 // import request from './zomes/request'
 import contacts from "./zomes/contacts";
 import preference from "./zomes/preference";
-import group from "./zomes/group/group";
-import group_message from "./zomes/group/group_message";
+import group from "./zomes/group";
 
 const network = {
   transport_pool: [
@@ -40,7 +39,7 @@ const installables: Installables = {
 const orchestrator = new Orchestrator();
 
 group(orchestrator, config, installables);
-group_message(orchestrator, config, installables);
+
 contacts(orchestrator, config, installables);
 preference(orchestrator, config, installables);
 // request(orchestrator, config);

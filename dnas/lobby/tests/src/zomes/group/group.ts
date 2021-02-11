@@ -1,26 +1,18 @@
 import { ScenarioApi } from "@holochain/tryorama/lib/api";
+import {
+  init,
+  createGroup,
+  AddGroupMebers,
+  removeGroupMembers,
+  getLatestGroupVersion,
+  updateGroupName,
+  getMyGroupsList,
+  signalHandler,
+  runValidationRules,
+} from "./zome_fns";
 
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
-function init(conductor) {
-  conductor.call("group", "init");
-}
-function createGroup(create_group_input) {
-  return (conductor) =>
-    conductor.call("group", "create_group", create_group_input);
-}
-function AddGroupMebers(update_members_io) {
-  return (conductor) =>
-    conductor.call("group", "add_members", update_members_io);
-}
-function removeGroupMembers(remove_members_io) {
-  return (conductor) =>
-    conductor.call("group", "remove_members", remove_members_io);
-}
-function getLatestGroupVersion(group_entry_hash) {
-  return (coductor) =>
-    coductor.call("group", "get_group_latest_version", group_entry_hash);
-}
 function getGroupfromGroupOutput(group_output) {
   return {
     name: group_output.latest_name,
@@ -29,40 +21,6 @@ function getGroupfromGroupOutput(group_output) {
     members: group_output.members,
   };
 }
-function updateGroupName(update_group_name_io) {
-  return (conductor) =>
-    conductor.call("group", "update_group_name", update_group_name_io);
-}
-function getMyGroupsList(conductor) {
-  return conductor.call("group", "get_all_my_groups");
-}
-function signalHandler(signal, signal_listener) {
-  /*
-    //this is the incoming signal format
-    signal = { 
-        type: String, 
-        data: { 
-            cellId: Hash (what it means this hashes) , 
-            payload: SignalDetails { 
-                name : String, 
-                payload : SignalPayload, 
-            } 
-        }
-    }
-    */
-
-  signal_listener.counter++;
-  return (username) => {
-    console.log(`we have a new signal incoming ${username}`);
-    signal_listener.payload = signal.data.payload.payload;
-  };
-}
-
-// VAlIDATION FUCNTIONS
-function runValidationRules(validation_input) {
-  return (conductor) =>
-    conductor.call("group", "run_validation", validation_input);
-}
 
 // CONTACTS ZOME FNS
 function blockContacts(agentPubKeys) {
@@ -70,8 +28,9 @@ function blockContacts(agentPubKeys) {
     conductor.call("contacts", "block_contacts", agentPubKeys);
 }
 
-//THE FUNCTION GET ALL MY GROUPS ITS BEEN IMPLICITLY TESTED BEACUSE IS USED IN ALMOST ALL THE TESTS AND WE'VE CHECK HIS CORRECT BEHAVIOR
-export default (orchestrator, config, installables) => {
+// THE FUNCTION get_all_my_groups IS BEING IMPLICITLY TESTED BEACUSE IT'S USED IN ALMOST ALL THE TESTS
+
+export function craeteGroupTest(orchestrator, config, installables) {
   orchestrator.registerScenario(
     "create group method test",
     async (s: ScenarioApi, t) => {
@@ -197,7 +156,9 @@ export default (orchestrator, config, installables) => {
       );
     }
   );
+}
 
+export function addAndRemoveMembersTest(orchestrator, config, installables) {
   orchestrator.registerScenario(
     "add members method AND remove members methods test",
     async (s, t) => {
@@ -474,7 +435,9 @@ export default (orchestrator, config, installables) => {
       );
     }
   );
+}
 
+export function updateGroupNameTest(orchestrator, config, installables) {
   orchestrator.registerScenario(
     "update group name  method test",
     async (s, t) => {
@@ -588,7 +551,9 @@ export default (orchestrator, config, installables) => {
       );
     }
   );
+}
 
+export function validateCreateGroupTest(orchestrator, config, installables) {
   orchestrator.registerScenario(
     "validate_create_group method test",
     async (s, t) => {
@@ -719,11 +684,12 @@ export default (orchestrator, config, installables) => {
       );
     }
   );
+}
 
-  orchestrator.registerScenario(
-    "validate_update_group method test",
-    async (s, t) => {
-      //THIS TESTS CANNOT BE IMPLEMENTED YET, UNTILL HOLOCHAIN DO THE VALIDATION CALLBACKS
-    }
-  );
-};
+// THIS TESTS CANNOT BE IMPLEMENTED YET, UNTILL HOLOCHAIN DO THE VALIDATION CALLBACKS
+// export function validateUpdateGroupTest(orchestrator, config, installables) {
+//   orchestrator.registerScenario(
+//     "validate_update_group method test",
+//     async (s, t) => {}
+//   );
+// }
