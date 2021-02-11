@@ -1,4 +1,4 @@
-use group_message::{GroupMessageData, GroupMessageDataWrapper, GroupMessageInput};
+use group_message::{GroupMessage, GroupMessageData, GroupMessageDataWrapper, GroupMessageInput};
 use hdk3::prelude::*;
 
 mod entries;
@@ -24,7 +24,11 @@ use entries::group::{
     ValidationInput,
 };
 
-entry_defs![Group::entry_def(), Path::entry_def()];
+entry_defs![
+    Group::entry_def(),
+    Path::entry_def(),
+    GroupMessage::entry_def()
+];
 
 // this is only exposed outside of WASM for testing purposes.
 #[hdk_extern]

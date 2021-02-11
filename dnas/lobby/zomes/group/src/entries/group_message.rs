@@ -7,6 +7,13 @@ pub mod handlers;
 
 //ENUMS
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+pub enum PayloadType {
+    Text,
+    File,
+    All,
+}
+
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 enum Payload {
     Text {
         payload: String,
@@ -51,6 +58,17 @@ pub struct GroupMessageInput {
     sender: AgentPubKey,
     reply_to: Option<EntryHash>,
 }
+
+#[derive(Serialize, Deserialize, SerializedBytes, Clone)]
+pub struct GroupChatFilter {
+    // has to be the original EntryHash
+    group_id: EntryHash,
+    // has to be divideable with no remainder in YYYY/MM/DD/00:00
+    date: Timestamp,
+    // This signifies which payload type is desired
+    // to be fetched.
+    payload_type: PayloadType,
+}
 //END OF INPUTS TYPES DEFINITION
 
 //OUTPUTS TYPES DEFINITION
@@ -64,3 +82,15 @@ pub struct GroupMessageData {
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 pub struct GroupMessageDataWrapper(Vec<GroupMessageData>);
 //END OF OUTPUTS TYPES DEFINITION
+
+// pub struct GroupMessageHash(EntryHash);
+
+// pub struct GroupEntryHash(EntryHash);
+
+// pub struct ReadList(HashMap<AgentPubKey, Timestamp>);
+// pub struct GroupMessageContent(GroupMessageElement, ReadList);
+
+// pub struct MessagesByGroup(HashMap<GroupEntryHash, Vec<GroupMessageHash>>);
+// pub struct GroupMessagesContents(HashMap<GroupMessageHash, GroupMessageContent>);
+
+// pub struct GroupMessagesOutput(MessagesByGroup, GroupMessagesContents);
