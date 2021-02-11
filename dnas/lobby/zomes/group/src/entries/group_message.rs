@@ -101,7 +101,7 @@ pub struct GroupChatFilter {
     payload_type: PayloadType,
 }
 
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+#[derive(Serialize, Deserialize, SerializedBytes, Clone)]
 pub struct GroupTypingDetailData {
     pub group_id: EntryHash,
     pub indicated_by: AgentPubKey,
@@ -109,7 +109,7 @@ pub struct GroupTypingDetailData {
     pub is_typing: bool,
 }
 
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+#[derive(Serialize, Deserialize, SerializedBytes, Clone)]
 pub struct GroupMessageReadData {
     pub group_id: EntryHash,
     pub message_ids: Vec<EntryHash>,
