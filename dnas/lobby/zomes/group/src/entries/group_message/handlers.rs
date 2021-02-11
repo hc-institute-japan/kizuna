@@ -13,9 +13,14 @@ use super::{
 };
 
 pub fn send_message(message_input: GroupMessageInput) -> ExternResult<GroupMessageData> {
+    // TODO: check if PayloadInput::File and commit GroupFileBytes first so that you
+    // can get the EntryHash of committed GroupFileBytes which will allow you to construct Payload
+    // from PayloadInput
+
     // GroupMessage entry
     let message = GroupMessage {
         group_hash: message_input.group_hash,
+        // TODO: conver PayloadInput to Payload since GroupMessageInput has PayloadInput and not Payload.
         payload: message_input.payload,
         created: to_timestamp(sys_time()?),
         sender: message_input.sender,

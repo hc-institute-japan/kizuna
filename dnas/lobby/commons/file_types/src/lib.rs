@@ -39,7 +39,7 @@ pub enum FileType {
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
 #[serde(tag = "type")]
-enum Payload {
+pub enum Payload {
     Text {
         payload: String,
     },
@@ -47,4 +47,11 @@ enum Payload {
         metadata: FileMetadata,
         file_type: FileType,
     },
+}
+
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+pub enum PayloadType {
+    Text,
+    File,
+    All,
 }
