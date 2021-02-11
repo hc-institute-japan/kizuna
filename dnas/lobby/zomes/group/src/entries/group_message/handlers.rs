@@ -4,7 +4,7 @@ use link::Link;
 
 use crate::{
     entries::group::{self, handlers::get_group_latest_version},
-    utils::{collect, error, path_from_str, timestamp_to_days, to_timestamp},
+    utils::{collect, path_from_str, timestamp_to_days, to_timestamp},
 };
 
 use super::{GroupMessage, GroupMessageData, GroupMessageDataWrapper, GroupMessageInput, Payload};

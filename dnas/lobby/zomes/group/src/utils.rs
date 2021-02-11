@@ -39,13 +39,13 @@ pub fn timestamp_to_days(seconds: Timestamp) -> i64 {
     seconds.0 / (SECONDS * MINUTES * HOURS)
 }
 
-pub fn error<T>(code: &str, message: &str) -> ExternResult<T> {
-    Err(HdkError::Wasm(WasmError::Zome(format!(
-        "{{\"code\": \"{}\", \"message\": \"{}\"}}",
-        code, message
-    ))))
-}
-
 pub fn collect<A, B>(vec: Vec<A>, callback: fn(A) -> HdkResult<B>) -> HdkResult<Vec<B>> {
     vec.into_iter().map(|item| callback(item)).collect()
 }
+
+// pub fn error<T>(code: &str, message: &str) -> ExternResult<T> {
+//     Err(HdkError::Wasm(WasmError::Zome(format!(
+//         "{{\"code\": \"{}\", \"message\": \"{}\"}}",
+//         code, message
+//     ))))
+// }

@@ -5,7 +5,9 @@ members = [
     # "zomes/request",
     "zomes/username",
     "zomes/contacts",
-    "zomes/group"
+    "zomes/group",
+
+    "commons/file_types",
 ]
 
 [profile.dev]
