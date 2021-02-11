@@ -3,8 +3,8 @@ use hdk3::prelude::link::Link;
 use hdk3::prelude::*;
 use timestamp::Timestamp;
 
-use crate::utils;
 use crate::utils::to_timestamp;
+use crate::{signals::SignalName, utils};
 
 use super::{
     CreateGroupInput,
@@ -320,7 +320,7 @@ pub fn link_and_emit_added_to_group_signals(
     }
 
     let signal: SignalDetails = SignalDetails {
-        name: "added_to_group".to_owned(),
+        name: SignalName::ADDED_TO_GROUP.to_owned(),
         payload: signal_payload,
     };
 
