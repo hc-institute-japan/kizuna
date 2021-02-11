@@ -27,7 +27,7 @@ pub fn send_message(message_input: GroupMessageInput) -> ExternResult<GroupMessa
 
     let group_hash = message.clone().group_hash.to_string(); // message's group hash as string
     let days = timestamp_to_days(message.clone().created).to_string(); // group message's timestamp into days as string
-    debug!("Asd: {:?}", days);
+
     match path_from_str(&[group_hash, days].join(".")).hash() {
         Ok(hash) => {
             create_link(
