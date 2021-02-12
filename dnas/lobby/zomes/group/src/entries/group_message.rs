@@ -6,24 +6,24 @@ use std::collections::hash_map::HashMap;
 pub mod handlers;
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Hash)]
-pub struct _GroupMessageHash(pub EntryHash);
+pub struct GroupMessageHash(pub EntryHash);
 
-impl PartialEq for _GroupMessageHash {
+impl PartialEq for GroupMessageHash {
     fn eq(&self, other: &Self) -> bool {
         self.0 == other.0
     }
 }
-impl Eq for _GroupMessageHash {}
+impl Eq for GroupMessageHash {}
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Hash)]
-pub struct _GroupEntryHash(pub EntryHash);
+pub struct GroupEntryHash(pub EntryHash);
 
-impl PartialEq for _GroupEntryHash {
+impl PartialEq for GroupEntryHash {
     fn eq(&self, other: &Self) -> bool {
         self.0 == other.0
     }
 }
-impl Eq for _GroupEntryHash {}
+impl Eq for GroupEntryHash {}
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
 pub struct _ReadList(pub HashMap<AgentPubKey, Timestamp>);
@@ -32,13 +32,13 @@ pub struct _ReadList(pub HashMap<AgentPubKey, Timestamp>);
 pub struct _GroupMessageElement(pub Element);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
-pub struct _GroupMessageContent(pub _GroupMessageElement, pub _ReadList);
+pub struct GroupMessageContent(pub _GroupMessageElement, pub _ReadList);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
-pub struct MessagesByGroup(pub HashMap<_GroupEntryHash, Vec<_GroupMessageHash>>);
+pub struct MessagesByGroup(pub HashMap<GroupEntryHash, Vec<GroupMessageHash>>);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
-pub struct _GroupMessagesContents(pub HashMap<_GroupMessageHash, _GroupMessageContent>);
+pub struct _GroupMessagesContents(pub HashMap<GroupMessageHash, GroupMessageContent>);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
 pub struct _GroupMessagesOutput(MessagesByGroup, _GroupMessagesContents);
