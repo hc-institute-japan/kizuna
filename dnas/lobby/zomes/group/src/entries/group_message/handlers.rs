@@ -4,7 +4,18 @@ use group::Group;
 use hdk3::{host_fn::remote_signal, prelude::*};
 use link::Link;
 
-use super::GroupMsgBatchFetchFilter;
+
+//LIST OF DEPENDENCIES ADDED FOR MANUEL 
+use std::collections::hash_map::HashMap;
+use super::{
+    GroupMsgBatchFetchFilter,
+    MessagesByGroup,
+    GroupEntryHash,
+    GroupMessageHash,
+    GroupMessageContent,
+};
+//END LIST OF DEPENDENCIES ADDED FOR MANUEL 
+
 
 use crate::{
     entries::group::{self, handlers::get_group_latest_version},
@@ -186,8 +197,49 @@ pub fn read_group_message(
     Ok(group_message_read_data)
 }
 
-pub fn _get_next_batch_group_messages(_filter: GroupMsgBatchFetchFilter) -> ExternResult<()> {
-    //constrcut path group_hash, Path::from(ENTRY_HASH.UNIX_TIMESTAMP_ON_UTC_FORMAT);
+/*
+pub struct GroupMsgBatchFetchFilter {
+    group_id: EntryHash,
+    // the last message of the last batch
+    last_fetched: Option<EntryHash>,
+    last_message_timestamp: Option<Timestamp>,
+    // usize?
+    batch_size: u8,
+    payload_type: PayloadType,
+}
+*/
+
+
+
+pub fn _get_next_batch_group_messages(filter: GroupMsgBatchFetchFilter) -> ExternResult<()> { //GroupMessagesOutput
+    
+    //pub struct MessagesByGroup(pub HashMap<_GroupEntryHash, Vec<_GroupMessageHash >>);
+    //initialize MessagesByGroup (group_id as single key)
+
+    let mut _messages_by_group: MessagesByGroup;
+    let _group_id:GroupEntryHash = GroupEntryHash(filter.group_id.clone());
+
+    //initialize GroupMessagesContents HashMap
+    
+    let mut _group_messages_contents: HashMap<GroupMessageHash, GroupMessageContent>;
+    
+    //constrcut path group_hash, Path::from(ENTRY_HASH.UNIX_TIMESTAMP_ON_UTC_FORMAT); (i assumme this path have to be created using the latest message timestamp)
+
+    
+    
+
+
+
+    let days = timestamp_to_days(filter.clone().last_message_timestamp).to_string(); // group message's timestamp into days as string
+
+
+    path_from_str(&[group_hash, days].join(".")).hash();
+
+
+
+
+    
+    
 
     Ok(())
 }
