@@ -5,9 +5,11 @@ import {
   validateCreateGroupTest,
 } from "./group";
 
-import { groupTypingIndicatorTest, sendMessageTest } from "./group_message";
-
-const delay = (ms) => new Promise((r) => setTimeout(r, ms));
+import {
+  groupTypingIndicatorTest,
+  sendMessageTest,
+  readGroupMessageTest,
+} from "./group_message";
 
 export default (orchestrator, config, installables) => {
   // Group CRUD and validation related tests.
@@ -19,4 +21,5 @@ export default (orchestrator, config, installables) => {
   // GroupMessage related tests
   groupTypingIndicatorTest(orchestrator, config, installables);
   sendMessageTest(orchestrator, config, installables);
+  readGroupMessageTest(orchestrator, config, installables);
 };
