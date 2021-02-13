@@ -42,6 +42,14 @@ export function readGroupMessage(group_message_read_io) {
     conductor.call("group", "read_group_message", group_message_read_io);
 }
 
+export function sendMessage(conductor, { group_id, sender, payload_input }) {
+  return conductor.call("group", "send_message", {
+    group_hash: group_id,
+    payload_input,
+    sender,
+  });
+}
+
 export function signalHandler(signal, signal_listener) {
   /*
     //this is the incoming signal format

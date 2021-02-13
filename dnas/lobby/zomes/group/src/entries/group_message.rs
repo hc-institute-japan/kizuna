@@ -33,7 +33,7 @@ pub struct GroupFileBytes(SerializedBytes);
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
 pub struct GroupMessageInput {
     group_hash: EntryHash,
-    payload: PayloadInput,
+    payload_input: PayloadInput,
     sender: AgentPubKey,
     reply_to: Option<EntryHash>,
 }

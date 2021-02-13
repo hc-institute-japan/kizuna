@@ -1,7 +1,7 @@
 import { ScenarioApi } from "@holochain/tryorama/lib/api";
 import { delay } from "../../utils";
 import { createGroup, init } from "./utils";
-import { indicateGroupTyping, signalHandler } from "./zome_fns";
+import { indicateGroupTyping, signalHandler, sendMessage } from "./zome_fns";
 
 function sendMessageSignalHandler(signal, data) {
   return function (sender) {
@@ -16,14 +16,6 @@ function sendMessageSignalHandler(signal, data) {
       else data[group][agent] = [signal.data.payload.payload.GroupMessageData];
     }
   };
-}
-
-async function sendMessage(conductor, { group_id, sender, payload }) {
-  return await conductor.call("group", "send_message", {
-    group_hash: group_id,
-    payload,
-    sender,
-  });
 }
 
 function evaluateMessagesFromSignal(messagesFromSignal, messages, t) {
@@ -168,7 +160,7 @@ function sendMessageTest(orchestrator, config, installables) {
       messagesFromSend.push(
         await sendMessage(alice_conductor, {
           group_id,
-          payload: { Text: { payload: "Hello" } },
+          payload_input: { Text: { payload: "Hello" } },
           sender: alicePubKey,
         })
       );
@@ -177,7 +169,7 @@ function sendMessageTest(orchestrator, config, installables) {
       messagesFromSend.push(
         await sendMessage(alice_conductor, {
           group_id,
-          payload: { Text: { payload: "How are you, Bob?!" } },
+          payload_input: { Text: { payload: "How are you, Bob?!" } },
           sender: alicePubKey,
         })
       );
@@ -187,7 +179,7 @@ function sendMessageTest(orchestrator, config, installables) {
       messagesFromSend.push(
         await sendMessage(bobby_conductor, {
           group_id,
-          payload: { Text: { payload: "Hi alice!" } },
+          payload_input: { Text: { payload: "Hi alice!" } },
           sender: bobbyPubKey,
         })
       );
@@ -196,7 +188,7 @@ function sendMessageTest(orchestrator, config, installables) {
       messagesFromSend.push(
         await sendMessage(charlie_conductor, {
           group_id,
-          payload: { Text: { payload: "Yo, what's up guys?" } },
+          payload_input: { Text: { payload: "Yo, what's up guys?" } },
           sender: charliePubKey,
         })
       );
@@ -242,12 +234,11 @@ function sendMessageTest(orchestrator, config, installables) {
       );
 
       await delay();
-      await delay();
 
       messagesFromSend2.push(
         await sendMessage(bobby_conductor, {
           group_id: group_id2,
-          payload: {
+          payload_input: {
             Text: {
               payload: "Yo charlie, this will be the GC for the management!",
             },
@@ -261,7 +252,7 @@ function sendMessageTest(orchestrator, config, installables) {
       messagesFromSend2.push(
         await sendMessage(charlie_conductor, {
           group_id: group_id2,
-          payload: {
+          payload_input: {
             Text: {
               payload: "Ayt, thanks!",
             },
