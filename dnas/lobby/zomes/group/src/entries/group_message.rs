@@ -3,6 +3,9 @@ use hdk3::prelude::timestamp::Timestamp;
 use hdk3::prelude::*;
 use std::collections::hash_map::HashMap;
 
+//i added this type while we move to the next holochain version
+use std::time::SystemTime;
+
 pub mod handlers;
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Hash)]
@@ -25,23 +28,27 @@ impl PartialEq for GroupEntryHash {
 }
 impl Eq for GroupEntryHash {}
 
+//this type was modfied the field Timestamp was changed for SystemTime
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
-pub struct _ReadList(pub HashMap<AgentPubKey, Timestamp>);
+pub struct ReadList(pub HashMap<AgentPubKey, SystemTime>);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
-pub struct _GroupMessageElement(pub Element);
+pub struct GroupMessageElement(pub Element);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
-pub struct GroupMessageContent(pub _GroupMessageElement, pub _ReadList);
+pub struct GroupMessageContent(pub GroupMessageElement, pub ReadList);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
 pub struct MessagesByGroup(pub HashMap<GroupEntryHash, Vec<GroupMessageHash>>);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
-pub struct _GroupMessagesContents(pub HashMap<GroupMessageHash, GroupMessageContent>);
+pub struct GroupMessagesContents(pub HashMap<GroupMessageHash, GroupMessageContent>);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
-pub struct _GroupMessagesOutput(MessagesByGroup, _GroupMessagesContents);
+pub struct GroupMessagesOutput {
+    messages_by_group: MessagesByGroup,
+    group_messages_contents: GroupMessagesContents,
+}
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
 pub struct GroupMsgBatchFetchFilter {
