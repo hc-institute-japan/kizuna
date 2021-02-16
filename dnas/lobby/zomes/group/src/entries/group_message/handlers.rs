@@ -190,17 +190,22 @@ pub fn read_group_message(
     remote_signal(&signal_detail, group_message_read_data.members.clone())?;
     Ok(group_message_read_data)
 }
+
 pub fn _get_next_batch_group_messages(
     filter: GroupMsgBatchFetchFilter,
 ) -> ExternResult<GroupMessagesOutput> {
-    //construct Path from group_id && get his children list
+    // construct Path from group_id && get his children list
+    // TATS: We should be getting all links only if we still need to
+    // children() is calling get_links to get all Link (target is Timestamp)
+    // but as per the flow of architecture, we should first get the messages linked to
+    // group_hash.timestamp then only get the other Timestamp path if necessary.
     let group_path: Path = path_from_str(&filter.group_id.to_string());
     let mut path_childrens_to_fetch: Vec<Link> = group_path.children()?.into_inner();
     path_childrens_to_fetch.sort_by_key(|child| child.timestamp);
 
-    //[if last_fetched && last_message_timestamp]
+    // [if last_fetched && last_message_timestamp]
     if filter.last_fetched.is_some() && filter.last_message_timestamp.is_some() {
-        //when we got this field supllied from the ui we can filter the path childrens before we start to fecth the messages
+        // when we got this field supllied from the ui we can filter the path childrens before we start to fecth the messages
 
         let last_message_timestamp: Timestamp = filter.last_message_timestamp.clone().unwrap();
         let days: String = timestamp_to_days(last_message_timestamp.clone()).to_string();
@@ -213,6 +218,7 @@ pub fn _get_next_batch_group_messages(
                     .clone()
                     .into_iter()
                     .position(|link| link.target.eq(&path_hash))
+                    // TODO: don't use unwrap as much as possible
                     .unwrap()
                     + 1;
 
@@ -233,8 +239,9 @@ pub fn _get_next_batch_group_messages(
     let mut messages_hashes: Vec<GroupMessageHash> = vec![];
     let group_id: GroupEntryHash = GroupEntryHash(filter.group_id.clone());
 
-    let mut firts_iteration: bool = true;
+    let mut first_iteration: bool = true;
     let mut link_to_path: Link;
+    // TATS: why does this have _ ?
     let mut _linked_messages: Vec<Link> = vec![];
 
     let mut messages_by_group: HashMap<GroupEntryHash, Vec<GroupMessageHash>> = HashMap::new();
@@ -265,22 +272,27 @@ pub fn _get_next_batch_group_messages(
 
         _linked_messages.sort_by_key(|link| link.timestamp);
 
-        if firts_iteration
+        // TATS: I see that you are getting the messages from the Path group_id.last_message_timestamp here.
+        // It would be better if we get the messages from here first and then call get_links on group_id path (with children)
+        // only if batch size is not yet met. This makes it a bit more performant
+        if first_iteration
             && filter.last_fetched.clone().is_some()
             && filter.last_message_timestamp.is_some()
         {
             // when we got last feched and last_message_timestamp we'll want to begin fecthing from that point again and keep going backwards
 
+            // TATS: here unwrap is fine because we are sure that there is value
             let last_message_fetched_hash: EntryHash = filter.last_fetched.clone().unwrap();
 
             let pivot: usize = _linked_messages
                 .clone()
                 .into_iter()
                 .position(|link| link.target.eq(&last_message_fetched_hash))
+                // TATS: avoid using unwrap
                 .unwrap();
             _linked_messages = _linked_messages.split_at(pivot).0.to_vec();
 
-            firts_iteration = false;
+            first_iteration = false;
         }
 
         loop {
@@ -291,11 +303,11 @@ pub fn _get_next_batch_group_messages(
             let link: Link = _linked_messages.pop().unwrap();
 
             if let Some(message_element) = get(link.target.clone(), GetOptions::content())? {
-                //here i collect all the values to fill the group_message_content this values are:
+                // here i collect all the values to fill the group_message_content this values are:
 
-                // -the message entry_hash (aka the link target )
-                // -the message element (got it using get to  the entry hash of the message )
-                // -the read_list for that message ( got it from the links related to the message with the tag "read" )
+                // - the message entry_hash (aka the link target )
+                // - the message element (got it using get to the entry hash of the message )
+                // - the read_list for that message ( got it from the links related to the message with the tag "read" )
 
                 let read_links: Vec<Link> =
                     get_links(link.target.clone(), Some(LinkTag::new("read")))?.into_inner();
