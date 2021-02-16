@@ -191,38 +191,45 @@ pub fn read_group_message(
     Ok(group_message_read_data)
 }
 
-pub fn _get_next_batch_group_messages(
-    filter: GroupMsgBatchFetchFilter,
-) -> ExternResult<GroupMessagesOutput> {
-    // construct Path from group_id && get his children list
-    // TATS: We should be getting all links only if we still need to
-    // children() is calling get_links to get all Link (target is Timestamp)
-    // but as per the flow of architecture, we should first get the messages linked to
-    // group_hash.timestamp then only get the other Timestamp path if necessary.
-    let group_path: Path = path_from_str(&filter.group_id.to_string());
-    let mut path_childrens_to_fetch: Vec<Link> = group_path.children()?.into_inner();
-    path_childrens_to_fetch.sort_by_key(|child| child.timestamp);
+pub fn get_next_batch_group_messages(filter: GroupMsgBatchFetchFilter) -> ExternResult<GroupMessagesOutput> { 
+  
+    let group_id: EntryHash = filter.group_id;
+    let last_fetched: Option<EntryHash> = filter.last_fetched;
+    let last_message_timestamp: Option<Timestamp> = filter.last_message_timestamp;
+    let batch_size: usize = filter.batch_size.into();
+    let payload_type: PayloadType = filter.payload_type;
 
-    // [if last_fetched && last_message_timestamp]
-    if filter.last_fetched.is_some() && filter.last_message_timestamp.is_some() {
-        // when we got this field supllied from the ui we can filter the path childrens before we start to fecth the messages
+    let mut linked_messages: Vec<Link>;
 
-        let last_message_timestamp: Timestamp = filter.last_message_timestamp.clone().unwrap();
-        let days: String = timestamp_to_days(last_message_timestamp.clone()).to_string();
 
-        match path_from_str(&[filter.group_id.clone().to_string(), days].join(".")).hash() {
+    let mut messages_hashes: Vec<GroupMessageHash> = vec![];
+    let mut messages_by_group: HashMap<GroupEntryHash, Vec<GroupMessageHash>> = HashMap::new();// not used yet
+    let mut group_messages_contents: HashMap<GroupMessageHash, GroupMessageContent> = HashMap::new();
+
+    let mut pivot_path: Option<EntryHash> = None; // this variable wiil be used if we dont reach the batch_size from the first path evaluated.
+
+    
+    if last_fetched.is_some() && last_message_timestamp.is_some() {
+        
+        //1- generate the especific path 
+        
+        let days: String = timestamp_to_days(last_message_timestamp.clone().unwrap()).to_string();
+
+        match path_from_str(&[group_id.clone().to_string(), days].join(".")).hash() {
             Ok(path_hash) => {
-                // the filtering in the childrens consist in split the path_childrens_to_fecth into a smaller list just keeping the oldest ones
 
-                let pivot: usize = path_childrens_to_fetch
-                    .clone()
-                    .into_iter()
-                    .position(|link| link.target.eq(&path_hash))
-                    // TODO: don't use unwrap as much as possible
-                    .unwrap()
-                    + 1;
+                pivot_path = Some(path_hash.clone());
 
-                path_childrens_to_fetch = path_childrens_to_fetch.split_at(pivot).0.to_vec();
+                //get the messages linked to this path (this list was sorted & filter inside the method )
+                linked_messages = get_linked_messages_from_path(path_hash, payload_type.clone(), last_fetched.clone())?;
+
+                //we will collect the messages and all the info we need of then using this function 
+                collect_messages_info(
+                    &mut linked_messages, // the linked message list contains all the messages linked to one especific path 
+                    batch_size.clone(),
+                    &mut messages_hashes, 
+                    &mut group_messages_contents,
+                )?;
             }
             Err(_) => {
                 //when this error can be generated? get the hash for a given entry should be safe
@@ -231,114 +238,156 @@ pub fn _get_next_batch_group_messages(
                 )));
             }
         }
-    } // end of [if last_fetched && last_message_timestamp]
+    }
 
-    //after the filtering process we have the list of the path to fectch for the messages so we'll collect those messages hashes until we reach the batch_size or we run out of path to keep fetching
+    // here we have to check if we already reach the batch size or not (if we dont reached yet the batch size we will repeat the proccess this time we will get all the pahs instead the especific one ) 
 
-    let batch_size: usize = filter.batch_size.into();
-    let mut messages_hashes: Vec<GroupMessageHash> = vec![];
-    let group_id: GroupEntryHash = GroupEntryHash(filter.group_id.clone());
+    if messages_hashes.len() < batch_size {
 
-    let mut first_iteration: bool = true;
-    let mut link_to_path: Link;
-    // TATS: why does this have _ ?
-    let mut _linked_messages: Vec<Link> = vec![];
+        //generate the general group path (only the group_id)
+        let group_path: Path = path_from_str(&group_id.to_string());
 
-    let mut messages_by_group: HashMap<GroupEntryHash, Vec<GroupMessageHash>> = HashMap::new();
-    let mut group_messages_contents: HashMap<GroupMessageHash, GroupMessageContent> =
-        HashMap::new();
-    let mut read_list: HashMap<AgentPubKey, SystemTime> = HashMap::new();
+        // get the list of childrens for this path 
+        let mut path_childrens: Vec<Link> = group_path.children()?.into_inner();
 
-    loop {
-        if path_childrens_to_fetch.is_empty() || messages_hashes.len() >= batch_size {
-            break;
-        }
+        // filter this childrens to removed the path we dont need to check 
+        filter_path_children_list( &mut path_childrens, pivot_path)?;
 
-        link_to_path = path_childrens_to_fetch.pop().unwrap();
+        //itarate the childrens untill we reach the batch size or we run out of paths
+        
+        loop{
 
-        match filter.payload_type {
-            PayloadType::Text => {
-                _linked_messages =
-                    get_links(link_to_path.target, Some(LinkTag::new("text")))?.into_inner();
-            }
-            PayloadType::File => {
-                _linked_messages =
-                    get_links(link_to_path.target, Some(LinkTag::new("file")))?.into_inner();
-            }
-            PayloadType::All => {
-                _linked_messages = get_links(link_to_path.target, None)?.into_inner();
-            }
-        }
+            if path_childrens.is_empty() || messages_hashes.len() >= batch_size { break; }
 
-        _linked_messages.sort_by_key(|link| link.timestamp);
+            let path_hash: EntryHash = path_childrens.pop().unwrap().target; // this unwrap is safe (we check the vector wasnt empty before do this)
 
-        // TATS: I see that you are getting the messages from the Path group_id.last_message_timestamp here.
-        // It would be better if we get the messages from here first and then call get_links on group_id path (with children)
-        // only if batch size is not yet met. This makes it a bit more performant
-        if first_iteration
-            && filter.last_fetched.clone().is_some()
-            && filter.last_message_timestamp.is_some()
-        {
-            // when we got last feched and last_message_timestamp we'll want to begin fecthing from that point again and keep going backwards
-
-            // TATS: here unwrap is fine because we are sure that there is value
-            let last_message_fetched_hash: EntryHash = filter.last_fetched.clone().unwrap();
-
-            let pivot: usize = _linked_messages
-                .clone()
-                .into_iter()
-                .position(|link| link.target.eq(&last_message_fetched_hash))
-                // TATS: avoid using unwrap
-                .unwrap();
-            _linked_messages = _linked_messages.split_at(pivot).0.to_vec();
-
-            first_iteration = false;
-        }
-
-        loop {
-            if _linked_messages.is_empty() || messages_hashes.len() >= batch_size {
-                break;
-            }
-
-            let link: Link = _linked_messages.pop().unwrap();
-
-            if let Some(message_element) = get(link.target.clone(), GetOptions::content())? {
-                // here i collect all the values to fill the group_message_content this values are:
-
-                // - the message entry_hash (aka the link target )
-                // - the message element (got it using get to the entry hash of the message )
-                // - the read_list for that message ( got it from the links related to the message with the tag "read" )
-
-                let read_links: Vec<Link> =
-                    get_links(link.target.clone(), Some(LinkTag::new("read")))?.into_inner();
-
-                for link in read_links {
-                    read_list.insert(link.target.into(), link.timestamp);
-                }
-
-                group_messages_contents.insert(
-                    GroupMessageHash(link.target.clone()),
-                    GroupMessageContent(
-                        GroupMessageElement(message_element),
-                        ReadList(read_list.clone()),
-                    ),
-                );
-
-                read_list.clear();
-            }
-
-            messages_hashes.push(GroupMessageHash(link.target));
+            //get the messages linked to this path (this list was sorted & filter inside the method )
+            linked_messages = get_linked_messages_from_path(path_hash, payload_type.clone(), None )?; // here by default we have to send a None
+            
+            collect_messages_info(
+                &mut linked_messages, // the linked message list contains all the messages linked to one especific path 
+                batch_size.clone(),
+                &mut messages_hashes, 
+                &mut group_messages_contents,
+            )?;
         }
     }
 
     // at this point we have all the data we need to returned to the ui
+    messages_by_group.insert(GroupEntryHash(group_id), messages_hashes);
 
-    messages_by_group.insert(group_id, messages_hashes);
-
-    let output: GroupMessagesOutput = GroupMessagesOutput {
+    Ok( 
+        GroupMessagesOutput {
         messages_by_group: MessagesByGroup(messages_by_group),
         group_messages_contents: GroupMessagesContents(group_messages_contents),
-    };
-
-    Ok(output)
+    })
 }
+
+
+fn get_linked_messages_from_path(path_hash: EntryHash, payload_type: PayloadType, last_fetched: Option<EntryHash>) -> HdkResult<Vec<Link>>{
+
+    //this method return the messages linked to the path, if the args given have a last_fetched then this method will filter the linked messages and will remove those links newest than the last_fecthed
+ 
+    let mut linked_messages: Vec<Link>;
+
+    match payload_type {
+        PayloadType::Text => {
+            linked_messages = get_links(path_hash, Some(LinkTag::new("text")))?.into_inner();
+        }
+        PayloadType::File => {
+            linked_messages = get_links(path_hash, Some(LinkTag::new("file")))?.into_inner();
+        }
+        PayloadType::All => {
+            linked_messages = get_links(path_hash, None)?.into_inner();
+
+        }
+    }
+
+    linked_messages.sort_by_key(|link| link.timestamp);
+
+    if let Some(last_fetched_entry_hash) = last_fetched{
+
+        if let Some(pivot) = linked_messages.clone().into_iter().position(|link| link.target.eq(&last_fetched_entry_hash)){
+
+            linked_messages.truncate(pivot);
+
+        }
+
+    }
+
+    return Ok(linked_messages);
+}
+
+fn collect_messages_info(
+    linked_messages:&mut Vec<Link>, 
+    batch_size:usize,
+    messages_hashes: &mut Vec<GroupMessageHash>, 
+    group_messages_contents: &mut HashMap<GroupMessageHash, GroupMessageContent> )->HdkResult<()>
+    { 
+    
+    let mut read_list: HashMap<AgentPubKey, SystemTime> = HashMap::new();
+
+    loop {
+        if linked_messages.is_empty() || messages_hashes.len() >= batch_size {
+            break;
+        }
+
+        let link: Link = linked_messages.pop().unwrap();
+
+        if let Some(message_element) = get(link.target.clone(), GetOptions::content())? {
+            // here i collect all the values to fill the group_message_content this values are:
+
+            // - the message entry_hash (aka the link target )
+            // - the message element (got it using get to the entry hash of the message )
+            // - the read_list for that message ( got it from the links related to the message with the tag "read" )
+
+            let read_links: Vec<Link> =
+                get_links(link.target.clone(), Some(LinkTag::new("read")))?.into_inner();
+
+            for link in read_links {
+                read_list.insert(link.target.into(), link.timestamp);
+            }
+
+            group_messages_contents.insert(
+                GroupMessageHash(link.target.clone()),
+                GroupMessageContent(
+                    GroupMessageElement(message_element),
+                    ReadList(read_list.clone()),
+                ),
+            );
+
+            read_list.clear();
+        }
+
+        messages_hashes.push(GroupMessageHash(link.target));
+    }
+
+    Ok(())
+}
+
+fn filter_path_children_list( path_childrens: &mut Vec<Link>, pivot_path: Option<EntryHash> )-> HdkResult<()>{ //->Vec<Link>
+
+
+    // the pivot path only be a Some(_) if we already collect messages in one path before this called happens in other words if we received the fields last_fecthed and last_message_timestamp as Some(_) 
+    path_childrens.sort_by_key(|link| link.timestamp);
+
+    match pivot_path {
+
+        Some(path_hash) => {
+
+            if let Some(pivot_position) =  path_childrens.clone().into_iter().position(|link| link.target.eq(&path_hash)){
+
+                // here we will split the path childrens to removed the newest paths from the olders (olders are those who we need to  keep checking) 
+                path_childrens.truncate(pivot_position);
+
+            }else{
+                // this case shouldnt happen but i will handle it as an error (we can modified this in the future)
+                return Err(HdkError::Wasm(WasmError::Zome("cannot find this pivot into the childrens list ".into())));
+            }
+        },
+        None => (),
+    }
+
+    Ok(())
+}
+
