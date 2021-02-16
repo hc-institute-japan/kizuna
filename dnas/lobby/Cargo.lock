@@ -79,7 +79,6 @@ name = "contacts"
 version = "0.0.1"
 dependencies = [
  "derive_more",
- "hc_utils",
  "hdk3 0.0.1 (git+https://github.com/holochain/holochain?rev=3675b58)",
  "serde",
 ]
@@ -143,7 +142,6 @@ name = "group"
 version = "0.0.1"
 dependencies = [
  "derive_more",
- "hc_utils",
  "hdk3 0.0.1 (git+https://github.com/holochain/holochain?rev=3675b58)",
  "serde",
 ]
@@ -153,17 +151,6 @@ name = "hashbrown"
 version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d7afe4a420e3fe79967a00898cc1f4db7c8a49a9333a29f8a4bd76a253d5cd04"
-
-[[package]]
-name = "hc_utils"
-version = "0.1.0"
-source = "git+https://github.com/holochain/hc-utils?branch=develop#cddc40c4ae4cbabe0c3c0e021dba612065ca75e9"
-dependencies = [
- "hdk3 0.0.1 (git+https://github.com/holochain/holochain?rev=3675b58)",
- "holo_hash 0.0.1 (git+https://github.com/holochain/holochain?rev=3675b58)",
- "serde",
- "thiserror",
-]
 
 [[package]]
 name = "hdk3"
@@ -386,7 +373,6 @@ name = "p2pmessage"
 version = "0.0.1"
 dependencies = [
  "derive_more",
- "hc_utils",
  "hdk3 0.0.1 (git+https://github.com/holochain/holochain?rev=3675b58)",
  "p2pmessage 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop)",
  "serde",
@@ -444,7 +430,6 @@ name = "preference"
 version = "0.0.1"
 dependencies = [
  "derive_more",
- "hc_utils",
  "hdk3 0.0.1 (git+https://github.com/holochain/holochain?rev=3675b58)",
  "serde",
 ]
@@ -710,7 +695,6 @@ name = "username"
 version = "0.0.1"
 dependencies = [
  "derive_more",
- "hc_utils",
  "hdk3 0.0.1 (git+https://github.com/holochain/holochain?rev=3675b58)",
  "serde",
  "username 0.0.1 (git+https://github.com/holochain-open-dev/username-zome)",

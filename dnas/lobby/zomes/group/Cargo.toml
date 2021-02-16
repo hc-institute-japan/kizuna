@@ -12,5 +12,4 @@ crate-type = [ "cdylib", "rlib" ]
 derive_more = "0"
 serde = "1"
 
-hc_utils = "0"
 hdk3 = "0"
