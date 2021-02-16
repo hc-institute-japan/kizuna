@@ -10,7 +10,9 @@ use signals::{SignalDetails, SignalPayload};
 
 use group_message::{
     GroupMessage, GroupMessageData, GroupMessageDataWrapper, GroupMessageInput,
-    GroupMessageReadData, GroupTypingDetailData,
+    GroupMessageReadData, GroupTypingDetailData,GroupMsgBatchFetchFilter,
+    GroupMessagesOutput,
+
 };
 
 use entries::group::{
@@ -289,3 +291,8 @@ fn read_group_message(
 ) -> ExternResult<GroupMessageReadData> {
     group_message::handlers::read_group_message(group_message_read_io)
 }
+
+#[hdk_extern]
+fn get_next_batch_group_messages(filter: GroupMsgBatchFetchFilter) -> ExternResult<GroupMessagesOutput> {
+    group_message::handlers::get_next_batch_group_messages(filter)
+} 

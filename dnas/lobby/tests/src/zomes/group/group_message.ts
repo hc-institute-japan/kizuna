@@ -43,6 +43,8 @@ function sendMessageTest(orchestrator, config, installables) {
   orchestrator.registerScenario(
     "Tests for text send_message",
     async (s: ScenarioApi, t) => {
+      
+
       const [alice, bobby, charlie] = await s.players([config, config, config]);
 
       const [[alice_happ]] = await alice.installAgentsHapps(installables.one);
@@ -205,6 +207,8 @@ function sendMessageTest(orchestrator, config, installables) {
         [...group1AliceMesssges, ...messages2],
         t
       );
+
+      
     }
   );
 }
@@ -213,6 +217,7 @@ function groupTypingIndicatorTest(orchestrator, config, installables) {
   orchestrator.registerScenario(
     "test typing indicator for group chat",
     async (s: ScenarioApi, t) => {
+      
       const [alice, bobby, charlie] = await s.players([config, config, config]);
 
       const [[alice_happ]] = await alice.installAgentsHapps(installables.one);
@@ -280,6 +285,8 @@ function groupTypingIndicatorTest(orchestrator, config, installables) {
       t.deepEqual(charlie_signal_listener.payload, {
         GroupTypingDetail: group_typing_detail_data,
       });
+
+      
     }
   );
 }
@@ -288,6 +295,8 @@ function readGroupMessageTest(orchestrator, config, installables) {
   orchestrator.registerScenario(
     "test typing indicator for group chat",
     async (s: ScenarioApi, t) => {
+      
+      
       const [alice, bobby, charlie] = await s.players([config, config, config]);
 
       const [[alice_happ]] = await alice.installAgentsHapps(installables.one);
@@ -439,8 +448,104 @@ function readGroupMessageTest(orchestrator, config, installables) {
       t.deepEqual(charlie_signal_listener.payload, {
         GroupMessageRead: bobby_group_message_read_data,
       });
+
+      
     }
   );
 }
 
-export { groupTypingIndicatorTest, sendMessageTest, readGroupMessageTest };
+function getNextBachOfMessagesTest(orchestrator, config, installables) {
+
+  orchestrator.registerScenario(
+    "hey",
+    async (s: ScenarioApi, t) => {
+    
+      
+      const [alice, bobby, charlie] = await s.players([config, config, config]);
+
+      const [[alice_happ]] = await alice.installAgentsHapps(installables.one);
+      const [[bobby_happ]] = await bobby.installAgentsHapps(installables.one);
+      const [[charlie_happ]] = await charlie.installAgentsHapps(installables.one);
+
+      await s.shareAllNodes([alice, bobby, charlie]);
+
+      const alicePubKey = alice_happ.agent;
+      const bobbyPubKey = bobby_happ.agent;
+      const charliePubKey = charlie_happ.agent;
+
+      const alice_conductor = alice_happ.cells[0];
+      const bobby_conductor = bobby_happ.cells[0];
+      const charlie_conductor = charlie_happ.cells[0];
+
+      init(alice_conductor);
+      init(bobby_conductor);
+      init(charlie_conductor);
+
+      let create_group_input = {
+        name: "Group_name",
+        members: [bobbyPubKey, charliePubKey],
+      };
+
+      let { content, group_id, group_revision_id } = await createGroup( create_group_input)(alice_conductor);
+
+      await delay(1000);
+
+      let {
+        id: message_id_1,
+        content: alice_message_content,
+      } = await sendMessage(alice_conductor, {
+        group_id,
+        payload_input: { payload: "How are you, Bob?!"  },
+        sender: alicePubKey,
+      });
+
+      await delay();
+/*
+      
+      let {
+        id: message_id_2,
+        content: bobby_meesage_content,
+      } = await sendMessage(bobby_conductor, {
+        group_id,
+        payload_input: { Text: { payload: "Hi alice!" } },
+        sender: bobbyPubKey,
+      });
+
+      await delay();
+
+      let {
+        id: message_id_3,
+        content: charlie_message_content,
+      } = await sendMessage(charlie_conductor, {
+        group_id,
+        payload_input: { Text: { payload: "Yo, what's up guys?" } },
+        sender: charliePubKey,
+      });
+
+      let alice_group_message_read_data = {
+        group_id,
+        message_ids: [message_id_2, message_id_3],
+        reader: alicePubKey,
+        timestamp: charlie_message_content.created,
+        members: [bobbyPubKey, charliePubKey],
+      };
+
+      let alice_group_message_read_data_res = await readGroupMessage(
+        alice_group_message_read_data
+      )(alice_conductor);
+      await delay();
+
+      
+
+      console.log("output");
+      console.log(alice_group_message_read_data_res);
+      */
+
+      
+    }
+  );
+}
+
+
+
+export { groupTypingIndicatorTest, sendMessageTest, readGroupMessageTest, getNextBachOfMessagesTest };
