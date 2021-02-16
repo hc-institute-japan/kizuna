@@ -3,30 +3,16 @@ use hdk3::prelude::timestamp::Timestamp;
 use hdk3::prelude::*;
 use std::collections::hash_map::HashMap;
 
-//i added this type while we move to the next holochain version
+// i added this type while we move to the next holochain version
 use std::time::SystemTime;
 
 pub mod handlers;
 
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Hash)]
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Hash, PartialEq, Eq)]
 pub struct GroupMessageHash(pub EntryHash);
 
-impl PartialEq for GroupMessageHash {
-    fn eq(&self, other: &Self) -> bool {
-        self.0 == other.0
-    }
-}
-impl Eq for GroupMessageHash {}
-
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Hash)]
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Hash, PartialEq, Eq)]
 pub struct GroupEntryHash(pub EntryHash);
-
-impl PartialEq for GroupEntryHash {
-    fn eq(&self, other: &Self) -> bool {
-        self.0 == other.0
-    }
-}
-impl Eq for GroupEntryHash {}
 
 //this type was modfied the field Timestamp was changed for SystemTime
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
