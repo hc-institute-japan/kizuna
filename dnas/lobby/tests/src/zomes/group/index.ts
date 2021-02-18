@@ -21,7 +21,7 @@ export default (orchestrator, config, installables) => {
 
   // GroupMessage related tests
   //groupTypingIndicatorTest(orchestrator, config, installables);
-  sendMessageTest(orchestrator, config, installables);
+  //sendMessageTest(orchestrator, config, installables);
   //readGroupMessageTest(orchestrator, config, installables);
-  //getNextBachOfMessagesTest(orchestrator, config, installables);
+  getNextBachOfMessagesTest(orchestrator, config, installables);
 };

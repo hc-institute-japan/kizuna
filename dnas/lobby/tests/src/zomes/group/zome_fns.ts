@@ -1,3 +1,5 @@
+import { filter } from "lodash";
+
 export function init(conductor) {
   conductor.call("group", "init");
 }
@@ -76,4 +78,10 @@ export function signalHandler(signal, signal_listener) {
 export function runValidationRules(validation_input) {
   return (conductor) =>
     conductor.call("group", "run_validation", validation_input);
+}
+
+export function getNextBatchGroupMessage(filter_input) {
+  return (conductor) =>
+    conductor.call("group", "get_next_batch_group_messages", filter_input);
+
 }

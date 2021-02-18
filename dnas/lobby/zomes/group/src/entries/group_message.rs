@@ -8,15 +8,15 @@ use std::time::SystemTime;
 
 pub mod handlers;
 
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Hash, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Hash, PartialEq, Eq, Debug)]
 pub struct GroupMessageHash(pub EntryHash);
 
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Hash, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Hash, PartialEq, Eq, Debug)]
 pub struct GroupEntryHash(pub EntryHash);
 
 //this type was modfied the field Timestamp was changed for SystemTime
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
-pub struct ReadList(pub HashMap<AgentPubKey, SystemTime>);
+pub struct ReadList(pub HashMap<String, SystemTime>);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
 pub struct GroupMessageElement(pub Element);
@@ -24,17 +24,21 @@ pub struct GroupMessageElement(pub Element);
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
 pub struct GroupMessageContent(pub GroupMessageElement, pub ReadList);
 
-#[derive(Serialize, Deserialize, SerializedBytes, Clone)]
-pub struct MessagesByGroup(pub HashMap<GroupEntryHash, Vec<GroupMessageHash>>);
+//--------------------------------------------------------------
+
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+pub struct MessagesByGroup(pub HashMap<String, Vec<GroupMessageHash>>);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
-pub struct GroupMessagesContents(pub HashMap<GroupMessageHash, GroupMessageContent>);
+pub struct GroupMessagesContents(pub HashMap<String, GroupMessageContent>);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
 pub struct GroupMessagesOutput {
     messages_by_group: MessagesByGroup,
     group_messages_contents: GroupMessagesContents,
 }
+
+//--------------------------------------------------------------------------
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
 pub struct GroupMsgBatchFetchFilter {
