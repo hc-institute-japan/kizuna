@@ -9,7 +9,7 @@ use entries::{group, group_message};
 use signals::{SignalDetails, SignalPayload};
 
 use group_message::{
-    GroupMessage, GroupMessageData, GroupMessageDataWrapper, GroupMessageInput,
+    BatchSize, GroupMessage, GroupMessageData, GroupMessageDataWrapper, GroupMessageInput,
     GroupMessageReadData, GroupMessagesOutput, GroupMsgBatchFetchFilter, GroupTypingDetailData,
 };
 
@@ -295,4 +295,9 @@ fn get_next_batch_group_messages(
     filter: GroupMsgBatchFetchFilter,
 ) -> ExternResult<GroupMessagesOutput> {
     group_message::handlers::get_next_batch_group_messages(filter)
+}
+
+#[hdk_extern]
+fn get_latest_messages_for_all_groups(batch_size: BatchSize) -> ExternResult<GroupMessagesOutput> {
+    group_message::handlers::get_latest_messages_for_all_groups(batch_size)
 }

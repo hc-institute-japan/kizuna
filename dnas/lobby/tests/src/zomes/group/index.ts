@@ -10,6 +10,7 @@ import {
   sendMessageTest,
   readGroupMessageTest,
   getNextBachOfMessagesTest,
+  getLatestMessagesForAllGroupsTest,
 } from "./group_message";
 
 export default (orchestrator, config, installables) => {
@@ -20,8 +21,9 @@ export default (orchestrator, config, installables) => {
   // validateCreateGroupTest(orchestrator, config, installables);
 
   // GroupMessage related tests
-  //groupTypingIndicatorTest(orchestrator, config, installables);
-  //sendMessageTest(orchestrator, config, installables);
-  //readGroupMessageTest(orchestrator, config, installables);
-  getNextBachOfMessagesTest(orchestrator, config, installables);
+  // groupTypingIndicatorTest(orchestrator, config, installables);
+  // sendMessageTest(orchestrator, config, installables);
+  // readGroupMessageTest(orchestrator, config, installables);
+  // getNextBachOfMessagesTest(orchestrator, config, installables);
+  getLatestMessagesForAllGroupsTest(orchestrator, config, installables);
 };
