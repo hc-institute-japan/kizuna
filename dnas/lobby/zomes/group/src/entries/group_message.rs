@@ -7,6 +7,8 @@ use std::collections::hash_map::HashMap;
 use std::time::SystemTime;
 
 pub mod handlers;
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+pub struct BatchSize(u8);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Hash, PartialEq, Eq, Debug)]
 pub struct GroupMessageHash(pub EntryHash);
@@ -42,13 +44,13 @@ pub struct GroupMessagesOutput {
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
 pub struct GroupMsgBatchFetchFilter {
-    group_id: EntryHash,
+    pub group_id: EntryHash,
     // the last message of the last batch
-    last_fetched: Option<EntryHash>,
-    last_message_timestamp: Option<Timestamp>,
+    pub last_fetched: Option<EntryHash>,
+    pub last_message_timestamp: Option<Timestamp>,
     // usize?
-    batch_size: u8,
-    payload_type: PayloadType,
+    pub batch_size: u8,
+    pub payload_type: PayloadType,
 }
 
 // GROUP MESSAGE TYPE DEFINITION, GETTERS, SETTERS, ENTRY_DEF, UTILS ...
