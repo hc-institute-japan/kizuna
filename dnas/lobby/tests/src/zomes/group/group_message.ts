@@ -8,6 +8,7 @@ import {
   sendMessage,
   readGroupMessage,
   getNextBatchGroupMessage,
+  getLatestMessagesForAllGroups,
 } from "./zome_fns";
 
 function sendMessageSignalHandler(signal, data) {
@@ -728,4 +729,111 @@ function getNextBachOfMessagesTest(orchestrator, config, installables) {
   );
 }
 
-export { groupTypingIndicatorTest, sendMessageTest, readGroupMessageTest, getNextBachOfMessagesTest };
+function getLatestMessagesForAllGroupsTest(orchestrator, config, installables) {
+
+  orchestrator.registerScenario(
+    "get_latest_messages_for_all_groups test",
+    async (s: ScenarioApi, t) => {
+
+      const [alice, bobby, charlie] = await s.players([config, config, config]);
+
+      const [[alice_happ]] = await alice.installAgentsHapps(installables.one);
+      const [[bobby_happ]] = await bobby.installAgentsHapps(installables.one);
+      const [[charlie_happ]] = await charlie.installAgentsHapps(installables.one);
+
+      await s.shareAllNodes([alice, bobby, charlie]);
+
+      const alicePubKey = alice_happ.agent;
+      const bobbyPubKey = bobby_happ.agent;
+      const charliePubKey = charlie_happ.agent;
+
+      const alice_conductor = alice_happ.cells[0];
+      const bobby_conductor = bobby_happ.cells[0];
+      const charlie_conductor = charlie_happ.cells[0];
+
+      init(alice_conductor);
+      init(bobby_conductor);
+      init(charlie_conductor);
+
+
+      let messages_hashes: any = [];
+      let messages_contents: any = [];
+      let messages_read_list: any = [];
+
+      let create_group_input = {
+        name: "Group_name",
+        members: [bobbyPubKey, charliePubKey],
+      };
+
+      let create_group_input_2 = {
+        name: "Group_name_2",
+        members: [alicePubKey, charliePubKey],
+      };
+
+
+      let group_1 = await createGroup( create_group_input)(alice_conductor);
+      await delay(500);
+
+      let group_2 = await createGroup( create_group_input_2)(alice_conductor);
+      await delay(500);
+
+      // WE SEND ONE MESSAGE PER GROUP CREATED AND WE'LL SEE IF THE APP ITS DOING WHAT WE EXPECT IT TO DO 
+
+      let {
+        id: message_id_1,
+        content: alice_message_content,
+      } = await sendMessage(alice_conductor, {
+        group_id : group_1.group_id,
+        payload_input: { Text: { payload: "How are you, Bob?!" } },
+        sender: alicePubKey,
+      });
+
+      await delay(200);
+
+
+      let {
+        id: message_id_2,
+        content: bobby_meesage_content,
+      } = await sendMessage(bobby_conductor, {
+        group_id: group_2.group_id,
+        payload_input: { Text: { payload: "Hi alice!" } },
+        sender: bobbyPubKey,
+      });
+
+      await delay(500);
+
+
+      //THEN WE GET THE LATEST MESSAGES FOR ALL THE GROUPS 
+
+
+      let output = await getLatestMessagesForAllGroups(1)(alice_conductor);
+
+      await delay(1000);
+
+      messages_hashes =  Object.values(output.messages_by_group)[0];
+
+      Object.values(output.group_messages_contents).map((message_content:any) =>{
+
+        messages_contents.push(message_content[0].signed_header.header.content);
+        messages_read_list.push( message_content[1]);
+                
+      });
+
+
+
+      console.log("messages_hashes ",{a: message_id_1, b: message_id_2} );
+      
+      console.log("output",messages_hashes);
+      console.log("output",messages_contents);
+      console.log("output",messages_read_list);
+
+      
+      
+
+
+
+    });
+
+}
+
+export { groupTypingIndicatorTest, sendMessageTest, readGroupMessageTest, getNextBachOfMessagesTest, getLatestMessagesForAllGroupsTest };

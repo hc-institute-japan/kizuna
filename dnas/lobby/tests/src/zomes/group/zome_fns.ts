@@ -85,3 +85,9 @@ export function getNextBatchGroupMessage(filter_input) {
     conductor.call("group", "get_next_batch_group_messages", filter_input);
 
 }
+
+export function getLatestMessagesForAllGroups(batch_size){
+  return (conductor) => 
+    conductor.call("group", "get_latest_messages_for_all_groups", batch_size);
+}
+

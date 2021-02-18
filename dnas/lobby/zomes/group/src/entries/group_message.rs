@@ -8,7 +8,7 @@ use std::time::SystemTime;
 
 pub mod handlers;
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
-pub struct BatchSize(u8);
+pub struct BatchSize(pub u8);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Hash, PartialEq, Eq, Debug)]
 pub struct GroupMessageHash(pub EntryHash);
@@ -26,8 +26,6 @@ pub struct GroupMessageElement(pub Element);
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
 pub struct GroupMessageContent(pub GroupMessageElement, pub ReadList);
 
-//--------------------------------------------------------------
-
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 pub struct MessagesByGroup(pub HashMap<String, Vec<GroupMessageHash>>);
 
@@ -39,8 +37,6 @@ pub struct GroupMessagesOutput {
     messages_by_group: MessagesByGroup,
     group_messages_contents: GroupMessagesContents,
 }
-
-//--------------------------------------------------------------------------
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
 pub struct GroupMsgBatchFetchFilter {
