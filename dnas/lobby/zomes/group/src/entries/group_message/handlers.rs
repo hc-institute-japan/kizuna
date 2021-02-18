@@ -203,9 +203,8 @@ pub fn get_next_batch_group_messages(
     let mut linked_messages: Vec<Link>;
 
     let mut messages_hashes: Vec<GroupMessageHash> = vec![];
-    let mut messages_by_group: HashMap<GroupEntryHash, Vec<GroupMessageHash>> = HashMap::new(); // not used yet
-    let mut group_messages_contents: HashMap<GroupMessageHash, GroupMessageContent> =
-        HashMap::new();
+    let mut messages_by_group: HashMap<String, Vec<GroupMessageHash>> = HashMap::new(); // not used yet
+    let mut group_messages_contents: HashMap<String, GroupMessageContent> = HashMap::new();
 
     let mut pivot_path: Option<EntryHash> = None; // this variable wiil be used if we dont reach the batch_size from the first path evaluated.
 
@@ -276,7 +275,7 @@ pub fn get_next_batch_group_messages(
     }
 
     // at this point we have all the data we need to returned to the ui
-    messages_by_group.insert(GroupEntryHash(group_id), messages_hashes);
+    messages_by_group.insert(format!("{:?}", GroupEntryHash(group_id)), messages_hashes);
 
     Ok(GroupMessagesOutput {
         messages_by_group: MessagesByGroup(messages_by_group),
@@ -324,9 +323,9 @@ fn collect_messages_info(
     linked_messages: &mut Vec<Link>,
     batch_size: usize,
     messages_hashes: &mut Vec<GroupMessageHash>,
-    group_messages_contents: &mut HashMap<GroupMessageHash, GroupMessageContent>,
+    group_messages_contents: &mut HashMap<String, GroupMessageContent>,
 ) -> HdkResult<()> {
-    let mut read_list: HashMap<AgentPubKey, SystemTime> = HashMap::new();
+    let mut read_list: HashMap<String, SystemTime> = HashMap::new();
 
     loop {
         if linked_messages.is_empty() || messages_hashes.len() >= batch_size {
@@ -346,11 +345,11 @@ fn collect_messages_info(
                 get_links(link.target.clone(), Some(LinkTag::new("read")))?.into_inner();
 
             for link in read_links {
-                read_list.insert(link.target.into(), link.timestamp);
+                read_list.insert(format!("{:?}", link.target), link.timestamp);
             }
 
             group_messages_contents.insert(
-                GroupMessageHash(link.target.clone()),
+                format!("{:?}", GroupMessageHash(link.target.clone())),
                 GroupMessageContent(
                     GroupMessageElement(message_element),
                     ReadList(read_list.clone()),

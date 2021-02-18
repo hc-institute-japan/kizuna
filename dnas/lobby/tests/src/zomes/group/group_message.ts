@@ -1,4 +1,5 @@
 import { ScenarioApi } from "@holochain/tryorama/lib/api";
+import { fileURLToPath } from "url";
 import { delay } from "../../utils";
 import { createGroup, init } from "./utils";
 import {
@@ -6,6 +7,7 @@ import {
   signalHandler,
   sendMessage,
   readGroupMessage,
+  getNextBatchGroupMessage,
 } from "./zome_fns";
 
 function sendMessageSignalHandler(signal, data) {
@@ -453,7 +455,6 @@ function readGroupMessageTest(orchestrator, config, installables) {
     }
   );
 }
-
 function getNextBachOfMessagesTest(orchestrator, config, installables) {
 
   orchestrator.registerScenario(
@@ -486,22 +487,97 @@ function getNextBachOfMessagesTest(orchestrator, config, installables) {
         members: [bobbyPubKey, charliePubKey],
       };
 
-      let { content, group_id, group_revision_id } = await createGroup( create_group_input)(alice_conductor);
 
+      let output;
+      let messages_hashes: any = [];
+      let messages_contents: any = [];
+      let messages_read_list: any = [];
+      let filter;
+      let counter = 0;
+
+      let { content, group_id, group_revision_id } = await createGroup( create_group_input)(alice_conductor);
+      await delay(500);
+
+      // 1- GET A BATCH FOR A GROUP WITHOUT MESSAGES 
+
+      filter = {
+        group_id,
+        last_fetched: null,
+        last_message_timestamp: null,
+        batch_size: 5, //THIS BATCH-SIZE CAN BE 0 BUT WE SHOULD MAYBE HANDLE THIS FROM THE BACK-END
+        payload_type: {Text:null},
+      };
+
+      output = await getNextBatchGroupMessage(filter)(bobby_conductor);
       await delay(1000);
 
+      messages_hashes =  Object.values(output.messages_by_group)[0];
+      messages_contents = Object.values(output.group_messages_contents);
+
+      t.deepEqual( messages_hashes , [] );
+      t.deepEqual( messages_contents , [] );
+
+      // 2- GET A BATCH FOR A GROUP WITH MESSAGES (THIS TEST HAVE A BATCH SIZE BIGGER THAN THE NUMBER OF MESSAGGES FOR THIS GROUP)
+
+
+      //FIRST MESSAGES SEND TO THIS GROUP (THIS MESSAGE WILL BE READED FOR 2 MEMBERS BOBBY AND CHARLIE )
       let {
         id: message_id_1,
         content: alice_message_content,
       } = await sendMessage(alice_conductor, {
         group_id,
-        payload_input: { payload: "How are you, Bob?!"  },
+        payload_input: { Text: { payload: "How are you, Bob?!" } },
         sender: alicePubKey,
       });
 
+      await delay(500);
+
+      let group_message_read_data = {
+        group_id,
+        message_ids: [message_id_1],
+        reader: alicePubKey,
+        timestamp: alice_message_content.created,
+        members: [bobbyPubKey, charliePubKey],
+      };
+
+      await readGroupMessage(
+        group_message_read_data
+      )(alice_conductor);
       await delay();
-/*
+
       
+      group_message_read_data.reader = bobbyPubKey;
+
+      await readGroupMessage(
+        group_message_read_data
+      )(bobby_conductor);
+      await delay();
+
+
+      output = await getNextBatchGroupMessage(filter)(bobby_conductor);
+      await delay(1000);
+
+      messages_hashes =  Object.values(output.messages_by_group)[0];
+
+      Object.values(output.group_messages_contents).map((message_content:any) =>{
+
+        messages_contents.push(message_content[0].signed_header.header.content);
+        messages_read_list.push( message_content[1]);
+                
+      });
+  
+      t.deepEqual(messages_hashes, [message_id_1]);
+      t.deepEqual(messages_contents[0].author, alicePubKey);
+      t.deepEqual(messages_contents[0].entry_hash, message_id_1);
+      t.deepEqual(Object.values(messages_read_list[0]).length, 2); 
+
+
+      messages_contents = [];
+      messages_read_list = [];
+
+      //TEST GET BATCHES OF ONE MESSAGE PER CALL TEST MADE USING 3 MESSAGES 
+      
+      //THE SENCOND MESSAGE ONLY WILL BE READED BY ALICE
       let {
         id: message_id_2,
         content: bobby_meesage_content,
@@ -511,7 +587,19 @@ function getNextBachOfMessagesTest(orchestrator, config, installables) {
         sender: bobbyPubKey,
       });
 
-      await delay();
+      await delay(500);
+
+      group_message_read_data.message_ids = [message_id_2];
+      group_message_read_data.reader = alicePubKey;
+      group_message_read_data.timestamp = bobby_meesage_content.created;
+
+      await readGroupMessage(
+        group_message_read_data
+      )(alice_conductor);
+
+      await delay(500);
+
+      //THIRD MESSAGE HAVENT BEEN READED YET FOR ANY MEMBER 
 
       let {
         id: message_id_3,
@@ -522,30 +610,122 @@ function getNextBachOfMessagesTest(orchestrator, config, installables) {
         sender: charliePubKey,
       });
 
-      let alice_group_message_read_data = {
-        group_id,
-        message_ids: [message_id_2, message_id_3],
-        reader: alicePubKey,
-        timestamp: charlie_message_content.created,
-        members: [bobbyPubKey, charliePubKey],
-      };
+      await delay(500);
 
-      let alice_group_message_read_data_res = await readGroupMessage(
-        alice_group_message_read_data
-      )(alice_conductor);
-      await delay();
 
+      filter.batch_size = 1 ; 
+
+
+      output = await getNextBatchGroupMessage(filter)(bobby_conductor);
+      await delay(1000);
+
+      messages_hashes =  Object.values(output.messages_by_group)[0];
+
+      Object.values(output.group_messages_contents).map((message_content:any) =>{
+
+        messages_contents.push(message_content[0].signed_header.header.content);
+        messages_read_list.push( message_content[1]);
+                
+      });
       
 
-      console.log("output");
-      console.log(alice_group_message_read_data_res);
-      */
-
+      //THE FIRST MESSAGE RETURNED TO THE UI HAVE TO BE THE LAST MESSAGE SENDED (MESSAGE#3)
+      t.deepEqual(messages_hashes, [message_id_3]);
+      t.deepEqual(messages_contents[0].author, charliePubKey);
+      t.deepEqual(messages_contents[0].entry_hash, message_id_3);
+      t.deepEqual(Object.values(messages_read_list[0]).length, 0); 
       
+      
+      //FOR THE NEXT CALL TO FECTH THE NEXT BATCH WE HAVE TO ASSIGNED THE FIELDS LAST_FETCHED AND LAST_MESSAGE_TIMESTAMP
+      
+      let last_fetched = message_id_3;
+      let last_message_timestamp = messages_contents[0].timestamp;
+
+      filter.last_fetched = last_fetched;
+      filter.last_message_timestamp = last_message_timestamp;
+
+      output = await getNextBatchGroupMessage(filter)(bobby_conductor);
+      await delay(1000);
+
+      messages_contents = [];
+      messages_read_list = [];
+
+      messages_hashes =  Object.values(output.messages_by_group)[0];
+
+      Object.values(output.group_messages_contents).map((message_content:any) =>{
+
+        messages_contents.push(message_content[0].signed_header.header.content);
+        messages_read_list.push( message_content[1]);
+                
+      });
+      
+      //THE SECOND MESSAGE RETURNED TO THE UI HAVE TO BE THE 2° MESSAGE SENDED (MESSAGE#2)
+      t.deepEqual(messages_hashes, [message_id_2]);
+      t.deepEqual(messages_contents[0].author, bobbyPubKey);
+      t.deepEqual(messages_contents[0].entry_hash, message_id_2);
+      t.deepEqual(Object.values(messages_read_list[0]).length, 1); 
+       
+
+      // THIRD CALL TO GET_THE NEXT_BATCH OF MESSAGES SHOULD RETURN THE FIRST MESSAGE SENDED 
+
+      last_fetched = message_id_2;
+      last_message_timestamp = messages_contents[0].timestamp;
+
+      filter.last_fetched = last_fetched;
+      filter.last_message_timestamp = last_message_timestamp;
+
+
+      output = await getNextBatchGroupMessage(filter)(alice_conductor);
+      await delay(1000);
+
+      messages_contents = [];
+      messages_read_list = [];
+
+      messages_hashes =  Object.values(output.messages_by_group)[0];
+
+      Object.values(output.group_messages_contents).map((message_content:any) =>{
+
+        messages_contents.push(message_content[0].signed_header.header.content);
+        messages_read_list.push( message_content[1]);
+                
+      });
+      
+      //THE THIRD MESSAGE RETURNED TO THE UI HAVE TO BE THE 1° MESSAGE SENDED (MESSAGE#1)
+      t.deepEqual(messages_hashes, [message_id_1]);
+      t.deepEqual(messages_contents[0].author, alicePubKey);
+      t.deepEqual(messages_contents[0].entry_hash, message_id_1);
+      t.deepEqual(Object.values(messages_read_list[0]).length, 2);
+
+
+      //TRY TO GET A MESSAGES BEYOND THE LAST MESSAGE OF THE GROUP  
+
+      last_fetched = message_id_1;
+      last_message_timestamp = messages_contents[0].timestamp;
+
+      filter.last_fetched = last_fetched;
+      filter.last_message_timestamp = last_message_timestamp;
+
+
+      output = await getNextBatchGroupMessage(filter)(alice_conductor);
+      await delay(1000);
+
+      messages_contents = [];
+      messages_read_list = [];
+
+      messages_hashes =  Object.values(output.messages_by_group)[0];
+
+      Object.values(output.group_messages_contents).map((message_content:any) =>{
+
+        messages_contents.push(message_content[0].signed_header.header.content);
+        messages_read_list.push( message_content[1]);
+                
+      });
+      
+      //WE SHOULD RECEIVED NOTHING HERE 
+      t.deepEqual(messages_hashes, []);
+
     }
   );
 }
-
-
 
 export { groupTypingIndicatorTest, sendMessageTest, readGroupMessageTest, getNextBachOfMessagesTest };
