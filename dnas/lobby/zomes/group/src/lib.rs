@@ -1,4 +1,3 @@
-use group::handlers;
 use hdk3::prelude::*;
 
 mod entries;
@@ -10,11 +9,9 @@ use entries::{group, group_message};
 use signals::{SignalDetails, SignalPayload};
 
 use group_message::{
-    GroupChatFilter, GroupMessage, GroupMessageData, GroupMessageDataWrapper, GroupMessageInput,
-    GroupMessageInputWithDate, GroupMessageReadData, GroupMessagesOutput, GroupMsgBatchFetchFilter,
-    GroupTypingDetailData,
-    BatchSize, GroupMessage, GroupMessageData, GroupMessageDataWrapper, GroupMessageInput,
-    GroupMessageReadData, GroupMessagesOutput, GroupMsgBatchFetchFilter, GroupTypingDetailData,
+    BatchSize, GroupChatFilter, GroupMessage, GroupMessageData, GroupMessageDataWrapper,
+    GroupMessageInput, GroupMessageInputWithDate, GroupMessageReadData, GroupMessagesOutput,
+    GroupMsgBatchFetchFilter, GroupTypingDetailData,
 };
 
 use entries::group::{
