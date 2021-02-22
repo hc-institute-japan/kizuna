@@ -13,6 +13,8 @@ use group_message::{
     GroupChatFilter, GroupMessage, GroupMessageData, GroupMessageDataWrapper, GroupMessageInput,
     GroupMessageInputWithDate, GroupMessageReadData, GroupMessagesOutput, GroupMsgBatchFetchFilter,
     GroupTypingDetailData,
+    BatchSize, GroupMessage, GroupMessageData, GroupMessageDataWrapper, GroupMessageInput,
+    GroupMessageReadData, GroupMessagesOutput, GroupMsgBatchFetchFilter, GroupTypingDetailData,
 };
 
 use entries::group::{
@@ -297,6 +299,11 @@ fn get_next_batch_group_messages(
     filter: GroupMsgBatchFetchFilter,
 ) -> ExternResult<GroupMessagesOutput> {
     group_message::handlers::get_next_batch_group_messages(filter)
+}
+
+#[hdk_extern]
+fn get_latest_messages_for_all_groups(batch_size: BatchSize) -> ExternResult<GroupMessagesOutput> {
+    group_message::handlers::get_latest_messages_for_all_groups(batch_size)
 }
 
 //END LIST OF DEPENDENCIES ADDED FOR MANUEL
