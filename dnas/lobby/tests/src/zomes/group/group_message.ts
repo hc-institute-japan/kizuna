@@ -1,9 +1,11 @@
 import { ScenarioApi } from "@holochain/tryorama/lib/api";
-import { delay } from "../../utils";
-import { createGroup, init, dateToTimestamp } from "./utils";
+import { delay, dateToTimestamp } from "../../utils";
+
 import {
   getNextBatchGroupMessage,
+  init,
   indicateGroupTyping,
+  createGroup,
   readGroupMessage,
   sendMessage,
   signalHandler,
@@ -205,12 +207,6 @@ function sendMessageTest(orchestrator, config, installables) {
         "get_all_messages",
         group_id2
       );
-      console.log("------");
-      let formattedList: {
-        [key: string]: any[];
-      } = {};
-
-      console.log("------");
 
       await delay(5000);
       await evaluateMessagesFromSignal(
@@ -704,9 +700,9 @@ function getNextBachOfMessagesTest(orchestrator, config, installables) {
   });
 }
 
-function sendMessageInTargetDate(orchestrator, config, installables) {
+function getMessagesByGroupByTimestampTest(orchestrator, config, installables) {
   orchestrator.registerScenario(
-    "Tests for text send_message",
+    "Tests for get messages by group by timestamp",
     async (s: ScenarioApi, t) => {
       const [alice, bobby, charlie] = await s.players([config, config, config]);
 
@@ -823,7 +819,6 @@ function sendMessageInTargetDate(orchestrator, config, installables) {
       await delay();
 
       evaluateMessagesByGroupByTimestampResult([], unreadMessages, t);
-      // console.log(unreadMessages);
 
       await alice_conductor.call("group", "read_group_message", {
         group_id,
@@ -847,10 +842,6 @@ function sendMessageInTargetDate(orchestrator, config, installables) {
       );
 
       await delay();
-
-      // console.log(messagesOnFeb9);
-      // console.log("-------");
-      // console.log(group1Messages);
 
       evaluateMessagesByGroupByTimestampResult(
         group1Messages,
@@ -1005,7 +996,7 @@ const evaluateMessagesByGroupByTimestampResult = (
   );
 
 export {
-  sendMessageInTargetDate,
+  getMessagesByGroupByTimestampTest,
   groupTypingIndicatorTest,
   sendMessageTest,
   readGroupMessageTest,

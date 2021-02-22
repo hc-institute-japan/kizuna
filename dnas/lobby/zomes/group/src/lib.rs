@@ -315,5 +315,5 @@ fn send_message_in_target_date(
 fn get_messages_by_group_by_timestamp(
     group_chat_filter: GroupChatFilter,
 ) -> ExternResult<GroupMessagesOutput> {
-    group_message::handlers::get_messages_by_group_by_timestamp(group_chat_filter)
+    group_message::get_messages_by_group_by_timestamp::handler(group_chat_filter)
 }
