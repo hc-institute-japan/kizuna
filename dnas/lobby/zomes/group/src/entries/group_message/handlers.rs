@@ -256,7 +256,9 @@ pub fn get_next_batch_group_messages(
     })
 }
 
-fn _get_latest_messages_for_all_groups(batch_size: BatchSize) -> ExternResult<GroupMessagesOutput> {
+pub fn get_latest_messages_for_all_groups(
+    batch_size: BatchSize,
+) -> ExternResult<GroupMessagesOutput> {
     let batch_size: u8 = batch_size.0;
 
     // initialize MessagesByGroup

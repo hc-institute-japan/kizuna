@@ -96,3 +96,9 @@ export async function sendMessageWithDate(
     date,
   });
 }
+
+export function getLatestMessagesForAllGroups(batch_size){
+  return (conductor) => 
+    conductor.call("group", "get_latest_messages_for_all_groups", batch_size);
+}
+
