@@ -1,19 +1,20 @@
 #![allow(unused_imports)]
+use element::ElementEntry;
 use file_types::FileMetadata;
 use group::Group;
 use hdk3::prelude::timestamp::Timestamp;
 use hdk3::{host_fn::remote_signal, prelude::*};
 use link::Link;
 
-use std::time::SystemTime;
+use std::time::{Duration, SystemTime};
 
 use file_types::PayloadType;
 
 //LIST OF DEPENDENCIES ADDED FOR MANUEL
 use super::{
     GroupEntryHash, GroupMessageContent, GroupMessageElement, GroupMessageHash,
-    GroupMessagesContents, GroupMessagesOutput, GroupMsgBatchFetchFilter, MessagesByGroup,
-    ReadList,
+    GroupMessageInputWithDate, GroupMessagesContents, GroupMessagesOutput,
+    GroupMsgBatchFetchFilter, MessagesByGroup, ReadList,
 };
 use std::collections::hash_map::HashMap;
 //END LIST OF DEPENDENCIES ADDED FOR MANUEL
@@ -451,4 +452,192 @@ fn filter_path_children_list(
     }
 
     Ok(())
+}
+
+pub fn send_message_in_target_date(
+    message_input: GroupMessageInputWithDate,
+) -> ExternResult<GroupMessageData> {
+    let payload_res = match message_input.clone().payload {
+        PayloadInput::Text { payload } => Ok(Payload::Text { payload }),
+        PayloadInput::File {
+            metadata,
+            file_type,
+            file_bytes,
+        } => {
+            let group_file_bytes = GroupFileBytes(file_bytes);
+            create_entry(&group_file_bytes)?;
+            match hash_entry(&group_file_bytes) {
+                Ok(hash) => Ok(Payload::File {
+                    file_type: file_type,
+                    metadata: FileMetadata {
+                        file_name: metadata.file_name,
+                        file_size: metadata.file_size,
+                        file_type: metadata.file_type,
+                        file_hash: hash,
+                    },
+                }),
+                Err(_) => Err(HdkError::Wasm(WasmError::Zome(
+                    "Cannot hash file bytes".into(),
+                ))),
+            }
+        }
+    };
+
+    match payload_res {
+        Ok(payload) => {
+            let message = GroupMessage {
+                group_hash: message_input.clone().group_hash,
+                payload,
+                created: to_timestamp(Duration::from_millis(message_input.clone().date)),
+                sender: message_input.clone().sender,
+                reply_to: message_input.clone().reply_to,
+            };
+
+            // commit GroupMessage entry
+            create_entry(&message)?;
+
+            let group_hash = message.clone().group_hash.to_string(); // message's group hash as string
+            let days = timestamp_to_days(message.clone().created).to_string(); // group message's timestamp into days as string
+
+            match path_from_str(&[group_hash, days].join(".")).hash() {
+                Ok(hash) => {
+                    create_link(
+                        hash.clone(),
+                        hash_entry(&message.clone())?,
+                        LinkTag::new(match message.payload {
+                            Payload::Text { payload: _ } => "text".to_owned(),
+                            Payload::File {
+                                metadata: _,
+                                file_type: _,
+                            } => "file".to_owned(),
+                        }),
+                    )?;
+
+                    match get_group_latest_version(message.clone().group_hash) {
+                        Ok(group) => {
+                            let message_hash = hash_entry(&message.clone())?;
+                            let group_message_data = GroupMessageData {
+                                id: message_hash,
+                                content: message,
+                            };
+
+                            // TODO: please use the SignalDetails format and add the GroupMessageData in the SignalPayload enum variant
+                            // to have coherence in code.
+                            let signal = SignalDetails {
+                                name: SignalName::GROUP_MESSAGE_DATA.to_owned(),
+                                payload: SignalPayload::GroupMessageData(
+                                    group_message_data.clone(),
+                                ),
+                            };
+
+                            remote_signal(
+                                &signal,
+                                [vec![group.clone().creator], group.clone().members]
+                                    .concat()
+                                    .into_iter()
+                                    .filter_map(|agent| {
+                                        if agent != message_input.clone().sender {
+                                            Some(agent)
+                                        } else {
+                                            None
+                                        }
+                                    })
+                                    .collect(),
+                            )?;
+                            Ok(group_message_data)
+                        }
+                        Err(_) => Err(HdkError::Wasm(WasmError::Zome(
+                            "Cannot get group's latest version".into(),
+                        ))),
+                    }
+                }
+                Err(_) => Err(HdkError::Wasm(WasmError::Zome("Cannot create path".into()))),
+            }
+        }
+        Err(_) => Err(HdkError::Wasm(WasmError::Zome(
+            "Cannot convert payload input to payload".into(),
+        ))),
+    }
+}
+
+pub fn get_messages_by_group_by_timestamp(
+    group_chat_filter: GroupChatFilter,
+) -> ExternResult<GroupMessagesOutput> {
+    let path = Path::from(
+        [
+            group_chat_filter.clone().group_id.to_string(),
+            timestamp_to_days(group_chat_filter.clone().date).to_string(),
+        ]
+        .join(".")
+        .to_string(),
+    );
+
+    match get_links(
+        path.hash()?,
+        // match group_chat_filter.payload_type {
+        //     PayloadType::Text => Some(LinkTag::new("file".to_owned())),
+        //     PayloadType::File => Some(LinkTag::new("text".to_owned())),
+        //     PayloadType::All => None,
+        // },
+        // Some(LinkTag::new("file".to_owned()))
+        // match group_chat_filter.payload_type {
+        //     PayloadType::Text => Some("file".to_owned()),
+        //     PayloadType::File => Some("text".to_owned()),
+        //     PayloadType::All => None,
+        // },
+        None,
+    ) {
+        Ok(message_links) => {
+            let mut messages_by_group: HashMap<String, Vec<GroupMessageHash>> = HashMap::new();
+            let mut group_messages_content: HashMap<String, GroupMessageContent> = HashMap::new();
+            let mut messages_hash: Vec<GroupMessageHash> = Vec::new();
+            let links = message_links.into_inner();
+
+            for i in 0..links.len() {
+                let message_link = links[i].clone();
+
+                if let Some(element) = get(message_link.clone().target, GetOptions::content())? {
+                    let read_links = get_links(
+                        message_link.clone().target,
+                        Some(LinkTag::new("read".to_owned())),
+                    )?;
+                    let mut read_list: HashMap<String, SystemTime> = HashMap::new();
+
+                    for j in 0..read_links.clone().into_inner().len() {
+                        let read_link = read_links.clone().into_inner()[j].clone();
+
+                        if let Some(element) = get(read_link.target, GetOptions::default())? {
+                            if let ElementEntry::Present(entry) = element.into_inner().1 {
+                                if let Entry::Agent(agent_pubkey) = entry {
+                                    messages_hash
+                                        .push(GroupMessageHash(message_link.clone().target));
+                                    read_list.insert(agent_pubkey.to_string(), read_link.timestamp);
+                                };
+                            };
+                        };
+                    }
+
+                    if !read_list.is_empty() {
+                        group_messages_content.insert(
+                            message_link.clone().target.to_string(),
+                            GroupMessageContent(GroupMessageElement(element), ReadList(read_list)),
+                        );
+                    }
+                };
+            }
+
+            messages_by_group.insert(
+                hash_entry(&group_chat_filter.clone().group_id)?.to_string(),
+                messages_hash,
+            );
+
+            Ok(GroupMessagesOutput {
+                messages_by_group: MessagesByGroup(messages_by_group),
+                group_messages_contents: GroupMessagesContents(group_messages_content),
+            })
+        }
+        Err(_) => Err(HdkError::Wasm(WasmError::Zome(
+            "Cannot get links on this path".into(),
+        ))),
+    }
 }

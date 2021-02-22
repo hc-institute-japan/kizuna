@@ -88,6 +88,15 @@ pub struct GroupMessageInput {
 }
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
+pub struct GroupMessageInputWithDate {
+    group_hash: EntryHash,
+    payload: PayloadInput,
+    sender: AgentPubKey,
+    reply_to: Option<EntryHash>,
+    date: u64,
+}
+
+#[derive(Serialize, Deserialize, SerializedBytes, Clone)]
 pub struct GroupChatFilter {
     // has to be the original EntryHash of Group
     group_id: EntryHash,

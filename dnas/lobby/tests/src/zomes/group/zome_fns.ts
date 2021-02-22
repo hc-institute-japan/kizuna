@@ -83,5 +83,16 @@ export function runValidationRules(validation_input) {
 export function getNextBatchGroupMessage(filter_input) {
   return (conductor) =>
     conductor.call("group", "get_next_batch_group_messages", filter_input);
+}
 
+export async function sendMessageWithDate(
+  conductor,
+  { group_id, sender, payload, date = Date.now() }
+) {
+  return await conductor.call("group", "send_message_in_target_date", {
+    group_hash: group_id,
+    payload,
+    sender,
+    date,
+  });
 }
