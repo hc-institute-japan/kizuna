@@ -6,6 +6,7 @@ use std::collections::hash_map::HashMap;
 // i added this type while we move to the next holochain version
 use std::time::SystemTime;
 
+pub mod get_messages_by_group_by_timestamp;
 pub mod handlers;
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 pub struct BatchSize(pub u8);
