@@ -1,3 +1,4 @@
+use group::handlers;
 use hdk3::prelude::*;
 
 mod entries;
@@ -9,8 +10,9 @@ use entries::{group, group_message};
 use signals::{SignalDetails, SignalPayload};
 
 use group_message::{
-    GroupMessage, GroupMessageData, GroupMessageDataWrapper, GroupMessageInput,
-    GroupMessageReadData, GroupMessagesOutput, GroupMsgBatchFetchFilter, GroupTypingDetailData,
+    GroupChatFilter, GroupMessage, GroupMessageData, GroupMessageDataWrapper, GroupMessageInput,
+    GroupMessageInputWithDate, GroupMessageReadData, GroupMessagesOutput, GroupMsgBatchFetchFilter,
+    GroupTypingDetailData,
 };
 
 use entries::group::{
@@ -295,4 +297,19 @@ fn get_next_batch_group_messages(
     filter: GroupMsgBatchFetchFilter,
 ) -> ExternResult<GroupMessagesOutput> {
     group_message::handlers::get_next_batch_group_messages(filter)
+}
+
+//END LIST OF DEPENDENCIES ADDED FOR MANUEL
+
+#[hdk_extern]
+fn send_message_in_target_date(
+    message_input: GroupMessageInputWithDate,
+) -> ExternResult<GroupMessageData> {
+    group_message::handlers::send_message_in_target_date(message_input)
+}
+#[hdk_extern]
+fn get_messages_by_group_by_timestamp(
+    group_chat_filter: GroupChatFilter,
+) -> ExternResult<GroupMessagesOutput> {
+    group_message::handlers::get_messages_by_group_by_timestamp(group_chat_filter)
 }
