@@ -7,9 +7,9 @@ import {
 import { Installables } from "./types";
 import path from "path";
 
+// import request from './zomes/request'
 import contacts from "./zomes/contacts";
 import preference from "./zomes/preference";
-// import request from './zomes/request'
 import group from "./zomes/group";
 
 const network = {
@@ -38,8 +38,9 @@ const installables: Installables = {
 
 const orchestrator = new Orchestrator();
 
-contacts(orchestrator, config, installables);
-// group(orchestrator, config, installables);
+group(orchestrator, config, installables);
+
+// contacts(orchestrator, config, installables);
 // preference(orchestrator, config, installables);
 // request(orchestrator, config);
 
