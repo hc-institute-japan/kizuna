@@ -13,10 +13,13 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
     let user_info: UsernameInfo =
         call(None, "username".into(), "get_my_username".into(), None, &())?;
 
+    let latest_group_messages: GroupMessagesOutput = call(None, "group".into(), "get_latest_messages_for_all_groups".into(), None, &())?;
+
     let aggregated_data: AggregatedLatestData = AggregatedLatestData {
         user_info,
         added_contacts: added_contacts.0,
         blocked_contacts: blocked_contacts.0,
+        latest_group_messages
     };
 
     Ok(aggregated_data)
