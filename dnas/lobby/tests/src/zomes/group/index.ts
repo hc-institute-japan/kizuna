@@ -22,7 +22,10 @@ export default (orchestrator, config, installables) => {
   // validateCreateGroupTest(orchestrator, config, installables);
 
   // GroupMessage related tests
+  sendMessageTest(orchestrator, config, installables);
   getLatestMessagesForAllGroupsTest(orchestrator, config, installables);
   getMessagesByGroupByTimestampTest(orchestrator, config, installables);
-  sendMessageTest(orchestrator, config, installables);
+  groupTypingIndicatorTest(orchestrator, config, installables);
+  readGroupMessageTest(orchestrator, config, installables);
+  getNextBachOfMessagesTest(orchestrator, config, installables);
 };

@@ -66,7 +66,6 @@ pub fn init(_: ()) -> ExternResult<InitCallbackResult> {
 fn recv_remote_signal(signal: SerializedBytes) -> ExternResult<()> {
     // currently only emitting the received signal
     // TODO: actually work with the received signal
-    emit_signal(&signal)?;
     let signal_detail: SignalDetails = signal.clone().try_into()?;
     match signal_detail.payload {
         SignalPayload::AddedToGroup(_) => {
