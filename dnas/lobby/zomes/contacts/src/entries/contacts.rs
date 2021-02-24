@@ -10,10 +10,10 @@ pub struct AgentPubKeysWrapper(pub Vec<AgentPubKey>);
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize, SerializedBytes)]
 pub enum ContactType {
-	Add,
-	Remove,
-	Block,
-	Unblock
+    Add,
+    Remove,
+    Block,
+    Unblock,
 }
 
 #[hdk_entry(id = "contact", visibility = "private")]
@@ -21,15 +21,19 @@ pub enum ContactType {
 pub struct Contact {
     agent_ids: Vec<AgentPubKey>,
     created: Timestamp,
-    contact_type: ContactType
+    contact_type: ContactType,
 }
 
 impl Contact {
-    pub fn new(timestamp: Timestamp, agent_ids: Vec<AgentPubKey>, contact_type: ContactType) -> Self {
+    pub fn new(
+        timestamp: Timestamp,
+        agent_ids: Vec<AgentPubKey>,
+        contact_type: ContactType,
+    ) -> Self {
         Contact {
             agent_ids,
             created: timestamp,
-            contact_type
+            contact_type,
         }
     }
 }
