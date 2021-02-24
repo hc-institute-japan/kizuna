@@ -1,5 +1,5 @@
-use std::time::Duration;
 use hdk3::prelude::*;
+use std::time::Duration;
 
 use timestamp::Timestamp;
 

@@ -1,11 +1,7 @@
 #![allow(unused_imports)]
 #![allow(dead_code)]
-use contacts::{
-    AgentPubKeysWrapper,
-    BooleanWrapper,
-    Contact,
-};
 use crate::utils::to_timestamp;
+use contacts::{AgentPubKeysWrapper, BooleanWrapper, Contact};
 use entries::contacts;
 use hdk3::prelude::*;
 
