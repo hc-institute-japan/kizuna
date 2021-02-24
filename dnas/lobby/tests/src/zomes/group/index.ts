@@ -1,5 +1,5 @@
 import {
-  craeteGroupTest,
+  createGroupTest,
   addAndRemoveMembersTest,
   updateGroupNameTest,
   validateCreateGroupTest,
@@ -10,7 +10,7 @@ import {
   sendMessageTest,
   readGroupMessageTest,
   getMessagesByGroupByTimestampTest,
-  getNextBachOfMessagesTest,
+  getNextBatchOfMessagesTest,
   getLatestMessagesForAllGroupsTest,
 } from "./group_message";
 
@@ -27,5 +27,5 @@ export default (orchestrator, config, installables) => {
   getMessagesByGroupByTimestampTest(orchestrator, config, installables);
   groupTypingIndicatorTest(orchestrator, config, installables);
   readGroupMessageTest(orchestrator, config, installables);
-  getNextBachOfMessagesTest(orchestrator, config, installables);
+  getNextBatchOfMessagesTest(orchestrator, config, installables);
 };
