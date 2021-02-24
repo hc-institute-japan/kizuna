@@ -451,7 +451,7 @@ function readGroupMessageTest(orchestrator, config, installables) {
     }
   );
 }
-function getNextBachOfMessagesTest(orchestrator, config, installables) {
+function getNextBatchOfMessagesTest(orchestrator, config, installables) {
   orchestrator.registerScenario("hey", async (s: ScenarioApi, t) => {
     const [alice, bobby, charlie] = await s.players([config, config, config]);
 
@@ -1000,6 +1000,6 @@ export {
   groupTypingIndicatorTest,
   sendMessageTest,
   readGroupMessageTest,
-  getNextBachOfMessagesTest,
+  getNextBatchOfMessagesTest,
   getLatestMessagesForAllGroupsTest,
 };
