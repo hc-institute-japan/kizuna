@@ -1,12 +1,23 @@
 import { Installables } from "../types";
+import { delay } from "../utils";
 
 const createPreference = (typingIndicator, readReceipt) => ({
   typing_indicator: typingIndicator,
   read_receipt: readReceipt,
 });
 
-const call = async (conductor, zome, zomeFunction, payload: any = null) =>
-  await conductor.call(zome, zomeFunction, payload);
+const call = async (
+  conductor,
+  zome,
+  zomeFunction,
+  payload: any = null,
+  timeout = 1000
+) => {
+  const res = await conductor.call(zome, zomeFunction, payload);
+  await delay(timeout);
+
+  return res;
+};
 
 const preference = (orchestrator, config, installables: Installables) => {
   orchestrator.registerScenario(
