@@ -14,6 +14,9 @@
     },
     "preference": {
       "wasm_path": "../target/wasm32-unknown-unknown/release/preference.wasm"
+    },
+    "group":{
+      "wasm_path": "../target/wasm32-unknown-unknown/release/group.wasm"
     }
   }
 }
