@@ -38,9 +38,9 @@ const installables: Installables = {
 
 const orchestrator = new Orchestrator();
 
-contacts(orchestrator, config, installables);
+// contacts(orchestrator, config, installables);
 // group(orchestrator, config, installables);
-// preference(orchestrator, config, installables);
+preference(orchestrator, config, installables);
 // request(orchestrator, config);
 
 orchestrator.run();
