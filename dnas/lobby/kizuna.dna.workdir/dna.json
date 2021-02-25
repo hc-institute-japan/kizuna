@@ -17,6 +17,9 @@
     },
     "group":{
       "wasm_path": "../target/wasm32-unknown-unknown/release/group.wasm"
+    },
+    "aggregator":{
+      "wasm_path": "../target/wasm32-unknown-unknown/release/aggregator.wasm"
     }
   }
 }
