@@ -1,6 +1,6 @@
 import { convertCamelToSnake } from "../../utils/helpers";
 import { ThunkAction } from "../types";
-import { FUNCTIONS, ZOMES } from "../holochain/types";
+import { FUNCTIONS, ZOMES } from "../../connection/types";
 import { PreferenceParameter, SET_PREFERENCE } from "./types";
 
 export const fetchPreference = (): ThunkAction => async (
