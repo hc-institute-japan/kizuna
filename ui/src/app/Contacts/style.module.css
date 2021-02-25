@@ -16,11 +16,12 @@
 
 .empty-contacts {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  flex-direction: column;
-  height: 100vh;
-  width: 100vw;
+
+  height: 100%;
+  width: 100%;
 }
 
 .empty-contacts ion-icon {
