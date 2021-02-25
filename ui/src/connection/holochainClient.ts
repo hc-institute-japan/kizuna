@@ -8,6 +8,7 @@ import store from "../redux/store";
 import { CallZomeConfig } from "../redux/types";
 
 let client: null | AppWebsocket = null;
+let myAgentId: null | AgentPubKey = null;
 
 let signalHandler: AppSignalCb = (signal) =>
   store.dispatch(signal.data.payload);
@@ -29,6 +30,9 @@ const init: () => any = async () => {
 };
 
 export const getAgentId: () => Promise<AgentPubKey | undefined> = async () => {
+  if (myAgentId) {
+    return myAgentId;
+  }
   await init();
   try {
     const info = await client?.appInfo({ installed_app_id: "test-app" });
