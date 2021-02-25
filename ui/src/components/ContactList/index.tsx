@@ -1,6 +1,7 @@
-import { IonItem, IonItemDivider, IonLabel, IonList } from "@ionic/react";
+import { IonList } from "@ionic/react";
 import React from "react";
 import { Profile } from "../../redux/profile/types";
+import IndexSection from "./IndexSection";
 import styles from "./style.module.css";
 
 interface Props {
@@ -13,18 +14,7 @@ const ContactsList: React.FC<Props> = ({ contacts: indexedContacts }) => (
   <IonList className={styles["contacts-list"]}>
     {Object.keys(indexedContacts).map((char) => {
       const contacts = indexedContacts[char];
-      return (
-        <React.Fragment key={char}>
-          <IonItemDivider>
-            <IonLabel>{char}</IonLabel>
-          </IonItemDivider>
-          {contacts.map((contact) => (
-            <IonItem lines="none" key={JSON.stringify(contact)}>
-              <IonLabel>{contact.username}</IonLabel>
-            </IonItem>
-          ))}
-        </React.Fragment>
-      );
+      return <IndexSection char={char} contacts={contacts}></IndexSection>;
     })}
   </IonList>
 );
