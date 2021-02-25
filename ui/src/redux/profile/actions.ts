@@ -1,5 +1,5 @@
 import { ThunkAction } from "../types";
-import { FUNCTIONS, ZOMES } from "../holochain/types";
+import { FUNCTIONS, ZOMES } from "../../connection/types";
 import { SET_USERNAME } from "./types";
 
 export const setUsername = (username: string | null): ThunkAction => (

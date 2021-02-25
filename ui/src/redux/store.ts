@@ -1,6 +1,9 @@
 import { applyMiddleware, createStore } from "redux";
-import { modifiedThunk } from "./holochain/holochainClient";
 import rootReducer from "./reducers";
+import { callZome, getAgentId } from "../connection/holochainClient";
+import thunk from "redux-thunk";
+
+const modifiedThunk = thunk.withExtraArgument({ callZome, getAgentId });
 
 const store = createStore(rootReducer, applyMiddleware(modifiedThunk));
 
