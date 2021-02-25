@@ -5,6 +5,7 @@ import { SET_SIGNAL } from "../signal/types";
 import store from "../store";
 
 let client: null | AppWebsocket = null;
+let myAgentId: null | AgentPubKey = null;
 
 const init: () => any = async () => {
   if (client) {
@@ -27,6 +28,9 @@ const init: () => any = async () => {
 };
 
 export const getAgentId: () => Promise<AgentPubKey | undefined> = async () => {
+  if (myAgentId) {
+    return myAgentId;
+  }
   await init();
   try {
     const info = await client?.appInfo({ installed_app_id: "test-app" });
