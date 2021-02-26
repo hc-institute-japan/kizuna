@@ -1,6 +1,8 @@
 import { ScenarioApi } from "@holochain/tryorama/lib/api";
 import { delay, dateToTimestamp } from "../../utils";
 
+import {HashType, hash, hashCache } from "./zome_fns"
+
 import {
   getNextBatchGroupMessage,
   init,
@@ -11,6 +13,10 @@ import {
   signalHandler,
   getLatestMessagesForAllGroups,
   sendMessageWithDate,
+  strToUtf8Bytes,
+  hash_file,
+  getMyGroupsList,
+
 } from "./zome_fns";
 
 function sendMessageSignalHandler(signal, data) {
@@ -451,6 +457,7 @@ function readGroupMessageTest(orchestrator, config, installables) {
     }
   );
 }
+
 function getNextBachOfMessagesTest(orchestrator, config, installables) {
   orchestrator.registerScenario("hey", async (s: ScenarioApi, t) => {
     const [alice, bobby, charlie] = await s.players([config, config, config]);
@@ -985,6 +992,99 @@ function getLatestMessagesForAllGroupsTest(orchestrator, config, installables) {
     }
   );
 }
+
+function sendMessageswithFilesTest(orchestrator, config, installables) {
+  orchestrator.registerScenario("send messages with files",async (s: ScenarioApi, t) => {
+    
+    const [alice, bobby] = await s.players([config, config, config]);
+
+    const [[alice_happ]] = await alice.installAgentsHapps(installables.one);
+    const [[bobby_happ]] = await bobby.installAgentsHapps(installables.one);
+
+    await s.shareAllNodes([alice, bobby]);
+
+    const alicePubKey = alice_happ.agent;
+    const bobbyPubKey = bobby_happ.agent;
+
+    const alice_conductor = alice_happ.cells[0];
+    const bobby_conductor = bobby_happ.cells[0];
+
+    init(alice_conductor);
+    init(bobby_conductor);
+
+    let create_group_input = {
+      name: "Group_name",
+      members: [bobbyPubKey],
+    };
+
+    let {content, group_id, group_revision_id} = await createGroup(create_group_input)(alice_conductor);
+    await delay(500);
+
+    let alice_group_list = await getMyGroupsList(alice_conductor); 
+    let bobby_group_list = await getMyGroupsList(bobby_conductor); 
+    await delay (500);
+
+    let group_list = [
+      {
+        group_id,
+        group_revision_id,
+        latest_name: 'Group_name',
+        members: [bobbyPubKey],
+        creator: alicePubKey,
+        created: content.created,
+      }
+    ];
+
+    // t.deepEqual(alice_group_list, group_list, "this field have passed the test ");  
+    // t.deepEqual(bobby_group_list, group_list, "this field have passed the test ");  
+
+
+    let file_metadata ={
+      file_name: "my_file",
+      file_size: 20,
+      file_type:"Other",
+    };
+
+    // console.log(file_bytes.toString());
+    // console.log(file_metadata);
+    //console.log(file_hash);
+    //console.log(file_hash2);
+    
+    let text: string = "The quick brown fox jumps over the lazy dog.";
+    let file_bytes = Int8Array.from(strToUtf8Bytes(text));
+    let file_hash = hash_file(file_bytes);
+    let file_hash2 = hash(file_bytes,HashType.ENTRY);
+    
+    console.log("output");
+    
+    console.log(hashCache);
+    
+    console.log(file_bytes);
+    console.log(Buffer.from(file_bytes));
+    
+
+    let message = {
+      group_hash: group_id,
+      payload_input: { File: { 
+
+        metadata: file_metadata,
+        file_type: {Other:null},
+        file_bytes: file_bytes,
+      
+      }},
+      sender:alicePubKey,
+      reply_to: null,
+    };
+
+
+    let group_messagge_data = await sendMessage(alice_conductor, {group_id, sender: alicePubKey, payload_input: message.payload_input});
+
+
+
+  });
+}
+
+
 const evaluateMessagesByGroupByTimestampResult = (
   referenceMessages,
   fetchedMessages,
@@ -1002,4 +1102,5 @@ export {
   readGroupMessageTest,
   getNextBachOfMessagesTest,
   getLatestMessagesForAllGroupsTest,
+  sendMessageswithFilesTest,
 };
