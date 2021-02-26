@@ -290,9 +290,6 @@ pub fn get_latest_messages_for_all_groups(
         let mut messages_output: GroupMessagesOutput = get_next_batch_group_messages(batch_filter)?;
 
         // insert GroupMessagesContents and MessagesByGroup values from returned GroupMessagesOutput into the initialized MessagesByGroup and GroupMessagesContents
-
-        // COMMENT: the order of the hashmaps will differ from the order of the given for the output will this be an issue?
-
         for (key, value) in messages_output.messages_by_group.0.drain() {
             messages_by_group.insert(key, value);
         }
