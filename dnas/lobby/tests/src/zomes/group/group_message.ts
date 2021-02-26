@@ -457,8 +457,12 @@ function readGroupMessageTest(orchestrator, config, installables) {
     }
   );
 }
+<<<<<<< HEAD
 
 function getNextBachOfMessagesTest(orchestrator, config, installables) {
+=======
+function getNextBatchOfMessagesTest(orchestrator, config, installables) {
+>>>>>>> 72abc33959c2f92098b4e61a55b7a5ab31a1d6e7
   orchestrator.registerScenario("hey", async (s: ScenarioApi, t) => {
     const [alice, bobby, charlie] = await s.players([config, config, config]);
 
@@ -1100,7 +1104,7 @@ export {
   groupTypingIndicatorTest,
   sendMessageTest,
   readGroupMessageTest,
-  getNextBachOfMessagesTest,
+  getNextBatchOfMessagesTest,
   getLatestMessagesForAllGroupsTest,
   sendMessageswithFilesTest,
 };

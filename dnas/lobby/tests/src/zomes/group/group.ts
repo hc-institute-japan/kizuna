@@ -30,7 +30,7 @@ function blockContacts(agentPubKeys) {
 
 // THE FUNCTION get_all_my_groups IS BEING IMPLICITLY TESTED BEACUSE IT'S USED IN ALMOST ALL THE TESTS
 
-export function craeteGroupTest(orchestrator, config, installables) {
+export function createGroupTest(orchestrator, config, installables) {
   orchestrator.registerScenario(
     "create group method test",
     async (s: ScenarioApi, t) => {
