@@ -1,7 +1,12 @@
 import { ScenarioApi } from "@holochain/tryorama/lib/api";
 import { delay, dateToTimestamp } from "../../utils";
-
 import {HashType, hash, hashCache } from "./zome_fns"
+
+import * as fs from "fs";
+
+import * as path from 'path'
+
+
 
 import {
   getNextBatchGroupMessage,
@@ -18,6 +23,7 @@ import {
   getMyGroupsList,
 
 } from "./zome_fns";
+import { identity } from "lodash";
 
 function sendMessageSignalHandler(signal, data) {
   return function (sender) {
@@ -457,12 +463,7 @@ function readGroupMessageTest(orchestrator, config, installables) {
     }
   );
 }
-<<<<<<< HEAD
-
-function getNextBachOfMessagesTest(orchestrator, config, installables) {
-=======
 function getNextBatchOfMessagesTest(orchestrator, config, installables) {
->>>>>>> 72abc33959c2f92098b4e61a55b7a5ab31a1d6e7
   orchestrator.registerScenario("hey", async (s: ScenarioApi, t) => {
     const [alice, bobby, charlie] = await s.players([config, config, config]);
 
@@ -1016,6 +1017,7 @@ function sendMessageswithFilesTest(orchestrator, config, installables) {
     init(alice_conductor);
     init(bobby_conductor);
 
+
     let create_group_input = {
       name: "Group_name",
       members: [bobbyPubKey],
@@ -1024,66 +1026,110 @@ function sendMessageswithFilesTest(orchestrator, config, installables) {
     let {content, group_id, group_revision_id} = await createGroup(create_group_input)(alice_conductor);
     await delay(500);
 
-    let alice_group_list = await getMyGroupsList(alice_conductor); 
-    let bobby_group_list = await getMyGroupsList(bobby_conductor); 
-    await delay (500);
 
-    let group_list = [
-      {
-        group_id,
-        group_revision_id,
-        latest_name: 'Group_name',
-        members: [bobbyPubKey],
-        creator: alicePubKey,
-        created: content.created,
-      }
-    ];
-
-    // t.deepEqual(alice_group_list, group_list, "this field have passed the test ");  
-    // t.deepEqual(bobby_group_list, group_list, "this field have passed the test ");  
-
+    let message_1 = await sendMessage(alice_conductor, { group_id, payload_input: { Text: { payload: "Hi bob i'm sending you the text file i told you about!" } }, sender: alicePubKey,});
+    await delay(1000);
 
     let file_metadata ={
       file_name: "my_file",
       file_size: 20,
       file_type:"Other",
     };
-
-    // console.log(file_bytes.toString());
-    // console.log(file_metadata);
-    //console.log(file_hash);
-    //console.log(file_hash2);
     
     let text: string = "The quick brown fox jumps over the lazy dog.";
     let file_bytes = Int8Array.from(strToUtf8Bytes(text));
-    let file_hash = hash_file(file_bytes);
-    let file_hash2 = hash(file_bytes,HashType.ENTRY);
-    
-    console.log("output");
-    
-    console.log(hashCache);
-    
-    console.log(file_bytes);
-    console.log(Buffer.from(file_bytes));
-    
 
-    let message = {
-      group_hash: group_id,
-      payload_input: { File: { 
+    let payload_input =  { File: { 
 
-        metadata: file_metadata,
-        file_type: {Other:null},
-        file_bytes: file_bytes,
-      
-      }},
-      sender:alicePubKey,
-      reply_to: null,
+      metadata: file_metadata,
+      file_type: {Other:null},
+      file_bytes: file_bytes,
+    
+    }};
+
+    let message_2 = await sendMessage(alice_conductor, {group_id, sender: alicePubKey, payload_input: payload_input});
+    await delay(1000);
+
+    let img_path = path.join(__dirname, "/files/img.png");
+    let thumbnail_bytes = Int8Array.from([1,2,3,4,5,6,7,8,9,10]);
+    let img_bytes = fs.readFileSync(img_path);
+
+    let img_metadata = {
+
+      file_name: "img.png",
+      file_size: 20,
+      file_type:"Image",
+
+    }
+    
+    let payload_input_2 = { File:
+      { 
+       metadata: img_metadata,
+       file_type: {Image : {thumbnail: thumbnail_bytes}},
+       file_bytes: Int8Array.from(img_bytes),
+     }
+   };
+
+   let message_3 = await sendMessage(bobby_conductor, { group_id, payload_input: { Text: { payload: "Wow nice thank you, i'm doing this on photoshop maybe you can give me feedback" } }, sender: bobbyPubKey,});
+   await delay(1000);
+
+    let message_4 = await sendMessage(bobby_conductor, {group_id, sender: bobbyPubKey, payload_input: payload_input_2});
+    await delay(1000);
+
+    let messages:{id:Buffer, timestamp: []}[]= [];
+
+    messages.push({
+      id: message_4.id,
+      timestamp: message_4.content.created
+    });    
+    messages.push({
+      id: message_3.id,
+      timestamp: message_3.content.created
+    });    
+    messages.push({
+      id: message_2.id,
+      timestamp: message_2.content.created
+    });
+    messages.push({
+      id: message_1.id,
+      timestamp: message_1.content.created
+    });
+
+    let filter = {
+      group_id,
+      last_fetched: null,
+      last_message_timestamp: null,
+      batch_size: 5, 
+      payload_type: { File: null },
     };
 
+    let filter_2 = {
+      group_id,
+      last_fetched: null,
+      last_message_timestamp: null,
+      batch_size: 5, 
+      payload_type: { All: null },
+    };
 
-    let group_messagge_data = await sendMessage(alice_conductor, {group_id, sender: alicePubKey, payload_input: message.payload_input});
+    let group_messages = await getNextBatchGroupMessage(filter)(bobby_conductor);
+    await delay(2000);
+
+    let group_messages_2 = await getNextBatchGroupMessage(filter_2)(alice_conductor);
+    await delay(2000);
 
 
+    console.log("output2");
+    console.log(messages);
+    
+    console.log("output");
+    console.log(Object.values(group_messages.messages_by_group)[0]);   
+    
+    console.log("output3");
+    console.log(Object.values(group_messages_2.messages_by_group)[0]); 
+
+
+    t.deepEqual([messages[0].id, messages[1].id, messages[2].id,messages[3].id], Object.values(group_messages_2.messages_by_group)[0]);
+    t.deepEqual([messages[0].id, messages[2].id], Object.values(group_messages.messages_by_group)[0]);
 
   });
 }

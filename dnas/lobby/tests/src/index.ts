@@ -20,7 +20,7 @@ const network = {
   ],
   bootstrap_service: "https://bootstrap.holo.host",
 };
-const config = Config.gen({network});
+const config = Config.gen();
 
 const kizuna = path.join("../kizuna.dna.gz");
 
@@ -40,8 +40,8 @@ const orchestrator = new Orchestrator();
 
 group(orchestrator, config, installables);
 
-contacts(orchestrator, config, installables);
-preference(orchestrator, config, installables);
+// contacts(orchestrator, config, installables);
+// preference(orchestrator, config, installables);
 // request(orchestrator, config);
 
 orchestrator.run();
