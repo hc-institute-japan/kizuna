@@ -9,7 +9,6 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { setPreference } from "../../redux/preference/actions";
 import { RootState } from "../../redux/types";
-
 import { useAppDispatch } from "../../utils/helpers";
 
 const Preference: React.FC = () => {
@@ -23,7 +22,7 @@ const Preference: React.FC = () => {
 
   const handleTypingChange = () =>
     dispatch(setPreference({ typingIndicator: !typingIndicator }));
-  console.log(typingIndicator, readReceipt);
+
   return (
     <IonList>
       <IonListHeader>

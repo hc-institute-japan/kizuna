@@ -1,6 +1,5 @@
 import {
   AgentPubKey,
-  AppSignal,
   AppSignalCb,
   AppWebsocket,
 } from "@holochain/conductor-api";

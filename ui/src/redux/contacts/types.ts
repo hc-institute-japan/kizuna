@@ -7,14 +7,19 @@ export interface IndexedContacts {
 }
 
 export interface ContactsState {
-  contacts: Profile[];
-  blocked: Profile[];
-  indexedContacts: IndexedContacts;
+  contacts: {
+    [key: string]: Profile;
+  };
+  blocked: {
+    [key: string]: Profile;
+  };
 }
 
 interface SetContactsAction {
   type: typeof SET_CONTACTS;
-  contacts: Profile[];
+  contacts: {
+    [key: string]: Profile;
+  };
 }
 
 export type ContactsActionType = SetContactsAction;

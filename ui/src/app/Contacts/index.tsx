@@ -6,18 +6,17 @@ import Spinner from "../../components/Spinner";
 import Toolbar from "../../components/Toolbar";
 import { fetchMyContacts } from "../../redux/contacts/actions";
 import { RootState } from "../../redux/types";
-
 import { indexContacts, useAppDispatch } from "../../utils/helpers";
 import AddContactFAB from "./AddContact/AddContactFAB";
 import AddContactModal from "./AddContact/AddContactModal";
 import EmptyContacts from "./EmptyContacts";
 
 const Contacts: React.FC = () => {
-  const { contacts } = useSelector((state: RootState) => state.contacts);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [search, setSearch] = useState<string>("");
   const [loading, setLoading] = useState<boolean>();
   const dispatch = useAppDispatch();
+  const contacts = useSelector((state: RootState) => state.contacts.contacts);
 
   /**
    * fetch all contacts here
@@ -31,7 +30,7 @@ const Contacts: React.FC = () => {
   }, [dispatch]);
 
   const indexedContacts = indexContacts(
-    contacts.filter((contact) =>
+    Object.values(contacts).filter((contact) =>
       contact.username.toLowerCase().includes(search.toLowerCase())
     )
   );
@@ -42,7 +41,7 @@ const Contacts: React.FC = () => {
       <IonContent>
         {loading ? (
           <Spinner name="crescent" />
-        ) : contacts.length !== 0 ? (
+        ) : Object.values(contacts).length !== 0 ? (
           <ContactsList contacts={indexedContacts} />
         ) : (
           <EmptyContacts />

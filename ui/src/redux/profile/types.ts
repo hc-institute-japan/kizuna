@@ -16,4 +16,8 @@ interface SetUsernameAction {
   username: string;
 }
 
+export type ProfileListType = {
+  [key: string]: Profile;
+};
+
 export type ProfileActionTypes = SetUsernameAction;

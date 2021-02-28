@@ -9,7 +9,7 @@ import {
 import { chatbox, person } from "ionicons/icons";
 import React, { useState } from "react";
 import { FormattedMessage } from "react-intl";
-import { Route } from "react-router";
+import { Route, RouteComponentProps } from "react-router";
 import Contacts from "../Contacts";
 import Conversations from "../Conversations";
 import styles from "./style.module.css";
@@ -36,14 +36,15 @@ const tabBar: TabBarItem[] = [
   },
 ];
 
-const HomeTabBar = () => {
+const HomeTabBar: React.FC<RouteComponentProps> = ({ match }) => {
   const [selected, setSelected] = useState(tabBar[0].tab);
+  const url = match.url.substring(1);
 
   return (
     <IonTabs>
       <IonRouterOutlet>
-        <Route path="/:tab(home)" component={Conversations} exact />
-        <Route path="/:tab(home/contacts)" component={Contacts} exact />
+        <Route path={`/:tab(home)`} component={Conversations} exact />
+        <Route path={`/:tab(${url}/contacts)`} component={Contacts} exact />
       </IonRouterOutlet>
       <IonTabBar slot="bottom" className={styles["home-tab-bar"]}>
         {tabBar.map((item) => (
