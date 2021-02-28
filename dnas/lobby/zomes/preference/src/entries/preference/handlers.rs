@@ -22,7 +22,7 @@ fn init(_: ()) -> ExternResult<InitCallbackResult> {
     Ok(InitCallbackResult::Pass)
 }
 
-fn fetch_preference() -> ExternResult<(element::SignedHeaderHashed, Preference)> {
+pub(crate) fn fetch_preference() -> ExternResult<(element::SignedHeaderHashed, Preference)> {
     let query_result = query(
         QueryFilter::new()
             .entry_type(EntryType::App(AppEntryType::new(
@@ -43,12 +43,6 @@ fn fetch_preference() -> ExternResult<(element::SignedHeaderHashed, Preference)>
         }
         None => crate::err("104", "No entry found for global preference."),
     }
-}
-
-pub(crate) fn get_preference() -> ExternResult<Preference> {
-    Ok(Preference {
-        ..fetch_preference()?.1
-    })
 }
 
 fn create_preference(preference: Preference) -> ExternResult<Preference> {
@@ -87,7 +81,8 @@ pub(crate) fn set_preference(preference_io: PreferenceIO) -> ExternResult<Prefer
     }
 }
 
-fn fetch_per_agent_preference() -> ExternResult<(element::SignedHeaderHashed, PerAgentPreference)> {
+pub(crate) fn fetch_per_agent_preference(
+) -> ExternResult<(element::SignedHeaderHashed, PerAgentPreference)> {
     let query_result = query(
         QueryFilter::new()
             .entry_type(EntryType::App(AppEntryType::new(
@@ -108,12 +103,6 @@ fn fetch_per_agent_preference() -> ExternResult<(element::SignedHeaderHashed, Pe
         }
         None => crate::err("104", "No entry found for per agent preference."),
     }
-}
-
-pub(crate) fn get_per_agent_preference() -> ExternResult<PerAgentPreference> {
-    Ok(PerAgentPreference {
-        ..fetch_per_agent_preference()?.1
-    })
 }
 
 fn create_per_agent_preference(preference: PerAgentPreference) -> ExternResult<PerAgentPreference> {
@@ -159,7 +148,8 @@ pub(crate) fn set_per_agent_preference(
     }
 }
 
-fn fetch_per_group_preference() -> ExternResult<(element::SignedHeaderHashed, PerGroupPreference)> {
+pub(crate) fn fetch_per_group_preference(
+) -> ExternResult<(element::SignedHeaderHashed, PerGroupPreference)> {
     let query_result = query(
         QueryFilter::new()
             .entry_type(EntryType::App(AppEntryType::new(
@@ -181,12 +171,6 @@ fn fetch_per_group_preference() -> ExternResult<(element::SignedHeaderHashed, Pe
         }
         None => crate::err("104", "No entry found for per group preference."),
     }
-}
-
-pub(crate) fn get_per_group_preference() -> ExternResult<PerGroupPreference> {
-    Ok(PerGroupPreference {
-        ..fetch_per_group_preference()?.1
-    })
 }
 
 fn create_per_group_preference(preference: PerGroupPreference) -> ExternResult<PerGroupPreference> {

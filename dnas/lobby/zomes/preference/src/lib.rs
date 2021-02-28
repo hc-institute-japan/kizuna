@@ -1,6 +1,6 @@
 use hdk3::prelude::*;
 mod entries;
-use entries::preference;
+use entries::preference::{self, handlers};
 
 use preference::*;
 
@@ -23,7 +23,9 @@ pub fn err<T>(code: &str, message: &str) -> ExternResult<T> {
 
 #[hdk_extern]
 fn get_preference(_: ()) -> ExternResult<Preference> {
-    handlers::get_preference()
+    Ok(Preference {
+        ..handlers::fetch_preference()?.1
+    })
 }
 
 #[hdk_extern]
@@ -38,7 +40,9 @@ fn set_per_agent_preference(preference: PerAgentPreferenceIO) -> ExternResult<Pe
 
 #[hdk_extern]
 fn get_per_agent_preference(_: ()) -> ExternResult<PerAgentPreference> {
-    handlers::get_per_agent_preference()
+    Ok(PerAgentPreference {
+        ..handlers::fetch_per_agent_preference()?.1
+    })
 }
 
 #[hdk_extern]
@@ -48,5 +52,7 @@ fn set_per_group_preference(preference: PerGroupPreferenceIO) -> ExternResult<Pe
 
 #[hdk_extern]
 fn get_per_group_preference(_: ()) -> ExternResult<PerGroupPreference> {
-    handlers::get_per_group_preference()
+    Ok(PerGroupPreference {
+        ..handlers::fetch_per_group_preference()?.1
+    })
 }

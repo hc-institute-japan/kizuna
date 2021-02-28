@@ -4,8 +4,8 @@ pub mod handlers;
 #[derive(Serialize, Deserialize, SerializedBytes, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct Preference {
-    typing_indicator: bool,
-    read_receipt: bool,
+    pub typing_indicator: bool,
+    pub read_receipt: bool,
 }
 
 entry_def!(Preference EntryDef {
@@ -19,8 +19,8 @@ entry_def!(Preference EntryDef {
 #[derive(Serialize, Deserialize, SerializedBytes, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct PerAgentPreference {
-    typing_indicator: Vec<AgentPubKey>,
-    read_receipt: Vec<AgentPubKey>,
+    pub typing_indicator: Vec<AgentPubKey>,
+    pub read_receipt: Vec<AgentPubKey>,
 }
 
 entry_def!(PerAgentPreference EntryDef {
@@ -34,8 +34,8 @@ entry_def!(PerAgentPreference EntryDef {
 #[derive(Serialize, Deserialize, SerializedBytes, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct PerGroupPreference {
-    typing_indicator: Vec<String>,
-    read_receipt: Vec<String>,
+    pub typing_indicator: Vec<String>,
+    pub read_receipt: Vec<String>,
 }
 
 entry_def!(PerGroupPreference EntryDef {
