@@ -2,7 +2,7 @@ import { IonContent, IonList, IonModal } from "@ionic/react";
 import React, { useEffect, useState } from "react";
 import { fetchAllUsernames } from "../../../redux/contacts/actions";
 import { IndexedContacts } from "../../../redux/contacts/types";
-import { Profile } from "../../../redux/profile/types";
+import { Profile, ProfileListType } from "../../../redux/profile/types";
 import { indexContacts, useAppDispatch } from "../../../utils/helpers";
 import styles from "../style.module.css";
 import AddContactHeader from "./AddContactHeader";
@@ -12,12 +12,12 @@ import AddContactToast from "./AddContactToast";
 interface Props {
   isOpen: boolean;
   onCancel: () => void;
-  contacts: Profile[];
+  contacts: ProfileListType;
 }
 
 const AddContactModal: React.FC<Props> = ({ isOpen, onCancel }) => {
   const [filter, setFilter] = useState<string>("");
-  const [users, setUsers] = useState<Profile[]>([]);
+  const [users, setUsers] = useState<ProfileListType>({});
   const [toast, setToast] = useState<string | null>(null);
   const dispatch = useAppDispatch();
 
@@ -27,15 +27,14 @@ const AddContactModal: React.FC<Props> = ({ isOpen, onCancel }) => {
     });
   }, [dispatch]);
 
-  let indexedContacts: IndexedContacts = indexContacts(
-    users.filter((user) => user.username.includes(filter))
-  );
+  let indexedContacts: IndexedContacts = indexContacts(Object.values(users));
 
   const onCompletion = (contact: Profile) => {
     setToast(contact.username);
-    setUsers((users) =>
-      users.filter((user) => contact.username !== user.username)
-    );
+    setUsers((users) => {
+      delete users[JSON.stringify(contact.id)];
+      return users;
+    });
   };
 
   return (

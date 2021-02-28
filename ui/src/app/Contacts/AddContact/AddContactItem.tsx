@@ -23,7 +23,7 @@ const AddContactItem: React.FC<Props> = ({ contact, onCompletion }) => {
 
   const handleOnClick = () => {
     setIsLoading(true);
-    dispatch(addContact(contact.id)).then((res: boolean) => {
+    dispatch(addContact(contact)).then((res: boolean) => {
       if (res) onCompletion(contact);
       else setIsLoading(false);
     });

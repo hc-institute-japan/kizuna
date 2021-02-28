@@ -6,12 +6,14 @@ import {
   IonList,
   IonPage,
 } from "@ionic/react";
-import { add } from "ionicons/icons";
-import React, { useState } from "react";
+import { pencil } from "ionicons/icons";
+import React from "react";
+import { useSelector } from "react-redux";
+import { RouteComponentProps, useHistory } from "react-router";
 import Conversation from "../../components/Conversation";
 import Toolbar from "../../components/Toolbar";
+import { RootState } from "../../redux/types";
 import { Conversations as ConversationsType } from "../../utils/types";
-import NewChatModal from "./NewChatModal";
 import styles from "./style.module.css";
 
 const conversations: ConversationsType = [
@@ -73,11 +75,14 @@ const conversations: ConversationsType = [
   },
 ];
 
-const Conversations: React.FC = () => {
-  const [isOpen, setIsOpen] = useState(false);
-
+const Conversations: React.FC<RouteComponentProps> = () => {
+  const history = useHistory();
+  const contacts = useSelector((state: RootState) => state.contacts.contacts);
   const handleOnClick = () => {
-    setIsOpen(true);
+    history.push({
+      pathname: `compose`,
+      state: { contacts },
+    });
   };
 
   return (
@@ -92,10 +97,10 @@ const Conversations: React.FC = () => {
             />
           ))}
         </IonList>
-        <NewChatModal isOpen={isOpen} onCancel={() => setIsOpen(false)} />
+
         <IonFab vertical="bottom" horizontal="end">
           <IonFabButton>
-            <IonIcon icon={add} onClick={handleOnClick} />
+            <IonIcon icon={pencil} onClick={handleOnClick} />
           </IonFabButton>
         </IonFab>
       </IonContent>

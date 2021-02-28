@@ -4,7 +4,9 @@ import { Profile } from "../../redux/profile/types";
 import { ThunkAction } from "../types";
 import { SET_CONTACTS } from "./types";
 
-export const setContacts = (contacts: Profile[]): ThunkAction => (dispatch) =>
+export const setContacts = (contacts: {
+  [key: string]: Profile;
+}): ThunkAction => (dispatch) =>
   dispatch({
     type: SET_CONTACTS,
     contacts,
@@ -21,8 +23,9 @@ export const fetchMyContacts = (): ThunkAction => async (
   });
 
   if (ids?.type !== "error") {
-    const contacts = await Promise.all(
-      ids.map(async (id: Uint8Array) => {
+    let contacts: { [key: string]: Profile } = {};
+    await Promise.all(
+      ids.map(async (id: AgentPubKey) => {
         const usernameOutput = await callZome({
           zomeName: ZOMES.USERNAME,
           fnName: FUNCTIONS[ZOMES.USERNAME].GET_USERNAME,
@@ -30,15 +33,13 @@ export const fetchMyContacts = (): ThunkAction => async (
         });
 
         if (usernameOutput?.type !== "error")
-          return {
+          contacts[JSON.stringify(id)] = {
             id,
             username: usernameOutput.username,
           };
-
-        return null;
       })
     );
-    if (contacts.find((contact) => contact === null)) return null;
+
     dispatch({
       type: SET_CONTACTS,
       contacts,
@@ -76,18 +77,22 @@ export const fetchAllUsernames = (): ThunkAction => async (
   return null;
 };
 
-export const addContact = (id: AgentPubKey): ThunkAction => async (
+export const addContact = (profile: Profile): ThunkAction => async (
   dispatch,
-  _getState,
+  getState,
   { callZome }
 ) => {
+  const contacts = getState().contacts.contacts;
+
   const res = await callZome({
     zomeName: ZOMES.CONTACTS,
     fnName: FUNCTIONS[ZOMES.CONTACTS].ADD_CONTACTS,
-    payload: [id],
+    payload: [profile.id],
   });
 
   if (res?.type !== "error") {
+    contacts[JSON.stringify(profile.id)] = profile;
+    dispatch({ type: SET_CONTACTS, contacts });
     return true;
   }
   return false;

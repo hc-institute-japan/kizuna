@@ -8,6 +8,7 @@
     "@holochain/conductor-api": "^0.0.1-dev.15",
     "@ionic/react": "^5.5.4",
     "@ionic/react-router": "^5.5.4",
+    "@testing-library/dom": "^7.29.6",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.4.0",
     "@testing-library/user-event": "^8.0.3",
@@ -33,6 +34,8 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "serve": "ionic serve",
+    "copy": "ionic cap copy ios",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -54,6 +57,7 @@
   },
   "devDependencies": {
     "@capacitor/cli": "2.4.5",
+    "@ionic/core": "^5.5.4",
     "@types/react": "^17.0.0",
     "@types/react-redux": "^7.1.15"
   },
