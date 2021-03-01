@@ -45,40 +45,43 @@ fn fetch_preference() -> ExternResult<(element::SignedHeaderHashed, Preference)>
     }
 }
 
-pub(crate) fn get_preference() -> ExternResult<PreferenceWrapper> {
-    match fetch_preference() {
-        Ok(unwrapped_preference) => Ok(PreferenceWrapper(Preference {
-            typing_indicator: unwrapped_preference.1.typing_indicator,
-            read_receipt: unwrapped_preference.1.read_receipt,
-        })),
-        _ => crate::err("104", "No entry found for global preference."),
+pub(crate) fn get_preference() -> ExternResult<Preference> {
+    Ok(Preference {
+        ..fetch_preference()?.1
+    })
+}
+
+fn create_preference(preference: Preference) -> ExternResult<Preference> {
+    match create_entry(&preference) {
+        Ok(_) => Ok(preference),
+        Err(_) => crate::err("100", "Problems were encountered during creation of entry"),
     }
 }
 
-fn create_preference(preference: Preference) -> PreferenceWrapper {
-    match create_entry(&preference) {
-        Ok(_) => debug!("Create entry preference success"),
-        Err(_) => crate::err::<()>("100", "Problems were encountered during creation of entry")
-            .expect("Entry should be of type Preference"),
-    };
-    return PreferenceWrapper(preference);
-}
-
-pub(crate) fn set_preference(preference: PreferenceIO) -> ExternResult<PreferenceWrapper> {
-    match (preference.typing_indicator, preference.read_receipt) {
-        (Some(typing_indicator), Some(read_receipt)) => Ok(create_preference(Preference {
+pub(crate) fn set_preference(preference_io: PreferenceIO) -> ExternResult<Preference> {
+    match (preference_io.typing_indicator, preference_io.read_receipt) {
+        (Some(typing_indicator), Some(read_receipt)) => create_preference(Preference {
             typing_indicator,
             read_receipt,
-        })),
+        }),
         _ => match fetch_preference() {
-            Ok(unwrapped_preference) => Ok(create_preference(Preference {
-                typing_indicator: preference
+            Ok(fetched_preference) => {
+                let typing_indicator = preference_io
                     .typing_indicator
-                    .unwrap_or(unwrapped_preference.1.typing_indicator),
-                read_receipt: preference
+                    .unwrap_or(fetched_preference.1.typing_indicator);
+                let read_receipt = preference_io
                     .read_receipt
-                    .unwrap_or(unwrapped_preference.1.read_receipt),
-            })),
+                    .unwrap_or(fetched_preference.1.read_receipt);
+                let preference = Preference {
+                    typing_indicator,
+                    read_receipt,
+                };
+
+                match preference == fetched_preference.1 {
+                    true => Ok(preference),
+                    _ => create_preference(preference),
+                }
+            }
             _ => crate::err("104", "No entry found for global preference."),
         },
     }
@@ -107,49 +110,50 @@ fn fetch_per_agent_preference() -> ExternResult<(element::SignedHeaderHashed, Pe
     }
 }
 
-pub(crate) fn get_per_agent_preference() -> ExternResult<PerAgentPreferenceWrapper> {
-    match fetch_per_agent_preference() {
-        Ok(unwrapped_preference) => Ok(PerAgentPreferenceWrapper(PerAgentPreference {
-            typing_indicator: unwrapped_preference.1.typing_indicator,
-            read_receipt: unwrapped_preference.1.read_receipt,
-        })),
-        _ => crate::err("104", "No entry found for per agent preference."),
-    }
+pub(crate) fn get_per_agent_preference() -> ExternResult<PerAgentPreference> {
+    Ok(PerAgentPreference {
+        ..fetch_per_agent_preference()?.1
+    })
 }
 
-fn create_per_agent_preference(preference: PerAgentPreference) -> PerAgentPreferenceWrapper {
+fn create_per_agent_preference(preference: PerAgentPreference) -> ExternResult<PerAgentPreference> {
     match create_entry(&preference) {
-        Ok(_) => debug!("Successfully created a PerAgentPreference entry"),
-        Err(_) => crate::err::<()>("100", "Problems were encountered during creation of entry")
-            .expect("Entry should be of type PerAgentPreference"),
-    };
-    return PerAgentPreferenceWrapper(preference);
+        Ok(_) => Ok(preference),
+        Err(_) => crate::err("100", "Problems were encountered during creation of entry"),
+    }
 }
 
 pub(crate) fn set_per_agent_preference(
     per_agent_preference: PerAgentPreferenceIO,
-) -> ExternResult<PerAgentPreferenceWrapper> {
+) -> ExternResult<PerAgentPreference> {
     match (
         per_agent_preference.clone().typing_indicator,
         per_agent_preference.clone().read_receipt,
     ) {
         (Some(typing_indicator), Some(read_receipt)) => {
-            Ok(create_per_agent_preference(PerAgentPreference {
+            create_per_agent_preference(PerAgentPreference {
                 typing_indicator,
                 read_receipt,
-            }))
+            })
         }
         _ => match fetch_per_agent_preference() {
-            Ok(unwrapped_preference) => Ok(create_per_agent_preference(PerAgentPreference {
-                typing_indicator: per_agent_preference
-                    .clone()
-                    .typing_indicator
-                    .unwrap_or(unwrapped_preference.1.typing_indicator.clone()),
-                read_receipt: per_agent_preference
-                    .clone()
-                    .read_receipt
-                    .unwrap_or(unwrapped_preference.1.read_receipt.clone()),
-            })),
+            Ok(fetched_preference) => {
+                let preference = PerAgentPreference {
+                    typing_indicator: per_agent_preference
+                        .clone()
+                        .typing_indicator
+                        .unwrap_or(fetched_preference.1.typing_indicator.clone()),
+                    read_receipt: per_agent_preference
+                        .clone()
+                        .read_receipt
+                        .unwrap_or(fetched_preference.1.read_receipt.clone()),
+                };
+
+                match fetched_preference.1 == preference {
+                    true => Ok(preference),
+                    _ => create_per_agent_preference(preference),
+                }
+            }
             _ => crate::err("104", "No entry found for per agent preference."),
         },
     }
@@ -179,49 +183,50 @@ fn fetch_per_group_preference() -> ExternResult<(element::SignedHeaderHashed, Pe
     }
 }
 
-pub(crate) fn get_per_group_preference() -> ExternResult<PerGroupPreferenceWrapper> {
-    match fetch_per_group_preference() {
-        Ok(unwrapped_preference) => Ok(PerGroupPreferenceWrapper(PerGroupPreference {
-            typing_indicator: unwrapped_preference.1.typing_indicator,
-            read_receipt: unwrapped_preference.1.read_receipt,
-        })),
-        _ => crate::err("104", "No entry found for per grou preference."),
-    }
+pub(crate) fn get_per_group_preference() -> ExternResult<PerGroupPreference> {
+    Ok(PerGroupPreference {
+        ..fetch_per_group_preference()?.1
+    })
 }
 
-fn create_per_group_preference(preference: PerGroupPreference) -> PerGroupPreferenceWrapper {
+fn create_per_group_preference(preference: PerGroupPreference) -> ExternResult<PerGroupPreference> {
     match create_entry(&preference) {
-        Ok(_) => debug!("Successfully created a PerGroupPreference entry"),
-        Err(_) => crate::err::<()>("100", "Problems were encountered during creation of entry")
-            .expect("Entry should be of type PerGroupPreference"),
-    };
-    return PerGroupPreferenceWrapper(preference);
+        Ok(_) => Ok(preference),
+        Err(_) => crate::err("100", "Problems were encountered during creation of entry"),
+    }
 }
 
 pub(crate) fn set_per_group_preference(
     per_group_preference: PerGroupPreferenceIO,
-) -> ExternResult<PerGroupPreferenceWrapper> {
+) -> ExternResult<PerGroupPreference> {
     match (
         per_group_preference.clone().typing_indicator,
         per_group_preference.clone().read_receipt,
     ) {
         (Some(typing_indicator), Some(read_receipt)) => {
-            Ok(create_per_group_preference(PerGroupPreference {
+            create_per_group_preference(PerGroupPreference {
                 typing_indicator,
                 read_receipt,
-            }))
+            })
         }
         _ => match fetch_per_group_preference() {
-            Ok(unwrapped_preference) => Ok(create_per_group_preference(PerGroupPreference {
-                typing_indicator: per_group_preference
-                    .clone()
-                    .typing_indicator
-                    .unwrap_or(unwrapped_preference.1.typing_indicator.clone()),
-                read_receipt: match per_group_preference.clone().read_receipt {
-                    Some(read_receipt) => read_receipt,
-                    _ => unwrapped_preference.1.read_receipt.clone(),
-                },
-            })),
+            Ok(fetched_preference) => {
+                let preference = PerGroupPreference {
+                    typing_indicator: per_group_preference
+                        .clone()
+                        .typing_indicator
+                        .unwrap_or(fetched_preference.1.typing_indicator.clone()),
+                    read_receipt: match per_group_preference.clone().read_receipt {
+                        Some(read_receipt) => read_receipt,
+                        _ => fetched_preference.1.read_receipt.clone(),
+                    },
+                };
+
+                match preference == fetched_preference.1 {
+                    true => Ok(preference),
+                    _ => create_per_group_preference(preference),
+                }
+            }
             _ => crate::err("104", "No entry found for per group preference."),
         },
     }

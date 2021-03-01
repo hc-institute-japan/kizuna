@@ -1,0 +1,14 @@
+[package]
+name = "aggregator"
+version = "0.0.1"
+authors = [ "hcij" ]
+edition = "2018"
+
+[lib]
+name = "aggregator"
+crate-type = [ "cdylib", "rlib" ]
+
+[dependencies]
+derive_more = "0"
+serde = "1"
+hdk3 = "0"
