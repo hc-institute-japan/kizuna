@@ -1076,8 +1076,56 @@ function sendMessageswithFilesTest(orchestrator, config, installables) {
     let message_4 = await sendMessage(bobby_conductor, {group_id, sender: bobbyPubKey, payload_input: payload_input_2});
     await delay(1000);
 
-    let messages:{id:Buffer, timestamp: []}[]= [];
+    let pdf1_metadata ={
+      file_name: "message_5.pdf",
+      file_size: 20,
+      file_type:"Other",
+    };
 
+    let pdf1_path = path.join(__dirname, "/files/message_5.pdf");
+    let pdf1_bytes = fs.readFileSync(pdf1_path);
+
+    let payload_input_3 = { File:
+      { 
+       metadata: pdf1_metadata,
+       file_type: {Other : null},
+       file_bytes: Int8Array.from(pdf1_bytes),
+     }
+   };
+
+   let message_5 = await sendMessage(bobby_conductor, {group_id, sender: bobbyPubKey, payload_input: payload_input_3});
+   await delay(1000);
+
+   let pdf2_metadata ={
+    file_name: "message_6.pdf",
+    file_size: 20,
+    file_type:"Other",
+  };
+
+   let pdf2_path = path.join(__dirname, "/files/message_6.pdf");
+   let pdf2_bytes = fs.readFileSync(pdf2_path);
+
+   let payload_input_4 = { File:
+     { 
+      metadata: pdf2_metadata,
+      file_type: {Other : null},
+      file_bytes: Int8Array.from(pdf2_bytes),
+    }
+  };
+
+  let message_6 = await sendMessage(alice_conductor, {group_id, sender: alicePubKey, payload_input: payload_input_4});
+  await delay(2000);
+
+  let messages:{id:Buffer, timestamp: []}[]= [];
+
+    messages.push({
+      id: message_6.id,
+      timestamp: message_6.content.created
+    });        
+    messages.push({
+      id: message_5.id,
+      timestamp: message_5.content.created
+    });    
     messages.push({
       id: message_4.id,
       timestamp: message_4.content.created
@@ -1099,7 +1147,7 @@ function sendMessageswithFilesTest(orchestrator, config, installables) {
       group_id,
       last_fetched: null,
       last_message_timestamp: null,
-      batch_size: 5, 
+      batch_size: 6, 
       payload_type: { File: null },
     };
 
@@ -1107,7 +1155,7 @@ function sendMessageswithFilesTest(orchestrator, config, installables) {
       group_id,
       last_fetched: null,
       last_message_timestamp: null,
-      batch_size: 5, 
+      batch_size: 6, 
       payload_type: { All: null },
     };
 
@@ -1117,21 +1165,47 @@ function sendMessageswithFilesTest(orchestrator, config, installables) {
     let group_messages_2 = await getNextBatchGroupMessage(filter_2)(alice_conductor);
     await delay(2000);
 
+    t.deepEqual([messages[0].id, messages[1].id, messages[2].id,messages[3].id,messages[4].id,messages[5].id], Object.values(group_messages_2.messages_by_group)[0]);
+    t.deepEqual([messages[0].id, messages[1].id,messages[2].id,messages[4].id], Object.values(group_messages.messages_by_group)[0]);
 
-    console.log("output2");
-    console.log(messages);
-    
-    console.log("output");
-    console.log(Object.values(group_messages.messages_by_group)[0]);   
-    
-    console.log("output3");
-    console.log(Object.values(group_messages_2.messages_by_group)[0]); 
+    let messages_with_files = [messages[0].id, messages[1].id, messages[2].id, messages[4].id];
 
+    let filter_3 = {
+      group_id,
+      last_fetched: null,
+      last_message_timestamp: null,
+      batch_size: 1, 
+      payload_type: { File: null },
+    };
 
-    t.deepEqual([messages[0].id, messages[1].id, messages[2].id,messages[3].id], Object.values(group_messages_2.messages_by_group)[0]);
-    t.deepEqual([messages[0].id, messages[2].id], Object.values(group_messages.messages_by_group)[0]);
+    let messages_one_by_one: Buffer[] = await getMessagesOneByOne(filter_3,bobby_conductor, messages_with_files);
+    t.deepEqual(messages_one_by_one, messages_with_files);
+
 
   });
+}
+
+async function getMessagesOneByOne(filter,conductor, messages_with_files){
+
+  let group_messages;
+  let output: Buffer[] = [];
+
+  for (let i=0; i<messages_with_files.length; i++){
+
+    group_messages = await getNextBatchGroupMessage(filter)(conductor);
+    await delay(2000);
+
+    if(Object.values(group_messages.messages_by_group).length == 0 ){ break; }
+
+    group_messages = (Object.values(group_messages.group_messages_contents)[0]);
+    
+    filter.last_fetched = group_messages[0].signed_header.header.content.entry_hash;
+    filter.last_message_timestamp = group_messages[0].signed_header.header.content.timestamp;
+
+    output.push(filter.last_fetched,);
+  }
+
+  return output;
 }
 
 
