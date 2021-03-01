@@ -13,5 +13,4 @@ file_types = { version = "0.0.1", path = "../../commons/file_types" }
 derive_more = "0"
 serde = "1"
 
-hc_utils = "0"
 hdk3 = "0"

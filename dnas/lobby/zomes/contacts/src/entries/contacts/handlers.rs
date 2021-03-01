@@ -183,7 +183,7 @@ fn query_contacts() -> ExternResult<Vec<Contact>> {
     let filter = QueryFilter::new()
         .entry_type(EntryType::App(AppEntryType::new(
             EntryDefIndex::from(0),
-            ZomeId::from(0),
+            zome_info()?.zome_id,
             EntryVisibility::Private,
         )))
         .include_entries(true)
