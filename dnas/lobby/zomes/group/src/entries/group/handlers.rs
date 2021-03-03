@@ -45,11 +45,19 @@ pub fn create_group(create_group_input: CreateGroupInput) -> ExternResult<Create
     // commit group entry
     let group_revision_id: HeaderHash = create_entry(&group.clone())?;
     let group_id: EntryHash = hash_entry(&group.clone())?;
+    let group_output = GroupOutput {
+        group_id: group_id.clone(),
+        group_revision_id: group_revision_id.clone(),
+        latest_name: group.name.clone(),
+        members: group.members.clone(),
+        creator: group.creator.clone(),
+        created: group.created.clone(),
+    };
 
     // link the group admin to the group
     create_link(creator.into(), group_id.clone(), LinkTag::new("member"))?;
 
-    let signal_payload: SignalPayload = SignalPayload::AddedToGroup(group_id.clone());
+    let signal_payload: SignalPayload = SignalPayload::AddedToGroup(group_output);
     // link all the group members to the group entry with the link tag "member" and send them a signal with the group_id as payload.
     link_and_emit_added_to_group_signals(
         group_members,
@@ -107,9 +115,18 @@ pub fn add_members(add_members_input: UpdateMembersIO) -> ExternResult<UpdateMem
     let updated_group: Group = Group::new(group_name, created, creator, group_members.clone());
 
     // update_entry the Group with new members field with original HeaderHash
-    update_entry(group_revision_id, &updated_group)?;
+    update_entry(group_revision_id.clone(), &updated_group)?;
 
-    let signal_payload: SignalPayload = SignalPayload::AddedToGroup(group_id.clone());
+    let group_output = GroupOutput {
+        group_id: group_id.clone(),
+        group_revision_id: group_revision_id,
+        latest_name: updated_group.name.clone(),
+        members: updated_group.members.clone(),
+        creator: updated_group.creator.clone(),
+        created: updated_group.created.clone(),
+    };
+
+    let signal_payload: SignalPayload = SignalPayload::AddedToGroup(group_output);
 
     // link all the new group members to the group entry with the link tag "member" and send them a signal with the group_id as payload
     link_and_emit_added_to_group_signals(

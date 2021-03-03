@@ -2,9 +2,7 @@ import { ScenarioApi } from "@holochain/tryorama/lib/api";
 import { delay, dateToTimestamp } from "../../utils";
 
 import * as fs from "fs";
-import * as path from 'path'
-
-
+import * as path from "path";
 
 import {
   getNextBatchGroupMessage,
@@ -933,7 +931,7 @@ function getLatestMessagesForAllGroupsTest(orchestrator, config, installables) {
         name: "Group_name",
         members: [bobbyPubKey, charliePubKey],
       };
- 
+
       let create_group_input_2 = {
         name: "Group_name_2",
         members: [alicePubKey, charliePubKey],
@@ -1210,7 +1208,10 @@ function sendMessageswithFilesTest(orchestrator, config, installables) {
         Object.values(group_messages_2.messages_by_group)[0]
       );
 
-      t.deepEqual( [messages[0].id, messages[1].id, messages[2].id, messages[4].id], Object.values(group_messages.messages_by_group)[0] );
+      t.deepEqual(
+        [messages[0].id, messages[1].id, messages[2].id, messages[4].id],
+        Object.values(group_messages.messages_by_group)[0]
+      );
 
       let messages_with_files = [
         messages[0].id,
@@ -1227,124 +1228,130 @@ function sendMessageswithFilesTest(orchestrator, config, installables) {
         payload_type: { File: null },
       };
 
+      let messages_one_by_one: Buffer[] = await getMessagesInBatches(
+        filter_3,
+        bobby_conductor,
+        messages_with_files
+      );
 
-    let messages_one_by_one: Buffer[] = await getMessagesInBatches( filter_3, bobby_conductor, messages_with_files);
- 
-    t.deepEqual(messages_one_by_one, messages_with_files);
- 
-  });
+      t.deepEqual(messages_one_by_one, messages_with_files);
+    }
+  );
 }
 
 function sendLargeSetOfFilesTest(orchestrator, config, installables) {
-  orchestrator.registerScenario("we should send and then return a large set of messages with files",async (s: ScenarioApi, t) => {
-    
-    const [alice, bobby] = await s.players([config, config]);
+  orchestrator.registerScenario(
+    "we should send and then return a large set of messages with files",
+    async (s: ScenarioApi, t) => {
+      const [alice, bobby] = await s.players([config, config]);
 
-    const [[alice_happ]] = await alice.installAgentsHapps(installables.one);
-    const [[bobby_happ]] = await bobby.installAgentsHapps(installables.one);
+      const [[alice_happ]] = await alice.installAgentsHapps(installables.one);
+      const [[bobby_happ]] = await bobby.installAgentsHapps(installables.one);
 
-    await s.shareAllNodes([alice, bobby]);
+      await s.shareAllNodes([alice, bobby]);
 
-    const alicePubKey = alice_happ.agent;
-    const bobbyPubKey = bobby_happ.agent;
+      const alicePubKey = alice_happ.agent;
+      const bobbyPubKey = bobby_happ.agent;
 
-    const alice_conductor = alice_happ.cells[0];
-    const bobby_conductor = bobby_happ.cells[0];
+      const alice_conductor = alice_happ.cells[0];
+      const bobby_conductor = bobby_happ.cells[0];
 
-    init(alice_conductor);
-    init(bobby_conductor);
+      init(alice_conductor);
+      init(bobby_conductor);
 
-    let file_name:string;
-    let day = 9;
-    let date:number = new Date(2021, 1, day).getTime();
-    let file_path;
-    let file_bytes;
-    let messages:Buffer[] = [];
-    let timestamps:number[][] = [];
-    let thumbnail_bytes = Int8Array.from([1,2,3,4,5,6,7,8,9,10]);
+      let file_name: string;
+      let day = 9;
+      let date: number = new Date(2021, 1, day).getTime();
+      let file_path;
+      let file_bytes;
+      let messages: Buffer[] = [];
+      let timestamps: number[][] = [];
+      let thumbnail_bytes = Int8Array.from([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
 
-    let total:any = [];
+      let total: any = [];
 
-
-    let create_group_input = {
-      name: "Group_name",
-      members: [bobbyPubKey],
-    };
-
-    let { group_id, content } = await createGroup(create_group_input)( alice_conductor);
-    await delay(1000);
-
-    
-    for (let i = 0; i < 25; i++) {
-      
-      file_name = `/files/Icon${i+1}.png`;
-      file_path = path.join(__dirname, file_name);
-      file_bytes = fs.readFileSync(file_path);
-
-      let file_metadata ={
-        file_name: `Ìcon${i+1}.png`,
-        file_size: 20,
-        file_type:"Image",
+      let create_group_input = {
+        name: "Group_name",
+        members: [bobbyPubKey],
       };
-      
-      let payload_input =  { File: { 
-        metadata: file_metadata,
-        file_type: {Image : {thumbnail: thumbnail_bytes}},
-        file_bytes: Int8Array.from(file_bytes),
-      
-      }};
-  
-      let message = await sendMessage(alice_conductor, {group_id, sender: alicePubKey, payload_input});
+
+      let { group_id, content } = await createGroup(create_group_input)(
+        alice_conductor
+      );
       await delay(1000);
-      messages.push(message.id);
 
-      date += 1000;
+      for (let i = 0; i < 25; i++) {
+        file_name = `/files/Icon${i + 1}.png`;
+        file_path = path.join(__dirname, file_name);
+        file_bytes = fs.readFileSync(file_path);
 
+        let file_metadata = {
+          file_name: `Ìcon${i + 1}.png`,
+          file_size: 20,
+          file_type: "Image",
+        };
 
-      if((i+1)%5 == 0){
-        day++;
-        date = new Date(2021, 3, day).getTime();
+        let payload_input = {
+          File: {
+            metadata: file_metadata,
+            file_type: { Image: { thumbnail: thumbnail_bytes } },
+            file_bytes: Int8Array.from(file_bytes),
+          },
+        };
+
+        let message = await sendMessage(alice_conductor, {
+          group_id,
+          sender: alicePubKey,
+          payload_input,
+        });
+        await delay(1000);
+        messages.push(message.id);
+
+        date += 1000;
+
+        if ((i + 1) % 5 == 0) {
+          day++;
+          date = new Date(2021, 3, day).getTime();
+        }
       }
+
+      messages.reverse();
+
+      let filter = {
+        group_id,
+        last_fetched: null,
+        last_message_timestamp: null,
+        batch_size: 5,
+        payload_type: { File: null },
+      };
+
+      let output = await getMessagesInBatches(
+        filter,
+        bobby_conductor,
+        messages
+      );
+      await delay(5000);
+
+      console.log(messages);
+      console.log(messages.length);
+      console.log("hey");
+      console.log(output);
+      console.log(output.length);
+
+      t.deepEqual(messages, output);
     }
-
-    messages.reverse();
-
-    let filter = {
-      group_id,
-      last_fetched:null,
-      last_message_timestamp:null,
-      batch_size: 5,
-      payload_type: { File: null },
-    };
-
-
-    let output = await getMessagesInBatches(filter, bobby_conductor,messages); 
-    await delay(5000);
-
-
-    console.log(messages);
-    console.log(messages.length);
-    console.log("hey");
-    console.log(output);
-    console.log(output.length);
-    
-    t.deepEqual(messages, output);
-    
-  });
+  );
 }
 
-async function getMessagesInBatches(filter,conductor, messages_with_files){
-
+async function getMessagesInBatches(filter, conductor, messages_with_files) {
   let group_messages;
   let output: Buffer[] = [];
-  let iterations = messages_with_files.length / filter.batch_size; //this is onnly valid if the messages is % of the batch size 
-  
-  let messages_by_group:any = [];
-  let messages_contents:any = [];
+  let iterations = messages_with_files.length / filter.batch_size; // this is onnly valid if the messages is % of the batch size
 
+  let messages_by_group: any = [];
+  let messages_contents: any = [];
 
-  for (let i=0; i<iterations; i++){
-
+  for (let i = 0; i < iterations; i++) {
     group_messages = await getNextBatchGroupMessage(filter)(conductor);
     await delay(2000);
 
@@ -1353,38 +1360,35 @@ async function getMessagesInBatches(filter,conductor, messages_with_files){
     }
 
     messages_by_group = Object.values(group_messages.messages_by_group)[0];
-    
+
     output = output.concat(messages_by_group);
 
-    Object.values(group_messages.group_messages_contents).forEach((element:any) => {
+    Object.values(group_messages.group_messages_contents).forEach(
+      (element: any) => {
+        let entry_hash: Buffer =
+          element[0].signed_header.header.content.entry_hash;
+        let timestamp: [] = element[0].signed_header.header.content.timestamp;
 
-      let entry_hash:Buffer = element[0].signed_header.header.content.entry_hash;
-      let timestamp:[] = element[0].signed_header.header.content.timestamp ;
+        messages_contents.push({
+          entry_hash,
+          timestamp,
+        });
+      }
+    );
 
-      messages_contents.push({
-        entry_hash,
-        timestamp,
-      });
+    messages_contents.forEach((element: any) => {
+      let buffer: Buffer = messages_by_group[messages_by_group.length - 1];
+      let buffer2: Buffer = element.entry_hash;
 
-    });
-
-    messages_contents.forEach( (element:any) => {
-
-      let buffer:Buffer = messages_by_group[(messages_by_group.length-1)];
-      let buffer2:Buffer = element.entry_hash;
-      
-      if( Buffer.compare(buffer, buffer2) == 0){
-
+      if (Buffer.compare(buffer, buffer2) == 0) {
         console.log(buffer);
         console.log(buffer2);
-        
 
         filter.last_fetched = element.entry_hash;
         filter.last_message_timestamp = element.timestamp;
       }
-
     });
-    
+
     messages_by_group = [];
     messages_contents = [];
   }
@@ -1410,5 +1414,5 @@ export {
   getNextBatchOfMessagesTest,
   getLatestMessagesForAllGroupsTest,
   sendMessageswithFilesTest,
-  sendLargeSetOfFilesTest
+  sendLargeSetOfFilesTest,
 };
