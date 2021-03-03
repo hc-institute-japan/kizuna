@@ -74,13 +74,14 @@ pub struct CreateGroupInput {
 //END OF INPUTS TYPES DEFINITION
 
 //OUTPUTS TYPES DEFINITION
-#[derive(Deserialize, Serialize, SerializedBytes)]
+#[derive(Deserialize, Serialize, SerializedBytes, Clone)]
 pub struct CreateGroupOutput {
     pub content: Group,
     pub group_id: EntryHash,
     pub group_revision_id: HeaderHash,
 }
-#[derive(Deserialize, Serialize, SerializedBytes)]
+#[derive(Deserialize, Serialize, SerializedBytes, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct GroupOutput {
     group_id: EntryHash,
     group_revision_id: HeaderHash,

@@ -107,6 +107,8 @@ export function getLatestMessagesForAllGroups(batch_size){
 
 //HELPERS FUNCTIONS FOR TESTING SENDING FILE MESSAGES
 
+
+
 export function strToUtf8Bytes(str){
   const bytes: Array<number> = [];
 
@@ -116,13 +118,6 @@ export function strToUtf8Bytes(str){
   }
 
   return bytes;
-}
-export function hash_file(input_text){
-  let file_hash = require("crypto")
-    .createHash("sha256")
-    .update(input_text)
-    .digest("hex");
-  return file_hash;
 }
 
 declare type Dictionary<T> = { [key: string]: T; };
