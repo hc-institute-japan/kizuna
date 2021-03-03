@@ -15,7 +15,7 @@ const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
 function getGroupfromGroupOutput(group_output) {
   return {
-    name: group_output.latest_name,
+    name: group_output.latestName,
     created: group_output.created,
     creator: group_output.creator,
     members: group_output.members,
@@ -141,7 +141,16 @@ export function createGroupTest(orchestrator, config, installables) {
       );
       t.deepEqual(
         bobby_signal_listener.payload,
-        { AddedToGroup: group_id },
+        {
+          AddedToGroup: {
+            groupId: group_id,
+            groupRevisionId: group_revision_id,
+            latestName: create_group_content.name,
+            members: create_group_content.members,
+            creator: create_group_content.creator,
+            created: create_group_content.created,
+          },
+        },
         "bobby has received the signal payload from create_group"
       );
       t.equal(
@@ -242,7 +251,16 @@ export function addAndRemoveMembersTest(orchestrator, config, installables) {
       );
       t.deepEqual(
         bobby_signal_listener.payload,
-        { AddedToGroup: group_id },
+        {
+          AddedToGroup: {
+            groupId: group_id,
+            groupRevisionId: group_revision_id,
+            latestName: original_group_content.name,
+            members: original_group_content.members,
+            creator: original_group_content.creator,
+            created: original_group_content.created,
+          },
+        },
         "bobby has received the signal payload from create_group"
       );
       t.equal(
@@ -322,7 +340,16 @@ export function addAndRemoveMembersTest(orchestrator, config, installables) {
       );
       t.deepEqual(
         bobby_signal_listener.payload,
-        { AddedToGroup: group_id },
+        {
+          AddedToGroup: {
+            groupId: group_id,
+            groupRevisionId: group_revision_id,
+            latestName: original_group_content.name,
+            members: original_group_content.members,
+            creator: original_group_content.creator,
+            created: original_group_content.created,
+          },
+        },
         "bobby has received the signal payload from create_group"
       );
       t.equal(
@@ -332,7 +359,16 @@ export function addAndRemoveMembersTest(orchestrator, config, installables) {
       );
       t.deepEqual(
         charlie_signal_listener.payload,
-        { AddedToGroup: group_id },
+        {
+          AddedToGroup: {
+            groupId: group_id,
+            groupRevisionId: group_revision_id,
+            latestName: updated_group.name,
+            members: updated_group.members,
+            creator: updated_group.creator,
+            created: updated_group.created,
+          },
+        },
         "charlie's has received the signal payload from create_group"
       );
 
