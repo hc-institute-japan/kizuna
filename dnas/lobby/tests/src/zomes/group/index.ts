@@ -13,6 +13,7 @@ import {
   getNextBatchOfMessagesTest,
   getLatestMessagesForAllGroupsTest,
   sendMessageswithFilesTest,
+  sendLargeSetOfFilesTest,
 } from "./group_message";
 
 export default (orchestrator, config, installables) => {
@@ -26,5 +27,7 @@ export default (orchestrator, config, installables) => {
   //getLatestMessagesForAllGroupsTest(orchestrator, config, installables);
   //getMessagesByGroupByTimestampTest(orchestrator, config, installables);
   //sendMessageTest(orchestrator, config, installables);
-  sendMessageswithFilesTest(orchestrator, config, installables);
+  //sendMessageswithFilesTest(orchestrator, config, installables);
+  sendLargeSetOfFilesTest(orchestrator, config, installables);
+
 };
