@@ -16,6 +16,7 @@ import {
   sendMessageWithDate,
   strToUtf8Bytes,
   getMyGroupsList,
+  getMessagesByGroupByTimestamp,
 } from "./zome_fns";
 import { identity } from "lodash";
 
@@ -1343,6 +1344,143 @@ function sendLargeSetOfFilesTest(orchestrator, config, installables) {
   );
 }
 
+function fetchFilesForAParticularDateTest(orchestrator, config, installables) {
+  orchestrator.registerScenario(
+    "we should send and then return a large set of messages with files",
+    async (s: ScenarioApi, t) => {
+      const [alice, bobby] = await s.players([config, config]);
+
+      const [[alice_happ]] = await alice.installAgentsHapps(installables.one);
+      const [[bobby_happ]] = await bobby.installAgentsHapps(installables.one);
+
+      await s.shareAllNodes([alice, bobby]);
+
+      const alicePubKey = alice_happ.agent;
+      const bobbyPubKey = bobby_happ.agent;
+
+      const alice_conductor = alice_happ.cells[0];
+      const bobby_conductor = bobby_happ.cells[0];
+
+      init(alice_conductor);
+      init(bobby_conductor);
+
+    let create_group_input = {
+      name: "Group_name",
+      members: [bobbyPubKey],
+    };
+
+    let { content, group_id, group_revision_id } = await createGroup( create_group_input )(alice_conductor);
+    await delay(500);
+
+//    let file1_payload_input = generateFileMessage("Icon1.png", "Image", thumbnail);
+
+
+    let dates:number[] =[
+      new Date(2021, 1, 9).getTime(),
+      new Date(2021, 1, 10).getTime(),
+      new Date(2021, 1, 11).getTime(),
+      new Date(2021, 1, 12).getTime(),
+      new Date(2021, 1, 13).getTime()
+    ];
+  
+    //FIRST I SEND 5 MESSAGES ONE PER DAY FOR 5 DAYS 
+
+    let result = await sendMessaggesWithFilesInDiferentDates(group_id, alice_conductor, alicePubKey, "Image", dates);
+
+    if(result){
+
+      let messages:any = result.messages;
+
+      //THEN I TRY TO GET THOSE MESSAGES BACK AGAIN HERE BUT THEY ARE NOT BEING RETRIEVED 
+      let result2 = await getMessagesWithTimestamps(alice_conductor, group_id, dates, "All");
+
+      console.log("hey");
+      console.log(result2);
+
+      let filter = {
+        group_id,
+        last_fetched: null,
+        last_message_timestamp: null,
+        batch_size: 5,
+        payload_type: { File: null },
+      };
+
+      //HERE I CHECK THOSE MESSAGES AWAS SENDED TO THE GIVEN GROUP 
+
+      let result3 = await getMessagesInBatches(filter,alice_conductor,result2);
+      await delay(10000);
+
+      console.log("result 3 ");
+
+      console.log(result3);
+      
+      
+      
+
+    }else{
+
+      t.fail("error");
+
+    }
+
+  })
+}
+
+function generateFileMessage(file_name, file_type, file_type_input){
+
+  let file_metadata = {
+    file_name,
+    file_size: 20,
+    file_type,
+  };
+
+  file_name = `/files/${file_name}`;
+  let file_path = path.join(__dirname, file_name);
+  let file_bytes = fs.readFileSync(file_path);
+
+  let payload_input = {
+    File: {
+      metadata: file_metadata,
+      file_type:file_type_input,
+      file_bytes: Int8Array.from(file_bytes),
+    }
+  };
+
+  return payload_input;
+}
+
+async function sendMessaggesWithFilesInDiferentDates(group_id,sender_conductor, sender_pubKey, message_type, dates){
+
+  let messages:{}[] = [];
+
+  let thumbnail_bytes = Int8Array.from([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+  let file_type_input:any = null;
+
+  switch(message_type){
+    case "Image":
+        file_type_input = { Image: { thumbnail: thumbnail_bytes } };
+      break;
+    case "Video":
+        file_type_input = { Video: { thumbnail: thumbnail_bytes } };
+      break;
+    default: return;  
+  }
+
+  for (let i = 0; i < dates.length; i++) {
+    
+    let file_name = `Icon${i+1}.png`;
+    let payload = generateFileMessage(file_name, message_type, file_type_input);
+
+    let result = await sendMessageWithDate( sender_conductor ,{group_id, payload, sender:sender_pubKey, date: dates[i]});
+    await delay(1000);
+
+    messages.push(result);
+    
+  }
+  return {
+    messages,
+  };
+}
 async function getMessagesInBatches(filter, conductor, messages_with_files) {
   let group_messages;
   let output: Buffer[] = [];
@@ -1373,6 +1511,10 @@ async function getMessagesInBatches(filter, conductor, messages_with_files) {
           entry_hash,
           timestamp,
         });
+
+
+        console.log(timestamp);
+        
       }
     );
 
@@ -1391,6 +1533,41 @@ async function getMessagesInBatches(filter, conductor, messages_with_files) {
 
     messages_by_group = [];
     messages_contents = [];
+  }
+
+  return output;
+}
+
+async function  getMessagesWithTimestamps(conductor,group_id, dates, messages_type){
+
+  let payload_type:any = null; 
+  
+  switch(messages_type){
+    case "Text":
+      payload_type = { Text: null,};
+      break;    
+    case "File":
+      payload_type = { File: null,};
+      break;
+    case "All":
+      payload_type = { All: null,};
+      break;
+  }
+
+  let output:any = [];
+
+  for (let i = 0; i < dates.length; i++) {
+
+    let result = await getMessagesByGroupByTimestamp({
+      group_id,
+      date: dateToTimestamp(new Date(dates[i])), 
+      payload_type, 
+    })(conductor);
+
+    console.log(dateToTimestamp(new Date(dates[i])));
+    
+    await delay(1000);
+    output.push(result);    
   }
 
   return output;
@@ -1415,4 +1592,5 @@ export {
   getLatestMessagesForAllGroupsTest,
   sendMessageswithFilesTest,
   sendLargeSetOfFilesTest,
+  fetchFilesForAParticularDateTest,
 };

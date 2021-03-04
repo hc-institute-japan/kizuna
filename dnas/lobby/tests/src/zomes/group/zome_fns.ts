@@ -1,4 +1,4 @@
-import { filter } from "lodash";
+import { cond, filter } from "lodash";
 import { Base64 } from "js-base64";
 import blake from 'blakejs';
 
@@ -54,6 +54,13 @@ export function sendMessage(conductor, { group_id, sender, payload_input }) {
     sender,
   });
 }
+
+export function getMessagesByGroupByTimestamp(message_info){
+  return (conductor)=> 
+    conductor.call("group", "get_messages_by_group_by_timestamp",message_info);
+}
+
+
 
 export function signalHandler(signal, signal_listener) {
   /*
