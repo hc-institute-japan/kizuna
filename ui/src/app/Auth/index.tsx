@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchMyUsername } from "../../redux/profile/actions";
 import { RootState } from "../../redux/types";
-import Home from "../Home";
+import Authenticated from "../Authenticated";
 import Unauthenticated from "../Unauthenticated";
 
 declare let cordova: any;
@@ -34,7 +34,7 @@ const Auth: React.FC = () => {
     }
   }, []);
 
-  return username !== null ? <Home /> : <Unauthenticated />;
+  return username !== null ? <Authenticated /> : <Unauthenticated />;
 };
 
 export default Auth;

@@ -49,3 +49,20 @@ export const registerUsername = (username: string): ThunkAction => async (
 
   return null;
 };
+
+export const fetchProfileFromUsername = (
+  username: string
+): ThunkAction => async (dispatch, _getState, { callZome }) => {
+  const res = await callZome({
+    zomeName: ZOMES.USERNAME,
+    fnName: FUNCTIONS[ZOMES.USERNAME].GET_AGENT_PUBKEY_FROM_USERNAME,
+    payload: username,
+  });
+
+  if (res?.type !== "error") {
+    return {
+      id: res,
+      username,
+    };
+  }
+};

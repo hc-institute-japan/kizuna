@@ -1,36 +1,45 @@
-import { IonRouterOutlet, IonSplitPane } from "@ionic/react";
-import React, { useEffect } from "react";
-import { Redirect, Route } from "react-router";
-import Menu from "../../components/Menu";
-import { fetchMyContacts } from "../../redux/contacts/actions";
-import { fetchPreference } from "../../redux/preference/actions";
-import { useAppDispatch } from "../../utils/helpers";
-import Chat from "../Chat";
-import NewConversation from "../NewConversation";
-import Settings from "../Settings";
-import HomeTabBar from "./HomeTabBar";
+import {
+  IonIcon,
+  IonLabel,
+  IonRouterOutlet,
+  IonTabBar,
+  IonTabButton,
+  IonTabs,
+} from "@ionic/react";
+import { chatbox, person } from "ionicons/icons";
+import React from "react";
+import { FormattedMessage } from "react-intl";
+import { Redirect, Route, RouteComponentProps } from "react-router";
+import Contacts from "../Contacts";
+import Conversations from "../Conversations";
+import styles from "./style.module.css";
 
-const Home: React.FC = () => {
-  const dispatch = useAppDispatch();
-  useEffect(
-    function () {
-      dispatch(fetchPreference());
-      dispatch(fetchMyContacts());
-    },
-    [dispatch]
-  );
-  return (
-    <IonSplitPane contentId="main">
-      <Menu />
-      <IonRouterOutlet id="main">
-        <Route path="/home" component={HomeTabBar} />
-        <Route path="/compose" exact component={NewConversation} />
-        <Route path="/u/:username" exact component={Chat} />
-        <Route path="/settings" exact component={Settings} />
-        <Redirect from="/" to="/home" exact />
-      </IonRouterOutlet>
-    </IonSplitPane>
-  );
-};
+const HomeTabBar: React.FC = () => (
+  <IonTabs>
+    <IonRouterOutlet id="home">
+      <Redirect exact path="/home" to="/home/messaging"></Redirect>
+      <Route
+        path="/home/messaging"
+        render={() => <Conversations />}
+        exact={true}
+      />
+      <Route path="/home/contacts" render={() => <Contacts />} exact={true} />
+    </IonRouterOutlet>
+    <IonTabBar slot="bottom" className={styles["home-tab-bar"]}>
+      <IonTabButton tab="messaging" href="/home/messaging">
+        <IonIcon icon={chatbox} />
+        <IonLabel>
+          <FormattedMessage id="app.home.messaging-tab-bar" />
+        </IonLabel>
+      </IonTabButton>
+      <IonTabButton tab="contacts" href="/home/contacts">
+        <IonIcon icon={person} />
+        <IonLabel>
+          <FormattedMessage id="app.home.contacts-tab-bar" />
+        </IonLabel>
+      </IonTabButton>
+    </IonTabBar>
+  </IonTabs>
+);
 
-export default Home;
+export default HomeTabBar;

@@ -8,7 +8,7 @@ import {
   IonList,
   IonMenu,
 } from "@ionic/react";
-import { cogOutline, logOutOutline } from "ionicons/icons";
+import { banOutline, cogOutline, logOutOutline } from "ionicons/icons";
 import React from "react";
 import { useIntl } from "react-intl";
 import { useDispatch, useSelector } from "react-redux";
@@ -37,7 +37,13 @@ const Menu: React.FC = () => {
       label: intl.formatMessage({ id: "app.menu.settings-label" }),
       icon: cogOutline,
     },
-
+    {
+      onClick: () => {
+        history.push("/blocked");
+      },
+      label: intl.formatMessage({ id: "app.menu.blocked-label" }),
+      icon: banOutline,
+    },
     {
       onClick: () => {
         dispatch(setUsername(null));

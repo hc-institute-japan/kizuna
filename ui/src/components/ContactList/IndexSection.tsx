@@ -14,7 +14,7 @@ const IndexSection: React.FC<Props> = ({ char, contacts }) => (
       <IonLabel>{char}</IonLabel>
     </IonItemDivider>
     {contacts.map((contact) => (
-      <ContactItem contact={contact} />
+      <ContactItem key={JSON.stringify(contact)} contact={contact} />
     ))}
   </React.Fragment>
 );

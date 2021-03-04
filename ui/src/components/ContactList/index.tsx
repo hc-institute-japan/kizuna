@@ -14,7 +14,9 @@ const ContactsList: React.FC<Props> = ({ contacts: indexedContacts }) => (
   <IonList className={styles["contacts-list"]}>
     {Object.keys(indexedContacts).map((char) => {
       const contacts = indexedContacts[char];
-      return <IndexSection char={char} contacts={contacts}></IndexSection>;
+      return (
+        <IndexSection key={char} char={char} contacts={contacts}></IndexSection>
+      );
     })}
   </IonList>
 );

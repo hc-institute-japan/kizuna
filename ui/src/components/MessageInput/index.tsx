@@ -8,19 +8,22 @@ import {
 } from "@ionic/react";
 import { attachOutline, camera, mic, send } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
+import { useIntl } from "react-intl";
 import styles from "./style.module.css";
 
 interface Props {
   onChange?: (message: string) => any;
+  onSend?: () => any;
 }
 
-const MessageInput: React.FC<Props> = ({ onChange }) => {
+const MessageInput: React.FC<Props> = ({ onChange, onSend }) => {
   const [message, setMessage] = useState("");
   const handleOnChange = (e: CustomEvent) => setMessage(e.detail.value!);
+  const intl = useIntl();
 
   useEffect(() => {
     if (onChange) onChange(message);
-  }, [message]);
+  }, [message, onChange]);
 
   return (
     <IonFooter>
@@ -33,7 +36,9 @@ const MessageInput: React.FC<Props> = ({ onChange }) => {
         <IonTextarea
           onIonChange={handleOnChange}
           autoGrow={true}
-          placeholder="Placeholder"
+          placeholder={intl.formatMessage({
+            id: "app.new-conversation.message-placeholder",
+          })}
         ></IonTextarea>
         <IonButtons slot="end">
           {message.length > 0 ? null : (
@@ -43,10 +48,10 @@ const MessageInput: React.FC<Props> = ({ onChange }) => {
               </IonButton>
               <IonButton>
                 <IonIcon color="medium" icon={mic} />
-              </IonButton>{" "}
+              </IonButton>
             </>
           )}
-          <IonButton disabled={message.length === 0}>
+          <IonButton onClick={onSend} disabled={message.length === 0}>
             <IonIcon color="medium" icon={send} />
           </IonButton>
         </IonButtons>

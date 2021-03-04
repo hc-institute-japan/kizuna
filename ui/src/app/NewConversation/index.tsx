@@ -3,17 +3,18 @@ import {
   IonButtons,
   IonChip,
   IonContent,
-  IonFooter,
   IonHeader,
   IonIcon,
   IonInput,
   IonLabel,
   IonPage,
   IonTitle,
+  IonToast,
   IonToolbar,
 } from "@ionic/react";
 import { close } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
+import { useIntl } from "react-intl";
 import { useLocation } from "react-router";
 import MessageInput from "../../components/MessageInput";
 import { Profile, ProfileListType } from "../../redux/profile/types";
@@ -30,6 +31,8 @@ const NewConversation: React.FC = () => {
   const [contacts, setContacts] = useState<ProfileListType>({});
   const [selectedContacts, setSelectedContacts] = useState<ProfileListType>({});
   const [search, setSearch] = useState("");
+  const [isOpen, setIsOpen] = useState(false);
+  const intl = useIntl();
 
   useEffect(() => {
     if (location.state !== undefined) setContacts(location.state.contacts);
@@ -50,23 +53,46 @@ const NewConversation: React.FC = () => {
     setSearch("");
   }, [contacts, selectedContacts]);
 
+  const handleOnSend = () => {
+    console.log("clicked");
+    if (Object.keys(selectedContacts).length === 1) {
+      // send p2p
+    } else if (Object.keys(selectedContacts).length > 1) {
+      // send group
+    } else {
+      console.log("what the fuck");
+      setIsOpen(true);
+    }
+  };
+
   return (
     <ContactsContext.Provider
       value={[contacts, setContacts, selectedContacts, setSelectedContacts]}
     >
       <IonPage>
+        <IonToast
+          isOpen={isOpen}
+          onDidDismiss={() => setIsOpen(false)}
+          duration={1500}
+          message="Select a contact...."
+          color="danger"
+        ></IonToast>
         <IonHeader className={styles.header}>
           <IonToolbar>
             <IonButtons slot="start">
               <IonBackButton defaultHref="/home" />
             </IonButtons>
-            <IonTitle>New Message</IonTitle>
+            <IonTitle>
+              {intl.formatMessage({ id: "app.new-conversation.header-title" })}
+            </IonTitle>
           </IonToolbar>
         </IonHeader>
 
         <IonContent className={styles["list"]}>
           <div className={`${styles.recipients} ion-padding`}>
-            <IonLabel className={styles.to}>To:</IonLabel>
+            <IonLabel className={styles.to}>
+              {intl.formatMessage({ id: "app.new-conversation.to" })}:
+            </IonLabel>
             {Object.values(selectedContacts).map((selectedContact) => (
               <IonChip color="primary" key={JSON.stringify(selectedContact.id)}>
                 <IonLabel className={styles["chip-label"]}>
@@ -80,7 +106,9 @@ const NewConversation: React.FC = () => {
             ))}
             <IonInput
               type="text"
-              placeholder="search contacts..."
+              placeholder={intl.formatMessage({
+                id: "app.new-conversation.search-placeholder",
+              })}
               onIonChange={(e) => setSearch(e.detail.value!)}
               value={search}
               debounce={500}
@@ -93,7 +121,10 @@ const NewConversation: React.FC = () => {
           />
         </IonContent>
 
-        <MessageInput onChange={(message) => {}}></MessageInput>
+        <MessageInput
+          onSend={handleOnSend}
+          onChange={(message) => {}}
+        ></MessageInput>
       </IonPage>
     </ContactsContext.Provider>
   );
