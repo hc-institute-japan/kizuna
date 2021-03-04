@@ -2,7 +2,7 @@ import { AgentPubKey } from "@holochain/conductor-api";
 import { FUNCTIONS, ZOMES } from "../../connection/types";
 import { Profile } from "../../redux/profile/types";
 import { ThunkAction } from "../types";
-import { SET_CONTACTS } from "./types";
+import { SET_CONTACTS, SET_BLOCKED } from "./types";
 
 export const setContacts = (contacts: {
   [key: string]: Profile;
@@ -96,4 +96,105 @@ export const addContact = (profile: Profile): ThunkAction => async (
     return true;
   }
   return false;
+};
+
+export const removeContact = (profile: Profile): ThunkAction => async (
+  dispatch,
+  getState,
+  { callZome }
+) => {
+  const contacts = getState().contacts.contacts;
+
+  const res = await callZome({
+    zomeName: ZOMES.CONTACTS,
+    fnName: FUNCTIONS[ZOMES.CONTACTS].REMOVE_CONTACTS,
+    payload: [profile.id],
+  });
+
+  if (res?.type !== "error") {
+    delete contacts[JSON.stringify(profile.id)];
+    dispatch({ type: SET_CONTACTS, contacts });
+    return true;
+  }
+  return false;
+};
+
+export const blockContact = (profile: Profile): ThunkAction => async (
+  dispatch,
+  getState,
+  { callZome }
+) => {
+  const blocked = getState().contacts.blocked;
+
+  const res = await callZome({
+    zomeName: ZOMES.CONTACTS,
+    fnName: FUNCTIONS[ZOMES.CONTACTS].BLOCK_CONTACTS,
+    payload: [profile.id],
+  });
+
+  if (res?.type !== "error") {
+    blocked[JSON.stringify(profile.id)] = profile;
+    dispatch({ type: SET_BLOCKED, blocked });
+    return true;
+  }
+  return false;
+};
+
+export const unblockContact = (profile: Profile): ThunkAction => async (
+  dispatch,
+  getState,
+  { callZome }
+) => {
+  const blocked = getState().contacts.blocked;
+
+  const res = await callZome({
+    zomeName: ZOMES.CONTACTS,
+    fnName: FUNCTIONS[ZOMES.CONTACTS].UNBLOCK_CONTACTS,
+    payload: [profile.id],
+  });
+
+  if (res?.type !== "error") {
+    delete blocked[JSON.stringify(profile.id)];
+    dispatch({ type: SET_CONTACTS, blocked });
+    return true;
+  }
+  return false;
+};
+
+export const fetchBlocked = (): ThunkAction => async (
+  dispatch,
+  _,
+  { callZome }
+) => {
+  const res = await callZome({
+    zomeName: ZOMES.CONTACTS,
+    fnName: FUNCTIONS[ZOMES.CONTACTS].LIST_BLOCKED,
+  });
+
+  if (res?.type !== "error") {
+    let blocked: { [key: string]: Profile } = {};
+    await Promise.all(
+      res.map(async (id: AgentPubKey) => {
+        const usernameOutput = await callZome({
+          zomeName: ZOMES.USERNAME,
+          fnName: FUNCTIONS[ZOMES.USERNAME].GET_USERNAME,
+          payload: id,
+        });
+
+        if (usernameOutput?.type !== "error")
+          blocked[JSON.stringify(id)] = {
+            id,
+            username: usernameOutput.username,
+          };
+      })
+    );
+
+    dispatch({
+      type: SET_BLOCKED,
+      blocked,
+    });
+
+    return blocked;
+  }
+  return null;
 };

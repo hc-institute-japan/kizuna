@@ -18,10 +18,6 @@ const Contacts: React.FC = () => {
   const dispatch = useAppDispatch();
   const contacts = useSelector((state: RootState) => state.contacts.contacts);
 
-  /**
-   * fetch all contacts here
-   */
-
   useEffect(() => {
     setLoading(true);
     dispatch(fetchMyContacts()).then((res: any) => {

@@ -75,12 +75,12 @@ const conversations: ConversationsType = [
   },
 ];
 
-const Conversations: React.FC<RouteComponentProps> = () => {
+const Conversations: React.FC = () => {
   const history = useHistory();
   const contacts = useSelector((state: RootState) => state.contacts.contacts);
   const handleOnClick = () => {
     history.push({
-      pathname: `compose`,
+      pathname: `/compose`,
       state: { contacts },
     });
   };

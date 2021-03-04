@@ -17,7 +17,7 @@ interface Props {
 
 const AddContactModal: React.FC<Props> = ({ isOpen, onCancel }) => {
   const [filter, setFilter] = useState<string>("");
-  const [users, setUsers] = useState<ProfileListType>({});
+  const [users, setUsers] = useState<Profile[]>([]);
   const [toast, setToast] = useState<string | null>(null);
   const dispatch = useAppDispatch();
 
@@ -27,14 +27,15 @@ const AddContactModal: React.FC<Props> = ({ isOpen, onCancel }) => {
     });
   }, [dispatch]);
 
-  let indexedContacts: IndexedContacts = indexContacts(Object.values(users));
+  let indexedContacts: IndexedContacts = indexContacts(
+    users.filter((user) => user.username.includes(filter))
+  );
 
   const onCompletion = (contact: Profile) => {
     setToast(contact.username);
-    setUsers((users) => {
-      delete users[JSON.stringify(contact.id)];
-      return users;
-    });
+    setUsers((users) =>
+      users.filter((user) => user.username !== contact.username)
+    );
   };
 
   return (

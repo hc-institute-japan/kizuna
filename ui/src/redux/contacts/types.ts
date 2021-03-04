@@ -1,6 +1,7 @@
 import { Profile } from "../profile/types";
 
 export const SET_CONTACTS = "SET_CONTACTS";
+export const SET_BLOCKED = "SET_BLOCKED";
 
 export interface IndexedContacts {
   [key: string]: Profile[];
@@ -22,4 +23,10 @@ interface SetContactsAction {
   };
 }
 
-export type ContactsActionType = SetContactsAction;
+interface SetBlockedAction {
+  type: typeof SET_BLOCKED;
+  blocked: {
+    [key: string]: Profile;
+  };
+}
+export type ContactsActionType = SetContactsAction | SetBlockedAction;

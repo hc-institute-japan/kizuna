@@ -6,13 +6,13 @@ import ReduxContainer from "./ReduxContainer";
 import RouterContainer from "./RouterContainer";
 
 const Container: React.FC = ({ children }) => (
-  <ReduxContainer>
-    <IonicContainer>
-      <IntlContainer>
-        <RouterContainer> {children}</RouterContainer>
-      </IntlContainer>
-    </IonicContainer>
-  </ReduxContainer>
+  <IonicContainer>
+    <RouterContainer>
+      <ReduxContainer>
+        <IntlContainer>{children}</IntlContainer>
+      </ReduxContainer>
+    </RouterContainer>
+  </IonicContainer>
 );
 
 export default Container;
