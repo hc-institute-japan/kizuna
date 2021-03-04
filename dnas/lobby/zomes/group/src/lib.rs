@@ -302,7 +302,6 @@ fn get_latest_messages_for_all_groups(batch_size: BatchSize) -> ExternResult<Gro
     group_message::handlers::get_latest_messages_for_all_groups(batch_size)
 }
 
-//END LIST OF DEPENDENCIES ADDED FOR MANUEL
 
 #[hdk_extern]
 fn send_message_in_target_date(
