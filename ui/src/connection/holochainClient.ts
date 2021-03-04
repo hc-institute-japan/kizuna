@@ -18,7 +18,7 @@ const init: () => any = async () => {
   }
   try {
     client = await AppWebsocket.connect(
-      "ws://localhost:8888",
+      process.env.REACT_APP_DNA_INTERFACE_URL as string,
       15000, // holochain's default timeout
       signalHandler
     );

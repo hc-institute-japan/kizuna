@@ -4,7 +4,15 @@ mod entries;
 mod signals;
 mod utils;
 
-use entries::group;
+use entries::{group, group_message};
+
+use signals::{SignalDetails, SignalPayload};
+
+use group_message::{
+    BatchSize, GroupChatFilter, GroupMessage, GroupMessageData, GroupMessageDataWrapper,
+    GroupMessageInput, GroupMessageInputWithDate, GroupMessageReadData, GroupMessagesOutput,
+    GroupMsgBatchFetchFilter, GroupTypingDetailData,GroupFileBytes
+};
 
 use entries::group::{
     handlers::get_group_entry_from_element,
@@ -23,7 +31,12 @@ use entries::group::{
     ValidationInput,
 };
 
-entry_defs![Group::entry_def(), Path::entry_def()];
+entry_defs![
+    Group::entry_def(),
+    Path::entry_def(),
+    GroupMessage::entry_def(),
+    GroupFileBytes::entry_def()
+];
 
 // this is only exposed outside of WASM for testing purposes.
 #[hdk_extern]
@@ -54,7 +67,22 @@ pub fn init(_: ()) -> ExternResult<InitCallbackResult> {
 fn recv_remote_signal(signal: SerializedBytes) -> ExternResult<()> {
     // currently only emitting the received signal
     // TODO: actually work with the received signal
-    emit_signal(&signal)?;
+    
+    let signal_detail: SignalDetails = signal.clone().try_into()?;
+    match signal_detail.payload {
+        SignalPayload::AddedToGroup(_) => {
+            emit_signal(&signal)?;
+        }
+        SignalPayload::GroupTypingDetail(_) => {
+            emit_signal(&signal)?;
+        }
+        SignalPayload::GroupMessageRead(_) => {
+            emit_signal(&signal)?;
+        }
+        SignalPayload::GroupMessageData(_) => {
+            emit_signal(&signal)?;
+        }
+    }
     Ok(())
 }
 
@@ -238,4 +266,53 @@ fn get_all_my_groups(_: ()) -> HdkResult<MyGroupListWrapper> {
 #[hdk_extern]
 fn get_group_latest_version(group_id: EntryHashWrapper) -> ExternResult<Group> {
     group::handlers::get_group_latest_version(group_id.group_hash)
+}
+
+#[hdk_extern]
+fn get_all_messages(group_id: EntryHash) -> ExternResult<GroupMessageDataWrapper> {
+    group_message::handlers::get_all_messages(group_id)
+}
+
+#[hdk_extern]
+fn send_message(message_input: GroupMessageInput) -> ExternResult<GroupMessageData> {
+    group_message::handlers::send_message(message_input)
+}
+
+#[hdk_extern]
+fn indicate_group_typing(group_typing_detail_data: GroupTypingDetailData) -> ExternResult<()> {
+    group_message::handlers::indicate_group_typing(group_typing_detail_data)
+}
+
+#[hdk_extern]
+fn read_group_message(
+    group_message_read_io: GroupMessageReadData,
+) -> ExternResult<GroupMessageReadData> {
+    group_message::handlers::read_group_message(group_message_read_io)
+}
+
+#[hdk_extern]
+fn get_next_batch_group_messages(
+    filter: GroupMsgBatchFetchFilter,
+) -> ExternResult<GroupMessagesOutput> {
+    group_message::handlers::get_next_batch_group_messages(filter)
+}
+
+#[hdk_extern]
+fn get_latest_messages_for_all_groups(batch_size: BatchSize) -> ExternResult<GroupMessagesOutput> {
+    group_message::handlers::get_latest_messages_for_all_groups(batch_size)
+}
+
+//END LIST OF DEPENDENCIES ADDED FOR MANUEL
+
+#[hdk_extern]
+fn send_message_in_target_date(
+    message_input: GroupMessageInputWithDate,
+) -> ExternResult<GroupMessageData> {
+    group_message::handlers::send_message_in_target_date(message_input)
+}
+#[hdk_extern]
+fn get_messages_by_group_by_timestamp(
+    group_chat_filter: GroupChatFilter,
+) -> ExternResult<GroupMessagesOutput> {
+    group_message::get_messages_by_group_by_timestamp::handler(group_chat_filter)
 }
