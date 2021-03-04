@@ -5,12 +5,33 @@ import {
 } from "@holochain/conductor-api";
 import store from "../redux/store";
 import { CallZomeConfig } from "../redux/types";
+import { ADD_GROUP, GroupConversation } from "../redux/group/types";
 
 let client: null | AppWebsocket = null;
 let myAgentId: null | AgentPubKey = null;
 
-let signalHandler: AppSignalCb = (signal) =>
-  store.dispatch(signal.data.payload);
+let signalHandler: AppSignalCb = (signal) => {
+  switch (signal.data.payload.name) {
+    case "added_to_group":
+      let payload = signal.data.payload.payload.AddedToGroup;
+      const groupData: GroupConversation = {
+        originalGroupEntryHash: payload.groupId,
+        originalGroupHeaderHash: payload.groupRevisionId,
+        name: payload.name,
+        members: payload.members,
+        createdAt: payload.created,
+        creator: payload.creator,
+        messages: [],
+      };
+      store.dispatch({
+        type: ADD_GROUP,
+        groupData,
+      });
+      break;
+    default:
+      break;
+  }
+};
 
 const init: () => any = async () => {
   if (client) {

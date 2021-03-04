@@ -51,6 +51,7 @@ entry_def!(Group
 
 // IO TYPES DEFINITION
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct UpdateMembersIO {
     pub members: Vec<AgentPubKey>,
     pub group_id: EntryHash,
@@ -58,6 +59,7 @@ pub struct UpdateMembersIO {
 }
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct UpdateGroupNameIO {
     name: String,
     group_id: EntryHash,
@@ -74,11 +76,12 @@ pub struct CreateGroupInput {
 //END OF INPUTS TYPES DEFINITION
 
 //OUTPUTS TYPES DEFINITION
-#[derive(Deserialize, Serialize, SerializedBytes, Clone)]
+#[derive(Deserialize, Serialize, SerializedBytes)]
+#[serde(rename_all = "camelCase")]
 pub struct CreateGroupOutput {
     pub content: Group,
-    pub group_id: EntryHash,
     pub group_revision_id: HeaderHash,
+    pub group_id: EntryHash,
 }
 #[derive(Deserialize, Serialize, SerializedBytes, Clone)]
 #[serde(rename_all = "camelCase")]

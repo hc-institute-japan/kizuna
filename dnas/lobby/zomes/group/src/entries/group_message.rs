@@ -77,6 +77,7 @@ pub struct GroupFileBytes(SerializedBytes);
 
 // START OF INPUTS TYPES DEFINITION
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct GroupMessageInput {
     group_hash: EntryHash,
     payload_input: PayloadInput,

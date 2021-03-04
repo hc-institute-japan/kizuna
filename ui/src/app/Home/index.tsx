@@ -9,6 +9,7 @@ import Chat from "../Chat";
 import NewConversation from "../NewConversation";
 import Settings from "../Settings";
 import HomeTabBar from "./HomeTabBar";
+import GroupChat from "../GroupChat";
 
 const Home: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -27,6 +28,7 @@ const Home: React.FC = () => {
         <Route path="/compose" exact component={NewConversation} />
         <Route path="/u/:username" exact component={Chat} />
         <Route path="/settings" exact component={Settings} />
+        <Route path="/test" exact component={GroupChat} />
         <Redirect from="/" to="/home" exact />
       </IonRouterOutlet>
     </IonSplitPane>
