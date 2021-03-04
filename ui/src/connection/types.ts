@@ -13,6 +13,7 @@ export const ZOMES: ZomeNameType = {
   PREFERENCE: "preference",
   P2PMESSAGE: "p2pmessage",
   CONTACTS: "contacts",
+  GROUP: "group",
 };
 
 export const FUNCTIONS: FunctionNameType = {
@@ -40,5 +41,15 @@ export const FUNCTIONS: FunctionNameType = {
     GET_PER_AGENT_PREFERENCE: "get_per_agent_preference",
     SET_PER_GROUP_PREFERENCE: "set_per_group_preference",
     GET_PER_GROUP_PREFERENCE: "get_per_group_preference",
+  },
+  [ZOMES.GROUP]: {
+    CREATE_GROUP: "create_group",
+    ADD_MEMBERS: "add_members",
+    REMOVE_MEMBERS: "remove_members",
+    UPDATE_GROUP_NAME: "update_group_name",
+    GET_ALL_MY_GROUPS: "get_all_my_groups",
+    SEND_MESSAGE: "send_message",
+    GET_NEXT_BATCH_GROUP_MESSAGES: "get_next_batch_group_messages",
+    GET_MESSAGES_BY_GROUP_BY_TIMESTAMP: "get_messages_by_group_by_timestamp",
   },
 };
