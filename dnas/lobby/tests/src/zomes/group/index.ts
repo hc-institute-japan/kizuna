@@ -27,11 +27,11 @@ export default (orchestrator, config, installables) => {
 
   // GroupMessage related tests
   // getLatestMessagesForAllGroupsTest(orchestrator, config, installables);
-  // getMessagesByGroupByTimestampTest(orchestrator, config, installables);
+  //getMessagesByGroupByTimestampTest(orchestrator, config, installables);
   // sendMessageTest(orchestrator, config, installables);
   // sendMessageswithFilesTest(orchestrator, config, installables);
   // sendLargeSetOfFilesTest(orchestrator, config, installables);
-  fetchFilesForAParticularDateTest(orchestrator, config, installables);
+   fetchFilesForAParticularDateTest(orchestrator, config, installables);
 
   
 };

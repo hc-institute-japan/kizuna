@@ -851,6 +851,11 @@ function getMessagesByGroupByTimestampTest(orchestrator, config, installables) {
 
       await delay();
 
+      console.log("Hola");
+      console.log(messagesOnFeb9);
+      
+      
+
       evaluateMessagesByGroupByTimestampResult(
         group1Messages,
         messagesOnFeb9,
@@ -1372,9 +1377,6 @@ function fetchFilesForAParticularDateTest(orchestrator, config, installables) {
     let { content, group_id, group_revision_id } = await createGroup( create_group_input )(alice_conductor);
     await delay(500);
 
-//    let file1_payload_input = generateFileMessage("Icon1.png", "Image", thumbnail);
-
-
     let dates:number[] =[
       new Date(2021, 1, 9).getTime(),
       new Date(2021, 1, 10).getTime(),
@@ -1383,45 +1385,16 @@ function fetchFilesForAParticularDateTest(orchestrator, config, installables) {
       new Date(2021, 1, 13).getTime()
     ];
   
-    //FIRST I SEND 5 MESSAGES ONE PER DAY FOR 5 DAYS 
-
+    // FIRST I SEND 5 MESSAGES ONE PER DAY FOR 5 DAYS 
     let result = await sendMessaggesWithFilesInDiferentDates(group_id, alice_conductor, alicePubKey, "Image", dates);
+    
+    // READ THE MESSAGES 
+    await readMessagesInDiferentDates(bobby_conductor, bobbyPubKey, group_id, content.members, result, dates);
 
-    if(result){
-
-      let messages:any = result.messages;
-
-      //THEN I TRY TO GET THOSE MESSAGES BACK AGAIN HERE BUT THEY ARE NOT BEING RETRIEVED 
-      let result2 = await getMessagesWithTimestamps(alice_conductor, group_id, dates, "All");
-
-      console.log("hey");
-      console.log(result2);
-
-      let filter = {
-        group_id,
-        last_fetched: null,
-        last_message_timestamp: null,
-        batch_size: 5,
-        payload_type: { File: null },
-      };
-
-      //HERE I CHECK THOSE MESSAGES AWAS SENDED TO THE GIVEN GROUP 
-
-      let result3 = await getMessagesInBatches(filter,alice_conductor,result2);
-      await delay(10000);
-
-      console.log("result 3 ");
-
-      console.log(result3);
-      
-      
-      
-
-    }else{
-
-      t.fail("error");
-
-    }
+    // GET THE MESSAGES AGAIN
+    let result2 = await getMessagesWithTimestamps(alice_conductor, group_id, dates, "File");
+  
+    t.deepEqual(result,result2);
 
   })
 }
@@ -1448,10 +1421,9 @@ function generateFileMessage(file_name, file_type, file_type_input){
 
   return payload_input;
 }
-
 async function sendMessaggesWithFilesInDiferentDates(group_id,sender_conductor, sender_pubKey, message_type, dates){
 
-  let messages:{}[] = [];
+   let messages:any[] = [];
 
   let thumbnail_bytes = Int8Array.from([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
   let file_type_input:any = null;
@@ -1467,19 +1439,19 @@ async function sendMessaggesWithFilesInDiferentDates(group_id,sender_conductor, 
   }
 
   for (let i = 0; i < dates.length; i++) {
-    
+
     let file_name = `Icon${i+1}.png`;
     let payload = generateFileMessage(file_name, message_type, file_type_input);
+
+    // console.log(dates[i]);
 
     let result = await sendMessageWithDate( sender_conductor ,{group_id, payload, sender:sender_pubKey, date: dates[i]});
     await delay(1000);
 
-    messages.push(result);
+    messages.push(result.id);
     
   }
-  return {
-    messages,
-  };
+  return messages;
 }
 async function getMessagesInBatches(filter, conductor, messages_with_files) {
   let group_messages;
@@ -1513,7 +1485,7 @@ async function getMessagesInBatches(filter, conductor, messages_with_files) {
         });
 
 
-        console.log(timestamp);
+        //console.log(timestamp);
         
       }
     );
@@ -1523,8 +1495,8 @@ async function getMessagesInBatches(filter, conductor, messages_with_files) {
       let buffer2: Buffer = element.entry_hash;
 
       if (Buffer.compare(buffer, buffer2) == 0) {
-        console.log(buffer);
-        console.log(buffer2);
+        // console.log(buffer);
+        // console.log(buffer2);
 
         filter.last_fetched = element.entry_hash;
         filter.last_message_timestamp = element.timestamp;
@@ -1537,7 +1509,6 @@ async function getMessagesInBatches(filter, conductor, messages_with_files) {
 
   return output;
 }
-
 async function  getMessagesWithTimestamps(conductor,group_id, dates, messages_type){
 
   let payload_type:any = null; 
@@ -1558,19 +1529,35 @@ async function  getMessagesWithTimestamps(conductor,group_id, dates, messages_ty
 
   for (let i = 0; i < dates.length; i++) {
 
-    let result = await getMessagesByGroupByTimestamp({
-      group_id,
-      date: dateToTimestamp(new Date(dates[i])), 
-      payload_type, 
-    })(conductor);
+     let result = await getMessagesByGroupByTimestamp({
+       group_id,
+       date: dateToTimestamp(new Date(dates[i])), 
+       payload_type, 
+     })(conductor);
 
-    console.log(dateToTimestamp(new Date(dates[i])));
-    
-    await delay(1000);
-    output.push(result);    
+    await delay(2000);
+
+    result = Object.values(result.messages_by_group)[0];
+    output.push(result[0]);    
   }
 
   return output;
+}
+async function readMessagesInDiferentDates(conductor, reader, group_id, members, messages_ids, dates ) {
+  
+  for (let i = 0; i < messages_ids.length; i++) {
+
+    let timestamp = dateToTimestamp(new Date(dates[i]));
+    
+    await conductor.call("group", "read_group_message", {
+      group_id,
+      reader,
+      timestamp,
+      members,
+      message_ids: [messages_ids[i]],
+    });
+  }
+
 }
 
 const evaluateMessagesByGroupByTimestampResult = (
