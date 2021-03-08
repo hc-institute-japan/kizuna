@@ -5,14 +5,23 @@ import {
   ADD_MEMBERS,
   REMOVE_MEMBERS,
   UPDATE_GROUP_NAME,
-  createGroupInput,
+  SEND_GROUP_MESSAGE,
+  CreateGroupInput,
   GroupConversation,
   UpdateGroupMembersIO,
   UpdateGroupNameIO,
+  GroupMessageInput,
+  GroupMessage,
+  Payload,
+  FilePayload,
+  FileType,
+  isTextPayload,
+  isOther,
+  isImage,
 } from "./types";
 
 export const createGroup = (
-  create_group_input: createGroupInput
+  create_group_input: CreateGroupInput
 ): ThunkAction => async (dispatch, _getState, { callZome }) => {
   // TODO: error handling
   // TODO: input sanitation
@@ -124,11 +133,61 @@ export const updateGroupName = (
   return update_group_name_io;
 };
 
-export const sendGroupMessage = (): ThunkAction => async (
-  dispatch,
-  _getState,
-  { callZome }
-) => {};
+export const sendGroupMessage = (
+  group_message_data: GroupMessageInput
+): ThunkAction => async (dispatch, _getState, { callZome }) => {
+  // TODO: error handling
+  // TODO: input sanitation
+  const sendGroupMessageOutput = await callZome({
+    zomeName: ZOMES.GROUP,
+    fnName: FUNCTIONS[ZOMES.GROUP].SEND_MESSAGE,
+    payload: group_message_data,
+  });
+
+  console.log(sendGroupMessageOutput);
+
+  let payload: Payload;
+  let fileBytes: Uint8Array | undefined;
+  if (isTextPayload(group_message_data.payloadInput)) {
+    payload = sendGroupMessageOutput.content.payload;
+  } else {
+    console.log(sendGroupMessageOutput);
+    let fileType: FileType =
+      sendGroupMessageOutput.content.payload.File.file_type;
+    let thumbnail: Uint8Array | undefined = isOther(fileType)
+      ? undefined
+      : isImage(fileType)
+      ? fileType.Image.thumbnail
+      : fileType.Video.thumbnail;
+    fileBytes = group_message_data.payloadInput.File.file_bytes;
+    let filePayload: FilePayload = {
+      fileName: sendGroupMessageOutput.content.payload.File.metadata.fileName,
+      fileSize: sendGroupMessageOutput.content.payload.File.metadata.fileSize,
+      fileType: sendGroupMessageOutput.content.payload.File.metadata.fileType,
+      fileHash: sendGroupMessageOutput.content.payload.File.metadata.fileHash,
+      thumbnail,
+    };
+    payload = filePayload;
+  }
+
+  let groupMessageData: GroupMessage = {
+    groupMessageEntryHash: sendGroupMessageOutput.id,
+    groupEntryHash: sendGroupMessageOutput.content.groupHash,
+    author: sendGroupMessageOutput.content.sender,
+    payload,
+    timestamp: sendGroupMessageOutput.content.created,
+    replyTo: sendGroupMessageOutput.content.replyTo,
+    readList: {},
+  };
+
+  dispatch({
+    type: SEND_GROUP_MESSAGE,
+    GroupMessage: groupMessageData,
+    fileBytes,
+  });
+
+  return groupMessageData;
+};
 
 export const getNextBatchGroupMessages = (): ThunkAction => async (
   dispatch,
