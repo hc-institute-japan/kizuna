@@ -4,14 +4,19 @@ import {
   UPDATE_GROUP_NAME,
   REMOVE_MEMBERS,
   ADD_MEMBERS,
+  SEND_GROUP_MESSAGE,
   GroupConversation,
   GroupConversationsState,
+  isTextPayload,
+  isOther,
+  isImage,
+  GroupMessage,
 } from "./types";
 
 const initialState: GroupConversationsState = {
   conversations: {},
   messages: {},
-  fileBytes: {},
+  groupFiles: {},
 };
 
 // TODO: action here should have a better type
@@ -69,6 +74,37 @@ const reducer = (state = initialState, action: any) => {
         [groupEntryHash]: groupConversation,
       };
       return { ...state, conversations: groupConversations };
+    }
+    case SEND_GROUP_MESSAGE: {
+      let groupMessage: GroupMessage = action.GroupMessage;
+      let groupEntryHash: string = groupMessage.groupEntryHash;
+      let groupMessageEntryHash: string = groupMessage.groupMessageEntryHash;
+      let groupConversation: GroupConversation =
+        state.conversations[groupEntryHash];
+      groupConversation.messages.push(groupMessage.groupMessageEntryHash);
+      let newMessage: { [key: string]: GroupMessage } = {
+        [groupMessageEntryHash]: groupMessage,
+      };
+      let messages = state.messages;
+      messages = {
+        ...messages,
+        ...newMessage,
+      };
+
+      if (!isTextPayload(groupMessage.payload)) {
+        // work with file payload
+        let groupFiles = state.groupFiles;
+        let newFile: { [key: string]: Uint8Array } = {
+          [groupMessage.payload.fileHash]: action.fileBytes,
+        };
+        groupFiles = {
+          ...groupFiles,
+          ...newFile,
+        };
+        return { ...state, messages, groupFiles };
+      } else {
+        return { ...state, messages };
+      }
     }
     default:
       return state;
