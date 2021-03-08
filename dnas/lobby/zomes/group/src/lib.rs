@@ -9,9 +9,9 @@ use entries::{group, group_message};
 use signals::{SignalDetails, SignalPayload};
 
 use group_message::{
-    BatchSize, GroupChatFilter, GroupMessage, GroupMessageData, GroupMessageDataWrapper,
-    GroupMessageInput, GroupMessageInputWithDate, GroupMessageReadData, GroupMessagesOutput,
-    GroupMsgBatchFetchFilter, GroupTypingDetailData,GroupFileBytes
+    BatchSize, GroupChatFilter, GroupFileBytes, GroupMessage, GroupMessageData,
+    GroupMessageDataWrapper, GroupMessageInput, GroupMessageInputWithDate, GroupMessageReadData,
+    GroupMessagesOutput, GroupMsgBatchFetchFilter, GroupTypingDetailData,
 };
 
 use entries::group::{
@@ -67,7 +67,7 @@ pub fn init(_: ()) -> ExternResult<InitCallbackResult> {
 fn recv_remote_signal(signal: SerializedBytes) -> ExternResult<()> {
     // currently only emitting the received signal
     // TODO: actually work with the received signal
-    
+
     let signal_detail: SignalDetails = signal.clone().try_into()?;
     match signal_detail.payload {
         SignalPayload::AddedToGroup(_) => {

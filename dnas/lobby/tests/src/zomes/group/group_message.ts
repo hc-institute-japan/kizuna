@@ -99,14 +99,14 @@ function sendMessageTest(orchestrator, config, installables) {
         members: [bobbyPubKey, charliePubKey],
       };
 
-      let { group_id } = await createGroup(create_group_input)(alice_conductor);
+      let { groupId } = await createGroup(create_group_input)(alice_conductor);
 
       await delay();
 
       messagesFromSend.push(
         await sendMessage(alice_conductor, {
-          group_id,
-          payload_input: { Text: { payload: "Hello" } },
+          groupId,
+          payloadInput: { type: "TEXT", payload: { payload: "Hello" } },
           sender: alicePubKey,
         })
       );
@@ -114,8 +114,11 @@ function sendMessageTest(orchestrator, config, installables) {
       await delay();
       messagesFromSend.push(
         await sendMessage(alice_conductor, {
-          group_id,
-          payload_input: { Text: { payload: "How are you, Bob?!" } },
+          groupId,
+          payloadInput: {
+            type: "TEXT",
+            payload: { payload: "How are you, Bob?!" },
+          },
           sender: alicePubKey,
         })
       );
@@ -124,8 +127,8 @@ function sendMessageTest(orchestrator, config, installables) {
 
       messagesFromSend.push(
         await sendMessage(bobby_conductor, {
-          group_id,
-          payload_input: { Text: { payload: "Hi alice!" } },
+          groupId,
+          payloadInput: { type: "TEXT", payload: { payload: "Hi alice!" } },
           sender: bobbyPubKey,
         })
       );
@@ -133,8 +136,11 @@ function sendMessageTest(orchestrator, config, installables) {
       await delay();
       messagesFromSend.push(
         await sendMessage(charlie_conductor, {
-          group_id,
-          payload_input: { Text: { payload: "Yo, what's up guys?" } },
+          groupId,
+          payloadInput: {
+            type: "TEXT",
+            payload: { payload: "Yo, what's up guys?" },
+          },
           sender: charliePubKey,
         })
       );
@@ -144,7 +150,7 @@ function sendMessageTest(orchestrator, config, installables) {
       const group1AliceMesssges = await alice_conductor.call(
         "group",
         "get_all_messages",
-        group_id
+        groupId
       );
 
       await delay();
@@ -152,7 +158,7 @@ function sendMessageTest(orchestrator, config, installables) {
       const group1BobbyMesssges = await bobby_conductor.call(
         "group",
         "get_all_messages",
-        group_id
+        groupId
       );
 
       await delay();
@@ -160,7 +166,7 @@ function sendMessageTest(orchestrator, config, installables) {
       const group1CharlieMesssges = await charlie_conductor.call(
         "group",
         "get_all_messages",
-        group_id
+        groupId
       );
 
       await delay();
@@ -175,7 +181,7 @@ function sendMessageTest(orchestrator, config, installables) {
         members: [charliePubKey],
       };
 
-      let { group_id: group_id2 } = await createGroup(create_group_input2)(
+      let { groupId: groupId2 } = await createGroup(create_group_input2)(
         bobby_conductor
       );
 
@@ -183,9 +189,10 @@ function sendMessageTest(orchestrator, config, installables) {
 
       messagesFromSend2.push(
         await sendMessage(bobby_conductor, {
-          group_id: group_id2,
-          payload_input: {
-            Text: {
+          groupId: groupId2,
+          payloadInput: {
+            type: "TEXT",
+            payload: {
               payload: "Yo charlie, this will be the GC for the management!",
             },
           },
@@ -197,9 +204,10 @@ function sendMessageTest(orchestrator, config, installables) {
 
       messagesFromSend2.push(
         await sendMessage(charlie_conductor, {
-          group_id: group_id2,
-          payload_input: {
-            Text: {
+          groupId: groupId2,
+          payloadInput: {
+            type: "TEXT",
+            payload: {
               payload: "Ayt, thanks!",
             },
           },
@@ -212,7 +220,7 @@ function sendMessageTest(orchestrator, config, installables) {
       const messages2 = await bobby_conductor.call(
         "group",
         "get_all_messages",
-        group_id2
+        groupId2
       );
 
       await delay(5000);
@@ -272,13 +280,13 @@ function groupTypingIndicatorTest(orchestrator, config, installables) {
         members: [bobbyPubKey, charliePubKey],
       };
 
-      let { content, group_id, group_revision_id } = await createGroup(
+      let { content, groupId, group_revision_id } = await createGroup(
         create_group_input
       )(alice_conductor);
       await delay(1000);
 
       let group_typing_detail_data = {
-        group_id,
+        groupId,
         indicated_by: alicePubKey,
         members: [bobbyPubKey, charliePubKey],
         is_typing: true,
@@ -354,7 +362,7 @@ function readGroupMessageTest(orchestrator, config, installables) {
         members: [bobbyPubKey, charliePubKey],
       };
 
-      let { content, group_id, group_revision_id } = await createGroup(
+      let { content, groupId, group_revision_id } = await createGroup(
         create_group_input
       )(alice_conductor);
 
@@ -364,8 +372,8 @@ function readGroupMessageTest(orchestrator, config, installables) {
         id: message_id_1,
         content: alice_message_content,
       } = await sendMessage(alice_conductor, {
-        group_id,
-        payload_input: { Text: { payload: "How are you, Bob?!" } },
+        groupId,
+        payloadInput: { Text: { payload: "How are you, Bob?!" } },
         sender: alicePubKey,
       });
 
@@ -375,8 +383,8 @@ function readGroupMessageTest(orchestrator, config, installables) {
         id: message_id_2,
         content: bobby_meesage_content,
       } = await sendMessage(bobby_conductor, {
-        group_id,
-        payload_input: { Text: { payload: "Hi alice!" } },
+        groupId,
+        payloadInput: { Text: { payload: "Hi alice!" } },
         sender: bobbyPubKey,
       });
 
@@ -386,13 +394,13 @@ function readGroupMessageTest(orchestrator, config, installables) {
         id: message_id_3,
         content: charlie_message_content,
       } = await sendMessage(charlie_conductor, {
-        group_id,
-        payload_input: { Text: { payload: "Yo, what's up guys?" } },
+        groupId,
+        payloadInput: { Text: { payload: "Yo, what's up guys?" } },
         sender: charliePubKey,
       });
 
       let alice_group_message_read_data = {
-        group_id,
+        groupId,
         message_ids: [message_id_2, message_id_3],
         reader: alicePubKey,
         timestamp: charlie_message_content.created,
@@ -405,7 +413,7 @@ function readGroupMessageTest(orchestrator, config, installables) {
       await delay();
 
       let bobby_group_message_read_data = {
-        group_id,
+        groupId,
         message_ids: [message_id_1, message_id_3],
         reader: bobbyPubKey,
         timestamp: charlie_message_content.created,
@@ -418,7 +426,7 @@ function readGroupMessageTest(orchestrator, config, installables) {
       await delay();
 
       let charlie_group_message_read_data = {
-        group_id,
+        groupId,
         message_ids: [message_id_1, message_id_2],
         reader: charliePubKey,
         timestamp: charlie_message_content.created,
@@ -493,7 +501,7 @@ function getNextBatchOfMessagesTest(orchestrator, config, installables) {
     let filter;
     let counter = 0;
 
-    let { content, group_id, group_revision_id } = await createGroup(
+    let { content, groupId, group_revision_id } = await createGroup(
       create_group_input
     )(alice_conductor);
     await delay(500);
@@ -501,7 +509,7 @@ function getNextBatchOfMessagesTest(orchestrator, config, installables) {
     // 1- GET A BATCH FOR A GROUP WITHOUT MESSAGES
 
     filter = {
-      group_id,
+      groupId,
       last_fetched: null,
       last_message_timestamp: null,
       batch_size: 5, //THIS BATCH-SIZE CAN BE 0 BUT WE SHOULD MAYBE HANDLE THIS FROM THE BACK-END
@@ -524,15 +532,15 @@ function getNextBatchOfMessagesTest(orchestrator, config, installables) {
       id: message_id_1,
       content: alice_message_content,
     } = await sendMessage(alice_conductor, {
-      group_id,
-      payload_input: { Text: { payload: "How are you, Bob?!" } },
+      groupId,
+      payloadInput: { Text: { payload: "How are you, Bob?!" } },
       sender: alicePubKey,
     });
 
     await delay(500);
 
     let group_message_read_data = {
-      group_id,
+      groupId,
       message_ids: [message_id_1],
       reader: alicePubKey,
       timestamp: alice_message_content.created,
@@ -574,8 +582,8 @@ function getNextBatchOfMessagesTest(orchestrator, config, installables) {
       id: message_id_2,
       content: bobby_meesage_content,
     } = await sendMessage(bobby_conductor, {
-      group_id,
-      payload_input: { Text: { payload: "Hi alice!" } },
+      groupId,
+      payloadInput: { Text: { payload: "Hi alice!" } },
       sender: bobbyPubKey,
     });
 
@@ -595,8 +603,8 @@ function getNextBatchOfMessagesTest(orchestrator, config, installables) {
       id: message_id_3,
       content: charlie_message_content,
     } = await sendMessage(charlie_conductor, {
-      group_id,
-      payload_input: { Text: { payload: "Yo, what's up guys?" } },
+      groupId,
+      payloadInput: { Text: { payload: "Yo, what's up guys?" } },
       sender: charliePubKey,
     });
 
@@ -751,7 +759,7 @@ function getMessagesByGroupByTimestampTest(orchestrator, config, installables) {
         members: [bobbyPubKey, charliePubKey],
       };
 
-      let { group_id, content } = await createGroup(create_group_input)(
+      let { groupId, content } = await createGroup(create_group_input)(
         alice_conductor
       );
 
@@ -760,8 +768,11 @@ function getMessagesByGroupByTimestampTest(orchestrator, config, installables) {
       const group1Messages: any[] = [];
 
       const feb9Message1 = await sendMessageWithDate(alice_conductor, {
-        group_id,
-        payload: { Text: { payload: "message 1 sent on February 9" } },
+        groupId,
+        payload: {
+          type: "TEXT",
+          payload: { payload: "message 1 sent on February 9" },
+        },
         sender: alicePubKey,
         date: new Date(2021, 1, 9).getTime(),
       });
@@ -771,8 +782,11 @@ function getMessagesByGroupByTimestampTest(orchestrator, config, installables) {
       group1Messages.push(feb9Message1);
 
       const feb9Message2 = await sendMessageWithDate(bobby_conductor, {
-        group_id,
-        payload: { Text: { payload: "message 2 sent on February 9" } },
+        groupId,
+        payload: {
+          type: "TEXT",
+          payload: { payload: "message 2 sent on February 9" },
+        },
         sender: bobbyPubKey,
         date: new Date(2021, 1, 9).getTime(),
       });
@@ -782,8 +796,11 @@ function getMessagesByGroupByTimestampTest(orchestrator, config, installables) {
       group1Messages.push(feb9Message2);
 
       const feb9Message3 = await sendMessageWithDate(charlie_conductor, {
-        group_id,
-        payload: { Text: { payload: "message 3 sent on February 9" } },
+        groupId,
+        payload: {
+          type: "TEXT",
+          payload: { payload: "message 3 sent on February 9" },
+        },
         sender: charliePubKey,
         date: new Date(2021, 1, 9).getTime(),
       });
@@ -793,8 +810,11 @@ function getMessagesByGroupByTimestampTest(orchestrator, config, installables) {
       group1Messages.push(feb9Message3);
 
       const feb9Message4 = await sendMessageWithDate(alice_conductor, {
-        group_id,
-        payload: { Text: { payload: "message 4 sent on February 9" } },
+        groupId,
+        payload: {
+          type: "TEXT",
+          payload: { payload: "message 4 sent on February 9" },
+        },
         sender: alicePubKey,
         date: new Date(2021, 1, 9).getTime(),
       });
@@ -804,8 +824,11 @@ function getMessagesByGroupByTimestampTest(orchestrator, config, installables) {
       group1Messages.push(feb9Message4);
 
       const feb10 = await sendMessageWithDate(alice_conductor, {
-        group_id,
-        payload: { Text: { payload: "message 1 sent on February 10" } },
+        groupId,
+        payload: {
+          type: "TEXT",
+          payload: { payload: "message 1 sent on February 10" },
+        },
         sender: alicePubKey,
         date: new Date(2021, 1, 10).getTime(),
       });
@@ -816,10 +839,11 @@ function getMessagesByGroupByTimestampTest(orchestrator, config, installables) {
         "group",
         "get_messages_by_group_by_timestamp",
         {
-          group_id,
+          groupId,
           date: dateToTimestamp(new Date(2021, 1, 9)),
-          payload_type: {
-            Text: null,
+          payloadType: {
+            type: "TEXT",
+            payload: null,
           },
         }
       );
@@ -829,32 +853,29 @@ function getMessagesByGroupByTimestampTest(orchestrator, config, installables) {
       evaluateMessagesByGroupByTimestampResult([], unreadMessages, t);
 
       await alice_conductor.call("group", "read_group_message", {
-        group_id,
+        groupId,
         reader: bobbyPubKey,
         timestamp: dateToTimestamp(new Date(2021, 1, 9)),
         members: content.members,
-        message_ids: group1Messages.map((message) => message.id),
+        messageIds: group1Messages.map((message) => message.id),
       });
+
       await delay();
 
       const messagesOnFeb9 = await alice_conductor.call(
         "group",
         "get_messages_by_group_by_timestamp",
         {
-          group_id,
+          groupId,
           date: dateToTimestamp(new Date(2021, 1, 9)),
-          payload_type: {
-            Text: null,
+          payloadType: {
+            type: "TEXT",
+            payload: null,
           },
         }
       );
 
       await delay();
-
-      console.log("Hola");
-      console.log(messagesOnFeb9);
-      
-      
 
       evaluateMessagesByGroupByTimestampResult(
         group1Messages,
@@ -866,10 +887,11 @@ function getMessagesByGroupByTimestampTest(orchestrator, config, installables) {
         "group",
         "get_messages_by_group_by_timestamp",
         {
-          group_id,
+          groupId,
           date: dateToTimestamp(new Date(2021, 1, 10)),
-          payload_type: {
-            Text: null,
+          payloadType: {
+            type: "TEXT",
+            payload: null,
           },
         }
       );
@@ -878,11 +900,11 @@ function getMessagesByGroupByTimestampTest(orchestrator, config, installables) {
       evaluateMessagesByGroupByTimestampResult([], unreadMessagesOnFeb10, t);
 
       await alice_conductor.call("group", "read_group_message", {
-        group_id,
+        groupId,
         reader: bobbyPubKey,
         timestamp: dateToTimestamp(new Date(2021, 1, 10)),
         members: content.members,
-        message_ids: [feb10].map((message) => message.id),
+        messageIds: [feb10].map((message) => message.id),
       });
       await delay();
 
@@ -890,10 +912,11 @@ function getMessagesByGroupByTimestampTest(orchestrator, config, installables) {
         "group",
         "get_messages_by_group_by_timestamp",
         {
-          group_id,
+          groupId,
           date: dateToTimestamp(new Date(2021, 1, 10)),
-          payload_type: {
-            Text: null,
+          payloadType: {
+            type: "TEXT",
+            payload: null,
           },
         }
       );
@@ -955,8 +978,13 @@ function getLatestMessagesForAllGroupsTest(orchestrator, config, installables) {
         id: message_id_1,
         content: alice_message_content,
       } = await sendMessage(alice_conductor, {
-        group_id: group_1.group_id,
-        payload_input: { Text: { payload: "How are you, Bob?!" } },
+        groupId: group_1.groupId,
+        payloadInput: {
+          type: "TEXT",
+          payload: {
+            payload: "How are you, Bob?!",
+          },
+        },
         sender: alicePubKey,
       });
 
@@ -966,8 +994,13 @@ function getLatestMessagesForAllGroupsTest(orchestrator, config, installables) {
         id: message_id_2,
         content: bobby_meesage_content,
       } = await sendMessage(bobby_conductor, {
-        group_id: group_2.group_id,
-        payload_input: { Text: { payload: "Hi alice!" } },
+        groupId: group_2.groupId,
+        payloadInput: {
+          type: "TEXT",
+          payload: {
+            payload: "Hi alice!",
+          },
+        },
         sender: bobbyPubKey,
       });
 
@@ -979,9 +1012,9 @@ function getLatestMessagesForAllGroupsTest(orchestrator, config, installables) {
 
       await delay(1000);
 
-      messages_hashes = Object.values(output.messages_by_group)[0];
+      messages_hashes = Object.values(output.messagesByGroup)[0];
 
-      Object.values(output.group_messages_contents).map(
+      Object.values(output.groupMessagesContents).map(
         (message_content: any) => {
           messages_contents.push(
             message_content[0].signed_header.header.content
@@ -989,12 +1022,6 @@ function getLatestMessagesForAllGroupsTest(orchestrator, config, installables) {
           messages_read_list.push(message_content[1]);
         }
       );
-
-      console.log("messages_hashes ", { a: message_id_1, b: message_id_2 });
-
-      console.log("output", messages_hashes);
-      console.log("output", messages_contents);
-      console.log("output", messages_read_list);
     }
   );
 }
@@ -1024,15 +1051,16 @@ function sendMessageswithFilesTest(orchestrator, config, installables) {
         members: [bobbyPubKey],
       };
 
-      let { content, group_id, group_revision_id } = await createGroup(
+      let { content, groupId, group_revision_id } = await createGroup(
         create_group_input
       )(alice_conductor);
       await delay(500);
 
       let message_1 = await sendMessage(alice_conductor, {
-        group_id,
-        payload_input: {
-          Text: {
+        groupId,
+        payloadInput: {
+          type: "TEXT",
+          payload: {
             payload: "Hi bob i'm sending you the text file i told you about!",
           },
         },
@@ -1049,19 +1077,21 @@ function sendMessageswithFilesTest(orchestrator, config, installables) {
       let text: string = "The quick brown fox jumps over the lazy dog.";
       let file_bytes = Int8Array.from(strToUtf8Bytes(text));
 
-      let payload_input = {
-        File: {
+      let payloadInput = {
+        type: "FILE",
+        payload: {
           metadata: file_metadata,
-          file_type: { Other: null },
+          file_type: { type: "OTHER", payload: null },
           file_bytes: file_bytes,
         },
       };
 
       let message_2 = await sendMessage(alice_conductor, {
-        group_id,
+        groupId,
         sender: alicePubKey,
-        payload_input: payload_input,
+        payloadInput: payloadInput,
       });
+
       await delay(1000);
 
       let img_path = path.join(__dirname, "/files/img.png");
@@ -1074,18 +1104,20 @@ function sendMessageswithFilesTest(orchestrator, config, installables) {
         file_type: "Image",
       };
 
-      let payload_input_2 = {
-        File: {
+      let payloadInput_2 = {
+        type: "FILE",
+        payload: {
           metadata: img_metadata,
-          file_type: { Image: { thumbnail: thumbnail_bytes } },
+          file_type: { type: "IMAGE", payload: { thumbnail: thumbnail_bytes } },
           file_bytes: Int8Array.from(img_bytes),
         },
       };
 
       let message_3 = await sendMessage(bobby_conductor, {
-        group_id,
-        payload_input: {
-          Text: {
+        groupId,
+        payloadInput: {
+          type: "TEXT",
+          payload: {
             payload:
               "Wow nice thank you, i'm doing this on photoshop maybe you can give me feedback",
           },
@@ -1095,9 +1127,9 @@ function sendMessageswithFilesTest(orchestrator, config, installables) {
       await delay(1000);
 
       let message_4 = await sendMessage(bobby_conductor, {
-        group_id,
+        groupId,
         sender: bobbyPubKey,
-        payload_input: payload_input_2,
+        payloadInput: payloadInput_2,
       });
       await delay(1000);
 
@@ -1110,18 +1142,19 @@ function sendMessageswithFilesTest(orchestrator, config, installables) {
       let pdf1_path = path.join(__dirname, "/files/message_5.pdf");
       let pdf1_bytes = fs.readFileSync(pdf1_path);
 
-      let payload_input_3 = {
-        File: {
+      let payloadInput_3 = {
+        type: "FILE",
+        payload: {
           metadata: pdf1_metadata,
-          file_type: { Other: null },
+          file_type: { type: "OTHER", payload: null },
           file_bytes: Int8Array.from(pdf1_bytes),
         },
       };
 
       let message_5 = await sendMessage(bobby_conductor, {
-        group_id,
+        groupId,
         sender: bobbyPubKey,
-        payload_input: payload_input_3,
+        payloadInput: payloadInput_3,
       });
       await delay(1000);
 
@@ -1134,18 +1167,19 @@ function sendMessageswithFilesTest(orchestrator, config, installables) {
       let pdf2_path = path.join(__dirname, "/files/message_6.pdf");
       let pdf2_bytes = fs.readFileSync(pdf2_path);
 
-      let payload_input_4 = {
-        File: {
+      let payloadInput_4 = {
+        type: "FILE",
+        payload: {
           metadata: pdf2_metadata,
-          file_type: { Other: null },
+          file_type: { type: "OTHER", payload: null },
           file_bytes: Int8Array.from(pdf2_bytes),
         },
       };
 
       let message_6 = await sendMessage(alice_conductor, {
-        group_id,
+        groupId,
         sender: alicePubKey,
-        payload_input: payload_input_4,
+        payloadInput: payloadInput_4,
       });
       await delay(2000);
 
@@ -1177,19 +1211,19 @@ function sendMessageswithFilesTest(orchestrator, config, installables) {
       });
 
       let filter = {
-        group_id,
-        last_fetched: null,
-        last_message_timestamp: null,
-        batch_size: 6,
-        payload_type: { File: null },
+        groupId,
+        lastFetched: null,
+        lastMessageTimestamp: null,
+        batchSize: 6,
+        payloadType: { type: "FILE", payload: null },
       };
 
       let filter_2 = {
-        group_id,
-        last_fetched: null,
-        last_message_timestamp: null,
-        batch_size: 6,
-        payload_type: { All: null },
+        groupId,
+        lastFetched: null,
+        lastMessageTimestamp: null,
+        batchSize: 6,
+        payloadType: { type: "ALL", payload: null },
       };
 
       let group_messages = await getNextBatchGroupMessage(filter)(
@@ -1211,12 +1245,12 @@ function sendMessageswithFilesTest(orchestrator, config, installables) {
           messages[4].id,
           messages[5].id,
         ],
-        Object.values(group_messages_2.messages_by_group)[0]
+        Object.values(group_messages_2.messagesByGroup)[0]
       );
 
       t.deepEqual(
         [messages[0].id, messages[1].id, messages[2].id, messages[4].id],
-        Object.values(group_messages.messages_by_group)[0]
+        Object.values(group_messages.messagesByGroup)[0]
       );
 
       let messages_with_files = [
@@ -1227,11 +1261,11 @@ function sendMessageswithFilesTest(orchestrator, config, installables) {
       ];
 
       let filter_3 = {
-        group_id,
-        last_fetched: null,
-        last_message_timestamp: null,
-        batch_size: 1,
-        payload_type: { File: null },
+        groupId,
+        lastFetched: null,
+        lastMessageTimestamp: null,
+        batchSize: 1,
+        payloadType: { type: "FILE", payload: null },
       };
 
       let messages_one_by_one: Buffer[] = await getMessagesInBatches(
@@ -1281,7 +1315,7 @@ function sendLargeSetOfFilesTest(orchestrator, config, installables) {
         members: [bobbyPubKey],
       };
 
-      let { group_id, content } = await createGroup(create_group_input)(
+      let { groupId, content } = await createGroup(create_group_input)(
         alice_conductor
       );
       await delay(1000);
@@ -1297,18 +1331,22 @@ function sendLargeSetOfFilesTest(orchestrator, config, installables) {
           file_type: "Image",
         };
 
-        let payload_input = {
-          File: {
+        let payloadInput = {
+          type: "FILE",
+          payload: {
             metadata: file_metadata,
-            file_type: { Image: { thumbnail: thumbnail_bytes } },
+            file_type: {
+              type: "IMAGE",
+              payload: { thumbnail: thumbnail_bytes },
+            },
             file_bytes: Int8Array.from(file_bytes),
           },
         };
 
         let message = await sendMessage(alice_conductor, {
-          group_id,
+          groupId,
           sender: alicePubKey,
-          payload_input,
+          payloadInput,
         });
         await delay(1000);
         messages.push(message.id);
@@ -1324,11 +1362,11 @@ function sendLargeSetOfFilesTest(orchestrator, config, installables) {
       messages.reverse();
 
       let filter = {
-        group_id,
-        last_fetched: null,
-        last_message_timestamp: null,
-        batch_size: 5,
-        payload_type: { File: null },
+        groupId,
+        lastFetched: null,
+        lastMessageTimestamp: null,
+        batchSize: 5,
+        payloadType: { type: "FILE", payload: null },
       };
 
       let output = await getMessagesInBatches(
@@ -1337,12 +1375,6 @@ function sendLargeSetOfFilesTest(orchestrator, config, installables) {
         messages
       );
       await delay(5000);
-
-      console.log(messages);
-      console.log(messages.length);
-      console.log("hey");
-      console.log(output);
-      console.log(output.length);
 
       t.deepEqual(messages, output);
     }
@@ -1369,38 +1401,57 @@ function fetchFilesForAParticularDateTest(orchestrator, config, installables) {
       init(alice_conductor);
       init(bobby_conductor);
 
-    let create_group_input = {
-      name: "Group_name",
-      members: [bobbyPubKey],
-    };
+      let create_group_input = {
+        name: "Group_name",
+        members: [bobbyPubKey],
+      };
 
-    let { content, group_id, group_revision_id } = await createGroup( create_group_input )(alice_conductor);
-    await delay(500);
+      let { content, groupId, groupRevisionId } = await createGroup(
+        create_group_input
+      )(alice_conductor);
+      await delay(500);
 
-    let dates:number[] =[
-      new Date(2021, 1, 9).getTime(),
-      new Date(2021, 1, 10).getTime(),
-      new Date(2021, 1, 11).getTime(),
-      new Date(2021, 1, 12).getTime(),
-      new Date(2021, 1, 13).getTime()
-    ];
-  
-    // FIRST I SEND 5 MESSAGES ONE PER DAY FOR 5 DAYS 
-    let result = await sendMessaggesWithFilesInDiferentDates(group_id, alice_conductor, alicePubKey, "Image", dates);
-    
-    // READ THE MESSAGES 
-    await readMessagesInDiferentDates(bobby_conductor, bobbyPubKey, group_id, content.members, result, dates);
+      let dates: number[] = [
+        new Date(2021, 1, 9).getTime(),
+        new Date(2021, 1, 10).getTime(),
+        new Date(2021, 1, 11).getTime(),
+        new Date(2021, 1, 12).getTime(),
+        new Date(2021, 1, 13).getTime(),
+      ];
 
-    // GET THE MESSAGES AGAIN
-    let result2 = await getMessagesWithTimestamps(alice_conductor, group_id, dates, "File");
-  
-    t.deepEqual(result,result2);
+      // FIRST I SEND 5 MESSAGES ONE PER DAY FOR 5 DAYS
+      let result = await sendMessaggesWithFilesInDiferentDates(
+        groupId,
+        alice_conductor,
+        alicePubKey,
+        "Image",
+        dates
+      );
 
-  })
+      // READ THE MESSAGES
+      await readMessagesInDiferentDates(
+        bobby_conductor,
+        bobbyPubKey,
+        groupId,
+        content.members,
+        result,
+        dates
+      );
+
+      // GET THE MESSAGES AGAIN
+      let result2 = await getMessagesWithTimestamps(
+        alice_conductor,
+        groupId,
+        dates,
+        "File"
+      );
+
+      t.deepEqual(result, result2);
+    }
+  );
 }
 
-function generateFileMessage(file_name, file_type, file_type_input){
-
+function generateFileMessage(file_name, file_type, file_type_input) {
   let file_metadata = {
     file_name,
     file_size: 20,
@@ -1412,51 +1463,65 @@ function generateFileMessage(file_name, file_type, file_type_input){
   let file_bytes = fs.readFileSync(file_path);
 
   let payload_input = {
-    File: {
+    type: "FILE",
+    payload: {
       metadata: file_metadata,
-      file_type:file_type_input,
+      file_type: file_type_input,
       file_bytes: Int8Array.from(file_bytes),
-    }
+    },
   };
 
   return payload_input;
 }
-async function sendMessaggesWithFilesInDiferentDates(group_id,sender_conductor, sender_pubKey, message_type, dates){
-
-   let messages:any[] = [];
+async function sendMessaggesWithFilesInDiferentDates(
+  groupId,
+  sender_conductor,
+  sender_pubKey,
+  message_type,
+  dates
+) {
+  let messages: any[] = [];
 
   let thumbnail_bytes = Int8Array.from([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-  let file_type_input:any = null;
+  let file_type_input: any = null;
 
-  switch(message_type){
+  switch (message_type) {
     case "Image":
-        file_type_input = { Image: { thumbnail: thumbnail_bytes } };
+      file_type_input = {
+        type: "IMAGE",
+        payload: { thumbnail: thumbnail_bytes },
+      };
       break;
     case "Video":
-        file_type_input = { Video: { thumbnail: thumbnail_bytes } };
+      file_type_input = {
+        type: "VIDEO",
+        payload: { thumbnail: thumbnail_bytes },
+      };
       break;
-    default: return;  
+    default:
+      return;
   }
 
   for (let i = 0; i < dates.length; i++) {
-
-    let file_name = `Icon${i+1}.png`;
+    let file_name = `Icon${i + 1}.png`;
     let payload = generateFileMessage(file_name, message_type, file_type_input);
 
-    // console.log(dates[i]);
-
-    let result = await sendMessageWithDate( sender_conductor ,{group_id, payload, sender:sender_pubKey, date: dates[i]});
+    let result = await sendMessageWithDate(sender_conductor, {
+      groupId,
+      payload,
+      sender: sender_pubKey,
+      date: dates[i],
+    });
     await delay(1000);
 
     messages.push(result.id);
-    
   }
   return messages;
 }
 async function getMessagesInBatches(filter, conductor, messages_with_files) {
   let group_messages;
   let output: Buffer[] = [];
-  let iterations = messages_with_files.length / filter.batch_size; // this is onnly valid if the messages is % of the batch size
+  let iterations = messages_with_files.length / filter.batchSize; // this is onnly valid if the messages is % of the batch size
 
   let messages_by_group: any = [];
   let messages_contents: any = [];
@@ -1465,15 +1530,15 @@ async function getMessagesInBatches(filter, conductor, messages_with_files) {
     group_messages = await getNextBatchGroupMessage(filter)(conductor);
     await delay(2000);
 
-    if (Object.values(group_messages.messages_by_group).length == 0) {
+    if (Object.values(group_messages.messagesByGroup).length == 0) {
       break;
     }
 
-    messages_by_group = Object.values(group_messages.messages_by_group)[0];
+    messages_by_group = Object.values(group_messages.messagesByGroup)[0];
 
     output = output.concat(messages_by_group);
 
-    Object.values(group_messages.group_messages_contents).forEach(
+    Object.values(group_messages.groupMessagesContents).forEach(
       (element: any) => {
         let entry_hash: Buffer =
           element[0].signed_header.header.content.entry_hash;
@@ -1483,10 +1548,6 @@ async function getMessagesInBatches(filter, conductor, messages_with_files) {
           entry_hash,
           timestamp,
         });
-
-
-        //console.log(timestamp);
-        
       }
     );
 
@@ -1495,11 +1556,8 @@ async function getMessagesInBatches(filter, conductor, messages_with_files) {
       let buffer2: Buffer = element.entry_hash;
 
       if (Buffer.compare(buffer, buffer2) == 0) {
-        // console.log(buffer);
-        // console.log(buffer2);
-
-        filter.last_fetched = element.entry_hash;
-        filter.last_message_timestamp = element.timestamp;
+        filter.lastFetched = element.entry_hash;
+        filter.lastMessageTimestamp = element.timestamp;
       }
     });
 
@@ -1509,55 +1567,62 @@ async function getMessagesInBatches(filter, conductor, messages_with_files) {
 
   return output;
 }
-async function  getMessagesWithTimestamps(conductor,group_id, dates, messages_type){
+async function getMessagesWithTimestamps(
+  conductor,
+  groupId,
+  dates,
+  messages_type
+) {
+  let payloadType: any = null;
 
-  let payload_type:any = null; 
-  
-  switch(messages_type){
+  switch (messages_type) {
     case "Text":
-      payload_type = { Text: null,};
-      break;    
+      payloadType = { type: "TEXT", payload: null };
+      break;
     case "File":
-      payload_type = { File: null,};
+      payloadType = { type: "FILE", payload: null };
       break;
     case "All":
-      payload_type = { All: null,};
+      payloadType = { type: "ALL", payload: null };
       break;
   }
 
-  let output:any = [];
+  let output: any = [];
 
   for (let i = 0; i < dates.length; i++) {
-
-     let result = await getMessagesByGroupByTimestamp({
-       group_id,
-       date: dateToTimestamp(new Date(dates[i])), 
-       payload_type, 
-     })(conductor);
+    let result = await getMessagesByGroupByTimestamp({
+      groupId,
+      date: dateToTimestamp(new Date(dates[i])),
+      payloadType,
+    })(conductor);
 
     await delay(2000);
 
-    result = Object.values(result.messages_by_group)[0];
-    output.push(result[0]);    
+    result = Object.values(result.messagesByGroup)[0];
+    output.push(result[0]);
   }
 
   return output;
 }
-async function readMessagesInDiferentDates(conductor, reader, group_id, members, messages_ids, dates ) {
-  
-  for (let i = 0; i < messages_ids.length; i++) {
-
+async function readMessagesInDiferentDates(
+  conductor,
+  reader,
+  groupId,
+  members,
+  messagesIds,
+  dates
+) {
+  for (let i = 0; i < messagesIds.length; i++) {
     let timestamp = dateToTimestamp(new Date(dates[i]));
-    
+
     await conductor.call("group", "read_group_message", {
-      group_id,
+      groupId,
       reader,
       timestamp,
       members,
-      message_ids: [messages_ids[i]],
+      messageIds: [messagesIds[i]],
     });
   }
-
 }
 
 const evaluateMessagesByGroupByTimestampResult = (
@@ -1566,7 +1631,7 @@ const evaluateMessagesByGroupByTimestampResult = (
   t
 ) =>
   t.deepEqual(
-    JSON.stringify(Object.values(fetchedMessages["messages_by_group"])[0]),
+    JSON.stringify(Object.values(fetchedMessages["messagesByGroup"])[0]),
     JSON.stringify(referenceMessages.map((message) => message.id))
   );
 
