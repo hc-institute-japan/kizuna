@@ -81,7 +81,6 @@ const preference = (orchestrator, config, installables: Installables) => {
 
       t.deepEqual(preference, createPreference(true, true));
 
-      // TATS: this test is failing with timeout.
       /**
        * Set receipt to true
        */

@@ -1317,8 +1317,6 @@ function sendMessageswithFilesTest(orchestrator, config, installables) {
   );
 }
 
-// TATS: Im not sure why but this test is failing as the expected and actual values are not the same.
-// Please check the problem thank you
 function sendLargeSetOfFilesTest(orchestrator, config, installables) {
   orchestrator.registerScenario(
     "we should send and then return a large set of messages with files",
@@ -1399,6 +1397,7 @@ function sendLargeSetOfFilesTest(orchestrator, config, installables) {
         }
       }
 
+      await delay(1000);
       messages.reverse();
 
       let filter = {
@@ -1546,7 +1545,7 @@ async function sendMessaggesWithFilesInDiferentDates(
     let file_name = `Icon${i + 1}.png`;
     let payload = generateFileMessage(file_name, message_type, file_type_input);
 
-    // TATS: why do we need this function? Is there a problem in using the send_message function?
+    // TATS: Please just use the sendMessage
     let result = await sendMessageWithDate(sender_conductor, {
       groupId,
       payload,
