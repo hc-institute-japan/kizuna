@@ -302,16 +302,17 @@ fn get_latest_messages_for_all_groups(batch_size: BatchSize) -> ExternResult<Gro
     group_message::handlers::get_latest_messages_for_all_groups(batch_size)
 }
 
-
-#[hdk_extern]
-fn send_message_in_target_date(
-    message_input: GroupMessageInputWithDate,
-) -> ExternResult<GroupMessageData> {
-    group_message::handlers::send_message_in_target_date(message_input)
-}
 #[hdk_extern]
 fn get_messages_by_group_by_timestamp(
     group_chat_filter: GroupChatFilter,
 ) -> ExternResult<GroupMessagesOutput> {
     group_message::get_messages_by_group_by_timestamp::handler(group_chat_filter)
+}
+
+// TATS: discuss the necessity of this
+#[hdk_extern]
+fn send_message_in_target_date(
+    message_input: GroupMessageInputWithDate,
+) -> ExternResult<GroupMessageData> {
+    group_message::handlers::send_message_in_target_date(message_input)
 }
