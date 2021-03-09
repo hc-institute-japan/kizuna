@@ -128,6 +128,7 @@ export function strToUtf8Bytes(str) {
   return bytes;
 }
 
+// TATS: Please delete the functions that are not being used anymore
 declare type Dictionary<T> = { [key: string]: T };
 declare type Hash = string;
 
