@@ -15,6 +15,7 @@ pub struct SignalDetails {
 
 // Here we add all the signal_types we add in the future
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
+#[serde(tag = "type", rename_all = "SCREAMING_SNAKE_CASE", content = "payload")]
 pub enum SignalPayload {
     // TODO: we may want to change the payload to the actual Group in the future.
     AddedToGroup(GroupOutput),

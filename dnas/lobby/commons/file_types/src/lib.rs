@@ -1,6 +1,6 @@
 use hdk3::prelude::*;
 
-#[derive(Serialize, Deserialize, SerializedBytes, Clone)]
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 // #[serde(rename_all = "camelCase")]
 pub struct FileMetadataInput {
     pub file_name: String,
@@ -8,8 +8,8 @@ pub struct FileMetadataInput {
     pub file_type: String,
 }
 
-#[derive(Serialize, Deserialize, SerializedBytes, Clone)]
-// #[serde(rename_all(serialize = "PascalCase"))]
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+#[serde(tag = "type", rename_all = "SCREAMING_SNAKE_CASE", content = "payload")]
 pub enum PayloadInput {
     Text {
         payload: String,
@@ -47,8 +47,8 @@ pub enum PayloadInput {
 //     }
 // }
 
-#[derive(Serialize, Deserialize, SerializedBytes, Clone)]
-// #[serde(rename_all = "camelCase")]
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct FileMetadata {
     pub file_name: String,
     pub file_size: usize,
@@ -56,16 +56,16 @@ pub struct FileMetadata {
     pub file_hash: EntryHash,
 }
 
-#[derive(Serialize, Deserialize, SerializedBytes, Clone)]
-// #[serde(tag = "fileType")]
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+#[serde(tag = "type", rename_all = "SCREAMING_SNAKE_CASE", content = "payload")]
 pub enum FileType {
     Image { thumbnail: SerializedBytes },
     Video { thumbnail: SerializedBytes },
     Other,
 }
 
-#[derive(Serialize, Deserialize, SerializedBytes, Clone)]
-// #[serde(tag = "type")]
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+#[serde(tag = "type", rename_all = "SCREAMING_SNAKE_CASE", content = "payload")]
 pub enum Payload {
     Text {
         payload: String,
@@ -77,6 +77,7 @@ pub enum Payload {
 }
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+#[serde(tag = "type", rename_all = "SCREAMING_SNAKE_CASE", content = "payload")]
 pub enum PayloadType {
     Text,
     File,

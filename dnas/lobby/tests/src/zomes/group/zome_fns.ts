@@ -1,7 +1,6 @@
-import { filter } from "lodash";
+import { cond, filter } from "lodash";
 import { Base64 } from "js-base64";
-import blake from 'blakejs';
-
+import blake from "blakejs";
 
 export function init(conductor) {
   conductor.call("group", "init");
@@ -47,12 +46,20 @@ export function readGroupMessage(group_message_read_io) {
     conductor.call("group", "read_group_message", group_message_read_io);
 }
 
-export function sendMessage(conductor, { group_id, sender, payload_input }) {
-  return conductor.call("group", "send_message", {
-    group_hash: group_id,
-    payload_input,
+export async function sendMessage(
+  conductor,
+  { groupId, sender, payloadInput }
+) {
+  return await conductor.call("group", "send_message", {
+    groupHash: groupId,
+    payloadInput,
     sender,
   });
+}
+
+export function getMessagesByGroupByTimestamp(message_info) {
+  return (conductor) =>
+    conductor.call("group", "get_messages_by_group_by_timestamp", message_info);
 }
 
 export function signalHandler(signal, signal_listener) {
@@ -72,7 +79,6 @@ export function signalHandler(signal, signal_listener) {
 
   signal_listener.counter++;
   return (payload) => {
-    console.log(`we have a new signal incoming ${payload}`);
     signal_listener.payload = signal.data.payload.payload;
   };
 }
@@ -90,26 +96,28 @@ export function getNextBatchGroupMessage(filter_input) {
 
 export async function sendMessageWithDate(
   conductor,
-  { group_id, sender, payload, date = Date.now() }
+  { groupId, sender, payload, date = Date.now() }
 ) {
   return await conductor.call("group", "send_message_in_target_date", {
-    group_hash: group_id,
+    groupHash: groupId,
     payload,
     sender,
     date,
   });
 }
 
-export function getLatestMessagesForAllGroups(batch_size){
-  return (conductor) => 
-    conductor.call("group", "get_latest_messages_for_all_groups", batch_size);
+export function getLatestMessagesForAllGroups(batch_size) {
+  return async (conductor) =>
+    await conductor.call(
+      "group",
+      "get_latest_messages_for_all_groups",
+      batch_size
+    );
 }
 
 //HELPERS FUNCTIONS FOR TESTING SENDING FILE MESSAGES
 
-
-
-export function strToUtf8Bytes(str){
+export function strToUtf8Bytes(str) {
   const bytes: Array<number> = [];
 
   for (let i = 0; i < str.length; i++) {
@@ -120,7 +128,8 @@ export function strToUtf8Bytes(str){
   return bytes;
 }
 
-declare type Dictionary<T> = { [key: string]: T; };
+// TATS: Please delete the functions that are not being used anymore
+declare type Dictionary<T> = { [key: string]: T };
 declare type Hash = string;
 
 export function serializeHash(hash) {
@@ -135,11 +144,11 @@ export enum HashType {
   DNA,
 }
 
-const AGENT_PREFIX = 'hCAk';
-const ENTRY_PREFIX = 'hCEk';
-const DHTOP_PREFIX = 'hCQk';
-const DNA_PREFIX = 'hC0k';
-const HEADER_PREFIX = 'hCkk';
+const AGENT_PREFIX = "hCAk";
+const ENTRY_PREFIX = "hCEk";
+const DHTOP_PREFIX = "hCQk";
+const DNA_PREFIX = "hC0k";
+const HEADER_PREFIX = "hCkk";
 
 function getPrefix(type: HashType) {
   switch (type) {
@@ -170,7 +179,7 @@ export const hashCache: Dictionary<Hash> = {};
 // From https://github.com/holochain/holochain/blob/dc0cb61d0603fa410ac5f024ed6ccfdfc29715b3/crates/holo_hash/src/encode.rs
 export function hash(content: any, type: HashType): Hash {
   const contentString =
-    typeof content === 'string' ? content : JSON.stringify(content);
+    typeof content === "string" ? content : JSON.stringify(content);
 
   if (hashCache[contentString]) return hashCache[contentString];
 
