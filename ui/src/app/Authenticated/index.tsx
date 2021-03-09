@@ -1,6 +1,6 @@
 import { IonRouterOutlet, IonSplitPane } from "@ionic/react";
 import React, { useEffect } from "react";
-import { Redirect, Route } from "react-router";
+import { Redirect, Route, Switch } from "react-router";
 import Menu from "../../components/Menu";
 import { fetchBlocked, fetchMyContacts } from "../../redux/contacts/actions";
 import { fetchPreference } from "../../redux/preference/actions";
@@ -27,17 +27,19 @@ const Authenticated: React.FC = () => {
     <IonSplitPane contentId="main">
       <Menu />
       <IonRouterOutlet id="main">
-        <Route path="/home" render={() => <Home />} />
-        <Route path="/compose" exact component={NewConversation} />
-        <Route path="/u/:username" exact component={Chat} />
-        <Route path="/settings" exact component={Settings} />
-        <Route path="/g/:group" exact component={GroupChat} />
-        <Route path="/p/:username" exact component={Profile} />
-        <Route path="/test" exact component={GroupChat} />
+        <Switch>
+          <Route path="/home" render={() => <Home />} />
+          <Route path="/compose" exact component={NewConversation} />
+          <Route path="/u/:username" exact component={Chat} />
+          <Route path="/settings" exact component={Settings} />
+          <Route path="/g/:group" exact component={GroupChat} />
+          <Route path="/p/:username" exact component={Profile} />
+          <Route path="/test" exact component={GroupChat} />
 
-        <Route path="/blocked" exact component={Blocked} />
+          <Route path="/blocked" exact component={Blocked} />
 
-        <Redirect from="/" to="/home" exact />
+          <Redirect from="/" to="/home" />
+        </Switch>
       </IonRouterOutlet>
     </IonSplitPane>
   );

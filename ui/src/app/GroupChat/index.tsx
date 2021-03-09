@@ -22,6 +22,8 @@ const GroupChat: React.FC = () => {
     (state: RootState) => state.groupConversations.conversations[group]
   );
 
+  console.log(groupInfo);
+
   return (
     <IonPage>
       <IonHeader>
@@ -34,7 +36,10 @@ const GroupChat: React.FC = () => {
 
       <IonContent>
         {groupInfo ? (
-          <MessageList messageIds={groupInfo.messages}></MessageList>
+          <MessageList
+            members={groupInfo.versions[0].conversants}
+            messageIds={groupInfo.messages}
+          ></MessageList>
         ) : null}
       </IonContent>
     </IonPage>

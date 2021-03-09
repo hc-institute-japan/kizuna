@@ -32,9 +32,10 @@ export const sendInitialGroupMessage = (
       fnName: FUNCTIONS[ZOMES.GROUP].SEND_MESSAGE,
       payload: {
         sender: groupRes.content.creator,
-        group_hash: groupRes.group_id,
-        payload_input: {
-          Text: {
+        groupHash: groupRes.groupId,
+        payloadInput: {
+          type: "TEXT",
+          payload: {
             payload: message,
           },
         },
@@ -42,14 +43,14 @@ export const sendInitialGroupMessage = (
     });
     if (messageRes?.type !== "error") {
       const groupConversation: GroupConversation = {
-        originalGroupEntryHash: groupRes.group_id,
-        originalGroupHeaderHash: groupRes.group_revision_id,
+        originalGroupEntryHash: groupRes.groupId,
+        originalGroupHeaderHash: groupRes.groupRevisionId,
         createdAt: date,
         creator: groupRes.content.creator,
         messages: [Uint8ArrayToBase64(messageRes.id)],
         versions: [
           {
-            groupEntryHash: groupRes.group_id,
+            groupEntryHash: groupRes.groupId,
             name,
             conversants: members.map((contact) =>
               Uint8ArrayToBase64(contact.id)
@@ -60,7 +61,7 @@ export const sendInitialGroupMessage = (
       };
       const groupMessage: GroupMessage = {
         groupMessageEntryHash: messageRes.id,
-        groupEntryHash: groupRes.group_id,
+        groupEntryHash: groupRes.groupId,
         author: groupRes.content.creator,
         payload: {
           payload: message,
@@ -72,7 +73,7 @@ export const sendInitialGroupMessage = (
         type: SET_CONVERSATIONS,
         conversations: {
           ...conversations,
-          [Uint8ArrayToBase64(groupRes.group_id)]: groupConversation,
+          [Uint8ArrayToBase64(groupRes.groupId)]: groupConversation,
         },
       });
       dispatch({
