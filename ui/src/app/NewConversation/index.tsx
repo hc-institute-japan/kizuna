@@ -7,6 +7,7 @@ import {
   IonIcon,
   IonInput,
   IonLabel,
+  IonLoading,
   IonPage,
   IonTitle,
   IonToast,
@@ -15,9 +16,11 @@ import {
 import { close } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
-import { useLocation } from "react-router";
+import { useHistory, useLocation } from "react-router";
 import MessageInput from "../../components/MessageInput";
+import { sendInitialGroupMessage } from "../../redux/groupConversations/actions";
 import { Profile, ProfileListType } from "../../redux/profile/types";
+import { Uint8ArrayToBase64, useAppDispatch } from "../../utils/helpers";
 import ContactList from "./ContactList";
 import { ContactsContext } from "./context";
 import styles from "./style.module.css";
@@ -32,7 +35,12 @@ const NewConversation: React.FC = () => {
   const [selectedContacts, setSelectedContacts] = useState<ProfileListType>({});
   const [search, setSearch] = useState("");
   const [isOpen, setIsOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState<string | undefined>(undefined);
+  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useAppDispatch();
   const intl = useIntl();
+  const history = useHistory();
 
   useEffect(() => {
     if (location.state !== undefined) setContacts(location.state.contacts);
@@ -40,11 +48,11 @@ const NewConversation: React.FC = () => {
   }, [location.state]);
   const handleOnClose = (contact: Profile) => {
     setSelectedContacts((currContacts) => {
-      delete currContacts[JSON.stringify(contact.id)];
+      delete currContacts[Uint8ArrayToBase64(contact.id)];
       return { ...currContacts };
     });
     setContacts((currContacts) => {
-      currContacts[JSON.stringify(contact.id)] = contact;
+      currContacts[Uint8ArrayToBase64(contact.id)] = contact;
       return currContacts;
     });
   };
@@ -52,16 +60,35 @@ const NewConversation: React.FC = () => {
   useEffect(() => {
     setSearch("");
   }, [contacts, selectedContacts]);
+  useEffect(() => {
+    setIsOpen(error !== undefined);
+  }, [error]);
 
   const handleOnSend = () => {
-    console.log("clicked");
-    if (Object.keys(selectedContacts).length === 1) {
+    const contacts = Object.values(selectedContacts);
+    if (contacts.length === 1) {
       // send p2p
-    } else if (Object.keys(selectedContacts).length > 1) {
-      // send group
+    } else if (contacts.length > 1) {
+      setIsLoading(true);
+      dispatch(sendInitialGroupMessage(contacts, message)).then((res: any) => {
+        if (res) {
+          setIsLoading(false);
+          const base64 = Uint8ArrayToBase64(res.versions[0].groupEntryHash);
+
+          history.push(`/g/${base64}`);
+        } else {
+          setIsLoading(false);
+          setError(
+            intl.formatMessage({
+              id: "app.new-conversation.problem-occured-toast",
+            })
+          );
+        }
+      });
     } else {
-      console.log("what the fuck");
-      setIsOpen(true);
+      setError(
+        intl.formatMessage({ id: "app.new-conversation.no-contacts-toast" })
+      );
     }
   };
 
@@ -72,9 +99,9 @@ const NewConversation: React.FC = () => {
       <IonPage>
         <IonToast
           isOpen={isOpen}
-          onDidDismiss={() => setIsOpen(false)}
+          onDidDismiss={() => setError(undefined)}
           duration={1500}
-          message="Select a contact...."
+          message={error}
           color="danger"
         ></IonToast>
         <IonHeader className={styles.header}>
@@ -87,6 +114,7 @@ const NewConversation: React.FC = () => {
             </IonTitle>
           </IonToolbar>
         </IonHeader>
+        <IonLoading isOpen={isLoading} />
 
         <IonContent className={styles["list"]}>
           <div className={`${styles.recipients} ion-padding`}>
@@ -123,8 +151,8 @@ const NewConversation: React.FC = () => {
 
         <MessageInput
           onSend={handleOnSend}
-          onChange={(message) => {}}
-        ></MessageInput>
+          onChange={(message) => setMessage(message)}
+        />
       </IonPage>
     </ContactsContext.Provider>
   );

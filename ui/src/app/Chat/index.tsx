@@ -10,12 +10,8 @@ import {
   IonToolbar,
 } from "@ionic/react";
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
 import { RouteComponentProps, useParams } from "react-router";
-import Me from "../../components/Me";
-import Others from "../../components/Others";
-import { RootState } from "../../redux/types";
-import { Conversation, Message } from "../../utils/types";
+import { Conversation } from "../../utils/types";
 import styles from "./style.module.css";
 
 type Props = {
@@ -24,7 +20,7 @@ type Props = {
 
 const Chat: React.FC<Props> = ({ location }) => {
   const { username } = useParams<{ username: string }>();
-  const { username: me } = useSelector((state: RootState) => state.profile);
+  // const { username: me } = useSelector((state: RootState) => state.profile)
   const [data, setData] = useState<Conversation | null>(null);
   useEffect(() => {
     const { state }: any = { ...location };
@@ -34,12 +30,12 @@ const Chat: React.FC<Props> = ({ location }) => {
     }
   }, [location]);
 
-  const { messages }: { messages?: Message[] } = { ...data };
+  // const { messages }: { messages?: Message[] } = { ...data };
 
-  const handleMessage = (message: Message) => {
-    const Message = me === message.sender ? Me : Others;
-    return <Message message={message} />;
-  };
+  // const handleMessage = (message: Message) => {
+  //   const Message = me === message.sender ? Me : Others;
+  //   return <Message message={message} />;
+  // };
   return (
     <IonPage>
       <IonHeader>
@@ -56,7 +52,7 @@ const Chat: React.FC<Props> = ({ location }) => {
       <IonContent>
         {data ? (
           <div className={`${styles.chat} ion-padding`}>
-            {messages?.map(handleMessage)}
+            {/* {messages?.map(handleMessage)} */}
           </div>
         ) : null}
       </IonContent>

@@ -1,19 +1,27 @@
 import { ThunkAction } from "../types";
 import { FUNCTIONS, ZOMES } from "../../connection/types";
-import { SET_USERNAME } from "./types";
+import { SET_PROFILE, SET_USERNAME } from "./types";
+import { Uint8ArrayToBase64 } from "../../utils/helpers";
 
 export const setUsername = (username: string | null): ThunkAction => (
-  dispatch
+  dispatch,
+  _getState
 ) =>
   dispatch({
     type: SET_USERNAME,
     username,
   });
 
+export const fetchId = (): ThunkAction => async (
+  _dispatch,
+  _getState,
+  { getAgentId }
+) => await getAgentId();
+
 export const fetchMyUsername = (): ThunkAction => async (
   dispatch,
   _getState,
-  { callZome }
+  { callZome, getAgentId }
 ) => {
   const res = await callZome({
     zomeName: ZOMES.USERNAME,
@@ -21,17 +29,20 @@ export const fetchMyUsername = (): ThunkAction => async (
   });
 
   if (res?.type !== "error") {
-    dispatch({
-      type: SET_USERNAME,
-      username: res.username,
-    });
+    let id = await getAgentId();
+    if (id)
+      dispatch({
+        type: SET_PROFILE,
+        username: res.username,
+        id: Uint8ArrayToBase64(id),
+      });
   }
 };
 
 export const registerUsername = (username: string): ThunkAction => async (
   dispatch,
   _getState,
-  { callZome }
+  { callZome, getAgentId }
 ) => {
   const res = await callZome({
     zomeName: ZOMES.USERNAME,
@@ -40,10 +51,13 @@ export const registerUsername = (username: string): ThunkAction => async (
   });
 
   if (res?.type !== "error") {
-    dispatch({
-      type: SET_USERNAME,
-      username: res.username,
-    });
+    let id = await getAgentId();
+    if (id)
+      dispatch({
+        type: SET_PROFILE,
+        username: res.username,
+        id: Uint8ArrayToBase64(id),
+      });
     return res;
   }
 

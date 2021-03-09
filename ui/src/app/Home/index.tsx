@@ -9,7 +9,7 @@ import {
 import { chatbox, person } from "ionicons/icons";
 import React from "react";
 import { FormattedMessage } from "react-intl";
-import { Redirect, Route, RouteComponentProps } from "react-router";
+import { Redirect, Route } from "react-router";
 import Contacts from "../Contacts";
 import Conversations from "../Conversations";
 import styles from "./style.module.css";

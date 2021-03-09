@@ -1,6 +1,7 @@
 import { AgentPubKey } from "@holochain/conductor-api";
 import { FUNCTIONS, ZOMES } from "../../connection/types";
 import { Profile } from "../../redux/profile/types";
+import { Uint8ArrayToBase64 } from "../../utils/helpers";
 import { ThunkAction } from "../types";
 import { SET_CONTACTS, SET_BLOCKED } from "./types";
 
@@ -33,7 +34,7 @@ export const fetchMyContacts = (): ThunkAction => async (
         });
 
         if (usernameOutput?.type !== "error")
-          contacts[JSON.stringify(id)] = {
+          contacts[Uint8ArrayToBase64(id)] = {
             id,
             username: usernameOutput.username,
           };
@@ -91,7 +92,7 @@ export const addContact = (profile: Profile): ThunkAction => async (
   });
 
   if (res?.type !== "error") {
-    contacts[JSON.stringify(profile.id)] = profile;
+    contacts[Uint8ArrayToBase64(profile.id)] = profile;
     dispatch({ type: SET_CONTACTS, contacts });
     return true;
   }
@@ -112,7 +113,7 @@ export const removeContact = (profile: Profile): ThunkAction => async (
   });
 
   if (res?.type !== "error") {
-    delete contacts[JSON.stringify(profile.id)];
+    delete contacts[Uint8ArrayToBase64(profile.id)];
     dispatch({ type: SET_CONTACTS, contacts });
     return true;
   }
@@ -133,7 +134,7 @@ export const blockContact = (profile: Profile): ThunkAction => async (
   });
 
   if (res?.type !== "error") {
-    blocked[JSON.stringify(profile.id)] = profile;
+    blocked[Uint8ArrayToBase64(profile.id)] = profile;
     dispatch({ type: SET_BLOCKED, blocked });
     return true;
   }
@@ -154,7 +155,7 @@ export const unblockContact = (profile: Profile): ThunkAction => async (
   });
 
   if (res?.type !== "error") {
-    delete blocked[JSON.stringify(profile.id)];
+    delete blocked[Uint8ArrayToBase64(profile.id)];
     dispatch({ type: SET_CONTACTS, blocked });
     return true;
   }
@@ -182,7 +183,7 @@ export const fetchBlocked = (): ThunkAction => async (
         });
 
         if (usernameOutput?.type !== "error")
-          blocked[JSON.stringify(id)] = {
+          blocked[Uint8ArrayToBase64(id)] = {
             id,
             username: usernameOutput.username,
           };
