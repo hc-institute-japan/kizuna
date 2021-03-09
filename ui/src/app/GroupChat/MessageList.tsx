@@ -8,34 +8,33 @@ import { Uint8ArrayToBase64, useAppDispatch } from "../../utils/helpers";
 import styles from "./style.module.css";
 interface Props {
   messageIds: string[];
+  members: string[];
 }
-const MessageList: React.FC<Props> = ({ messageIds }) => {
-  const dispatch = useAppDispatch();
+const MessageList: React.FC<Props> = ({ messageIds, members }) => {
   const { id } = useSelector((state: RootState) => state.profile);
   const messages = useSelector((state: RootState) => {
     const messages: (any | undefined)[] = messageIds.map((messageId) => {
       let message = state.groupConversations.messages[messageId];
-      let profile = null;
-      if (message) {
-        if (state.profile.id)
-          if (
-            Uint8ArrayToBase64(state.profile.id) ===
-            Uint8ArrayToBase64(message.author)
-          )
-            profile = state.profile;
-          else dispatch(fetchId());
 
+      if (message) {
+        const id = members.find(
+          (member) => member === Uint8ArrayToBase64(message.author)
+        );
         return {
           ...message,
-          author: profile
-            ? profile
-            : state.contacts.contacts[Uint8ArrayToBase64(message.author)],
+          author: id
+            ? state.contacts.contacts[id]
+            : {
+                username: state.profile.username,
+                id: Uint8ArrayToBase64(message.author),
+              },
         };
       }
       return null;
     });
-    if (messages.find((message) => message === null)) return messages;
-    return null;
+
+    if (messages.find((message) => message === null)) return null;
+    return messages;
     // handle fetching of missing messages
   });
 

@@ -124,31 +124,31 @@ export interface GroupConversationsState {
 }
 
 // TODO: use it for typing action
-interface AddGroupAction {
-  type: typeof ADD_GROUP;
-  groupData: GroupConversation;
-}
+// interface AddGroupAction {
+//   type: typeof ADD_GROUP;
+//   groupData: GroupConversation;
+// }
 
-interface AddGroupMembersAction {
-  type: typeof ADD_MEMBERS;
-  updateGroupMembersData: UpdateGroupMembersIO;
-}
+// interface AddGroupMembersAction {
+//   type: typeof ADD_MEMBERS;
+//   updateGroupMembersData: UpdateGroupMembersIO;
+// }
 
-interface RemoveGroupMembersAction {
-  type: typeof REMOVE_MEMBERS;
-  updateGroupMembersData: UpdateGroupMembersIO;
-}
+// interface RemoveGroupMembersAction {
+//   type: typeof REMOVE_MEMBERS;
+//   updateGroupMembersData: UpdateGroupMembersIO;
+// }
 
-interface UpdateGroupNameAction {
-  type: typeof UPDATE_GROUP_NAME;
-  UpdateGroupNameIO: UpdateGroupNameIO;
-}
+// interface UpdateGroupNameAction {
+//   type: typeof UPDATE_GROUP_NAME;
+//   UpdateGroupNameIO: UpdateGroupNameIO;
+// }
 
-interface sendGroupMessage {
-  type: typeof SEND_GROUP_MESSAGE;
-  groupMessage: GroupMessage;
-  fileBytes?: Uint8Array;
-}
+// interface sendGroupMessage {
+//   type: typeof SEND_GROUP_MESSAGE;
+//   groupMessage: GroupMessage;
+//   fileBytes?: Uint8Array;
+// }
 
 // type guards
 export function isTextPayload(
