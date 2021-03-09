@@ -11,6 +11,7 @@ interface Props {
 
 const ContactList: React.FC<Props> = ({ contacts }) => {
   const indexedContacts = indexContacts(Object.values(contacts));
+
   return (
     <IonList className={styles["contacts-list"]}>
       {Object.keys(indexedContacts).map((char) => {

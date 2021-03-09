@@ -1,6 +1,7 @@
 {
   "app.contacts.add-message": "{name} has been added to your contacts.",
   "app.contacts.empty-contact-list": "Your contact list is empty as of the moment.",
+  "app.conversations.empty-conversations-list": "You don't seem to have any conversation yet...",
   "app.landing.login": "Start Messaging",
   "app.landing.register": "Don't have an account?",
   "app.login.login": "Login",
@@ -15,6 +16,8 @@
   "app.new-conversation.to": "To",
   "app.new-conversation.search-placeholder": "Search contacts...",
   "app.new-conversation.message-placeholder": "Compose message...",
+  "app.new-conversation.no-contacts-toast": "Please select a contact...",
+  "app.new-conversation.problem-occured-toast": "A problem occurred...",
   "app.register.error-invalid-username": "Username must be at least 3 characters and contain 1 alphanumberic character",
   "app.register.error-existing-username": "There's already a username registered for this user",
   "app.register.username-label": "Username",

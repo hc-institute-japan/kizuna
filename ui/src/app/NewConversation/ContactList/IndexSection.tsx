@@ -1,6 +1,7 @@
 import { IonItemDivider, IonLabel } from "@ionic/react";
 import React from "react";
 import { Profile } from "../../../redux/profile/types";
+import { Uint8ArrayToBase64 } from "../../../utils/helpers";
 import { useContacts } from "../context";
 import ContactItem from "./ContactItem";
 
@@ -15,11 +16,11 @@ const IndexSection: React.FC<Props> = ({ char, contacts }) => {
 
   const handleOnClick = (contact: Profile) => {
     setSelectedContacts((currContacts) => {
-      currContacts[JSON.stringify(contact.id)] = contact;
+      currContacts[Uint8ArrayToBase64(contact.id)] = contact;
       return currContacts;
     });
     setContacts((currContacts) => {
-      delete currContacts[JSON.stringify(contact.id)];
+      delete currContacts[Uint8ArrayToBase64(contact.id)];
       return { ...currContacts };
     });
   };
@@ -31,7 +32,7 @@ const IndexSection: React.FC<Props> = ({ char, contacts }) => {
       </IonItemDivider>
       {contacts.map((contact) => (
         <ContactItem
-          key={JSON.stringify(contact)}
+          key={Uint8ArrayToBase64(contact.id)}
           contact={contact}
           onClick={handleOnClick}
         />

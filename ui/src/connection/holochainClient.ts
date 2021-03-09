@@ -3,11 +3,11 @@ import {
   AppSignalCb,
   AppWebsocket,
 } from "@holochain/conductor-api";
+import { SET_ID } from "../redux/profile/types";
 import store from "../redux/store";
 import { CallZomeConfig } from "../redux/types";
 
 let client: null | AppWebsocket = null;
-let myAgentId: null | AgentPubKey = null;
 
 let signalHandler: AppSignalCb = (signal) =>
   store.dispatch(signal.data.payload);
@@ -29,12 +29,17 @@ const init: () => any = async () => {
 };
 
 export const getAgentId: () => Promise<AgentPubKey | undefined> = async () => {
+  let myAgentId = store.getState().profile.id;
   if (myAgentId) {
     return myAgentId;
   }
   await init();
   try {
     const info = await client?.appInfo({ installed_app_id: "test-app" });
+    store.dispatch({
+      type: SET_ID,
+      id: info?.cell_data[0][0][1],
+    });
     return info?.cell_data[0][0][1];
   } catch (e) {
     console.warn(e);

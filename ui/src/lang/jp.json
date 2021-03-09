@@ -1,6 +1,7 @@
 {
   "app.contacts.add-message": "{name}が連絡先に追加されました。",
   "app.contacts.empty-contact-list": "点では、連絡先リストは空です。",
+  "app.conversations.empty-conversations-list": "まだ会話がないようです...",
   "app.landing.login": "メッセージングを開始する",
   "app.landing.register": "アカウントをお持ちではありませんか？",
   "app.login.login": "ログインする",
@@ -15,6 +16,8 @@
   "app.new-conversation.to": "に",
   "app.new-conversation.search-placeholder": "連絡先を検索...",
   "app.new-conversation.message-placeholder": "メッセージを作成します...",
+  "app.new-conversation.no-contacts-toast": "連絡先を選択してください...",
+  "app.new-conversation.problem-occured-toast": "問題が発生しました...",
   "app.register.error-invalid-username": "ユーザー名は3文字以上で、1つの英字を含める必要があります",
   "app.register.error-existing-username": "このユーザーにはすでにユーザー名が登録されています",
   "app.register.username-label": "ユーザー名",
