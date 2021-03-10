@@ -1,7 +1,7 @@
 use hdk3::prelude::*;
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
-// #[serde(rename_all = "camelCase")]
+#[serde(rename_all = "camelCase")]
 pub struct FileMetadataInput {
     pub file_name: String,
     pub file_size: usize,
@@ -11,9 +11,9 @@ pub struct FileMetadataInput {
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(tag = "type", rename_all = "SCREAMING_SNAKE_CASE", content = "payload")]
 pub enum PayloadInput {
-    Text {
-        payload: String,
-    },
+    #[serde(rename_all = "camelCase")]
+    Text { payload: String },
+    #[serde(rename_all = "camelCase")]
     File {
         metadata: FileMetadataInput,
         file_type: FileType,
@@ -67,9 +67,9 @@ pub enum FileType {
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(tag = "type", rename_all = "SCREAMING_SNAKE_CASE", content = "payload")]
 pub enum Payload {
-    Text {
-        payload: String,
-    },
+    #[serde(rename_all = "camelCase")]
+    Text { payload: String },
+    #[serde(rename_all = "camelCase")]
     File {
         metadata: FileMetadata,
         file_type: FileType,

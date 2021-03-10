@@ -1106,21 +1106,21 @@ function sendMessageswithFilesTest(orchestrator, config, installables) {
       });
       await delay(1000);
 
-      let file_metadata = {
-        file_name: "my_file",
-        file_size: 20,
-        file_type: "Other",
+      let fileMetadata = {
+        fileName: "my_file",
+        fileSize: 20,
+        fileType: "OTHER",
       };
 
       let text: string = "The quick brown fox jumps over the lazy dog.";
-      let file_bytes = Int8Array.from(strToUtf8Bytes(text));
+      let fileBytes = Int8Array.from(strToUtf8Bytes(text));
 
       let payloadInput = {
         type: "FILE",
         payload: {
-          metadata: file_metadata,
-          file_type: { type: "OTHER", payload: null },
-          file_bytes: file_bytes,
+          metadata: fileMetadata,
+          fileType: { type: "OTHER", payload: null },
+          fileBytes: fileBytes,
         },
       };
 
@@ -1132,22 +1132,22 @@ function sendMessageswithFilesTest(orchestrator, config, installables) {
 
       await delay(1000);
 
-      let img_path = path.join(__dirname, "/files/img.png");
-      let thumbnail_bytes = Int8Array.from([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-      let img_bytes = fs.readFileSync(img_path);
+      let imgPath = path.join(__dirname, "/files/img.png");
+      let thumbnailBytes = Int8Array.from([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+      let imgBytes = fs.readFileSync(imgPath);
 
-      let img_metadata = {
-        file_name: "img.png",
-        file_size: 20,
-        file_type: "Image",
+      let imgMetadata = {
+        fileName: "img.png",
+        fileSize: 20,
+        fileType: "Image",
       };
 
       let payloadInput_2 = {
         type: "FILE",
         payload: {
-          metadata: img_metadata,
-          file_type: { type: "IMAGE", payload: { thumbnail: thumbnail_bytes } },
-          file_bytes: Int8Array.from(img_bytes),
+          metadata: imgMetadata,
+          fileType: { type: "IMAGE", payload: { thumbnail: thumbnailBytes } },
+          fileBytes: Int8Array.from(imgBytes),
         },
       };
 
@@ -1171,21 +1171,21 @@ function sendMessageswithFilesTest(orchestrator, config, installables) {
       });
       await delay(1000);
 
-      let pdf1_metadata = {
-        file_name: "message_5.pdf",
-        file_size: 20,
-        file_type: "Other",
+      let pdf1Metadata = {
+        fileName: "message_5.pdf",
+        fileSize: 20,
+        fileType: "Other",
       };
 
-      let pdf1_path = path.join(__dirname, "/files/message_5.pdf");
-      let pdf1_bytes = fs.readFileSync(pdf1_path);
+      let pdf1Path = path.join(__dirname, "/files/message_5.pdf");
+      let pdf1Bytes = fs.readFileSync(pdf1Path);
 
       let payloadInput_3 = {
         type: "FILE",
         payload: {
-          metadata: pdf1_metadata,
-          file_type: { type: "OTHER", payload: null },
-          file_bytes: Int8Array.from(pdf1_bytes),
+          metadata: pdf1Metadata,
+          fileType: { type: "OTHER", payload: null },
+          fileBytes: Int8Array.from(pdf1Bytes),
         },
       };
 
@@ -1196,21 +1196,21 @@ function sendMessageswithFilesTest(orchestrator, config, installables) {
       });
       await delay(1000);
 
-      let pdf2_metadata = {
-        file_name: "message_6.pdf",
-        file_size: 20,
-        file_type: "Other",
+      let pdf2Metadata = {
+        fileName: "message_6.pdf",
+        fileSize: 20,
+        fileType: "Other",
       };
 
-      let pdf2_path = path.join(__dirname, "/files/message_6.pdf");
-      let pdf2_bytes = fs.readFileSync(pdf2_path);
+      let pdf2Path = path.join(__dirname, "/files/message_6.pdf");
+      let pdf2Bytes = fs.readFileSync(pdf2Path);
 
       let payloadInput_4 = {
         type: "FILE",
         payload: {
-          metadata: pdf2_metadata,
-          file_type: { type: "OTHER", payload: null },
-          file_bytes: Int8Array.from(pdf2_bytes),
+          metadata: pdf2Metadata,
+          fileType: { type: "OTHER", payload: null },
+          fileBytes: Int8Array.from(pdf2Bytes),
         },
       };
 
@@ -1337,11 +1337,11 @@ function sendLargeSetOfFilesTest(orchestrator, config, installables) {
       init(alice_conductor);
       init(bobby_conductor);
 
-      let file_name: string;
+      let fileName: string;
       let day = 9;
       let date: number = new Date(2021, 1, day).getTime();
-      let file_path;
-      let file_bytes;
+      let filePath;
+      let fileBytes;
       let messages: Buffer[] = [];
       let timestamps: number[][] = [];
       let thumbnail_bytes = Int8Array.from([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
@@ -1359,25 +1359,25 @@ function sendLargeSetOfFilesTest(orchestrator, config, installables) {
       await delay(1000);
 
       for (let i = 0; i < 25; i++) {
-        file_name = `/files/Icon${i + 1}.png`;
-        file_path = path.join(__dirname, file_name);
-        file_bytes = fs.readFileSync(file_path);
+        fileName = `/files/Icon${i + 1}.png`;
+        filePath = path.join(__dirname, fileName);
+        fileBytes = fs.readFileSync(filePath);
 
-        let file_metadata = {
-          file_name: `Icon${i + 1}.png`,
-          file_size: 20,
-          file_type: "Image",
+        let fileMetadata = {
+          fileName: `Icon${i + 1}.png`,
+          fileSize: 20,
+          fileType: "Image",
         };
 
         let payloadInput = {
           type: "FILE",
           payload: {
-            metadata: file_metadata,
-            file_type: {
+            metadata: fileMetadata,
+            fileType: {
               type: "IMAGE",
               payload: { thumbnail: thumbnail_bytes },
             },
-            file_bytes: Int8Array.from(file_bytes),
+            fileBytes: Int8Array.from(fileBytes),
           },
         };
 
@@ -1490,23 +1490,23 @@ function fetchFilesForAParticularDateTest(orchestrator, config, installables) {
   );
 }
 
-function generateFileMessage(file_name, file_type, file_type_input) {
+function generateFileMessage(fileName, fileType, fileTypeInput) {
   let file_metadata = {
-    file_name,
-    file_size: 20,
-    file_type,
+    fileName,
+    fileSize: 20,
+    fileType,
   };
 
-  file_name = `/files/${file_name}`;
-  let file_path = path.join(__dirname, file_name);
-  let file_bytes = fs.readFileSync(file_path);
+  fileName = `/files/${fileName}`;
+  let filePath = path.join(__dirname, fileName);
+  let fileBytes = fs.readFileSync(filePath);
 
   let payload_input = {
     type: "FILE",
     payload: {
       metadata: file_metadata,
-      file_type: file_type_input,
-      file_bytes: Int8Array.from(file_bytes),
+      fileType: fileTypeInput,
+      fileBytes: Int8Array.from(fileBytes),
     },
   };
 
