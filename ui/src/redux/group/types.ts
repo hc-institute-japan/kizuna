@@ -15,9 +15,9 @@ type GroupRevisionID = string; // Group's HeaderHash
 export type Payload = TextPayload | FilePayload;
 type PayloadInput = TextPayload | FilePayloadInput;
 export type FileType =
-  | { Image: { thumbnail: Uint8Array } }
-  | { Video: { thumbnail: Uint8Array } }
-  | { Other: null };
+  | { type: "IMAGE"; payload: { thumbnail: Uint8Array } }
+  | { type: "VIDEO"; payload: { thumbnail: Uint8Array } }
+  | { type: "OTHER"; payload: null };
 // end
 
 // input declaration
@@ -42,27 +42,29 @@ export interface GroupMessageInput {
   groupHash: GroupID;
   payloadInput: PayloadInput;
   sender: AgentPubKey;
-  reply_to?: GroupMessageID;
+  replyTo?: GroupMessageID;
 }
 
 export interface FileMetadataInput {
-  file_name: string;
-  file_size: number;
-  file_type: string;
+  fileName: string;
+  fileSize: number;
+  fileType: string;
 }
 
 export interface FilePayloadInput {
-  File: {
+  type: "FILE";
+  payload: {
     metadata: FileMetadataInput;
-    file_type: FileType;
-    file_bytes: Uint8Array;
+    fileType: FileType;
+    fileBytes: Uint8Array;
   };
 }
 
 // end
 
 export interface TextPayload {
-  Text: { payload: String };
+  type: string;
+  payload: { payload: String };
 }
 
 export interface FilePayload {
@@ -124,52 +126,62 @@ export interface GroupConversationsState {
 }
 
 // TODO: use it for typing action
-// interface AddGroupAction {
-//   type: typeof ADD_GROUP;
-//   groupData: GroupConversation;
-// }
+export interface AddGroupAction {
+  type: typeof ADD_GROUP;
+  groupData: GroupConversation;
+}
 
-// interface AddGroupMembersAction {
-//   type: typeof ADD_MEMBERS;
-//   updateGroupMembersData: UpdateGroupMembersIO;
-// }
+export interface AddGroupMembersAction {
+  type: typeof ADD_MEMBERS;
+  updateGroupMembersData: UpdateGroupMembersIO;
+}
 
-// interface RemoveGroupMembersAction {
-//   type: typeof REMOVE_MEMBERS;
-//   updateGroupMembersData: UpdateGroupMembersIO;
-// }
+export interface RemoveGroupMembersAction {
+  type: typeof REMOVE_MEMBERS;
+  updateGroupMembersData: UpdateGroupMembersIO;
+}
 
-// interface UpdateGroupNameAction {
-//   type: typeof UPDATE_GROUP_NAME;
-//   UpdateGroupNameIO: UpdateGroupNameIO;
-// }
+export interface UpdateGroupNameAction {
+  type: typeof UPDATE_GROUP_NAME;
+  UpdateGroupNameIO: UpdateGroupNameIO;
+}
 
-// interface sendGroupMessage {
-//   type: typeof SEND_GROUP_MESSAGE;
-//   groupMessage: GroupMessage;
-//   fileBytes?: Uint8Array;
-// }
+export interface sendGroupMessage {
+  type: typeof SEND_GROUP_MESSAGE;
+  groupMessage: GroupMessage;
+  fileBytes?: Uint8Array;
+}
+
+export type GroupConversationsActionTypes =
+  | AddGroupAction
+  | AddGroupMembersAction
+  | RemoveGroupMembersAction
+  | UpdateGroupNameAction
+  | sendGroupMessage;
 
 // type guards
 export function isTextPayload(
   payload: TextPayload | FilePayloadInput | FilePayload
 ): payload is TextPayload {
-  return (payload as TextPayload).Text !== undefined;
+  return (payload as TextPayload).type === "TEXT";
 }
 
 export function isOther(
   payload:
-    | { Image: { thumbnail: Uint8Array } }
-    | { Video: { thumbnail: Uint8Array } }
-    | { Other: null }
-): payload is { Other: null } {
-  return (payload as { Other: null }).Other === null;
+    | { type: "IMAGE"; payload: { thumbnail: Uint8Array } }
+    | { type: "VIDEO"; payload: { thumbnail: Uint8Array } }
+    | { type: "OTHER"; payload: null }
+): payload is { type: "OTHER"; payload: null } {
+  return (payload as { type: "OTHER"; payload: null }).type === "OTHER";
 }
 
 export function isImage(
   payload:
-    | { Image: { thumbnail: Uint8Array } }
-    | { Video: { thumbnail: Uint8Array } }
-): payload is { Image: { thumbnail: Uint8Array } } {
-  return (payload as { Image: { thumbnail: Uint8Array } }).Image !== undefined;
+    | { type: "IMAGE"; payload: { thumbnail: Uint8Array } }
+    | { type: "VIDEO"; payload: { thumbnail: Uint8Array } }
+): payload is { type: "IMAGE"; payload: { thumbnail: Uint8Array } } {
+  return (
+    (payload as { type: "IMAGE"; payload: { thumbnail: Uint8Array } }).type ===
+    "IMAGE"
+  );
 }

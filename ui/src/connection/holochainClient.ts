@@ -13,7 +13,7 @@ let client: null | AppWebsocket = null;
 let signalHandler: AppSignalCb = (signal) => {
   switch (signal.data.payload.name) {
     case "added_to_group":
-      let payload = signal.data.payload.payload.AddedToGroup;
+      let payload = signal.data.payload.payload.payload;
       const groupData: GroupConversation = {
         originalGroupEntryHash: payload.groupId,
         originalGroupHeaderHash: payload.groupRevisionId,

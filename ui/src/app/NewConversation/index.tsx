@@ -18,7 +18,7 @@ import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import { useHistory, useLocation } from "react-router";
 import MessageInput from "../../components/MessageInput";
-import { sendInitialGroupMessage } from "../../redux/groupConversations/actions";
+// import { sendInitialGroupMessage } from "../../redux/groupConversations/actions";
 import { Profile, ProfileListType } from "../../redux/profile/types";
 import { Uint8ArrayToBase64, useAppDispatch } from "../../utils/helpers";
 import ContactList from "./ContactList";
@@ -69,22 +69,22 @@ const NewConversation: React.FC = () => {
     if (contacts.length === 1) {
       // send p2p
     } else if (contacts.length > 1) {
-      setIsLoading(true);
-      dispatch(sendInitialGroupMessage(contacts, message)).then((res: any) => {
-        if (res) {
-          setIsLoading(false);
-          const base64 = Uint8ArrayToBase64(res.versions[0].groupEntryHash);
+      // setIsLoading(true);
+      // dispatch(sendInitialGroupMessage(contacts, message)).then((res: any) => {
+      //   if (res) {
+      //     setIsLoading(false);
+      //     const base64 = Uint8ArrayToBase64(res.versions[0].groupEntryHash);
 
-          history.push(`/g/${base64}`);
-        } else {
-          setIsLoading(false);
-          setError(
-            intl.formatMessage({
-              id: "app.new-conversation.problem-occured-toast",
-            })
-          );
-        }
-      });
+      //     history.push(`/g/${base64}`);
+      //   } else {
+      //     setIsLoading(false);
+      //     setError(
+      //       intl.formatMessage({
+      //         id: "app.new-conversation.problem-occured-toast",
+      //       })
+      //     );
+      //   }
+      // });
     } else {
       setError(
         intl.formatMessage({ id: "app.new-conversation.no-contacts-toast" })
