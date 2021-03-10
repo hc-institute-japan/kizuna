@@ -63,6 +63,7 @@ pub fn send_message(message_input: GroupMessageInput) -> ExternResult<GroupMessa
     };
 
     // commit GroupMessage entry
+
     create_entry(&message)?;
 
     let group_hash = message.group_hash.clone().to_string(); // message's group hash as string
