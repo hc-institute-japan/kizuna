@@ -359,6 +359,8 @@ function readGroupMessageTest(orchestrator, config, installables) {
       init(bobby_conductor);
       init(charlie_conductor);
 
+      await delay(1500);
+
       let create_group_input = {
         name: "Group_name",
         members: [bobbyPubKey, charliePubKey],
@@ -368,7 +370,7 @@ function readGroupMessageTest(orchestrator, config, installables) {
         create_group_input
       )(alice_conductor);
 
-      await delay(1000);
+      await delay(1500);
 
       let {
         id: message_id_1,
@@ -382,7 +384,7 @@ function readGroupMessageTest(orchestrator, config, installables) {
         sender: alicePubKey,
       });
 
-      await delay();
+      await delay(1500);
 
       let {
         id: message_id_2,
@@ -393,7 +395,7 @@ function readGroupMessageTest(orchestrator, config, installables) {
         sender: bobbyPubKey,
       });
 
-      await delay();
+      await delay(1500);
 
       let {
         id: message_id_3,
@@ -407,6 +409,8 @@ function readGroupMessageTest(orchestrator, config, installables) {
         sender: charliePubKey,
       });
 
+      await delay(1500);
+
       let alice_group_message_read_data = {
         groupId,
         messageIds: [message_id_2, message_id_3],
@@ -418,7 +422,8 @@ function readGroupMessageTest(orchestrator, config, installables) {
       let alice_group_message_read_data_res = await readGroupMessage(
         alice_group_message_read_data
       )(alice_conductor);
-      await delay();
+
+      await delay(1500);
 
       let bobby_group_message_read_data = {
         groupId,
@@ -431,7 +436,7 @@ function readGroupMessageTest(orchestrator, config, installables) {
       let bobby_group_message_read_data_res = await readGroupMessage(
         bobby_group_message_read_data
       )(bobby_conductor);
-      await delay();
+      await delay(1500);
 
       let charlie_group_message_read_data = {
         groupId,
@@ -444,7 +449,7 @@ function readGroupMessageTest(orchestrator, config, installables) {
       let charlie_group_message_read_data_res = await readGroupMessage(
         charlie_group_message_read_data
       )(charlie_conductor);
-      await delay();
+      await delay(1500);
 
       t.deepEqual(
         alice_group_message_read_data,
