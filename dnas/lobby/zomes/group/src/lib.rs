@@ -309,7 +309,8 @@ fn get_messages_by_group_by_timestamp(
     group_message::get_messages_by_group_by_timestamp::handler(group_chat_filter)
 }
 
-// TATS: discuss the necessity of this
+// This function is only used for testing purposes
+// should be uncommented on production use
 #[hdk_extern]
 fn send_message_in_target_date(
     message_input: GroupMessageInputWithDate,
