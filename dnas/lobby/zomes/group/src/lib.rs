@@ -9,9 +9,9 @@ use entries::{group, group_message};
 use signals::{SignalDetails, SignalPayload};
 
 use group_message::{
-    BatchSize, GroupChatFilter, GroupMessage, GroupMessageData, GroupMessageDataWrapper,
-    GroupMessageInput, GroupMessageInputWithDate, GroupMessageReadData, GroupMessagesOutput,
-    GroupMsgBatchFetchFilter, GroupTypingDetailData,GroupFileBytes
+    BatchSize, GroupChatFilter, GroupFileBytes, GroupMessage, GroupMessageData,
+    GroupMessageDataWrapper, GroupMessageInput, GroupMessageInputWithDate, GroupMessageReadData,
+    GroupMessagesOutput, GroupMsgBatchFetchFilter, GroupTypingDetailData,
 };
 
 use entries::group::{
@@ -67,7 +67,7 @@ pub fn init(_: ()) -> ExternResult<InitCallbackResult> {
 fn recv_remote_signal(signal: SerializedBytes) -> ExternResult<()> {
     // currently only emitting the received signal
     // TODO: actually work with the received signal
-    
+
     let signal_detail: SignalDetails = signal.clone().try_into()?;
     match signal_detail.payload {
         SignalPayload::AddedToGroup(_) => {
@@ -302,17 +302,18 @@ fn get_latest_messages_for_all_groups(batch_size: BatchSize) -> ExternResult<Gro
     group_message::handlers::get_latest_messages_for_all_groups(batch_size)
 }
 
-//END LIST OF DEPENDENCIES ADDED FOR MANUEL
-
-#[hdk_extern]
-fn send_message_in_target_date(
-    message_input: GroupMessageInputWithDate,
-) -> ExternResult<GroupMessageData> {
-    group_message::handlers::send_message_in_target_date(message_input)
-}
 #[hdk_extern]
 fn get_messages_by_group_by_timestamp(
     group_chat_filter: GroupChatFilter,
 ) -> ExternResult<GroupMessagesOutput> {
     group_message::get_messages_by_group_by_timestamp::handler(group_chat_filter)
+}
+
+// This function is only used for testing purposes
+// should be uncommented on production use
+#[hdk_extern]
+fn send_message_in_target_date(
+    message_input: GroupMessageInputWithDate,
+) -> ExternResult<GroupMessageData> {
+    group_message::handlers::send_message_in_target_date(message_input)
 }
