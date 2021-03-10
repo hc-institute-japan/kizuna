@@ -10,7 +10,7 @@ const rootReducer = combineReducers({
   profile: profileReducer,
   contacts: contactsReducer,
   preference: preferenceReducer,
-  groupConversations: groupConversationsReducer,
+  groups: groupReducer,
 });
 
 export default rootReducer;

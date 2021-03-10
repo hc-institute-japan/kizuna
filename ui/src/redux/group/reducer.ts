@@ -8,9 +8,8 @@ import {
   GroupConversation,
   GroupConversationsState,
   isTextPayload,
-  isOther,
-  isImage,
   GroupMessage,
+  GroupConversationsActionTypes,
 } from "./types";
 
 const initialState: GroupConversationsState = {

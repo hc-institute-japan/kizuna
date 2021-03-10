@@ -153,20 +153,23 @@ export const sendGroupMessage = (
   if (isTextPayload(group_message_data.payloadInput)) {
     payload = sendGroupMessageOutput.content.payload;
   } else {
-    console.log(sendGroupMessageOutput);
     let fileType: FileType =
-      sendGroupMessageOutput.content.payload.File.file_type;
+      sendGroupMessageOutput.content.payload.payload.fileType;
     let thumbnail: Uint8Array | undefined = isOther(fileType)
       ? undefined
       : isImage(fileType)
-      ? fileType.Image.thumbnail
-      : fileType.Video.thumbnail;
-    fileBytes = group_message_data.payloadInput.File.file_bytes;
+      ? fileType.payload.thumbnail
+      : fileType.payload.thumbnail;
+    fileBytes = group_message_data.payloadInput.payload.fileBytes;
     let filePayload: FilePayload = {
-      fileName: sendGroupMessageOutput.content.payload.File.metadata.fileName,
-      fileSize: sendGroupMessageOutput.content.payload.File.metadata.fileSize,
-      fileType: sendGroupMessageOutput.content.payload.File.metadata.fileType,
-      fileHash: sendGroupMessageOutput.content.payload.File.metadata.fileHash,
+      fileName:
+        sendGroupMessageOutput.content.payload.payload.metadata.fileName,
+      fileSize:
+        sendGroupMessageOutput.content.payload.payload.metadata.fileSize,
+      fileType:
+        sendGroupMessageOutput.content.payload.payload.metadata.fileType,
+      fileHash:
+        sendGroupMessageOutput.content.payload.payload.metadata.fileHash,
       thumbnail,
     };
     payload = filePayload;
