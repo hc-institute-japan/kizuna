@@ -878,45 +878,40 @@ function getMessagesByGroupByTimestampTest(orchestrator, config, installables) {
 
       await delay();
 
-      const unreadMessages = await alice_conductor.call(
-        "group",
-        "get_messages_by_group_by_timestamp",
-        {
-          groupId,
-          date: dateToTimestamp(new Date(2021, 1, 9)),
-          payloadType: {
-            type: "TEXT",
-            payload: null,
-          },
-        }
-      );
+      const unreadMessages = await getMessagesByGroupByTimestamp({
+        groupId,
+        date: dateToTimestamp(new Date(2021, 1, 9)),
+        payloadType: {
+          type: "TEXT",
+          payload: null,
+        },
+      })(alice_conductor);
+
+      console.log("these are the unread messages!");
+      console.log(unreadMessages);
 
       await delay();
 
       evaluateMessagesByGroupByTimestampResult([], unreadMessages, t);
 
-      await alice_conductor.call("group", "read_group_message", {
+      await readGroupMessage({
         groupId,
         reader: bobbyPubKey,
         timestamp: dateToTimestamp(new Date(2021, 1, 9)),
         members: content.members,
         messageIds: group1Messages.map((message) => message.id),
-      });
+      })(alice_conductor);
 
       await delay();
 
-      const messagesOnFeb9 = await alice_conductor.call(
-        "group",
-        "get_messages_by_group_by_timestamp",
-        {
-          groupId,
-          date: dateToTimestamp(new Date(2021, 1, 9)),
-          payloadType: {
-            type: "TEXT",
-            payload: null,
-          },
-        }
-      );
+      const messagesOnFeb9 = await getMessagesByGroupByTimestamp({
+        groupId,
+        date: dateToTimestamp(new Date(2021, 1, 9)),
+        payloadType: {
+          type: "TEXT",
+          payload: null,
+        },
+      })(alice_conductor);
 
       await delay();
 
@@ -926,43 +921,37 @@ function getMessagesByGroupByTimestampTest(orchestrator, config, installables) {
         t
       );
 
-      const unreadMessagesOnFeb10 = await alice_conductor.call(
-        "group",
-        "get_messages_by_group_by_timestamp",
-        {
-          groupId,
-          date: dateToTimestamp(new Date(2021, 1, 10)),
-          payloadType: {
-            type: "TEXT",
-            payload: null,
-          },
-        }
-      );
+      const unreadMessagesOnFeb10 = await getMessagesByGroupByTimestamp({
+        groupId,
+        date: dateToTimestamp(new Date(2021, 1, 10)),
+        payloadType: {
+          type: "TEXT",
+          payload: null,
+        },
+      })(alice_conductor);
       await delay();
 
       evaluateMessagesByGroupByTimestampResult([], unreadMessagesOnFeb10, t);
 
-      await alice_conductor.call("group", "read_group_message", {
+      await readGroupMessage({
         groupId,
         reader: bobbyPubKey,
         timestamp: dateToTimestamp(new Date(2021, 1, 10)),
         members: content.members,
         messageIds: [feb10].map((message) => message.id),
-      });
+      })(alice_conductor);
+
       await delay();
 
-      const messagesOnFeb10 = await alice_conductor.call(
-        "group",
-        "get_messages_by_group_by_timestamp",
-        {
-          groupId,
-          date: dateToTimestamp(new Date(2021, 1, 10)),
-          payloadType: {
-            type: "TEXT",
-            payload: null,
-          },
-        }
-      );
+      const messagesOnFeb10 = await getMessagesByGroupByTimestamp({
+        groupId,
+        date: dateToTimestamp(new Date(2021, 1, 10)),
+        payloadType: {
+          type: "TEXT",
+          payload: null,
+        },
+      })(alice_conductor);
+
       await delay();
       evaluateMessagesByGroupByTimestampResult([feb10], messagesOnFeb10, t);
     }
