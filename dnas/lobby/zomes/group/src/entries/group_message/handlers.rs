@@ -12,9 +12,9 @@ use file_types::PayloadType;
 
 //LIST OF DEPENDENCIES ADDED FOR MANUEL
 use super::{
-    GroupEntryHash, GroupMessageContent, GroupMessageHash, GroupMessageInputWithDate,
-    GroupMessagesContents, GroupMessagesOutput, GroupMsgBatchFetchFilter, MessagesByGroup,
-    ReadList,
+    GroupEntryHash, GroupMessageContent, GroupMessageElement, GroupMessageHash,
+    GroupMessageInputWithDate, GroupMessagesContents, GroupMessagesOutput,
+    GroupMsgBatchFetchFilter, MessagesByGroup, ReadList,
 };
 use std::collections::hash_map::HashMap;
 //END LIST OF DEPENDENCIES ADDED FOR MANUEL
@@ -413,14 +413,14 @@ fn collect_messages_info(
                 .ok_or(HdkError::Wasm(WasmError::Zome(
                     "the group message ElementEntry enum is not of Present variant".into(),
                 )))?;
-            let group_message_data: GroupMessageData = GroupMessageData {
-                id: hash_entry(&group_message)?,
-                content: group_message,
+            let group_message_element: GroupMessageElement = GroupMessageElement {
+                entry: group_message,
+                signed_header: message_element.signed_header().to_owned(),
             };
 
             group_messages_contents.insert(
                 link.target.clone().to_string(),
-                GroupMessageContent(group_message_data, ReadList(read_list.clone())),
+                GroupMessageContent(group_message_element, ReadList(read_list.clone())),
             );
 
             read_list.clear();

@@ -6,7 +6,7 @@ use hdk3::prelude::*;
 use crate::utils::timestamp_to_days;
 
 use super::{
-    GroupChatFilter, GroupMessage, GroupMessageContent, GroupMessageData, GroupMessageHash,
+    GroupChatFilter, GroupMessage, GroupMessageContent, GroupMessageElement, GroupMessageHash,
     GroupMessagesContents, GroupMessagesOutput, MessagesByGroup, ReadList,
 };
 
@@ -82,16 +82,15 @@ pub fn handler(group_chat_filter: GroupChatFilter) -> ExternResult<GroupMessages
                         .ok_or(HdkError::Wasm(WasmError::Zome(
                             "the group message ElementEntry enum is not of Present variant".into(),
                         )))?;
-
-                    let group_message_data: GroupMessageData = GroupMessageData {
-                        id: hash_entry(&group_message)?,
-                        content: group_message,
+                    let group_message_element: GroupMessageElement = GroupMessageElement {
+                        entry: group_message,
+                        signed_header: element.signed_header().to_owned(),
                     };
 
                     // if !read_list.is_empty() {}
                     group_messages_content.insert(
                         message_link.clone().target.to_string(),
-                        GroupMessageContent(group_message_data, ReadList(read_list)),
+                        GroupMessageContent(group_message_element, ReadList(read_list)),
                     );
                 };
             }

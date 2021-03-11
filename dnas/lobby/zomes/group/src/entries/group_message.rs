@@ -1,6 +1,6 @@
 use file_types::{Payload, PayloadInput, PayloadType};
-use hdk3::prelude::timestamp::Timestamp;
 use hdk3::prelude::*;
+use hdk3::prelude::{element::SignedHeaderHashed, timestamp::Timestamp};
 use std::collections::hash_map::HashMap;
 
 // i added this type while we move to the next holochain version
@@ -27,7 +27,7 @@ pub struct ReadList(pub HashMap<String, SystemTime>);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct GroupMessageContent(pub GroupMessageData, pub ReadList);
+pub struct GroupMessageContent(pub GroupMessageElement, pub ReadList);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -139,6 +139,15 @@ pub struct GroupMessageData {
     // entry_hash of GroupMessage
     pub id: EntryHash,
     pub content: GroupMessage,
+}
+
+// This is needed since the entry field of Element will not be deserialized
+// automatically when it reaches the frontend.
+#[derive(Serialize, Deserialize, SerializedBytes, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct GroupMessageElement {
+    pub entry: GroupMessage,
+    pub signed_header: SignedHeaderHashed,
 }
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
