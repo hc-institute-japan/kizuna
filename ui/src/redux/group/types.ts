@@ -1,5 +1,4 @@
 import { AgentPubKey } from "@holochain/conductor-api";
-import { Agent } from "http";
 
 export const ADD_GROUP = "ADD_GROUP";
 export const UPDATE_GROUP_NAME = "UPDATE_GROUP_NAME";
@@ -8,10 +7,14 @@ export const ADD_MEMBERS = "ADD_MEMBERS";
 export const SEND_GROUP_MESSAGE = "SEND_GROUP_MESSAGE";
 
 // type declarations
-type GroupMessageID = string;
-type GroupID = string; // Group's EntryHash
-type GroupFileBytesID = string; // GroupFileBytes' EntryHash
-type GroupRevisionID = string; // Group's HeaderHash
+type GroupMessageID = string; // Group Message EntryHash in base64 string
+type GroupID = string; // Group's EntryHash in base64 string
+type GroupRevisionID = string; // Group's HeaderHash in base64 string
+type GroupFileBytesID = string; // GroupFileBytes' EntryHash in base64 string
+type GroupEntryHash = Uint8Array; // Group's EntryHash
+type GroupHeaderHash = Uint8Array; // Group's HeaderHash
+type GroupMessageEntryHash = Uint8Array; // Group Message EntryHash
+type GroupFileBytesEntryHash = Uint8Array; // GroupFileBytes' EntryHash
 export type Payload = TextPayload | FilePayload;
 type PayloadInput = TextPayload | FilePayloadInput;
 export type FileType =
@@ -28,21 +31,21 @@ export interface CreateGroupInput {
 
 export interface UpdateGroupMembersIO {
   members: AgentPubKey[];
-  groupId: GroupID;
-  groupRevisionId: GroupRevisionID;
+  groupId: GroupEntryHash;
+  groupRevisionId: GroupHeaderHash;
 }
 
 export interface UpdateGroupNameIO {
   name: string;
-  groupId: GroupID;
-  groupRevisionId: GroupRevisionID;
+  groupId: GroupEntryHash;
+  groupRevisionId: GroupHeaderHash;
 }
 
 export interface GroupMessageInput {
-  groupHash: GroupID;
+  groupHash: GroupEntryHash;
   payloadInput: PayloadInput;
   sender: AgentPubKey;
-  replyTo?: GroupMessageID;
+  replyTo?: GroupMessageEntryHash;
 }
 
 export interface FileMetadataInput {
@@ -56,9 +59,18 @@ export interface FilePayloadInput {
   payload: {
     metadata: FileMetadataInput;
     fileType: FileType;
-    fileBytes: Uint8Array;
+    fileBytes: GroupFileBytesEntryHash;
   };
 }
+
+// export interface GroupMessageBatchFetchFilter {
+//   groupId: GroupID,
+//   // the last message of the last batch fetched
+//   last_fetched?: GroupMessageID,
+//   last_message_timestamp: Option<Timestamp>,
+//   batch_size: u8,
+//   payload_type: PayloadType,
+// }
 
 // end
 
@@ -78,7 +90,7 @@ export interface FilePayload {
 export interface GroupMessage {
   groupMessageEntryHash: GroupMessageID;
   groupEntryHash: GroupID;
-  author: AgentPubKey;
+  author: string;
   payload: Payload; // subject to change
   timestamp: Date;
   replyTo?: GroupMessageID;
@@ -92,7 +104,7 @@ export interface GroupMessage {
 // export interface GroupVersion {
 //   groupEntryHash: GroupID;
 //   name: string;
-//   conversants: AgentPubKey[];
+//   conversants: string[];
 //   timestamp: Date;
 // }
 
@@ -101,10 +113,23 @@ export interface GroupConversation {
   originalGroupHeaderHash: GroupRevisionID;
   // versions: GroupVersion[];
   name: string;
-  members: AgentPubKey[];
+  members: string[];
   createdAt: Date;
-  creator: AgentPubKey;
+  creator: string;
   messages: GroupMessageID[];
+}
+
+export interface UpdateGroupMembersData {
+  // base64 string
+  members: string[];
+  groupId: GroupID;
+  groupRevisionId: GroupRevisionID;
+}
+
+export interface UpdateGroupNameData {
+  name: string;
+  groupId: GroupID;
+  groupRevisionId: GroupRevisionID;
 }
 
 /*
@@ -133,20 +158,20 @@ export interface AddGroupAction {
 
 export interface AddGroupMembersAction {
   type: typeof ADD_MEMBERS;
-  updateGroupMembersData: UpdateGroupMembersIO;
+  updateGroupMembersData: UpdateGroupMembersData;
 }
 
 export interface RemoveGroupMembersAction {
   type: typeof REMOVE_MEMBERS;
-  updateGroupMembersData: UpdateGroupMembersIO;
+  updateGroupMembersData: UpdateGroupMembersData;
 }
 
 export interface UpdateGroupNameAction {
   type: typeof UPDATE_GROUP_NAME;
-  UpdateGroupNameIO: UpdateGroupNameIO;
+  updateGroupNameData: UpdateGroupNameData;
 }
 
-export interface sendGroupMessage {
+export interface sendGroupMessageAction {
   type: typeof SEND_GROUP_MESSAGE;
   groupMessage: GroupMessage;
   fileBytes?: Uint8Array;
@@ -157,7 +182,7 @@ export type GroupConversationsActionTypes =
   | AddGroupMembersAction
   | RemoveGroupMembersAction
   | UpdateGroupNameAction
-  | sendGroupMessage;
+  | sendGroupMessageAction;
 
 // type guards
 export function isTextPayload(

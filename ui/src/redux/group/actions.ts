@@ -1,8 +1,13 @@
 import { FUNCTIONS, ZOMES } from "../../connection/types";
 import { ThunkAction } from "../types";
-import { Uint8ArrayToBase64 } from "../../utils/helpers";
+import { Uint8ArrayToBase64, base64ToUint8Array } from "../../utils/helpers";
 import { Profile } from "../profile/types";
 import {
+  AddGroupAction,
+  AddGroupMembersAction,
+  RemoveGroupMembersAction,
+  UpdateGroupNameAction,
+  sendGroupMessageAction,
   ADD_GROUP,
   ADD_MEMBERS,
   REMOVE_MEMBERS,
@@ -12,6 +17,8 @@ import {
   GroupConversation,
   UpdateGroupMembersIO,
   UpdateGroupNameIO,
+  UpdateGroupMembersData,
+  UpdateGroupNameData,
   GroupMessageInput,
   GroupMessage,
   Payload,
@@ -36,16 +43,18 @@ export const createGroup = (
   console.log(createGroupRes);
 
   let groupData: GroupConversation = {
-    originalGroupEntryHash: createGroupRes.groupId,
-    originalGroupHeaderHash: createGroupRes.groupRevisionId,
+    originalGroupEntryHash: Uint8ArrayToBase64(createGroupRes.groupId),
+    originalGroupHeaderHash: Uint8ArrayToBase64(createGroupRes.groupRevisionId),
     name: createGroupRes.content.name,
-    members: createGroupRes.content.members,
+    members: createGroupRes.content.members.map((member: Buffer) =>
+      Uint8ArrayToBase64(member)
+    ),
     createdAt: createGroupRes.content.created,
-    creator: createGroupRes.content.creator,
+    creator: Uint8ArrayToBase64(createGroupRes.content.creator),
     messages: [],
   };
 
-  dispatch({
+  dispatch<AddGroupAction>({
     type: ADD_GROUP,
     groupData,
   });
@@ -59,10 +68,10 @@ export const addedToGroup = (
   // TODO: error handling?
   const myAgentId = await getAgentId();
   // do nothing if self created group
-  if (group_data.creator === myAgentId) {
+  if (group_data.creator === Uint8ArrayToBase64(myAgentId!)) {
     return null;
   }
-  dispatch({
+  dispatch<AddGroupAction>({
     type: ADD_GROUP,
     groupData: {
       originalGroupEntryHash: group_data.originalGroupEntryHash,
@@ -77,62 +86,108 @@ export const addedToGroup = (
 };
 
 export const addGroupMembers = (
-  update_group_members_io: UpdateGroupMembersIO
+  update_group_members_data: UpdateGroupMembersData
 ): ThunkAction => async (dispatch, _getState, { callZome }) => {
+  let updateGroupMembersIO: UpdateGroupMembersIO = {
+    members: update_group_members_data.members.map((member: string) =>
+      Buffer.from(base64ToUint8Array(member).buffer)
+    ),
+    groupId: base64ToUint8Array(update_group_members_data.groupId),
+    groupRevisionId: base64ToUint8Array(
+      update_group_members_data.groupRevisionId
+    ),
+  };
+
   // TODO: error handling
   // TODO: input sanitation
   // Might be better to check whether there are any members duplicate in ui or hc.
   const addMembersOutput: UpdateGroupMembersIO = await callZome({
     zomeName: ZOMES.GROUP,
     fnName: FUNCTIONS[ZOMES.GROUP].ADD_MEMBERS,
-    payload: update_group_members_io,
+    payload: updateGroupMembersIO,
   });
 
-  dispatch({
+  let updateGroupMembersData: UpdateGroupMembersData = {
+    members: addMembersOutput.members.map((member) =>
+      Uint8ArrayToBase64(member)
+    ),
+    groupId: Uint8ArrayToBase64(addMembersOutput.groupId),
+    groupRevisionId: Uint8ArrayToBase64(addMembersOutput.groupRevisionId),
+  };
+
+  dispatch<AddGroupMembersAction>({
     type: ADD_MEMBERS,
-    updateGroupMembersData: addMembersOutput,
+    updateGroupMembersData,
   });
 
-  return update_group_members_io;
+  return updateGroupMembersData;
 };
 
 export const removeGroupMembers = (
-  update_group_members_io: UpdateGroupMembersIO
+  update_group_members_data: UpdateGroupMembersData
 ): ThunkAction => async (dispatch, _getState, { callZome }) => {
+  let updateGroupMembersIO: UpdateGroupMembersIO = {
+    members: update_group_members_data.members.map((member: string) =>
+      Buffer.from(base64ToUint8Array(member).buffer)
+    ),
+    groupId: base64ToUint8Array(update_group_members_data.groupId),
+    groupRevisionId: base64ToUint8Array(
+      update_group_members_data.groupRevisionId
+    ),
+  };
   // TODO: error handling
   // TODO: input sanitation
   // make sure the members being removed are actual members of the group.
   const removeMembersOutput: UpdateGroupMembersIO = await callZome({
     zomeName: ZOMES.GROUP,
     fnName: FUNCTIONS[ZOMES.GROUP].REMOVE_MEMBERS,
-    payload: update_group_members_io,
+    payload: updateGroupMembersIO,
   });
 
-  dispatch({
+  let updateGroupMembersData: UpdateGroupMembersData = {
+    members: removeMembersOutput.members.map((member) =>
+      Uint8ArrayToBase64(member)
+    ),
+    groupId: Uint8ArrayToBase64(removeMembersOutput.groupId),
+    groupRevisionId: Uint8ArrayToBase64(removeMembersOutput.groupRevisionId),
+  };
+
+  dispatch<RemoveGroupMembersAction>({
     type: REMOVE_MEMBERS,
-    updateGroupMembersData: removeMembersOutput,
+    updateGroupMembersData,
   });
 
-  return update_group_members_io;
+  return updateGroupMembersData;
 };
 
 export const updateGroupName = (
-  update_group_name_io: UpdateGroupNameIO
+  update_group_name_data: UpdateGroupNameData
 ): ThunkAction => async (dispatch, _getState, { callZome }) => {
+  let updateGroupNameIO: UpdateGroupNameIO = {
+    name: update_group_name_data.name,
+    groupId: base64ToUint8Array(update_group_name_data.groupId),
+    groupRevisionId: base64ToUint8Array(update_group_name_data.groupRevisionId),
+  };
   // TODO: error handling
   // TODO: input sanitation
   const updateGroupNameOutput: UpdateGroupNameIO = await callZome({
     zomeName: ZOMES.GROUP,
     fnName: FUNCTIONS[ZOMES.GROUP].UPDATE_GROUP_NAME,
-    payload: update_group_name_io,
+    payload: updateGroupNameIO,
   });
 
-  dispatch({
+  let updateGroupNameData: UpdateGroupNameData = {
+    name: updateGroupNameOutput.name,
+    groupId: Uint8ArrayToBase64(updateGroupNameOutput.groupId),
+    groupRevisionId: Uint8ArrayToBase64(updateGroupNameOutput.groupRevisionId),
+  };
+
+  dispatch<UpdateGroupNameAction>({
     type: UPDATE_GROUP_NAME,
-    UpdateGroupNameIO: updateGroupNameOutput,
+    updateGroupNameData,
   });
 
-  return update_group_name_io;
+  return updateGroupNameData;
 };
 
 export const sendGroupMessage = (
@@ -168,26 +223,31 @@ export const sendGroupMessage = (
         sendGroupMessageOutput.content.payload.payload.metadata.fileSize,
       fileType:
         sendGroupMessageOutput.content.payload.payload.metadata.fileType,
-      fileHash:
-        sendGroupMessageOutput.content.payload.payload.metadata.fileHash,
+      fileHash: Uint8ArrayToBase64(
+        sendGroupMessageOutput.content.payload.payload.metadata.fileHash
+      ),
       thumbnail,
     };
     payload = filePayload;
   }
 
   let groupMessageData: GroupMessage = {
-    groupMessageEntryHash: sendGroupMessageOutput.id,
-    groupEntryHash: sendGroupMessageOutput.content.groupHash,
-    author: sendGroupMessageOutput.content.sender,
+    groupMessageEntryHash: Uint8ArrayToBase64(sendGroupMessageOutput.id),
+    groupEntryHash: Uint8ArrayToBase64(
+      sendGroupMessageOutput.content.groupHash
+    ),
+    author: Uint8ArrayToBase64(sendGroupMessageOutput.content.sender),
     payload,
     timestamp: sendGroupMessageOutput.content.created,
-    replyTo: sendGroupMessageOutput.content.replyTo,
+    replyTo: !sendGroupMessageOutput.content.replyTo
+      ? undefined
+      : Uint8ArrayToBase64(sendGroupMessageOutput.content.replyTo),
     readList: {},
   };
 
-  dispatch({
+  dispatch<sendGroupMessageAction>({
     type: SEND_GROUP_MESSAGE,
-    GroupMessage: groupMessageData,
+    groupMessage: groupMessageData,
     fileBytes,
   });
 
