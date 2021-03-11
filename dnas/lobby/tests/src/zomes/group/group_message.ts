@@ -588,8 +588,10 @@ function getNextBatchOfMessagesTest(orchestrator, config, installables) {
 
       Object.values(output.groupMessagesContents).map(
         (message_content: any) => {
+          console.log("here is the groupMessagesContents");
+          console.log(message_content);
           messages_contents.push(
-            message_content[0].signed_header.header.content
+            message_content[0].signedHeader.header.content
           );
           messages_read_list.push(message_content[1]);
         }
@@ -654,7 +656,7 @@ function getNextBatchOfMessagesTest(orchestrator, config, installables) {
       Object.values(output.groupMessagesContents).map(
         (message_content: any) => {
           messages_contents.push(
-            message_content[0].signed_header.header.content
+            message_content[0].signedHeader.header.content
           );
           messages_read_list.push(message_content[1]);
         }
@@ -685,7 +687,7 @@ function getNextBatchOfMessagesTest(orchestrator, config, installables) {
       Object.values(output.groupMessagesContents).map(
         (message_content: any) => {
           messages_contents.push(
-            message_content[0].signed_header.header.content
+            message_content[0].signedHeader.header.content
           );
           messages_read_list.push(message_content[1]);
         }
@@ -716,7 +718,7 @@ function getNextBatchOfMessagesTest(orchestrator, config, installables) {
       Object.values(output.groupMessagesContents).map(
         (message_content: any) => {
           messages_contents.push(
-            message_content[0].signed_header.header.content
+            message_content[0].signedHeader.header.content
           );
           messages_read_list.push(message_content[1]);
         }
@@ -747,7 +749,7 @@ function getNextBatchOfMessagesTest(orchestrator, config, installables) {
       Object.values(output.groupMessagesContents).map(
         (message_content: any) => {
           messages_contents.push(
-            message_content[0].signed_header.header.content
+            message_content[0].signedHeader.header.content
           );
           messages_read_list.push(message_content[1]);
         }
@@ -878,45 +880,37 @@ function getMessagesByGroupByTimestampTest(orchestrator, config, installables) {
 
       await delay();
 
-      const unreadMessages = await alice_conductor.call(
-        "group",
-        "get_messages_by_group_by_timestamp",
-        {
-          groupId,
-          date: dateToTimestamp(new Date(2021, 1, 9)),
-          payloadType: {
-            type: "TEXT",
-            payload: null,
-          },
-        }
-      );
+      const unreadMessages = await getMessagesByGroupByTimestamp({
+        groupId,
+        date: dateToTimestamp(new Date(2021, 1, 9)),
+        payloadType: {
+          type: "TEXT",
+          payload: null,
+        },
+      })(alice_conductor);
 
       await delay();
 
       evaluateMessagesByGroupByTimestampResult([], unreadMessages, t);
 
-      await alice_conductor.call("group", "read_group_message", {
+      await readGroupMessage({
         groupId,
         reader: bobbyPubKey,
         timestamp: dateToTimestamp(new Date(2021, 1, 9)),
         members: content.members,
         messageIds: group1Messages.map((message) => message.id),
-      });
+      })(alice_conductor);
 
       await delay();
 
-      const messagesOnFeb9 = await alice_conductor.call(
-        "group",
-        "get_messages_by_group_by_timestamp",
-        {
-          groupId,
-          date: dateToTimestamp(new Date(2021, 1, 9)),
-          payloadType: {
-            type: "TEXT",
-            payload: null,
-          },
-        }
-      );
+      const messagesOnFeb9 = await getMessagesByGroupByTimestamp({
+        groupId,
+        date: dateToTimestamp(new Date(2021, 1, 9)),
+        payloadType: {
+          type: "TEXT",
+          payload: null,
+        },
+      })(alice_conductor);
 
       await delay();
 
@@ -926,43 +920,37 @@ function getMessagesByGroupByTimestampTest(orchestrator, config, installables) {
         t
       );
 
-      const unreadMessagesOnFeb10 = await alice_conductor.call(
-        "group",
-        "get_messages_by_group_by_timestamp",
-        {
-          groupId,
-          date: dateToTimestamp(new Date(2021, 1, 10)),
-          payloadType: {
-            type: "TEXT",
-            payload: null,
-          },
-        }
-      );
+      const unreadMessagesOnFeb10 = await getMessagesByGroupByTimestamp({
+        groupId,
+        date: dateToTimestamp(new Date(2021, 1, 10)),
+        payloadType: {
+          type: "TEXT",
+          payload: null,
+        },
+      })(alice_conductor);
       await delay();
 
       evaluateMessagesByGroupByTimestampResult([], unreadMessagesOnFeb10, t);
 
-      await alice_conductor.call("group", "read_group_message", {
+      await readGroupMessage({
         groupId,
         reader: bobbyPubKey,
         timestamp: dateToTimestamp(new Date(2021, 1, 10)),
         members: content.members,
         messageIds: [feb10].map((message) => message.id),
-      });
+      })(alice_conductor);
+
       await delay();
 
-      const messagesOnFeb10 = await alice_conductor.call(
-        "group",
-        "get_messages_by_group_by_timestamp",
-        {
-          groupId,
-          date: dateToTimestamp(new Date(2021, 1, 10)),
-          payloadType: {
-            type: "TEXT",
-            payload: null,
-          },
-        }
-      );
+      const messagesOnFeb10 = await getMessagesByGroupByTimestamp({
+        groupId,
+        date: dateToTimestamp(new Date(2021, 1, 10)),
+        payloadType: {
+          type: "TEXT",
+          payload: null,
+        },
+      })(alice_conductor);
+
       await delay();
       evaluateMessagesByGroupByTimestampResult([feb10], messagesOnFeb10, t);
     }
@@ -1060,7 +1048,7 @@ function getLatestMessagesForAllGroupsTest(orchestrator, config, installables) {
       Object.values(output.groupMessagesContents).map(
         (message_content: any) => {
           messages_contents.push(
-            message_content[0].signed_header.header.content
+            message_content[0].signedHeader.header.content
           );
           messages_read_list.push(message_content[1]);
         }
@@ -1586,8 +1574,8 @@ async function getMessagesInBatches(filter, conductor, messages_with_files) {
     Object.values(group_messages.groupMessagesContents).forEach(
       (element: any) => {
         let entry_hash: Buffer =
-          element[0].signed_header.header.content.entry_hash;
-        let timestamp: [] = element[0].signed_header.header.content.timestamp;
+          element[0].signedHeader.header.content.entry_hash;
+        let timestamp: [] = element[0].signedHeader.header.content.timestamp;
 
         messages_contents.push({
           entry_hash,
