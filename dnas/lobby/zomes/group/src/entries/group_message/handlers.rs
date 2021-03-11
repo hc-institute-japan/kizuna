@@ -12,9 +12,9 @@ use file_types::PayloadType;
 
 //LIST OF DEPENDENCIES ADDED FOR MANUEL
 use super::{
-    GroupEntryHash, GroupMessageContent, GroupMessageElement, GroupMessageHash,
-    GroupMessageInputWithDate, GroupMessagesContents, GroupMessagesOutput,
-    GroupMsgBatchFetchFilter, MessagesByGroup, ReadList,
+    GroupEntryHash, GroupMessageContent, GroupMessageHash, GroupMessageInputWithDate,
+    GroupMessagesContents, GroupMessagesOutput, GroupMsgBatchFetchFilter, MessagesByGroup,
+    ReadList,
 };
 use std::collections::hash_map::HashMap;
 //END LIST OF DEPENDENCIES ADDED FOR MANUEL
@@ -396,7 +396,7 @@ fn collect_messages_info(
             // here i collect all the values to fill the group_message_content this values are:
 
             // - the message entry_hash (aka the link target )
-            // - the message element (got it using get to the entry hash of the message )
+            // - the GroupMessageData (constructed from the element fetched from entry hash of the message )
             // - the read_list for that message ( got it from the links related to the message with the tag "read" )
 
             let read_links: Vec<Link> =
@@ -406,12 +406,21 @@ fn collect_messages_info(
                 read_list.insert(link.target.to_string(), link.timestamp);
             }
 
+            let group_message: GroupMessage = message_element
+                .entry()
+                .to_owned()
+                .to_app_option::<GroupMessage>()?
+                .ok_or(HdkError::Wasm(WasmError::Zome(
+                    "the group message ElementEntry enum is not of Present variant".into(),
+                )))?;
+            let group_message_data: GroupMessageData = GroupMessageData {
+                id: hash_entry(&group_message)?,
+                content: group_message,
+            };
+
             group_messages_contents.insert(
                 link.target.clone().to_string(),
-                GroupMessageContent(
-                    GroupMessageElement(message_element),
-                    ReadList(read_list.clone()),
-                ),
+                GroupMessageContent(group_message_data, ReadList(read_list.clone())),
             );
 
             read_list.clear();

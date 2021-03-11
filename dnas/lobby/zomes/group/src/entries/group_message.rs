@@ -27,11 +27,7 @@ pub struct ReadList(pub HashMap<String, SystemTime>);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct GroupMessageElement(pub Element);
-
-#[derive(Serialize, Deserialize, SerializedBytes, Clone)]
-#[serde(rename_all = "camelCase")]
-pub struct GroupMessageContent(pub GroupMessageElement, pub ReadList);
+pub struct GroupMessageContent(pub GroupMessageData, pub ReadList);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
