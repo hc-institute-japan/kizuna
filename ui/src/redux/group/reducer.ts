@@ -1,4 +1,5 @@
 import { AgentPubKey } from "@holochain/conductor-api";
+import { Uint8ArrayToBase64 } from "../../utils/helpers";
 import {
   ADD_GROUP,
   UPDATE_GROUP_NAME,
@@ -19,7 +20,10 @@ const initialState: GroupConversationsState = {
 };
 
 // TODO: action here should have a better type
-const reducer = (state = initialState, action: any) => {
+const reducer = (
+  state = initialState,
+  action: GroupConversationsActionTypes
+) => {
   switch (action.type) {
     case ADD_GROUP: {
       let groupEntryHash: string = action.groupData.originalGroupEntryHash;
@@ -49,7 +53,7 @@ const reducer = (state = initialState, action: any) => {
     }
     case REMOVE_MEMBERS: {
       let groupEntryHash: string = action.updateGroupMembersData.groupId;
-      let removedMembers: AgentPubKey[] = action.updateGroupMembersData.members;
+      let removedMembers: string[] = action.updateGroupMembersData.members;
       let groupConversation: GroupConversation =
         state.conversations[groupEntryHash];
       groupConversation.members = groupConversation.members.filter(
@@ -63,10 +67,10 @@ const reducer = (state = initialState, action: any) => {
       return { ...state, conversations: groupConversations };
     }
     case UPDATE_GROUP_NAME: {
-      let groupEntryHash: string = action.UpdateGroupNameIO.groupId;
+      let groupEntryHash: string = action.updateGroupNameData.groupId;
       let groupConversation: GroupConversation =
         state.conversations[groupEntryHash];
-      groupConversation.name = action.UpdateGroupNameIO.name;
+      groupConversation.name = action.updateGroupNameData.name;
       let groupConversations = state.conversations;
       groupConversations = {
         ...groupConversations,
@@ -75,7 +79,7 @@ const reducer = (state = initialState, action: any) => {
       return { ...state, conversations: groupConversations };
     }
     case SEND_GROUP_MESSAGE: {
-      let groupMessage: GroupMessage = action.GroupMessage;
+      let groupMessage: GroupMessage = action.groupMessage;
       let groupEntryHash: string = groupMessage.groupEntryHash;
       let groupMessageEntryHash: string = groupMessage.groupMessageEntryHash;
       let groupConversation: GroupConversation =
@@ -94,7 +98,7 @@ const reducer = (state = initialState, action: any) => {
         // work with file payload
         let groupFiles = state.groupFiles;
         let newFile: { [key: string]: Uint8Array } = {
-          [groupMessage.payload.fileHash]: action.fileBytes,
+          [groupMessage.payload.fileHash]: action.fileBytes!,
         };
         groupFiles = {
           ...groupFiles,

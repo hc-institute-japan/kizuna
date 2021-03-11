@@ -51,12 +51,13 @@
 import { IonPage, IonButton } from "@ionic/react";
 import React, {useState, useEffect} from "react";
 import { createGroup, addGroupMembers, removeGroupMembers, updateGroupName, sendGroupMessage } from "../../redux/group/actions";
-import { GroupConversation, GroupMessageInput, UpdateGroupMembersIO, UpdateGroupNameIO, GroupMessage, FileMetadataInput } from "../../redux/group/types";
+import { GroupConversation, GroupMessageInput, UpdateGroupNameData, UpdateGroupMembersIO, UpdateGroupNameIO, GroupMessage, FileMetadataInput, UpdateGroupMembersData } from "../../redux/group/types";
 import { fetchAllUsernames } from "../../redux/contacts/actions";
-import { useAppDispatch } from "../../utils/helpers";
+import { Uint8ArrayToBase64, useAppDispatch } from "../../utils/helpers";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/types";
 import { AgentPubKey } from "@holochain/conductor-api";
+import { base64ToUint8Array } from "../../utils/helpers";
 
 interface userData {
   id: AgentPubKey,
@@ -80,38 +81,34 @@ const GroupChat: React.FC = () => {
       console.log("create group is working perfectly fine!");
       console.log(res);
 
-      let dummy_input2: UpdateGroupMembersIO = {
-        members: [contacts[1]],
+      let dummy_input2: UpdateGroupMembersData = {
+        members: [Uint8ArrayToBase64(contacts[0])],
         groupId: res.originalGroupEntryHash,
         groupRevisionId: res.originalGroupHeaderHash
       };
       // 2 - add group members
-      dispatch(addGroupMembers(dummy_input2)).then((res: UpdateGroupMembersIO) => {
+      dispatch(addGroupMembers(dummy_input2)).then((res: UpdateGroupMembersData) => {
         console.log("adding works");
         console.log(res);
 
-        let dummy_input3: UpdateGroupMembersIO = {
-          members: [res.members[0]],
-          groupId: res.groupId,
-          groupRevisionId: res.groupRevisionId
-        };
+        let dummy_input3: UpdateGroupMembersData = res;
         // 3 - remove group members
-        dispatch(removeGroupMembers(dummy_input3)).then((res: UpdateGroupMembersIO)  => {
+        dispatch(removeGroupMembers(dummy_input3)).then((res: UpdateGroupMembersData)  => {
           console.log("removing member is also working!");
           console.log(res);
 
-          let dummy_input4: UpdateGroupNameIO = {
+          let dummy_input4: UpdateGroupNameData = {
             name: "this is a test!!",
             groupId: res.groupId,
             groupRevisionId: res.groupRevisionId
           };
           // 4 - update group name
-          dispatch(updateGroupName(dummy_input4)).then((res: UpdateGroupNameIO) => {
+          dispatch(updateGroupName(dummy_input4)).then((res: UpdateGroupNameData) => {
             console.log("This means update group name is working!");
             console.log(res);
 
             let dummy_input5: GroupMessageInput = {
-              groupHash: res.groupId,
+              groupHash: base64ToUint8Array(res.groupId),
               payloadInput: {type: "TEXT", payload: { payload: "this is obviously a test!!"}},
               sender: agentPubKey,
               replyTo: undefined,
@@ -128,11 +125,8 @@ const GroupChat: React.FC = () => {
               };
               let dummy_bytes = Uint8Array.from([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
 
-              // let blob = new Blob([""], { type: 'text/html' });
-              // let fakeF = <File>blob;
-
               let dummy_input6: GroupMessageInput = {
-                groupHash: res.groupEntryHash,
+                groupHash: base64ToUint8Array(res.groupEntryHash),
                 payloadInput: {
                   type: "FILE", 
                   payload: {
