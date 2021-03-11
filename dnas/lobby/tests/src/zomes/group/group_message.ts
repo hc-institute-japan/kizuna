@@ -588,8 +588,10 @@ function getNextBatchOfMessagesTest(orchestrator, config, installables) {
 
       Object.values(output.groupMessagesContents).map(
         (message_content: any) => {
+          console.log("here is the groupMessagesContents");
+          console.log(message_content);
           messages_contents.push(
-            message_content[0].signed_header.header.content
+            message_content[0].signedHeader.header.content
           );
           messages_read_list.push(message_content[1]);
         }
@@ -654,7 +656,7 @@ function getNextBatchOfMessagesTest(orchestrator, config, installables) {
       Object.values(output.groupMessagesContents).map(
         (message_content: any) => {
           messages_contents.push(
-            message_content[0].signed_header.header.content
+            message_content[0].signedHeader.header.content
           );
           messages_read_list.push(message_content[1]);
         }
@@ -685,7 +687,7 @@ function getNextBatchOfMessagesTest(orchestrator, config, installables) {
       Object.values(output.groupMessagesContents).map(
         (message_content: any) => {
           messages_contents.push(
-            message_content[0].signed_header.header.content
+            message_content[0].signedHeader.header.content
           );
           messages_read_list.push(message_content[1]);
         }
@@ -716,7 +718,7 @@ function getNextBatchOfMessagesTest(orchestrator, config, installables) {
       Object.values(output.groupMessagesContents).map(
         (message_content: any) => {
           messages_contents.push(
-            message_content[0].signed_header.header.content
+            message_content[0].signedHeader.header.content
           );
           messages_read_list.push(message_content[1]);
         }
@@ -747,7 +749,7 @@ function getNextBatchOfMessagesTest(orchestrator, config, installables) {
       Object.values(output.groupMessagesContents).map(
         (message_content: any) => {
           messages_contents.push(
-            message_content[0].signed_header.header.content
+            message_content[0].signedHeader.header.content
           );
           messages_read_list.push(message_content[1]);
         }
@@ -886,9 +888,6 @@ function getMessagesByGroupByTimestampTest(orchestrator, config, installables) {
           payload: null,
         },
       })(alice_conductor);
-
-      console.log("these are the unread messages!");
-      console.log(unreadMessages);
 
       await delay();
 
@@ -1049,7 +1048,7 @@ function getLatestMessagesForAllGroupsTest(orchestrator, config, installables) {
       Object.values(output.groupMessagesContents).map(
         (message_content: any) => {
           messages_contents.push(
-            message_content[0].signed_header.header.content
+            message_content[0].signedHeader.header.content
           );
           messages_read_list.push(message_content[1]);
         }
@@ -1575,8 +1574,8 @@ async function getMessagesInBatches(filter, conductor, messages_with_files) {
     Object.values(group_messages.groupMessagesContents).forEach(
       (element: any) => {
         let entry_hash: Buffer =
-          element[0].signed_header.header.content.entry_hash;
-        let timestamp: [] = element[0].signed_header.header.content.timestamp;
+          element[0].signedHeader.header.content.entry_hash;
+        let timestamp: [] = element[0].signedHeader.header.content.timestamp;
 
         messages_contents.push({
           entry_hash,
