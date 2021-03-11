@@ -85,7 +85,7 @@ pub fn handler(group_chat_filter: GroupChatFilter) -> ExternResult<GroupMessages
             }
 
             messages_by_group.insert(
-                hash_entry(&group_chat_filter.clone().group_id)?.to_string(),
+                group_chat_filter.clone().group_id.to_string(),
                 messages_hash,
             );
 

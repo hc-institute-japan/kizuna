@@ -249,7 +249,7 @@ pub fn get_next_batch_group_messages(
     }
 
     // at this point we have all the data we need to returned to the ui
-    messages_by_group.insert(format!("{:?}", GroupEntryHash(group_id)), messages_hashes);
+    messages_by_group.insert(group_id.to_string(), messages_hashes);
 
     Ok(GroupMessagesOutput {
         messages_by_group: MessagesByGroup(messages_by_group),
@@ -403,11 +403,11 @@ fn collect_messages_info(
                 get_links(link.target.clone(), Some(LinkTag::new("read")))?.into_inner();
 
             for link in read_links {
-                read_list.insert(format!("{:?}", link.target), link.timestamp);
+                read_list.insert(link.target.to_string(), link.timestamp);
             }
 
             group_messages_contents.insert(
-                format!("{:?}", GroupMessageHash(link.target.clone())),
+                link.target.clone().to_string(),
                 GroupMessageContent(
                     GroupMessageElement(message_element),
                     ReadList(read_list.clone()),
