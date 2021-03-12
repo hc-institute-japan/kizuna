@@ -90,7 +90,10 @@ pub fn handler(group_chat_filter: GroupChatFilter) -> ExternResult<GroupMessages
                     // if !read_list.is_empty() {}
                     group_messages_content.insert(
                         message_link.clone().target.to_string(),
-                        GroupMessageContent(group_message_element, ReadList(read_list)),
+                        GroupMessageContent {
+                            group_message_element,
+                            read_list: ReadList(read_list),
+                        },
                     );
                 };
             }
