@@ -12,11 +12,7 @@ const ContactItem: React.FC<Props> = ({ contact, onClick }) => {
   const handleOnClick = () => onClick(contact);
 
   return (
-    <IonItem
-      onClick={handleOnClick}
-      lines="none"
-      key={Uint8ArrayToBase64(contact.id)}
-    >
+    <IonItem onClick={handleOnClick} lines="none">
       <IonLabel>{contact.username}</IonLabel>
     </IonItem>
   );

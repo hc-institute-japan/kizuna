@@ -1,6 +1,6 @@
 import { ThunkAction } from "../types";
 import { FUNCTIONS, ZOMES } from "../../connection/types";
-import { SET_PROFILE, SET_USERNAME } from "./types";
+import { SET_USERNAME } from "./types";
 import { Uint8ArrayToBase64 } from "../../utils/helpers";
 
 export const setUsername = (username: string | null): ThunkAction => (
@@ -29,13 +29,10 @@ export const fetchMyUsername = (): ThunkAction => async (
   });
 
   if (res?.type !== "error") {
-    let id = await getAgentId();
-    if (id)
-      dispatch({
-        type: SET_PROFILE,
-        username: res.username,
-        id: Uint8ArrayToBase64(id),
-      });
+    dispatch({
+      type: SET_USERNAME,
+      username: res.username,
+    });
   }
 };
 
@@ -51,13 +48,10 @@ export const registerUsername = (username: string): ThunkAction => async (
   });
 
   if (res?.type !== "error") {
-    let id = await getAgentId();
-    if (id)
-      dispatch({
-        type: SET_PROFILE,
-        username: res.username,
-        id: Uint8ArrayToBase64(id),
-      });
+    dispatch({
+      type: SET_USERNAME,
+      username: res.username,
+    });
     return res;
   }
 
@@ -75,7 +69,7 @@ export const fetchProfileFromUsername = (
 
   if (res?.type !== "error") {
     return {
-      id: res,
+      id: Uint8ArrayToBase64(res),
       username,
     };
   }

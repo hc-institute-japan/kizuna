@@ -47,14 +47,14 @@ const NewConversation: React.FC = () => {
     return () => setContacts({});
   }, [location.state]);
   const handleOnClose = (contact: Profile) => {
-    setSelectedContacts((currContacts) => {
-      delete currContacts[Uint8ArrayToBase64(contact.id)];
-      return { ...currContacts };
-    });
-    setContacts((currContacts) => {
-      currContacts[Uint8ArrayToBase64(contact.id)] = contact;
-      return currContacts;
-    });
+    // setSelectedContacts((currContacts) => {
+    //   delete currContacts[Uint8ArrayToBase64(contact.id)];
+    //   return { ...currContacts };
+    // });
+    // setContacts((currContacts) => {
+    //   currContacts[Uint8ArrayToBase64(contact.id)] = contact;
+    //   return currContacts;
+    // });
   };
 
   useEffect(() => {
@@ -74,7 +74,6 @@ const NewConversation: React.FC = () => {
       //   if (res) {
       //     setIsLoading(false);
       //     const base64 = Uint8ArrayToBase64(res.versions[0].groupEntryHash);
-
       //     history.push(`/g/${base64}`);
       //   } else {
       //     setIsLoading(false);
@@ -122,7 +121,7 @@ const NewConversation: React.FC = () => {
               {intl.formatMessage({ id: "app.new-conversation.to" })}:
             </IonLabel>
             {Object.values(selectedContacts).map((selectedContact) => (
-              <IonChip color="primary" key={JSON.stringify(selectedContact.id)}>
+              <IonChip color="primary" key={JSON.stringify(selectedContact)}>
                 <IonLabel className={styles["chip-label"]}>
                   {selectedContact.username}
                 </IonLabel>

@@ -15,7 +15,7 @@ export interface CallZomeConfig {
 }
 
 interface HolochainConfig {
-  getAgentId: () => Promise<AgentPubKey | undefined>;
+  getAgentId: () => Promise<AgentPubKey | null>;
   callZome: (config: CallZomeConfig) => Promise<any>;
 }
 

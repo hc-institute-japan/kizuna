@@ -1,6 +1,6 @@
 import { FUNCTIONS, ZOMES } from "../../connection/types";
 import { ThunkAction } from "../types";
-import { Uint8ArrayToBase64 } from "../../utils/helpers";
+import { base64ToUint8Array, Uint8ArrayToBase64 } from "../../utils/helpers";
 import { Profile } from "../profile/types";
 import {
   ADD_GROUP,
@@ -21,6 +21,7 @@ import {
   isOther,
   isImage,
 } from "./types";
+import { SET_CONVERSATIONS } from "../groupConversations/types";
 
 export const createGroup = (
   create_group_input: CreateGroupInput
@@ -194,84 +195,97 @@ export const sendGroupMessage = (
   return groupMessageData;
 };
 
-// export const sendInitialGroupMessage = (
-//   members: Profile[],
-//   message: string
-// ): ThunkAction => async (dispatch, getState, { callZome }) => {
-//   const { conversations, messages } = getState().groupConversations;
-//   const name = members.map((member) => member.username).join(", ");
-//   const groupRes = await callZome({
-//     zomeName: ZOMES.GROUP,
-//     fnName: FUNCTIONS[ZOMES.GROUP].CREATE_GROUP,
-//     payload: {
-//       name,
-//       members: members.map((member) => member.id),
-//     },
-//   });
-//   if (groupRes?.type !== "error") {
-//     const date = new Date(groupRes.content.created[0] * 1000);
+export const sendInitialGroupMessage = (
+  members: Profile[],
+  message: string
+): ThunkAction => async (dispatch, getState, { callZome }) => {
+  const { conversations, messages } = getState().groups;
+  const name = members.map((member) => member.username).join(", ");
+  const groupResult = await dispatch(
+    createGroup({
+      name,
+      members: members.map((member) =>
+        Buffer.from(base64ToUint8Array(member.id).buffer)
+      ),
+    })
+  );
 
-//     const messageRes = await callZome({
-//       zomeName: ZOMES.GROUP,
-//       fnName: FUNCTIONS[ZOMES.GROUP].SEND_MESSAGE,
-//       payload: {
-//         sender: groupRes.content.creator,
-//         groupHash: groupRes.groupId,
-//         payloadInput: {
-//           type: "TEXT",
-//           payload: {
-//             payload: message,
-//           },
-//         },
-//       },
-//     });
-//     if (messageRes?.type !== "error") {
-//       const groupConversation: GroupConversation = {
-//         originalGroupEntryHash: groupRes.groupId,
-//         originalGroupHeaderHash: groupRes.groupRevisionId,
-//         createdAt: date,
-//         creator: groupRes.content.creator,
-//         messages: [Uint8ArrayToBase64(messageRes.id)],
-//         versions: [
-//           {
-//             groupEntryHash: groupRes.groupId,
-//             name,
-//             conversants: members.map((contact) =>
-//               Uint8ArrayToBase64(contact.id)
-//             ),
-//             timestamp: date,
-//           },
-//         ],
-//       };
-//       const groupMessage: GroupMessage = {
-//         groupMessageEntryHash: messageRes.id,
-//         groupEntryHash: groupRes.groupId,
-//         author: groupRes.content.creator,
-//         payload: {
-//           payload: message,
-//         },
-//         timestamp: new Date(messageRes.content.created[0] * 1000),
-//         readList: {},
-//       };
-//       dispatch({
-//         type: SET_CONVERSATIONS,
-//         conversations: {
-//           ...conversations,
-//           [Uint8ArrayToBase64(groupRes.groupId)]: groupConversation,
-//         },
-//       });
-//       dispatch({
-//         type: SET_MESSAGES,
-//         messages: {
-//           ...messages,
-//           [Uint8ArrayToBase64(messageRes.id)]: groupMessage,
-//         },
-//       });
-//       return groupConversation;
-//     }
-//   }
-//   return false;
-// };
+  const date = new Date(groupResult.content.created[0] * 1000);
+
+  const messageResult = await dispatch(
+    sendGroupMessage({
+      groupHash: groupResult.groupId,
+      payloadInput: {
+        type: "TEXT",
+        payload: { payload: message },
+      },
+      sender: groupResult.content.creator,
+    })
+  );
+
+  // const groupRes = await callZome({
+  //   zomeName: ZOMES.GROUP,
+  //   fnName: FUNCTIONS[ZOMES.GROUP].CREATE_GROUP,
+  //   payload: {
+  //     name,
+  //     members: members.map((member) => member.id),
+  //   },
+  // });
+  // if (groupRes?.type !== "error") {
+  //   const date = new Date(groupRes.content.created[0] * 1000);
+
+  //   const messageRes = await callZome({
+  //     zomeName: ZOMES.GROUP,
+  //     fnName: FUNCTIONS[ZOMES.GROUP].SEND_MESSAGE,
+  //     payload: {
+  //       sender: groupRes.content.creator,
+  //       groupHash: groupRes.groupId,
+  //       payloadInput: {
+  //         type: "TEXT",
+  //         payload: {
+  //           payload: message,
+  //         },
+  //       },
+  //     },
+  //   });
+  //   if (messageRes?.type !== "error") {
+  //     const groupConversation: GroupConversation = {
+  //       originalGroupEntryHash: groupRes.groupId,
+  //       originalGroupHeaderHash: groupRes.groupRevisionId,
+  //       createdAt: date,
+  //       creator: groupRes.content.creator,
+  //       messages: [Uint8ArrayToBase64(messageRes.id)],
+  //     };
+  //     const groupMessage: GroupMessage = {
+  //       groupMessageEntryHash: messageRes.id,
+  //       groupEntryHash: groupRes.groupId,
+  //       author: groupRes.content.creator,
+  //       payload: {
+
+  //         payload: message,
+  //       },
+  //       timestamp: new Date(messageRes.content.created[0] * 1000),
+  //       readList: {},
+  //     };
+  //     dispatch({
+  //       type: SET_CONVERSATIONS,
+  //       conversations: {
+  //         ...conversations,
+  //         [Uint8ArrayToBase64(groupRes.groupId)]: groupConversation,
+  //       },
+  //     });
+  //     dispatch({
+  //       type: SET_MESSAGES,
+  //       messages: {
+  //         ...messages,
+  //         [Uint8ArrayToBase64(messageRes.id)]: groupMessage,
+  //       },
+  //     });
+  //     return groupConversation;
+  // }
+  // }
+  return false;
+};
 
 export const getNextBatchGroupMessages = (): ThunkAction => async (
   dispatch,

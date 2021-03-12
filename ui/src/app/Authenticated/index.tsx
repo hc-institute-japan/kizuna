@@ -12,6 +12,8 @@ import Home from "../Home";
 import Profile from "../Profile";
 import Blocked from "../Blocked";
 import GroupChat from "../GroupChat";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/types";
 
 const Authenticated: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -23,6 +25,9 @@ const Authenticated: React.FC = () => {
     },
     [dispatch]
   );
+
+  const store = useSelector((state: RootState) => state);
+
   return (
     <IonSplitPane contentId="main">
       <Menu />
