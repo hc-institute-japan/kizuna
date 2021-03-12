@@ -420,7 +420,10 @@ fn collect_messages_info(
 
             group_messages_contents.insert(
                 link.target.clone().to_string(),
-                GroupMessageContent(group_message_element, ReadList(read_list.clone())),
+                GroupMessageContent {
+                    group_message_element,
+                    read_list: ReadList(read_list.clone()),
+                },
             );
 
             read_list.clear();
