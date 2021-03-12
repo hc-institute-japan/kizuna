@@ -15,12 +15,14 @@ let signalHandler: AppSignalCb = (signal) => {
     case "added_to_group":
       let payload = signal.data.payload.payload.payload;
       const groupData: GroupConversation = {
-        originalGroupEntryHash: payload.groupId,
-        originalGroupHeaderHash: payload.groupRevisionId,
+        originalGroupEntryHash: Uint8ArrayToBase64(payload.groupId),
+        originalGroupHeaderHash: Uint8ArrayToBase64(payload.groupRevisionId),
         name: payload.name,
-        members: payload.members,
+        members: payload.members.map((member: Buffer) =>
+          Uint8ArrayToBase64(member)
+        ),
         createdAt: payload.created,
-        creator: payload.creator,
+        creator: Uint8ArrayToBase64(payload.creator),
         messages: [],
       };
       store.dispatch({
