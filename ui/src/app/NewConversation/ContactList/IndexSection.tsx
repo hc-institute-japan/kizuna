@@ -15,14 +15,14 @@ const IndexSection: React.FC<Props> = ({ char, contacts }) => {
   const setSelectedContacts = useContacts()[3];
 
   const handleOnClick = (contact: Profile) => {
-    setSelectedContacts((currContacts) => {
-      currContacts[Uint8ArrayToBase64(contact.id)] = contact;
-      return currContacts;
-    });
-    setContacts((currContacts) => {
-      delete currContacts[Uint8ArrayToBase64(contact.id)];
-      return { ...currContacts };
-    });
+    // setSelectedContacts((currContacts) => {
+    //   currContacts[Uint8ArrayToBase64(contact.id)] = contact;
+    //   return currContacts;
+    // });
+    // setContacts((currContacts) => {
+    //   delete currContacts[Uint8ArrayToBase64(contact.id)];
+    //   return { ...currContacts };
+    // });
   };
 
   return (
@@ -32,7 +32,7 @@ const IndexSection: React.FC<Props> = ({ char, contacts }) => {
       </IonItemDivider>
       {contacts.map((contact) => (
         <ContactItem
-          key={Uint8ArrayToBase64(contact.id)}
+          key={JSON.stringify(contact)}
           contact={contact}
           onClick={handleOnClick}
         />

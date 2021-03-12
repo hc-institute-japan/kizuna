@@ -63,7 +63,7 @@ export interface FilePayloadInput {
 // end
 
 export interface TextPayload {
-  type: string;
+  type: "TEXT";
   payload: { payload: String };
 }
 

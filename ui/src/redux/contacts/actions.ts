@@ -1,7 +1,7 @@
 import { AgentPubKey } from "@holochain/conductor-api";
 import { FUNCTIONS, ZOMES } from "../../connection/types";
 import { Profile } from "../../redux/profile/types";
-import { Uint8ArrayToBase64 } from "../../utils/helpers";
+import { base64ToUint8Array, Uint8ArrayToBase64 } from "../../utils/helpers";
 import { ThunkAction } from "../types";
 import { SET_CONTACTS, SET_BLOCKED } from "./types";
 
@@ -32,10 +32,10 @@ export const fetchMyContacts = (): ThunkAction => async (
           fnName: FUNCTIONS[ZOMES.USERNAME].GET_USERNAME,
           payload: id,
         });
-
+        const base64 = Uint8ArrayToBase64(id);
         if (usernameOutput?.type !== "error")
-          contacts[Uint8ArrayToBase64(id)] = {
-            id,
+          contacts[base64] = {
+            id: base64,
             username: usernameOutput.username,
           };
       })
@@ -64,7 +64,7 @@ export const fetchAllUsernames = (): ThunkAction => async (
   if (usernames?.type !== "error") {
     const filteredProfiles = await Promise.all(
       usernames.map(async ({ username, agent_id }: any) => ({
-        id: agent_id,
+        id: Uint8ArrayToBase64(agent_id),
         username,
         isAdded: await callZome({
           zomeName: ZOMES.CONTACTS,
@@ -84,15 +84,15 @@ export const addContact = (profile: Profile): ThunkAction => async (
   { callZome }
 ) => {
   const contacts = getState().contacts.contacts;
-
+  console.log(profile.id);
   const res = await callZome({
     zomeName: ZOMES.CONTACTS,
     fnName: FUNCTIONS[ZOMES.CONTACTS].ADD_CONTACTS,
-    payload: [profile.id],
+    payload: [base64ToUint8Array(profile.id)],
   });
 
   if (res?.type !== "error") {
-    contacts[Uint8ArrayToBase64(profile.id)] = profile;
+    contacts[profile.id] = profile;
     dispatch({ type: SET_CONTACTS, contacts });
     return true;
   }
@@ -109,11 +109,11 @@ export const removeContact = (profile: Profile): ThunkAction => async (
   const res = await callZome({
     zomeName: ZOMES.CONTACTS,
     fnName: FUNCTIONS[ZOMES.CONTACTS].REMOVE_CONTACTS,
-    payload: [profile.id],
+    payload: [base64ToUint8Array(profile.id)],
   });
 
   if (res?.type !== "error") {
-    delete contacts[Uint8ArrayToBase64(profile.id)];
+    delete contacts[profile.id];
     dispatch({ type: SET_CONTACTS, contacts });
     return true;
   }
@@ -125,17 +125,20 @@ export const blockContact = (profile: Profile): ThunkAction => async (
   getState,
   { callZome }
 ) => {
-  const blocked = getState().contacts.blocked;
+  const { contacts, blocked } = getState().contacts;
 
   const res = await callZome({
     zomeName: ZOMES.CONTACTS,
     fnName: FUNCTIONS[ZOMES.CONTACTS].BLOCK_CONTACTS,
-    payload: [profile.id],
+    payload: [base64ToUint8Array(profile.id)],
   });
 
   if (res?.type !== "error") {
-    blocked[Uint8ArrayToBase64(profile.id)] = profile;
+    blocked[profile.id] = profile;
+    delete contacts[profile.id];
     dispatch({ type: SET_BLOCKED, blocked });
+    dispatch({ type: SET_CONTACTS, contacts });
+
     return true;
   }
   return false;
@@ -151,12 +154,12 @@ export const unblockContact = (profile: Profile): ThunkAction => async (
   const res = await callZome({
     zomeName: ZOMES.CONTACTS,
     fnName: FUNCTIONS[ZOMES.CONTACTS].UNBLOCK_CONTACTS,
-    payload: [profile.id],
+    payload: [base64ToUint8Array(profile.id)],
   });
 
   if (res?.type !== "error") {
-    delete blocked[Uint8ArrayToBase64(profile.id)];
-    dispatch({ type: SET_CONTACTS, blocked });
+    delete blocked[profile.id];
+    dispatch({ type: SET_BLOCKED, blocked });
     return true;
   }
   return false;
@@ -181,10 +184,10 @@ export const fetchBlocked = (): ThunkAction => async (
           fnName: FUNCTIONS[ZOMES.USERNAME].GET_USERNAME,
           payload: id,
         });
-
+        const base64 = Uint8ArrayToBase64(id);
         if (usernameOutput?.type !== "error")
-          blocked[Uint8ArrayToBase64(id)] = {
-            id,
+          blocked[base64] = {
+            id: base64,
             username: usernameOutput.username,
           };
       })

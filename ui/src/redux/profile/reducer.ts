@@ -1,13 +1,7 @@
-import {
-  ProfileActionTypes,
-  ProfileState,
-  SET_PROFILE,
-  SET_USERNAME,
-} from "./types";
+import { ProfileActionTypes, ProfileState, SET_USERNAME } from "./types";
 
 const initialState: ProfileState = {
   username: null,
-  id: null,
 };
 
 const reducer = (state = initialState, action: ProfileActionTypes) => {
@@ -17,12 +11,7 @@ const reducer = (state = initialState, action: ProfileActionTypes) => {
         ...state,
         username: action.username,
       };
-    case SET_PROFILE:
-      return {
-        ...state,
-        username: action.username,
-        id: action.id,
-      };
+
     default:
       return state;
   }

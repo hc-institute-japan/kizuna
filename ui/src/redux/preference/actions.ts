@@ -1,6 +1,5 @@
-import { convertCamelToSnake } from "../../utils/helpers";
-import { ThunkAction } from "../types";
 import { FUNCTIONS, ZOMES } from "../../connection/types";
+import { ThunkAction } from "../types";
 import { PreferenceParameter, SET_PREFERENCE } from "./types";
 
 export const fetchPreference = (): ThunkAction => async (
@@ -15,8 +14,8 @@ export const fetchPreference = (): ThunkAction => async (
   dispatch({
     type: SET_PREFERENCE,
     preference: {
-      readReceipt: preference.read_receipt,
-      typingIndicator: preference.typing_indicator,
+      readReceipt: preference.readReceipt,
+      typingIndicator: preference.typingIndicator,
     },
   });
 };
@@ -25,8 +24,10 @@ export const setPreference = (
   preference: PreferenceParameter
 ): ThunkAction => async (dispatch, _getState, { callZome }) => {
   const keys = Object.keys(preference).map<any>((key) => ({
-    [convertCamelToSnake(key)]: preference[key],
+    [key]: preference[key],
   }));
+
+  console.log(keys);
 
   const res = await callZome({
     zomeName: ZOMES.PREFERENCE,
@@ -37,8 +38,8 @@ export const setPreference = (
   dispatch({
     type: SET_PREFERENCE,
     preference: {
-      readReceipt: res.read_receipt,
-      typingIndicator: res.typing_indicator,
+      readReceipt: res.readReceipt,
+      typingIndicator: res.typingIndicator,
     },
   });
 };

@@ -14,7 +14,7 @@ import {
 } from "../../redux/contacts/actions";
 import { Profile } from "../../redux/profile/types";
 import { RootState } from "../../redux/types";
-import { useAppDispatch } from "../../utils/helpers";
+import { Uint8ArrayToBase64, useAppDispatch } from "../../utils/helpers";
 import styles from "./style.module.css";
 
 interface Props {
@@ -26,14 +26,14 @@ interface Props {
 const ProfilePopover: React.FC<Props> = ({ isOpen, dismiss, profile }) => {
   const [isContact, setIsContact] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
-  const stringifiedId = JSON.stringify(profile.id).replace(/\\g/, "");
+  const stringifiedId = profile.id;
   const dispatch = useAppDispatch();
   const username = useSelector((state: RootState) => state.profile.username);
 
   const { contacts, blocked } = useSelector(
     (state: RootState) => state.contacts
   );
-
+  console.log(contacts, blocked);
   useEffect(() => {
     setIsContact(stringifiedId in contacts);
     setIsBlocked(stringifiedId in blocked);
@@ -66,16 +66,16 @@ const ProfilePopover: React.FC<Props> = ({ isOpen, dismiss, profile }) => {
   return (
     <IonPopover isOpen={isOpen} onDidDismiss={dismiss}>
       <IonList className={`${styles["popover-list"]}`}>
-        {isContact ? (
+        {!isBlocked && isContact ? (
           <IonItem onClick={remove}>
-            <IonIcon icon={personRemoveOutline}></IonIcon>
+            <IonIcon icon={personRemoveOutline} />
             <IonLabel className="ion-padding-start">
               Remove from contacts
             </IonLabel>
           </IonItem>
         ) : (
-          <IonItem onClick={add}>
-            <IonIcon icon={personAddOutline}></IonIcon>
+          <IonItem disabled={isBlocked} onClick={add}>
+            <IonIcon icon={personAddOutline} />
             <IonLabel className="ion-padding-start">Add to contacts</IonLabel>
           </IonItem>
         )}
