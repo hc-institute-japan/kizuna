@@ -4,6 +4,23 @@ import { Payload, TextPayload } from "../redux/groupConversations/types";
 import { Profile } from "../redux/profile/types";
 import { ReduxDispatch } from "../redux/types";
 
+// returns a new object with the values at each key mapped using mapFn(value)
+// optional keyFn if user wants to uniformly edit the keys as well
+export const objectMap = (
+  object: any,
+  mapFn: (v: any) => any,
+  keyFn?: (v: string) => string
+): any => {
+  return Object.keys(object).reduce((result: any, key) => {
+    let newKey: string | undefined;
+    if (keyFn) newKey = keyFn(key);
+    newKey
+      ? (result[newKey] = mapFn(object[key]))
+      : (result[key] = mapFn(object[key]));
+    return result;
+  }, {});
+};
+
 export const indexContacts: (contacts: Profile[]) => IndexedContacts = (
   contacts
 ) => {
