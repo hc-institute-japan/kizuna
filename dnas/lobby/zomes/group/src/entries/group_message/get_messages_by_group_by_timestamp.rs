@@ -7,7 +7,7 @@ use crate::utils::timestamp_to_days;
 
 use super::{
     GroupChatFilter, GroupMessage, GroupMessageContent, GroupMessageElement, GroupMessageHash,
-    GroupMessagesContents, GroupMessagesOutput, MessagesByGroup, ReadList,
+    GroupMessagesContents, GroupMessagesOutput, MessagesByGroup, PayloadType, ReadList,
 };
 
 /*
@@ -32,23 +32,16 @@ pub fn handler(group_chat_filter: GroupChatFilter) -> ExternResult<GroupMessages
 
     match get_links(
         path.hash()?,
-        // match group_chat_filter.payload_type {
-        //     PayloadType::Text => Some(LinkTag::new("file".to_owned())),
-        //     PayloadType::File => Some(LinkTag::new("text".to_owned())),
-        //     PayloadType::All => None,
-        // },
-        // Some(LinkTag::new("file".to_owned()))
-        // match group_chat_filter.payload_type {
-        //     PayloadType::Text => Some("file".to_owned()),
-        //     PayloadType::File => Some("text".to_owned()),
-        //     PayloadType::All => None,
-        // },
-        None,
+        match group_chat_filter.payload_type {
+            PayloadType::Text => Some(LinkTag::new("text".to_owned())),
+            PayloadType::File => Some(LinkTag::new("file".to_owned())),
+            PayloadType::All => None,
+        },
     ) {
         Ok(message_links) => {
             let mut messages_by_group: HashMap<String, Vec<GroupMessageHash>> = HashMap::new();
             let mut group_messages_content: HashMap<String, GroupMessageContent> = HashMap::new();
-            let mut messages_hash: Vec<GroupMessageHash> = Vec::new();
+            let mut messages_hashes: Vec<GroupMessageHash> = Vec::new();
             let links = message_links.into_inner();
 
             for i in 0..links.len() {
@@ -67,8 +60,6 @@ pub fn handler(group_chat_filter: GroupChatFilter) -> ExternResult<GroupMessages
                         if let Some(element) = get(read_link.target, GetOptions::default())? {
                             if let ElementEntry::Present(entry) = element.into_inner().1 {
                                 if let Entry::Agent(agent_pubkey) = entry {
-                                    messages_hash
-                                        .push(GroupMessageHash(message_link.clone().target));
                                     read_list.insert(agent_pubkey.to_string(), read_link.timestamp);
                                 };
                             };
@@ -87,7 +78,6 @@ pub fn handler(group_chat_filter: GroupChatFilter) -> ExternResult<GroupMessages
                         signed_header: element.signed_header().to_owned(),
                     };
 
-                    // if !read_list.is_empty() {}
                     group_messages_content.insert(
                         message_link.clone().target.to_string(),
                         GroupMessageContent {
@@ -95,12 +85,14 @@ pub fn handler(group_chat_filter: GroupChatFilter) -> ExternResult<GroupMessages
                             read_list: ReadList(read_list),
                         },
                     );
+
+                    messages_hashes.push(GroupMessageHash(message_link.clone().target));
                 };
             }
 
             messages_by_group.insert(
                 group_chat_filter.clone().group_id.to_string(),
-                messages_hash,
+                messages_hashes,
             );
 
             Ok(GroupMessagesOutput {
