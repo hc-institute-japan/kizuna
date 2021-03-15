@@ -7,6 +7,7 @@ import {
 import store from "../redux/store";
 import { CallZomeConfig } from "../redux/types";
 import { ADD_GROUP, GroupConversation } from "../redux/group/types";
+import { Uint8ArrayToBase64 } from "../utils/helpers";
 
 let client: null | AppWebsocket = null;
 

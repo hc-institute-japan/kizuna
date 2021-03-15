@@ -1,3 +1,174 @@
+import { IonPage, IonButton } from "@ionic/react";
+import React, { useState, useEffect } from "react";
+import {
+  createGroup,
+  addGroupMembers,
+  removeGroupMembers,
+  updateGroupName,
+  sendGroupMessage,
+  getNextBatchGroupMessages,
+} from "../../redux/group/actions";
+import {
+  GroupConversation,
+  GroupMessageInput,
+  UpdateGroupNameData,
+  GroupMessage,
+  FileMetadataInput,
+  UpdateGroupMembersData,
+  GroupMessageBatchFetchFilter,
+} from "../../redux/group/types";
+import { fetchAllUsernames } from "../../redux/contacts/actions";
+import { Uint8ArrayToBase64, useAppDispatch } from "../../utils/helpers";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/types";
+import { AgentPubKey } from "@holochain/conductor-api";
+import { base64ToUint8Array } from "../../utils/helpers";
+
+interface userData {
+  id: string;
+  username: string;
+  isAdded: boolean;
+}
+
+const GroupChat: React.FC = () => {
+  const [contacts, setContacts] = useState<AgentPubKey[]>([]);
+  const dispatch = useAppDispatch();
+  const groups = useSelector((state: RootState) => state.groups);
+  const handleCreateGroup = () => {
+    const agentPubKey: AgentPubKey = contacts[0];
+    console.log(agentPubKey);
+    const dummy_input = {
+      name: "test03032021",
+      members: [agentPubKey],
+    };
+    // 1 - create group
+    dispatch(createGroup(dummy_input)).then((res: GroupConversation) => {
+      console.log("create group is working perfectly fine!");
+      console.log(res);
+
+      let dummy_input2: UpdateGroupMembersData = {
+        members: [Uint8ArrayToBase64(contacts[0])],
+        groupId: res.originalGroupEntryHash,
+        groupRevisionId: res.originalGroupHeaderHash,
+      };
+      // 2 - add group members
+      dispatch(addGroupMembers(dummy_input2)).then(
+        (res: UpdateGroupMembersData) => {
+          console.log("adding works");
+          console.log(res);
+
+          let dummy_input3: UpdateGroupMembersData = res;
+          // 3 - remove group members
+          dispatch(removeGroupMembers(dummy_input3)).then(
+            (res: UpdateGroupMembersData) => {
+              console.log("removing member is also working!");
+              console.log(res);
+
+              let dummy_input4: UpdateGroupNameData = {
+                name: "this is a test!!",
+                groupId: res.groupId,
+                groupRevisionId: res.groupRevisionId,
+              };
+              // 4 - update group name
+              dispatch(updateGroupName(dummy_input4)).then(
+                (res: UpdateGroupNameData) => {
+                  console.log("This means update group name is working!");
+                  console.log(res);
+
+                  let dummy_input5: GroupMessageInput = {
+                    groupHash: base64ToUint8Array(res.groupId),
+                    payloadInput: {
+                      type: "TEXT",
+                      payload: { payload: "this is obviously a test!!" },
+                    },
+                    sender: agentPubKey,
+                    replyTo: undefined,
+                  };
+                  console.log(dummy_input5)
+                  // 5 - send group message
+                  dispatch(sendGroupMessage(dummy_input5)).then(
+                    (res: GroupMessage) => {
+                      console.log(
+                        "This means sending of message is also working fine!"
+                      );
+                      console.log(res);
+
+                      let metadata: FileMetadataInput = {
+                        fileName: "test_file_1",
+                        fileSize: 20,
+                        fileType: "Other",
+                      };
+                      let dummy_bytes = Uint8Array.from([
+                        1,
+                        2,
+                        3,
+                        4,
+                        5,
+                        6,
+                        7,
+                        8,
+                        9,
+                        10,
+                      ]);
+
+                      let dummy_input6: GroupMessageInput = {
+                        groupHash: base64ToUint8Array(res.groupEntryHash),
+                        payloadInput: {
+                          type: "FILE",
+                          payload: {
+                            metadata,
+                            fileType: { type: "OTHER", payload: null },
+                            fileBytes: dummy_bytes,
+                          },
+                        },
+                        sender: agentPubKey,
+                        replyTo: undefined,
+                      };
+
+                      dispatch(sendGroupMessage(dummy_input6)).then(
+                        (res: GroupMessage) => {
+                          console.log(
+                            "This means sending of FILE is also working fine!"
+                          );
+                          console.log(res);
+                          let dummy_filter: GroupMessageBatchFetchFilter = {
+                            groupId: base64ToUint8Array(res.groupEntryHash),
+                            batchSize: 10,
+                            payloadType: {type: "ALL", payload: null}
+                          };
+                          setTimeout(() => {}, 1500);
+                          dispatch(getNextBatchGroupMessages(dummy_filter));
+                        }
+                      );
+                    }
+                  );
+                }
+              );
+            }
+          );
+        }
+      );
+    });
+  };
+
+  useEffect(() => {
+    dispatch(fetchAllUsernames()).then((res: userData[]) => {
+      setContacts(res.map((x) => Buffer.from(base64ToUint8Array(x.id))));
+      console.log(groups);
+    });
+  }, [groups]);
+
+  return (
+    <IonPage>
+      <IonButton onClick={handleCreateGroup}>
+        Create group with 1 member
+      </IonButton>
+    </IonPage>
+  );
+};
+
+export default GroupChat;
+
 // import {
 //   IonBackButton,
 //   IonButtons,
@@ -47,151 +218,3 @@
 // };
 
 // export default GroupChat;
-
-import { IonPage, IonButton } from "@ionic/react";
-import React, {useState, useEffect} from "react";
-import { createGroup, addGroupMembers, removeGroupMembers, updateGroupName, sendGroupMessage } from "../../redux/group/actions";
-import { GroupConversation, GroupMessageInput, UpdateGroupNameData, UpdateGroupMembersIO, UpdateGroupNameIO, GroupMessage, FileMetadataInput, UpdateGroupMembersData } from "../../redux/group/types";
-import { fetchAllUsernames } from "../../redux/contacts/actions";
-import { Uint8ArrayToBase64, useAppDispatch } from "../../utils/helpers";
-import { useSelector } from "react-redux";
-import { RootState } from "../../redux/types";
-import { AgentPubKey } from "@holochain/conductor-api";
-import { base64ToUint8Array } from "../../utils/helpers";
-
-interface userData {
-  id: AgentPubKey;
-  username: string;
-  isAdded: boolean;
-}
-
-const GroupChat: React.FC = () => {
-  const [contacts, setContacts] = useState<AgentPubKey[]>([]);
-  const dispatch = useAppDispatch();
-  const groups = useSelector((state: RootState) => state.groups);
-  const handleCreateGroup = () => {
-    const agentPubKey: AgentPubKey = contacts[0];
-    console.log(agentPubKey);
-    const dummy_input = {
-      name: "test03032021",
-      members: [agentPubKey],
-    };
-    // 1 - create group
-    dispatch(createGroup(dummy_input)).then((res: GroupConversation) => {
-      console.log("create group is working perfectly fine!");
-      console.log(res);
-
-      let dummy_input2: UpdateGroupMembersData = {
-        members: [Uint8ArrayToBase64(contacts[0])],
-        groupId: res.originalGroupEntryHash,
-        groupRevisionId: res.originalGroupHeaderHash,
-      };
-      // 2 - add group members
-      dispatch(addGroupMembers(dummy_input2)).then((res: UpdateGroupMembersData) => {
-        console.log("adding works");
-        console.log(res);
-
-        let dummy_input3: UpdateGroupMembersData = res;
-        // 3 - remove group members
-        dispatch(removeGroupMembers(dummy_input3)).then((res: UpdateGroupMembersData)  => {
-          console.log("removing member is also working!");
-          console.log(res);
-
-          let dummy_input4: UpdateGroupNameData = {
-            name: "this is a test!!",
-            groupId: res.groupId,
-            groupRevisionId: res.groupRevisionId,
-          };
-          // 4 - update group name
-          dispatch(updateGroupName(dummy_input4)).then((res: UpdateGroupNameData) => {
-            console.log("This means update group name is working!");
-            console.log(res);
-
-            let dummy_input5: GroupMessageInput = {
-              groupHash: base64ToUint8Array(res.groupId),
-              payloadInput: {type: "TEXT", payload: { payload: "this is obviously a test!!"}},
-              sender: agentPubKey,
-              replyTo: undefined,
-            };
-            // 5 - send group message
-            dispatch(sendGroupMessage(dummy_input5)).then((res: GroupMessage) => {
-              console.log("This means sending of message is also working fine!");
-              console.log(res);
-
-              let dummy_input4: UpdateGroupNameIO = {
-                name: "this is a test!!",
-                groupId: res.groupId,
-                groupRevisionId: res.groupRevisionId,
-              };
-              // 4 - update group name
-              dispatch(updateGroupName(dummy_input4)).then(
-                (res: UpdateGroupNameIO) => {
-                  console.log("This means update group name is working!");
-                  console.log(res);
-
-              let dummy_input6: GroupMessageInput = {
-                groupHash: base64ToUint8Array(res.groupEntryHash),
-                payloadInput: {
-                  type: "FILE", 
-                  payload: {
-                    metadata,
-                    fileType: { type: "OTHER", payload: null },
-                    fileBytes: dummy_bytes,
-                  }},
-                sender: agentPubKey,
-                replyTo: undefined,
-              };
-
-                      // let blob = new Blob([""], { type: 'text/html' });
-                      // let fakeF = <File>blob;
-
-                      let dummy_input6: GroupMessageInput = {
-                        groupHash: res.groupEntryHash,
-                        payloadInput: {
-                          type: "FILE",
-                          payload: {
-                            metadata,
-                            fileType: { type: "OTHER", payload: null },
-                            fileBytes: dummy_bytes,
-                          },
-                        },
-                        sender: agentPubKey,
-                        replyTo: undefined,
-                      };
-
-                      dispatch(sendGroupMessage(dummy_input6)).then(
-                        (res: GroupMessage) => {
-                          console.log(
-                            "This means sending of FILE is also working fine!"
-                          );
-                          console.log(res);
-                        }
-                      );
-                    }
-                  );
-                }
-              );
-            }
-          );
-        }
-      );
-    });
-  };
-
-  useEffect(() => {
-    dispatch(fetchAllUsernames()).then((res: userData[]) => {
-      setContacts(res.map((x) => x.id));
-      console.log(groups);
-    });
-  }, [groups]);
-
-  return (
-    <IonPage>
-      <IonButton onClick={handleCreateGroup}>
-        Create group with 1 member
-      </IonButton>
-    </IonPage>
-  );
-};
-
-export default GroupChat;

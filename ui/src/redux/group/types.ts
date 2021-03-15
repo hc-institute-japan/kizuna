@@ -5,6 +5,7 @@ export const UPDATE_GROUP_NAME = "UPDATE_GROUP_NAME";
 export const REMOVE_MEMBERS = "REMOVE_MEMBERS";
 export const ADD_MEMBERS = "ADD_MEMBERS";
 export const SEND_GROUP_MESSAGE = "SEND_GROUP_MESSAGE";
+export const GET_NEXT_BATCH_GROUP_MESSAGES = "GET_NEXT_BATCH_GROUP_MESSAGES";
 
 // type declarations
 type GroupMessageID = string; // Group Message EntryHash in base64 string
@@ -21,6 +22,10 @@ export type FileType =
   | { type: "IMAGE"; payload: { thumbnail: Uint8Array } }
   | { type: "VIDEO"; payload: { thumbnail: Uint8Array } }
   | { type: "OTHER"; payload: null };
+export type FetchPayloadType =
+  | { type: "TEXT"; payload: null }
+  | { type: "FILE"; payload: null }
+  | { type: "ALL"; payload: null };
 // end
 
 // input declaration
@@ -63,14 +68,14 @@ export interface FilePayloadInput {
   };
 }
 
-// export interface GroupMessageBatchFetchFilter {
-//   groupId: GroupID,
-//   // the last message of the last batch fetched
-//   last_fetched?: GroupMessageID,
-//   last_message_timestamp: Option<Timestamp>,
-//   batch_size: u8,
-//   payload_type: PayloadType,
-// }
+export interface GroupMessageBatchFetchFilter {
+  groupId: GroupEntryHash;
+  // the entry hash of the last message in the last batch fetched
+  lastFetched?: GroupMessageEntryHash;
+  lastMessageTimestamp?: Date;
+  batchSize: number;
+  payloadType: FetchPayloadType;
+}
 
 // end
 
@@ -98,6 +103,33 @@ export interface GroupMessage {
     // key is AgentPubKey
     [key: string]: Date;
   };
+}
+
+export interface GroupMessagesOutput {
+  messagesByGroup: MessagesByGroup;
+  groupMessagesContents: GroupMessagesContents;
+}
+
+export interface MessagesByGroup {
+  // key here is the base64 string of Group EntryHash
+  [key: string]: GroupMessageID[];
+}
+
+export interface GroupMessagesContents {
+  // key here is the base 64 string of GroupMessage EntryHash
+  [key: string]: GroupMessage;
+}
+
+// Unused right now
+export interface GroupMessageElement {
+  // any field from Element received from HC can be added here
+  // as needed
+  entry: GroupMessage;
+  // base64 string
+  groupMessageHeaderHash: string;
+  groupMessageEntryHash: string;
+  // agentPubKey(?)
+  signature: string;
 }
 
 // TODO: make sure this is fetched from holochain at some point
@@ -171,10 +203,17 @@ export interface UpdateGroupNameAction {
   updateGroupNameData: UpdateGroupNameData;
 }
 
-export interface sendGroupMessageAction {
+export interface SendGroupMessageAction {
   type: typeof SEND_GROUP_MESSAGE;
   groupMessage: GroupMessage;
   fileBytes?: Uint8Array;
+}
+
+export interface GetNextBatchGroupMessagesAction {
+  type: typeof GET_NEXT_BATCH_GROUP_MESSAGES;
+  groupMessagesOutput: GroupMessagesOutput;
+  // for ease of retrieving groupID
+  groupId: string;
 }
 
 export type GroupConversationsActionTypes =
@@ -182,7 +221,8 @@ export type GroupConversationsActionTypes =
   | AddGroupMembersAction
   | RemoveGroupMembersAction
   | UpdateGroupNameAction
-  | sendGroupMessageAction;
+  | SendGroupMessageAction
+  | GetNextBatchGroupMessagesAction;
 
 // type guards
 export function isTextPayload(

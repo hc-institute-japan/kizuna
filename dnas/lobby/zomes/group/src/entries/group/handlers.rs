@@ -129,6 +129,7 @@ pub fn add_members(add_members_input: UpdateMembersIO) -> ExternResult<UpdateMem
     let signal_payload: SignalPayload = SignalPayload::AddedToGroup(group_output);
 
     // link all the new group members to the group entry with the link tag "member" and send them a signal with the group_id as payload
+    // TODO: we might need to also send signals to existing members to notify them that a new member joined the group.
     link_and_emit_added_to_group_signals(
         new_group_members,
         group_id,

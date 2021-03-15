@@ -1,34 +1,48 @@
 import { FUNCTIONS, ZOMES } from "../../connection/types";
 import { ThunkAction } from "../types";
-import { Uint8ArrayToBase64, base64ToUint8Array } from "../../utils/helpers";
+import {
+  Uint8ArrayToBase64,
+  base64ToUint8Array,
+  objectMap,
+} from "../../utils/helpers";
 import { Profile } from "../profile/types";
 import {
-  AddGroupAction,
-  AddGroupMembersAction,
-  RemoveGroupMembersAction,
-  UpdateGroupNameAction,
-  sendGroupMessageAction,
+  // action types
   ADD_GROUP,
   ADD_MEMBERS,
   REMOVE_MEMBERS,
   UPDATE_GROUP_NAME,
   SEND_GROUP_MESSAGE,
+  GET_NEXT_BATCH_GROUP_MESSAGES,
+  // IO
   CreateGroupInput,
   GroupConversation,
   UpdateGroupMembersIO,
-  UpdateGroupNameIO,
   UpdateGroupMembersData,
+  UpdateGroupNameIO,
   UpdateGroupNameData,
   GroupMessageInput,
   GroupMessage,
   Payload,
   FilePayload,
   FileType,
+  GroupMessageBatchFetchFilter,
+  GroupMessagesOutput,
+  MessagesByGroup,
+  GroupMessagesContents,
+  // type guards
   isTextPayload,
   isOther,
   isImage,
+  // action payload types
+  AddGroupAction,
+  AddGroupMembersAction,
+  RemoveGroupMembersAction,
+  UpdateGroupNameAction,
+  SendGroupMessageAction,
+  GetNextBatchGroupMessagesAction,
 } from "./types";
-import { SET_CONVERSATIONS } from "../groupConversations/types";
+import { SET_CONVERSATIONS, TextPayload } from "../groupConversations/types";
 
 export const createGroup = (
   create_group_input: CreateGroupInput
@@ -196,6 +210,7 @@ export const sendGroupMessage = (
 ): ThunkAction => async (dispatch, _getState, { callZome }) => {
   // TODO: error handling
   // TODO: input sanitation
+  console.log(group_message_data);
   const sendGroupMessageOutput = await callZome({
     zomeName: ZOMES.GROUP,
     fnName: FUNCTIONS[ZOMES.GROUP].SEND_MESSAGE,
@@ -246,7 +261,7 @@ export const sendGroupMessage = (
     readList: {},
   };
 
-  dispatch<sendGroupMessageAction>({
+  dispatch<SendGroupMessageAction>({
     type: SEND_GROUP_MESSAGE,
     groupMessage: groupMessageData,
     fileBytes,
@@ -347,11 +362,57 @@ export const sendInitialGroupMessage = (
   return false;
 };
 
-export const getNextBatchGroupMessages = (): ThunkAction => async (
-  dispatch,
-  _getState,
-  { callZome }
-) => {};
+export const getNextBatchGroupMessages = (
+  group_message_batch_fetch_filter: GroupMessageBatchFetchFilter
+): ThunkAction => async (dispatch, _getState, { callZome }) => {
+  // TODO: error handling
+  // TODO: input sanitation
+  const groupMessagesRes = await callZome({
+    zomeName: ZOMES.GROUP,
+    fnName: FUNCTIONS[ZOMES.GROUP].GET_NEXT_BATCH_GROUP_MESSAGES,
+    payload: group_message_batch_fetch_filter,
+  });
+
+  let messagesByGroup: MessagesByGroup = objectMap(
+    groupMessagesRes.messagesByGroup,
+    (message_ids: Uint8Array[]): string[] =>
+      message_ids.map((message_id) => Uint8ArrayToBase64(message_id)),
+    (group_id: string) => group_id.substring(1)
+  );
+
+  let groupMessagesContents: GroupMessagesContents = objectMap(
+    groupMessagesRes.groupMessagesContents,
+    (msg_content): GroupMessage => {
+      return {
+        groupMessageEntryHash: Uint8ArrayToBase64(
+          msg_content.groupMessageElement.signedHeader.header.content.entry_hash
+        ),
+        groupEntryHash: Uint8ArrayToBase64(
+          msg_content.groupMessageElement.entry.groupHash
+        ),
+        author: Uint8ArrayToBase64(
+          msg_content.groupMessageElement.entry.sender
+        ),
+        payload: convertPayload(msg_content.groupMessageElement.entry.payload),
+        timestamp: msg_content.groupMessageElement.entry.created,
+        replyTo: msg_content.groupMessageElement.entry.replyTo,
+        readList: msg_content.readList,
+      };
+    },
+    (group_id: string) => group_id.substring(1)
+  );
+
+  let groupMessagesOutput: GroupMessagesOutput = {
+    messagesByGroup,
+    groupMessagesContents,
+  };
+
+  dispatch<GetNextBatchGroupMessagesAction>({
+    type: GET_NEXT_BATCH_GROUP_MESSAGES,
+    groupMessagesOutput,
+    groupId: Uint8ArrayToBase64(group_message_batch_fetch_filter.groupId),
+  });
+};
 
 export const getMessagesByGroupByTimestamp = (): ThunkAction => async (
   dispatch,
@@ -371,3 +432,24 @@ export const getAllMyGroups = (): ThunkAction => async (
   _getState,
   { callZome }
 ) => {};
+
+// helper function
+const convertPayload = (payload: any | TextPayload): Payload => {
+  if (isTextPayload(payload)) return payload;
+  if (isOther(payload.payload.fileType)) {
+    return {
+      fileName: payload.payload.metadata.fileName,
+      fileSize: payload.payload.metadata.fileSize,
+      fileType: payload.payload.metadata.fileType,
+      fileHash: payload.payload.metadata.fileHash,
+    };
+  } else {
+    return {
+      fileName: payload.payload.metadata.fileName,
+      fileSize: payload.payload.metadata.fileSize,
+      fileType: payload.payload.metadata.fileType,
+      fileHash: payload.payload.metadata.fileHash,
+      thumbnail: payload.payload.fileType.thumbnail,
+    };
+  }
+};

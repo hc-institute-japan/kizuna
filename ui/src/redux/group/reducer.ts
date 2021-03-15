@@ -1,16 +1,16 @@
-import { AgentPubKey } from "@holochain/conductor-api";
-import { Uint8ArrayToBase64 } from "../../utils/helpers";
 import {
   ADD_GROUP,
   UPDATE_GROUP_NAME,
   REMOVE_MEMBERS,
   ADD_MEMBERS,
   SEND_GROUP_MESSAGE,
+  GET_NEXT_BATCH_GROUP_MESSAGES,
+  GroupConversationsActionTypes,
   GroupConversation,
   GroupConversationsState,
-  isTextPayload,
+  GroupMessagesOutput,
   GroupMessage,
-  GroupConversationsActionTypes,
+  isTextPayload,
 } from "./types";
 
 const initialState: GroupConversationsState = {
@@ -108,6 +108,29 @@ const reducer = (
       } else {
         return { ...state, messages };
       }
+    }
+    case GET_NEXT_BATCH_GROUP_MESSAGES: {
+      let groupConversations = state.conversations;
+      let groupConversation: GroupConversation =
+        groupConversations[action.groupId];
+      // we probably won't have any duplicates of hash but just in case we do we dedupe here
+      groupConversation.messages = Array.from(
+        new Set(
+          groupConversation.messages.concat(
+            action.groupMessagesOutput.messagesByGroup[action.groupId]
+          )
+        )
+      );
+      groupConversations = {
+        ...groupConversations,
+        [action.groupId]: groupConversation,
+      };
+      let messages = state.messages;
+      messages = {
+        ...messages,
+        ...action.groupMessagesOutput.groupMessagesContents,
+      };
+      return { ...state, messages, conversations: groupConversations };
     }
     default:
       return state;
