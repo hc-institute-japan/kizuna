@@ -7,6 +7,7 @@ import {
   updateGroupName,
   sendGroupMessage,
   getNextBatchGroupMessages,
+  getMessagesByGroupByTimestamp,
 } from "../../redux/group/actions";
 import {
   GroupConversation,
@@ -16,6 +17,8 @@ import {
   FileMetadataInput,
   UpdateGroupMembersData,
   GroupMessageBatchFetchFilter,
+  GroupMessagesOutput,
+  GroupMessageByDateFetchFilter
 } from "../../redux/group/types";
 import { fetchAllUsernames } from "../../redux/contacts/actions";
 import { Uint8ArrayToBase64, useAppDispatch } from "../../utils/helpers";
@@ -36,7 +39,6 @@ const GroupChat: React.FC = () => {
   const groups = useSelector((state: RootState) => state.groups);
   const handleCreateGroup = () => {
     const agentPubKey: AgentPubKey = contacts[0];
-    console.log(agentPubKey);
     const dummy_input = {
       name: "test03032021",
       members: [agentPubKey],
@@ -84,7 +86,6 @@ const GroupChat: React.FC = () => {
                     sender: agentPubKey,
                     replyTo: undefined,
                   };
-                  console.log(dummy_input5)
                   // 5 - send group message
                   dispatch(sendGroupMessage(dummy_input5)).then(
                     (res: GroupMessage) => {
@@ -127,17 +128,34 @@ const GroupChat: React.FC = () => {
 
                       dispatch(sendGroupMessage(dummy_input6)).then(
                         (res: GroupMessage) => {
+                          let groupId = res.groupEntryHash;
                           console.log(
                             "This means sending of FILE is also working fine!"
                           );
                           console.log(res);
-                          let dummy_filter: GroupMessageBatchFetchFilter = {
-                            groupId: base64ToUint8Array(res.groupEntryHash),
+                          let dummy_filter1: GroupMessageBatchFetchFilter = {
+                            groupId: base64ToUint8Array(groupId),
                             batchSize: 10,
                             payloadType: {type: "ALL", payload: null}
                           };
                           setTimeout(() => {}, 1500);
-                          dispatch(getNextBatchGroupMessages(dummy_filter));
+                          dispatch(getNextBatchGroupMessages(dummy_filter1)).then((res: GroupMessagesOutput) => {
+                            console.log(
+                              "This means getNextBatchGroupMessages is working!"
+                            );
+                            console.log(res);
+                            let dummy_filter2: GroupMessageByDateFetchFilter = {
+                              groupId: base64ToUint8Array(groupId),
+                              date: [Math.round(new Date().getTime() / 1000), 0],
+                              payloadType: {type: "ALL", payload: null}
+                            };
+                            dispatch(getMessagesByGroupByTimestamp(dummy_filter2)).then((res: GroupMessagesOutput) => {
+                              console.log(
+                                "This means getMessagesByGroupByTimestamp is working!"
+                              );
+                              console.log(res);
+                            })
+                          });
                         }
                       );
                     }

@@ -30,6 +30,7 @@ import {
   GroupMessagesOutput,
   MessagesByGroup,
   GroupMessagesContents,
+  GroupMessageByDateFetchFilter,
   // type guards
   isTextPayload,
   isOther,
@@ -46,7 +47,11 @@ import { SET_CONVERSATIONS, TextPayload } from "../groupConversations/types";
 
 export const createGroup = (
   create_group_input: CreateGroupInput
-): ThunkAction => async (dispatch, _getState, { callZome }) => {
+): ThunkAction => async (
+  dispatch,
+  _getState,
+  { callZome }
+): Promise<GroupConversation> => {
   // TODO: error handling
   // TODO: input sanitation
   const createGroupRes = await callZome({
@@ -102,7 +107,11 @@ export const addedToGroup = (
 
 export const addGroupMembers = (
   update_group_members_data: UpdateGroupMembersData
-): ThunkAction => async (dispatch, _getState, { callZome }) => {
+): ThunkAction => async (
+  dispatch,
+  _getState,
+  { callZome }
+): Promise<UpdateGroupMembersData> => {
   let updateGroupMembersIO: UpdateGroupMembersIO = {
     members: update_group_members_data.members.map((member: string) =>
       Buffer.from(base64ToUint8Array(member).buffer)
@@ -140,7 +149,11 @@ export const addGroupMembers = (
 
 export const removeGroupMembers = (
   update_group_members_data: UpdateGroupMembersData
-): ThunkAction => async (dispatch, _getState, { callZome }) => {
+): ThunkAction => async (
+  dispatch,
+  _getState,
+  { callZome }
+): Promise<UpdateGroupMembersData> => {
   let updateGroupMembersIO: UpdateGroupMembersIO = {
     members: update_group_members_data.members.map((member: string) =>
       Buffer.from(base64ToUint8Array(member).buffer)
@@ -177,7 +190,11 @@ export const removeGroupMembers = (
 
 export const updateGroupName = (
   update_group_name_data: UpdateGroupNameData
-): ThunkAction => async (dispatch, _getState, { callZome }) => {
+): ThunkAction => async (
+  dispatch,
+  _getState,
+  { callZome }
+): Promise<UpdateGroupNameData> => {
   let updateGroupNameIO: UpdateGroupNameIO = {
     name: update_group_name_data.name,
     groupId: base64ToUint8Array(update_group_name_data.groupId),
@@ -207,7 +224,11 @@ export const updateGroupName = (
 
 export const sendGroupMessage = (
   group_message_data: GroupMessageInput
-): ThunkAction => async (dispatch, _getState, { callZome }) => {
+): ThunkAction => async (
+  dispatch,
+  _getState,
+  { callZome }
+): Promise<GroupMessage> => {
   // TODO: error handling
   // TODO: input sanitation
   console.log(group_message_data);
@@ -364,7 +385,11 @@ export const sendInitialGroupMessage = (
 
 export const getNextBatchGroupMessages = (
   group_message_batch_fetch_filter: GroupMessageBatchFetchFilter
-): ThunkAction => async (dispatch, _getState, { callZome }) => {
+): ThunkAction => async (
+  dispatch,
+  _getState,
+  { callZome }
+): Promise<GroupMessagesOutput> => {
   // TODO: error handling
   // TODO: input sanitation
   const groupMessagesRes = await callZome({
@@ -373,15 +398,82 @@ export const getNextBatchGroupMessages = (
     payload: group_message_batch_fetch_filter,
   });
 
+  let groupMessagesOutput: GroupMessagesOutput = convertFetchedResToGroupMessagesOutput(
+    groupMessagesRes
+  );
+
+  console.log("this is the fetch for next batch");
+  console.log(groupMessagesRes);
+  console.log(groupMessagesOutput);
+
+  dispatch<GetNextBatchGroupMessagesAction>({
+    type: GET_NEXT_BATCH_GROUP_MESSAGES,
+    groupMessagesOutput,
+    groupId: Uint8ArrayToBase64(group_message_batch_fetch_filter.groupId),
+  });
+
+  return groupMessagesOutput;
+};
+
+export const getMessagesByGroupByTimestamp = (
+  group_message_by_date_fetch_filter: GroupMessageByDateFetchFilter
+): ThunkAction => async (
+  dispatch,
+  _getState,
+  { callZome }
+): Promise<GroupMessagesOutput> => {
+  // TODO: error handling
+  // TODO: input sanitation
+  const groupMessagesRes = await callZome({
+    zomeName: ZOMES.GROUP,
+    fnName: FUNCTIONS[ZOMES.GROUP].GET_MESSAGES_BY_GROUP_BY_TIMESTAMP,
+    payload: group_message_by_date_fetch_filter,
+  });
+
+  console.log("this is the fetch for byTimestamp fetch");
+  console.log(groupMessagesRes);
+
+  let groupMessagesOutput: GroupMessagesOutput = convertFetchedResToGroupMessagesOutput(
+    groupMessagesRes
+  );
+
+  console.log(groupMessagesOutput);
+
+  dispatch<GetNextBatchGroupMessagesAction>({
+    type: GET_NEXT_BATCH_GROUP_MESSAGES,
+    groupMessagesOutput,
+    groupId: Uint8ArrayToBase64(group_message_by_date_fetch_filter.groupId),
+  });
+
+  return groupMessagesOutput;
+};
+
+// these might not be needed because aggregator exists
+export const getLatestMessagesForAllGroups = (): ThunkAction => async (
+  dispatch,
+  _getState,
+  { callZome }
+) => {};
+
+export const getAllMyGroups = (): ThunkAction => async (
+  dispatch,
+  _getState,
+  { callZome }
+) => {};
+
+// helper function
+const convertFetchedResToGroupMessagesOutput = (
+  fetched_res: any
+): GroupMessagesOutput => {
   let messagesByGroup: MessagesByGroup = objectMap(
-    groupMessagesRes.messagesByGroup,
+    fetched_res.messagesByGroup,
     (message_ids: Uint8Array[]): string[] =>
       message_ids.map((message_id) => Uint8ArrayToBase64(message_id)),
     (group_id: string) => group_id.substring(1)
   );
 
   let groupMessagesContents: GroupMessagesContents = objectMap(
-    groupMessagesRes.groupMessagesContents,
+    fetched_res.groupMessagesContents,
     (msg_content): GroupMessage => {
       return {
         groupMessageEntryHash: Uint8ArrayToBase64(
@@ -407,33 +499,9 @@ export const getNextBatchGroupMessages = (
     groupMessagesContents,
   };
 
-  dispatch<GetNextBatchGroupMessagesAction>({
-    type: GET_NEXT_BATCH_GROUP_MESSAGES,
-    groupMessagesOutput,
-    groupId: Uint8ArrayToBase64(group_message_batch_fetch_filter.groupId),
-  });
+  return groupMessagesOutput;
 };
 
-export const getMessagesByGroupByTimestamp = (): ThunkAction => async (
-  dispatch,
-  _getState,
-  { callZome }
-) => {};
-
-// these might not be needed because aggregator exists
-export const getLatestMessagesForAllGroups = (): ThunkAction => async (
-  dispatch,
-  _getState,
-  { callZome }
-) => {};
-
-export const getAllMyGroups = (): ThunkAction => async (
-  dispatch,
-  _getState,
-  { callZome }
-) => {};
-
-// helper function
 const convertPayload = (payload: any | TextPayload): Payload => {
   if (isTextPayload(payload)) return payload;
   if (isOther(payload.payload.fileType)) {
