@@ -878,19 +878,6 @@ function getMessagesByGroupByTimestampTest(orchestrator, config, installables) {
 
       await delay();
 
-      const unreadMessages = await getMessagesByGroupByTimestamp({
-        groupId,
-        date: dateToTimestamp(new Date(2021, 1, 9)),
-        payloadType: {
-          type: "TEXT",
-          payload: null,
-        },
-      })(alice_conductor);
-
-      await delay();
-
-      evaluateMessagesByGroupByTimestampResult([], unreadMessages, t);
-
       await readGroupMessage({
         groupId,
         reader: bobbyPubKey,
@@ -918,17 +905,18 @@ function getMessagesByGroupByTimestampTest(orchestrator, config, installables) {
         t
       );
 
-      const unreadMessagesOnFeb10 = await getMessagesByGroupByTimestamp({
+      // this should be empty
+      const filesOnFeb9 = await getMessagesByGroupByTimestamp({
         groupId,
-        date: dateToTimestamp(new Date(2021, 1, 10)),
+        date: dateToTimestamp(new Date(2021, 1, 9)),
         payloadType: {
-          type: "TEXT",
+          type: "FILE",
           payload: null,
         },
       })(alice_conductor);
-      await delay();
 
-      evaluateMessagesByGroupByTimestampResult([], unreadMessagesOnFeb10, t);
+      await delay();
+      evaluateMessagesByGroupByTimestampResult([], filesOnFeb9, t);
 
       await readGroupMessage({
         groupId,
