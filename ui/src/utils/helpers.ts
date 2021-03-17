@@ -44,6 +44,7 @@ export const debounce: (callback: () => any, delay?: number) => Function = (
   callback,
   delay = 500
 ) => {
+  // TODO: does this work in browser??
   let timeout: NodeJS.Timeout;
   return () => {
     clearTimeout(timeout);
