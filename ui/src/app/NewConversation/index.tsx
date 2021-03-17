@@ -72,10 +72,7 @@ const NewConversation: React.FC = () => {
       dispatch(sendInitialGroupMessage(contacts, message)).then((res: any) => {
         if (res) {
           setIsLoading(false);
-          console.log("SendInitialGroupMessage is working fine!");
-          console.log(res);
-          // const base64 = Uint8ArrayToBase64(res.versions[0].groupEntryHash);
-          // history.push(`/g/${base64}`);
+          history.push(`/g/${res.groupResult.originalGroupEntryHash}`);
         } else {
           setIsLoading(false);
           setError(
