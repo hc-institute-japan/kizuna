@@ -5,10 +5,10 @@ import {
   ADD_MEMBERS,
   SEND_GROUP_MESSAGE,
   GET_NEXT_BATCH_GROUP_MESSAGES,
+  GET_MESSAGES_BY_GROUP_BY_TIMESTAMP,
   GroupConversationsActionTypes,
   GroupConversation,
   GroupConversationsState,
-  GroupMessagesOutput,
   GroupMessage,
   isTextPayload,
 } from "./types";
@@ -109,7 +109,8 @@ const reducer = (
         return { ...state, messages };
       }
     }
-    case GET_NEXT_BATCH_GROUP_MESSAGES: {
+    case GET_NEXT_BATCH_GROUP_MESSAGES: // fallthrough since its the same process with the next case
+    case GET_MESSAGES_BY_GROUP_BY_TIMESTAMP: {
       let groupConversations = state.conversations;
       let groupConversation: GroupConversation =
         groupConversations[action.groupId];
