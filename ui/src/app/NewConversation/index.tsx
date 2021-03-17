@@ -1,9 +1,9 @@
 import { IonContent, IonLoading, IonPage, IonToast } from "@ionic/react";
 import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
-import { useLocation } from "react-router";
+import { useHistory, useLocation } from "react-router";
 import MessageInput from "../../components/MessageInput";
-// import { sendInitialGroupMessage } from "../../redux/groupConversations/actions";
+import { sendInitialGroupMessage } from "../../redux/group/actions";
 import { Profile, ProfileListType } from "../../redux/profile/types";
 import ContactList from "./ContactList";
 import { ContactsContext } from "./context";
@@ -21,12 +21,12 @@ const NewConversation: React.FC = () => {
   const [selectedContacts, setSelectedContacts] = useState<ProfileListType>({});
   const [search, setSearch] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const [_message, setMessage] = useState("");
+  const [message, setMessage] = useState("");
   const [error, setError] = useState<string | undefined>(undefined);
-  const [isLoading] = useState(false);
-  // const dispatch = useAppDispatch();
+  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useAppDispatch();
   const intl = useIntl();
-  // const history = useHistory();
+  const history = useHistory();
 
   useEffect(() => {
     if (location.state !== undefined) setContacts(location.state.contacts);
@@ -55,21 +55,22 @@ const NewConversation: React.FC = () => {
     if (contacts.length === 1) {
       // send p2p
     } else if (contacts.length > 1) {
-      // setIsLoading(true);
-      // dispatch(sendInitialGroupMessage(contacts, message)).then((res: any) => {
-      //   if (res) {
-      //     setIsLoading(false);
-      //     const base64 = Uint8ArrayToBase64(res.versions[0].groupEntryHash);
-      //     history.push(`/g/${base64}`);
-      //   } else {
-      //     setIsLoading(false);
-      //     setError(
-      //       intl.formatMessage({
-      //         id: "app.new-conversation.problem-occured-toast",
-      //       })
-      //     );
-      //   }
-      // });
+      // create a Group and send the initial message
+      setIsLoading(true);
+      // need to handle files here as well
+      dispatch(sendInitialGroupMessage(contacts, message)).then((res: any) => {
+        if (res) {
+          setIsLoading(false);
+          history.push(`/g/${res.groupResult.originalGroupEntryHash}`);
+        } else {
+          setIsLoading(false);
+          setError(
+            intl.formatMessage({
+              id: "app.new-conversation.problem-occured-toast",
+            })
+          );
+        }
+      });
     } else {
       setError(
         intl.formatMessage({ id: "app.new-conversation.no-contacts-toast" })

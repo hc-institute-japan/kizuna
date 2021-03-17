@@ -25,6 +25,7 @@ import {
   GroupMessage,
   Payload,
   FilePayload,
+  TextPayload,
   FileType,
   GroupMessageBatchFetchFilter,
   GroupMessagesOutput,
@@ -43,7 +44,6 @@ import {
   SendGroupMessageAction,
   GetNextBatchGroupMessagesAction,
 } from "./types";
-import { SET_CONVERSATIONS, TextPayload } from "../groupConversations/types";
 
 export const createGroup = (
   create_group_input: CreateGroupInput
@@ -293,11 +293,11 @@ export const sendGroupMessage = (
 
 export const sendInitialGroupMessage = (
   members: Profile[],
+  // need to handle files as well
   message: string
-): ThunkAction => async (dispatch, getState, { callZome }) => {
-  const { conversations, messages } = getState().groups;
+): ThunkAction => async (dispatch) => {
   const name = members.map((member) => member.username).join(", ");
-  const groupResult = await dispatch(
+  const groupResult: GroupConversation = await dispatch(
     createGroup({
       name,
       members: members.map((member) =>
@@ -305,82 +305,23 @@ export const sendInitialGroupMessage = (
       ),
     })
   );
-
-  const date = new Date(groupResult.content.created[0] * 1000);
+  console.log(groupResult);
 
   const messageResult = await dispatch(
     sendGroupMessage({
-      groupHash: groupResult.groupId,
+      groupHash: base64ToUint8Array(groupResult.originalGroupEntryHash),
       payloadInput: {
         type: "TEXT",
         payload: { payload: message },
       },
-      sender: groupResult.content.creator,
+      sender: Buffer.from(base64ToUint8Array(groupResult.creator).buffer),
     })
   );
-
-  // const groupRes = await callZome({
-  //   zomeName: ZOMES.GROUP,
-  //   fnName: FUNCTIONS[ZOMES.GROUP].CREATE_GROUP,
-  //   payload: {
-  //     name,
-  //     members: members.map((member) => member.id),
-  //   },
-  // });
-  // if (groupRes?.type !== "error") {
-  //   const date = new Date(groupRes.content.created[0] * 1000);
-
-  //   const messageRes = await callZome({
-  //     zomeName: ZOMES.GROUP,
-  //     fnName: FUNCTIONS[ZOMES.GROUP].SEND_MESSAGE,
-  //     payload: {
-  //       sender: groupRes.content.creator,
-  //       groupHash: groupRes.groupId,
-  //       payloadInput: {
-  //         type: "TEXT",
-  //         payload: {
-  //           payload: message,
-  //         },
-  //       },
-  //     },
-  //   });
-  //   if (messageRes?.type !== "error") {
-  //     const groupConversation: GroupConversation = {
-  //       originalGroupEntryHash: groupRes.groupId,
-  //       originalGroupHeaderHash: groupRes.groupRevisionId,
-  //       createdAt: date,
-  //       creator: groupRes.content.creator,
-  //       messages: [Uint8ArrayToBase64(messageRes.id)],
-  //     };
-  //     const groupMessage: GroupMessage = {
-  //       groupMessageEntryHash: messageRes.id,
-  //       groupEntryHash: groupRes.groupId,
-  //       author: groupRes.content.creator,
-  //       payload: {
-
-  //         payload: message,
-  //       },
-  //       timestamp: new Date(messageRes.content.created[0] * 1000),
-  //       readList: {},
-  //     };
-  //     dispatch({
-  //       type: SET_CONVERSATIONS,
-  //       conversations: {
-  //         ...conversations,
-  //         [Uint8ArrayToBase64(groupRes.groupId)]: groupConversation,
-  //       },
-  //     });
-  //     dispatch({
-  //       type: SET_MESSAGES,
-  //       messages: {
-  //         ...messages,
-  //         [Uint8ArrayToBase64(messageRes.id)]: groupMessage,
-  //       },
-  //     });
-  //     return groupConversation;
-  // }
-  // }
-  return false;
+  console.log(messageResult);
+  return {
+    groupResult,
+    messageResult,
+  };
 };
 
 export const getNextBatchGroupMessages = (
