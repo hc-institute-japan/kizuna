@@ -1,6 +1,5 @@
 import { useDispatch } from "react-redux";
 import { IndexedContacts } from "../redux/contacts/types";
-import { Payload, TextPayload } from "../redux/groupConversations/types";
 import { Profile } from "../redux/profile/types";
 import { ReduxDispatch } from "../redux/types";
 
@@ -45,6 +44,7 @@ export const debounce: (callback: () => any, delay?: number) => Function = (
   callback,
   delay = 500
 ) => {
+  // TODO: does this work in browser??
   let timeout: NodeJS.Timeout;
   return () => {
     clearTimeout(timeout);
@@ -73,6 +73,3 @@ export const base64ToUint8Array = (base64: string) =>
       "base64"
     ).buffer
   );
-
-export const isTextPayload = (payload: Payload) =>
-  (payload as TextPayload).payload !== undefined;
