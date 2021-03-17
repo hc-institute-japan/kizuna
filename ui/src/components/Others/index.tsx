@@ -1,7 +1,6 @@
 import { IonText } from "@ionic/react";
 import React from "react";
-import { Payload, TextPayload } from "../../redux/groupConversations/types";
-import { isTextPayload } from "../../utils/helpers";
+import { Payload, TextPayload, isTextPayload } from "../../redux/group/types";
 import styles from "./style.module.css";
 
 interface Props {
@@ -12,7 +11,7 @@ const Others: React.FC<Props> = ({ message }) => {
   return (
     <div className={styles.others}>
       {isTextPayload(message) ? (
-        <IonText>{(message as TextPayload).payload}</IonText>
+        <IonText>{(message as TextPayload).payload.payload}</IonText>
       ) : null}
     </div>
   );
