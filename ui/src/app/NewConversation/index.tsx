@@ -1,14 +1,4 @@
-import {
-  IonBackButton,
-  IonButtons,
-  IonContent,
-  IonHeader,
-  IonLoading,
-  IonPage,
-  IonTitle,
-  IonToast,
-  IonToolbar,
-} from "@ionic/react";
+import { IonContent, IonLoading, IonPage, IonToast } from "@ionic/react";
 import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import { useLocation } from "react-router";
@@ -16,10 +6,10 @@ import MessageInput from "../../components/MessageInput";
 // import { sendInitialGroupMessage } from "../../redux/groupConversations/actions";
 import { Profile, ProfileListType } from "../../redux/profile/types";
 import ContactList from "./ContactList";
-import SelectedContactsHeader from "./SelectedContactsHeader";
 import { ContactsContext } from "./context";
-import styles from "./style.module.css";
 import NewConversationHeader from "./NewConversationHeader";
+import SelectedContactsHeader from "./SelectedContactsHeader";
+import styles from "./style.module.css";
 
 interface StateProps {
   contacts: ProfileListType;
@@ -117,7 +107,7 @@ const NewConversation: React.FC = () => {
         <MessageInput
           onSend={handleOnSend}
           onChange={(message) => setMessage(message)}
-          onFileSelect={(files) => console.log(files)}
+          onFileSelect={() => {}}
         />
       </IonPage>
     </ContactsContext.Provider>

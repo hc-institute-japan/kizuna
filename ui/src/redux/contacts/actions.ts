@@ -84,7 +84,7 @@ export const addContact = (profile: Profile): ThunkAction => async (
   { callZome }
 ) => {
   const contacts = getState().contacts.contacts;
-  console.log(profile.id);
+
   const res = await callZome({
     zomeName: ZOMES.CONTACTS,
     fnName: FUNCTIONS[ZOMES.CONTACTS].ADD_CONTACTS,

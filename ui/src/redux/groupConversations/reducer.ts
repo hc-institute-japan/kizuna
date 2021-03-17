@@ -17,7 +17,6 @@ const groupConversationsReducer = (
 ) => {
   switch (action.type) {
     case SET_CONVERSATIONS:
-      console.log(action.conversations);
       return {
         ...state,
         conversations: action.conversations,

@@ -9,7 +9,7 @@ import {
   IonMenu,
 } from "@ionic/react";
 import { banOutline, cogOutline, logOutOutline } from "ionicons/icons";
-import React from "react";
+import React, { useRef } from "react";
 import { useIntl } from "react-intl";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
@@ -28,6 +28,7 @@ const Menu: React.FC = () => {
   const { username } = useSelector((state: RootState) => state.profile);
   const dispatch = useDispatch();
   const intl = useIntl();
+  const menu = useRef<any>(null);
 
   const menuList: MenuItem[] = [
     {
@@ -55,8 +56,8 @@ const Menu: React.FC = () => {
   ];
 
   return (
-    <IonMenu contentId="main" type="overlay">
-      <IonContent className={styles.menu}>
+    <IonMenu ref={menu} contentId="main" type="overlay">
+      <IonContent className={`${styles.menu} ion-padding-top`}>
         <IonList id="inbox-list" lines="none">
           <IonItemGroup className="ion-no-margin">
             <IonAvatar className="ion-margin">
@@ -71,7 +72,13 @@ const Menu: React.FC = () => {
             </IonItem>
           </IonItemGroup>
           {menuList.map(({ onClick, label, icon }) => (
-            <IonItem key={label} onClick={onClick}>
+            <IonItem
+              key={label}
+              onClick={() => {
+                menu?.current?.close();
+                onClick();
+              }}
+            >
               <IonIcon className="ion-margin-end" icon={icon} />
               <IonLabel>{label}</IonLabel>
             </IonItem>

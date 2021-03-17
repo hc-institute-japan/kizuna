@@ -1,7 +1,6 @@
 import { IonItem, IonLabel } from "@ionic/react";
 import React from "react";
 import { Profile } from "../../../redux/profile/types";
-import { Uint8ArrayToBase64 } from "../../../utils/helpers";
 
 interface Props {
   contact: Profile;
