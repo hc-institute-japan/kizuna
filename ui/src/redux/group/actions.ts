@@ -25,6 +25,7 @@ import {
   GroupMessage,
   Payload,
   FilePayload,
+  TextPayload,
   FileType,
   GroupMessageBatchFetchFilter,
   GroupMessagesOutput,
@@ -43,7 +44,6 @@ import {
   SendGroupMessageAction,
   GetNextBatchGroupMessagesAction,
 } from "./types";
-import { SET_CONVERSATIONS, TextPayload } from "../groupConversations/types";
 
 export const createGroup = (
   create_group_input: CreateGroupInput
