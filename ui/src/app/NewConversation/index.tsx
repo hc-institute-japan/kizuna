@@ -5,6 +5,7 @@ import { useHistory, useLocation } from "react-router";
 import MessageInput from "../../components/MessageInput";
 import { sendInitialGroupMessage } from "../../redux/group/actions";
 import { Profile, ProfileListType } from "../../redux/profile/types";
+import { useAppDispatch } from "../../utils/helpers";
 import ContactList from "./ContactList";
 import { ContactsContext } from "./context";
 import NewConversationHeader from "./NewConversationHeader";
