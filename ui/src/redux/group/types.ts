@@ -6,6 +6,8 @@ export const REMOVE_MEMBERS = "REMOVE_MEMBERS";
 export const ADD_MEMBERS = "ADD_MEMBERS";
 export const SEND_GROUP_MESSAGE = "SEND_GROUP_MESSAGE";
 export const GET_NEXT_BATCH_GROUP_MESSAGES = "GET_NEXT_BATCH_GROUP_MESSAGES";
+export const GET_MESSAGES_BY_GROUP_BY_TIMESTAMP =
+  "GET_MESSAGES_BY_GROUP_BY_TIMESTAMP";
 
 // type declarations
 type GroupMessageID = string; // Group Message EntryHash in base64 string
@@ -72,8 +74,15 @@ export interface GroupMessageBatchFetchFilter {
   groupId: GroupEntryHash;
   // the entry hash of the last message in the last batch fetched
   lastFetched?: GroupMessageEntryHash;
-  lastMessageTimestamp?: Date;
+  // 0 - seconds since epoch, 1 - nanoseconds. See Timestamp type in hdk doc for more info.
+  lastMessageTimestamp?: [number, number];
   batchSize: number;
+  payloadType: FetchPayloadType;
+}
+
+export interface GroupMessageByDateFetchFilter {
+  groupId: GroupEntryHash;
+  date: [number, number];
   payloadType: FetchPayloadType;
 }
 
@@ -216,13 +225,20 @@ export interface GetNextBatchGroupMessagesAction {
   groupId: string;
 }
 
+export interface GetMessagesByGroupByTimestampAction {
+  type: typeof GET_MESSAGES_BY_GROUP_BY_TIMESTAMP;
+  groupMessagesOutput: GroupMessagesOutput;
+  groupId: string;
+}
+
 export type GroupConversationsActionTypes =
   | AddGroupAction
   | AddGroupMembersAction
   | RemoveGroupMembersAction
   | UpdateGroupNameAction
   | SendGroupMessageAction
-  | GetNextBatchGroupMessagesAction;
+  | GetNextBatchGroupMessagesAction
+  | GetMessagesByGroupByTimestampAction;
 
 // type guards
 export function isTextPayload(
