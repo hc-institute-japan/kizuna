@@ -1,29 +1,25 @@
 import {
   IonBackButton,
   IonButtons,
-  IonChip,
   IonContent,
   IonHeader,
-  IonIcon,
-  IonInput,
-  IonLabel,
   IonLoading,
   IonPage,
   IonTitle,
   IonToast,
   IonToolbar,
 } from "@ionic/react";
-import { close } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
-import { useHistory, useLocation } from "react-router";
+import { useLocation } from "react-router";
 import MessageInput from "../../components/MessageInput";
 // import { sendInitialGroupMessage } from "../../redux/groupConversations/actions";
 import { Profile, ProfileListType } from "../../redux/profile/types";
-import { Uint8ArrayToBase64, useAppDispatch } from "../../utils/helpers";
 import ContactList from "./ContactList";
+import SelectedContactsHeader from "./SelectedContactsHeader";
 import { ContactsContext } from "./context";
 import styles from "./style.module.css";
+import NewConversationHeader from "./NewConversationHeader";
 
 interface StateProps {
   contacts: ProfileListType;
@@ -35,26 +31,26 @@ const NewConversation: React.FC = () => {
   const [selectedContacts, setSelectedContacts] = useState<ProfileListType>({});
   const [search, setSearch] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const [message, setMessage] = useState("");
+  const [_message, setMessage] = useState("");
   const [error, setError] = useState<string | undefined>(undefined);
-  const [isLoading, setIsLoading] = useState(false);
-  const dispatch = useAppDispatch();
+  const [isLoading] = useState(false);
+  // const dispatch = useAppDispatch();
   const intl = useIntl();
-  const history = useHistory();
+  // const history = useHistory();
 
   useEffect(() => {
     if (location.state !== undefined) setContacts(location.state.contacts);
     return () => setContacts({});
   }, [location.state]);
-  const handleOnClose = (contact: Profile) => {
-    // setSelectedContacts((currContacts) => {
-    //   delete currContacts[Uint8ArrayToBase64(contact.id)];
-    //   return { ...currContacts };
-    // });
-    // setContacts((currContacts) => {
-    //   currContacts[Uint8ArrayToBase64(contact.id)] = contact;
-    //   return currContacts;
-    // });
+  const handleOnRemove = (contact: Profile) => {
+    setSelectedContacts((currContacts) => {
+      delete currContacts[contact.id];
+      return { ...currContacts };
+    });
+    setContacts((currContacts) => {
+      currContacts[contact.id] = contact;
+      return currContacts;
+    });
   };
 
   useEffect(() => {
@@ -96,61 +92,32 @@ const NewConversation: React.FC = () => {
       value={[contacts, setContacts, selectedContacts, setSelectedContacts]}
     >
       <IonPage>
+        <IonLoading isOpen={isLoading} />
         <IonToast
           isOpen={isOpen}
           onDidDismiss={() => setError(undefined)}
           duration={1500}
           message={error}
           color="danger"
-        ></IonToast>
-        <IonHeader className={styles.header}>
-          <IonToolbar>
-            <IonButtons slot="start">
-              <IonBackButton defaultHref="/home" />
-            </IonButtons>
-            <IonTitle>
-              {intl.formatMessage({ id: "app.new-conversation.header-title" })}
-            </IonTitle>
-          </IonToolbar>
-        </IonHeader>
-        <IonLoading isOpen={isLoading} />
+        />
+        <NewConversationHeader />
 
         <IonContent className={styles["list"]}>
-          <div className={`${styles.recipients} ion-padding`}>
-            <IonLabel className={styles.to}>
-              {intl.formatMessage({ id: "app.new-conversation.to" })}:
-            </IonLabel>
-            {Object.values(selectedContacts).map((selectedContact) => (
-              <IonChip color="primary" key={JSON.stringify(selectedContact)}>
-                <IonLabel className={styles["chip-label"]}>
-                  {selectedContact.username}
-                </IonLabel>
-                <IonIcon
-                  icon={close}
-                  onClick={() => handleOnClose(selectedContact)}
-                />
-              </IonChip>
-            ))}
-            <IonInput
-              type="text"
-              placeholder={intl.formatMessage({
-                id: "app.new-conversation.search-placeholder",
-              })}
-              onIonChange={(e) => setSearch(e.detail.value!)}
-              value={search}
-              debounce={500}
-            ></IonInput>
-          </div>
+          <SelectedContactsHeader
+            contacts={selectedContacts}
+            onCloseButtonPress={handleOnRemove}
+            onSearch={setSearch}
+          />
           <ContactList
             contacts={Object.values(contacts).filter((a) =>
               a.username.includes(search)
             )}
           />
         </IonContent>
-
         <MessageInput
           onSend={handleOnSend}
           onChange={(message) => setMessage(message)}
+          onFileSelect={(files) => console.log(files)}
         />
       </IonPage>
     </ContactsContext.Provider>
