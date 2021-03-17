@@ -5,15 +5,13 @@ import Menu from "../../components/Menu";
 import { fetchBlocked, fetchMyContacts } from "../../redux/contacts/actions";
 import { fetchPreference } from "../../redux/preference/actions";
 import { useAppDispatch } from "../../utils/helpers";
-import Chat from "../Chat";
-import NewConversation from "../NewConversation";
-import Settings from "../Settings";
-import Home from "../Home";
-import Profile from "../Profile";
 import Blocked from "../Blocked";
+import Chat from "../Chat";
 import GroupChat from "../GroupChat";
-import { useSelector } from "react-redux";
-import { RootState } from "../../redux/types";
+import Home from "../Home";
+import NewConversation from "../NewConversation";
+import Profile from "../Profile";
+import Settings from "../Settings";
 
 const Authenticated: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -25,8 +23,6 @@ const Authenticated: React.FC = () => {
     },
     [dispatch]
   );
-
-  const store = useSelector((state: RootState) => state);
 
   return (
     <IonSplitPane contentId="main">

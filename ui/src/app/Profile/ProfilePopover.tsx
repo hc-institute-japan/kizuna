@@ -14,7 +14,7 @@ import {
 } from "../../redux/contacts/actions";
 import { Profile } from "../../redux/profile/types";
 import { RootState } from "../../redux/types";
-import { Uint8ArrayToBase64, useAppDispatch } from "../../utils/helpers";
+import { useAppDispatch } from "../../utils/helpers";
 import styles from "./style.module.css";
 
 interface Props {
@@ -33,7 +33,7 @@ const ProfilePopover: React.FC<Props> = ({ isOpen, dismiss, profile }) => {
   const { contacts, blocked } = useSelector(
     (state: RootState) => state.contacts
   );
-  console.log(contacts, blocked);
+
   useEffect(() => {
     setIsContact(stringifiedId in contacts);
     setIsBlocked(stringifiedId in blocked);

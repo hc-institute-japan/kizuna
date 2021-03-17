@@ -1,5 +1,51 @@
 .toolbar {
   display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
+  flex-direction: row;
+  
+}
+
+.file-view {
+  display: flex;
+  height: 100%;
+  flex-direction: row;
+}
+
+
+.row {
+  display: flex;
+  width: 100% !important;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  /* background-color: red; */
+}
+
+.chip {
+  position: relative;
+  /* height: 56px !important; */
+  width: auto !important;
+  margin-left: 12px !important;
+  border-radius: 10px;
+  flex: none;
+}
+
+.col > * {
+  position: absolute;
+  right: -5px;
+  top: -5px;
+}
+
+.col > *:hover {
+  cursor: pointer;
+}
+
+.close-button {
+  position: absolute;
+  right: -3px;
+  top: -3px;
+}
+
+.close-button:hover {
+  cursor: pointer;
 }

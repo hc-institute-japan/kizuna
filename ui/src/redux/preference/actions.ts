@@ -27,8 +27,6 @@ export const setPreference = (
     [key]: preference[key],
   }));
 
-  console.log(keys);
-
   const res = await callZome({
     zomeName: ZOMES.PREFERENCE,
     fnName: FUNCTIONS[ZOMES.PREFERENCE].SET_PREFERENCE,

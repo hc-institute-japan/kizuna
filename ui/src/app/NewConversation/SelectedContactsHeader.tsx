@@ -21,7 +21,7 @@ const SelectedContactsHeader: React.FC<Props> = ({
 
   useEffect(() => {
     onSearch(search);
-  }, [search]);
+  }, [search, onSearch]);
   return (
     <div className={`${styles.recipients} ion-padding`}>
       <IonLabel className={styles.to}>

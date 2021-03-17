@@ -1,5 +1,3 @@
-import { AgentPubKey } from "@holochain/conductor-api";
-
 export const SET_USERNAME = "SET_USERNAME";
 
 export interface Profile {

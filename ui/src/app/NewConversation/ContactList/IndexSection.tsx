@@ -1,7 +1,6 @@
 import { IonItemDivider, IonLabel } from "@ionic/react";
 import React from "react";
 import { Profile } from "../../../redux/profile/types";
-import { Uint8ArrayToBase64 } from "../../../utils/helpers";
 import { useContacts } from "../context";
 import ContactItem from "./ContactItem";
 
