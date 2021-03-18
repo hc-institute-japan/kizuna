@@ -1,25 +1,27 @@
-// Commons
+// Common Types
 export type ProfileID = string;
 export type MessageID = string;
 export type FileBytesID = string;
 
-export type Payload =  TextPayload | FilePayload
+export type Payload = TextPayload | FilePayload;
+
 export interface TextPayload {
-    type: "TEXT",
-    payload: string
+  type: "TEXT";
+  payload: { payload: string };
 }
 export interface FilePayload {
-    fileName: string,
-    fileSize: number,
-    fileType: String,
-    fileHash: FileBytesID,
-    thumbnail?: Uint8Array
+  fileName: string;
+  fileSize: number;
+  fileType: string;
+  fileHash: FileBytesID;
+  thumbnail?: Uint8Array;
 }
 
 export type FileType =
   | { type: "IMAGE"; payload: { thumbnail: Uint8Array } }
   | { type: "VIDEO"; payload: { thumbnail: Uint8Array } }
   | { type: "OTHER"; payload: null };
+
 export type FetchPayloadType =
   | { type: "TEXT"; payload: null }
   | { type: "FILE"; payload: null }
