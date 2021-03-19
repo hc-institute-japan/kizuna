@@ -95,8 +95,6 @@ export const fetchAllUsernames = (): ThunkAction => async (
     fnName: FUNCTIONS[ZOMES.USERNAME].GET_ALL_USERNAMES,
   });
 
-  console.log(usernames);
-
   if (usernames?.type !== "error") {
     const filteredProfiles = await Promise.all(
       usernames.map(async ({ username, agentId }: any) => ({

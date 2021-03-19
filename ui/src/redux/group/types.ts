@@ -1,4 +1,11 @@
 import { AgentPubKey } from "@holochain/conductor-api";
+import { Profile } from "../profile/types";
+import {
+  Payload,
+  TextPayload,
+  FetchPayloadType,
+  FilePayloadInput,
+} from "../commons/types";
 
 export const ADD_GROUP = "ADD_GROUP";
 export const UPDATE_GROUP_NAME = "UPDATE_GROUP_NAME";
@@ -13,21 +20,10 @@ export const GET_MESSAGES_BY_GROUP_BY_TIMESTAMP =
 type GroupMessageID = string; // Group Message EntryHash in base64 string
 type GroupID = string; // Group's EntryHash in base64 string
 type GroupRevisionID = string; // Group's HeaderHash in base64 string
-type GroupFileBytesID = string; // GroupFileBytes' EntryHash in base64 string
 type GroupEntryHash = Uint8Array; // Group's EntryHash
 type GroupHeaderHash = Uint8Array; // Group's HeaderHash
 type GroupMessageEntryHash = Uint8Array; // Group Message EntryHash
-type GroupFileBytesEntryHash = Uint8Array; // GroupFileBytes' EntryHash
-export type Payload = TextPayload | FilePayload;
 type PayloadInput = TextPayload | FilePayloadInput;
-export type FileType =
-  | { type: "IMAGE"; payload: { thumbnail: Uint8Array } }
-  | { type: "VIDEO"; payload: { thumbnail: Uint8Array } }
-  | { type: "OTHER"; payload: null };
-export type FetchPayloadType =
-  | { type: "TEXT"; payload: null }
-  | { type: "FILE"; payload: null }
-  | { type: "ALL"; payload: null };
 // end
 
 // input declaration
@@ -55,21 +51,6 @@ export interface GroupMessageInput {
   replyTo?: GroupMessageEntryHash;
 }
 
-export interface FileMetadataInput {
-  fileName: string;
-  fileSize: number;
-  fileType: string;
-}
-
-export interface FilePayloadInput {
-  type: "FILE";
-  payload: {
-    metadata: FileMetadataInput;
-    fileType: FileType;
-    fileBytes: GroupFileBytesEntryHash;
-  };
-}
-
 export interface GroupMessageBatchFetchFilter {
   groupId: GroupEntryHash;
   // the entry hash of the last message in the last batch fetched
@@ -85,21 +66,7 @@ export interface GroupMessageByDateFetchFilter {
   date: [number, number];
   payloadType: FetchPayloadType;
 }
-
 // end
-
-export interface TextPayload {
-  type: "TEXT";
-  payload: { payload: String };
-}
-
-export interface FilePayload {
-  fileName: String;
-  fileSize: Uint8Array;
-  fileType: String;
-  fileHash: GroupFileBytesID;
-  thumbnail?: Uint8Array;
-}
 
 export interface GroupMessage {
   groupMessageEntryHash: GroupMessageID;
@@ -189,17 +156,29 @@ export interface GroupConversationsState {
   groupFiles: {
     [key: string]: Uint8Array;
   };
+  // This makes it easier to manage when member of a group updates their username (username has no update fn yet)
+  // and saves network calls to fetch username in case a member is part of multiple groups
+  // key is agentPubKey
+  members: {
+    [key: string]: Profile;
+  };
 }
 
 // TODO: use it for typing action
 export interface AddGroupAction {
   type: typeof ADD_GROUP;
   groupData: GroupConversation;
+  membersUsernames: {
+    [key: string]: Profile;
+  };
 }
 
 export interface AddGroupMembersAction {
   type: typeof ADD_MEMBERS;
   updateGroupMembersData: UpdateGroupMembersData;
+  membersUsernames: {
+    [key: string]: Profile;
+  };
 }
 
 export interface RemoveGroupMembersAction {
@@ -239,30 +218,3 @@ export type GroupConversationsActionTypes =
   | SendGroupMessageAction
   | GetNextBatchGroupMessagesAction
   | GetMessagesByGroupByTimestampAction;
-
-// type guards
-export function isTextPayload(
-  payload: TextPayload | FilePayloadInput | FilePayload
-): payload is TextPayload {
-  return (payload as TextPayload).type === "TEXT";
-}
-
-export function isOther(
-  payload:
-    | { type: "IMAGE"; payload: { thumbnail: Uint8Array } }
-    | { type: "VIDEO"; payload: { thumbnail: Uint8Array } }
-    | { type: "OTHER"; payload: null }
-): payload is { type: "OTHER"; payload: null } {
-  return (payload as { type: "OTHER"; payload: null }).type === "OTHER";
-}
-
-export function isImage(
-  payload:
-    | { type: "IMAGE"; payload: { thumbnail: Uint8Array } }
-    | { type: "VIDEO"; payload: { thumbnail: Uint8Array } }
-): payload is { type: "IMAGE"; payload: { thumbnail: Uint8Array } } {
-  return (
-    (payload as { type: "IMAGE"; payload: { thumbnail: Uint8Array } }).type ===
-    "IMAGE"
-  );
-}

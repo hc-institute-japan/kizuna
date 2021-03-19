@@ -27,7 +27,6 @@ export const fetchMyUsername = (): ThunkAction => async (
     zomeName: ZOMES.USERNAME,
     fnName: FUNCTIONS[ZOMES.USERNAME].GET_MY_USERNAME,
   });
-
   if (res?.type !== "error") {
     dispatch({
       type: SET_USERNAME,
