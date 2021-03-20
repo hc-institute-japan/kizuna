@@ -19,7 +19,7 @@ export const ZOMES: ZomeNameType = {
 export const FUNCTIONS: FunctionNameType = {
   [ZOMES.USERNAME]: {
     SET_USERNAME: "set_username",
-    GET_USERNAME: "get_username",
+    GET_USERNAMES: "get_usernames",
     GET_ALL_USERNAMES: "get_all_usernames",
     GET_AGENT_PUBKEY_FROM_USERNAME: "get_agent_pubkey_from_username",
     GET_MY_USERNAME: "get_my_username",

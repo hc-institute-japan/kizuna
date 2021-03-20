@@ -25,28 +25,62 @@ export const fetchMyContacts = (): ThunkAction => async (
 
   if (ids?.type !== "error") {
     let contacts: { [key: string]: Profile } = {};
-    await Promise.all(
-      ids.map(async (id: AgentPubKey) => {
-        const usernameOutput = await callZome({
-          zomeName: ZOMES.USERNAME,
-          fnName: FUNCTIONS[ZOMES.USERNAME].GET_USERNAME,
-          payload: id,
-        });
-        const base64 = Uint8ArrayToBase64(id);
-        if (usernameOutput?.type !== "error")
-          contacts[base64] = {
-            id: base64,
-            username: usernameOutput.username,
-          };
-      })
-    );
-
+    const usernameOutputs = await callZome({
+      zomeName: ZOMES.USERNAME,
+      fnName: FUNCTIONS[ZOMES.USERNAME].GET_USERNAMES,
+      payload: ids,
+    });
+    console.log("here are the fetched usernames", usernameOutputs);
+    if (usernameOutputs?.type !== "error") {
+      usernameOutputs.forEach((usernameOutput: any) => {
+        const base64 = Uint8ArrayToBase64(usernameOutput.agentId);
+        contacts[base64] = {
+          id: base64,
+          username: usernameOutput.username,
+        };
+      });
+    }
     dispatch({
       type: SET_CONTACTS,
       contacts,
     });
 
     return contacts;
+  }
+  return null;
+};
+
+export const fetchBlocked = (): ThunkAction => async (
+  dispatch,
+  _,
+  { callZome }
+) => {
+  const ids = await callZome({
+    zomeName: ZOMES.CONTACTS,
+    fnName: FUNCTIONS[ZOMES.CONTACTS].LIST_BLOCKED,
+  });
+
+  if (ids?.type !== "error") {
+    let blocked: { [key: string]: Profile } = {};
+    const usernameOutputs = await callZome({
+      zomeName: ZOMES.USERNAME,
+      fnName: FUNCTIONS[ZOMES.USERNAME].GET_USERNAMES,
+      payload: ids,
+    });
+    if (usernameOutputs?.type !== "error") {
+      usernameOutputs.forEach((usernameOutput: any) => {
+        const base64 = Uint8ArrayToBase64(usernameOutput.agentId);
+        blocked[base64] = {
+          id: base64,
+          username: usernameOutput.username,
+        };
+      });
+    }
+    dispatch({
+      type: SET_BLOCKED,
+      blocked,
+    });
+    return blocked;
   }
   return null;
 };
@@ -63,13 +97,13 @@ export const fetchAllUsernames = (): ThunkAction => async (
 
   if (usernames?.type !== "error") {
     const filteredProfiles = await Promise.all(
-      usernames.map(async ({ username, agent_id }: any) => ({
-        id: Uint8ArrayToBase64(agent_id),
+      usernames.map(async ({ username, agentId }: any) => ({
+        id: Uint8ArrayToBase64(agentId),
         username,
         isAdded: await callZome({
           zomeName: ZOMES.CONTACTS,
           fnName: FUNCTIONS[ZOMES.CONTACTS].IN_CONTACTS,
-          payload: agent_id,
+          payload: agentId,
         }),
       }))
     );
@@ -163,42 +197,4 @@ export const unblockContact = (profile: Profile): ThunkAction => async (
     return true;
   }
   return false;
-};
-
-export const fetchBlocked = (): ThunkAction => async (
-  dispatch,
-  _,
-  { callZome }
-) => {
-  const res = await callZome({
-    zomeName: ZOMES.CONTACTS,
-    fnName: FUNCTIONS[ZOMES.CONTACTS].LIST_BLOCKED,
-  });
-
-  if (res?.type !== "error") {
-    let blocked: { [key: string]: Profile } = {};
-    await Promise.all(
-      res.map(async (id: AgentPubKey) => {
-        const usernameOutput = await callZome({
-          zomeName: ZOMES.USERNAME,
-          fnName: FUNCTIONS[ZOMES.USERNAME].GET_USERNAME,
-          payload: id,
-        });
-        const base64 = Uint8ArrayToBase64(id);
-        if (usernameOutput?.type !== "error")
-          blocked[base64] = {
-            id: base64,
-            username: usernameOutput.username,
-          };
-      })
-    );
-
-    dispatch({
-      type: SET_BLOCKED,
-      blocked,
-    });
-
-    return blocked;
-  }
-  return null;
 };
