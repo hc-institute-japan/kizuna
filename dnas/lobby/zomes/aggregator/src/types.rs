@@ -1,5 +1,6 @@
-use hdk3::prelude::timestamp::Timestamp;
+use file_types::Payload;
 use hdk3::prelude::*;
+use hdk3::prelude::{element::SignedHeaderHashed, timestamp::Timestamp};
 use std::collections::hash_map::HashMap;
 use std::time::SystemTime;
 
@@ -16,15 +17,18 @@ pub struct UsernameInfo {
     entry_header_hash: HeaderHash,
 }
 
+#[derive(Serialize, Deserialize, SerializedBytes, Debug)]
+pub struct UsernameList(Vec<UsernameInfo>);
+
 // for group
 #[derive(Deserialize, Serialize, SerializedBytes, Debug)]
 pub struct GroupOutput {
-    group_id: EntryHash,
-    group_revision_id: HeaderHash,
-    latest_name: String,
-    members: Vec<AgentPubKey>,
-    creator: AgentPubKey,
-    created: Timestamp,
+    pub group_id: EntryHash,
+    pub group_revision_id: HeaderHash,
+    pub latest_name: String,
+    pub members: Vec<AgentPubKey>,
+    pub creator: AgentPubKey,
+    pub created: Timestamp,
     // group_versions: Vec<Group>,
 }
 
@@ -42,10 +46,29 @@ pub struct GroupMessageHash(pub EntryHash);
 pub struct ReadList(pub HashMap<String, SystemTime>);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
-pub struct GroupMessageElement(pub Element);
+#[serde(rename_all = "camelCase")]
+pub struct GroupMessage {
+    // EntryHash of first ver of Group
+    group_hash: EntryHash,
+    payload: Payload,
+    created: Timestamp,
+    sender: AgentPubKey,
+    reply_to: Option<EntryHash>,
+}
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
-pub struct GroupMessageContent(pub GroupMessageElement, pub ReadList);
+#[serde(rename_all = "camelCase")]
+pub struct GroupMessageElement {
+    pub entry: GroupMessage,
+    pub signed_header: SignedHeaderHashed,
+}
+
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct GroupMessageContent {
+    pub group_message_element: GroupMessageElement,
+    pub read_list: ReadList,
+}
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 pub struct MessagesByGroup(pub HashMap<String, Vec<GroupMessageHash>>);
@@ -74,35 +97,6 @@ pub struct P2PMessage {
 pub struct P2PMessageReceipt {
     id: EntryHash,
     status: Status,
-}
-
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
-#[serde(tag = "type")]
-pub enum Payload {
-    Text {
-        payload: String,
-    },
-    File {
-        metadata: FileMetadata,
-        file_type: FileType,
-    },
-}
-
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct FileMetadata {
-    file_name: String,
-    file_size: u8,
-    file_type: FileType,
-    file_hash: String,
-}
-
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
-#[serde(tag = "type", rename_all = "camelCase")]
-pub enum FileType {
-    Image { thumbnail: SerializedBytes },
-    Video { thumbnail: SerializedBytes },
-    Others,
 }
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
@@ -154,15 +148,16 @@ pub struct PerGroupPreference {
 #[serde(rename_all = "camelCase")]
 pub struct AggregatedLatestData {
     pub user_info: UsernameInfo,
-    // retrieved from contacts zome
+    // for contacts
     pub added_contacts: Vec<AgentPubKey>,
     pub blocked_contacts: Vec<AgentPubKey>,
-    // from group
+    // for group
     pub groups: MyGroupListWrapper,
     pub latest_group_messages: GroupMessagesOutput,
-    // from p2pmessage
+    pub member_profiles: UsernameList,
+    // for p2pmessage
     pub latest_p2p_messages: P2PMessageHashTables,
-    // from preference
+    // for preference
     pub global_preference: Preference,
     pub per_agent_preference: PerAgentPreference,
     pub per_group_preference: PerGroupPreference,
