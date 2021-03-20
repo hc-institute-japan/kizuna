@@ -1,4 +1,6 @@
-import { filter } from "lodash";
+import { cond, filter } from "lodash";
+import { Base64 } from "js-base64";
+import blake from "blakejs";
 
 export function init(conductor) {
   conductor.call("group", "init");
@@ -44,12 +46,20 @@ export function readGroupMessage(group_message_read_io) {
     conductor.call("group", "read_group_message", group_message_read_io);
 }
 
-export function sendMessage(conductor, { group_id, sender, payload_input }) {
-  return conductor.call("group", "send_message", {
-    group_hash: group_id,
-    payload_input,
+export async function sendMessage(
+  conductor,
+  { groupId, sender, payloadInput }
+) {
+  return await conductor.call("group", "send_message", {
+    groupHash: groupId,
+    payloadInput,
     sender,
   });
+}
+
+export function getMessagesByGroupByTimestamp(message_info) {
+  return (conductor) =>
+    conductor.call("group", "get_messages_by_group_by_timestamp", message_info);
 }
 
 export function signalHandler(signal, signal_listener) {
@@ -69,7 +79,6 @@ export function signalHandler(signal, signal_listener) {
 
   signal_listener.counter++;
   return (payload) => {
-    console.log(`we have a new signal incoming ${payload}`);
     signal_listener.payload = signal.data.payload.payload;
   };
 }
@@ -87,18 +96,34 @@ export function getNextBatchGroupMessage(filter_input) {
 
 export async function sendMessageWithDate(
   conductor,
-  { group_id, sender, payload, date = Date.now() }
+  { groupId, sender, payload, date = Date.now() }
 ) {
   return await conductor.call("group", "send_message_in_target_date", {
-    group_hash: group_id,
+    groupHash: groupId,
     payload,
     sender,
     date,
   });
 }
 
-export function getLatestMessagesForAllGroups(batch_size){
-  return (conductor) => 
-    conductor.call("group", "get_latest_messages_for_all_groups", batch_size);
+export function getLatestMessagesForAllGroups(batch_size) {
+  return async (conductor) =>
+    await conductor.call(
+      "group",
+      "get_latest_messages_for_all_groups",
+      batch_size
+    );
 }
 
+//HELPERS FUNCTIONS FOR TESTING SENDING FILE MESSAGES
+
+export function strToUtf8Bytes(str) {
+  const bytes: Array<number> = [];
+
+  for (let i = 0; i < str.length; i++) {
+    const code = str.charCodeAt(i); // x00-xFFFF
+    bytes.push(code & 255); // low, high
+  }
+
+  return bytes;
+}
