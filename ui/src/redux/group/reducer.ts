@@ -10,16 +10,16 @@ import {
   GroupConversation,
   GroupConversationsState,
   GroupMessage,
-  isTextPayload,
 } from "./types";
+import { isTextPayload } from "../commons/types";
 
 const initialState: GroupConversationsState = {
   conversations: {},
   messages: {},
   groupFiles: {},
+  members: {},
 };
 
-// TODO: action here should have a better type
 const reducer = (
   state = initialState,
   action: GroupConversationsActionTypes
@@ -35,7 +35,12 @@ const reducer = (
         ...groupConversations,
         ...newConversation,
       };
-      return { ...state, conversations: groupConversations };
+      let members = state.members;
+      members = {
+        ...members,
+        ...action.membersUsernames,
+      };
+      return { ...state, conversations: groupConversations, members };
     }
     case ADD_MEMBERS: {
       let groupEntryHash: string = action.updateGroupMembersData.groupId;
@@ -49,7 +54,12 @@ const reducer = (
         ...groupConversations,
         [groupEntryHash]: groupConversation,
       };
-      return { ...state, conversations: groupConversations };
+      let members = state.members;
+      members = {
+        ...members,
+        ...action.membersUsernames,
+      };
+      return { ...state, conversations: groupConversations, members };
     }
     case REMOVE_MEMBERS: {
       let groupEntryHash: string = action.updateGroupMembersData.groupId;
