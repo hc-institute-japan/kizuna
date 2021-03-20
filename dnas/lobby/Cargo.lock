@@ -5,6 +5,7 @@ name = "aggregator"
 version = "0.0.1"
 dependencies = [
  "derive_more",
+ "file_types",
  "hdk3 0.0.1 (git+https://github.com/holochain/holochain?rev=3675b58)",
  "serde",
 ]
