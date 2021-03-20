@@ -79,12 +79,11 @@ const conversations: ConversationsType = [
 const Conversations: React.FC = () => {
   const history = useHistory();
   const contacts = useSelector((state: RootState) => state.contacts.contacts);
-  const handleOnClick = () => {
+  const handleOnClick = () =>
     history.push({
       pathname: `/compose`,
       state: { contacts },
     });
-  };
 
   return (
     <IonPage>

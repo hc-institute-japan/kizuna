@@ -3,9 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchMyUsername } from "../../redux/profile/actions";
 import { RootState } from "../../redux/types";
 import Authenticated from "../Authenticated";
+import Playground from "../Playground";
 import Unauthenticated from "../Unauthenticated";
-
-declare let cordova: any;
 
 const Auth: React.FC = () => {
   const { username } = useSelector((state: RootState) => state.profile);
@@ -15,7 +14,8 @@ const Auth: React.FC = () => {
     dispatch(fetchMyUsername());
   }, [dispatch]);
 
-  return username !== null ? <Authenticated /> : <Unauthenticated />;
+  return <Playground></Playground>;
+  // return username !== null ? <Authenticated /> : <Unauthenticated />;
 };
 
 export default Auth;

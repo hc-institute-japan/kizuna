@@ -23,17 +23,14 @@ interface Props {
 const determineFileType = (type: string): string => {
   //too lazy to do all
   //url: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
+
   switch (type) {
     case "image/png":
-    case "image/jpg":
+    case "image/jpeg":
       return "IMAGE";
     default:
       return "OTHER";
   }
-};
-
-const getThumbnail = (type: string) => {
-  return null;
 };
 
 const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
@@ -62,29 +59,39 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
           if (fileSize < 15728640) {
             const fileBytes = new Uint8Array(arrBuffer);
             const type = determineFileType(file.type);
-            const thumbnail = getThumbnail(type);
-            const fileType = {
-              type,
-              ...(thumbnail
-                ? {
-                    thumbnail: {},
-                  }
-                : {}),
-            };
-            const final = {
-              metadata: { fileName, fileType: type, fileSize },
-              fileType,
-              fileBytes,
-            };
 
-            setFiles((currFiles) => {
-              currFiles.push(final);
-              return [...currFiles];
-            });
+            if (type === "IMAGE" || type === "VIDEO") {
+              const reader = new FileReader();
+              reader.readAsDataURL(file);
+              reader.onload = (readerEvent) => {
+                const final = {
+                  metadata: { fileName, fileType: type, fileSize },
+                  fileType: { type, thumbnail: readerEvent.target?.result },
+                  fileBytes,
+                };
+
+                setFiles((currFiles) => {
+                  currFiles.push(final);
+                  return [...currFiles];
+                });
+              };
+            } else {
+              const final = {
+                metadata: { fileName, fileType: type, fileSize },
+                fileType: { type },
+                fileBytes,
+              };
+
+              setFiles((currFiles) => {
+                currFiles.push(final);
+                return [...currFiles];
+              });
+            }
           } else {
             showToast({
               message: `${fileName} exceeds the 15mb file limit`,
               color: "danger",
+              duration: 2500,
             });
           }
         });

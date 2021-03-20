@@ -1,5 +1,5 @@
 import { IonChip, IonIcon, IonLabel, IonRow } from "@ionic/react";
-import { close } from "ionicons/icons";
+import { closeCircle } from "ionicons/icons";
 import React, { Dispatch, SetStateAction } from "react";
 import styles from "./style.module.css";
 
@@ -17,12 +17,34 @@ const FileView: React.FC<Props> = ({ files, setFiles }) => {
 
   return (
     <IonRow className={styles.row}>
-      {files.map((file, index) => (
-        <IonChip className={styles.chip} key={index}>
-          <IonLabel>{file.metadata.fileName}</IonLabel>
-          <IonIcon icon={close} onClick={() => handleClose(index)}></IonIcon>
-        </IonChip>
-      ))}
+      {files.map((file, index) => {
+        return (
+          <IonChip
+            {...(file.fileType.type === "IMAGE" ||
+            file.fileType.type === "VIDEO"
+              ? {
+                  style: {
+                    backgroundImage: `url(${file.fileType.thumbnail})`,
+                    backgroundRepeat: "no-repeat",
+                    backgroundPosition: "center",
+                    backgroundSize: "cover",
+                  },
+                }
+              : {})}
+            className={styles.chip}
+            key={index}
+          >
+            {file.fileType.type === "IMAGE" ||
+            file.fileType.type === "VIDEO" ? null : (
+              <IonLabel>{file.metadata.fileName}</IonLabel>
+            )}
+            <IonIcon
+              icon={closeCircle}
+              onClick={() => handleClose(index)}
+            ></IonIcon>
+          </IonChip>
+        );
+      })}
     </IonRow>
   );
 };
