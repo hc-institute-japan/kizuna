@@ -82,7 +82,7 @@ const Conversations: React.FC = () => {
   const handleOnClick = () => {
     history.push({
       pathname: `/compose`,
-      state: { contacts },
+      state: { contacts: {...contacts} },
     });
   };
 

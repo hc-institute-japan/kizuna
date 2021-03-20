@@ -19,8 +19,9 @@ const IndexSection: React.FC<Props> = ({ char, contacts }) => {
       return currContacts;
     });
     setContacts((currContacts) => {
-      delete currContacts[contact.id];
-      return { ...currContacts };
+      const newContacts = {...currContacts}
+      delete newContacts[contact.id];
+      return newContacts;
     });
   };
 

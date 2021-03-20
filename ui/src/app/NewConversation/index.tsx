@@ -1,10 +1,12 @@
 import { IonContent, IonLoading, IonPage, IonToast } from "@ionic/react";
 import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
+import { useSelector } from "react-redux";
 import { useHistory, useLocation } from "react-router";
 import MessageInput from "../../components/MessageInput";
 import { sendInitialGroupMessage } from "../../redux/group/actions";
 import { Profile, ProfileListType } from "../../redux/profile/types";
+import { RootState } from "../../redux/types";
 import { useAppDispatch } from "../../utils/helpers";
 import ContactList from "./ContactList";
 import { ContactsContext } from "./context";
@@ -40,7 +42,7 @@ const NewConversation: React.FC = () => {
     });
     setContacts((currContacts) => {
       currContacts[contact.id] = contact;
-      return currContacts;
+      return { ...currContacts };
     });
   };
 
