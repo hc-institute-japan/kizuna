@@ -5,6 +5,7 @@ pub mod handlers;
 
 //GROUP TYPE DEFINITION, GETTERS, SETTERS, ENTRY_DEF, UTILS ...
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct Group {
     pub name: String,
     pub created: Timestamp,
@@ -51,6 +52,7 @@ entry_def!(Group
 
 // IO TYPES DEFINITION
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct UpdateMembersIO {
     pub members: Vec<AgentPubKey>,
     pub group_id: EntryHash,
@@ -58,6 +60,7 @@ pub struct UpdateMembersIO {
 }
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct UpdateGroupNameIO {
     name: String,
     group_id: EntryHash,
@@ -67,6 +70,7 @@ pub struct UpdateGroupNameIO {
 
 //INPUTS TYPES DEFINITION
 #[derive(Serialize, Deserialize, SerializedBytes, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct CreateGroupInput {
     name: String,
     members: Vec<AgentPubKey>,
@@ -74,13 +78,15 @@ pub struct CreateGroupInput {
 //END OF INPUTS TYPES DEFINITION
 
 //OUTPUTS TYPES DEFINITION
-#[derive(Deserialize, Serialize, SerializedBytes)]
+#[derive(Deserialize, Serialize, SerializedBytes, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct CreateGroupOutput {
     pub content: Group,
     pub group_id: EntryHash,
     pub group_revision_id: HeaderHash,
 }
-#[derive(Deserialize, Serialize, SerializedBytes)]
+#[derive(Deserialize, Serialize, SerializedBytes, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct GroupOutput {
     group_id: EntryHash,
     group_revision_id: HeaderHash,
@@ -107,15 +113,19 @@ impl GroupOutput {
 
 //WRAPPERS TYPES DEFINITION
 #[derive(Deserialize, Serialize, SerializedBytes)]
+#[serde(rename_all = "camelCase")]
 pub struct BlockedWrapper(pub Vec<AgentPubKey>);
 
 #[derive(Deserialize, Serialize, SerializedBytes)]
+#[serde(rename_all = "camelCase")]
 pub struct MyGroupListWrapper(pub Vec<GroupOutput>);
 
 #[derive(Deserialize, Serialize, SerializedBytes)]
+#[serde(rename_all = "camelCase")]
 pub struct AgentPubKeysWrapper(Vec<AgentPubKey>);
 
 #[derive(Deserialize, Serialize, SerializedBytes)]
+#[serde(rename_all = "camelCase")]
 pub struct EntryHashWrapper {
     pub group_hash: EntryHash,
 }
@@ -123,6 +133,7 @@ pub struct EntryHashWrapper {
 
 //VALIDATION TYPES DEFINITION (this types are created just for testing purposes and can be removed in the future)
 #[derive(Deserialize, Serialize, SerializedBytes)]
+#[serde(rename_all = "camelCase")]
 pub struct ValidationInput {
     pub validation_type: String,
     pub group_revision_id: HeaderHash,

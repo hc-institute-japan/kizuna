@@ -63,6 +63,7 @@ pub fn send_message(message_input: GroupMessageInput) -> ExternResult<GroupMessa
     };
 
     // commit GroupMessage entry
+
     create_entry(&message)?;
 
     let group_hash = message.group_hash.clone().to_string(); // message's group hash as string
@@ -248,7 +249,7 @@ pub fn get_next_batch_group_messages(
     }
 
     // at this point we have all the data we need to returned to the ui
-    messages_by_group.insert(format!("{:?}", GroupEntryHash(group_id)), messages_hashes);
+    messages_by_group.insert(group_id.to_string(), messages_hashes);
 
     Ok(GroupMessagesOutput {
         messages_by_group: MessagesByGroup(messages_by_group),
@@ -290,9 +291,6 @@ pub fn get_latest_messages_for_all_groups(
         let mut messages_output: GroupMessagesOutput = get_next_batch_group_messages(batch_filter)?;
 
         // insert GroupMessagesContents and MessagesByGroup values from returned GroupMessagesOutput into the initialized MessagesByGroup and GroupMessagesContents
-
-        // COMMENT: the order of the hashmaps will differ from the order of the given for the output will this be an issue?
-
         for (key, value) in messages_output.messages_by_group.0.drain() {
             messages_by_group.insert(key, value);
         }
@@ -398,22 +396,34 @@ fn collect_messages_info(
             // here i collect all the values to fill the group_message_content this values are:
 
             // - the message entry_hash (aka the link target )
-            // - the message element (got it using get to the entry hash of the message )
+            // - the GroupMessageData (constructed from the element fetched from entry hash of the message )
             // - the read_list for that message ( got it from the links related to the message with the tag "read" )
 
             let read_links: Vec<Link> =
                 get_links(link.target.clone(), Some(LinkTag::new("read")))?.into_inner();
 
             for link in read_links {
-                read_list.insert(format!("{:?}", link.target), link.timestamp);
+                read_list.insert(link.target.to_string(), link.timestamp);
             }
 
+            let group_message: GroupMessage = message_element
+                .entry()
+                .to_owned()
+                .to_app_option::<GroupMessage>()?
+                .ok_or(HdkError::Wasm(WasmError::Zome(
+                    "the group message ElementEntry enum is not of Present variant".into(),
+                )))?;
+            let group_message_element: GroupMessageElement = GroupMessageElement {
+                entry: group_message,
+                signed_header: message_element.signed_header().to_owned(),
+            };
+
             group_messages_contents.insert(
-                format!("{:?}", GroupMessageHash(link.target.clone())),
-                GroupMessageContent(
-                    GroupMessageElement(message_element),
-                    ReadList(read_list.clone()),
-                ),
+                link.target.clone().to_string(),
+                GroupMessageContent {
+                    group_message_element,
+                    read_list: ReadList(read_list.clone()),
+                },
             );
 
             read_list.clear();

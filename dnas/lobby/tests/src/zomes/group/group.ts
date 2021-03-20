@@ -15,7 +15,7 @@ const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
 function getGroupfromGroupOutput(group_output) {
   return {
-    name: group_output.latest_name,
+    name: group_output.latestName,
     created: group_output.created,
     creator: group_output.creator,
     members: group_output.members,
@@ -30,7 +30,7 @@ function blockContacts(agentPubKeys) {
 
 // THE FUNCTION get_all_my_groups IS BEING IMPLICITLY TESTED BEACUSE IT'S USED IN ALMOST ALL THE TESTS
 
-export function craeteGroupTest(orchestrator, config, installables) {
+export function createGroupTest(orchestrator, config, installables) {
   orchestrator.registerScenario(
     "create group method test",
     async (s: ScenarioApi, t) => {
@@ -96,8 +96,8 @@ export function craeteGroupTest(orchestrator, config, installables) {
 
       let {
         content: create_group_content,
-        group_id,
-        group_revision_id,
+        groupId,
+        groupRevisionId,
       } = await createGroup(create_group_input)(alice_conductor);
       await delay(1000);
 
@@ -139,9 +139,20 @@ export function craeteGroupTest(orchestrator, config, installables) {
         1,
         "bobby's signal counter its = 1 beacuse he was added to the group"
       );
+
       t.deepEqual(
         bobby_signal_listener.payload,
-        { AddedToGroup: group_id },
+        {
+          type: "ADDED_TO_GROUP",
+          payload: {
+            groupId: groupId,
+            groupRevisionId: groupRevisionId,
+            latestName: create_group_content.name,
+            members: create_group_content.members,
+            creator: create_group_content.creator,
+            created: create_group_content.created,
+          },
+        },
         "bobby has received the signal payload from create_group"
       );
       t.equal(
@@ -225,8 +236,8 @@ export function addAndRemoveMembersTest(orchestrator, config, installables) {
 
       let {
         content: original_group_content,
-        group_id,
-        group_revision_id,
+        groupId,
+        groupRevisionId,
       } = await createGroup(create_group_input)(alice_conductor);
       await delay(1000);
 
@@ -242,7 +253,17 @@ export function addAndRemoveMembersTest(orchestrator, config, installables) {
       );
       t.deepEqual(
         bobby_signal_listener.payload,
-        { AddedToGroup: group_id },
+        {
+          type: "ADDED_TO_GROUP",
+          payload: {
+            groupId: groupId,
+            groupRevisionId: groupRevisionId,
+            latestName: original_group_content.name,
+            members: original_group_content.members,
+            creator: original_group_content.creator,
+            created: original_group_content.created,
+          },
+        },
         "bobby has received the signal payload from create_group"
       );
       t.equal(
@@ -259,8 +280,8 @@ export function addAndRemoveMembersTest(orchestrator, config, installables) {
       // 2 - ADD A NEW MEMBER TO THE GROUP WE CREATED WE SEND A LIST WITH MEMBERS ALREADY ARE ADDED TO TEST ALL THE METHOD
       let update_members_io = {
         members: [bobbyPubKey, charliePubKey],
-        group_id: group_id,
-        group_revision_id: group_revision_id,
+        groupId,
+        groupRevisionId,
       };
 
       await AddGroupMebers(update_members_io)(alice_conductor);
@@ -295,7 +316,7 @@ export function addAndRemoveMembersTest(orchestrator, config, installables) {
       // );
 
       // 3 - CHECK IF THE VALUES HAS CHANGED AND THE GROUP STATE ITS THE EXPECTED
-      let updated_group = await getLatestGroupVersion({ group_hash: group_id })(
+      let updated_group = await getLatestGroupVersion({ groupHash: groupId })(
         alice_conductor
       );
       await delay(1000);
@@ -322,7 +343,17 @@ export function addAndRemoveMembersTest(orchestrator, config, installables) {
       );
       t.deepEqual(
         bobby_signal_listener.payload,
-        { AddedToGroup: group_id },
+        {
+          type: "ADDED_TO_GROUP",
+          payload: {
+            groupId,
+            groupRevisionId,
+            latestName: original_group_content.name,
+            members: original_group_content.members,
+            creator: original_group_content.creator,
+            created: original_group_content.created,
+          },
+        },
         "bobby has received the signal payload from create_group"
       );
       t.equal(
@@ -332,7 +363,17 @@ export function addAndRemoveMembersTest(orchestrator, config, installables) {
       );
       t.deepEqual(
         charlie_signal_listener.payload,
-        { AddedToGroup: group_id },
+        {
+          type: "ADDED_TO_GROUP",
+          payload: {
+            groupId,
+            groupRevisionId,
+            latestName: updated_group.name,
+            members: updated_group.members,
+            creator: updated_group.creator,
+            created: updated_group.created,
+          },
+        },
         "charlie's has received the signal payload from create_group"
       );
 
@@ -370,8 +411,8 @@ export function addAndRemoveMembersTest(orchestrator, config, installables) {
 
       update_members_io = {
         members: [bobbyPubKey], //this public keys list  contains all members we want to remove from the group
-        group_id: group_id,
-        group_revision_id: group_revision_id,
+        groupId,
+        groupRevisionId,
       };
 
       await removeGroupMembers(update_members_io)(alice_conductor);
@@ -393,7 +434,7 @@ export function addAndRemoveMembersTest(orchestrator, config, installables) {
 
       // 6 - CHECK IF THE VALUES HAS CHANGED AND THE GROUP STATE IS THE EXPECTED
 
-      updated_group = await getLatestGroupVersion({ group_hash: group_id })(
+      updated_group = await getLatestGroupVersion({ groupHash: groupId })(
         alice_conductor
       );
       updated_group.created = original_group_content.created;
@@ -468,8 +509,8 @@ export function updateGroupNameTest(orchestrator, config, installables) {
 
       let {
         content: original_group_content,
-        group_id,
-        group_revision_id,
+        groupId,
+        groupRevisionId,
       } = await createGroup(create_group_input)(alice_conductor);
       await delay(1000);
 
@@ -477,8 +518,8 @@ export function updateGroupNameTest(orchestrator, config, installables) {
 
       let update_group_name_io = {
         name: "New Group Name",
-        group_id: group_id,
-        group_revision_id: group_revision_id,
+        groupId,
+        groupRevisionId,
       };
 
       await updateGroupName(update_group_name_io)(alice_conductor);
@@ -500,7 +541,7 @@ export function updateGroupNameTest(orchestrator, config, installables) {
       // 3- CHECK IF THE VALUES HAS CHANGED AND THE GROUP STATE ITS THE EXPECTED
 
       let updated_group = await getLatestGroupVersion({
-        group_hash: update_group_name_io.group_id,
+        groupHash: update_group_name_io.groupId,
       })(alice_conductor);
       updated_group.created = original_group_content.created;
       await delay(1000);
@@ -586,8 +627,8 @@ export function validateCreateGroupTest(orchestrator, config, installables) {
       await delay(1000);
 
       let validation_input = {
-        validation_type: "create",
-        group_revision_id: create_group_output.group_revision_id,
+        validationType: "create",
+        groupRevisionId: create_group_output.groupRevisionId,
       };
       // 2- CHECK THE VALIDATION RULES OUTPUT ANCd CHECK IF WE GET THE EXPECTED VALUE
 
@@ -598,7 +639,9 @@ export function validateCreateGroupTest(orchestrator, config, installables) {
 
       t.deepEqual(
         validation_output,
-        { Valid: null },
+        {
+          Valid: null,
+        },
         "this group pass the validation rules and can be committed and shared through the network"
       );
 
@@ -611,8 +654,7 @@ export function validateCreateGroupTest(orchestrator, config, installables) {
       );
       await delay(1000);
 
-      validation_input.group_revision_id =
-        create_group_output.group_revision_id;
+      validation_input.groupRevisionId = create_group_output.groupRevisionId;
 
       // 4- CHECK THE VALIDATION RULES OUTPUT AND CHECK IF WE GET THE EXPECTED VALUE
 
@@ -636,8 +678,7 @@ export function validateCreateGroupTest(orchestrator, config, installables) {
       );
       await delay(1000);
 
-      validation_input.group_revision_id =
-        create_group_output.group_revision_id;
+      validation_input.groupRevisionId = create_group_output.groupRevisionId;
 
       // 6- CHECK THE VALIDATION RULES OUTPUT AND CHECK IF WE GET THE EXPECTED VALUE
 
@@ -664,8 +705,7 @@ export function validateCreateGroupTest(orchestrator, config, installables) {
       );
       await delay(1000);
 
-      validation_input.group_revision_id =
-        create_group_output.group_revision_id;
+      validation_input.groupRevisionId = create_group_output.groupRevisionId;
 
       // 6- CHECK THE VALIDATION RULES OUTPUT AND CHECK IF WE GET THE EXPECTED VALUE
 
