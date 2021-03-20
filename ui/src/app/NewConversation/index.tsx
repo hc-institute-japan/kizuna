@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import { useHistory, useLocation } from "react-router";
 import MessageInput from "../../components/MessageInput";
+import { useToast } from "../../containers/ToastContainer/context";
 import { sendInitialGroupMessage } from "../../redux/group/actions";
 import { Profile, ProfileListType } from "../../redux/profile/types";
 import { useAppDispatch } from "../../utils/helpers";
@@ -109,7 +110,7 @@ const NewConversation: React.FC = () => {
         <MessageInput
           onSend={handleOnSend}
           onChange={(message) => setMessage(message)}
-          onFileSelect={() => {}}
+          onFileSelect={(files) => {}}
         />
       </IonPage>
     </ContactsContext.Provider>

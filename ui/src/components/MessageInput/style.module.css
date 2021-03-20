@@ -23,8 +23,8 @@
 
 .chip {
   position: relative;
-  /* height: 56px !important; */
-  width: auto !important;
+  height: 56px !important;
+  /* width: auto !important; */
   margin-left: 12px !important;
   border-radius: 10px;
   flex: none;

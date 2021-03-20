@@ -29,6 +29,7 @@ const ToastContainer: React.FC = ({ children }) => {
         duration={1500}
         {...props}
       />
+
       {children}
     </ToastContext.Provider>
   );
