@@ -1,11 +1,11 @@
+use hdk::prelude::*;
+use hdk::prelude::{element::SignedHeaderHashed, timestamp::Timestamp};
 use file_types::Payload;
-use hdk3::prelude::*;
-use hdk3::prelude::{element::SignedHeaderHashed, timestamp::Timestamp};
-use std::collections::hash_map::HashMap;
 use std::time::SystemTime;
+use std::collections::hash_map::HashMap;
 
 // for contacts
-#[derive(Deserialize, Serialize, SerializedBytes)]
+#[derive(Deserialize, Serialize, SerializedBytes, Debug)]
 pub struct AgentPubKeys(pub Vec<AgentPubKey>);
 
 // for username
