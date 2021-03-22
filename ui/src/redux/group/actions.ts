@@ -38,6 +38,7 @@ import {
   GroupConversationsState,
   SET_MESSAGES_BY_GROUP_BY_TIMESTAMP,
   SetMessagesByGroupByTimestampAction,
+  SET_LATEST_GROUP_VERSION,
 } from "./types";
 import {
   Payload,
@@ -274,6 +275,8 @@ export const sendGroupMessage = (
     groupMessageData.payloadInput.payload = { payload: message.trim() };
   }
 
+  console.log(groupMessageData);
+
   const sendGroupMessageOutput = await callZome({
     zomeName: ZOMES.GROUP,
     fnName: FUNCTIONS[ZOMES.GROUP].SEND_MESSAGE,
@@ -285,6 +288,7 @@ export const sendGroupMessage = (
   if (isTextPayload(groupMessageData.payloadInput)) {
     payload = sendGroupMessageOutput.content.payload;
   } else {
+    console.log(sendGroupMessageOutput);
     let fileType: FileType =
       sendGroupMessageOutput.content.payload.payload.fileType;
     let thumbnail: Uint8Array | undefined = isOther(fileType)
@@ -420,18 +424,30 @@ export const getMessagesByGroupByTimestamp = (
   return groupMessagesOutput;
 };
 
-// these might not be needed because aggregator exists
-export const getLatestMessagesForAllGroups = (): ThunkAction => async (
+export const getLatestGroupVersion = (groupId: string): ThunkAction => async (
   dispatch,
   _getState,
   { callZome }
-) => {};
+) => {
+  const res = await callZome({
+    zomeName: ZOMES.GROUP,
+    fnName: FUNCTIONS[ZOMES.GROUP].GET_GROUP_LATEST_VERSION,
+    payload: {
+      groupHash: base64ToUint8Array(groupId),
+    },
+  });
+  console.log("here is the latest group", res);
 
-export const getAllMyGroups = (): ThunkAction => async (
-  dispatch,
-  _getState,
-  { callZome }
-) => {};
+  // let groupData: GroupConversation = {
+  //   originalGroupEntryHash:
+  // }
+  // dispatch<SetLatestGroupVersion>({
+  //   type: SET_LATEST_GROUP_VERSION,
+
+  // })
+
+  return res;
+};
 
 // helper function
 export const convertFetchedResToGroupMessagesOutput = (

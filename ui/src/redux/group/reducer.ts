@@ -12,6 +12,7 @@ import {
   GroupMessage,
   SET_LATEST_GROUP_STATE,
   GroupMessagesOutput,
+  SET_LATEST_GROUP_VERSION,
 } from "./types";
 import { isTextPayload } from "../commons/types";
 import { stat } from "fs";
@@ -167,6 +168,15 @@ const reducer = (
         members[member.id] = member;
       });
       return { ...state, conversations, messages, members };
+    }
+    case SET_LATEST_GROUP_VERSION: {
+      let groupConversations = state.conversations;
+      let groupConversation: GroupConversation = action.groupData;
+      groupConversations = {
+        ...groupConversations,
+        [groupConversation.originalGroupEntryHash]: groupConversation,
+      };
+      return { ...state, conversations: groupConversations };
     }
     default:
       return state;

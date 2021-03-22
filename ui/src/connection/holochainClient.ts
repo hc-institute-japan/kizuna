@@ -7,13 +7,17 @@ import {
 import store from "../redux/store";
 import { CallZomeConfig } from "../redux/types";
 import {
+  AddGroupAction,
   ADD_GROUP,
   GroupConversation,
   GroupMessage,
 } from "../redux/group/types";
 import { SET_GROUP_MESSAGE, SetGroupMessageAction } from "../redux/group/types";
-import { Uint8ArrayToBase64 } from "../utils/helpers";
+import { base64ToUint8Array, Uint8ArrayToBase64 } from "../utils/helpers";
 import { isTextPayload } from "../redux/commons/types";
+import { addedToGroup } from "../redux/group/actions";
+import { Profile } from "../redux/profile/types";
+import { FUNCTIONS, ZOMES } from "./types";
 
 let client: null | AppWebsocket = null;
 
@@ -32,9 +36,43 @@ let signalHandler: AppSignalCb = (signal) => {
         creator: Uint8ArrayToBase64(payload.creator),
         messages: [],
       };
-      store.dispatch({
+
+      let contacts = store.getState().contacts.contacts;
+      let undefinedProfiles: AgentPubKey[] = [];
+      let myAgentId = getAgentId().then((res: any) => Uint8ArrayToBase64(res));
+      let membersUsernames: { [key: string]: Profile } = {};
+      groupData.members.forEach(async (member) => {
+        if (contacts[member]) {
+          membersUsernames[member] = contacts[member];
+        } else if (member === (await myAgentId)) {
+          // do nothing if member is yourself
+        } else {
+          undefinedProfiles.push(
+            Buffer.from(base64ToUint8Array(member).buffer)
+          );
+        }
+      });
+
+      if (undefinedProfiles?.length) {
+        callZome({
+          zomeName: ZOMES.USERNAME,
+          fnName: FUNCTIONS[ZOMES.USERNAME].GET_USERNAMES,
+          payload: undefinedProfiles,
+        }).then((res: any) => {
+          res.forEach((profile: any) => {
+            let base64 = Uint8ArrayToBase64(profile.agentId);
+            membersUsernames[base64] = {
+              id: base64,
+              username: profile.username,
+            };
+          });
+        });
+      }
+
+      store.dispatch<AddGroupAction>({
         type: ADD_GROUP,
         groupData,
+        membersUsernames,
       });
       break;
     case "group_messsage_data": {

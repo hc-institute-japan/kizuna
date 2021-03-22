@@ -1,3 +1,4 @@
+import { AgentPubKey } from "@holochain/conductor-api";
 import {
   IonContent,
   IonFab,
@@ -7,23 +8,30 @@ import {
   IonPage,
 } from "@ionic/react";
 import { pencil } from "ionicons/icons";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import Conversation from "../../components/Conversation";
 import Toolbar from "../../components/Toolbar";
 import { isTextPayload } from "../../redux/commons/types";
 import { GroupConversation, GroupConversationsActionTypes, GroupMessage } from "../../redux/group/types";
+import { fetchId } from "../../redux/profile/actions";
 import { RootState } from "../../redux/types";
+import { Uint8ArrayToBase64, useAppDispatch } from "../../utils/helpers";
 import { Conversations as ConversationsType, Message } from "../../utils/types";
 import EmptyConversations from "./EmptyConversations";
 import styles from "./style.module.css";
 
 const Conversations: React.FC = () => {
   const history = useHistory();
+  const dispatch = useAppDispatch();
   const contacts = useSelector((state: RootState) => state.contacts.contacts);
   const groups = useSelector((state: RootState) => state.groups.conversations);
   const groupMessages = useSelector((state: RootState) => state.groups.messages);
+  const groupMembers = useSelector((state: RootState) => state.groups.members);
+  const myUsername = useSelector((state: RootState) => state.profile.username);
+  const [myAgentId, setMyAgentId] = useState<string>("");
+
   const handleOnClick = () => {
     history.push({
       pathname: `/compose`,
@@ -42,18 +50,41 @@ const Conversations: React.FC = () => {
       if (isTextPayload(groupMessage.payload)) {
         let message: Message = {
           id: groupMessage.groupMessageEntryHash,
-          sender: groupMessage.author,
+          sender: groupMembers[groupMessage.author] ? {
+            id: groupMembers[groupMessage.author].id,
+            username: groupMembers[groupMessage.author].username
+          } : {
+            id: myAgentId,
+            username: myUsername!
+          },
           timestamp: groupMessage.timestamp,
           message: groupMessage.payload.payload.payload
         };
         return message
       } else {
+        let maybeOther: any | undefined = groupMembers[groupMessage.author];
+        let fileString: string = "";
+        if (maybeOther) {
+          // TODO: format for i18n
+          fileString = new String(maybeOther.username + " " + "has sent" + groupMessage.payload.fileName).toString();
+        } else {
+          // MAYBE BUG: assumption is you sent it.
+          // TODO: format for i18n
+          fileString = new String("You" + " sent " + groupMessage.payload.fileName).toString();
+        }
+        
         let message: Message = {
           id: groupMessage.groupMessageEntryHash,
-          sender: groupMessage.author,
+          sender: groupMembers[groupMessage.author] ? {
+            id: groupMembers[groupMessage.author].id,
+            username: groupMembers[groupMessage.author].username
+          } : {
+            id: myAgentId,
+            username: myUsername!
+          },
           timestamp: groupMessage.timestamp,
           // TODO: this part is file
-          message: "This is a placeholder"
+          message: fileString
         };
         return message
       };
@@ -72,6 +103,12 @@ const Conversations: React.FC = () => {
     );
     return arr;
   };
+
+  useEffect(() => {
+    dispatch(fetchId()).then((res: AgentPubKey | null) => {
+      if (res) setMyAgentId(Uint8ArrayToBase64(res))
+    });
+    }, [])
 
   return (
     <IonPage>

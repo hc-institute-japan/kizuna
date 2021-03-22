@@ -1,6 +1,7 @@
 import { IonAvatar, IonItem, IonLabel } from "@ionic/react";
 import React, { useEffect, useState } from "react";
 import { useHistory } from "react-router";
+import { Profile } from "../../redux/profile/types";
 import { Message } from "../../utils/types";
 
 interface Props {
@@ -10,8 +11,14 @@ interface Props {
 }
 
 const Conversation: React.FC<Props> = ({ content, isGroup, groupId }) => {
-  const { src, name, sender, messages } = content;
-  const [latestMessage, setLatestMessage] = useState<string>("");
+  const { src, name, sender: messageSender, messages } = content;
+  const [latestMessageDetail, setLatestMessageDetail] = useState<{
+    message: string,
+    sender: string
+  }>({
+    message: "",
+    sender: ""
+  });
   const history = useHistory();
   const handleOnClick = () => {
     if (isGroup) {
@@ -23,10 +30,20 @@ const Conversation: React.FC<Props> = ({ content, isGroup, groupId }) => {
 
   useEffect(() => {
     console.log(messages.length);
-    setLatestMessage(messages.length === 0 ? "" : messages.length === 1 ? messages[0].message : messages[messages.length - 1].message);
+    setLatestMessageDetail(messages.length === 0 ? {
+      message: "",
+      sender: ""
+    } : messages.length === 1 ? {
+      message: messages[0].message,
+      sender: messages[0].sender.username
+    } : {
+      message: messages[messages.length - 1].message,
+      sender: messages[messages.length - 1].sender.username
+    });
     messages.sort((x: Message, y: Message) => {
       return x.timestamp.valueOf() - y.timestamp.valueOf();
-    })
+    });
+    console.log(latestMessageDetail);
   }, [messages]);
   return (
     <IonItem onClick={handleOnClick}>
@@ -35,8 +52,8 @@ const Conversation: React.FC<Props> = ({ content, isGroup, groupId }) => {
       </IonAvatar>
       <IonLabel>
         <h2>{name}</h2>
-        <h3>{sender}</h3>
-        <p>{latestMessage}</p>
+        <h3>{latestMessageDetail.sender}</h3>
+        <p>{latestMessageDetail.message}</p>
       </IonLabel>
     </IonItem>
   );

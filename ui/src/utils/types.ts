@@ -2,9 +2,11 @@
  * Temporary place of types
  */
 
+import { Profile } from "../redux/profile/types";
+
 export interface Message {
   id: string;
-  sender: string;
+  sender: Profile;
   message: string;
   timestamp: Date;
 }
