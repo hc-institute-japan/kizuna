@@ -66,7 +66,7 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
               reader.onload = (readerEvent) => {
                 const final = {
                   metadata: { fileName, fileType: type, fileSize },
-                  fileType: { type, thumbnail: readerEvent.target?.result },
+                  fileType: { type, payload: {thumbnail: readerEvent.target?.result} },
                   fileBytes,
                 };
 

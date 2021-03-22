@@ -22,6 +22,7 @@ import {
   sendGroupMessage,
   getNextBatchGroupMessages,
   getMessagesByGroupByTimestamp,
+  getLatestGroupVersion,
 } from "../../redux/group/actions";
 import {
   GroupConversation,
@@ -34,11 +35,10 @@ import {
   GroupMessageByDateFetchFilter
 } from "../../redux/group/types";
 import { RootState } from "../../redux/types";
-import { FileMetadataInput } from "../../redux/commons/types"; 
+import { FileMetadataInput, FilePayloadInput } from "../../redux/commons/types"; 
 import MessageList from "./MessageList";
 import { base64ToUint8Array, Uint8ArrayToBase64, useAppDispatch } from "../../utils/helpers";
 import {fetchId} from "../../redux/profile/actions";
-
 
 import MessageInput from "../../components/MessageInput";
 import { arrowBackSharp } from "ionicons/icons";
@@ -56,6 +56,8 @@ interface GroupChatParams {
 const GroupChat: React.FC = () => {
   const history = useHistory();
   const [myAgentId, setMyAgentId] = useState<string>("");
+  const [files, setFiles] = useState<object[]>([]);
+  const [groupData, setGroupData] = useState<GroupConversation | undefined>();
   const [message, setMessage] = useState("");
   const dispatch = useAppDispatch();
   const { group } = useParams<GroupChatParams>();
@@ -64,19 +66,48 @@ const GroupChat: React.FC = () => {
   );
 
   const handleOnSend = () => {
-    let input: GroupMessageInput = {
-      groupHash: base64ToUint8Array(groupInfo.originalGroupEntryHash),
-      payloadInput: {
-        type: "TEXT",
-        payload: {payload: message}
-      },
-      sender: Buffer.from(base64ToUint8Array(myAgentId).buffer),
-      // TODO: handle replying to message here as well
-      replyTo: undefined,
+    let inputs: GroupMessageInput[] = [];
+    if (files.length) {
+      files.forEach((file: any) => {
+        let filePayloadInput: FilePayloadInput = {
+          type: "FILE",
+          payload: {
+            metadata: {
+              fileName: file.metadata.fileName,
+              fileSize:file.metadata.fileSize,
+              fileType: file.metadata.fileType,
+            },
+            fileType: file.fileType,
+            fileBytes: file.fileBytes,
+          }
+        }
+        let groupMessage: GroupMessageInput = {
+          groupHash: base64ToUint8Array(groupInfo!.originalGroupEntryHash),
+          payloadInput: filePayloadInput,
+          sender: Buffer.from(base64ToUint8Array(myAgentId).buffer),
+          // TODO: handle replying to message here as well
+          replyTo: undefined,
+        };
+        inputs.push(groupMessage);
+      });
     };
+    if (message.length) {
+      inputs.push({
+        groupHash: base64ToUint8Array(groupInfo!.originalGroupEntryHash),
+        payloadInput: {
+          type: "TEXT",
+          payload: {payload: message}
+        },
+        sender: Buffer.from(base64ToUint8Array(myAgentId).buffer),
+        // TODO: handle replying to message here as well
+        replyTo: undefined,
+      })
+    }
 
-    // TODO: error handling
-    dispatch(sendGroupMessage(input));
+    inputs.forEach((groupMessage: any) => {
+      // TODO: error handling
+      dispatch(sendGroupMessage(groupMessage));
+    });
   };
 
   const handleOnBack = () => {
@@ -87,10 +118,23 @@ const GroupChat: React.FC = () => {
 
 
   useEffect(() => {
+  dispatch(getLatestGroupVersion(group)).then((res:any) => {console.log(res)});
   dispatch(fetchId()).then((res: AgentPubKey | null) => {
     if (res) setMyAgentId(Uint8ArrayToBase64(res))
   });
-  }, [])
+  if (groupData) {
+    setGroupData(groupData)
+  } else {
+    let filter: GroupMessageBatchFetchFilter = {
+      groupId: base64ToUint8Array(group),
+      batchSize: 10,
+      payloadType: { type: "ALL", payload: null },
+
+    }
+    dispatch(getLatestGroupVersion(group)).then((res:any) => {console.log(res)})
+  }
+  }, [groupData])
+
 
   return (
     <IonPage>
@@ -102,9 +146,9 @@ const GroupChat: React.FC = () => {
             </IonButton>
             <IonAvatar className="ion-padding">
               {/* TODO: proper picture for default avatar if none is set */}
-              {groupInfo.avatar ? <img src={groupInfo.avatar} alt={groupInfo.name} /> : <img src={"https://upload.wikimedia.org/wikipedia/commons/8/8c/Lauren_Tsai_by_Gage_Skidmore.jpg"} alt={groupInfo.name} />}
+              {groupInfo!.avatar ? <img src={groupInfo!.avatar} alt={groupInfo!.name} /> : <img src={"https://upload.wikimedia.org/wikipedia/commons/8/8c/Lauren_Tsai_by_Gage_Skidmore.jpg"} alt={groupInfo!.name} />}
             </IonAvatar>
-            <IonTitle className="ion-no-padding"> {groupInfo.name}</IonTitle>
+            <IonTitle className="ion-no-padding"> {groupInfo!.name}</IonTitle>
           </IonButtons>
         </IonToolbar>
       </IonHeader>
@@ -122,7 +166,10 @@ const GroupChat: React.FC = () => {
       <MessageInput
           onSend={() => handleOnSend()}
           onChange={(message) => setMessage(message)}
-          onFileSelect={() => {}}
+          onFileSelect={(files) => {
+            console.log(files);
+            setFiles(files)
+          }}
         />
     </IonPage>
   );

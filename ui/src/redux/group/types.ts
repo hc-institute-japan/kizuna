@@ -16,6 +16,7 @@ export const SET_NEXT_BATCH_GROUP_MESSAGES = "SET_NEXT_BATCH_GROUP_MESSAGES";
 export const SET_MESSAGES_BY_GROUP_BY_TIMESTAMP =
   "SET_MESSAGES_BY_GROUP_BY_TIMESTAMP";
 export const SET_LATEST_GROUP_STATE = "SET_LATEST_GROUP_STATE";
+export const SET_LATEST_GROUP_VERSION = "SET_LATEST_GROUP_VERSION";
 
 // type declarations
 type GroupMessageID = string; // Group Message EntryHash in base64 string
@@ -226,6 +227,11 @@ export interface SetLatestGroupState {
   members: Profile[];
 }
 
+export interface SetLatestGroupVersionAction {
+  type: typeof SET_LATEST_GROUP_VERSION;
+  groupData: GroupConversation;
+}
+
 export type GroupConversationsActionTypes =
   | AddGroupAction
   | AddGroupMembersAction
@@ -234,4 +240,5 @@ export type GroupConversationsActionTypes =
   | SetGroupMessageAction
   | SetNextBatchGroupMessagesAction
   | SetMessagesByGroupByTimestampAction
-  | SetLatestGroupState;
+  | SetLatestGroupState
+  | SetLatestGroupVersionAction;
