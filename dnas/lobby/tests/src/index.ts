@@ -1,5 +1,6 @@
 import {
   Config,
+  NetworkType,
   Orchestrator,
   InstallAgentsHapps,
   TransportConfigType,
@@ -7,22 +8,20 @@ import {
 import { Installables } from "./types";
 import path from "path";
 
-// import request from './zomes/request'
+import request from './zomes/request'
 import contacts from "./zomes/contacts";
 import preference from "./zomes/preference";
 import group from "./zomes/group";
 
+// QUIC
 const network = {
-  transport_pool: [
-    {
-      type: TransportConfigType.Quic,
-    },
-  ],
-  bootstrap_service: "https://bootstrap.holo.host",
+  network_type: NetworkType.QuicBootstrap,
+  transport_pool: [{type: TransportConfigType.Quic}],
+  bootstrap_service: "https://bootstrap-staging.holo.host/",
 };
-const config = Config.gen();
 
-const kizuna = path.join("../kizuna.dna.gz");
+const config = Config.gen({network});
+const kizuna = path.join(__dirname, "../../Kizuna.dna.workdir/Kizuna.dna");
 
 const installAgent: InstallAgentsHapps = [[[kizuna]]];
 
@@ -36,11 +35,9 @@ const installables: Installables = {
   three: install3Agents,
 };
 
-const orchestrator = new Orchestrator();
 
-group(orchestrator, config, installables);
-// contacts(orchestrator, config, installables);
-// preference(orchestrator, config, installables);
-// request(orchestrator, config);
+// group( config, installables);
+// contacts(config, installables);
+// preference(config, installables);
+// request(config); // not passing 
 
-orchestrator.run();
