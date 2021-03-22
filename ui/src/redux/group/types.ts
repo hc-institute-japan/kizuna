@@ -27,6 +27,12 @@ type PayloadInput = TextPayload | FilePayloadInput;
 // end
 
 // input declaration
+export interface FileMetadataInput {
+  fileName: string;
+  fileSize: number;
+  fileType: string;
+}
+
 export interface CreateGroupInput {
   name: String;
   members: AgentPubKey[];
