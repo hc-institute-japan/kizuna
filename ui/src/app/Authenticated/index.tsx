@@ -2,6 +2,7 @@ import { IonRouterOutlet, IonSplitPane } from "@ionic/react";
 import React, { useEffect } from "react";
 import { Redirect, Route, Switch } from "react-router";
 import Menu from "../../components/Menu";
+import { getLatestData } from "../../redux/commons/actions";
 import { fetchBlocked, fetchMyContacts } from "../../redux/contacts/actions";
 import { fetchPreference } from "../../redux/preference/actions";
 import { useAppDispatch } from "../../utils/helpers";
@@ -16,10 +17,8 @@ import Settings from "../Settings";
 const Authenticated: React.FC = () => {
   const dispatch = useAppDispatch();
   useEffect(
-    function () {
-      dispatch(fetchPreference());
-      dispatch(fetchMyContacts());
-      dispatch(fetchBlocked());
+    () => {
+      dispatch(getLatestData());
     },
     [dispatch]
   );

@@ -5,15 +5,15 @@ import {
   base64ToUint8Array,
   objectMap,
 } from "../../utils/helpers";
-import { Profile } from "../profile/types";
+import { Profile, ProfileState } from "../profile/types";
 import {
   // action types
   ADD_GROUP,
   ADD_MEMBERS,
   REMOVE_MEMBERS,
   UPDATE_GROUP_NAME,
-  SEND_GROUP_MESSAGE,
-  GET_NEXT_BATCH_GROUP_MESSAGES,
+  SET_GROUP_MESSAGE,
+  SET_NEXT_BATCH_GROUP_MESSAGES,
   // IO
   CreateGroupInput,
   GroupConversation,
@@ -33,8 +33,11 @@ import {
   AddGroupMembersAction,
   RemoveGroupMembersAction,
   UpdateGroupNameAction,
-  SendGroupMessageAction,
-  GetNextBatchGroupMessagesAction,
+  SetGroupMessageAction,
+  SetNextBatchGroupMessagesAction,
+  GroupConversationsState,
+  SET_MESSAGES_BY_GROUP_BY_TIMESTAMP,
+  SetMessagesByGroupByTimestampAction,
 } from "./types";
 import {
   Payload,
@@ -48,13 +51,15 @@ import {
 } from "../commons/types";
 import { AgentPubKey } from "@holochain/conductor-api";
 import { ContactsState } from "../contacts/types";
+import { CombinedState } from "redux";
+import { PreferenceState } from "../preference/types";
 
 export const createGroup = (
   createGroupInput: CreateGroupInput
 ): ThunkAction => async (
   dispatch,
   getState,
-  { callZome }
+  { callZome, getAgentId }
 ): Promise<GroupConversation> => {
   // TODO: error handling
   // TODO: input sanitation
@@ -76,10 +81,16 @@ export const createGroup = (
     messages: [],
   };
 
-  let contactsState = getState().contacts;
+  let state = getState();
+  let myAgentId = await getAgentId();
   let membersUsernames: {
     [key: string]: Profile;
-  } = await fetchUsernameOfMembers(contactsState, groupData.members, callZome);
+  } = await fetchUsernameOfMembers(
+    state,
+    groupData.members,
+    callZome,
+    Uint8ArrayToBase64(myAgentId!)
+  );
 
   dispatch<AddGroupAction>({
     type: ADD_GROUP,
@@ -100,10 +111,15 @@ export const addedToGroup = (
     return null;
   }
 
-  let contactsState = getState().contacts;
+  let state = getState();
   let membersUsernames: {
     [key: string]: Profile;
-  } = await fetchUsernameOfMembers(contactsState, groupData.members, callZome);
+  } = await fetchUsernameOfMembers(
+    state,
+    groupData.members,
+    callZome,
+    Uint8ArrayToBase64(myAgentId!)
+  );
 
   dispatch<AddGroupAction>({
     type: ADD_GROUP,
@@ -125,7 +141,7 @@ export const addGroupMembers = (
 ): ThunkAction => async (
   dispatch,
   getState,
-  { callZome }
+  { callZome, getAgentId }
 ): Promise<UpdateGroupMembersData> => {
   let updateGroupMembersIO: UpdateGroupMembersIO = {
     members: updateGroupMembersData.members.map((member: string) =>
@@ -154,11 +170,13 @@ export const addGroupMembers = (
     groupRevisionId: Uint8ArrayToBase64(addMembersOutput.groupRevisionId),
   };
 
-  let contactsState = getState().contacts;
+  let state = getState();
+  let myAgentId = await getAgentId();
   let membersUsernames = await fetchUsernameOfMembers(
-    contactsState,
+    state,
     membersBase64,
-    callZome
+    callZome,
+    Uint8ArrayToBase64(myAgentId!)
   );
 
   dispatch<AddGroupMembersAction>({
@@ -251,7 +269,11 @@ export const sendGroupMessage = (
   { callZome }
 ): Promise<GroupMessage> => {
   // TODO: error handling
-  // TODO: input sanitation
+  if (isTextPayload(groupMessageData.payloadInput)) {
+    let message = groupMessageData.payloadInput.payload.payload;
+    groupMessageData.payloadInput.payload = { payload: message.trim() };
+  }
+
   const sendGroupMessageOutput = await callZome({
     zomeName: ZOMES.GROUP,
     fnName: FUNCTIONS[ZOMES.GROUP].SEND_MESSAGE,
@@ -301,8 +323,8 @@ export const sendGroupMessage = (
     readList: {},
   };
 
-  dispatch<SendGroupMessageAction>({
-    type: SEND_GROUP_MESSAGE,
+  dispatch<SetGroupMessageAction>({
+    type: SET_GROUP_MESSAGE,
     groupMessage: groupMessageDataFromRes,
     fileBytes,
   });
@@ -314,11 +336,12 @@ export const sendInitialGroupMessage = (
   members: Profile[],
   // need to handle files as well
   message: string
-): ThunkAction => async (dispatch) => {
-  const name = members.map((member) => member.username).join(", ");
+): ThunkAction => async (dispatch, getState) => {
+  let name = members.map((member) => member.username);
+  name.push(getState().profile.username!);
   const groupResult: GroupConversation = await dispatch(
     createGroup({
-      name,
+      name: name.join(","),
       members: members.map((member) =>
         Buffer.from(base64ToUint8Array(member.id).buffer)
       ),
@@ -360,12 +383,8 @@ export const getNextBatchGroupMessages = (
     groupMessagesRes
   );
 
-  console.log("this is the fetch for next batch");
-  console.log(groupMessagesRes);
-  console.log(groupMessagesOutput);
-
-  dispatch<GetNextBatchGroupMessagesAction>({
-    type: GET_NEXT_BATCH_GROUP_MESSAGES,
+  dispatch<SetNextBatchGroupMessagesAction>({
+    type: SET_NEXT_BATCH_GROUP_MESSAGES,
     groupMessagesOutput,
     groupId: Uint8ArrayToBase64(groupMessageBatchFetchFilter.groupId),
   });
@@ -392,8 +411,8 @@ export const getMessagesByGroupByTimestamp = (
     groupMessagesRes
   );
 
-  dispatch<GetNextBatchGroupMessagesAction>({
-    type: GET_NEXT_BATCH_GROUP_MESSAGES,
+  dispatch<SetMessagesByGroupByTimestampAction>({
+    type: SET_MESSAGES_BY_GROUP_BY_TIMESTAMP,
     groupMessagesOutput,
     groupId: Uint8ArrayToBase64(groupMessageByDateFetchFilter.groupId),
   });
@@ -415,7 +434,7 @@ export const getAllMyGroups = (): ThunkAction => async (
 ) => {};
 
 // helper function
-const convertFetchedResToGroupMessagesOutput = (
+export const convertFetchedResToGroupMessagesOutput = (
   fetchedRes: any
 ): GroupMessagesOutput => {
   let messagesByGroup: MessagesByGroup = objectMap(
@@ -479,18 +498,25 @@ const convertPayload = (payload: any | TextPayload): Payload => {
 };
 
 const fetchUsernameOfMembers = async (
-  contactsState: ContactsState,
+  state: CombinedState<{
+    profile: ProfileState;
+    contacts: ContactsState;
+    preference: PreferenceState;
+    groups: GroupConversationsState;
+  }>,
   members: string[],
-  callZome: (config: CallZomeConfig) => Promise<any>
+  callZome: (config: CallZomeConfig) => Promise<any>,
+  myAgentId: string
 ) => {
-  // BUG: This contacts state is sometimes incomplete
-  let contacts = contactsState.contacts;
+  let contacts = state.contacts.contacts;
   let undefinedProfiles: AgentPubKey[] = [];
 
   let membersUsernames: { [key: string]: Profile } = {};
   members.forEach((member) => {
     if (contacts[member]) {
       membersUsernames[member] = contacts[member];
+    } else if (member === myAgentId) {
+      // do nothing if member is yourself
     } else {
       undefinedProfiles.push(Buffer.from(base64ToUint8Array(member).buffer));
     }

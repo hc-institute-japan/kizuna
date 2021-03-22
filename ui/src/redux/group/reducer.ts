@@ -3,15 +3,19 @@ import {
   UPDATE_GROUP_NAME,
   REMOVE_MEMBERS,
   ADD_MEMBERS,
-  SEND_GROUP_MESSAGE,
-  GET_NEXT_BATCH_GROUP_MESSAGES,
-  GET_MESSAGES_BY_GROUP_BY_TIMESTAMP,
+  SET_GROUP_MESSAGE,
+  SET_NEXT_BATCH_GROUP_MESSAGES,
+  SET_MESSAGES_BY_GROUP_BY_TIMESTAMP,
   GroupConversationsActionTypes,
   GroupConversation,
   GroupConversationsState,
   GroupMessage,
+  SET_LATEST_GROUP_STATE,
+  GroupMessagesOutput,
 } from "./types";
 import { isTextPayload } from "../commons/types";
+import { stat } from "fs";
+import { Profile, ProfileState } from "../profile/types";
 
 const initialState: GroupConversationsState = {
   conversations: {},
@@ -88,7 +92,7 @@ const reducer = (
       };
       return { ...state, conversations: groupConversations };
     }
-    case SEND_GROUP_MESSAGE: {
+    case SET_GROUP_MESSAGE: {
       let groupMessage: GroupMessage = action.groupMessage;
       let groupEntryHash: string = groupMessage.groupEntryHash;
       let groupMessageEntryHash: string = groupMessage.groupMessageEntryHash;
@@ -119,8 +123,8 @@ const reducer = (
         return { ...state, messages };
       }
     }
-    case GET_NEXT_BATCH_GROUP_MESSAGES: // fallthrough since its the same process with the next case
-    case GET_MESSAGES_BY_GROUP_BY_TIMESTAMP: {
+    case SET_NEXT_BATCH_GROUP_MESSAGES: // fallthrough since its the same process with the next case
+    case SET_MESSAGES_BY_GROUP_BY_TIMESTAMP: {
       let groupConversations = state.conversations;
       let groupConversation: GroupConversation =
         groupConversations[action.groupId];
@@ -142,6 +146,27 @@ const reducer = (
         ...action.groupMessagesOutput.groupMessagesContents,
       };
       return { ...state, messages, conversations: groupConversations };
+    }
+    case SET_LATEST_GROUP_STATE: {
+      let groups: GroupConversation[] = action.groups;
+      let groupMessagesOutput: GroupMessagesOutput = action.groupMessagesOutput;
+
+      let conversations = state.conversations;
+      groups.forEach((group: GroupConversation) => {
+        conversations[group.originalGroupEntryHash] = group;
+      });
+
+      let messages = state.messages;
+      messages = {
+        ...messages,
+        ...groupMessagesOutput.groupMessagesContents,
+      };
+
+      let members = state.members;
+      action.members.forEach((member: Profile) => {
+        members[member.id] = member;
+      });
+      return { ...state, conversations, messages, members };
     }
     default:
       return state;

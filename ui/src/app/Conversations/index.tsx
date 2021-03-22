@@ -12,89 +12,79 @@ import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import Conversation from "../../components/Conversation";
 import Toolbar from "../../components/Toolbar";
+import { isTextPayload } from "../../redux/commons/types";
+import { GroupConversation, GroupConversationsActionTypes, GroupMessage } from "../../redux/group/types";
 import { RootState } from "../../redux/types";
-import { Conversations as ConversationsType } from "../../utils/types";
+import { Conversations as ConversationsType, Message } from "../../utils/types";
 import EmptyConversations from "./EmptyConversations";
 import styles from "./style.module.css";
-
-const conversations: ConversationsType = [
-  // {
-  //   id: "1",
-  //   name: "Akira",
-  //   messages: [
-  //     {
-  //       id: "2",
-  //       sender: "Akira",
-  //       message: "Last message",
-  //       timestamp: new Date(),
-  //     },
-  //     {
-  //       id: "1",
-  //       sender: "seulgibear",
-  //       message: "Yo what's up",
-  //       timestamp: new Date(),
-  //     },
-  //     {
-  //       id: "32",
-  //       sender: "seulgibear",
-  //       message: "Test message",
-  //       timestamp: new Date(),
-  //     },
-  //     {
-  //       id: "14",
-  //       sender: "seulgibear",
-  //       message:
-  //         "Hey, this is James. We met at Sandra’s party on Saturday, and she gave me your number",
-  //       timestamp: new Date(),
-  //     },
-  //     {
-  //       id: "1",
-  //       sender: "Akira",
-  //       message:
-  //         "Hey, Jane! I was going to watch that movie you recommended, but I can’t think of the name. Do you remember what it’s called?",
-  //       timestamp: new Date(),
-  //     },
-  //   ],
-  //   src:
-  //     "https://upload.wikimedia.org/wikipedia/commons/8/8c/Lauren_Tsai_by_Gage_Skidmore.jpg",
-  // },
-  // {
-  //   id: "1",
-  //   name: "Beyonder",
-  //   messages: [
-  //     {
-  //       id: "1",
-  //       sender: "Neil",
-  //       timestamp: new Date(),
-  //       message:
-  //         "Yo what's up Yo what's up Yo what's up Yo what's up Yo what's up Yo what's up Yo what's up ",
-  //     },
-  //   ],
-  //   sender: "Neil",
-  //   src:
-  //     "https://upload.wikimedia.org/wikipedia/commons/8/8c/Lauren_Tsai_by_Gage_Skidmore.jpg",
-  // },
-];
 
 const Conversations: React.FC = () => {
   const history = useHistory();
   const contacts = useSelector((state: RootState) => state.contacts.contacts);
-  const handleOnClick = () =>
+  const groups = useSelector((state: RootState) => state.groups.conversations);
+  const groupMessages = useSelector((state: RootState) => state.groups.messages);
+  const handleOnClick = () => {
     history.push({
       pathname: `/compose`,
       state: { contacts: {...contacts} },
     });
+  };
+  const renderGroupConversation = (groups:  {
+    [key: string]: GroupConversation;
+  }) => {
+  let arr: any[] = [];
+  Object.keys(groups).forEach((key: string ) => {
+    // TODO: change to actual pic chosen by group creator
+    let src = "https://upload.wikimedia.org/wikipedia/commons/8/8c/Lauren_Tsai_by_Gage_Skidmore.jpg";
+    let messages: Message[] = groups[key].messages.map((messageId: string) => {
+      let groupMessage: GroupMessage = groupMessages[messageId];
+      if (isTextPayload(groupMessage.payload)) {
+        let message: Message = {
+          id: groupMessage.groupMessageEntryHash,
+          sender: groupMessage.author,
+          timestamp: groupMessage.timestamp,
+          message: groupMessage.payload.payload.payload
+        };
+        return message
+      } else {
+        let message: Message = {
+          id: groupMessage.groupMessageEntryHash,
+          sender: groupMessage.author,
+          timestamp: groupMessage.timestamp,
+          // TODO: this part is file
+          message: "This is a placeholder"
+        };
+        return message
+      };
+    })
+    messages.sort((x: Message, y: Message) => 
+      y.timestamp.valueOf() < x.timestamp.valueOf() ? 1 : -1
+    );
+    let conversation = {
+      id: groups[key].originalGroupEntryHash,
+      content: { src, name: groups[key].name, messages, },
+    }
+    arr.push(conversation);
+    });
+    arr.sort((x: any, y: any) => 
+      groups[x.id].createdAt.valueOf() < groups[y.id].createdAt.valueOf() ? 1 : -1
+    );
+    return arr;
+  };
 
   return (
     <IonPage>
       <Toolbar onChange={() => {}} />
       <IonContent>
-        {conversations.length > 0 ? (
+        {Object.keys(groups).length > 0 ? (
           <IonList className={styles.conversation}>
-            {conversations.map((conversation) => (
+            {renderGroupConversation(groups).map((groupConversation: any) => (
               <Conversation
-                key={JSON.stringify(conversation)}
-                content={conversation}
+                isGroup={true}
+                groupId={groupConversation.id}
+                key={JSON.stringify(groupConversation.id)}
+                content={groupConversation.content}
               />
             ))}
           </IonList>
@@ -112,4 +102,4 @@ const Conversations: React.FC = () => {
   );
 };
 
-export default Conversations;
+export default Conversations

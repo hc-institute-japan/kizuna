@@ -16,6 +16,10 @@ export const fetchPreference = (): ThunkAction => async (
     preference: {
       readReceipt: preference.readReceipt,
       typingIndicator: preference.typingIndicator,
+      agentReadReceipt: {},
+      agentTypingIndicator: {},
+      groupReadReceipt: {},
+      groupTypingIndicator: {},
     },
   });
 };

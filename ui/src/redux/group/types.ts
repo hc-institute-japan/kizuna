@@ -11,10 +11,11 @@ export const ADD_GROUP = "ADD_GROUP";
 export const UPDATE_GROUP_NAME = "UPDATE_GROUP_NAME";
 export const REMOVE_MEMBERS = "REMOVE_MEMBERS";
 export const ADD_MEMBERS = "ADD_MEMBERS";
-export const SEND_GROUP_MESSAGE = "SEND_GROUP_MESSAGE";
-export const GET_NEXT_BATCH_GROUP_MESSAGES = "GET_NEXT_BATCH_GROUP_MESSAGES";
-export const GET_MESSAGES_BY_GROUP_BY_TIMESTAMP =
-  "GET_MESSAGES_BY_GROUP_BY_TIMESTAMP";
+export const SET_GROUP_MESSAGE = "SET_GROUP_MESSAGE";
+export const SET_NEXT_BATCH_GROUP_MESSAGES = "SET_NEXT_BATCH_GROUP_MESSAGES";
+export const SET_MESSAGES_BY_GROUP_BY_TIMESTAMP =
+  "SET_MESSAGES_BY_GROUP_BY_TIMESTAMP";
+export const SET_LATEST_GROUP_STATE = "SET_LATEST_GROUP_STATE";
 
 // type declarations
 type GroupMessageID = string; // Group Message EntryHash in base64 string
@@ -130,6 +131,8 @@ export interface GroupConversation {
   members: string[];
   createdAt: Date;
   creator: string;
+  // TODO: enable setting of avatar for a GroupConversation
+  avatar?: string;
   messages: GroupMessageID[];
 }
 
@@ -197,23 +200,30 @@ export interface UpdateGroupNameAction {
   updateGroupNameData: UpdateGroupNameData;
 }
 
-export interface SendGroupMessageAction {
-  type: typeof SEND_GROUP_MESSAGE;
+export interface SetGroupMessageAction {
+  type: typeof SET_GROUP_MESSAGE;
   groupMessage: GroupMessage;
   fileBytes?: Uint8Array;
 }
 
-export interface GetNextBatchGroupMessagesAction {
-  type: typeof GET_NEXT_BATCH_GROUP_MESSAGES;
+export interface SetNextBatchGroupMessagesAction {
+  type: typeof SET_NEXT_BATCH_GROUP_MESSAGES;
   groupMessagesOutput: GroupMessagesOutput;
   // for ease of retrieving groupID
   groupId: string;
 }
 
-export interface GetMessagesByGroupByTimestampAction {
-  type: typeof GET_MESSAGES_BY_GROUP_BY_TIMESTAMP;
+export interface SetMessagesByGroupByTimestampAction {
+  type: typeof SET_MESSAGES_BY_GROUP_BY_TIMESTAMP;
   groupMessagesOutput: GroupMessagesOutput;
   groupId: string;
+}
+
+export interface SetLatestGroupState {
+  type: typeof SET_LATEST_GROUP_STATE;
+  groups: GroupConversation[];
+  groupMessagesOutput: GroupMessagesOutput;
+  members: Profile[];
 }
 
 export type GroupConversationsActionTypes =
@@ -221,6 +231,7 @@ export type GroupConversationsActionTypes =
   | AddGroupMembersAction
   | RemoveGroupMembersAction
   | UpdateGroupNameAction
-  | SendGroupMessageAction
-  | GetNextBatchGroupMessagesAction
-  | GetMessagesByGroupByTimestampAction;
+  | SetGroupMessageAction
+  | SetNextBatchGroupMessagesAction
+  | SetMessagesByGroupByTimestampAction
+  | SetLatestGroupState;
