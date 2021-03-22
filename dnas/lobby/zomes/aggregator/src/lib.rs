@@ -37,6 +37,7 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
 
     for group in &groups.0 {
         agent_pub_keys.extend(group.members.iter().cloned());
+        agent_pub_keys.push(group.creator.clone())
     }
 
     agent_pub_keys.sort_unstable();
