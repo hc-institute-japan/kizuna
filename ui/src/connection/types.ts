@@ -14,6 +14,7 @@ export const ZOMES: ZomeNameType = {
   P2PMESSAGE: "p2pmessage",
   CONTACTS: "contacts",
   GROUP: "group",
+  AGGREGATOR: "aggregator",
 };
 
 export const FUNCTIONS: FunctionNameType = {
@@ -51,5 +52,8 @@ export const FUNCTIONS: FunctionNameType = {
     GET_ALL_MY_GROUPS: "get_all_my_groups",
     GET_NEXT_BATCH_GROUP_MESSAGES: "get_next_batch_group_messages",
     GET_MESSAGES_BY_GROUP_BY_TIMESTAMP: "get_messages_by_group_by_timestamp",
+  },
+  [ZOMES.AGGREGATOR]: {
+    RETRIEVE_LATEST_DATA: "retrieve_latest_data",
   },
 };

@@ -30,7 +30,6 @@ export const fetchMyContacts = (): ThunkAction => async (
       fnName: FUNCTIONS[ZOMES.USERNAME].GET_USERNAMES,
       payload: ids,
     });
-    console.log("here are the fetched usernames", usernameOutputs);
     if (usernameOutputs?.type !== "error") {
       usernameOutputs.forEach((usernameOutput: any) => {
         const base64 = Uint8ArrayToBase64(usernameOutput.agentId);

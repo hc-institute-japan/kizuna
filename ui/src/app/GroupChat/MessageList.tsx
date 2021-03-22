@@ -1,58 +1,65 @@
-// import React from "react";
-// import { useSelector } from "react-redux";
-// import Me from "../../components/Me";
-// import Others from "../../components/Others";
-// import { fetchId } from "../../redux/profile/actions";
-// import { RootState } from "../../redux/types";
-// import { Uint8ArrayToBase64, useAppDispatch } from "../../utils/helpers";
-// import styles from "./style.module.css";
-// interface Props {
-//   messageIds: string[];
-//   members: string[];
-// }
-// const MessageList: React.FC<Props> = ({ messageIds, members }) => {
-//   const { id } = useSelector((state: RootState) => state.profile);
-//   const messages = useSelector((state: RootState) => {
-//     const messages: (any | undefined)[] = messageIds.map((messageId) => {
-//       let message = state.groupConversations.messages[messageId];
+import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import Me from "../../components/Me";
+import Others from "../../components/Others";
+import { fetchId } from "../../redux/profile/actions";
+import { RootState } from "../../redux/types";
+import { Uint8ArrayToBase64, useAppDispatch } from "../../utils/helpers";
+import styles from "./style.module.css";
+import { GroupMessage } from "../../redux/group/types";
+import { getMessagesByGroupByTimestamp } from "../../redux/group/actions";
+interface Props {
+  messageIds: string[];
+  members: string[];
+  myAgentId: string;
+}
+const MessageList: React.FC<Props> = ({ messageIds, members, myAgentId }) => {
+  const messages = useSelector((state: RootState) => {
+    const messages: (any | undefined)[] = messageIds.map((messageId) => {
+      let message: GroupMessage = state.groups.messages[messageId];
+      let allMembers  = state.groups.members;
 
-//       if (message) {
-//         const id = members.find(
-//           (member) => member === Uint8ArrayToBase64(message.author)
-//         );
-//         return {
-//           ...message,
-//           author: id
-//             ? state.contacts.contacts[id]
-//             : {
-//                 username: state.profile.username,
-//                 id: Uint8ArrayToBase64(message.author),
-//               },
-//         };
-//       }
-//       return null;
-//     });
+      if (message) {
+        const authorProfile = allMembers[message.author];
+        return {
+          ...message,
+          author: authorProfile
+            ? authorProfile
+            // if profile was not found from allMembers, then the author is self
+            // assuming that allMembers have all the members of group at all times
+            : {
+                username: state.profile.username!,
+                id: message.author,
+              },
+        };
+      }
+      return null;
+    });
 
-//     if (messages.find((message) => message === null)) return null;
-//     return messages;
-//     // handle fetching of missing messages
-//   });
+    // TODO: handle fetching of missing messages (most likely won't occur)
+    if (messages.find((message) => message === null)) return null;
+    messages.sort((x, y) => {
+      return x.timestamp.valueOf()[0] - y.timestamp.valueOf()[0]
+    })
+    return messages;
+  });
 
-//   return (
-//     <div className={`${styles.chat} ion-padding`}>
-//       {messages
-//         ? messages.map((message) => {
-//             let Message =
-//               JSON.stringify(message.author) === JSON.stringify(id)
-//                 ? Me
-//                 : Others;
-//             return (
-//               <Message key={message.groupEntryHash} message={message.payload} />
-//             );
-//           })
-//         : null}
-//     </div>
-//   );
-// };
+  // BUG: The screen does not scroll to the latest message sent or received
+  return (
+    <div className={`${styles.chat} ion-padding`}>
+      {messages
+        ? messages.map((message) => {
+            let Message =
+              message.author.id === myAgentId
+                ? Me
+                : Others;
+            return (
+              <Message key={message.groupMessageEntryHash} message={message.payload} />
+            );
+          })
+        : null}
+    </div>
+  );
+};
 
-export default {};
+export default MessageList;

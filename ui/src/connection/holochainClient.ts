@@ -6,8 +6,14 @@ import {
 
 import store from "../redux/store";
 import { CallZomeConfig } from "../redux/types";
-import { ADD_GROUP, GroupConversation } from "../redux/group/types";
+import {
+  ADD_GROUP,
+  GroupConversation,
+  GroupMessage,
+} from "../redux/group/types";
+import { SET_GROUP_MESSAGE, SetGroupMessageAction } from "../redux/group/types";
 import { Uint8ArrayToBase64 } from "../utils/helpers";
+import { isTextPayload } from "../redux/commons/types";
 
 let client: null | AppWebsocket = null;
 
@@ -18,7 +24,7 @@ let signalHandler: AppSignalCb = (signal) => {
       const groupData: GroupConversation = {
         originalGroupEntryHash: Uint8ArrayToBase64(payload.groupId),
         originalGroupHeaderHash: Uint8ArrayToBase64(payload.groupRevisionId),
-        name: payload.name,
+        name: payload.latestName,
         members: payload.members.map((member: Buffer) =>
           Uint8ArrayToBase64(member)
         ),
@@ -31,6 +37,33 @@ let signalHandler: AppSignalCb = (signal) => {
         groupData,
       });
       break;
+    case "group_messsage_data": {
+      let payload = signal.data.payload.payload.payload;
+      let groupMessage: GroupMessage = {
+        groupMessageEntryHash: Uint8ArrayToBase64(payload.id),
+        groupEntryHash: Uint8ArrayToBase64(payload.content.groupHash),
+        author: Uint8ArrayToBase64(payload.content.sender),
+        payload: isTextPayload(payload.content.payload)
+          ? payload.content.payload
+          : {
+              type: "TEXT",
+              payload: {
+                // TODO: work on files
+                payload: "This is a placeholder",
+              },
+            },
+        timestamp: payload.content.created,
+        // TODO: work on this
+        // replyTo: undefined,
+        // TODO: work on this too
+        readList: {},
+      };
+      store.dispatch<SetGroupMessageAction>({
+        type: SET_GROUP_MESSAGE,
+        groupMessage,
+      });
+      break;
+    }
     default:
       break;
   }

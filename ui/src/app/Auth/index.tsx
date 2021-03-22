@@ -14,8 +14,8 @@ const Auth: React.FC = () => {
     dispatch(fetchMyUsername());
   }, [dispatch]);
 
-  return <Playground></Playground>;
-  // return username !== null ? <Authenticated /> : <Unauthenticated />;
+  // return <Playground></Playground>;
+  return username !== null ? <Authenticated /> : <Unauthenticated />;
 };
 
 export default Auth;
