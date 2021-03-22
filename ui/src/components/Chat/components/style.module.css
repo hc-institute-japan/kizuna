@@ -1,0 +1,66 @@
+.me-container {
+  align-self: flex-end;
+  display: flex;
+  align-items: flex-start;
+  max-width: 90%;
+}
+
+.space {
+  height: 0.5rem;
+  width: 100%;
+}
+
+.others-container {
+  align-self: flex-start;
+  display: flex;
+  align-items: flex-start;
+  max-width: 90%;
+}
+
+.picture {
+  flex-shrink: 0;
+  height: calc(1.1rem + 0.5rem + 0.5rem);
+  width: calc(1.1rem + 0.5rem + 0.5rem);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.picture > img {
+  height: calc(1.1rem + 0.5rem + 0.5rem);
+  width: calc(1.1rem + 0.5rem + 0.5rem);
+}
+
+.me {
+  background: var(--ion-color-primary);
+  border-radius: 8px;
+  margin-bottom: 0.2rem;
+  padding-left: 0.8rem;
+  padding-right: 0.8rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  width: 100%;
+}
+
+.me ion-text {
+  color: var(--ion-color-primary-contrast);
+  font-size: 1.1rem;
+}
+
+.others {
+  background: var(--ion-color-light);
+  border-radius: 8px;
+  margin-bottom: 0.2rem;
+  padding-left: 0.8rem;
+  padding-right: 0.8rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  width: 100%;
+}
+
+.others ion-text {
+  color: var(--ion-color-light-contrast);
+  font-size: 1.1rem;
+}

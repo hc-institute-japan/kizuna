@@ -272,6 +272,7 @@ export const sendGroupMessage = (
       : fileType.payload.thumbnail;
     fileBytes = groupMessageData.payloadInput.payload.fileBytes;
     let filePayload: FilePayload = {
+      type: "FILE",
       fileName:
         sendGroupMessageOutput.content.payload.payload.metadata.fileName,
       fileSize:
@@ -458,6 +459,7 @@ const convertPayload = (payload: any | TextPayload): Payload => {
   if (isTextPayload(payload)) return payload;
   if (isOther(payload.payload.fileType)) {
     return {
+      type: "FILE",
       fileName: payload.payload.metadata.fileName,
       fileSize: payload.payload.metadata.fileSize,
       fileType: payload.payload.metadata.fileType,
@@ -465,6 +467,8 @@ const convertPayload = (payload: any | TextPayload): Payload => {
     };
   } else {
     return {
+      type: "FILE",
+
       fileName: payload.payload.metadata.fileName,
       fileSize: payload.payload.metadata.fileSize,
       fileType: payload.payload.metadata.fileType,

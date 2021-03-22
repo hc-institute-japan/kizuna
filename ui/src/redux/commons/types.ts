@@ -10,6 +10,7 @@ export interface TextPayload {
   payload: { payload: string };
 }
 export interface FilePayload {
+  type: "FILE";
   fileName: string;
   fileSize: number;
   fileType: string;
