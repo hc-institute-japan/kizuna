@@ -119,6 +119,7 @@ const reducer = (
           ...groupFiles,
           ...newFile,
         };
+        console.log(messages);
         return { ...state, messages, groupFiles };
       } else {
         return { ...state, messages };
@@ -130,13 +131,15 @@ const reducer = (
       let groupConversation: GroupConversation =
         groupConversations[action.groupId];
       // we probably won't have any duplicates of hash but just in case we do we dedupe here
-      groupConversation.messages = Array.from(
-        new Set(
-          groupConversation.messages.concat(
-            action.groupMessagesOutput.messagesByGroup[action.groupId]
+      groupConversation.messages = groupConversation.messages
+        ? Array.from(
+            new Set(
+              groupConversation.messages.concat(
+                action.groupMessagesOutput.messagesByGroup[action.groupId]
+              )
+            )
           )
-        )
-      );
+        : groupConversations[action.groupId].messages;
       groupConversations = {
         ...groupConversations,
         [action.groupId]: groupConversation,
@@ -176,7 +179,19 @@ const reducer = (
         ...groupConversations,
         [groupConversation.originalGroupEntryHash]: groupConversation,
       };
-      return { ...state, conversations: groupConversations };
+
+      let messages = state.messages;
+      messages = {
+        ...messages,
+        ...action.groupMessagesOutput.groupMessagesContents,
+      };
+
+      let members = state.members;
+      Object.keys(action.membersUsernames).forEach((key: string) => {
+        members[key] = action.membersUsernames[key];
+      });
+
+      return { ...state, conversations: groupConversations, members };
     }
     default:
       return state;

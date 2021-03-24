@@ -230,6 +230,10 @@ export interface SetLatestGroupState {
 export interface SetLatestGroupVersionAction {
   type: typeof SET_LATEST_GROUP_VERSION;
   groupData: GroupConversation;
+  groupMessagesOutput: GroupMessagesOutput;
+  membersUsernames: {
+    [key: string]: Profile;
+  };
 }
 
 export type GroupConversationsActionTypes =

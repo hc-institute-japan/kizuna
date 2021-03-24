@@ -29,7 +29,6 @@ const Conversation: React.FC<Props> = ({ content, isGroup, groupId }) => {
   };
 
   useEffect(() => {
-    console.log(messages.length);
     setLatestMessageDetail(messages.length === 0 ? {
       message: "",
       sender: ""
@@ -43,7 +42,6 @@ const Conversation: React.FC<Props> = ({ content, isGroup, groupId }) => {
     messages.sort((x: Message, y: Message) => {
       return x.timestamp.valueOf() - y.timestamp.valueOf();
     });
-    console.log(latestMessageDetail);
   }, [messages]);
   return (
     <IonItem onClick={handleOnClick}>

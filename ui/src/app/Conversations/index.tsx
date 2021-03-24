@@ -26,7 +26,10 @@ const Conversations: React.FC = () => {
   const history = useHistory();
   const dispatch = useAppDispatch();
   const contacts = useSelector((state: RootState) => state.contacts.contacts);
-  const groups = useSelector((state: RootState) => state.groups.conversations);
+  const [groups, setGroups] = useState<{
+    [key: string]: GroupConversation;
+}>({});
+  const groupsData = useSelector((state: RootState) => state.groups.conversations);
   const groupMessages = useSelector((state: RootState) => state.groups.messages);
   const groupMembers = useSelector((state: RootState) => state.groups.members);
   const myUsername = useSelector((state: RootState) => state.profile.username);
@@ -45,7 +48,7 @@ const Conversations: React.FC = () => {
   Object.keys(groups).forEach((key: string ) => {
     // TODO: change to actual pic chosen by group creator
     let src = "https://upload.wikimedia.org/wikipedia/commons/8/8c/Lauren_Tsai_by_Gage_Skidmore.jpg";
-    let messages: Message[] = groups[key].messages.map((messageId: string) => {
+    let messages: Message[] =  groups[key].messages ? groups[key].messages.map((messageId: string) => {
       let groupMessage: GroupMessage = groupMessages[messageId];
       if (isTextPayload(groupMessage.payload)) {
         let message: Message = {
@@ -88,15 +91,19 @@ const Conversations: React.FC = () => {
         };
         return message
       };
-    })
+    }) : [];
     messages.sort((x: Message, y: Message) => 
       y.timestamp.valueOf() < x.timestamp.valueOf() ? 1 : -1
     );
     let conversation = {
       id: groups[key].originalGroupEntryHash,
       content: { src, name: groups[key].name, messages, },
+    };
+    
+    if (!(arr.find((group: any) => group.id === conversation.id))) {
+      arr.push(conversation);
     }
-    arr.push(conversation);
+    
     });
     arr.sort((x: any, y: any) => 
       groups[x.id].createdAt.valueOf() < groups[y.id].createdAt.valueOf() ? 1 : -1
@@ -108,7 +115,8 @@ const Conversations: React.FC = () => {
     dispatch(fetchId()).then((res: AgentPubKey | null) => {
       if (res) setMyAgentId(Uint8ArrayToBase64(res))
     });
-    }, [])
+    setGroups(groupsData);
+    }, [groupsData])
 
   return (
     <IonPage>

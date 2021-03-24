@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Me from "../../components/Me";
 import Others from "../../components/Others";
@@ -8,14 +8,20 @@ import { Uint8ArrayToBase64, useAppDispatch } from "../../utils/helpers";
 import styles from "./style.module.css";
 import { GroupMessage } from "../../redux/group/types";
 import { getMessagesByGroupByTimestamp } from "../../redux/group/actions";
+import { IonLoading } from "@ionic/react";
+import Chat from "../../components/Chat";
 interface Props {
   messageIds: string[];
   members: string[];
   myAgentId: string;
 }
 const MessageList: React.FC<Props> = ({ messageIds, members, myAgentId }) => {
-  const messages = useSelector((state: RootState) => {
-    const messages: (any | undefined)[] = messageIds.map((messageId) => {
+  let { username } = useSelector((state: RootState) => state.profile)
+  const messagesData = useSelector((state: RootState) => {
+    let uniqueArray = messageIds.filter(function(item, pos, self) {
+      return self.indexOf(item) == pos;
+    });
+    const messages: (any | undefined)[] = uniqueArray ? uniqueArray.map((messageId) => {
       let message: GroupMessage = state.groups.messages[messageId];
       let allMembers  = state.groups.members;
 
@@ -34,7 +40,7 @@ const MessageList: React.FC<Props> = ({ messageIds, members, myAgentId }) => {
         };
       }
       return null;
-    });
+    }) : [];
 
     // TODO: handle fetching of missing messages (most likely won't occur)
     if (messages.find((message) => message === null)) return null;
@@ -46,19 +52,12 @@ const MessageList: React.FC<Props> = ({ messageIds, members, myAgentId }) => {
 
   // BUG: The screen does not scroll to the latest message sent or received
   return (
-    <div className={`${styles.chat} ion-padding`}>
-      {messages
-        ? messages.map((message) => {
-            let Message =
-              message.author.id === myAgentId
-                ? Me
-                : Others;
-            return (
-              <Message key={message.groupMessageEntryHash} message={message.payload} />
-            );
-          })
-        : null}
-    </div>
+    <Chat.ChatList author={username!} type="group">
+      {messagesData!.map((message) => {
+        if (message.author.id === myAgentId) return <Chat.Me key={message.groupMessageEntryHash} author={message.author.username} timestamp={message.timestamp} payload={message.payload} readList={message.readList} />;
+        return <Chat.Others key={message.groupMessageEntryHash} author={message.author.username} timestamp={message.timestamp} payload={message.payload} readList={message.readList} />;
+      })}
+    </Chat.ChatList>
   );
 };
 
