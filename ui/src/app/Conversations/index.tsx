@@ -67,14 +67,16 @@ const Conversations: React.FC = () => {
       } else {
         let maybeOther: any | undefined = groupMembers[groupMessage.author];
         let fileString: string = "";
+        console.log(maybeOther);
         if (maybeOther) {
           // TODO: format for i18n
-          fileString = new String(maybeOther.username + " " + "has sent" + groupMessage.payload.fileName).toString();
+          fileString = new String(maybeOther.username + " " + "has sent" + " " + groupMessage.payload.fileName).toString();
         } else {
           // MAYBE BUG: assumption is you sent it.
           // TODO: format for i18n
           fileString = new String("You" + " sent " + groupMessage.payload.fileName).toString();
         }
+        console.log(fileString);
         
         let message: Message = {
           id: groupMessage.groupMessageEntryHash,
@@ -89,6 +91,7 @@ const Conversations: React.FC = () => {
           // TODO: this part is file
           message: fileString
         };
+        console.log(message);
         return message
       };
     }) : [];
@@ -108,6 +111,7 @@ const Conversations: React.FC = () => {
     arr.sort((x: any, y: any) => 
       groups[x.id].createdAt.valueOf() < groups[y.id].createdAt.valueOf() ? 1 : -1
     );
+    console.log("is this working or what",arr);
     return arr;
   };
 
