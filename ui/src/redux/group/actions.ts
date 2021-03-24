@@ -51,6 +51,7 @@ import {
   isTextPayload,
   isOther,
   isImage,
+  FilePayloadInput,
 } from "../commons/types";
 import { AgentPubKey } from "@holochain/conductor-api";
 import { ContactsState } from "../contacts/types";
@@ -341,7 +342,8 @@ export const sendGroupMessage = (
 export const sendInitialGroupMessage = (
   members: Profile[],
   // need to handle files as well
-  message: string
+  message: string,
+  files: FilePayloadInput[]
 ): ThunkAction => async (dispatch, getState) => {
   let name = members.map((member) => member.username);
   name.push(getState().profile.username!);
@@ -354,19 +356,55 @@ export const sendInitialGroupMessage = (
     })
   );
 
-  const messageResult = await dispatch(
-    sendGroupMessage({
+  let inputs: GroupMessageInput[] = [];
+
+  files.forEach((file: any) => {
+    let filePayloadInput: FilePayloadInput = {
+      type: "FILE",
+      payload: {
+        metadata: {
+          fileName: file.payload.metadata.fileName,
+          fileSize: file.payload.metadata.fileSize,
+          fileType: file.payload.metadata.fileType,
+        },
+        fileType: file.payload.fileType,
+        fileBytes: file.payload.fileBytes,
+      },
+    };
+    let groupMessage: GroupMessageInput = {
+      groupHash: base64ToUint8Array(groupResult.originalGroupEntryHash),
+      payloadInput: filePayloadInput,
+      sender: Buffer.from(base64ToUint8Array(groupResult.creator).buffer),
+      // TODO: handle replying to message here as well
+      replyTo: undefined,
+    };
+    inputs.push(groupMessage);
+  });
+
+  if (message.length) {
+    message = message.trim();
+    inputs.push({
       groupHash: base64ToUint8Array(groupResult.originalGroupEntryHash),
       payloadInput: {
         type: "TEXT",
         payload: { payload: message },
       },
       sender: Buffer.from(base64ToUint8Array(groupResult.creator).buffer),
-    })
-  );
+      // TODO: handle replying to message here as well
+      replyTo: undefined,
+    });
+  }
+
+  let messageResults: any[] = [];
+  inputs.forEach(async (groupMessage: any) => {
+    // TODO: error handling
+    let messageResult = await dispatch(sendGroupMessage(groupMessage));
+    messageResults.push(messageResult);
+  });
+
   return {
     groupResult,
-    messageResult,
+    messageResults,
   };
 };
 
@@ -457,6 +495,8 @@ export const getLatestGroupVersion = (groupId: string): ThunkAction => async (
   let groupMessagesOutput: GroupMessagesOutput = convertFetchedResToGroupMessagesOutput(
     groupMessagesRes
   );
+
+  console.log(groupMessagesOutput);
 
   let groupData: GroupConversation = {
     originalGroupEntryHash: Uint8ArrayToBase64(res.groupId),

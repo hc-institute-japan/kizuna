@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import { useHistory, useLocation } from "react-router";
 import MessageInput from "../../components/MessageInput";
 import { useToast } from "../../containers/ToastContainer/context";
+import { FilePayloadInput } from "../../redux/commons/types";
 import { sendInitialGroupMessage } from "../../redux/group/actions";
 import { Profile, ProfileListType } from "../../redux/profile/types";
 import { RootState } from "../../redux/types";
@@ -26,6 +27,7 @@ const NewConversation: React.FC = () => {
   const [search, setSearch] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
+  const [files, setFiles] = useState<object[]>([]);
   const [error, setError] = useState<string | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useAppDispatch();
@@ -61,8 +63,22 @@ const NewConversation: React.FC = () => {
     } else if (contacts.length > 1) {
       // create a Group and send the initial message
       setIsLoading(true);
-      // need to handle files here as well
-      dispatch(sendInitialGroupMessage(contacts, message)).then((res: any) => {
+      let fileInputs: FilePayloadInput[] = files.map((file: any) => {
+        let filePayloadInput: FilePayloadInput = {
+          type: "FILE",
+          payload: {
+            metadata: {
+              fileName: file.metadata.fileName,
+              fileSize:file.metadata.fileSize,
+              fileType: file.metadata.fileType,
+            },
+            fileType: file.fileType,
+            fileBytes: file.fileBytes,
+          }
+        }
+        return filePayloadInput
+      });
+      dispatch(sendInitialGroupMessage(contacts, message, fileInputs)).then((res: any) => {
         if (res) {
           setIsLoading(false);
           history.push(`/g/${res.groupResult.originalGroupEntryHash}`);
@@ -112,7 +128,7 @@ const NewConversation: React.FC = () => {
         <MessageInput
           onSend={handleOnSend}
           onChange={(message) => setMessage(message)}
-          onFileSelect={(files) => {}}
+          onFileSelect={(files) => setFiles(files)}
         />
       </IonPage>
     </ContactsContext.Provider>
