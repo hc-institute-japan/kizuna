@@ -61,12 +61,17 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
             const type = determineFileType(file.type);
 
             if (type === "IMAGE" || type === "VIDEO") {
+              const encoder = new TextEncoder();
               const reader = new FileReader();
               reader.readAsDataURL(file);
               reader.onload = (readerEvent) => {
+                const encoded = encoder.encode(
+                  readerEvent.target?.result as string
+                );
+
                 const final = {
                   metadata: { fileName, fileType: type, fileSize },
-                  fileType: { type, thumbnail: readerEvent.target?.result },
+                  fileType: { type, thumbnail: encoded },
                   fileBytes,
                 };
 
