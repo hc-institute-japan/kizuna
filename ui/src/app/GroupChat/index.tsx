@@ -7,6 +7,7 @@ import {
   IonContent,
   IonHeader,
   IonIcon,
+  IonLoading,
   IonPage,
   IonTitle,
   IonToolbar,
@@ -42,6 +43,7 @@ import {fetchId} from "../../redux/profile/actions";
 
 import MessageInput from "../../components/MessageInput";
 import { arrowBackSharp } from "ionicons/icons";
+import Chat from "../../components/Chat";
 
 interface userData {
   id: string;
@@ -57,11 +59,13 @@ const GroupChat: React.FC = () => {
   const history = useHistory();
   const [myAgentId, setMyAgentId] = useState<string>("");
   const [files, setFiles] = useState<object[]>([]);
-  const [groupData, setGroupData] = useState<GroupConversation | undefined>();
+  const [groupInfo, setGroupInfo] = useState<GroupConversation | undefined>();
+  const [messages, setMessages] = useState<string[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
   const [message, setMessage] = useState("");
   const dispatch = useAppDispatch();
   const { group } = useParams<GroupChatParams>();
-  const groupInfo = useSelector(
+  const groupData = useSelector(
     (state: RootState) => state.groups.conversations[group]
   );
 
@@ -106,7 +110,9 @@ const GroupChat: React.FC = () => {
 
     inputs.forEach((groupMessage: any) => {
       // TODO: error handling
-      dispatch(sendGroupMessage(groupMessage));
+      dispatch(sendGroupMessage(groupMessage)).then((res: GroupMessage) => {
+        groupInfo?.messages.push(res.groupMessageEntryHash)
+      });
     });
   };
 
@@ -118,25 +124,36 @@ const GroupChat: React.FC = () => {
 
 
   useEffect(() => {
-  dispatch(getLatestGroupVersion(group)).then((res:any) => {console.log(res)});
+  // setLoading(true);
   dispatch(fetchId()).then((res: AgentPubKey | null) => {
     if (res) setMyAgentId(Uint8ArrayToBase64(res))
   });
-  if (groupData) {
-    setGroupData(groupData)
-  } else {
-    let filter: GroupMessageBatchFetchFilter = {
-      groupId: base64ToUint8Array(group),
-      batchSize: 10,
-      payloadType: { type: "ALL", payload: null },
+  }, [])
 
+  useEffect(() => {
+    if (groupData) {
+      dispatch(getLatestGroupVersion(group)).then((res:GroupConversation) => {
+        console.log(res);
+        setGroupInfo(res);
+      })
+      setLoading(false);
+    } else {
+      dispatch(getLatestGroupVersion(group)).then((res:GroupConversation) => {
+        console.log(res);
+        setGroupInfo(res);
+        setLoading(false);
+      })
     }
-    dispatch(getLatestGroupVersion(group)).then((res:any) => {console.log(res)})
-  }
+  }, []);
+
+  useEffect(() => {
+    groupData ? groupData.messages ?  setMessages(groupData.messages) : setMessages([]) : setMessages([])
   }, [groupData])
 
 
-  return (
+
+
+  return (!loading && groupInfo) ? (
     <IonPage>
       <IonHeader>
         <IonToolbar>
@@ -146,7 +163,7 @@ const GroupChat: React.FC = () => {
             </IonButton>
             <IonAvatar className="ion-padding">
               {/* TODO: proper picture for default avatar if none is set */}
-              {groupInfo!.avatar ? <img src={groupInfo!.avatar} alt={groupInfo!.name} /> : <img src={"https://upload.wikimedia.org/wikipedia/commons/8/8c/Lauren_Tsai_by_Gage_Skidmore.jpg"} alt={groupInfo!.name} />}
+              {groupInfo ? groupInfo!.avatar ? <img src={groupInfo!.avatar} alt={groupInfo!.name} /> : <img src={"https://upload.wikimedia.org/wikipedia/commons/8/8c/Lauren_Tsai_by_Gage_Skidmore.jpg"} alt={groupInfo!.name} /> : <img src={"https://upload.wikimedia.org/wikipedia/commons/8/8c/Lauren_Tsai_by_Gage_Skidmore.jpg"} alt={groupInfo!.name} />}
             </IonAvatar>
             <IonTitle className="ion-no-padding"> {groupInfo!.name}</IonTitle>
           </IonButtons>
@@ -154,25 +171,22 @@ const GroupChat: React.FC = () => {
       </IonHeader>
 
       <IonContent>
-        {groupInfo ? (
+        {groupData ? (
           <MessageList
             myAgentId={myAgentId}
-            members={groupInfo.members}
-            messageIds={groupInfo.messages}
+            members={groupInfo!.members}
+            messageIds={messages}
           ></MessageList>
-        ) : null}
+        ) : <IonLoading isOpen={loading} />}
       </IonContent>
       {/* BUG: the input field does not reset to empty after send */}
       <MessageInput
           onSend={() => handleOnSend()}
           onChange={(message) => setMessage(message)}
-          onFileSelect={(files) => {
-            console.log(files);
-            setFiles(files)
-          }}
+          onFileSelect={(files) => setFiles(files)}
         />
     </IonPage>
-  );
+  ) : <IonLoading isOpen={loading} />;
 };
 
 export default GroupChat;

@@ -41,7 +41,7 @@ let signalHandler: AppSignalCb = (signal) => {
       let undefinedProfiles: AgentPubKey[] = [];
       let myAgentId = getAgentId().then((res: any) => Uint8ArrayToBase64(res));
       let membersUsernames: { [key: string]: Profile } = {};
-      groupData.members.forEach(async (member) => {
+      groupData.members.forEach(async (member: any) => {
         if (contacts[member]) {
           membersUsernames[member] = contacts[member];
         } else if (member === (await myAgentId)) {
@@ -84,11 +84,17 @@ let signalHandler: AppSignalCb = (signal) => {
         payload: isTextPayload(payload.content.payload)
           ? payload.content.payload
           : {
-              type: "TEXT",
-              payload: {
-                // TODO: work on files
-                payload: "This is a placeholder",
-              },
+              type: "FILE",
+              fileName: payload.content.payload.payload.metadata.fileName,
+              fileSize: payload.content.payload.payload.metadata.fileSize,
+              fileType: payload.content.payload.payload.metadata.fileType,
+              fileHash: Uint8ArrayToBase64(
+                payload.content.payload.payload.metadata.fileHash
+              ),
+              thumbnail: payload.content.payload.payload.fileType.payload
+                .thumbnail
+                ? payload.content.payload.payload.fileType.payload.thumbnail
+                : undefined,
             },
         timestamp: payload.content.created,
         // TODO: work on this
