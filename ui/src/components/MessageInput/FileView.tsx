@@ -14,6 +14,7 @@ const FileView: React.FC<Props> = ({ files, setFiles }) => {
       return [...currFiles];
     });
   };
+  const decoder = new TextDecoder();
 
   return (
     <IonRow className={styles.row}>
@@ -24,7 +25,9 @@ const FileView: React.FC<Props> = ({ files, setFiles }) => {
             file.fileType.type === "VIDEO"
               ? {
                   style: {
-                    backgroundImage: `url(${file.fileType.thumbnail})`,
+                    backgroundImage: `url(${decoder.decode(
+                      file.fileType.thumbnail
+                    )})`,
                     backgroundRepeat: "no-repeat",
                     backgroundPosition: "center",
                     backgroundSize: "cover",
