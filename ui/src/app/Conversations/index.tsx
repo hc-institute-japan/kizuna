@@ -141,7 +141,7 @@ const Conversations: React.FC = () => {
           <EmptyConversations />
         )}
 
-        <IonFab vertical="bottom" horizontal="end">
+        <IonFab vertical="bottom" horizontal="end" slot="fixed">
           <IonFabButton>
             <IonIcon icon={pencil} onClick={handleOnClick} />
           </IonFabButton>
