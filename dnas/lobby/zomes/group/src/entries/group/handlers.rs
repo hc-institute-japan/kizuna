@@ -97,8 +97,8 @@ pub fn add_members(add_members_input: UpdateMembersIO) -> ExternResult<UpdateMem
     }
 
     // get most recent Group Entry
-    let latest_group_version: Group = get_group_latest_version(group_id.clone())?;
-    let mut group_members: Vec<AgentPubKey> = latest_group_version.get_group_members();
+    let latest_group_version: GroupOutput = get_group_latest_version(group_id.clone())?;
+    let mut group_members: Vec<AgentPubKey> = latest_group_version.members;
     let creator: AgentPubKey = agent_info()?.agent_latest_pubkey;
 
     // filter the list of members the admin want to add to avoid duplicated members
@@ -109,7 +109,7 @@ pub fn add_members(add_members_input: UpdateMembersIO) -> ExternResult<UpdateMem
 
     group_members.append(&mut new_group_members_from_input);
 
-    let group_name: String = latest_group_version.name;
+    let group_name: String = latest_group_version.latest_name;
     let created: Timestamp = to_timestamp(sys_time()?);
 
     let updated_group: Group = Group::new(group_name, created, creator, group_members.clone());
@@ -153,15 +153,15 @@ pub fn remove_members(remove_members_input: UpdateMembersIO) -> ExternResult<Upd
     }
 
     // get most recent Group Entry
-    let latest_group_version: Group = get_group_latest_version(group_id.clone())?;
-    let mut group_members: Vec<AgentPubKey> = latest_group_version.get_group_members();
+    let latest_group_version: GroupOutput = get_group_latest_version(group_id.clone())?;
+    let mut group_members: Vec<AgentPubKey> = latest_group_version.members;
 
     // remove the members for the group members list
     group_members.retain(|member| !members_to_remove.contains(&member));
 
     // update_entry the Group with new members field using the  original HeaderHash
     let creator: AgentPubKey = agent_info()?.agent_latest_pubkey;
-    let group_name: String = latest_group_version.name;
+    let group_name: String = latest_group_version.latest_name;
     let created: Timestamp = to_timestamp(sys_time()?);
 
     let updated_group: Group = Group::new(group_name, created, creator, group_members.clone());
@@ -195,10 +195,10 @@ pub fn update_group_name(
     let group_id: EntryHash = update_group_name_input.group_id.clone();
 
     // 1 - we've to get the latest group entry version for the recived entryhash (group_id)
-    let latest_group_version: Group = get_group_latest_version(group_id)?;
+    let latest_group_version: GroupOutput = get_group_latest_version(group_id)?;
 
     // 2 - check whether the new name is the same with old name and return error if so
-    let old_group_name: String = latest_group_version.name.clone();
+    let old_group_name: String = latest_group_version.latest_name.clone();
     if new_group_name.eq(&old_group_name) {
         return Err(HdkError::Wasm(WasmError::Zome(
             "the new name and old name of the group are the same.".into(),
@@ -207,7 +207,7 @@ pub fn update_group_name(
 
     let created: Timestamp = to_timestamp(sys_time()?);
     let creator: AgentPubKey = agent_info()?.agent_latest_pubkey;
-    let members: Vec<AgentPubKey> = latest_group_version.get_group_members();
+    let members: Vec<AgentPubKey> = latest_group_version.members;
 
     let updated_group: Group = Group::new(new_group_name, created, creator, members);
 
@@ -248,9 +248,10 @@ pub fn get_all_my_groups() -> ExternResult<MyGroupListWrapper> {
                     }
 
                     if !group_entry_details.updates.is_empty() {
-                        let latest_group: Group = get_group_latest_version(link.target.clone())?;
+                        let latest_group: GroupOutput =
+                            get_group_latest_version(link.target.clone())?;
 
-                        group.name = latest_group.name; // latest group name
+                        group.name = latest_group.latest_name; // latest group name
 
                         group.members = latest_group.members; // latest group members
                     }
@@ -272,7 +273,7 @@ pub fn get_all_my_groups() -> ExternResult<MyGroupListWrapper> {
 }
 
 // UTILS FUNCTIONS
-pub fn get_group_latest_version(group_id: EntryHash) -> ExternResult<Group> {
+pub fn get_group_latest_version(group_id: EntryHash) -> ExternResult<GroupOutput> {
     // 1 - we have to get details from the recived entry_hash as arg (group_id), based in the details we get back for this function we should have one or other behavior
     if let Some(details) = get_details(group_id.clone(), GetOptions::latest())? {
         match details {
@@ -288,8 +289,19 @@ pub fn get_group_latest_version(group_id: EntryHash) -> ExternResult<Group> {
                     if let Entry::App(group_entry_bytes) = group_entry_details.entry {
                         let group_sb: SerializedBytes = group_entry_bytes.into_sb();
                         let latest_group_version: Group = group_sb.try_into()?;
+                        let group_output = GroupOutput {
+                            group_id,
+                            group_revision_id: group_entry_details.headers[0]
+                                .clone()
+                                .as_hash()
+                                .to_owned(),
+                            latest_name: latest_group_version.name,
+                            members: latest_group_version.members,
+                            creator: latest_group_version.creator,
+                            created: latest_group_version.created,
+                        };
 
-                        return Ok(latest_group_version);
+                        return Ok(group_output);
                     }
                 }
 
@@ -313,7 +325,18 @@ pub fn get_group_latest_version(group_id: EntryHash) -> ExternResult<Group> {
                             latest_group_element.entry().to_app_option()?;
 
                         if let Some(group) = latest_group_version {
-                            return Ok(group);
+                            let group_output = GroupOutput {
+                                group_id,
+                                group_revision_id: group_entry_details.headers[0]
+                                    .clone()
+                                    .as_hash()
+                                    .to_owned(),
+                                latest_name: group.name,
+                                members: group.members,
+                                creator: group.creator,
+                                created: group.created,
+                            };
+                            return Ok(group_output);
                         }
                     }
                 }

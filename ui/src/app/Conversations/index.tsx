@@ -1,3 +1,4 @@
+import { AgentPubKey } from "@holochain/conductor-api";
 import {
   IonContent,
   IonFab,
@@ -7,94 +8,132 @@ import {
   IonPage,
 } from "@ionic/react";
 import { pencil } from "ionicons/icons";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import Conversation from "../../components/Conversation";
 import Toolbar from "../../components/Toolbar";
+import { isTextPayload } from "../../redux/commons/types";
+import { GroupConversation, GroupConversationsActionTypes, GroupMessage } from "../../redux/group/types";
+import { fetchId } from "../../redux/profile/actions";
 import { RootState } from "../../redux/types";
-import { Conversations as ConversationsType } from "../../utils/types";
+import { Uint8ArrayToBase64, useAppDispatch } from "../../utils/helpers";
+import { Conversations as ConversationsType, Message } from "../../utils/types";
 import EmptyConversations from "./EmptyConversations";
 import styles from "./style.module.css";
 
-const conversations: ConversationsType = [
-  // {
-  //   id: "1",
-  //   name: "Akira",
-  //   messages: [
-  //     {
-  //       id: "2",
-  //       sender: "Akira",
-  //       message: "Last message",
-  //       timestamp: new Date(),
-  //     },
-  //     {
-  //       id: "1",
-  //       sender: "seulgibear",
-  //       message: "Yo what's up",
-  //       timestamp: new Date(),
-  //     },
-  //     {
-  //       id: "32",
-  //       sender: "seulgibear",
-  //       message: "Test message",
-  //       timestamp: new Date(),
-  //     },
-  //     {
-  //       id: "14",
-  //       sender: "seulgibear",
-  //       message:
-  //         "Hey, this is James. We met at Sandra’s party on Saturday, and she gave me your number",
-  //       timestamp: new Date(),
-  //     },
-  //     {
-  //       id: "1",
-  //       sender: "Akira",
-  //       message:
-  //         "Hey, Jane! I was going to watch that movie you recommended, but I can’t think of the name. Do you remember what it’s called?",
-  //       timestamp: new Date(),
-  //     },
-  //   ],
-  //   src:
-  //     "https://upload.wikimedia.org/wikipedia/commons/8/8c/Lauren_Tsai_by_Gage_Skidmore.jpg",
-  // },
-  // {
-  //   id: "1",
-  //   name: "Beyonder",
-  //   messages: [
-  //     {
-  //       id: "1",
-  //       sender: "Neil",
-  //       timestamp: new Date(),
-  //       message:
-  //         "Yo what's up Yo what's up Yo what's up Yo what's up Yo what's up Yo what's up Yo what's up ",
-  //     },
-  //   ],
-  //   sender: "Neil",
-  //   src:
-  //     "https://upload.wikimedia.org/wikipedia/commons/8/8c/Lauren_Tsai_by_Gage_Skidmore.jpg",
-  // },
-];
-
 const Conversations: React.FC = () => {
   const history = useHistory();
+  const dispatch = useAppDispatch();
   const contacts = useSelector((state: RootState) => state.contacts.contacts);
-  const handleOnClick = () =>
+  const [groups, setGroups] = useState<{
+    [key: string]: GroupConversation;
+}>({});
+  const groupsData = useSelector((state: RootState) => state.groups.conversations);
+  const groupMessages = useSelector((state: RootState) => state.groups.messages);
+  const groupMembers = useSelector((state: RootState) => state.groups.members);
+  const myUsername = useSelector((state: RootState) => state.profile.username);
+  const [myAgentId, setMyAgentId] = useState<string>("");
+
+  const handleOnClick = () => {
     history.push({
       pathname: `/compose`,
       state: { contacts: {...contacts} },
     });
+  };
+  const renderGroupConversation = (groups:  {
+    [key: string]: GroupConversation;
+  }) => {
+  let arr: any[] = [];
+  Object.keys(groups).forEach((key: string ) => {
+    // TODO: change to actual pic chosen by group creator
+    let src = "https://upload.wikimedia.org/wikipedia/commons/8/8c/Lauren_Tsai_by_Gage_Skidmore.jpg";
+    let messages: Message[] =  groups[key].messages ? groups[key].messages.map((messageId: string) => {
+      let groupMessage: GroupMessage = groupMessages[messageId];
+      if (isTextPayload(groupMessage.payload)) {
+        let message: Message = {
+          id: groupMessage.groupMessageEntryHash,
+          sender: groupMembers[groupMessage.author] ? {
+            id: groupMembers[groupMessage.author].id,
+            username: groupMembers[groupMessage.author].username
+          } : {
+            id: myAgentId,
+            username: myUsername!
+          },
+          timestamp: groupMessage.timestamp,
+          message: groupMessage.payload.payload.payload
+        };
+        return message
+      } else {
+        let maybeOther: any | undefined = groupMembers[groupMessage.author];
+        let fileString: string = "";
+        console.log(maybeOther);
+        if (maybeOther) {
+          // TODO: format for i18n
+          fileString = new String(maybeOther.username + " " + "has sent" + " " + groupMessage.payload.fileName).toString();
+        } else {
+          // MAYBE BUG: assumption is you sent it.
+          // TODO: format for i18n
+          fileString = new String("You" + " sent " + groupMessage.payload.fileName).toString();
+        }
+        console.log(fileString);
+        
+        let message: Message = {
+          id: groupMessage.groupMessageEntryHash,
+          sender: groupMembers[groupMessage.author] ? {
+            id: groupMembers[groupMessage.author].id,
+            username: groupMembers[groupMessage.author].username
+          } : {
+            id: myAgentId,
+            username: myUsername!
+          },
+          timestamp: groupMessage.timestamp,
+          // TODO: this part is file
+          message: fileString
+        };
+        console.log(message);
+        return message
+      };
+    }) : [];
+    messages.sort((x: Message, y: Message) => 
+      y.timestamp.valueOf() < x.timestamp.valueOf() ? 1 : -1
+    );
+    let conversation = {
+      id: groups[key].originalGroupEntryHash,
+      content: { src, name: groups[key].name, messages, },
+    };
+    
+    if (!(arr.find((group: any) => group.id === conversation.id))) {
+      arr.push(conversation);
+    }
+    
+    });
+    arr.sort((x: any, y: any) => 
+      groups[x.id].createdAt.valueOf() < groups[y.id].createdAt.valueOf() ? 1 : -1
+    );
+    console.log("is this working or what",arr);
+    return arr;
+  };
+
+  useEffect(() => {
+    dispatch(fetchId()).then((res: AgentPubKey | null) => {
+      if (res) setMyAgentId(Uint8ArrayToBase64(res))
+    });
+    setGroups(groupsData);
+    }, [groupsData])
 
   return (
     <IonPage>
       <Toolbar onChange={() => {}} />
       <IonContent>
-        {conversations.length > 0 ? (
+        {Object.keys(groups).length > 0 ? (
           <IonList className={styles.conversation}>
-            {conversations.map((conversation) => (
+            {renderGroupConversation(groups).map((groupConversation: any) => (
               <Conversation
-                key={JSON.stringify(conversation)}
-                content={conversation}
+                isGroup={true}
+                groupId={groupConversation.id}
+                key={JSON.stringify(groupConversation.id)}
+                content={groupConversation.content}
               />
             ))}
           </IonList>
@@ -102,7 +141,7 @@ const Conversations: React.FC = () => {
           <EmptyConversations />
         )}
 
-        <IonFab vertical="bottom" horizontal="end">
+        <IonFab vertical="bottom" horizontal="end" slot="fixed">
           <IonFabButton>
             <IonIcon icon={pencil} onClick={handleOnClick} />
           </IonFabButton>
@@ -112,4 +151,4 @@ const Conversations: React.FC = () => {
   );
 };
 
-export default Conversations;
+export default Conversations
