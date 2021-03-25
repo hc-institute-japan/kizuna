@@ -10,6 +10,22 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
     let added_contacts: AgentPubKeys =
         call(None, "contacts".into(), "list_added".into(), None, &())?;
 
+    let added_profiles: UsernameList = call(
+        None,
+        "username".into(),
+        "get_usernames".into(),
+        None,
+        &added_contacts,
+    )?;
+
+    let blocked_profiles: UsernameList = call(
+        None,
+        "username".into(),
+        "get_usernames".into(),
+        None,
+        &blocked_contacts,
+    )?;
+
     let user_info: UsernameInfo =
         call(None, "username".into(), "get_my_username".into(), None, &())?;
 
@@ -21,6 +37,7 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
 
     for group in &groups.0 {
         agent_pub_keys.extend(group.members.iter().cloned());
+        agent_pub_keys.push(group.creator.clone())
     }
 
     agent_pub_keys.sort_unstable();
@@ -78,8 +95,8 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
 
     let aggregated_data: AggregatedLatestData = AggregatedLatestData {
         user_info,
-        added_contacts: added_contacts.0,
-        blocked_contacts: blocked_contacts.0,
+        added_contacts: added_profiles.0,
+        blocked_contacts: blocked_profiles.0,
         groups,
         latest_group_messages,
         member_profiles,

@@ -3,15 +3,20 @@ import {
   UPDATE_GROUP_NAME,
   REMOVE_MEMBERS,
   ADD_MEMBERS,
-  SEND_GROUP_MESSAGE,
-  GET_NEXT_BATCH_GROUP_MESSAGES,
-  GET_MESSAGES_BY_GROUP_BY_TIMESTAMP,
+  SET_GROUP_MESSAGE,
+  SET_NEXT_BATCH_GROUP_MESSAGES,
+  SET_MESSAGES_BY_GROUP_BY_TIMESTAMP,
   GroupConversationsActionTypes,
   GroupConversation,
   GroupConversationsState,
   GroupMessage,
+  SET_LATEST_GROUP_STATE,
+  GroupMessagesOutput,
+  SET_LATEST_GROUP_VERSION,
 } from "./types";
 import { isTextPayload } from "../commons/types";
+import { stat } from "fs";
+import { Profile, ProfileState } from "../profile/types";
 
 const initialState: GroupConversationsState = {
   conversations: {},
@@ -88,7 +93,7 @@ const reducer = (
       };
       return { ...state, conversations: groupConversations };
     }
-    case SEND_GROUP_MESSAGE: {
+    case SET_GROUP_MESSAGE: {
       let groupMessage: GroupMessage = action.groupMessage;
       let groupEntryHash: string = groupMessage.groupEntryHash;
       let groupMessageEntryHash: string = groupMessage.groupMessageEntryHash;
@@ -114,24 +119,27 @@ const reducer = (
           ...groupFiles,
           ...newFile,
         };
+        console.log(messages);
         return { ...state, messages, groupFiles };
       } else {
         return { ...state, messages };
       }
     }
-    case GET_NEXT_BATCH_GROUP_MESSAGES: // fallthrough since its the same process with the next case
-    case GET_MESSAGES_BY_GROUP_BY_TIMESTAMP: {
+    case SET_NEXT_BATCH_GROUP_MESSAGES: // fallthrough since its the same process with the next case
+    case SET_MESSAGES_BY_GROUP_BY_TIMESTAMP: {
       let groupConversations = state.conversations;
       let groupConversation: GroupConversation =
         groupConversations[action.groupId];
       // we probably won't have any duplicates of hash but just in case we do we dedupe here
-      groupConversation.messages = Array.from(
-        new Set(
-          groupConversation.messages.concat(
-            action.groupMessagesOutput.messagesByGroup[action.groupId]
+      groupConversation.messages = groupConversation.messages
+        ? Array.from(
+            new Set(
+              groupConversation.messages.concat(
+                action.groupMessagesOutput.messagesByGroup[action.groupId]
+              )
+            )
           )
-        )
-      );
+        : groupConversations[action.groupId].messages;
       groupConversations = {
         ...groupConversations,
         [action.groupId]: groupConversation,
@@ -142,6 +150,48 @@ const reducer = (
         ...action.groupMessagesOutput.groupMessagesContents,
       };
       return { ...state, messages, conversations: groupConversations };
+    }
+    case SET_LATEST_GROUP_STATE: {
+      let groups: GroupConversation[] = action.groups;
+      let groupMessagesOutput: GroupMessagesOutput = action.groupMessagesOutput;
+
+      let conversations = state.conversations;
+      groups.forEach((group: GroupConversation) => {
+        conversations[group.originalGroupEntryHash] = group;
+      });
+
+      let messages = state.messages;
+      messages = {
+        ...messages,
+        ...groupMessagesOutput.groupMessagesContents,
+      };
+
+      let members = state.members;
+      action.members.forEach((member: Profile) => {
+        members[member.id] = member;
+      });
+      return { ...state, conversations, messages, members };
+    }
+    case SET_LATEST_GROUP_VERSION: {
+      let groupConversations = state.conversations;
+      let groupConversation: GroupConversation = action.groupData;
+      groupConversations = {
+        ...groupConversations,
+        [groupConversation.originalGroupEntryHash]: groupConversation,
+      };
+
+      let messages = state.messages;
+      messages = {
+        ...messages,
+        ...action.groupMessagesOutput.groupMessagesContents,
+      };
+
+      let members = state.members;
+      Object.keys(action.membersUsernames).forEach((key: string) => {
+        members[key] = action.membersUsernames[key];
+      });
+
+      return { ...state, conversations: groupConversations, members };
     }
     default:
       return state;
