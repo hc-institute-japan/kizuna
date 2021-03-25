@@ -13,7 +13,7 @@ export interface FilePayload {
   type: "FILE";
   fileName: string;
   fileSize: number;
-  fileType: string;
+  fileType: "IMAGE" | "VIDEO" | "OTHER";
   fileHash: FileBytesID;
   thumbnail?: Uint8Array;
 }

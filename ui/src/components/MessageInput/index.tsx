@@ -7,7 +7,7 @@ import {
   IonToolbar,
 } from "@ionic/react";
 import { attachOutline } from "ionicons/icons";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { useToast } from "../../containers/ToastContainer/context";
 import EndButtons from "./EndButtons";
@@ -21,8 +21,8 @@ interface Props {
 }
 
 const determineFileType = (type: string): string => {
-  //too lazy to do all
-  //url: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
+  // too lazy to do all
+  // url: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
 
   switch (type) {
     case "image/png":
@@ -41,15 +41,23 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
   const [files, setFiles] = useState<any[]>([]);
   const handleOnFileClick = () => file?.current?.click();
 
-  useEffect(() => {
+  const onFileSelectCallback = useCallback(() => {
     if (onFileSelect) onFileSelect(files);
-  }, [files, onFileSelect]);
-  useEffect(() => {
+  }, [files]);
+
+  const onChangeCallback = useCallback(() => {
     if (onChange) onChange(message);
-  }, [message, onChange]);
+  }, [message]);
+
+  useEffect(() => {
+    onFileSelectCallback();
+  }, [files, onFileSelectCallback]);
+  useEffect(() => {
+    onChangeCallback();
+  }, [message, onChangeCallback]);
   const { showToast } = useToast();
 
-  const handleOnFileChange = () => {
+  const handleOnFileChange = () =>
     Array.from(file.current ? file.current.files! : new FileList()).forEach(
       (file) => {
         file.arrayBuffer().then((arrBuffer) => {
@@ -86,7 +94,6 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
                 fileType: { type },
                 fileBytes,
               };
-
               setFiles((currFiles) => {
                 currFiles.push(final);
                 return [...currFiles];
@@ -94,7 +101,12 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
             }
           } else {
             showToast({
-              message: `${fileName} exceeds the 15mb file limit`,
+              message: intl.formatMessage(
+                {
+                  id: "components.message-input.over-size-limit",
+                },
+                { fileName }
+              ),
               color: "danger",
               duration: 2500,
             });
@@ -102,7 +114,6 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
         });
       }
     );
-  };
 
   return (
     <IonFooter>
@@ -127,7 +138,15 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
             id: "app.new-conversation.message-placeholder",
           })}
         />
-        <EndButtons files={files} onSend={onSend} message={message} />
+        <EndButtons
+          files={files}
+          onSend={() => {
+            if (onSend) onSend();
+            setMessage("");
+            setFiles([]);
+          }}
+          message={message}
+        />
       </IonToolbar>
     </IonFooter>
   );

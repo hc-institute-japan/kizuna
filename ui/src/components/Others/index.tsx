@@ -1,6 +1,6 @@
 import { IonText } from "@ionic/react";
 import React from "react";
-import { Payload, TextPayload, isTextPayload } from "../../redux/commons/types";
+import { isTextPayload, Payload, TextPayload } from "../../redux/commons/types";
 import styles from "./style.module.css";
 
 interface Props {
