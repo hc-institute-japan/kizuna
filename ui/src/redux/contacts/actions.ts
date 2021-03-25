@@ -1,9 +1,8 @@
-import { AgentPubKey } from "@holochain/conductor-api";
 import { FUNCTIONS, ZOMES } from "../../connection/types";
 import { Profile } from "../../redux/profile/types";
 import { base64ToUint8Array, Uint8ArrayToBase64 } from "../../utils/helpers";
 import { ThunkAction } from "../types";
-import { SET_CONTACTS, SET_BLOCKED } from "./types";
+import { SET_BLOCKED, SET_CONTACTS } from "./types";
 
 export const setContacts = (contacts: {
   [key: string]: Profile;
