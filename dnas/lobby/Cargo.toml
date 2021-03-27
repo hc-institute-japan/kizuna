@@ -1,11 +1,13 @@
 [workspace]
 members = [
-    "zomes/request"
-    "zomes/contacts",
+    "zomes/group",
+    "zomes/request",
     "zomes/username",
+    "zomes/contacts",
     "zomes/aggregator",
     "zomes/preference",
     "zomes/p2pmessage",
+    "commons/file_types", 
 ]
 
 [profile.dev]
