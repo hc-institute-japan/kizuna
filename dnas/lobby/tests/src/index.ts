@@ -1,7 +1,6 @@
 import {
   Config,
   NetworkType,
-  Orchestrator,
   InstallAgentsHapps,
   TransportConfigType,
 } from "@holochain/tryorama";
@@ -36,7 +35,7 @@ const installables: Installables = {
 };
 
 
-// group( config, installables);
+group( config, installables);
 // contacts(config, installables);
 // preference(config, installables);
 // request(config); // not passing 

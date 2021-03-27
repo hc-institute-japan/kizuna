@@ -23,6 +23,7 @@
     -receive_message bumped (no tested)    
     -there are some async methods headers declarations but not the definition should i removed tath ?
     -theres a method call blocked agent this is a copy from the contacts zome ?  should be removed ? 
+    -there are some tested failing 
 
  ## Zome Contacts: 
     - minimal changes in the source code to fixed the hdk bumping version   
@@ -34,11 +35,26 @@
 
 ## Zome: Username:
     - minimal changes in the source code to fixed the hdk bumping version   
-    -zome compiled no tested yet
+    - test files can be cleaned theres a lot of commented code 
+    - all tests are passing
+    
 
 ## Zome: Request:
     - minimal changes in the source code to fixed the hdk bumping version   
     -testes are failingg have an error i have to checked 
+
+## Zome: Group:
+    - group methods (crud) bumped and compiled.
+    - group methos tested and passing the tests.
+    - all methods are separated in diferent files (helpers should be split it as well ?).
+    - remote_signal has change in the new hdk version (small chasges added to fixed).
+
+
+
+
+## Testing changes:
+    - init method its called at the beging of the app     
+    - the signal handlers are required if there are not specified the test will fail 
 
 
         
