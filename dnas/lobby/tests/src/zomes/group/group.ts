@@ -206,7 +206,7 @@ export function addAndRemoveMembersTest(config, installables) {
       };
       let bobby_signal_listener = {
         counter: 0,
-        payload: Buffer,
+        payload: null,
       };
       let charlie_signal_listener = {
         counter: 0,
@@ -238,7 +238,7 @@ export function addAndRemoveMembersTest(config, installables) {
         groupId,
         groupRevisionId,
       } = await createGroup(create_group_input)(alice_conductor);
-      await delay(1000);
+      await delay(5000);
 
       t.deepEqual(
         original_group_content.members,
@@ -321,7 +321,7 @@ export function addAndRemoveMembersTest(config, installables) {
       await delay(1000);
 
       t.deepEqual(
-        updated_group.latestName,
+        updated_group.name,
         create_group_input.name,
         "the group name fields match with the expected value"
       );
@@ -367,7 +367,7 @@ export function addAndRemoveMembersTest(config, installables) {
           payload: {
             groupId,
             groupRevisionId,
-            latestName: updated_group.latestName,
+            latestName: updated_group.name,
             members: updated_group.members,
             creator: updated_group.creator,
             created: updated_group.created,
@@ -375,7 +375,7 @@ export function addAndRemoveMembersTest(config, installables) {
         },
         "charlie's has received the signal payload from create_group"
       );
-
+      
       // 4 - CHECK IF THE GROUP MEMBERS KNOW THEY ARE MEMBERS OF THE GROUP AND IF THE GROUP LIST CONTAINS THE LATEST VERSION OF THE GROUP ENTRIES
       let alice_group_list = (
         await getMyGroupsList(alice_conductor)
@@ -405,6 +405,7 @@ export function addAndRemoveMembersTest(config, installables) {
         [updated_group].length,
         "charlie group list match with the expected value"
       );
+
 
       // 5 - REMOVE GROUP MEMBERS FROM THE GROUP WE CREATED (the add members input and the remove members input have the same format UpdateMembersIo)
 
@@ -540,10 +541,14 @@ export function updateGroupNameTest(config, installables) {
 
       let updated_group = await getLatestGroupVersion({ groupHash: update_group_name_io.groupId, })(alice_conductor);
       updated_group.created = original_group_content.created;
-      await delay(1000);      
+      await delay(1000);  
+      
+      console.log("output");
+      console.log(updated_group);
+      
 
       t.deepEqual(
-        updated_group.latestName,
+        updated_group.name,
         update_group_name_io.name,
         "the group name fields match with the expected value"
       );
