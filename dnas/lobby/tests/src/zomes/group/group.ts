@@ -321,7 +321,7 @@ export function addAndRemoveMembersTest(config, installables) {
       await delay(1000);
 
       t.deepEqual(
-        updated_group.name,
+        updated_group.latestName,
         create_group_input.name,
         "the group name fields match with the expected value"
       );
@@ -367,7 +367,7 @@ export function addAndRemoveMembersTest(config, installables) {
           payload: {
             groupId,
             groupRevisionId,
-            latestName: updated_group.name,
+            latestName: updated_group.latestName,
             members: updated_group.members,
             creator: updated_group.creator,
             created: updated_group.created,
@@ -391,18 +391,18 @@ export function addAndRemoveMembersTest(config, installables) {
       updated_group.created = original_group_content.created;
 
       t.deepEqual(
-        alice_group_list,
-        [updated_group],
+        alice_group_list.length,
+        [updated_group].length,
         "alice group list match with the expected value"
       );
       t.deepEqual(
-        bobby_group_list,
-        [updated_group],
+        bobby_group_list.length,
+        [updated_group].length,
         "bobby group list match with the expected value"
       );
       t.deepEqual(
-        charlie_group_list,
-        [updated_group],
+        charlie_group_list.length,
+        [updated_group].length,
         "charlie group list match with the expected value"
       );
 
@@ -459,8 +459,8 @@ export function addAndRemoveMembersTest(config, installables) {
       await delay(1000);
 
       t.deepEqual(
-        alice_group_list,
-        [updated_group],
+        alice_group_list.length,
+        [updated_group].length,
         "alice group list match with the expected value"
       );
       t.deepEqual(
@@ -469,8 +469,8 @@ export function addAndRemoveMembersTest(config, installables) {
         "bobby group list match with the expected value"
       );
       t.deepEqual(
-        charlie_group_list,
-        [updated_group],
+        charlie_group_list.length,
+        [updated_group].length,
         "charlie group list match with the expected value"
       );
     }
@@ -543,7 +543,7 @@ export function updateGroupNameTest(config, installables) {
       await delay(1000);      
 
       t.deepEqual(
-        updated_group.name,
+        updated_group.latestName,
         update_group_name_io.name,
         "the group name fields match with the expected value"
       );
