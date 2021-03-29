@@ -9,20 +9,19 @@ use std::collections::hash_map::HashMap;
 pub struct AgentPubKeys(pub Vec<AgentPubKey>);
 
 // for username
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
-#[serde(rename_all = "camelCase")]
+#[derive(Serialize, Deserialize, Debug, SerializedBytes)]
 pub struct UsernameInfo {
     username: String,
     agent_id: AgentPubKey,
     created_at: Timestamp,
     entry_header_hash: HeaderHash,
 }
+
 #[derive(Serialize, Deserialize, SerializedBytes, Debug)]
-pub struct UsernameList(pub Vec<UsernameInfo>);
+pub struct UsernameList(Vec<UsernameInfo>);
 
 // for group
 #[derive(Deserialize, Serialize, SerializedBytes, Debug)]
-#[serde(rename_all = "camelCase")]
 pub struct GroupOutput {
     pub group_id: EntryHash,
     pub group_revision_id: HeaderHash,
@@ -78,7 +77,6 @@ pub struct MessagesByGroup(pub HashMap<String, Vec<GroupMessageHash>>);
 pub struct GroupMessagesContents(pub HashMap<String, GroupMessageContent>);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
-#[serde(rename_all = "camelCase")]
 pub struct GroupMessagesOutput {
     messages_by_group: MessagesByGroup,
     group_messages_contents: GroupMessagesContents,
@@ -151,8 +149,8 @@ pub struct PerGroupPreference {
 pub struct AggregatedLatestData {
     pub user_info: UsernameInfo,
     // for contacts
-    pub added_contacts: Vec<UsernameInfo>,
-    pub blocked_contacts: Vec<UsernameInfo>,
+    pub added_contacts: Vec<AgentPubKey>,
+    pub blocked_contacts: Vec<AgentPubKey>,
     // for group
     pub groups: MyGroupListWrapper,
     pub latest_group_messages: GroupMessagesOutput,
