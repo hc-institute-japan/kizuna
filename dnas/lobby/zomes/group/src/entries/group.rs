@@ -95,12 +95,12 @@ pub struct CreateGroupOutput {
 #[derive(Deserialize, Serialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct GroupOutput {
-    pub group_id: EntryHash,
-    pub group_revision_id: HeaderHash,
-    pub latest_name: String,
-    pub members: Vec<AgentPubKey>,
-    pub creator: AgentPubKey,
-    pub created: Timestamp,
+    group_id: EntryHash,
+    group_revision_id: HeaderHash,
+    latest_name: String,
+    members: Vec<AgentPubKey>,
+    creator: AgentPubKey,
+    created: Timestamp,
     // group_versions: Vec<Group>,
 }
 
