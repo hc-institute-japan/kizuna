@@ -3,23 +3,17 @@ use hdk::prelude::*;
 use hdk::prelude::{element::SignedHeaderHashed, timestamp::Timestamp};
 use std::collections::hash_map::HashMap;
 
-pub mod send_message;
 pub mod get_all_messages;
-pub mod read_group_message;
-pub mod group_message_helpers;
-pub mod indicate_group_typing;
-pub mod send_message_in_target_date;
-pub mod get_next_batch_group_messages;
 pub mod get_latest_messages_for_all_groups;
 pub mod get_messages_by_group_by_timestamp;
+pub mod get_next_batch_group_messages;
+pub mod group_message_helpers;
+pub mod indicate_group_typing;
+pub mod read_group_message;
+pub mod send_message;
+pub mod send_message_in_target_date;
 
 
-
-
-// i added this type while we move to the next holochain version
-
-// pub mod get_messaKges_by_group_by_timestamp;
-// pub mod handlers;
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct BatchSize(pub u8);

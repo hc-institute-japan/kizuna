@@ -101,7 +101,6 @@ fn run_validation(validation_input: ValidationInput) -> ExternResult<ValidateCal
     return run_validations_handler(validation_input);
 }
 
-//  GROUP ZOME FUNCTIONS
 #[hdk_extern]
 fn create_group(create_group_input: CreateGroupInput) -> ExternResult<CreateGroupOutput> {
     return create_group_handler(create_group_input);
