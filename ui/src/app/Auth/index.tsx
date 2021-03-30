@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchMyUsername } from "../../redux/profile/actions";
+import React, { useEffect } from "react";
 import { RootState } from "../../redux/types";
 import Authenticated from "../Authenticated";
 import Playground from "../Playground";
@@ -14,8 +14,8 @@ const Auth: React.FC = () => {
     dispatch(fetchMyUsername());
   }, [dispatch]);
 
-  // return <Playground></Playground>;
-  return username !== null ? <Authenticated /> : <Unauthenticated />;
+  return <Playground></Playground>;
+  // return username !== null ? <Authenticated /> : <Unauthenticated />;
 };
 
 export default Auth;
