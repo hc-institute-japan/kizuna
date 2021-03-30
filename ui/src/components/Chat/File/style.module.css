@@ -1,0 +1,34 @@
+.file:hover {
+  cursor: pointer;
+}
+
+.modal ion-toolbar {
+  --background: rgba(0, 0, 0, 0);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-attachment: fixed;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  box-sizing: border-box;
+  width: 100%;
+  overflow: hidden;
+}
+
+.content img {
+  object-fit: cover;
+}
+
+.video {
+  width: 100%;
+}
+
+.video video {
+  width: 100% !important;
+}

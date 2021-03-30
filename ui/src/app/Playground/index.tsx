@@ -268,6 +268,7 @@ const Playground = () => {
       <IonContent>
         <ChatList type="group">
           {data.map((data, index) => {
+            console.log(data.author, username);
             if (data.author === username) return <Me key={index} {...data} />;
             return <Others key={index} {...data} />;
           })}

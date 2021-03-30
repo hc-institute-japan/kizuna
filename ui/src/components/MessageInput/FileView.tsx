@@ -41,10 +41,7 @@ const FileView: React.FC<Props> = ({ files, setFiles }) => {
             file.fileType.type === "VIDEO" ? null : (
               <IonLabel>{file.metadata.fileName}</IonLabel>
             )}
-            <IonIcon
-              icon={closeCircle}
-              onClick={() => handleClose(index)}
-            ></IonIcon>
+            <IonIcon icon={closeCircle} onClick={() => handleClose(index)} />
           </IonChip>
         );
       })}

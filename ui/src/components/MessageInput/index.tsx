@@ -25,6 +25,9 @@ const determineFileType = (type: string): string => {
   // url: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
 
   switch (type) {
+    case "video/mpeg":
+    case "video/mp4":
+      return "VIDEO";
     case "image/png":
     case "image/jpeg":
       return "IMAGE";
@@ -48,6 +51,11 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
   const onChangeCallback = useCallback(() => {
     if (onChange) onChange(message);
   }, [message]);
+
+  const reset = () => {
+    setMessage("");
+    setFiles([]);
+  };
 
   useEffect(() => {
     onFileSelectCallback();
@@ -142,8 +150,7 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
           files={files}
           onSend={() => {
             if (onSend) onSend();
-            setMessage("");
-            setFiles([]);
+            reset();
           }}
           message={message}
         />

@@ -1,18 +1,20 @@
 import { IonText } from "@ionic/react";
 import React from "react";
 import { useIntl } from "react-intl";
-import { TextPayload } from "../../../../redux/commons/types";
-import styles from "./style.module.css";
+
+import common from "../style.module.css";
+import { TextPayload } from "../../../redux/commons/types";
 
 interface Props {
   message: TextPayload;
   timestamp: Date;
+  type: "me" | "others";
 }
 
-const OthersText: React.FC<Props> = ({ message, timestamp }) => {
+const OthersText: React.FC<Props> = ({ message, timestamp, type }) => {
   const intl = useIntl();
   return (
-    <div className={`${styles.others} ${styles.text}`}>
+    <div className={`${common[type]} ${common.text} ${common.bubble}`}>
       <IonText>
         <p className="ion-no-margin">{message.payload.payload}</p>
       </IonText>
