@@ -4,7 +4,7 @@ import { useIntl } from "react-intl";
 
 import FileView from "./FileView";
 import ImageView from "./ImageView";
-import styles from "./style.module.css";
+
 import common from "../style.module.css";
 import { FilePayload } from "../../../redux/commons/types";
 import VideoView from "./VideoView";
