@@ -1,8 +1,8 @@
 import React from "react";
 import ChatList from "./ChatList";
 import { ChatListProps, ChatProps } from "./types";
-import Me from "./components/Me";
-import Others from "./components/Others";
+import Me from "./Me";
+import Others from "./Others";
 
 const Chat: {
   ChatList: React.FC<ChatListProps>;

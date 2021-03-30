@@ -2,6 +2,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import App from "./app";
 import Container from "./containers";
+import "./theme/global.css";
 
 ReactDOM.render(
   <Container>

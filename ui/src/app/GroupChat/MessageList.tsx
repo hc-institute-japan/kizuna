@@ -1,15 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
-import Me from "../../components/Me";
-import Others from "../../components/Others";
-import { fetchId } from "../../redux/profile/actions";
-import { RootState } from "../../redux/types";
-import { Uint8ArrayToBase64, useAppDispatch } from "../../utils/helpers";
-import styles from "./style.module.css";
-import { GroupMessage } from "../../redux/group/types";
-import { getMessagesByGroupByTimestamp } from "../../redux/group/actions";
-import { IonLoading } from "@ionic/react";
 import Chat from "../../components/Chat";
+import { GroupMessage } from "../../redux/group/types";
+import { RootState } from "../../redux/types";
 interface Props {
   messageIds: string[];
   members: string[];

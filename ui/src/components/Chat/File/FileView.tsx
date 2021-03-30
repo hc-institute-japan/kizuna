@@ -1,8 +1,8 @@
 import { IonGrid, IonIcon, IonRow, IonText } from "@ionic/react";
 import { documentOutline } from "ionicons/icons";
 import React from "react";
-import { FilePayload } from "../../../../redux/commons/types";
-import { base64ToUint8Array } from "../../../../utils/helpers";
+import { FilePayload } from "../../../redux/commons/types";
+import { base64ToUint8Array } from "../../../utils/helpers";
 import styles from "./style.module.css";
 
 interface Props {
@@ -12,9 +12,7 @@ interface Props {
 const File: React.FC<Props> = ({ file }) => {
   const { fileName, fileSize } = file;
   const handleOnClick = () => {
-    const blob = new Blob([base64ToUint8Array(file.fileHash)], {
-      type: "application/pdf",
-    }); // change resultByte to bytes
+    const blob = new Blob([base64ToUint8Array(file.fileHash)]); // change resultByte to bytes
 
     var link = document.createElement("a");
     link.href = window.URL.createObjectURL(blob);
