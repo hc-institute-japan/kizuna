@@ -1,4 +1,10 @@
-import { IonText } from "@ionic/react";
+import {
+  IonItem,
+  IonItemOption,
+  IonItemOptions,
+  IonItemSliding,
+  IonText,
+} from "@ionic/react";
 import React from "react";
 import {
   FilePayload,
@@ -29,13 +35,14 @@ const Others: React.FC<ChatProps> = ({
           <IonText color="medium">{author}</IonText>
         </div>
       ) : null}
-      <div className={common["others-container"]}>
+
+      <IonItem lines="none" className={`${common["others-container"]}`}>
         {isP2P ? null : (
           <div className={common.picture} style={{ marginRight: "0.5rem" }}>
             {showProfilePicture ? (
               <img
                 alt={`${author}'s profile`}
-                src="https://instagram.fmnl4-4.fna.fbcdn.net/v/t51.2885-15/e35/s1080x1080/163528151_952829552157741_3965471732380754680_n.jpg?tp=1&_nc_ht=instagram.fmnl4-4.fna.fbcdn.net&_nc_cat=109&_nc_ohc=J_UMfyNh00IAX_eoD0Z&ccb=7-4&oh=52c4031bd9c5cb1dfc9211af018e4d95&oe=607F179B&_nc_sid=86f79a"
+                src="https://instagram.fmnl4-4.fna.fbcdn.net/v/t51.2885-15/e35/165950076_444388300151532_1799111197207173012_n.jpg?tp=1&_nc_ht=instagram.fmnl4-4.fna.fbcdn.net&_nc_cat=100&_nc_ohc=7z4YUOlGp6gAX90UHs8&ccb=7-4&oh=4bbdb3043f0a6668e67e143b769ce4be&oe=6066B770&_nc_sid=86f79a"
               ></img>
             ) : null}
           </div>
@@ -54,7 +61,7 @@ const Others: React.FC<ChatProps> = ({
             timestamp={timestamp}
           />
         )}
-      </div>
+      </IonItem>
     </>
   );
 };
