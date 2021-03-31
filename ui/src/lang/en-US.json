@@ -23,6 +23,6 @@
   "app.register.username-label": "Username",
   "app.register.username-placeholder": "Type your username...",
   "app.register.register": "Create an account",
-  "components.message-input.over-size-limit": "{fileName} exceeds the 15mb file limit"
-
+  "components.message-input.over-size-limit": "{fileName} exceeds the 15mb file limit",
+  "components.chat.image-modal-download": "Download"
 }
