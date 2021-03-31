@@ -5,8 +5,8 @@ export interface ChatListProps {
   type?: "p2p" | "group";
   children: ReactElement<ChatProps> | Array<ReactElement<ChatProps>>;
   onScrollTop?: (
-    event: CustomEvent<void>,
-    complete: () => Promise<void>
+    complete: () => Promise<void>,
+    event: CustomEvent<void>
   ) => any;
 }
 

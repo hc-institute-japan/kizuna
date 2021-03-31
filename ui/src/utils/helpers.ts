@@ -73,3 +73,11 @@ export const base64ToUint8Array = (base64: string) =>
       "base64"
     ).buffer
   );
+
+type SearchContacts = (
+  contacts: { [key: string]: Profile },
+  username: string
+) => Profile | undefined;
+
+export const searchContacts: SearchContacts = (contacts, username) =>
+  Object.values(contacts).find((curr) => username === curr.username);
