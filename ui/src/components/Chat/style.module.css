@@ -1,7 +1,12 @@
 .chat {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.chat > * {
+  margin-right: 0 !important;
 }
 
 .bubble {
@@ -57,6 +62,7 @@
   align-self: flex-end;
   display: flex;
   align-items: flex-start;
+
   max-width: 80%;
 }
 

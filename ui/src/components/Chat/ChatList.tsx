@@ -1,12 +1,22 @@
-import { IonText } from "@ionic/react";
-import React from "react";
+import {
+  IonInfiniteScroll,
+  IonInfiniteScrollContent,
+  IonText,
+} from "@ionic/react";
+import React, { useEffect, useRef } from "react";
 import { useIntl } from "react-intl";
 import styles from "./style.module.css";
 import { ChatListProps } from "./types";
 
-const ChatList: React.FC<ChatListProps> = ({ children, type = "p2p" }) => {
+const ChatList: React.FC<ChatListProps> = ({
+  children,
+  type = "p2p",
+  onScrollTop,
+}) => {
   const arrChildren = React.Children.toArray(children);
   const intl = useIntl();
+  const scroll = useRef<HTMLDivElement | null>(null);
+  const infiniteScroll = useRef<HTMLIonInfiniteScrollElement>(null);
   const assess = (
     child: React.ReactElement,
     arrChildren: React.ReactElement[],
@@ -40,36 +50,61 @@ const ChatList: React.FC<ChatListProps> = ({ children, type = "p2p" }) => {
 
     return { showProfilePicture, space, showName, showDate };
   };
+
+  const elements = React.Children.map(arrChildren, (child, i) => {
+    if (React.isValidElement(child)) {
+      const { showProfilePicture, showName, showDate } = assess(
+        child,
+        arrChildren as React.ReactElement[],
+        i
+      );
+      return (
+        <>
+          {showDate ? (
+            <IonText className="ion-text-center">
+              {intl.formatDate(child.props.timestamp, {
+                year: "numeric",
+                month: "numeric",
+                day: "numeric",
+              })}
+            </IonText>
+          ) : null}
+          {React.cloneElement(child, {
+            type,
+            showProfilePicture,
+            showName,
+          })}
+        </>
+      );
+    }
+    return child;
+  });
+
+  useEffect(() => {
+    if (scroll.current) {
+      setTimeout(() => {
+        scroll.current!.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    }
+  }, [scroll]);
+
+  const complete = () => infiniteScroll.current!.complete();
+
   return (
     <div className={`${styles.chat} ion-padding`}>
-      {React.Children.map(arrChildren, (child, i) => {
-        if (React.isValidElement(child)) {
-          const { showProfilePicture, showName, showDate } = assess(
-            child,
-            arrChildren as React.ReactElement[],
-            i
-          );
-          return (
-            <>
-              {showDate ? (
-                <IonText className="ion-text-center">
-                  {intl.formatDate(child.props.timestamp, {
-                    year: "numeric",
-                    month: "numeric",
-                    day: "numeric",
-                  })}
-                </IonText>
-              ) : null}
-              {React.cloneElement(child, {
-                type,
-                showProfilePicture,
-                showName,
-              })}
-            </>
-          );
-        }
-        return child;
-      })}
+      <IonInfiniteScroll
+        ref={infiniteScroll}
+        position="top"
+        onIonInfinite={(e) => {
+          if (onScrollTop) {
+            onScrollTop(e, complete);
+          }
+        }}
+      >
+        <IonInfiniteScrollContent loadingSpinner="crescent" />
+      </IonInfiniteScroll>
+      {elements}
+      <div ref={scroll} />
     </div>
   );
 };
