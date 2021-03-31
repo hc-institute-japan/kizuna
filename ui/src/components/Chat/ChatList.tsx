@@ -3,16 +3,24 @@ import {
   IonInfiniteScrollContent,
   IonText,
 } from "@ionic/react";
-import React, { useEffect, useRef } from "react";
+import React, {
+  forwardRef,
+  ForwardRefRenderFunction,
+  ReactFragment,
+  Ref,
+  RefForwardingComponent,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+} from "react";
 import { useIntl } from "react-intl";
 import styles from "./style.module.css";
-import { ChatListProps } from "./types";
+import { ChatListMethods, ChatListProps } from "./types";
 
-const ChatList: React.FC<ChatListProps> = ({
-  children,
-  type = "p2p",
-  onScrollTop,
-}) => {
+const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
+  { children, type = "p2p", onScrollTop },
+  ref: Ref<ChatListMethods>
+) => {
   const arrChildren = React.Children.toArray(children);
   const intl = useIntl();
   const scroll = useRef<HTMLDivElement | null>(null);
@@ -90,6 +98,12 @@ const ChatList: React.FC<ChatListProps> = ({
 
   const complete = () => infiniteScroll.current!.complete();
 
+  useImperativeHandle(ref, () => ({
+    scrollToBottom: () => {
+      scroll.current!.scrollIntoView({ behavior: "smooth" });
+    },
+  }));
+
   return (
     <div className={`${styles.chat} ion-padding`}>
       <IonInfiniteScroll
@@ -109,4 +123,4 @@ const ChatList: React.FC<ChatListProps> = ({
   );
 };
 
-export default ChatList;
+export default forwardRef(ChatList);
