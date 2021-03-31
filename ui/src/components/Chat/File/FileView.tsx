@@ -14,7 +14,7 @@ const File: React.FC<Props> = ({ file }) => {
   const handleOnClick = () => {
     const blob = new Blob([base64ToUint8Array(file.fileHash)]); // change resultByte to bytes
 
-    var link = document.createElement("a");
+    const link = document.createElement("a");
     link.href = window.URL.createObjectURL(blob);
     link.download = file.fileName;
     link.click();
