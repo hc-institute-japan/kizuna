@@ -1,6 +1,7 @@
 import {
   IonInfiniteScroll,
   IonInfiniteScrollContent,
+  IonList,
   IonText,
 } from "@ionic/react";
 import React, {
@@ -105,7 +106,7 @@ const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
   }));
 
   return (
-    <div className={`${styles.chat} ion-padding`}>
+    <IonList className={`${styles.chat}`}>
       {onScrollTop ? (
         <IonInfiniteScroll
           ref={infiniteScroll}
@@ -120,7 +121,7 @@ const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
 
       {elements}
       <div ref={scroll} />
-    </div>
+    </IonList>
   );
 };
 
