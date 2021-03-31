@@ -6,9 +6,7 @@ import {
 import React, {
   forwardRef,
   ForwardRefRenderFunction,
-  ReactFragment,
   Ref,
-  RefForwardingComponent,
   useEffect,
   useImperativeHandle,
   useRef,
@@ -106,17 +104,18 @@ const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
 
   return (
     <div className={`${styles.chat} ion-padding`}>
-      <IonInfiniteScroll
-        ref={infiniteScroll}
-        position="top"
-        onIonInfinite={(e) => {
-          if (onScrollTop) {
+      {onScrollTop ? (
+        <IonInfiniteScroll
+          ref={infiniteScroll}
+          position="top"
+          onIonInfinite={(e) => {
             onScrollTop(e, complete);
-          }
-        }}
-      >
-        <IonInfiniteScrollContent loadingSpinner="crescent" />
-      </IonInfiniteScroll>
+          }}
+        >
+          <IonInfiniteScrollContent loadingSpinner="crescent" />
+        </IonInfiniteScroll>
+      ) : null}
+
       {elements}
       <div ref={scroll} />
     </div>
