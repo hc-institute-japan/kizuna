@@ -1,6 +1,6 @@
 import { IonImg } from "@ionic/react";
 import React, { useState } from "react";
-import { FilePayload } from "../../../redux/commons/types";
+import { FilePayload } from "../../../../redux/commons/types";
 
 import ImageModal from "./ImageModal";
 
@@ -9,7 +9,7 @@ interface Props {
   file: FilePayload;
 }
 
-const Image: React.FC<Props> = ({ src }) => {
+const Image: React.FC<Props> = ({ src, file }) => {
   const [isOpen, setIsOpen] = useState(false);
   const handleOnImageOnClick = () => {
     setIsOpen(true);
@@ -17,7 +17,7 @@ const Image: React.FC<Props> = ({ src }) => {
 
   return (
     <>
-      <ImageModal state={[isOpen, setIsOpen]} src={src}></ImageModal>
+      <ImageModal state={[isOpen, setIsOpen]} src={src} file={file} />
       <IonImg onClick={handleOnImageOnClick} src={src} />
     </>
   );

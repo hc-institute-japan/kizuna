@@ -2,12 +2,8 @@
   cursor: pointer;
 }
 
-.modal ion-toolbar {
-  --background: rgba(0, 0, 0, 0);
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-attachment: fixed;
+.toolbar {
+  --background: rgb(0, 0, 0) !important;
 }
 
 .content {
@@ -15,7 +11,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
+  background-color: black;
   box-sizing: border-box;
   width: 100%;
   overflow: hidden;
