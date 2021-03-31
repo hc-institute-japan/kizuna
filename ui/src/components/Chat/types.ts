@@ -21,3 +21,7 @@ export interface ChatProps {
   showProfilePicture?: boolean;
   showName?: boolean;
 }
+
+export interface ChatListMethods {
+  scrollToBottom(): any;
+}
