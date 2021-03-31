@@ -24,5 +24,7 @@
   "app.register.username-placeholder": "ユーザー名を入力してください...",
   "app.register.register": "アカウントを作成する",
   "components.message-input.over-size-limit": "{fileName}が15MBのファイル制限を超えています",
-  "components.chat.image-modal-download": "ダウンロード"
+  "components.chat.image-modal-download": "ダウンロード",
+  "components.chat.chat-list.today": "今日"
+
 }

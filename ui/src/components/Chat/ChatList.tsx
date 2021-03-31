@@ -68,11 +68,13 @@ const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
         <>
           {showDate ? (
             <IonText className="ion-text-center">
-              {intl.formatDate(child.props.timestamp, {
-                year: "numeric",
-                month: "numeric",
-                day: "numeric",
-              })}
+              {child.props.timestamp.toDateString() == new Date().toDateString()
+                ? "Today"
+                : intl.formatDate(child.props.timestamp, {
+                    year: "numeric",
+                    month: "numeric",
+                    day: "numeric",
+                  })}
             </IonText>
           ) : null}
           {React.cloneElement(child, {
@@ -109,7 +111,7 @@ const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
           ref={infiniteScroll}
           position="top"
           onIonInfinite={(e) => {
-            onScrollTop(e, complete);
+            onScrollTop(complete, e);
           }}
         >
           <IonInfiniteScrollContent loadingSpinner="crescent" />
