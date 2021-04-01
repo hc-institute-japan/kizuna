@@ -46,10 +46,12 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
 
   const onFileSelectCallback = useCallback(() => {
     if (onFileSelect) onFileSelect(files);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [files]);
 
   const onChangeCallback = useCallback(() => {
     if (onChange) onChange(message);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [message]);
 
   const reset = () => {
@@ -87,7 +89,7 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
 
                 const final = {
                   metadata: { fileName, fileType: type, fileSize },
-                  fileType: { type, thumbnail: encoded },
+                  fileType: { type, payload: {thumbnail: encoded} },
                   fileBytes,
                 };
 
@@ -99,7 +101,7 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
             } else {
               const final = {
                 metadata: { fileName, fileType: type, fileSize },
-                fileType: { type },
+                fileType: { type, payload: null },
                 fileBytes,
               };
               setFiles((currFiles) => {

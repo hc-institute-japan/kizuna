@@ -39,7 +39,6 @@ import {
   SET_MESSAGES_BY_GROUP_BY_TIMESTAMP,
   SetMessagesByGroupByTimestampAction,
   SET_LATEST_GROUP_VERSION,
-  SetLatestGroupState,
   SetLatestGroupVersionAction,
 } from "./types";
 import {
@@ -278,8 +277,6 @@ export const sendGroupMessage = (
     groupMessageData.payloadInput.payload = { payload: message.trim() };
   }
 
-  console.log(groupMessageData);
-
   const sendGroupMessageOutput = await callZome({
     zomeName: ZOMES.GROUP,
     fnName: FUNCTIONS[ZOMES.GROUP].SEND_MESSAGE,
@@ -291,7 +288,6 @@ export const sendGroupMessage = (
   if (isTextPayload(groupMessageData.payloadInput)) {
     payload = sendGroupMessageOutput.content.payload;
   } else {
-    console.log(sendGroupMessageOutput);
     let fileType: FileType =
       sendGroupMessageOutput.content.payload.payload.fileType;
     let thumbnail: Uint8Array | undefined = isOther(fileType)
@@ -476,7 +472,6 @@ export const getLatestGroupVersion = (groupId: string): ThunkAction => async (
       groupHash: base64ToUint8Array(groupId),
     },
   });
-  console.log("here is the latest group", res);
   let groupMessageBatchFetchFilter: GroupMessageBatchFetchFilter = {
     groupId: base64ToUint8Array(groupId),
     batchSize: 10,
@@ -496,8 +491,6 @@ export const getLatestGroupVersion = (groupId: string): ThunkAction => async (
     groupMessagesRes
   );
 
-  console.log(groupMessagesOutput);
-
   let groupData: GroupConversation = {
     originalGroupEntryHash: Uint8ArrayToBase64(res.groupId),
     originalGroupHeaderHash: Uint8ArrayToBase64(res.groupRevisionId),
@@ -514,10 +507,6 @@ export const getLatestGroupVersion = (groupId: string): ThunkAction => async (
     groupData.members,
     callZome,
     Uint8ArrayToBase64(myAgentId!)
-  );
-  console.log(groupData);
-  console.log(
-    groupMessagesOutput.messagesByGroup[Uint8ArrayToBase64(res.groupId)]
   );
 
   dispatch<SetLatestGroupVersionAction>({
@@ -584,12 +573,11 @@ const convertPayload = (payload: any | TextPayload): Payload => {
   } else {
     return {
       type: "FILE",
-
       fileName: payload.payload.metadata.fileName,
       fileSize: payload.payload.metadata.fileSize,
       fileType: payload.payload.metadata.fileType,
       fileHash: payload.payload.metadata.fileHash,
-      thumbnail: payload.payload.fileType.thumbnail,
+      thumbnail: payload.payload.fileType.payload.thumbnail,
     };
   }
 };

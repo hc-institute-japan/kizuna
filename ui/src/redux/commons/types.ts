@@ -21,7 +21,7 @@ export interface FilePayload {
 export type FileType =
   | { type: "IMAGE"; payload: { thumbnail: Uint8Array } }
   | { type: "VIDEO"; payload: { thumbnail: Uint8Array } }
-  | { type: "OTHER"; payload: null };
+  | { type: "OTHER"; payload?: null };
 
 export type FetchPayloadType =
   | { type: "TEXT"; payload: null }
@@ -54,9 +54,9 @@ export function isOther(
   payload:
     | { type: "IMAGE"; payload: { thumbnail: Uint8Array } }
     | { type: "VIDEO"; payload: { thumbnail: Uint8Array } }
-    | { type: "OTHER"; payload: null }
-): payload is { type: "OTHER"; payload: null } {
-  return (payload as { type: "OTHER"; payload: null }).type === "OTHER";
+    | { type: "OTHER"; payload?: null }
+): payload is { type: "OTHER"; payload?: null } {
+  return (payload as { type: "OTHER"; payload?: null }).type === "OTHER";
 }
 
 export function isImage(
@@ -67,5 +67,16 @@ export function isImage(
   return (
     (payload as { type: "IMAGE"; payload: { thumbnail: Uint8Array } }).type ===
     "IMAGE"
+  );
+}
+
+export function isVideo(
+  payload:
+    | { type: "IMAGE"; payload: { thumbnail: Uint8Array } }
+    | { type: "VIDEO"; payload: { thumbnail: Uint8Array } }
+): payload is { type: "VIDEO"; payload: { thumbnail: Uint8Array } } {
+  return (
+    (payload as { type: "VIDEO"; payload: { thumbnail: Uint8Array } }).type ===
+    "VIDEO"
   );
 }

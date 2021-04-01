@@ -14,8 +14,7 @@ import {
 } from "../redux/group/types";
 import { SET_GROUP_MESSAGE, SetGroupMessageAction } from "../redux/group/types";
 import { base64ToUint8Array, Uint8ArrayToBase64 } from "../utils/helpers";
-import { isTextPayload } from "../redux/commons/types";
-import { addedToGroup } from "../redux/group/actions";
+import { isImage, isOther, isTextPayload } from "../redux/commons/types";
 import { Profile } from "../redux/profile/types";
 import { FUNCTIONS, ZOMES } from "./types";
 
@@ -87,14 +86,17 @@ let signalHandler: AppSignalCb = (signal) => {
               type: "FILE",
               fileName: payload.content.payload.payload.metadata.fileName,
               fileSize: payload.content.payload.payload.metadata.fileSize,
-              fileType: payload.content.payload.payload.metadata.fileType,
+              fileType: isOther(payload.content.payload.payload.fileType)
+                ? "OTHER"
+                : isImage(payload.content.payload.payload.fileType)
+                ? "IMAGE"
+                : "VIDEO",
               fileHash: Uint8ArrayToBase64(
                 payload.content.payload.payload.metadata.fileHash
               ),
-              thumbnail: payload.content.payload.payload.fileType.payload
-                .thumbnail
-                ? payload.content.payload.payload.fileType.payload.thumbnail
-                : undefined,
+              thumbnail: isOther(payload.content.payload.payload.fileType)
+                ? undefined
+                : payload.content.payload.payload.fileType.payload.thumbnail,
             },
         timestamp: payload.content.created,
         // TODO: work on this

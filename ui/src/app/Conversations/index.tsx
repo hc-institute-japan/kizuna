@@ -14,11 +14,11 @@ import { useHistory } from "react-router";
 import Conversation from "../../components/Conversation";
 import Toolbar from "../../components/Toolbar";
 import { isTextPayload } from "../../redux/commons/types";
-import { GroupConversation, GroupConversationsActionTypes, GroupMessage } from "../../redux/group/types";
+import { GroupConversation, GroupMessage } from "../../redux/group/types";
 import { fetchId } from "../../redux/profile/actions";
 import { RootState } from "../../redux/types";
 import { Uint8ArrayToBase64, useAppDispatch } from "../../utils/helpers";
-import { Conversations as ConversationsType, Message } from "../../utils/types";
+import { Message } from "../../utils/types";
 import EmptyConversations from "./EmptyConversations";
 import styles from "./style.module.css";
 
@@ -67,16 +67,14 @@ const Conversations: React.FC = () => {
       } else {
         let maybeOther: any | undefined = groupMembers[groupMessage.author];
         let fileString: string = "";
-        console.log(maybeOther);
         if (maybeOther) {
           // TODO: format for i18n
-          fileString = new String(maybeOther.username + " " + "has sent" + " " + groupMessage.payload.fileName).toString();
+          fileString = String(maybeOther.username + " has sent " + groupMessage.payload.fileName).toString();
         } else {
           // MAYBE BUG: assumption is you sent it.
           // TODO: format for i18n
-          fileString = new String("You" + " sent " + groupMessage.payload.fileName).toString();
+          fileString = String("You sent " + groupMessage.payload.fileName).toString();
         }
-        console.log(fileString);
         
         let message: Message = {
           id: groupMessage.groupMessageEntryHash,
@@ -89,9 +87,9 @@ const Conversations: React.FC = () => {
           },
           timestamp: groupMessage.timestamp,
           // TODO: this part is file
-          message: fileString
+          message: fileString,
+          fileName: groupMessage.payload.fileName
         };
-        console.log(message);
         return message
       };
     }) : [];
@@ -111,7 +109,6 @@ const Conversations: React.FC = () => {
     arr.sort((x: any, y: any) => 
       groups[x.id].createdAt.valueOf() < groups[y.id].createdAt.valueOf() ? 1 : -1
     );
-    console.log("is this working or what",arr);
     return arr;
   };
 
@@ -120,7 +117,7 @@ const Conversations: React.FC = () => {
       if (res) setMyAgentId(Uint8ArrayToBase64(res))
     });
     setGroups(groupsData);
-    }, [groupsData])
+    }, [groupsData, dispatch])
 
   return (
     <IonPage>
@@ -134,6 +131,7 @@ const Conversations: React.FC = () => {
                 groupId={groupConversation.id}
                 key={JSON.stringify(groupConversation.id)}
                 content={groupConversation.content}
+                myAgentId={myAgentId}
               />
             ))}
           </IonList>

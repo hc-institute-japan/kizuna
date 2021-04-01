@@ -69,7 +69,7 @@ const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
         <>
           {showDate ? (
             <IonText className="ion-text-center">
-              {child.props.timestamp.toDateString() == new Date().toDateString()
+              {child.props.timestamp.toDateString() === new Date().toDateString()
                 ? "Today"
                 : intl.formatDate(child.props.timestamp, {
                     year: "numeric",

@@ -8,7 +8,8 @@ export interface Message {
   id: string;
   sender: Profile;
   message: string;
-  timestamp: Date;
+  fileName?: string;
+  timestamp: [number, number];
 }
 
 export interface Conversation {

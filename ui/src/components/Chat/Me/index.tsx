@@ -1,9 +1,4 @@
-import {
-  IonItem,
-  IonItemOption,
-  IonItemOptions,
-  IonItemSliding,
-} from "@ionic/react";
+import { IonItem } from "@ionic/react";
 import React from "react";
 import {
   FilePayload,
@@ -19,7 +14,6 @@ const Me: React.FC<ChatProps> = ({
   payload,
   author,
   timestamp,
-  readList,
   type,
   showProfilePicture,
 }) => {

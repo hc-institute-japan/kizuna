@@ -1,10 +1,4 @@
-import {
-  IonItem,
-  IonItemOption,
-  IonItemOptions,
-  IonItemSliding,
-  IonText,
-} from "@ionic/react";
+import { IonItem, IonText } from "@ionic/react";
 import React from "react";
 import {
   FilePayload,
