@@ -1,7 +1,6 @@
 import { AgentPubKey } from "@holochain/conductor-api";
 import {
   IonAvatar,
-  IonBackButton,
   IonButton,
   IonButtons,
   IonContent,
@@ -16,40 +15,22 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router";
 import {
-  createGroup,
-  addGroupMembers,
-  removeGroupMembers,
-  updateGroupName,
   sendGroupMessage,
-  getNextBatchGroupMessages,
-  getMessagesByGroupByTimestamp,
   getLatestGroupVersion,
 } from "../../redux/group/actions";
 import {
   GroupConversation,
   GroupMessageInput,
-  UpdateGroupNameData,
   GroupMessage,
-  UpdateGroupMembersData,
-  GroupMessageBatchFetchFilter,
-  GroupMessagesOutput,
-  GroupMessageByDateFetchFilter
 } from "../../redux/group/types";
 import { RootState } from "../../redux/types";
-import { FileMetadataInput, FilePayloadInput } from "../../redux/commons/types"; 
+import { FilePayloadInput } from "../../redux/commons/types"; 
 import MessageList from "./MessageList";
 import { base64ToUint8Array, Uint8ArrayToBase64, useAppDispatch } from "../../utils/helpers";
 import {fetchId} from "../../redux/profile/actions";
 
 import MessageInput from "../../components/MessageInput";
-import { arrowBackSharp } from "ionicons/icons";
-import Chat from "../../components/Chat";
-
-interface userData {
-  id: string;
-  username: string;
-  isAdded: boolean;
-}
+import { arrowBackSharp, informationCircleOutline } from "ionicons/icons";
 
 interface GroupChatParams {
   group: string;
@@ -128,22 +109,21 @@ const GroupChat: React.FC = () => {
   dispatch(fetchId()).then((res: AgentPubKey | null) => {
     if (res) setMyAgentId(Uint8ArrayToBase64(res))
   });
-  }, [])
+  }, [dispatch])
 
   useEffect(() => {
     if (groupData) {
       dispatch(getLatestGroupVersion(group)).then((res:GroupConversation) => {
-        console.log(res);
         setGroupInfo(res);
       })
       setLoading(false);
     } else {
       dispatch(getLatestGroupVersion(group)).then((res:GroupConversation) => {
-        console.log(res);
         setGroupInfo(res);
         setLoading(false);
       })
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -166,6 +146,11 @@ const GroupChat: React.FC = () => {
               {groupInfo ? groupInfo!.avatar ? <img src={groupInfo!.avatar} alt={groupInfo!.name} /> : <img src={"https://upload.wikimedia.org/wikipedia/commons/8/8c/Lauren_Tsai_by_Gage_Skidmore.jpg"} alt={groupInfo!.name} /> : <img src={"https://upload.wikimedia.org/wikipedia/commons/8/8c/Lauren_Tsai_by_Gage_Skidmore.jpg"} alt={groupInfo!.name} />}
             </IonAvatar>
             <IonTitle className="ion-no-padding"> {groupInfo!.name}</IonTitle>
+            <IonButton onClick={() =>  {
+              history.push(`/g/${groupInfo.originalGroupEntryHash}/info`);
+            }}>
+              <IonIcon slot ="icon-only" icon={informationCircleOutline}/>
+            </IonButton>
           </IonButtons>
         </IonToolbar>
       </IonHeader>

@@ -1,18 +1,18 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import Chat from "../../components/Chat";
-import { GroupMessage } from "../../redux/group/types";
+
 import { RootState } from "../../redux/types";
+import { GroupMessage } from "../../redux/group/types";
+import Chat from "../../components/Chat";
 interface Props {
   messageIds: string[];
   members: string[];
   myAgentId: string;
 }
 const MessageList: React.FC<Props> = ({ messageIds, members, myAgentId }) => {
-  let { username } = useSelector((state: RootState) => state.profile);
   const messagesData = useSelector((state: RootState) => {
     let uniqueArray = messageIds.filter(function (item, pos, self) {
-      return self.indexOf(item) == pos;
+      return self.indexOf(item) === pos;
     });
     const messages: (any | undefined)[] = uniqueArray
       ? uniqueArray.map((messageId) => {
@@ -49,25 +49,8 @@ const MessageList: React.FC<Props> = ({ messageIds, members, myAgentId }) => {
   return (
     <Chat.ChatList type="group">
       {messagesData!.map((message) => {
-        if (message.author.id === myAgentId)
-          return (
-            <Chat.Me
-              key={message.groupMessageEntryHash}
-              author={message.author.username}
-              timestamp={message.timestamp}
-              payload={message.payload}
-              readList={message.readList}
-            />
-          );
-        return (
-          <Chat.Others
-            key={message.groupMessageEntryHash}
-            author={message.author.username}
-            timestamp={message.timestamp}
-            payload={message.payload}
-            readList={message.readList}
-          />
-        );
+        if (message.author.id === myAgentId) return <Chat.Me key={message.groupMessageEntryHash} author={message.author.username} timestamp={new Date(message.timestamp[0] * 1000)} payload={message.payload} readList={message.readList} type={"group"} showName={true} showProfilePicture={true} />;
+        return <Chat.Others key={message.groupMessageEntryHash} author={message.author.username} timestamp={new Date(message.timestamp[0] * 1000)} payload={message.payload} readList={message.readList} type={"group"} showName={true} showProfilePicture={true} />;
       })}
     </Chat.ChatList>
   );

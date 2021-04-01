@@ -15,8 +15,7 @@ import {
   SET_LATEST_GROUP_VERSION,
 } from "./types";
 import { isTextPayload } from "../commons/types";
-import { stat } from "fs";
-import { Profile, ProfileState } from "../profile/types";
+import { Profile } from "../profile/types";
 
 const initialState: GroupConversationsState = {
   conversations: {},
@@ -79,7 +78,11 @@ const reducer = (
         ...groupConversations,
         [groupEntryHash]: groupConversation,
       };
-      return { ...state, conversations: groupConversations };
+      let members = state.members;
+      removedMembers.forEach((memberId: any) => {
+        delete members[memberId];
+      });
+      return { ...state, conversations: groupConversations, members };
     }
     case UPDATE_GROUP_NAME: {
       let groupEntryHash: string = action.updateGroupNameData.groupId;
@@ -119,7 +122,6 @@ const reducer = (
           ...groupFiles,
           ...newFile,
         };
-        console.log(messages);
         return { ...state, messages, groupFiles };
       } else {
         return { ...state, messages };
@@ -191,7 +193,7 @@ const reducer = (
         members[key] = action.membersUsernames[key];
       });
 
-      return { ...state, conversations: groupConversations, members };
+      return { ...state, conversations: groupConversations, members, messages };
     }
     default:
       return state;

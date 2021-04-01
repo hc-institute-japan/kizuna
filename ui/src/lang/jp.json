@@ -25,6 +25,10 @@
   "app.register.register": "アカウントを作成する",
   "components.message-input.over-size-limit": "{fileName}が15MBのファイル制限を超えています",
   "components.chat.image-modal-download": "ダウンロード",
-  "components.chat.chat-list.today": "今日"
-
+  "components.chat.chat-list.today": "今日",
+  "app.conversation.me-file-string": "{name}が{fileName}を送信しました",
+  "app.conversation.other-file-string": "あなたは{fileName}を送りました",
+  "app.groups.no-member-to-add": "追加できるユーザーがいません。",
+  "app.groups.cannot-remove-member": "グループのメンバーは最低３名です。",
+  "app.groups.cannot-add-member": "{name}はすでにグループのメンバーです。"
 }

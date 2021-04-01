@@ -4,7 +4,6 @@ import { SET_BLOCKED, SET_CONTACTS } from "../contacts/types";
 import {
   GroupConversation,
   GroupMessagesOutput,
-  MessagesByGroup,
   SetLatestGroupState,
   SET_LATEST_GROUP_STATE,
 } from "../group/types";
