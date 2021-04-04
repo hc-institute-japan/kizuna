@@ -568,7 +568,7 @@ const convertPayload = (payload: any | TextPayload): Payload => {
       fileName: payload.payload.metadata.fileName,
       fileSize: payload.payload.metadata.fileSize,
       fileType: payload.payload.metadata.fileType,
-      fileHash: payload.payload.metadata.fileHash,
+      fileHash: Uint8ArrayToBase64(payload.payload.metadata.fileHash),
     };
   } else {
     return {
@@ -576,7 +576,7 @@ const convertPayload = (payload: any | TextPayload): Payload => {
       fileName: payload.payload.metadata.fileName,
       fileSize: payload.payload.metadata.fileSize,
       fileType: payload.payload.metadata.fileType,
-      fileHash: payload.payload.metadata.fileHash,
+      fileHash: Uint8ArrayToBase64(payload.payload.metadata.fileHash),
       thumbnail: payload.payload.fileType.payload.thumbnail,
     };
   }

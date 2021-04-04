@@ -1,9 +1,9 @@
-import { IonGrid, IonIcon, IonRow, IonText } from "@ionic/react";
+import { IonGrid, IonIcon, IonLabel, IonRow, IonText } from "@ionic/react";
 import { documentOutline } from "ionicons/icons";
 import React from "react";
 import { FilePayload } from "../../../../../redux/commons/types";
 import { base64ToUint8Array } from "../../../../../utils/helpers";
-import styles from "./style.module.css";
+import styles from "../../style.module.css";
 
 interface Props {
   file: FilePayload;
@@ -12,11 +12,9 @@ interface Props {
 const File: React.FC<Props> = ({ file }) => {
   const { fileName, fileSize } = file;
   const handleOnClick = () => {
-    const blob = new Blob([base64ToUint8Array(file.fileHash)], {
-      type: "application/pdf",
-    }); // change resultByte to bytes
+    const blob = new Blob([base64ToUint8Array(file.fileHash)]); // change resultByte to bytes
 
-    var link = document.createElement("a");
+    const link = document.createElement("a");
     link.href = window.URL.createObjectURL(blob);
     link.download = file.fileName;
     link.click();
@@ -32,9 +30,9 @@ const File: React.FC<Props> = ({ file }) => {
         </div>
         <div className="ion-align-items-center">
           <IonRow>
-            <IonText>
+            <IonLabel className="ion-text-wrap">
               <p className="ion-no-margin">{fileName}</p>
-            </IonText>
+            </IonLabel>
           </IonRow>
           <IonRow>
             <IonText>
