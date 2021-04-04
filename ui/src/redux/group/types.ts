@@ -5,7 +5,6 @@ import {
   TextPayload,
   FetchPayloadType,
   FilePayloadInput,
-  FilePayload,
 } from "../commons/types";
 
 export const ADD_GROUP = "ADD_GROUP";
@@ -103,10 +102,6 @@ export interface MessagesByGroup {
 export interface GroupMessagesContents {
   // key here is the base 64 string of GroupMessage EntryHash
   [key: string]: GroupMessage;
-}
-
-export interface IndexedMedia {
-  [key: string]: FilePayload[];
 }
 
 // Unused right now

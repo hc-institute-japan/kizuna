@@ -28,7 +28,22 @@
   "components.chat.chat-list.today": "今日",
   "app.conversation.me-file-string": "{name}が{fileName}を送信しました",
   "app.conversation.other-file-string": "あなたは{fileName}を送りました",
+  "app.groups.add-member-contacts": "連絡先",
+  "app.groups.add-member-close": "閉じる",
+  "app.groups.add-member": "追加",
   "app.groups.no-member-to-add": "追加できるユーザーがいません。",
   "app.groups.cannot-remove-member": "グループのメンバーは最低３名です。",
-  "app.groups.cannot-add-member": "{name}はすでにグループのメンバーです。"
+  "app.groups.cannot-add-member": "{name}はすでにグループのメンバーです。",
+  "app.groups.media.january": "1月",
+  "app.groups.media.fabruary": "2月",
+  "app.groups.media.march": "3月",
+  "app.groups.media.april": "4月",
+  "app.groups.media.may": "5月",
+  "app.groups.media.june": "6月",
+  "app.groups.media.july": "7月",
+  "app.groups.media.august": "8月",
+  "app.groups.media.september": "9月",
+  "app.groups.media.october": "10月",
+  "app.groups.media.november": "11月",
+  "app.groups.media.december": "12月"
 }

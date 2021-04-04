@@ -28,7 +28,22 @@
   "components.chat.chat-list.today": "Today",
   "app.conversation.other-file-string": "{name} has sent {fileName}",
   "app.conversation.me-file-string": "You sent {fileName}",
+  "app.groups.add-member-contacts": "Contacts",
+  "app.groups.add-member-close": "Close",
+  "app.groups.add-member": "Add",
   "app.groups.no-member-to-add": "You have no one to add right now...",
   "app.groups.cannot-remove-member": "The group must at leaset have 3 members",
-  "app.groups.cannot-add-member": "{name} is already a member of the group"
+  "app.groups.cannot-add-member": "{name} is already a member of the group",
+  "app.groups.media.january": "January",
+  "app.groups.media.fabruary": "February",
+  "app.groups.media.march": "March",
+  "app.groups.media.april": "April",
+  "app.groups.media.may": "May",
+  "app.groups.media.june": "June",
+  "app.groups.media.july": "July",
+  "app.groups.media.august": "August",
+  "app.groups.media.september": "Septmember",
+  "app.groups.media.october": "October",
+  "app.groups.media.november": "November",
+  "app.groups.media.december": "December"
 }
