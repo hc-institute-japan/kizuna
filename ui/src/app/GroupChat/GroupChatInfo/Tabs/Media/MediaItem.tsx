@@ -2,6 +2,7 @@ import { IonItem } from "@ionic/react";
   import React from "react";
 import { FilePayload } from "../../../../../redux/commons/types";
 import ImageView from "../../../../../components/Chat/File/ImageView/index";
+import VideoView from "../../../../../components/Chat/File/VideoView";
   
   interface Props {
     file?: FilePayload;
@@ -17,9 +18,13 @@ import ImageView from "../../../../../components/Chat/File/ImageView/index";
             return (
               <ImageView file={file} src={decoder.decode(file.thumbnail!)} />
             );
+          case "VIDEO":
+            // TODO: fix this
+            return (
+              <VideoView file={file} />
+            )
           case "OTHER":
             return null;
-            // TODO: work on video
           default:
             return null;
         }

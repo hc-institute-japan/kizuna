@@ -3,7 +3,6 @@ import {
   IonButtons,
   IonHeader,
   IonIcon,
-  IonLabel,
   IonLoading,
   IonModal,
   IonPage,
@@ -26,6 +25,7 @@ import EndButtons from "./EndButtons";
 import UpdateGroupName from "./UpdateGroupName";
 import Members from "./Tabs/Members/Members";
 import Media from "./Tabs/Media/Media";
+import File from "./Tabs/Files/File";
 import { GroupConversation, GroupMessage } from "../../../redux/group/types";
 
 interface GroupChatParams {
@@ -75,11 +75,11 @@ const GroupChatInfo: React.FC = () => {
         return (<Members groupId={group} groupRevisionId={groupInfo!.originalGroupHeaderHash}/>)
       }
       case (show.files): {
-        return (
-          <IonLabel>
-            HERE ARE THE FILES!
-          </IonLabel>
-        )
+        let messages: (GroupMessage[] | undefined) = groupInfo?.messages.map((key: string) => {
+          let message = allMessages[key];
+          return message
+        })
+        return ( <File fileMessages={messages ? messages : []} groupId={group} /> );
       }
       case (show.media): {
         let messages: (GroupMessage[] | undefined) = groupInfo?.messages.map((key: string) => {
