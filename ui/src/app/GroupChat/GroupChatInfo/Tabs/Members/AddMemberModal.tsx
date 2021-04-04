@@ -109,7 +109,7 @@ const AddContactModal: React.FC<Props> = ({ isOpen, setIsOpen, onCancel, contact
           <IonToolbar>
             <IonButtons slot="end">
               <IonButton disabled={selected.length === 0} onClick={() => onAdded()}>
-                <IonLabel>Add</IonLabel>
+                <IonLabel className={styles["add-label"]}>Add</IonLabel>
               </IonButton>
             </IonButtons>
           </IonToolbar>

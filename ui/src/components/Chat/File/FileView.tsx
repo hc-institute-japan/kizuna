@@ -1,4 +1,4 @@
-import { IonGrid, IonIcon, IonRow, IonText } from "@ionic/react";
+import { IonGrid, IonIcon, IonLabel, IonRow, IonText } from "@ionic/react";
 import { documentOutline } from "ionicons/icons";
 import React from "react";
 import { FilePayload } from "../../../redux/commons/types";
@@ -30,9 +30,9 @@ const File: React.FC<Props> = ({ file }) => {
         </div>
         <div className="ion-align-items-center">
           <IonRow>
-            <IonText>
+            <IonLabel className="ion-text-wrap">
               <p className="ion-no-margin">{fileName}</p>
-            </IonText>
+            </IonLabel>
           </IonRow>
           <IonRow>
             <IonText>

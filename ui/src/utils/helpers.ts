@@ -1,3 +1,4 @@
+import { IntlShape } from "react-intl";
 import { useDispatch } from "react-redux";
 import { IndexedContacts } from "../redux/contacts/types";
 import { Profile } from "../redux/profile/types";
@@ -18,6 +19,37 @@ export const objectMap = (
       : (result[key] = mapFn(object[key]));
     return result;
   }, {});
+};
+
+export const monthToString = (month: number, intl: IntlShape) => {
+  switch (month) {
+    case 0:
+      return intl.formatMessage({ id: "app.groups.media.january" })!;
+    case 1:
+      return intl.formatMessage({ id: "app.groups.media.february" })!;
+    case 2:
+      return intl.formatMessage({ id: "app.groups.media.march" })!;
+    case 3:
+      return intl.formatMessage({ id: "app.groups.media.april" })!;
+    case 4:
+      return intl.formatMessage({ id: "app.groups.media.may" })!;
+    case 5:
+      return intl.formatMessage({ id: "app.groups.media.june" })!;
+    case 6:
+      return intl.formatMessage({ id: "app.groups.media.july" })!;
+    case 7:
+      return intl.formatMessage({ id: "app.groups.media.august" })!;
+    case 8:
+      return intl.formatMessage({ id: "app.groups.media.september" })!;
+    case 9:
+      return intl.formatMessage({ id: "app.groups.media.october" })!;
+    case 10:
+      return intl.formatMessage({ id: "app.groups.media.november" })!;
+    case 11:
+      return intl.formatMessage({ id: "app.groups.media.december" })!;
+    default:
+      break;
+  }
 };
 
 export const indexContacts: (contacts: Profile[]) => IndexedContacts = (

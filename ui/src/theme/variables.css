@@ -241,3 +241,7 @@ body {
 ion-toolbar {
   --background: var(--ion-background-color);
 }
+
+ion-button {
+  text-transform: none;
+ }

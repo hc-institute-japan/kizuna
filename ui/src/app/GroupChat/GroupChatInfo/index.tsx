@@ -26,7 +26,7 @@ import EndButtons from "./EndButtons";
 import UpdateGroupName from "./UpdateGroupName";
 import Members from "./Tabs/Members/Members";
 import Media from "./Tabs/Media/Media";
-import { GroupConversation } from "../../../redux/group/types";
+import { GroupConversation, GroupMessage } from "../../../redux/group/types";
 
 interface GroupChatParams {
   group: string;
@@ -38,6 +38,7 @@ const GroupChatInfo: React.FC = () => {
   const groupData = useSelector(
     (state: RootState) => state.groups.conversations[group]
   );
+  const allMessages = useSelector((state: RootState) => state.groups.messages);
   const [editGroupName, setEditGroupName] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [modalLoading, setModalLoading] = useState<boolean>(false);
@@ -81,8 +82,12 @@ const GroupChatInfo: React.FC = () => {
         )
       }
       case (show.media): {
+        let messages: (GroupMessage[] | undefined) = groupInfo?.messages.map((key: string) => {
+          let message = allMessages[key];
+          return message
+        })
         return (
-          <Media groupId={group}/>
+          <Media fileMessages={messages ? messages : []} groupId={group}/>
         )
       }
       default:

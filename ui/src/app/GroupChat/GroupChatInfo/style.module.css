@@ -79,17 +79,6 @@
     padding-left: 5%;
 }
 
-/* .groupName {
-    padding-top: 10%;
-}
-   */
-.my-custom-modal-css{
-    height: 20%;
-    top: 80%;
-    position: absolute; 
-    display: block;  
-}
-
 .groupname {
     display: flex;
     font-size: x-large;
@@ -101,4 +90,49 @@
 .input {
     padding: 10px;
     margin: 10px;
+}
+
+/*
+  FOR ADD MEMBER MODAL
+*/
+.contacts {
+  font-size: large;
+}
+
+.close-label {
+  font-size: large;
+}
+
+.add-label {
+  font-size: medium;
+}
+
+.close-button {
+  --padding-end: 20px !important;
+}
+
+/*
+ FOR MEDIA
+*/
+
+.month {
+    padding-left: 1%;
+    font-size: large;
+}
+
+.grid {
+  --ion-grid-columns: 15;
+  --ion-grid-padding: 0px;
+  --ion-grid-margin: 0px;
+  --padding-inline-start: 0px;
+  --padding-top: 0px;
+  --padding-bottom: 0px;
+  padding-inline-end: 0px;
+  padding-inline-start: 0px
+
+  /* --ion-grid-padding-xs:5px; */
+  /* --ion-grid-padding-sm:5px; */
+  /* --ion-grid-padding-md:5px; */
+  /* --ion-grid-padding-lg:5px; */
+  /* --ion-grid-padding-xl:5px; */
 }
