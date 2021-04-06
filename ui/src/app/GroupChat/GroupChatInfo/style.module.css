@@ -1,95 +1,108 @@
 .header {
-    /* background: var(--ion-background-color); */
-    /* height: 30%; */
-    display: flex;
-    flex-direction: column;
+  /* background: var(--ion-background-color); */
+  /* height: 30%; */
+  display: flex;
+  flex-direction: column;
 }
 
 .memberName {
-    font-size: x-large;
+  font-size: x-large;
+}
+
+.image-row {
+  width: 100% !important;
+}
+.content {
+  width: 100%;
+}
+
+.image-row ion-col > * {
+  height: 100% !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  object-fit: cover;
 }
 
 .memberTitle {
-    font-size: x-large;
+  font-size: x-large;
 }
 
-.newBackgroundColor{
-    background-color: #fff
+.newBackgroundColor {
+  background-color: #fff;
 }
 .my-custom-modal-css .modal-wrapper {
-    height: 20%;
-    top: 80%;
-    position: absolute; 
-    display: block;  
- }
+  height: 20%;
+  top: 80%;
+  position: absolute;
+  display: block;
+}
 .modal {
-    padding: 10px;
-    background-color: red;
+  padding: 10px;
+  background-color: red;
 }
 
-
 .editGroup {
-    font-size: large;
-    padding: 10px;
+  font-size: large;
+  padding: 10px;
 }
 
 .selected {
-    text-underline-position: below;
+  text-underline-position: below;
 }
 
 .memberInfo {
-    font-size: large;
-    align-items: center;
-    align-content: center;
-    padding-bottom: 5px;
+  font-size: large;
+  align-items: center;
+  align-content: center;
+  padding-bottom: 5px;
 }
 
 .empty-contacts {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    max-width: 100%;
-    max-height: 100%;
-    height: 100%;
-    width: 100%;
-    font-size: medium;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  max-width: 100%;
+  max-height: 100%;
+  height: 100%;
+  width: 100%;
+  font-size: medium;
 }
 
 .addMembers {
-    padding: 3%;
+  padding: 3%;
 }
 
 .contacts-list {
-    background: var(--ion-background-color) !important;
-  }
+  background: var(--ion-background-color) !important;
+}
 
-.icon { 
-    padding-right: 1%;
+.icon {
+  padding-right: 1%;
 }
 
 .divider {
-    height: 5px;
+  height: 5px;
 }
 
 .menu {
-    display: flex;
-    flex-direction: column;
-    background-image:aqua;
-    padding-left: 5%;
+  display: flex;
+  flex-direction: column;
+  background-image: aqua;
+  padding-left: 5%;
 }
 
 .groupname {
-    display: flex;
-    font-size: x-large;
-    padding-left: 7%;
-    padding-bottom: 2%;
-    padding-top: 15%;
-
+  display: flex;
+  font-size: x-large;
+  padding-left: 7%;
+  padding-bottom: 2%;
+  padding-top: 15%;
 }
 .input {
-    padding: 10px;
-    margin: 10px;
+  padding: 10px;
+  margin: 10px;
 }
 
 /*
@@ -116,8 +129,8 @@
 */
 
 .month {
-    padding-left: 1%;
-    font-size: large;
+  padding-left: 1%;
+  font-size: large;
 }
 
 .grid {
@@ -128,7 +141,7 @@
   --padding-top: 0px;
   --padding-bottom: 0px;
   padding-inline-end: 0px;
-  padding-inline-start: 0px
+  padding-inline-start: 0px;
 
   /* --ion-grid-padding-xs:5px; */
   /* --ion-grid-padding-sm:5px; */
