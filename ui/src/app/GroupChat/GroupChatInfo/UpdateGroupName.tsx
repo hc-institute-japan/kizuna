@@ -32,7 +32,10 @@ const UpdateGroupName: React.FC<Props> = ({ onCancel, groupData, onSave, loading
         <IonButton slot="end" onClick={onCancel}>
           <IonLabel>Cancel</IonLabel>
         </IonButton>
-        <IonButton slot="end" onClick={() => onSave(name)}>
+        <IonButton slot="end" onClick={() => {
+          onSave(name);
+          setName("");
+        }}>
           <IonLabel>Save</IonLabel>
         </IonButton>
       </IonButtons>
