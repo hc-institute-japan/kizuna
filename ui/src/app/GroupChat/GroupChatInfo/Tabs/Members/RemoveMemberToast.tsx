@@ -1,21 +1,18 @@
 import { IonToast } from "@ionic/react";
 import React from "react";
-import { useIntl } from "react-intl";
 
 interface Props {
   toast: boolean;
   onDismiss(): any;
+  message: string;
 }
 
-const RemoveMemberToast: React.FC<Props> = ({ toast, onDismiss }) => {
-  const intl = useIntl();
+const RemoveMemberToast: React.FC<Props> = ({ toast, onDismiss, message }) => {
   return (
     <IonToast
       isOpen={toast}
       onDidDismiss={onDismiss}
-      message={intl.formatMessage(
-        { id: "app.groups.cannot-remove-member" },
-      )}
+      message={message}
       duration={1000}
       color="danger"
     />
