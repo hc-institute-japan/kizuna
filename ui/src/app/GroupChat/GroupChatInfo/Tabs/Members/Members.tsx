@@ -168,33 +168,6 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
             </IonItemSliding>
           ) ;
         })}
-
-        {/* This is for admin */}
-        {/* {myAgentId === groupData.creator ? (
-          <IonItemSliding>
-            <IonItem lines="none" key={myAgentId}>
-              <IonLabel className={styles.memberName}>
-                <h3>
-                  {username}
-                  <br />
-                  admin
-                </h3>
-              </IonLabel>
-            </IonItem>
-          </IonItemSliding>
-        ) : (
-          <IonItemSliding>
-            <IonItem lines="none" key={myAgentId}>
-              <IonLabel className={styles.memberName}>
-                <h3>
-                  {username}
-                  <br />
-                  member
-                </h3>
-              </IonLabel>
-            </IonItem>
-          </IonItemSliding>
-        )} */}
       </IonList>
 
       <AddMemberModal

@@ -69,7 +69,13 @@ export const indexContacts: (contacts: Profile[]) => IndexedContacts = (
       currArr.push(contact);
     });
   }
-  return indexedContacts;
+  const orderedIndexedContacts = Object.keys(indexedContacts)
+    .sort()
+    .reduce((obj: any, key: any) => {
+      obj[key] = indexedContacts[key];
+      return obj;
+    }, {});
+  return orderedIndexedContacts;
 };
 
 export const debounce: (callback: () => any, delay?: number) => Function = (
