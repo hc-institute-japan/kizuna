@@ -1,12 +1,9 @@
 import { IonText } from "@ionic/react";
 import React from "react";
 import { useIntl } from "react-intl";
-
+import { FilePayload } from "../../../redux/commons/types";
 import FileView from "./FileView";
 import ImageView from "./ImageView";
-
-import common from "../style.module.css";
-import { FilePayload } from "../../../redux/commons/types";
 import VideoView from "./VideoView";
 
 interface Props {
@@ -32,16 +29,7 @@ const File: React.FC<Props> = ({ timestamp, file, type }) => {
     }
   };
 
-  return (
-    <div className={`${common[type]} ${common.file} ${common.bubble}`}>
-      {renderFile()}
-      <IonText>
-        <h6 className="ion-no-margin ion-text-end">
-          {intl.formatTime(timestamp)}
-        </h6>
-      </IonText>
-    </div>
-  );
+  return renderFile();
 };
 
 export default File;

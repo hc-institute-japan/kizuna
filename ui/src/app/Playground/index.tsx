@@ -1,9 +1,10 @@
 import { IonContent, IonHeader, IonPage, IonToolbar } from "@ionic/react";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import { ChatList, Others, Me } from "../../components/Chat";
+import { ChatList, Me, Others } from "../../components/Chat";
+import { ChatListMethods } from "../../components/Chat/types";
+import Typing from "../../components/Chat/Typing";
 import MessageInput from "../../components/MessageInput";
-
 import { FilePayload, Payload } from "../../redux/commons/types";
 import { RootState } from "../../redux/types";
 import { Uint8ArrayToBase64 } from "../../utils/helpers";
@@ -60,10 +61,7 @@ const Playground = () => {
           payload: "hello",
         },
       },
-      readList: {
-        tats: new Date(),
-        akira: new Date(),
-      },
+      readList: {},
     },
     {
       author: "neil",
@@ -119,9 +117,7 @@ const Playground = () => {
           payload: "hello 3",
         },
       },
-      readList: {
-        neil: new Date(),
-      },
+      readList: {},
     },
     {
       author: "neil",
@@ -260,19 +256,44 @@ const Playground = () => {
     // },
   ]);
 
+  const chatList = useRef<ChatListMethods>(null);
+
   return (
     <IonPage>
       <IonHeader>
         <IonToolbar />
       </IonHeader>
       <IonContent>
-        <ChatList type="group">
+        <ChatList ref={chatList} type="group" onScrollTop={(complete, e) => {}}>
           {data.map((data, index) => {
             if (data.author === username) return <Me key={index} {...data} />;
             return <Others key={index} {...data} />;
           })}
         </ChatList>
       </IonContent>
+      <Typing
+        profiles={[
+          { id: "xd", username: "tats" },
+          { id: "xd", username: "vats" },
+          { id: "xd", username: "pats" },
+          { id: "xd", username: "eats" },
+          { id: "xd", username: "xats" },
+
+          { id: "xd", username: "wats" },
+
+          { id: "xd", username: "qats" },
+
+          { id: "xd", username: "bats" },
+
+          { id: "xd", username: "pats" },
+
+          { id: "xd", username: "lats" },
+
+          { id: "xd", username: "fats" },
+
+          { id: "xd", username: "dats" },
+        ]}
+      />
       <MessageInput
         onFileSelect={(files) => {
           setFilesToUpload(
@@ -300,7 +321,7 @@ const Playground = () => {
                 },
                 payload: file,
               };
-              currData.unshift(dataToAdd);
+              currData.push(dataToAdd);
               return [...currData];
             });
           });

@@ -1,5 +1,7 @@
-import { IonItem } from "@ionic/react";
+import { IonIcon, IonItem, IonLabel, IonText } from "@ionic/react";
+import { checkmarkDoneOutline, checkmarkOutline } from "ionicons/icons";
 import React from "react";
+import { useIntl } from "react-intl";
 import {
   FilePayload,
   isTextPayload,
@@ -16,21 +18,38 @@ const Me: React.FC<ChatProps> = ({
   timestamp,
   type,
   showProfilePicture,
+  isSeen = false,
 }) => {
   const isText = isTextPayload(payload);
   const isP2P = type === "p2p";
+  const intl = useIntl();
 
   return (
     <IonItem lines="none" className={`${common["me-container"]}`}>
-      {isText ? (
-        <Text
-          type="me"
-          message={payload as TextPayload}
-          timestamp={timestamp}
-        />
-      ) : (
-        <File type="me" timestamp={timestamp} file={payload as FilePayload} />
-      )}
+      <div
+        className={`${common["me"]} ${common[isText ? "text" : "file"]} ${
+          common.bubble
+        }`}
+      >
+        {isText ? (
+          <Text
+            type="me"
+            message={payload as TextPayload}
+            timestamp={timestamp}
+          />
+        ) : (
+          <File type="me" timestamp={timestamp} file={payload as FilePayload} />
+        )}
+        <IonText>
+          <h6 className="ion-no-margin ion-text-end">
+            {intl.formatTime(timestamp)}
+            <IonIcon
+              size="s"
+              icon={isSeen ? checkmarkDoneOutline : checkmarkOutline}
+            />
+          </h6>
+        </IonText>
+      </div>
       {isP2P ? null : (
         <div className={common.picture} style={{ marginLeft: "0.5rem" }}>
           {showProfilePicture ? (

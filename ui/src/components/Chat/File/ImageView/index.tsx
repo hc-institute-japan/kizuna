@@ -7,9 +7,10 @@ import ImageModal from "./ImageModal";
 interface Props {
   src: string;
   file: FilePayload;
+  className?: string;
 }
 
-const Image: React.FC<Props> = ({ src, file }) => {
+const Image: React.FC<Props> = ({ src, file, className }) => {
   const [isOpen, setIsOpen] = useState(false);
   const handleOnImageOnClick = () => {
     setIsOpen(true);
@@ -18,7 +19,11 @@ const Image: React.FC<Props> = ({ src, file }) => {
   return (
     <>
       <ImageModal state={[isOpen, setIsOpen]} src={src} file={file} />
-      <IonImg onClick={handleOnImageOnClick} src={src} />
+      <IonImg
+        {...(className ? { className } : {})}
+        onClick={handleOnImageOnClick}
+        src={src}
+      />
     </>
   );
 };

@@ -14,6 +14,11 @@
   padding: 0 !important;
 }
 
+.read {
+  font-size: 0.7rem !important;
+  color: var(--ion-color-medium) !important;
+}
+
 .bubble {
   border-radius: 8px;
   margin-bottom: 0.2rem;

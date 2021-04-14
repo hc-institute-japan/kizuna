@@ -1,12 +1,17 @@
 import {
+  IonIcon,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
+  IonItem,
+  IonLabel,
   IonList,
   IonText,
 } from "@ionic/react";
+import { checkmarkDoneOutline, checkmarkOutline } from "ionicons/icons";
 import React, {
   forwardRef,
   ForwardRefRenderFunction,
+  Fragment,
   Ref,
   useEffect,
   useImperativeHandle,
@@ -34,6 +39,8 @@ const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
     let showName = false;
     let showDate = i === 0;
 
+    const hasRead = Object.values(arrChildren[i].props.readList).length !== 0;
+
     if (i === 0) showProfilePicture = true;
 
     const prevChild = arrChildren[i - 1];
@@ -55,21 +62,23 @@ const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
     }
     if (type === "group") showName = showProfilePicture;
 
-    return { showProfilePicture, space, showName, showDate };
+    return { showProfilePicture, space, showName, showDate, hasRead };
   };
 
   const elements = React.Children.map(arrChildren, (child, i) => {
     if (React.isValidElement(child)) {
-      const { showProfilePicture, showName, showDate } = assess(
+      const { showProfilePicture, showName, showDate, hasRead } = assess(
         child,
         arrChildren as React.ReactElement[],
         i
       );
+
       return (
-        <>
+        <Fragment key={i}>
           {showDate ? (
             <IonText className="ion-text-center">
-              {child.props.timestamp.toDateString() === new Date().toDateString()
+              {child.props.timestamp.toDateString() ===
+              new Date().toDateString()
                 ? "Today"
                 : intl.formatDate(child.props.timestamp, {
                     year: "numeric",
@@ -79,11 +88,12 @@ const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
             </IonText>
           ) : null}
           {React.cloneElement(child, {
+            isSeen: hasRead,
             type,
             showProfilePicture,
             showName,
           })}
-        </>
+        </Fragment>
       );
     }
     return child;
