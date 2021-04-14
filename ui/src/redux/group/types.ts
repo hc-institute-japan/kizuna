@@ -172,6 +172,11 @@ export interface GroupConversationsState {
   members: {
     [key: string]: Profile;
   };
+  // typing: {
+  //   // key is GroupID
+  //   // TODO: finish this
+  //   [key: string]: Profile[]
+  // }
 }
 
 // TODO: use it for typing action
