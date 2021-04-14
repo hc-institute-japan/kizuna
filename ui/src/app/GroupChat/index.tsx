@@ -22,13 +22,9 @@ import {
   GroupConversation,
   GroupMessageInput,
   GroupMessage,
-  UpdateGroupMembersData,
-  GroupMessageBatchFetchFilter,
-  GroupMessagesOutput,
-  GroupMessageByDateFetchFilter,
 } from "../../redux/group/types";
 import { RootState } from "../../redux/types";
-import { FileMetadataInput, FilePayloadInput } from "../../redux/commons/types";
+import { FilePayloadInput } from "../../redux/commons/types";
 import MessageList from "./MessageList";
 import {
   base64ToUint8Array,
@@ -116,7 +112,7 @@ const GroupChat: React.FC = () => {
     dispatch(fetchId()).then((res: AgentPubKey | null) => {
       if (res) setMyAgentId(Uint8ArrayToBase64(res));
     });
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     if (groupData) {
@@ -127,7 +123,6 @@ const GroupChat: React.FC = () => {
       setLoading(false);
     } else {
       dispatch(getLatestGroupVersion(group)).then((res: GroupConversation) => {
-        console.log(res);
         setGroupInfo(res);
         setLoading(false);
       });

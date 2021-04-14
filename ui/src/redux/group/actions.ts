@@ -86,11 +86,13 @@ export const createGroup = (
 
   let state = getState();
   let myAgentId = await getAgentId();
+  let groupMembers = [...groupData.members, groupData.creator];
+
   let membersUsernames: {
     [key: string]: Profile;
   } = await fetchUsernameOfMembers(
     state,
-    groupData.members,
+    groupMembers,
     callZome,
     Uint8ArrayToBase64(myAgentId!)
   );
@@ -104,40 +106,48 @@ export const createGroup = (
   return groupData;
 };
 
-export const addedToGroup = (
-  groupData: GroupConversation
-): ThunkAction => async (dispatch, getState, { callZome, getAgentId }) => {
-  // TODO: error handling?
-  const myAgentId = await getAgentId();
-  // do nothing if self created group
-  if (groupData.creator === Uint8ArrayToBase64(myAgentId!)) {
-    return null;
-  }
+// TODO: Delete this if not needed (not in use right now)
+// export const addedToGroup = (
+//   groupData: GroupConversation
+// ): ThunkAction => async (dispatch, getState, { callZome, getAgentId }) => {
+//   // TODO: error handling?
+//   const myAgentId = await getAgentId();
+//   // do nothing if self created group
+//   if (groupData.creator === Uint8ArrayToBase64(myAgentId!)) {
+//     return null;
+//   }
 
-  let state = getState();
-  let membersUsernames: {
-    [key: string]: Profile;
-  } = await fetchUsernameOfMembers(
-    state,
-    groupData.members,
-    callZome,
-    Uint8ArrayToBase64(myAgentId!)
-  );
+//   let state = getState();
+//   // This includes both members and admin of the group
+//   let members = [...groupData.members, groupData.creator];
 
-  dispatch<AddGroupAction>({
-    type: ADD_GROUP,
-    groupData: {
-      originalGroupEntryHash: groupData.originalGroupEntryHash,
-      originalGroupHeaderHash: groupData.originalGroupHeaderHash,
-      name: groupData.name,
-      createdAt: groupData.createdAt,
-      creator: groupData.creator,
-      members: groupData.members,
-      messages: [],
-    },
-    membersUsernames,
-  });
-};
+//   console.log("here are all the members of the group", members);
+
+//   let membersUsernames: {
+//     [key: string]: Profile;
+//   } = await fetchUsernameOfMembers(
+//     state,
+//     members,
+//     callZome,
+//     Uint8ArrayToBase64(myAgentId!)
+//   );
+
+//   console.log("here are the memberUsernames", membersUsernames);
+
+//   dispatch<AddGroupAction>({
+//     type: ADD_GROUP,
+//     groupData: {
+//       originalGroupEntryHash: groupData.originalGroupEntryHash,
+//       originalGroupHeaderHash: groupData.originalGroupHeaderHash,
+//       name: groupData.name,
+//       createdAt: groupData.createdAt,
+//       creator: groupData.creator,
+//       members: groupData.members,
+//       messages: [],
+//     },
+//     membersUsernames,
+//   });
+// };
 
 export const addGroupMembers = (
   updateGroupMembersData: UpdateGroupMembersData
@@ -594,6 +604,9 @@ const fetchUsernameOfMembers = async (
   myAgentId: string
 ) => {
   let contacts = state.contacts.contacts;
+  // can assume that this is non-nullable since agent cannot call this
+  // function without having a username.
+  let username = state.profile.username!;
   let undefinedProfiles: AgentPubKey[] = [];
 
   let membersUsernames: { [key: string]: Profile } = {};
@@ -601,7 +614,10 @@ const fetchUsernameOfMembers = async (
     if (contacts[member]) {
       membersUsernames[member] = contacts[member];
     } else if (member === myAgentId) {
-      // do nothing if member is yourself
+      membersUsernames[myAgentId] = {
+        id: myAgentId,
+        username,
+      };
     } else {
       undefinedProfiles.push(Buffer.from(base64ToUint8Array(member).buffer));
     }

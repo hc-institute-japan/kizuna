@@ -35,10 +35,12 @@ interface GroupChatParams {
 const GroupChatInfo: React.FC = () => {
   const history = useHistory();
   const { group } = useParams<GroupChatParams>();
+
   const groupData = useSelector(
     (state: RootState) => state.groups.conversations[group]
   );
   const allMessages = useSelector((state: RootState) => state.groups.messages);
+
   const [editGroupName, setEditGroupName] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [modalLoading, setModalLoading] = useState<boolean>(false);
