@@ -9,8 +9,10 @@ import common from "../style.module.css";
 import File from "../File";
 import { ChatProps } from "../types";
 import Text from "../Text";
+import { useIntl } from "react-intl";
 
 const Others: React.FC<ChatProps> = ({
+  id,
   author,
   type,
   timestamp,
@@ -18,16 +20,18 @@ const Others: React.FC<ChatProps> = ({
   readList,
   showProfilePicture,
   showName,
+  isSeen = false,
 }) => {
   const isText = isTextPayload(payload);
   const isP2P = type === "p2p";
+  const intl = useIntl();
 
   return (
     <>
       {isP2P ? null : showName ? (
-        <div className={common["author-name"]}>
+        <IonItem lines="none" className={`${common["author-name"]}`}>
           <IonText color="medium">{author}</IonText>
-        </div>
+        </IonItem>
       ) : null}
 
       <IonItem lines="none" className={`${common["others-container"]}`}>
@@ -42,19 +46,30 @@ const Others: React.FC<ChatProps> = ({
           </div>
         )}
 
-        {isText ? (
-          <Text
-            type="others"
-            message={payload as TextPayload}
-            timestamp={timestamp}
-          />
-        ) : (
-          <File
-            type="others"
-            file={payload as FilePayload}
-            timestamp={timestamp}
-          />
-        )}
+        <div
+          className={`${common["others"]} ${common[isText ? "text" : "file"]} ${
+            common.bubble
+          }`}
+        >
+          {isText ? (
+            <Text
+              type="others"
+              message={payload as TextPayload}
+              timestamp={timestamp}
+            />
+          ) : (
+            <File
+              type="others"
+              file={payload as FilePayload}
+              timestamp={timestamp}
+            />
+          )}
+          <IonText>
+            <h6 className="ion-no-margin ion-text-end">
+              {intl.formatTime(timestamp)}
+            </h6>
+          </IonText>
+        </div>
       </IonItem>
     </>
   );

@@ -1,0 +1,32 @@
+.typing {
+  display: flex;
+  flex-direction: row;
+  --min-height: auto;
+  padding-bottom: 5px;
+  padding-top: 5px;
+  --background: transparent;
+  overflow: visible;
+}
+
+@keyframes dot {
+  0% {
+    transform: translateY(0);
+  }
+  25% {
+    transform: translateY(-1.2px);
+  }
+  50% {
+    transform: translateY(0);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.dot {
+  display: inline-block;
+  animation-name: dot;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-duration: 1.5s;
+}

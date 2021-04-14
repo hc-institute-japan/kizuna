@@ -11,6 +11,7 @@ export interface ChatListProps {
 }
 
 export interface ChatProps {
+  id?: string;
   type?: "group" | "p2p";
   author: string;
   timestamp: Date;
@@ -20,6 +21,7 @@ export interface ChatProps {
   };
   showProfilePicture?: boolean;
   showName?: boolean;
+  isSeen?: boolean;
 }
 
 export interface ChatListMethods {
