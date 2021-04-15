@@ -1,9 +1,8 @@
-import { IonCol, IonGrid, IonLabel, IonRow } from "@ionic/react";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { IonCol, IonLabel, IonRow } from "@ionic/react";
+import React, {useRef, useState } from "react";
 import { FilePayload } from "../../../../../redux/commons/types";
 import { GroupMessage } from "../../../../../redux/group/types";
 import { Profile } from "../../../../../redux/profile/types";
-import MediaItem from "./MediaItem";
 import styles from "../../style.module.css";
 import MediaCol from "./MediaCol";
 

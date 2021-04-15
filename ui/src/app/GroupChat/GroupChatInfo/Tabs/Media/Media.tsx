@@ -1,5 +1,5 @@
-import { IonContent, IonGrid, IonList, IonLoading } from "@ionic/react";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import { IonContent, IonGrid, IonLoading } from "@ionic/react";
+import React, {useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import {
   FilePayload,
