@@ -1,10 +1,10 @@
-import React, { useRef } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
 
 import { RootState } from "../../redux/types";
 import { GroupMessage } from "../../redux/group/types";
 import Chat from "../../components/Chat";
-import { ChatListMethods, ChatListProps } from "../../components/Chat/types";
+import { ChatListMethods } from "../../components/Chat/types";
 interface Props {
   messageIds: string[];
   members: string[];

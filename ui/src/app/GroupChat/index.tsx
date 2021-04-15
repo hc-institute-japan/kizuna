@@ -131,7 +131,6 @@ const GroupChat: React.FC = () => {
   useEffect(() => {
     if (groupData) {
       dispatch(getLatestGroupVersion(group)).then((res: GroupConversation) => {
-        console.log(res);
         setGroupInfo(res);
       });
       setLoading(false);
