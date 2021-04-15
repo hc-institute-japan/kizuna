@@ -11,7 +11,7 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router";
 import {
@@ -35,6 +35,7 @@ import { fetchId } from "../../redux/profile/actions";
 
 import MessageInput from "../../components/MessageInput";
 import { arrowBackSharp, informationCircleOutline } from "ionicons/icons";
+import { ChatListMethods } from "../../components/Chat/types";
 
 interface GroupChatParams {
   group: string;
@@ -42,18 +43,24 @@ interface GroupChatParams {
 
 const GroupChat: React.FC = () => {
   const history = useHistory();
+  const dispatch = useAppDispatch();
+  const { group } = useParams<GroupChatParams>();
+  const chatList = useRef<ChatListMethods>(null);
+
+  // local states
   const [myAgentId, setMyAgentId] = useState<string>("");
   const [files, setFiles] = useState<object[]>([]);
   const [groupInfo, setGroupInfo] = useState<GroupConversation | undefined>();
   const [messages, setMessages] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [message, setMessage] = useState("");
-  const dispatch = useAppDispatch();
-  const { group } = useParams<GroupChatParams>();
+
+  // Selectors
   const groupData = useSelector(
     (state: RootState) => state.groups.conversations[group]
   );
 
+  // Handlers
   const handleOnSend = () => {
     let inputs: GroupMessageInput[] = [];
     if (files.length) {
@@ -93,12 +100,18 @@ const GroupChat: React.FC = () => {
       });
     }
 
-    inputs.forEach((groupMessage: any) => {
+    const messagePromises = inputs.map((groupMessage: any) => 
       // TODO: error handling
-      dispatch(sendGroupMessage(groupMessage)).then((res: GroupMessage) => {
-        groupInfo?.messages.push(res.groupMessageEntryHash);
-      });
-    });
+      dispatch(sendGroupMessage(groupMessage))
+    );
+
+    Promise.all(messagePromises).then((messages: GroupMessage[]) => {
+      messages.forEach((msg: GroupMessage, i) => {
+        groupInfo?.messages.push(msg.groupMessageEntryHash);
+      })
+      chatList.current!.scrollToBottom();
+    })
+    
   };
 
   const handleOnBack = () => {
@@ -107,6 +120,7 @@ const GroupChat: React.FC = () => {
     });
   };
 
+  // useEffects
   useEffect(() => {
     // setLoading(true);
     dispatch(fetchId()).then((res: AgentPubKey | null) => {
@@ -189,6 +203,7 @@ const GroupChat: React.FC = () => {
             myAgentId={myAgentId}
             members={groupInfo!.members}
             messageIds={messages}
+            chatList={chatList}
           ></MessageList>
         ) : (
           <IonLoading isOpen={loading} />
