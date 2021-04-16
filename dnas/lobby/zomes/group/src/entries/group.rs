@@ -1,8 +1,6 @@
 use hdk::prelude::timestamp::Timestamp;
 use hdk::prelude::*;
 
-// pub mod handlers;
-
 pub mod add_members;
 pub mod create_group;
 pub mod get_all_my_groups;
@@ -10,7 +8,7 @@ pub mod group_helpers;
 pub mod remove_members;
 pub mod update_group_name;
 
-//GROUP TYPE DEFINITION, GETTERS, SETTERS, ENTRY_DEF, UTILS ...
+// GROUP TYPE DEFINITION, GETTERS, SETTERS, ENTRY_DEF, UTILS ...
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Group {
@@ -34,7 +32,7 @@ impl Group {
             members,
         }
     }
-    //GETTERS
+    // GETTERS
     pub fn get_group_creation_timestamp(&self) -> Timestamp {
         self.created.clone()
     }
