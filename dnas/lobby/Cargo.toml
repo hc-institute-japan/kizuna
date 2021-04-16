@@ -1,7 +1,7 @@
 [workspace]
 members = [
     "zomes/group",
-    "zomes/request",
+    # "zomes/request",
     "zomes/username",
     "zomes/contacts",
     "zomes/aggregator",
