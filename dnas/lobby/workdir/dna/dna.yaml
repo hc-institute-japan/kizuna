@@ -12,8 +12,8 @@ zomes:
     bundled: ../../target/wasm32-unknown-unknown/release/p2pmessage.wasm
   - name: preference
     bundled: ../../target/wasm32-unknown-unknown/release/preference.wasm
-  - name: request
-    bundled: ../../target/wasm32-unknown-unknown/release/request.wasm
+  # - name: request
+  #   bundled: ../../target/wasm32-unknown-unknown/release/request.wasm
   - name: username
     bundled: ../../target/wasm32-unknown-unknown/release/username.wasm  
   - name : group
