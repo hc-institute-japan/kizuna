@@ -12,7 +12,8 @@ interface Props {
 const File: React.FC<Props> = ({ file }) => {
   const { fileName, fileSize } = file;
   const handleOnClick = () => {
-    const blob = new Blob([base64ToUint8Array(file.fileHash)]); // change resultByte to bytes
+    // const blob = new Blob([base64ToUint8Array(file.fileHash)]); // change resultByte to bytes
+    const blob = new Blob([file.fileHash]); // change resultByte to bytes
 
     const link = document.createElement("a");
     link.href = window.URL.createObjectURL(blob);

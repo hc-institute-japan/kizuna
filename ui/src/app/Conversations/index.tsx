@@ -17,9 +17,11 @@ import { isTextPayload } from "../../redux/commons/types";
 import { GroupConversation, GroupMessage } from "../../redux/group/types";
 import { fetchId } from "../../redux/profile/actions";
 import { RootState } from "../../redux/types";
-import { Uint8ArrayToBase64, useAppDispatch } from "../../utils/helpers";
-import { Message } from "../../utils/types";
+import { Uint8ArrayToBase64, useAppDispatch, dateToTimestamp } from "../../utils/helpers";
+import { Conversations as ConversationsType, Message } from "../../utils/types";
 import EmptyConversations from "./EmptyConversations";
+import { P2PMessageConversationState } from "../../redux/p2pmessages/types";
+import { FilePayload, TextPayload } from "../../redux/commons/types";
 import styles from "./style.module.css";
 
 const Conversations: React.FC = () => {
@@ -34,6 +36,7 @@ const Conversations: React.FC = () => {
   const groupMembers = useSelector((state: RootState) => state.groups.members);
   const myUsername = useSelector((state: RootState) => state.profile.username);
   const [myAgentId, setMyAgentId] = useState<string>("");
+  const p2pState = useSelector((state: RootState) => state.p2pmessages);
 
   const handleOnClick = () => {
     history.push({
@@ -41,75 +44,109 @@ const Conversations: React.FC = () => {
       state: { contacts: {...contacts} },
     });
   };
-  const renderGroupConversation = (groups:  {
-    [key: string]: GroupConversation;
-  }) => {
-  let arr: any[] = [];
-  Object.keys(groups).forEach((key: string ) => {
-    // TODO: change to actual pic chosen by group creator
-    let src = "https://upload.wikimedia.org/wikipedia/commons/8/8c/Lauren_Tsai_by_Gage_Skidmore.jpg";
-    let messages: Message[] =  groups[key].messages ? groups[key].messages.map((messageId: string) => {
-      let groupMessage: GroupMessage = groupMessages[messageId];
-      if (isTextPayload(groupMessage.payload)) {
-        let message: Message = {
-          id: groupMessage.groupMessageEntryHash,
-          sender: groupMembers[groupMessage.author] ? {
-            id: groupMembers[groupMessage.author].id,
-            username: groupMembers[groupMessage.author].username
-          } : {
-            id: myAgentId,
-            username: myUsername!
-          },
-          timestamp: groupMessage.timestamp,
-          message: groupMessage.payload.payload.payload
+  const renderConversation = (groups: {[key: string]: GroupConversation}, p2p: P2PMessageConversationState) => {
+    let conversationsArray: any[] = [];
+
+    if (p2p != undefined) {
+      for (let key in p2p.conversations) {
+        let src = "https://upload.wikimedia.org/wikipedia/commons/8/8c/Lauren_Tsai_by_Gage_Skidmore.jpg";
+        let conversant = contacts[key.slice(1)].username;
+        let lastMessageID = p2p.conversations[key].messages[0];
+        let lastMessage = p2p.messages[lastMessageID];
+        let lastSender = lastMessage.author;
+  
+        let messages: Message[] = Object.values(p2p.conversations[key].messages).map(p2pMessageID => {
+          let p2pMessage = p2p.messages[p2pMessageID];
+          let message: Message = {
+            id: p2pMessage.p2pMessageEntryHash,
+            sender: {id: conversant, username: p2pMessage.author},
+            message: p2pMessage.payload.type == "TEXT"
+                      ? (p2pMessage.payload as TextPayload).payload.payload 
+                      : (p2pMessage.payload as FilePayload).fileName,
+            timestamp: dateToTimestamp(p2pMessage.timestamp)
+          };
+          return message;
+        })
+        
+        let conversation = {
+          isGroup: false,
+          content: {
+            src: src, 
+            name: conversant, 
+            messages: messages
+          }
         };
-        return message
-      } else {
-        let maybeOther: any | undefined = groupMembers[groupMessage.author];
-        let fileString: string = "";
-        if (maybeOther) {
-          // TODO: format for i18n
-          fileString = String(maybeOther.username + " has sent " + groupMessage.payload.fileName).toString();
-        } else {
-          // MAYBE BUG: assumption is you sent it.
-          // TODO: format for i18n
-          fileString = String("You sent " + groupMessage.payload.fileName).toString();
+        conversationsArray.push(conversation);
+      }  
+    }
+
+    if (groups != undefined) {
+      Object.keys(groups).forEach((key: string ) => {
+        // TODO: change to actual pic chosen by group creator
+        let src = "https://upload.wikimedia.org/wikipedia/commons/8/8c/Lauren_Tsai_by_Gage_Skidmore.jpg";
+        let messages: Message[] =  groups[key].messages ? groups[key].messages.map((messageId: string) => {
+          let groupMessage: GroupMessage = groupMessages[messageId];
+          if (isTextPayload(groupMessage.payload)) {
+            let message: Message = {
+              id: groupMessage.groupMessageEntryHash,
+              sender: groupMembers[groupMessage.author] ? {
+                id: groupMembers[groupMessage.author].id,
+                username: groupMembers[groupMessage.author].username
+              } : {
+                id: myAgentId,
+                username: myUsername!
+              },
+              timestamp: groupMessage.timestamp,
+              message: groupMessage.payload.payload.payload
+            };
+            return message
+          } else {
+            let maybeOther: any | undefined = groupMembers[groupMessage.author];
+            let fileString: string = "";
+            if (maybeOther) {
+              // TODO: format for i18n
+              fileString = String(maybeOther.username + " has sent " + groupMessage.payload.fileName).toString();
+            } else {
+              // MAYBE BUG: assumption is you sent it.
+              // TODO: format for i18n
+              fileString = String("You sent " + groupMessage.payload.fileName).toString();
+            }
+            
+            let message: Message = {
+              id: groupMessage.groupMessageEntryHash,
+              sender: groupMembers[groupMessage.author] ? {
+                id: groupMembers[groupMessage.author].id,
+                username: groupMembers[groupMessage.author].username
+              } : {
+                id: myAgentId,
+                username: myUsername!
+              },
+              timestamp: groupMessage.timestamp,
+              // TODO: this part is file
+              message: fileString,
+              fileName: groupMessage.payload.fileName
+            };
+            return message
+          };
+        }) : [];
+        messages.sort((x: Message, y: Message) => 
+          y.timestamp.valueOf() < x.timestamp.valueOf() ? 1 : -1
+        );
+        let conversation = {
+          isGroup: true,
+          groupId: groups[key].originalGroupEntryHash,
+          content: { src, name: groups[key].name, messages, },
+        };
+        
+        if (!(conversationsArray.find((group: any) => group.id === conversation.groupId))) {
+          conversationsArray.push(conversation);
         }
         
-        let message: Message = {
-          id: groupMessage.groupMessageEntryHash,
-          sender: groupMembers[groupMessage.author] ? {
-            id: groupMembers[groupMessage.author].id,
-            username: groupMembers[groupMessage.author].username
-          } : {
-            id: myAgentId,
-            username: myUsername!
-          },
-          timestamp: groupMessage.timestamp,
-          // TODO: this part is file
-          message: fileString,
-          fileName: groupMessage.payload.fileName
-        };
-        return message
-      };
-    }) : [];
-    messages.sort((x: Message, y: Message) => 
-      y.timestamp.valueOf() < x.timestamp.valueOf() ? 1 : -1
-    );
-    let conversation = {
-      id: groups[key].originalGroupEntryHash,
-      content: { src, name: groups[key].name, messages, },
-    };
-    
-    if (!(arr.find((group: any) => group.id === conversation.id))) {
-      arr.push(conversation);
+        });
     }
     
-    });
-    arr.sort((x: any, y: any) => 
-      groups[x.id].createdAt.valueOf() < groups[y.id].createdAt.valueOf() ? 1 : -1
-    );
-    return arr;
+
+    return conversationsArray;
   };
 
   useEffect(() => {
@@ -117,20 +154,20 @@ const Conversations: React.FC = () => {
       if (res) setMyAgentId(Uint8ArrayToBase64(res))
     });
     setGroups(groupsData);
-    }, [groupsData, dispatch])
+  }, [groupsData, dispatch])
 
   return (
     <IonPage>
       <Toolbar onChange={() => {}} />
       <IonContent>
-        {Object.keys(groups).length > 0 ? (
+        {Object.keys(groups).length > 0 || p2pState != undefined? (
           <IonList className={styles.conversation}>
-            {renderGroupConversation(groups).map((groupConversation: any) => (
+            {renderConversation(groups, p2pState).map((conversation: any) => (
               <Conversation
-                isGroup={true}
-                groupId={groupConversation.id}
-                key={JSON.stringify(groupConversation.id)}
-                content={groupConversation.content}
+                key={conversation.groupId != undefined ? JSON.stringify(conversation.groupId) : conversation.conversant}
+                isGroup={conversation.isGroup}
+                groupId={conversation.groupId != undefined ? JSON.stringify(conversation.groupId) : undefined}
+                content={conversation.content}
                 myAgentId={myAgentId}
               />
             ))}

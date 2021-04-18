@@ -57,4 +57,11 @@ export const FUNCTIONS: FunctionNameType = {
   [ZOMES.AGGREGATOR]: {
     RETRIEVE_LATEST_DATA: "retrieve_latest_data",
   },
+  [ZOMES.P2PMESSAGE]: {
+    SEND_MESSAGE: "send_message",
+    GET_LATEST_MESSAGES: "get_latest_messages",
+    GET_MESSAGES_BY_AGENT_BY_TIMESTAMP: "get_messages_by_agent_by_timestamp",
+    GET_NEXT_BATCH_MESSAGES: "get_next_batch_messages",
+    GET_ALL_MESSAGES: "get_all_messages"
+  }
 };
