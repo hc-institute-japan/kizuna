@@ -5,8 +5,9 @@ import { useHistory, useLocation } from "react-router";
 import MessageInput from "../../components/MessageInput";
 import { FilePayloadInput } from "../../redux/commons/types";
 import { sendInitialGroupMessage } from "../../redux/group/actions";
+import { sendMessage } from "../../redux/p2pmessages/actions";
 import { Profile, ProfileListType } from "../../redux/profile/types";
-import { useAppDispatch } from "../../utils/helpers";
+import { base64ToUint8Array, useAppDispatch } from "../../utils/helpers";
 import ContactList from "./ContactList";
 import { ContactsContext } from "./context";
 import NewConversationHeader from "./NewConversationHeader";
@@ -55,8 +56,35 @@ const NewConversation: React.FC = () => {
 
   const handleOnSend = () => {
     const contacts = Object.values(selectedContacts);
+
+    // P2PMessaging
     if (contacts.length === 1) {
-      // send p2p
+      setIsLoading(true);
+      files.forEach((file) => {
+        dispatch(
+          sendMessage(
+            Buffer.from(base64ToUint8Array(contacts[0].id)), 
+            message, 
+            "FILE",
+            undefined,
+            file
+          ))
+      });
+
+      if (message != "") {
+        dispatch(
+          sendMessage(
+            Buffer.from(base64ToUint8Array(contacts[0].id)), 
+            message, 
+            "TEXT",
+            undefined, 
+            )
+          )
+          .then(setIsLoading(false)
+        );
+      }
+      
+      history.push(`/u/${contacts[0].username}`);
     } else if (contacts.length > 1) {
       // create a Group and send the initial message
       setIsLoading(true);

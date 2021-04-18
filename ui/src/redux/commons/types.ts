@@ -47,7 +47,7 @@ export interface FilePayloadInput {
 export function isTextPayload(
   payload: TextPayload | FilePayloadInput | FilePayload
 ): payload is TextPayload {
-  return (payload as TextPayload).type === "TEXT";
+  return (payload as TextPayload)["type"] === "TEXT";
 }
 
 export function isOther(

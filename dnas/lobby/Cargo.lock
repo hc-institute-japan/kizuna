@@ -5,7 +5,7 @@ name = "aggregator"
 version = "0.0.1"
 dependencies = [
  "derive_more",
- "file_types",
+ "file_types 0.0.1",
  "hdk3 0.0.1 (git+https://github.com/holochain/holochain?rev=3675b58)",
  "serde",
 ]
@@ -114,6 +114,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "file_types"
+version = "0.0.1"
+source = "git+https://github.com/hc-institute-japan/Kizuna?branch=develop#9ac765e0caf1d5952dc3f378cef73655d9074de8"
+dependencies = [
+ "derive_more",
+ "hdk3 0.0.1 (git+https://github.com/holochain/holochain?rev=3675b58)",
+ "serde",
+]
+
+[[package]]
 name = "fixt"
 version = "0.0.1"
 source = "git+https://github.com/holochain/holochain.git?rev=3675b5#3675b588de0aaf7eb9dc852b4012f3cfa5a27df7"
@@ -161,7 +171,7 @@ name = "group"
 version = "0.0.1"
 dependencies = [
  "derive_more",
- "file_types",
+ "file_types 0.0.1",
  "hdk3 0.0.1 (git+https://github.com/holochain/holochain?rev=3675b58)",
  "serde",
 ]
@@ -394,17 +404,18 @@ version = "0.0.1"
 dependencies = [
  "derive_more",
  "hdk3 0.0.1 (git+https://github.com/holochain/holochain?rev=3675b58)",
- "p2pmessage 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop)",
+ "p2pmessage 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=commons)",
  "serde",
 ]
 
 [[package]]
 name = "p2pmessage"
 version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop#4f91ca832bac8d0d1605f2d5b50a1998b459cd8a"
+source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=commons#520f2f77fea82a016814c7f7f6b4a6acdd5e449b"
 dependencies = [
  "derive_more",
- "hdk3 0.0.1 (git+https://github.com/holochain/holochain.git?rev=3675b5)",
+ "file_types 0.0.1 (git+https://github.com/hc-institute-japan/Kizuna?branch=develop)",
+ "hdk3 0.0.1 (git+https://github.com/holochain/holochain?rev=3675b58)",
  "serde",
  "thiserror",
 ]

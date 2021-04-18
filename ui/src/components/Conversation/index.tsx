@@ -27,10 +27,10 @@ const Conversation: React.FC<Props> = ({ content, isGroup, groupId, myAgentId })
   });
   const history = useHistory();
   const handleOnClick = () => {
-    if (isGroup) {
+    if (groupId != undefined) {
       history.push(`/g/${groupId}`);
     } else { 
-      history.push(`/u/${name}`, content);
+      history.push(`/u/${name}`);
     }
   };
 

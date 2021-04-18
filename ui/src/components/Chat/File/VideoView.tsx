@@ -13,7 +13,8 @@ const Video: React.FC<Props> = ({ file }) => {
     <div className={styles.video}>
       <video
         src={URL.createObjectURL(
-          new Blob([base64ToUint8Array(file.fileHash)], { type: "video/mp4" })
+          // new Blob([base64ToUint8Array(file.fileHash)], { type: "video/mp4" })
+          new Blob([file.fileHash], { type: "video/mp4" })
         )}
         autoPlay={false}
         controls={true}

@@ -13,4 +13,4 @@ derive_more = "0"
 serde = "1"
 
 hdk3 = "0"
-p2pmessage = {git = "https://github.com/hc-institute-japan/p2pmessage-zome", branch="develop", package = "p2pmessage"}
+p2pmessage = {git = "https://github.com/hc-institute-japan/p2pmessage-zome", branch="commons"}
