@@ -1,5 +1,5 @@
 import { IonCol } from "@ionic/react";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { FilePayload } from "../../../../../redux/commons/types";
 import MediaItem from "./MediaItem";
 
