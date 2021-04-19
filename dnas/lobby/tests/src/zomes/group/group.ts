@@ -1,3 +1,4 @@
+import { Orchestrator } from "@holochain/tryorama";
 import { ScenarioApi } from "@holochain/tryorama/lib/api";
 import {
   init,
@@ -30,7 +31,9 @@ function blockContacts(agentPubKeys) {
 
 // THE FUNCTION get_all_my_groups IS BEING IMPLICITLY TESTED BEACUSE IT'S USED IN ALMOST ALL THE TESTS
 
-export function createGroupTest(orchestrator, config, installables) {
+export function createGroupTest(config, installables) {
+
+  let orchestrator = new Orchestrator();
   orchestrator.registerScenario(
     "create group method test",
     async (s: ScenarioApi, t) => {
@@ -48,8 +51,6 @@ export function createGroupTest(orchestrator, config, installables) {
       );
       const [[david_happ]] = await david.installAgentsHapps(installables.one);
 
-      await s.shareAllNodes([alice, bobby, charlie, david]);
-
       const alicePubKey = alice_happ.agent;
       const bobbyPubKey = bobby_happ.agent;
       const charliePubKey = charlie_happ.agent;
@@ -62,31 +63,26 @@ export function createGroupTest(orchestrator, config, installables) {
       // LISTENERS: THIS LISTENERS ARE USED TO KEEP TRACK OF THE SIGNALS RECEIVED FOR EACH AGENT
       let alice_signal_listener = {
         counter: 0,
-        payload: Buffer,
+        payload: null,
       };
       let bobby_signal_listener = {
         counter: 0,
-        payload: Buffer,
+        payload: null,
       };
       let charlie_signal_listener = {
         counter: 0,
-        payload: Buffer,
+        payload: null,
       };
       // SIGNAL HANLDERS ASSIGNMENT
       alice.setSignalHandler((signal) => {
-        signalHandler(signal, alice_signal_listener)("alice");
+        signalHandler(signal, alice_signal_listener);
       });
       bobby.setSignalHandler((signal) => {
-        signalHandler(signal, bobby_signal_listener)("bobby");
+        signalHandler(signal, bobby_signal_listener);
       });
       charlie.setSignalHandler((signal) => {
-        signalHandler(signal, charlie_signal_listener)("charlie");
+        signalHandler(signal, charlie_signal_listener);
       });
-
-      init(alice_conductor);
-      init(bobby_conductor);
-      init(charlie_conductor);
-      await delay(1000);
 
       // 1- CREATE ONE GROUP WITH A SET OF MEMBERS (I USED JUST ONE AGENT BEACUSE THE VALIDATION IS IMPLEMENTED IN THE VALIDATE_CREATE_GROUP CALLBACK AND HOLOCHAIN NOT IMPLEMENTED THIS CALLBACKS YET BUT I TESTED BY MISELF AND IT WORK)
       let create_group_input = {
@@ -119,6 +115,7 @@ export function createGroupTest(orchestrator, config, installables) {
       // );
 
       //t.equal(actual, expected, msg)
+
       t.deepEqual(
         create_group_content.name,
         create_group_input.name,
@@ -160,16 +157,22 @@ export function createGroupTest(orchestrator, config, installables) {
         0,
         "charlie's signal counter its = 0 because he wasn't added to the group"
       );
+
       t.deepEqual(
         charlie_signal_listener.payload,
-        Buffer,
+        null,
         "charlie's has not received any payload beacuse he was nos added to the group"
       );
     }
   );
+
+  orchestrator.run();
 }
 
-export function addAndRemoveMembersTest(orchestrator, config, installables) {
+export function addAndRemoveMembersTest(config, installables) {
+
+  let orchestrator = new Orchestrator();
+
   orchestrator.registerScenario(
     "add members method AND remove members methods test",
     async (s, t) => {
@@ -187,8 +190,6 @@ export function addAndRemoveMembersTest(orchestrator, config, installables) {
       );
       const [[david_happ]] = await david.installAgentsHapps(installables.one);
 
-      await s.shareAllNodes([alice, bobby, charlie]);
-
       const alicePubKey = alice_happ.agent;
       const bobbyPubKey = bobby_happ.agent;
       const charliePubKey = charlie_happ.agent;
@@ -201,31 +202,29 @@ export function addAndRemoveMembersTest(orchestrator, config, installables) {
       // LISTENERS: THIS LISTENERS ARE USED TO KEEP TRACK OF THE SIGNALS RECEIVED FOR EACH AGENT
       let alice_signal_listener = {
         counter: 0,
-        payload: Buffer,
+        payload: null,
       };
       let bobby_signal_listener = {
         counter: 0,
-        payload: Buffer,
+        payload: null,
       };
       let charlie_signal_listener = {
         counter: 0,
-        payload: Buffer,
+        payload: null,
       };
 
       //SIGNAL HANLDERS ASSIGNMENT
       alice.setSignalHandler((signal) => {
-        signalHandler(signal, alice_signal_listener)("alice");
+        signalHandler(signal, alice_signal_listener);
       });
       bobby.setSignalHandler((signal) => {
-        signalHandler(signal, bobby_signal_listener)("bobby");
+        signalHandler(signal, bobby_signal_listener);
       });
       charlie.setSignalHandler((signal) => {
-        signalHandler(signal, charlie_signal_listener)("charlie");
+        signalHandler(signal, charlie_signal_listener);
       });
 
-      init(alice_conductor);
-      init(bobby_conductor);
-      init(charlie_conductor);
+
       await delay(1000);
 
       // 1 - CREATE ONE GROUP WITH A SET OF MEMBERS
@@ -239,7 +238,7 @@ export function addAndRemoveMembersTest(orchestrator, config, installables) {
         groupId,
         groupRevisionId,
       } = await createGroup(create_group_input)(alice_conductor);
-      await delay(1000);
+      await delay(5000);
 
       t.deepEqual(
         original_group_content.members,
@@ -273,7 +272,7 @@ export function addAndRemoveMembersTest(orchestrator, config, installables) {
       );
       t.deepEqual(
         charlie_signal_listener.payload,
-        Buffer,
+        null,
         "charlie's has not received any payload beacuse he was nos added to the group"
       );
 
@@ -322,7 +321,7 @@ export function addAndRemoveMembersTest(orchestrator, config, installables) {
       await delay(1000);
 
       t.deepEqual(
-        updated_group.latestName,
+        updated_group.name,
         create_group_input.name,
         "the group name fields match with the expected value"
       );
@@ -368,7 +367,7 @@ export function addAndRemoveMembersTest(orchestrator, config, installables) {
           payload: {
             groupId,
             groupRevisionId,
-            latestName: updated_group.latestName,
+            latestName: updated_group.name,
             members: updated_group.members,
             creator: updated_group.creator,
             created: updated_group.created,
@@ -376,7 +375,7 @@ export function addAndRemoveMembersTest(orchestrator, config, installables) {
         },
         "charlie's has received the signal payload from create_group"
       );
-
+      
       // 4 - CHECK IF THE GROUP MEMBERS KNOW THEY ARE MEMBERS OF THE GROUP AND IF THE GROUP LIST CONTAINS THE LATEST VERSION OF THE GROUP ENTRIES
       let alice_group_list = (
         await getMyGroupsList(alice_conductor)
@@ -406,6 +405,7 @@ export function addAndRemoveMembersTest(orchestrator, config, installables) {
         [updated_group].length,
         "charlie group list match with the expected value"
       );
+
 
       // 5 - REMOVE GROUP MEMBERS FROM THE GROUP WE CREATED (the add members input and the remove members input have the same format UpdateMembersIo)
 
@@ -476,9 +476,14 @@ export function addAndRemoveMembersTest(orchestrator, config, installables) {
       );
     }
   );
+
+    orchestrator.run();
 }
 
-export function updateGroupNameTest(orchestrator, config, installables) {
+export function updateGroupNameTest(config, installables) {
+
+  let orchestrator = new Orchestrator();
+
   orchestrator.registerScenario(
     "update group name  method test",
     async (s, t) => {
@@ -486,11 +491,7 @@ export function updateGroupNameTest(orchestrator, config, installables) {
 
       const [[alice_happ]] = await alice.installAgentsHapps(installables.one);
       const [[bobby_happ]] = await bobby.installAgentsHapps(installables.one);
-      const [[charlie_happ]] = await charlie.installAgentsHapps(
-        installables.one
-      );
-
-      await s.shareAllNodes([alice, bobby, charlie]);
+      const [[charlie_happ]] = await charlie.installAgentsHapps(installables.one);
 
       const alicePubKey = alice_happ.agent;
       const bobbyPubKey = bobby_happ.agent;
@@ -501,7 +502,6 @@ export function updateGroupNameTest(orchestrator, config, installables) {
       const charlie_conductor = charlie_happ.cells[0];
 
       // 1- CREATE ONE GROUP WITH A SET OF MEMBERS
-
       let create_group_input = {
         name: "Group_name",
         members: [bobbyPubKey, charliePubKey],
@@ -512,19 +512,18 @@ export function updateGroupNameTest(orchestrator, config, installables) {
         groupId,
         groupRevisionId,
       } = await createGroup(create_group_input)(alice_conductor);
-      await delay(1000);
+      await delay(2000);
 
       // 2 - UPDATE THE GROUP NAME FROM THE GROUP WE'VE CREATED
-
       let update_group_name_io = {
         name: "New Group Name",
         groupId,
         groupRevisionId,
       };
 
-      await updateGroupName(update_group_name_io)(alice_conductor);
+      let update_result = await updateGroupName(update_group_name_io)(alice_conductor);
       await delay(1000);
-
+      
       // 2.1 - UPDATE GROUP NAME WITH THE SAME NAME: Err case
       // let update_group_name_io_same_name = {
       //   name: "New Group Name",
@@ -540,14 +539,16 @@ export function updateGroupNameTest(orchestrator, config, installables) {
 
       // 3- CHECK IF THE VALUES HAS CHANGED AND THE GROUP STATE ITS THE EXPECTED
 
-      let updated_group = await getLatestGroupVersion({
-        groupHash: update_group_name_io.groupId,
-      })(alice_conductor);
+      let updated_group = await getLatestGroupVersion({ groupHash: update_group_name_io.groupId, })(alice_conductor);
       updated_group.created = original_group_content.created;
-      await delay(1000);
+      await delay(1000);  
+      
+      console.log("output");
+      console.log(updated_group);
+      
 
       t.deepEqual(
-        updated_group.latestName,
+        updated_group.name,
         update_group_name_io.name,
         "the group name fields match with the expected value"
       );
@@ -589,12 +590,18 @@ export function updateGroupNameTest(orchestrator, config, installables) {
         charlie_group_list.length,
         [updated_group].length,
         "charlie group list match with the expected value"
-      );
+      );    
+
     }
   );
+
+  orchestrator.run();
 }
 
-export function validateCreateGroupTest(orchestrator, config, installables) {
+export function validateCreateGroupTest( config, installables) {
+
+  let orchestrator = new Orchestrator();
+
   orchestrator.registerScenario(
     "validate_create_group method test",
     async (s, t) => {
@@ -606,7 +613,7 @@ export function validateCreateGroupTest(orchestrator, config, installables) {
         installables.one
       );
 
-      await s.shareAllNodes([alice, bobby, charlie]);
+      // await s.shareAllNodes([alice, bobby, charlie]);
 
       const alicePubKey = alice_happ.agent;
       const bobbyPubKey = bobby_happ.agent;
@@ -724,6 +731,8 @@ export function validateCreateGroupTest(orchestrator, config, installables) {
       );
     }
   );
+
+    orchestrator.run();
 }
 
 // THIS TESTS CANNOT BE IMPLEMENTED YET, UNTILL HOLOCHAIN DO THE VALIDATION CALLBACKS
