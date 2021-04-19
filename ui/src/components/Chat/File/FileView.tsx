@@ -19,6 +19,14 @@ const File: React.FC<Props> = ({ file }) => {
     link.download = file.fileName;
     link.click();
   };
+
+  const renderSize = () => {
+    const size =
+      (fileSize / 1024 / 1024).toFixed(2) === "0.00"
+        ? `${(fileSize / 1024 / 1024).toFixed(2)}mb`
+        : `${(fileSize / 1024).toFixed(2)}kb`;
+    return size;
+  };
   return (
     <IonGrid>
       <IonRow
@@ -36,7 +44,7 @@ const File: React.FC<Props> = ({ file }) => {
           </IonRow>
           <IonRow>
             <IonText>
-              <span>{(fileSize / 1024 / 1024).toFixed(2)} mb</span>
+              <span>{renderSize()}</span>
             </IonText>
           </IonRow>
         </div>
