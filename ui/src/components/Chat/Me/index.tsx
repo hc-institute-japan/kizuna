@@ -1,5 +1,9 @@
 import { IonIcon, IonItem, IonLabel, IonText } from "@ionic/react";
-import { checkmarkDoneOutline, checkmarkOutline } from "ionicons/icons";
+import {
+  checkmarkDoneOutline,
+  checkmarkOutline,
+  personCircleOutline,
+} from "ionicons/icons";
 import React from "react";
 import { useIntl } from "react-intl";
 import {
@@ -11,6 +15,7 @@ import File from "../File";
 import common from "../style.module.css";
 import Text from "../Text";
 import { ChatProps } from "../types";
+import styles from "../style.module.css";
 
 const Me: React.FC<ChatProps> = ({
   payload,
@@ -32,11 +37,7 @@ const Me: React.FC<ChatProps> = ({
         }`}
       >
         {isText ? (
-          <Text
-            type="me"
-            message={payload as TextPayload}
-            timestamp={timestamp}
-          />
+          <Text message={payload as TextPayload} />
         ) : (
           <File type="me" timestamp={timestamp} file={payload as FilePayload} />
         )}
@@ -54,8 +55,9 @@ const Me: React.FC<ChatProps> = ({
         <div className={common.picture} style={{ marginLeft: "0.5rem" }}>
           {showProfilePicture ? (
             <img
+              className={styles.avatar}
               alt={`${author}'s profile`}
-              src="https://instagram.fmnl4-4.fna.fbcdn.net/v/t51.2885-15/e35/165950076_444388300151532_1799111197207173012_n.jpg?tp=1&_nc_ht=instagram.fmnl4-4.fna.fbcdn.net&_nc_cat=100&_nc_ohc=7z4YUOlGp6gAX90UHs8&ccb=7-4&oh=4bbdb3043f0a6668e67e143b769ce4be&oe=6066B770&_nc_sid=86f79a"
+              src={personCircleOutline}
             />
           ) : null}
         </div>

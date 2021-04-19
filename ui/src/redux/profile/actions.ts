@@ -73,3 +73,9 @@ export const fetchProfileFromUsername = (
     };
   }
 };
+
+export const getAgentId = (): ThunkAction => async (
+  _dispatch,
+  _getState,
+  { getAgentId }
+) => await getAgentId();
