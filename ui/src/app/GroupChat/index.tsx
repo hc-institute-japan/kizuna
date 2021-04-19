@@ -34,8 +34,13 @@ import {
 import { fetchId } from "../../redux/profile/actions";
 
 import MessageInput from "../../components/MessageInput";
-import { arrowBackSharp, informationCircleOutline } from "ionicons/icons";
+import {
+  arrowBackSharp,
+  informationCircleOutline,
+  peopleCircleOutline,
+} from "ionicons/icons";
 import { ChatListMethods } from "../../components/Chat/types";
+import styles from "./style.module.css";
 
 interface GroupChatParams {
   group: string;
@@ -100,7 +105,7 @@ const GroupChat: React.FC = () => {
       });
     }
 
-    const messagePromises = inputs.map((groupMessage: any) => 
+    const messagePromises = inputs.map((groupMessage: any) =>
       // TODO: error handling
       dispatch(sendGroupMessage(groupMessage))
     );
@@ -108,10 +113,9 @@ const GroupChat: React.FC = () => {
     Promise.all(messagePromises).then((messages: GroupMessage[]) => {
       messages.forEach((msg: GroupMessage, i) => {
         groupInfo?.messages.push(msg.groupMessageEntryHash);
-      })
+      });
       chatList.current!.scrollToBottom();
-    })
-    
+    });
   };
 
   const handleOnBack = () => {
