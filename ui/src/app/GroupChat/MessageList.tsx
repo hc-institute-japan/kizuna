@@ -4,12 +4,15 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../redux/types";
 import { GroupMessage } from "../../redux/group/types";
 import Chat from "../../components/Chat";
+import { ChatListMethods } from "../../components/Chat/types";
 interface Props {
   messageIds: string[];
   members: string[];
   myAgentId: string;
+  // TODO: not really sure what type this is
+  chatList: React.RefObject<ChatListMethods>
 }
-const MessageList: React.FC<Props> = ({ messageIds, members, myAgentId }) => {
+const MessageList: React.FC<Props> = ({ messageIds, members, myAgentId, chatList }) => {
   const messagesData = useSelector((state: RootState) => {
     let uniqueArray = messageIds.filter(function (item, pos, self) {
       return self.indexOf(item) === pos;
@@ -45,9 +48,8 @@ const MessageList: React.FC<Props> = ({ messageIds, members, myAgentId }) => {
     return messages;
   });
 
-  // BUG: The screen does not scroll to the latest message sent or received
   return (
-    <Chat.ChatList type="group">
+    <Chat.ChatList ref={chatList} type="group" >
       {messagesData!.map((message) => {
         if (message.author.id === myAgentId) return <Chat.Me key={message.groupMessageEntryHash} author={message.author.username} timestamp={new Date(message.timestamp[0] * 1000)} payload={message.payload} readList={message.readList} type={"group"} showName={true} showProfilePicture={true} />;
         return <Chat.Others key={message.groupMessageEntryHash} author={message.author.username} timestamp={new Date(message.timestamp[0] * 1000)} payload={message.payload} readList={message.readList} type={"group"} showName={true} showProfilePicture={true} />;

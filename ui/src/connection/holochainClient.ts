@@ -37,42 +37,52 @@ let signalHandler: AppSignalCb = (signal) => {
       };
 
       let contacts = store.getState().contacts.contacts;
+      // At this point, username is non-nullable
+      let username = store.getState().profile.username!;
       let undefinedProfiles: AgentPubKey[] = [];
-      let myAgentId = getAgentId().then((res: any) => Uint8ArrayToBase64(res));
       let membersUsernames: { [key: string]: Profile } = {};
-      groupData.members.forEach(async (member: any) => {
-        if (contacts[member]) {
-          membersUsernames[member] = contacts[member];
-        } else if (member === (await myAgentId)) {
-          // do nothing if member is yourself
-        } else {
-          undefinedProfiles.push(
-            Buffer.from(base64ToUint8Array(member).buffer)
-          );
-        }
-      });
+      let groupMembers = [...groupData.members, groupData.creator];
 
-      if (undefinedProfiles?.length) {
-        callZome({
-          zomeName: ZOMES.USERNAME,
-          fnName: FUNCTIONS[ZOMES.USERNAME].GET_USERNAMES,
-          payload: undefinedProfiles,
-        }).then((res: any) => {
-          res.forEach((profile: any) => {
-            let base64 = Uint8ArrayToBase64(profile.agentId);
-            membersUsernames[base64] = {
-              id: base64,
-              username: profile.username,
-            };
+      // TODO: simplify this
+      getAgentId()
+        .then((res: any) => Uint8ArrayToBase64(res))
+        .then((myAgentIdBase64: any) => {
+          // to ensure that the Profile of members (including creator) are available
+          groupMembers.forEach((member: any) => {
+            if (contacts[member]) {
+              membersUsernames[member] = contacts[member];
+            } else if (member === myAgentIdBase64) {
+              membersUsernames[myAgentIdBase64] = {
+                id: myAgentIdBase64,
+                username,
+              };
+            } else {
+              undefinedProfiles.push(
+                Buffer.from(base64ToUint8Array(member).buffer)
+              );
+            }
           });
+          if (undefinedProfiles?.length) {
+            callZome({
+              zomeName: ZOMES.USERNAME,
+              fnName: FUNCTIONS[ZOMES.USERNAME].GET_USERNAMES,
+              payload: undefinedProfiles,
+            }).then((res: any) => {
+              res.forEach((profile: any) => {
+                let base64 = Uint8ArrayToBase64(profile.agentId);
+                membersUsernames[base64] = {
+                  id: base64,
+                  username: profile.username,
+                };
+              });
+              store.dispatch<AddGroupAction>({
+                type: ADD_GROUP,
+                groupData,
+                membersUsernames,
+              });
+            });
+          }
         });
-      }
-
-      store.dispatch<AddGroupAction>({
-        type: ADD_GROUP,
-        groupData,
-        membersUsernames,
-      });
       break;
     case "group_messsage_data": {
       let payload = signal.data.payload.payload.payload;
