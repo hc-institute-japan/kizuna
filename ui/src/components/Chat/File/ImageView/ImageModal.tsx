@@ -49,8 +49,7 @@ const ImageModal: React.FC<Props> = ({ state, src, file }) => {
   }, [isOpen]);
 
   const download = () => {
-    // const blob = new Blob([base64ToUint8Array(file.fileHash)]); // change resultByte to bytes
-    const blob = new Blob([file.fileHash], { type:"text/plain;charset=UTF-8"}); // change resultByte to bytes
+    const blob = new Blob([base64ToUint8Array(file.fileHash)]); // change resultByte to bytes
 
     const link = document.createElement("a");
     link.href = window.URL.createObjectURL(blob);
