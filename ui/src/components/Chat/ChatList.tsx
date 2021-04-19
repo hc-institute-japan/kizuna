@@ -1,13 +1,9 @@
 import {
-  IonIcon,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
-  IonItem,
-  IonLabel,
   IonList,
   IonText,
 } from "@ionic/react";
-import { checkmarkDoneOutline, checkmarkOutline } from "ionicons/icons";
 import React, {
   forwardRef,
   ForwardRefRenderFunction,

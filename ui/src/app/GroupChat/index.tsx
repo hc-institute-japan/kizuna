@@ -38,7 +38,13 @@ import {
 import { fetchId } from "../../redux/profile/actions";
 
 import MessageInput from "../../components/MessageInput";
-import { arrowBackSharp, informationCircleOutline } from "ionicons/icons";
+import {
+  arrowBackSharp,
+  informationCircleOutline,
+  peopleCircleOutline,
+  personCircleOutline,
+} from "ionicons/icons";
+import styles from "./style.module.css";
 
 interface GroupChatParams {
   group: string;
@@ -161,9 +167,8 @@ const GroupChat: React.FC = () => {
                   <img src={groupInfo!.avatar} alt={groupInfo!.name} />
                 ) : (
                   <img
-                    src={
-                      "https://upload.wikimedia.org/wikipedia/commons/8/8c/Lauren_Tsai_by_Gage_Skidmore.jpg"
-                    }
+                    className={styles.avatar}
+                    src={peopleCircleOutline}
                     alt={groupInfo!.name}
                   />
                 )
