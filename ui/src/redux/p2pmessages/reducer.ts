@@ -59,7 +59,7 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
               fileName: message.payload.payload.metadata.fileName,
               fileSize: message.payload.payload.metadata.fileSize,
               fileType: message.payload.payload.fileType.type,
-              fileHash: message.payload.payload.metadata.fileHash,
+              fileHash: Uint8ArrayToBase64(message.payload.payload.metadata.fileHash),
               thumbnail: message.payload.payload.fileType.type != "OTHER" 
                           ? message.payload.payload.fileType.payload.thumbnail
                           : null
@@ -136,7 +136,7 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
             fileName: message.payload.payload.metadata.fileName,
             fileSize: message.payload.payload.metadata.fileSize,
             fileType: message.payload.payload.fileType.type,
-            fileHash: message.payload.payload.metadata.fileHash,
+            fileHash: Uint8ArrayToBase64(message.payload.payload.metadata.fileHash),
             thumbnail: message.payload.payload.fileType.type != "OTHER" 
                         ? message.payload.payload.fileType.payload.thumbnail
                         : null
