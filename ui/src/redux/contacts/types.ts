@@ -1,3 +1,4 @@
+import { AgentPubKey } from "@holochain/conductor-api";
 import { Profile } from "../profile/types";
 
 export const SET_CONTACTS = "SET_CONTACTS";
@@ -30,3 +31,8 @@ interface SetBlockedAction {
   };
 }
 export type ContactsActionType = SetContactsAction | SetBlockedAction;
+
+export interface Contact {
+  agentPubKey: AgentPubKey,
+  username: string
+}

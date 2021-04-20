@@ -6,6 +6,7 @@ import { getLatestData } from "../../redux/commons/actions";
 import { useAppDispatch } from "../../utils/helpers";
 import Blocked from "../Blocked";
 import Chat from "../Chat";
+import ChatDetails from "../Chat/ChatDetails";
 import GroupChat from "../GroupChat";
 import GroupChatInfo from "../GroupChat/GroupChatInfo";
 import Home from "../Home";
@@ -34,9 +35,11 @@ const Authenticated: React.FC = () => {
           <Route path="/g/:group" exact component={GroupChat} />
           <Route path="/g/:group/info" component={GroupChatInfo}/>
           <Route path="/p/:username" exact component={Profile} />
-          <Route path="/test" exact component={GroupChat} />
+          {/* <Route path="/test" exact component={GroupChat} /> */}
 
           <Route path="/blocked" exact component={Blocked} />
+
+          <Route path="/u/:username/details" exact component={ChatDetails} />
 
           <Redirect from="/" to="/home" />
         </Switch>

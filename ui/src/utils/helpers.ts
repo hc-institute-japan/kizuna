@@ -1,6 +1,7 @@
 import { IntlShape } from "react-intl";
 import { useDispatch } from "react-redux";
 import { IndexedContacts } from "../redux/contacts/types";
+import { Payload, TextPayload } from "../redux/commons/types";
 import { Profile } from "../redux/profile/types";
 import { ReduxDispatch } from "../redux/types";
 
@@ -119,3 +120,20 @@ type SearchContacts = (
 
 export const searchContacts: SearchContacts = (contacts, username) =>
   Object.values(contacts).find((curr) => username === curr.username);
+
+export const timestampToDate = (timestamp: number[]) => {
+  let { 0: seconds, 1: nanoseconds } = timestamp;
+  let date = new Date( (seconds*1000) + (nanoseconds*10**-6));
+  return date
+}
+
+export const dateToTimestamp = (date: Date) => {
+  let milliseconds = date.getTime();
+  let seconds = (milliseconds/1000)>>0;
+  let nanoseconds = (milliseconds%1000)*10**6;
+  let ret: [number, number]= [seconds, nanoseconds];
+  return ret
+}
+
+export const isTextPayload = (payload: Payload) =>
+  (payload as TextPayload) != undefined;
