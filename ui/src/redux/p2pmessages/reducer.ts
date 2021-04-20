@@ -1,4 +1,3 @@
-import { actionSheetController } from "@ionic/core";
 import {
   P2PMessageActionType,
   P2PMessageConversationState,
@@ -8,13 +7,8 @@ import {
   SET_MESSAGES,
   APPEND_MESSAGE
 } from "./types";
-import {
-  FilePayload,
-  MessageID
-} from "../commons/types";
+import { MessageID } from "../commons/types";
 import { Uint8ArrayToBase64, timestampToDate } from "../../utils/helpers";
-import { MessageFormatError } from "@formatjs/intl";
-import { DefaultIonLifeCycleContext } from "@ionic/react";
 
 const initialState: P2PMessageConversationState = {
   conversations: {},
@@ -71,7 +65,8 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
 
         let p2pMessage = {
           p2pMessageEntryHash: key,
-          author: message.author,
+          author: Uint8ArrayToBase64(message.author),
+          // author: message.author,
           payload: payload,
           timestamp: timestampToDate(message.timeSent),
           replyTo: message.replyTo,
@@ -148,7 +143,8 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
 
       let p2pMessage: P2PMessage = {
         p2pMessageEntryHash: Uint8ArrayToBase64(receipt.id),
-        author: message.author,
+        author: Uint8ArrayToBase64(message.author),
+        // author: message.author,
         payload: payload,
         timestamp: timestampToDate(message.timeSent),
         replyTo: message.replyTo,
