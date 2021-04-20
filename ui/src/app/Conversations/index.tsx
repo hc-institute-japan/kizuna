@@ -51,15 +51,12 @@ const Conversations: React.FC = () => {
       for (let key in p2p.conversations) {
         let src = "https://upload.wikimedia.org/wikipedia/commons/8/8c/Lauren_Tsai_by_Gage_Skidmore.jpg";
         let conversant = contacts[key.slice(1)].username;
-        let lastMessageID = p2p.conversations[key].messages[0];
-        let lastMessage = p2p.messages[lastMessageID];
-        let lastSender = lastMessage.author;
-  
+        
         let messages: Message[] = Object.values(p2p.conversations[key].messages).map(p2pMessageID => {
           let p2pMessage = p2p.messages[p2pMessageID];
           let message: Message = {
             id: p2pMessage.p2pMessageEntryHash,
-            sender: {id: conversant, username: p2pMessage.author},
+            sender: {id: p2pMessage.author, username: p2pMessage.author == myAgentId ? "You" : conversant},
             message: p2pMessage.payload.type == "TEXT"
                       ? (p2pMessage.payload as TextPayload).payload.payload 
                       : (p2pMessage.payload as FilePayload).fileName,
@@ -67,6 +64,10 @@ const Conversations: React.FC = () => {
           };
           return message;
         })
+
+        messages.sort((x: Message, y: Message) => 
+          y.timestamp.valueOf() < x.timestamp.valueOf() ? 1 : -1
+        );
         
         let conversation = {
           isGroup: false,
@@ -144,7 +145,9 @@ const Conversations: React.FC = () => {
         
         });
     }
-    
+    conversationsArray.sort((x: any, y: any) => 
+      x.content.messages[x.content.messages.length - 1].timestamp < y.content.messages[y.content.messages.length - 1].timestamp ? 1 : -1
+    )
 
     return conversationsArray;
   };

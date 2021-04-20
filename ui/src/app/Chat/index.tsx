@@ -32,7 +32,7 @@ const Chat: React.FC<Props> = ({ location }) => {
   const { username } = useParams<{ username: string }>();
   const conversant = useSelector((state: RootState) => {
     let contacts = state.contacts.contacts;
-    let conversant = Object.values(contacts).filter(contact => contact.username = username);
+    let conversant = Object.values(contacts).filter(contact => contact.username == username);
     return conversant[0];
   });
 
@@ -148,7 +148,7 @@ const Chat: React.FC<Props> = ({ location }) => {
   const scrollRef = React.createRef<HTMLIonInfiniteScrollElement>();
 
   const displayMessage = (messageBundle: any) => {
-    if (conversant.id != Uint8ArrayToBase64(Buffer.from(messageBundle.message.author))) {
+    if (conversant.id != messageBundle.message.author) {
       return (
         <Me 
           key={messageBundle.message.p2pMessageEntryHash}
