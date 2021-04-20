@@ -50,8 +50,8 @@ const Conversation: React.FC<Props> = ({
   const handleOnClick = () => {
     if (isGroup) {
       history.push(`/g/${groupId}`);
-    } else {
-      history.push(`/u/${name}`, content);
+    } else { 
+      history.push(`/u/${name}`);
     }
   };
   useSelector((state: RootState) => {
