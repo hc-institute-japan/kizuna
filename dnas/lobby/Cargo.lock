@@ -5,7 +5,7 @@ name = "aggregator"
 version = "0.0.1"
 dependencies = [
  "derive_more",
- "file_types",
+ "file_types 0.0.1",
  "hdk",
  "serde",
 ]
@@ -143,6 +143,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "file_types"
+version = "0.0.1"
+source = "git+https://github.com/hc-institute-japan/Kizuna?branch=develop#05beb585ed9bb1c7876ed93cf6a9b9ec454c0e91"
+dependencies = [
+ "derive_more",
+ "hdk",
+ "serde",
+]
+
+[[package]]
 name = "fixt"
 version = "0.0.2-alpha.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -175,7 +185,7 @@ name = "group"
 version = "0.0.1"
 dependencies = [
  "derive_more",
- "file_types",
+ "file_types 0.0.1",
  "hdk",
  "serde",
 ]
@@ -337,9 +347,9 @@ checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
 name = "libc"
-version = "0.2.91"
+version = "0.2.93"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8916b1f6ca17130ec6568feccee27c156ad12037880833a3b842a823236502e7"
+checksum = "9385f66bf6105b241aa65a61cb923ef20efc665cb9f9bb50ac2f0c4b7f378d41"
 
 [[package]]
 name = "lock_api"
@@ -399,16 +409,17 @@ version = "0.0.1"
 dependencies = [
  "derive_more",
  "hdk",
- "p2pmessage 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=bump-hdk-0.0.100)",
+ "p2pmessage 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop)",
  "serde",
 ]
 
 [[package]]
 name = "p2pmessage"
 version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=bump-hdk-0.0.100#d0f1307352212de6a4b1203043705e1d08e923d6"
+source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop#87a2a4f767afbe9396f7fee387f84a22801e7e6f"
 dependencies = [
  "derive_more",
+ "file_types 0.0.1 (git+https://github.com/hc-institute-japan/Kizuna?branch=develop)",
  "hdk",
  "serde",
 ]
@@ -466,9 +477,9 @@ dependencies = [
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.24"
+version = "1.0.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1e0704ee1a7e00d7bb417d0770ea303c1bccbabf0ef1667dae92b5967f5f8a71"
+checksum = "a152013215dca273577e18d2bf00fa862b89b24169fb78c4c95aeb07992c9cec"
 dependencies = [
  "unicode-xid",
 ]
@@ -678,9 +689,9 @@ checksum = "1e81da0851ada1f3e9d4312c704aa4f8806f0f9d69faaf8df2f3464b4a9437c2"
 
 [[package]]
 name = "syn"
-version = "1.0.67"
+version = "1.0.69"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6498a9efc342871f91cc2d0d694c674368b4ceb40f62b65a7a08c3792935e702"
+checksum = "48fe99c6bd8b1cc636890bcc071842de909d902c81ac7dab53ba33c421ab8ffb"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -821,13 +832,13 @@ dependencies = [
  "derive_more",
  "hdk",
  "serde",
- "username 0.0.1 (git+https://github.com/holochain-open-dev/username-zome?branch=bump-hdk-0.0.100)",
+ "username 0.0.1 (git+https://github.com/holochain-open-dev/username-zome)",
 ]
 
 [[package]]
 name = "username"
 version = "0.0.1"
-source = "git+https://github.com/holochain-open-dev/username-zome?branch=bump-hdk-0.0.100#8b8b2a2f0f8b3e06ea56aea9721de7723893ba92"
+source = "git+https://github.com/holochain-open-dev/username-zome?branch=master#e05f862410c061f6f04e1bf3640fa3e23c517724"
 dependencies = [
  "derive_more",
  "hdk",

@@ -12,4 +12,4 @@ crate-type = [ "cdylib", "rlib" ]
 derive_more = "0"
 serde = "1"
 hdk = "0.0.100"
-username = {git = "https://github.com/holochain-open-dev/username-zome", branch = "bump-hdk-0.0.100", package = "username"}
+username = {git = "https://github.com/holochain-open-dev/username-zome", branch = "master", package = "username"}
