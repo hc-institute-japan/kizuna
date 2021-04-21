@@ -2,7 +2,10 @@ import { Orchestrator } from "@holochain/tryorama";
 
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
-const request = (orchestrator: Orchestrator<unknown>, config: any) => {
+const request = (config: any) => {
+
+  let orchestrator = new Orchestrator();
+
   orchestrator.registerScenario("Request Testing", async (s, t) => {
     const { conductor } = await s.players({ conductor: config });
     await conductor.spawn();
@@ -44,6 +47,8 @@ const request = (orchestrator: Orchestrator<unknown>, config: any) => {
       message: "working",
     });
   });
+
+  orchestrator.run();
 };
 
 export default request;
