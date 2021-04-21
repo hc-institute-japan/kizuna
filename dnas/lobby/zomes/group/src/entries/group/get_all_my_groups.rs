@@ -1,11 +1,7 @@
 use hdk::prelude::*;
 
 use super::group_helpers::get_group_latest_version;
-use super::{
-    Group, 
-    GroupOutput,
-    MyGroupListWrapper,
-};
+use super::{Group, GroupOutput, MyGroupListWrapper};
 use crate::utils::error;
 
 pub fn get_all_my_groups_handler() -> ExternResult<MyGroupListWrapper> {
@@ -36,11 +32,12 @@ pub fn get_all_my_groups_handler() -> ExternResult<MyGroupListWrapper> {
                     }
 
                     if !group_entry_details.updates.is_empty() {
-                        let latest_group: Group = get_group_latest_version(link.target.clone())?;
+                        let latest_group_version: GroupOutput =
+                            get_group_latest_version(group_id.clone())?;
 
-                        group.name = latest_group.name; // latest group name
+                        group.name = latest_group_version.latest_name; // latest group name
 
-                        group.members = latest_group.members; // latest group members
+                        group.members = latest_group_version.members; // latest group members
                     }
 
                     my_linked_groups_entries.push(GroupOutput::new(

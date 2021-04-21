@@ -36,7 +36,7 @@ use group_message::{
 };
 
 use group::{
-    CreateGroupInput, CreateGroupOutput, EntryHashWrapper, Group, MyGroupListWrapper,
+    CreateGroupInput, CreateGroupOutput, EntryHashWrapper, Group, GroupOutput, MyGroupListWrapper,
     UpdateGroupNameIO, UpdateMembersIO,
 };
 
@@ -129,7 +129,7 @@ fn get_all_my_groups(_: ()) -> ExternResult<MyGroupListWrapper> {
 }
 
 #[hdk_extern]
-fn get_group_latest_version(group_id: EntryHashWrapper) -> ExternResult<Group> {
+fn get_group_latest_version(group_id: EntryHashWrapper) -> ExternResult<GroupOutput> {
     return group_helpers::get_group_latest_version(group_id.group_hash);
 }
 
