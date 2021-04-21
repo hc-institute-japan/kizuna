@@ -30,8 +30,8 @@ pub fn add_members_handler(add_members_input: UpdateMembersIO) -> ExternResult<U
     }
 
     // get most recent Group Entry
-    let latest_group_version: Group = get_group_latest_version(group_id.clone())?;
-    let mut group_members: Vec<AgentPubKey> = latest_group_version.get_group_members();
+    let latest_group_version: GroupOutput = get_group_latest_version(group_id.clone())?;
+    let mut group_members: Vec<AgentPubKey> = latest_group_version.members;
     let creator: AgentPubKey = agent_info()?.agent_latest_pubkey;
 
     // filter the list of members the admin want to add to avoid duplicated members
@@ -42,7 +42,7 @@ pub fn add_members_handler(add_members_input: UpdateMembersIO) -> ExternResult<U
 
     group_members.append(&mut new_group_members_from_input);
 
-    let group_name: String = latest_group_version.name;
+    let group_name: String = latest_group_version.latest_name;
     let created: Timestamp = to_timestamp(sys_time()?);
 
     let updated_group: Group = Group::new(group_name, created, creator, group_members.clone());
