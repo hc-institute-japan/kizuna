@@ -1,3 +1,4 @@
+import { Orchestrator } from "@holochain/tryorama";
 import { remove } from "lodash";
 
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -41,7 +42,11 @@ function inBlocked(agentPubKey) {
 // NOTE: all the calls that return Err are commented out.
 // they are already tested and they are returning the intended
 // errors.
-export default (orchestrator, config, installables) => {
+
+let orchestrator = new Orchestrator();
+
+export default (config, installables) => {
+
   orchestrator.registerScenario("add a contact", async (s, t) => {
     const [conductor] = await s.players([config]);
     const [
@@ -81,6 +86,10 @@ export default (orchestrator, config, installables) => {
     t.deepEqual(remove_then_add[0], agent_pubkey_bobby);
   });
 
+  orchestrator.run();
+
+  orchestrator = new Orchestrator(); 
+
   orchestrator.registerScenario("remove a contact", async (s, t) => {
     const [conductor] = await s.players([config]);
     const [
@@ -112,6 +121,9 @@ export default (orchestrator, config, installables) => {
 
     t.deepEqual(add_then_remove[0], agent_pubkey_bobby);
   });
+  orchestrator.run();
+
+  orchestrator = new Orchestrator();
 
   orchestrator.registerScenario("list added", async (s, t) => {
     const [conductor] = await s.players([config]);
@@ -148,6 +160,9 @@ export default (orchestrator, config, installables) => {
     t.deepEqual(list_added_4.length, 2);
     t.deepEqual(list_added_5.length, 1);
   });
+  orchestrator.run();
+
+  orchestrator = new Orchestrator();
 
   orchestrator.registerScenario("block contact", async (s, t) => {
     const [conductor] = await s.players([config]);
@@ -192,6 +207,9 @@ export default (orchestrator, config, installables) => {
     t.deepEqual(unblocked_then_block[0], agent_pubkey_bobby);
     t.deepEqual(removed_then_block[0], agent_pubkey_bobby);
   });
+  orchestrator.run();
+
+  orchestrator = new Orchestrator();
 
   orchestrator.registerScenario("unblock contact", async (s, t) => {
     const [conductor] = await s.players([config]);
@@ -231,6 +249,9 @@ export default (orchestrator, config, installables) => {
 
     t.deepEqual(blocked_then_unblock[0], agent_pubkey_bobby);
   });
+  orchestrator.run();
+
+  orchestrator = new Orchestrator();
 
   orchestrator.registerScenario("list blocked", async (s, t) => {
     const [conductor] = await s.players([config]);
@@ -267,6 +288,9 @@ export default (orchestrator, config, installables) => {
     t.deepEqual(list_blocked_3.length, 1);
     t.deepEqual(list_blocked_4.length, 2);
 });
+orchestrator.run();
+
+orchestrator = new Orchestrator();
 
   orchestrator.registerScenario("check in blocked list", async (s, t) => {
     const [conductor] = await s.players([config]);
@@ -295,3 +319,4 @@ export default (orchestrator, config, installables) => {
     t.deepEqual(in_contacts_3, true);
   });
 };
+orchestrator.run();

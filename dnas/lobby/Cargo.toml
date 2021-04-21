@@ -1,14 +1,13 @@
 [workspace]
 members = [
-    "zomes/preference",
-    "zomes/p2pmessage",
+    "zomes/group",
     # "zomes/request",
     "zomes/username",
     "zomes/contacts",
-    "zomes/group",
     "zomes/aggregator",
-
-    "commons/file_types",
+    "zomes/preference",
+    "zomes/p2pmessage",
+    "commons/file_types", 
 ]
 
 [profile.dev]
@@ -18,6 +17,5 @@ opt-level = "z"
 opt-level = "z"
 
 [patch.crates-io]
-hdk3 = {git = "https://github.com/holochain/holochain", rev = "3675b58", package = "hdk3"}
-holo_hash = {git = "https://github.com/holochain/holochain", rev = "3675b58", package = "holo_hash"}
+#holo_hash = {git = "https://github.com/holochain/holochain", rev = "3675b58", package = "holo_hash"}
 
