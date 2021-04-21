@@ -150,8 +150,8 @@ export const getAgentId: () => Promise<AgentPubKey | null> = async () => {
   await init();
   try {
     const info = await client?.appInfo({ installed_app_id: "test-app" });
-    if (info?.cell_data[0][0][1]) {
-      myAgentId = info?.cell_data[0][0][1];
+    if (info?.cell_data[0].cell_id[1]) {
+      myAgentId = info?.cell_data[0].cell_id[1];
       return myAgentId;
     }
     return null;
@@ -169,10 +169,10 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
   const info = await client?.appInfo({ installed_app_id: "test-app" });
   const {
     cap = null,
-    cellId = info?.cell_data[0][0],
+    cellId = info?.cell_data[0].cell_id,
     zomeName,
     fnName,
-    provenance = info?.cell_data[0][0][1],
+    provenance = info?.cell_data[0].cell_id[1],
     payload = null,
   } = config;
   try {

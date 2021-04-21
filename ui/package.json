@@ -44,13 +44,13 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "hc:alice": "cd ../dnas/lobby && holochain-run-dna kizuna.dna.gz -p 8888",
-    "hc:bob": "cd ../dnas/lobby && holochain-run-dna kizuna.dna.gz -p 8889",
-    "hc:charlie": "cd ../dnas/lobby && holochain-run-dna kizuna.dna.gz -p 8899",
     "ui:alice": "REACT_APP_DNA_INTERFACE_URL=ws://localhost:8888 ionic serve -p 8100",
     "ui:bob": "REACT_APP_DNA_INTERFACE_URL=ws://localhost:8889 ionic serve -p 8200",
     "ui:charlie": "REACT_APP_DNA_INTERFACE_URL=ws://localhost:8899 ionic serve -p 8300",
-    "demo": "concurrently \"npm run hc:alice\" \"npm run hc:bob\" \"npm run hc:charlie\" \"npm run ui:alice\" \"npm run ui:bob\" \"npm run ui:charlie\"",
+    "build-happ": "cd ../dnas/lobby && CARGO_TARGET_DIR=target cargo build --release --target wasm32-unknown-unknown && hc dna pack workdir/dna && hc app pack workdir/happ",
+    "sandbox-create": "rm -rf ~/tmp && mkdir ~/tmp && hc s clean && hc s create --root ~/tmp/ -n 3 network -b https://bootstrap-staging.holo.host/ quic && hc s call 0 1 2 install-app-bundle ../dnas/lobby/workdir/happ/kizuna.happ",
+    "sandbox-run": "WASM_LOG=debug RUST_LOG=warn hc s run --all -p 8888 8889 8899",
+    "demo": "concurrently \"npm run build-happ\" \"npm run sandbox-create\" \"npm run sandbox-run\" \"npm run ui:alice\" \"npm run ui:bob\" \"npm run ui:charlie\"",
     "ios": "npx cap sync ios && npx cap copy ios && npx cap open ios"
   },
   "eslintConfig": {
