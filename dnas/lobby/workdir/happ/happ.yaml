@@ -1,14 +1,14 @@
 ---
 manifest_version: "1"
-name: Kizuna
+name: kizuna
 description: ~
 slots:
-  - id: Kizuna
+  - id: kizuna
     provisioning:
       strategy: create
       deferred: false
     dna:
-      bundled: "../dna/Kizuna.dna"
+      bundled: "../dna/kizuna.dna"
       properties: ~
       uuid: ~
       version: ~
