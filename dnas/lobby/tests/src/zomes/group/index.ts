@@ -25,13 +25,13 @@ export default (config, installables) => {
   validateCreateGroupTest(config, installables); //good
 
   // GroupMessage related tests
-  sendMessageTest(config, installables); // good
-  sendMessageswithFilesTest(config, installables); // good
-  sendLargeSetOfFilesTest(config, installables); // good
-  getNextBatchOfMessagesTest(config, installables); // good
-  getMessagesByGroupByTimestampTest(config, installables); // good
-  getLatestMessagesForAllGroupsTest(config, installables); // good
-  fetchFilesForAParticularDateTest(config, installables); // good
+  // sendMessageTest(config, installables); // good
+  // sendMessageswithFilesTest(config, installables); // good
+  // sendLargeSetOfFilesTest(config, installables); // good
+  // getNextBatchOfMessagesTest(config, installables); // good
+  // getMessagesByGroupByTimestampTest(config, installables); // good
+  // getLatestMessagesForAllGroupsTest(config, installables); // good
+  // fetchFilesForAParticularDateTest(config, installables); // good
 
   // groupTypingIndicatorTest(config, installables); // not-goodk
   // readGroupMessageTest(config, installables); // not-good
