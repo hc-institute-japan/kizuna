@@ -19,7 +19,7 @@ pub struct UsernameInfo {
 }
 
 #[derive(Serialize, Deserialize, SerializedBytes, Debug)]
-pub struct UsernameList(Vec<UsernameInfo>);
+pub struct UsernameList(pub Vec<UsernameInfo>);
 
 // for group
 #[derive(Deserialize, Serialize, SerializedBytes, Debug)]
@@ -79,6 +79,7 @@ pub struct MessagesByGroup(pub HashMap<String, Vec<GroupMessageHash>>);
 pub struct GroupMessagesContents(pub HashMap<String, GroupMessageContent>);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct GroupMessagesOutput {
     messages_by_group: MessagesByGroup,
     group_messages_contents: GroupMessagesContents,
@@ -151,8 +152,8 @@ pub struct PerGroupPreference {
 pub struct AggregatedLatestData {
     pub user_info: UsernameInfo,
     // for contacts
-    pub added_contacts: Vec<AgentPubKey>,
-    pub blocked_contacts: Vec<AgentPubKey>,
+    pub added_contacts: Vec<UsernameInfo>,
+    pub blocked_contacts: Vec<UsernameInfo>,
     // for group
     pub groups: MyGroupListWrapper,
     pub latest_group_messages: GroupMessagesOutput,
