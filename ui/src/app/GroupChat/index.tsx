@@ -114,7 +114,8 @@ const GroupChat: React.FC = () => {
       messages.forEach((msg: GroupMessage, i) => {
         groupInfo?.messages.push(msg.groupMessageEntryHash);
       });
-      chatList.current!.scrollToBottom();
+      // TODO: bring this back
+      // chatList.current!.scrollToBottom();
     });
   };
 

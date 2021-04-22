@@ -95,7 +95,7 @@ const Conversation: React.FC<Props> = ({
       return x.timestamp[0] - y.timestamp[0];
     });
   }, [messages]);
-  return latestMessageDetail.sender ? (
+  return (latestMessageDetail.sender || isGroup) ? (
     <IonItem onClick={handleOnClick}>
       <IonAvatar slot="start">
         <img
@@ -119,7 +119,8 @@ const Conversation: React.FC<Props> = ({
                 { id: "app.conversation.other-file-string" },
                 {
                   fileName: latestMessageDetail.fileName!,
-                  name: latestMessageDetail.sender.username,
+                  // this is non nullable since no file will be sent if there is no message sent
+                  name: latestMessageDetail.sender!.username,
                 }
               )}
         </p>

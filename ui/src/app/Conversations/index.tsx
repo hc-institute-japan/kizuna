@@ -28,9 +28,6 @@ const Conversations: React.FC = () => {
   const history = useHistory();
   const dispatch = useAppDispatch();
   const contacts = useSelector((state: RootState) => state.contacts.contacts);
-  const [groups, setGroups] = useState<{
-    [key: string]: GroupConversation;
-  }>({});
   const groupsData = useSelector(
     (state: RootState) => state.groups.conversations
   );
@@ -39,8 +36,15 @@ const Conversations: React.FC = () => {
   );
   const groupMembers = useSelector((state: RootState) => state.groups.members);
   const myUsername = useSelector((state: RootState) => state.profile.username);
-  const [myAgentId, setMyAgentId] = useState<string>("");
   const p2pState = useSelector((state: RootState) => state.p2pmessages);
+  const [myAgentId, setMyAgentId] = useState<string>("");
+  const [groups, setGroups] = useState<{
+    [key: string]: GroupConversation;
+  }>({});
+
+  const [groupMessagesLocal, setGroupMessagesLocal] = useState<{
+    [key: string]: GroupMessage;
+}>({});
 
   const handleOnClick = () => {
     history.push({
@@ -51,7 +55,7 @@ const Conversations: React.FC = () => {
   const renderConversation = (groups: {[key: string]: GroupConversation}, p2p: P2PMessageConversationState) => {
     let conversationsArray: any[] = [];
 
-    if (p2p != undefined) {
+    if (p2p !== undefined) {
       for (let key in p2p.conversations) {
         let src = "https://upload.wikimedia.org/wikipedia/commons/8/8c/Lauren_Tsai_by_Gage_Skidmore.jpg";
         let conversant = contacts[key.slice(1)].username;
@@ -60,8 +64,8 @@ const Conversations: React.FC = () => {
           let p2pMessage = p2p.messages[p2pMessageID];
           let message: Message = {
             id: p2pMessage.p2pMessageEntryHash,
-            sender: {id: p2pMessage.author, username: p2pMessage.author == myAgentId ? "You" : conversant},
-            message: p2pMessage.payload.type == "TEXT"
+            sender: {id: p2pMessage.author, username: p2pMessage.author === myAgentId ? "You" : conversant},
+            message: p2pMessage.payload.type === "TEXT"
                       ? (p2pMessage.payload as TextPayload).payload.payload 
                       : (p2pMessage.payload as FilePayload).fileName,
             timestamp: dateToTimestamp(p2pMessage.timestamp)
@@ -85,12 +89,13 @@ const Conversations: React.FC = () => {
       }  
     }
 
-    if (groups != undefined) {
+    if (groups !== undefined) {
       Object.keys(groups).forEach((key: string ) => {
         // TODO: change to actual pic chosen by group creator
         let src = "https://upload.wikimedia.org/wikipedia/commons/8/8c/Lauren_Tsai_by_Gage_Skidmore.jpg";
         let messages: Message[] =  groups[key].messages ? groups[key].messages.map((messageId: string) => {
-          let groupMessage: GroupMessage = groupMessages[messageId];
+          console.log(groupMessagesLocal);
+          let groupMessage: GroupMessage = Object.keys(groupMessagesLocal).length ? groupMessagesLocal[messageId] : groupMessages[messageId];
           if (isTextPayload(groupMessage.payload)) {
             let message: Message = {
               id: groupMessage.groupMessageEntryHash,
@@ -139,8 +144,9 @@ const Conversations: React.FC = () => {
         );
         let conversation = {
           isGroup: true,
+          createdAt: groups[key].createdAt,
           groupId: groups[key].originalGroupEntryHash,
-          content: { src, name: groups[key].name, messages, },
+          content: { src, name: groups[key].name, messages },
         };
         
         if (!(conversationsArray.find((group: any) => group.id === conversation.groupId))) {
@@ -149,9 +155,17 @@ const Conversations: React.FC = () => {
         
         });
     }
-    conversationsArray.sort((x: any, y: any) => 
-      x.content.messages[x.content.messages.length - 1].timestamp < y.content.messages[y.content.messages.length - 1].timestamp ? 1 : -1
-    )
+    // conversationsArray.sort((x: any, y: any) => {
+    //   let timestampX = (x.content.messages.length !== 0) ?  x.content.messages[x.content.messages.length - 1].timestamp.valueOf() : x.createdAt.valueOf()
+    //   let timestampY = (y.content.messages.length !== 0) ?  y.content.messages[x.content.messages.length - 1].timestamp.valueOf() : y.createdAt.valueOf()
+
+    //   if (x.content.messages.length !== 0 || y.content.messages.length !== 0) {
+    //     console.log("heello?");
+    //     console.log(x.content.messages.length !== 0, y.content.messages.length !== 0)
+    //   }
+
+    //   return timestampX < timestampY ? 1 : -1
+    // })
 
     return conversationsArray;
   };
@@ -160,20 +174,30 @@ const Conversations: React.FC = () => {
     dispatch(fetchId()).then((res: AgentPubKey | null) => {
       if (res) setMyAgentId(Uint8ArrayToBase64(res));
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    console.log("here is the groupData", groupsData)
     setGroups(groupsData);
-  }, [groupsData, dispatch])
+  }, [groupsData])
+
+  useEffect(() => {
+    console.log("there are the messages", groupMessages);
+    setGroupMessagesLocal(groupMessages);
+  }, [groupMessages])
 
   return (
     <IonPage>
       <Toolbar noSearch onChange={() => {}} />
       <IonContent>
-        {Object.keys(groups).length > 0 || p2pState != undefined? (
+        {Object.keys(groups).length > 0 || p2pState !== undefined? (
           <IonList className={styles.conversation}>
             {renderConversation(groups, p2pState).map((conversation: any) => (
               <Conversation
-                key={conversation.groupId != undefined ? JSON.stringify(conversation.groupId) : conversation.conversant}
+                key={conversation.groupId !== undefined ? conversation.groupId : conversation.conversant}
                 isGroup={conversation.isGroup}
-                groupId={conversation.groupId != undefined ? JSON.stringify(conversation.groupId) : undefined}
+                groupId={conversation.groupId !== undefined ? conversation.groupId : undefined}
                 content={conversation.content}
                 myAgentId={myAgentId}
               />

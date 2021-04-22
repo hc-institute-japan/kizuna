@@ -46,5 +46,6 @@
   "app.groups.media.september": "Septmember",
   "app.groups.media.october": "October",
   "app.groups.media.november": "November",
-  "app.groups.media.december": "December"
+  "app.groups.media.december": "December",
+  "app.groups.media.no-media": "There is no media sent in the chat yet..."
 }
