@@ -17,8 +17,10 @@ import {
   strToUtf8Bytes,
   getMyGroupsList,
   getMessagesByGroupByTimestamp,
+  getFilesBytes,
 } from "./zome_fns";
-import { identity } from "lodash";
+import { Orchestrator } from "@holochain/tryorama";
+import { first } from "lodash";
 
 function sendMessageSignalHandler(signal, data) {
   return function (sender) {
@@ -55,7 +57,9 @@ function evaluateMessagesFromSignal(messagesFromSignal, messages, t) {
 
 // function evaluateMessagesFromSignal(messagesFromSignal, messages, t) {}
 
-function sendMessageTest(orchestrator, config, installables) {
+function sendMessageTest(config, installables) {
+  let orchestrator = new Orchestrator();
+
   orchestrator.registerScenario(
     "Tests for text send_message",
     async (s: ScenarioApi, t) => {
@@ -67,8 +71,6 @@ function sendMessageTest(orchestrator, config, installables) {
         installables.one
       );
 
-      await s.shareAllNodes([alice, bobby, charlie]);
-
       const alicePubKey = alice_happ.agent;
       const bobbyPubKey = bobby_happ.agent;
       const charliePubKey = charlie_happ.agent;
@@ -76,6 +78,11 @@ function sendMessageTest(orchestrator, config, installables) {
       const alice_conductor = alice_happ.cells[0];
       const bobby_conductor = bobby_happ.cells[0];
       const charlie_conductor = charlie_happ.cells[0];
+
+      init(alice_conductor);
+      init(bobby_conductor);
+      init(charlie_conductor);
+
       let list = {};
       const messagesFromSend: any[] = [];
 
@@ -90,18 +97,13 @@ function sendMessageTest(orchestrator, config, installables) {
         sendMessageSignalHandler(signal, list)(charliePubKey);
       });
 
-      init(alice_conductor);
-      init(bobby_conductor);
-      init(charlie_conductor);
-
       let create_group_input = {
         name: "Group_name",
         members: [bobbyPubKey, charliePubKey],
       };
 
       let { groupId } = await createGroup(create_group_input)(alice_conductor);
-
-      await delay();
+      await delay(1000);
 
       messagesFromSend.push(
         await sendMessage(alice_conductor, {
@@ -110,8 +112,8 @@ function sendMessageTest(orchestrator, config, installables) {
           sender: alicePubKey,
         })
       );
+      await delay(1000);
 
-      await delay();
       messagesFromSend.push(
         await sendMessage(alice_conductor, {
           groupId,
@@ -122,8 +124,7 @@ function sendMessageTest(orchestrator, config, installables) {
           sender: alicePubKey,
         })
       );
-
-      await delay();
+      await delay(1000);
 
       messagesFromSend.push(
         await sendMessage(bobby_conductor, {
@@ -132,8 +133,8 @@ function sendMessageTest(orchestrator, config, installables) {
           sender: bobbyPubKey,
         })
       );
+      await delay(1000);
 
-      await delay();
       messagesFromSend.push(
         await sendMessage(charlie_conductor, {
           groupId,
@@ -144,32 +145,28 @@ function sendMessageTest(orchestrator, config, installables) {
           sender: charliePubKey,
         })
       );
-
-      await delay();
+      await delay(1000);
 
       const group1AliceMesssges = await alice_conductor.call(
         "group",
         "get_all_messages",
         groupId
       );
-
-      await delay();
+      await delay(1000);
 
       const group1BobbyMesssges = await bobby_conductor.call(
         "group",
         "get_all_messages",
         groupId
       );
-
-      await delay();
+      await delay(1000);
 
       const group1CharlieMesssges = await charlie_conductor.call(
         "group",
         "get_all_messages",
         groupId
       );
-
-      await delay();
+      await delay(1000);
 
       t.deepEqual(group1AliceMesssges, group1BobbyMesssges);
       t.deepEqual(group1CharlieMesssges, group1AliceMesssges);
@@ -184,8 +181,7 @@ function sendMessageTest(orchestrator, config, installables) {
       let { groupId: groupId2 } = await createGroup(create_group_input2)(
         bobby_conductor
       );
-
-      await delay();
+      await delay(1000);
 
       messagesFromSend2.push(
         await sendMessage(bobby_conductor, {
@@ -199,8 +195,7 @@ function sendMessageTest(orchestrator, config, installables) {
           sender: bobbyPubKey,
         })
       );
-
-      await delay();
+      await delay(1000);
 
       messagesFromSend2.push(
         await sendMessage(charlie_conductor, {
@@ -214,16 +209,15 @@ function sendMessageTest(orchestrator, config, installables) {
           sender: charliePubKey,
         })
       );
-
-      await delay();
+      await delay(1000);
 
       const messages2 = await bobby_conductor.call(
         "group",
         "get_all_messages",
         groupId2
       );
-
       await delay(5000);
+
       await evaluateMessagesFromSignal(
         list,
         [...group1AliceMesssges, ...messages2],
@@ -231,9 +225,13 @@ function sendMessageTest(orchestrator, config, installables) {
       );
     }
   );
+
+  orchestrator.run();
 }
 
-function groupTypingIndicatorTest(orchestrator, config, installables) {
+function groupTypingIndicatorTest(config, installables) {
+  let orchestrator = new Orchestrator();
+
   orchestrator.registerScenario(
     "test typing indicator for group chat",
     async (s: ScenarioApi, t) => {
@@ -245,7 +243,7 @@ function groupTypingIndicatorTest(orchestrator, config, installables) {
         installables.one
       );
 
-      await s.shareAllNodes([alice, bobby, charlie]);
+      // await s.shareAllNodes([alice, bobby, charlie]);
 
       const alicePubKey = alice_happ.agent;
       const bobbyPubKey = bobby_happ.agent;
@@ -265,15 +263,15 @@ function groupTypingIndicatorTest(orchestrator, config, installables) {
       };
       // SIGNAL HANLDERS ASSIGNMENT
       bobby.setSignalHandler((signal) => {
-        signalHandler(signal, bobby_signal_listener)("bobby");
+        signalHandler(signal, bobby_signal_listener);
       });
       charlie.setSignalHandler((signal) => {
-        signalHandler(signal, charlie_signal_listener)("charlie");
+        signalHandler(signal, charlie_signal_listener);
       });
 
-      init(alice_conductor);
-      init(bobby_conductor);
-      init(charlie_conductor);
+      // init(alice_conductor);
+      // init(bobby_conductor);
+      // init(charlie_conductor);
 
       let create_group_input = {
         name: "Group_name",
@@ -292,7 +290,7 @@ function groupTypingIndicatorTest(orchestrator, config, installables) {
         isTyping: true,
       };
       await indicateGroupTyping(group_typing_detail_data)(alice_conductor);
-      await delay(1000);
+      await delay(5000);
 
       // check whether bobby and charlie both received the signal and that the payload is correct
       // the counter is 2 since createGroup and indicateGroupTyping both calls remote_signal()
@@ -308,9 +306,13 @@ function groupTypingIndicatorTest(orchestrator, config, installables) {
       });
     }
   );
+
+  orchestrator.run();
 }
 
-function readGroupMessageTest(orchestrator, config, installables) {
+function readGroupMessageTest(config, installables) {
+  let orchestrator = new Orchestrator();
+
   orchestrator.registerScenario(
     "test read group message",
     async (s: ScenarioApi, t) => {
@@ -322,7 +324,7 @@ function readGroupMessageTest(orchestrator, config, installables) {
         installables.one
       );
 
-      await s.shareAllNodes([alice, bobby, charlie]);
+      // await s.shareAllNodes([alice, bobby, charlie]);
 
       const alicePubKey = alice_happ.agent;
       const bobbyPubKey = bobby_happ.agent;
@@ -346,18 +348,18 @@ function readGroupMessageTest(orchestrator, config, installables) {
       };
       // SIGNAL HANLDERS ASSIGNMENT
       alice.setSignalHandler((signal) => {
-        signalHandler(signal, alice_signal_listener)("alice");
+        signalHandler(signal, alice_signal_listener);
       });
       bobby.setSignalHandler((signal) => {
-        signalHandler(signal, bobby_signal_listener)("bobby");
+        signalHandler(signal, bobby_signal_listener);
       });
       charlie.setSignalHandler((signal) => {
-        signalHandler(signal, charlie_signal_listener)("charlie");
+        signalHandler(signal, charlie_signal_listener);
       });
 
-      init(alice_conductor);
-      init(bobby_conductor);
-      init(charlie_conductor);
+      // init(alice_conductor);
+      // init(bobby_conductor);
+      // init(charlie_conductor);
 
       await delay(1500);
 
@@ -481,9 +483,13 @@ function readGroupMessageTest(orchestrator, config, installables) {
       });
     }
   );
+
+  orchestrator.run();
 }
 
-function getNextBatchOfMessagesTest(orchestrator, config, installables) {
+function getNextBatchOfMessagesTest(config, installables) {
+  let orchestrator = new Orchestrator();
+
   orchestrator.registerScenario(
     "test to get the next batch of message",
     async (s: ScenarioApi, t) => {
@@ -505,9 +511,9 @@ function getNextBatchOfMessagesTest(orchestrator, config, installables) {
       const bobby_conductor = bobby_happ.cells[0];
       const charlie_conductor = charlie_happ.cells[0];
 
-      init(alice_conductor);
-      init(bobby_conductor);
-      init(charlie_conductor);
+      // init(alice_conductor);
+      // init(bobby_conductor);
+      // init(charlie_conductor);
 
       let create_group_input = {
         name: "Group_name",
@@ -757,9 +763,12 @@ function getNextBatchOfMessagesTest(orchestrator, config, installables) {
       t.deepEqual(messages_hashes, []);
     }
   );
+  orchestrator.run();
 }
 
-function getMessagesByGroupByTimestampTest(orchestrator, config, installables) {
+function getMessagesByGroupByTimestampTest(config, installables) {
+  let orchestrator = new Orchestrator();
+
   orchestrator.registerScenario(
     "Tests for get messages by group by timestamp",
     async (s: ScenarioApi, t) => {
@@ -771,7 +780,7 @@ function getMessagesByGroupByTimestampTest(orchestrator, config, installables) {
         installables.one
       );
 
-      await s.shareAllNodes([alice, bobby, charlie]);
+      // await s.shareAllNodes([alice, bobby, charlie]);
 
       const alicePubKey = alice_happ.agent;
       const bobbyPubKey = bobby_happ.agent;
@@ -793,9 +802,9 @@ function getMessagesByGroupByTimestampTest(orchestrator, config, installables) {
         sendMessageSignalHandler(signal, list)(charliePubKey);
       });
 
-      init(alice_conductor);
-      init(bobby_conductor);
-      init(charlie_conductor);
+      // init(alice_conductor);
+      // init(bobby_conductor);
+      // init(charlie_conductor);
 
       let create_group_input = {
         name: "Group_name",
@@ -941,9 +950,13 @@ function getMessagesByGroupByTimestampTest(orchestrator, config, installables) {
       evaluateMessagesByGroupByTimestampResult([feb10], messagesOnFeb10, t);
     }
   );
+
+  orchestrator.run();
 }
 
-function getLatestMessagesForAllGroupsTest(orchestrator, config, installables) {
+function getLatestMessagesForAllGroupsTest(config, installables) {
+  let orchestrator = new Orchestrator();
+
   orchestrator.registerScenario(
     "get_latest_messages_for_all_groups test",
     async (s: ScenarioApi, t) => {
@@ -955,7 +968,7 @@ function getLatestMessagesForAllGroupsTest(orchestrator, config, installables) {
         installables.one
       );
 
-      await s.shareAllNodes([alice, bobby, charlie]);
+      // await s.shareAllNodes([alice, bobby, charlie]);
 
       const alicePubKey = alice_happ.agent;
       const bobbyPubKey = bobby_happ.agent;
@@ -965,9 +978,9 @@ function getLatestMessagesForAllGroupsTest(orchestrator, config, installables) {
       const bobby_conductor = bobby_happ.cells[0];
       const charlie_conductor = charlie_happ.cells[0];
 
-      init(alice_conductor);
-      init(bobby_conductor);
-      init(charlie_conductor);
+      // init(alice_conductor);
+      // init(bobby_conductor);
+      // init(charlie_conductor);
 
       let messages_hashes: any = [];
       let messages_contents: any = [];
@@ -1041,9 +1054,13 @@ function getLatestMessagesForAllGroupsTest(orchestrator, config, installables) {
       );
     }
   );
+
+  orchestrator.run();
 }
 
-function sendMessageswithFilesTest(orchestrator, config, installables) {
+function sendMessageswithFilesTest(config, installables) {
+  let orchestrator = new Orchestrator();
+
   orchestrator.registerScenario(
     "send messages with files",
     async (s: ScenarioApi, t) => {
@@ -1052,16 +1069,14 @@ function sendMessageswithFilesTest(orchestrator, config, installables) {
       const [[alice_happ]] = await alice.installAgentsHapps(installables.one);
       const [[bobby_happ]] = await bobby.installAgentsHapps(installables.one);
 
-      await s.shareAllNodes([alice, bobby]);
-
       const alicePubKey = alice_happ.agent;
       const bobbyPubKey = bobby_happ.agent;
 
       const alice_conductor = alice_happ.cells[0];
       const bobby_conductor = bobby_happ.cells[0];
 
-      init(alice_conductor);
-      init(bobby_conductor);
+      // init(alice_conductor);
+      // init(bobby_conductor);
 
       let create_group_input = {
         name: "Group_name",
@@ -1294,9 +1309,13 @@ function sendMessageswithFilesTest(orchestrator, config, installables) {
       t.deepEqual(messages_one_by_one, messages_with_files);
     }
   );
+
+  orchestrator.run();
 }
 
-function sendLargeSetOfFilesTest(orchestrator, config, installables) {
+function sendLargeSetOfFilesTest(config, installables) {
+  let orchestrator = new Orchestrator();
+
   orchestrator.registerScenario(
     "we should send and then return a large set of messages with files",
     async (s: ScenarioApi, t) => {
@@ -1305,7 +1324,7 @@ function sendLargeSetOfFilesTest(orchestrator, config, installables) {
       const [[alice_happ]] = await alice.installAgentsHapps(installables.one);
       const [[bobby_happ]] = await bobby.installAgentsHapps(installables.one);
 
-      await s.shareAllNodes([alice, bobby]);
+      // await s.shareAllNodes([alice, bobby]);
 
       const alicePubKey = alice_happ.agent;
       const bobbyPubKey = bobby_happ.agent;
@@ -1313,8 +1332,8 @@ function sendLargeSetOfFilesTest(orchestrator, config, installables) {
       const alice_conductor = alice_happ.cells[0];
       const bobby_conductor = bobby_happ.cells[0];
 
-      init(alice_conductor);
-      init(bobby_conductor);
+      // init(alice_conductor);
+      // init(bobby_conductor);
 
       let fileName: string;
       let day = 9;
@@ -1397,9 +1416,12 @@ function sendLargeSetOfFilesTest(orchestrator, config, installables) {
       t.deepEqual(messages, output);
     }
   );
+  orchestrator.run();
 }
 
-function fetchFilesForAParticularDateTest(orchestrator, config, installables) {
+function fetchFilesForAParticularDateTest(config, installables) {
+  let orchestrator = new Orchestrator();
+
   orchestrator.registerScenario(
     "we should send and then return a large set of messages with files",
     async (s: ScenarioApi, t) => {
@@ -1408,7 +1430,7 @@ function fetchFilesForAParticularDateTest(orchestrator, config, installables) {
       const [[alice_happ]] = await alice.installAgentsHapps(installables.one);
       const [[bobby_happ]] = await bobby.installAgentsHapps(installables.one);
 
-      await s.shareAllNodes([alice, bobby]);
+      // await s.shareAllNodes([alice, bobby]);
 
       const alicePubKey = alice_happ.agent;
       const bobbyPubKey = bobby_happ.agent;
@@ -1416,8 +1438,8 @@ function fetchFilesForAParticularDateTest(orchestrator, config, installables) {
       const alice_conductor = alice_happ.cells[0];
       const bobby_conductor = bobby_happ.cells[0];
 
-      init(alice_conductor);
-      init(bobby_conductor);
+      // init(alice_conductor);
+      // init(bobby_conductor);
 
       let create_group_input = {
         name: "Group_name",
@@ -1467,7 +1489,199 @@ function fetchFilesForAParticularDateTest(orchestrator, config, installables) {
       t.deepEqual(result, result2);
     }
   );
+
+  orchestrator.run();
 }
+
+function FetchFilesBytesTest(config, installables) {
+  let orchestrator = new Orchestrator();
+
+  orchestrator.registerScenario(
+    "send messages with files then fetch the file bytes",
+    async (s: ScenarioApi, t) => {
+      const [alice, bobby] = await s.players([config, config, config]);
+
+      const [[alice_happ]] = await alice.installAgentsHapps(installables.one);
+      const [[bobby_happ]] = await bobby.installAgentsHapps(installables.one);
+
+      const alicePubKey = alice_happ.agent;
+      const bobbyPubKey = bobby_happ.agent;
+
+      const alice_conductor = alice_happ.cells[0];
+      const bobby_conductor = bobby_happ.cells[0];
+
+      // init(alice_conductor);
+      // init(bobby_conductor);
+
+      let create_group_input = {
+        name: "Group_name",
+        members: [bobbyPubKey],
+      };
+
+      let { content, groupId, group_revision_id } = await createGroup(
+        create_group_input
+      )(alice_conductor);
+      await delay(500);
+
+      let message_1 = await sendMessage(alice_conductor, {
+        groupId,
+        payloadInput: {
+          type: "TEXT",
+          payload: {
+            payload: "Hi bob i'm sending you the text file i told you about!",
+          },
+        },
+        sender: alicePubKey,
+      });
+      await delay(1000);
+
+      let fileMetadata = {
+        fileName: "my_file",
+        fileSize: 20,
+        fileType: "OTHER",
+      };
+
+      let text: string = "The quick brown fox jumps over the lazy dog.";
+      let first_fileBytes = Int8Array.from(strToUtf8Bytes(text));
+
+      let payloadInput = {
+        type: "FILE",
+        payload: {
+          metadata: fileMetadata,
+          fileType: { type: "OTHER", payload: null },
+          fileBytes: first_fileBytes,
+        },
+      };
+
+      let message_2 = await sendMessage(alice_conductor, {
+        groupId,
+        sender: alicePubKey,
+        payloadInput: payloadInput,
+      });
+
+      await delay(1000);
+
+      let imgPath = path.join(__dirname, "/files/img.png");
+      let thumbnailBytes = Int8Array.from([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+      let imgBytes = fs.readFileSync(imgPath);
+
+      let imgMetadata = {
+        fileName: "img.png",
+        fileSize: 20,
+        fileType: "Image",
+      };
+
+      let payloadInput_2 = {
+        type: "FILE",
+        payload: {
+          metadata: imgMetadata,
+          fileType: { type: "IMAGE", payload: { thumbnail: thumbnailBytes } },
+          fileBytes: Int8Array.from(imgBytes),
+        },
+      };
+
+      let message_3 = await sendMessage(bobby_conductor, {
+        groupId,
+        payloadInput: {
+          type: "TEXT",
+          payload: {
+            payload:
+              "Wow nice thank you, i'm doing this on photoshop maybe you can give me feedback",
+          },
+        },
+        sender: bobbyPubKey,
+      });
+      await delay(1000);
+
+      let message_4 = await sendMessage(bobby_conductor, {
+        groupId,
+        sender: bobbyPubKey,
+        payloadInput: payloadInput_2,
+      });
+      await delay(1000);
+
+      let pdf1Metadata = {
+        fileName: "message_5.pdf",
+        fileSize: 20,
+        fileType: "Other",
+      };
+
+      let pdf1Path = path.join(__dirname, "/files/message_5.pdf");
+      let pdf1Bytes = fs.readFileSync(pdf1Path);
+
+      let payloadInput_3 = {
+        type: "FILE",
+        payload: {
+          metadata: pdf1Metadata,
+          fileType: { type: "OTHER", payload: null },
+          fileBytes: Int8Array.from(pdf1Bytes),
+        },
+      };
+
+      let message_5 = await sendMessage(bobby_conductor, {
+        groupId,
+        sender: bobbyPubKey,
+        payloadInput: payloadInput_3,
+      });
+      await delay(1000);
+
+      let pdf2Metadata = {
+        fileName: "message_6.pdf",
+        fileSize: 20,
+        fileType: "Other",
+      };
+
+      let pdf2Path = path.join(__dirname, "/files/message_6.pdf");
+      let pdf2Bytes = fs.readFileSync(pdf2Path);
+
+      let payloadInput_4 = {
+        type: "FILE",
+        payload: {
+          metadata: pdf2Metadata,
+          fileType: { type: "OTHER", payload: null },
+          fileBytes: Int8Array.from(pdf2Bytes),
+        },
+      };
+
+      let message_6 = await sendMessage(alice_conductor, {
+        groupId,
+        sender: alicePubKey,
+        payloadInput: payloadInput_4,
+      });
+      await delay(2000);
+
+      let files_bytes_payload_1 = await getFilesBytes([
+        message_2.content.payload.payload.metadata.fileHash,
+      ])(alice_conductor);
+      let bytes_1 = Object.values(files_bytes_payload_1)[0];
+
+      let files_bytes_payload_2 = await getFilesBytes([
+        message_4.content.payload.payload.metadata.fileHash,
+      ])(alice_conductor);
+
+      let bytes_2 = Object.values(files_bytes_payload_2)[0];
+      let files_bytes_payload_3 = await getFilesBytes([
+        message_5.content.payload.payload.metadata.fileHash,
+      ])(alice_conductor);
+
+      let bytes_3 = Object.values(files_bytes_payload_3)[0];
+
+      let files_bytes_payload_4 = await getFilesBytes([
+        message_6.content.payload.payload.metadata.fileHash,
+      ])(alice_conductor);
+      let bytes_4 = Object.values(files_bytes_payload_4)[0];
+
+      // This is already equal but the test is still failing.
+      t.equal(bytes_1, Buffer.from(payloadInput.payload.fileBytes));
+      t.equal(bytes_2, Buffer.from(payloadInput_2.payload.fileBytes));
+      t.equal(bytes_3, Buffer.from(payloadInput_3.payload.fileBytes));
+      t.equal(bytes_4, Buffer.from(payloadInput_4.payload.fileBytes));
+    }
+  );
+  orchestrator.run();
+}
+
+// HELPER
 
 function generateFileMessage(fileName, fileType, fileTypeInput) {
   let file_metadata = {
@@ -1656,6 +1870,7 @@ const evaluateMessagesByGroupByTimestampResult = (
   );
 
 export {
+  FetchFilesBytesTest,
   getMessagesByGroupByTimestampTest,
   groupTypingIndicatorTest,
   sendMessageTest,

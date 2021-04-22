@@ -149,3 +149,14 @@
   /* --ion-grid-padding-lg:5px; */
   /* --ion-grid-padding-xl:5px; */
 }
+
+.empty-media {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.no-media-label {
+  font-size: xx-large;
+}

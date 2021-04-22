@@ -1,20 +1,20 @@
+use hdk::prelude::*;
+
 use crate::entries::{
     group::GroupOutput,
     group_message::{GroupMessageData, GroupMessageReadData, GroupTypingDetailData},
 };
-use hdk3::prelude::*;
-//use timestamp::Timestamp
-//use crate::utils::to_timestamp;
+
 
 // Signal Details is a warpper for all the signals we can send from the happ
-#[derive(Serialize, Deserialize, SerializedBytes, Clone)]
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 pub struct SignalDetails {
     pub name: String,
     pub payload: SignalPayload,
 }
 
 // Here we add all the signal_types we add in the future
-#[derive(Serialize, Deserialize, SerializedBytes, Clone)]
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(tag = "type", rename_all = "SCREAMING_SNAKE_CASE", content = "payload")]
 pub enum SignalPayload {
     // TODO: we may want to change the payload to the actual Group in the future.
@@ -24,6 +24,8 @@ pub enum SignalPayload {
     GroupMessageData(GroupMessageData),
 }
 
+
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 pub struct SignalName;
 impl SignalName {
     pub const ADDED_TO_GROUP: &'static str = "added_to_group";

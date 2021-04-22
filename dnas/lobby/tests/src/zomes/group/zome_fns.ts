@@ -78,9 +78,7 @@ export function signalHandler(signal, signal_listener) {
     */
 
   signal_listener.counter++;
-  return (payload) => {
-    signal_listener.payload = signal.data.payload.payload;
-  };
+  signal_listener.payload = signal.data.payload.payload;
 }
 
 // VAlIDATION FUCNTIONS
@@ -92,6 +90,10 @@ export function runValidationRules(validation_input) {
 export function getNextBatchGroupMessage(filter_input) {
   return (conductor) =>
     conductor.call("group", "get_next_batch_group_messages", filter_input);
+}
+
+export function getFilesBytes(file_hashes) {
+  return (conductor) => conductor.call("group", "get_files_bytes", file_hashes);
 }
 
 export async function sendMessageWithDate(

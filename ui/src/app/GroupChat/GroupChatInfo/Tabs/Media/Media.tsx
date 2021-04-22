@@ -1,4 +1,4 @@
-import { IonContent, IonGrid, IonLoading } from "@ionic/react";
+import { IonContent, IonGrid, IonIcon, IonLabel, IonLoading } from "@ionic/react";
 import React, {useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import {
@@ -19,6 +19,7 @@ import {
 } from "../../../../../utils/helpers";
 import MediaIndex from "./MediaIndex";
 import styles from "../../style.module.css";
+import { sadOutline } from "ionicons/icons";
 
 interface Props {
   groupId: string;
@@ -112,8 +113,10 @@ const Media: React.FC<Props> = ({ groupId, fileMessages }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+
   return !loading ? (
-    <IonContent className={styles.content}>
+    (Object.keys(indexedFileMessages).length !== 0) ? (
+      <IonContent className={styles.content}> 
       <IonGrid>
         {Object.keys(indexedFileMessages).map((month: string) => {
           const fileMessages = indexedFileMessages[month];
@@ -123,7 +126,7 @@ const Media: React.FC<Props> = ({ groupId, fileMessages }) => {
               files.push(fileMessage.payload);
             }
           });
-
+  
           return (
             <MediaIndex
               onCompletion={() => {
@@ -138,6 +141,16 @@ const Media: React.FC<Props> = ({ groupId, fileMessages }) => {
         })}
       </IonGrid>
     </IonContent>
+    ) : (
+      <IonContent className={styles["empty-media"]}>
+        <IonIcon icon={sadOutline} />
+        <IonLabel className="ion-padding ion-margin-bottom no-media-label">
+          {intl.formatMessage({
+            id: "app.groups.media.no-media",
+          })}
+        </IonLabel>
+      </IonContent>
+    )
   ) : (
     <IonLoading isOpen={loading} />
   );

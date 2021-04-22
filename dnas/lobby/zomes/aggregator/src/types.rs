@@ -1,15 +1,15 @@
 use file_types::Payload;
-use hdk3::prelude::*;
-use hdk3::prelude::{element::SignedHeaderHashed, timestamp::Timestamp};
+use hdk::prelude::*;
+use hdk::prelude::{element::SignedHeaderHashed, timestamp::Timestamp};
 use std::collections::hash_map::HashMap;
 use std::time::SystemTime;
 
 // for contacts
-#[derive(Deserialize, Serialize, SerializedBytes)]
+#[derive(Deserialize, Serialize, SerializedBytes, Debug)]
 pub struct AgentPubKeys(pub Vec<AgentPubKey>);
 
 // for username
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+#[derive(Serialize, Deserialize, Debug, SerializedBytes)]
 #[serde(rename_all = "camelCase")]
 pub struct UsernameInfo {
     username: String,
@@ -17,6 +17,7 @@ pub struct UsernameInfo {
     created_at: Timestamp,
     entry_header_hash: HeaderHash,
 }
+
 #[derive(Serialize, Deserialize, SerializedBytes, Debug)]
 pub struct UsernameList(pub Vec<UsernameInfo>);
 

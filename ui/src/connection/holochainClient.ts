@@ -21,6 +21,7 @@ import { FUNCTIONS, ZOMES } from "./types";
 let client: null | AppWebsocket = null;
 
 let signalHandler: AppSignalCb = (signal) => {
+  console.log("is this shit even triggering sir?", signal);
   switch (signal.data.payload.name) {
     case "added_to_group":
       let payload = signal.data.payload.payload.payload;
@@ -86,6 +87,7 @@ let signalHandler: AppSignalCb = (signal) => {
       break;
     case "group_messsage_data": {
       let payload = signal.data.payload.payload.payload;
+      console.log("is this shit even triggering sir?", payload);
       let groupMessage: GroupMessage = {
         groupMessageEntryHash: Uint8ArrayToBase64(payload.id),
         groupEntryHash: Uint8ArrayToBase64(payload.content.groupHash),
@@ -150,8 +152,8 @@ export const getAgentId: () => Promise<AgentPubKey | null> = async () => {
   await init();
   try {
     const info = await client?.appInfo({ installed_app_id: "test-app" });
-    if (info?.cell_data[0][0][1]) {
-      myAgentId = info?.cell_data[0][0][1];
+    if (info?.cell_data[0].cell_id[1]) {
+      myAgentId = info?.cell_data[0].cell_id[1];
       return myAgentId;
     }
     return null;
@@ -169,14 +171,14 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
   const info = await client?.appInfo({ installed_app_id: "test-app" });
   const {
     cap = null,
-    cellId = info?.cell_data[0][0],
+    cellId = info?.cell_data[0].cell_id,
     zomeName,
     fnName,
-    provenance = info?.cell_data[0][0][1],
+    provenance = info?.cell_data[0].cell_id[1],
     payload = null,
   } = config;
   try {
-    if (cellId && provenance)
+    if (cellId && provenance) {
       return await client?.callZome({
         cap: cap,
         cell_id: cellId,
@@ -185,6 +187,7 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
         payload,
         provenance,
       });
+    }
   } catch (e) {
     console.warn(e);
     return e;
