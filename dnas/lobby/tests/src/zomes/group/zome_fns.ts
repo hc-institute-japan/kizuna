@@ -63,6 +63,7 @@ export function getMessagesByGroupByTimestamp(message_info) {
 }
 
 export function signalHandler(signal, signal_listener) {
+  
   /*
     //this is the incoming signal format
     signal = { 
@@ -78,9 +79,7 @@ export function signalHandler(signal, signal_listener) {
     */
 
   signal_listener.counter++;
-  return (payload) => {
-    signal_listener.payload = signal.data.payload.payload;
-  };
+  signal_listener.payload = signal.data.payload.payload;
 }
 
 // VAlIDATION FUCNTIONS

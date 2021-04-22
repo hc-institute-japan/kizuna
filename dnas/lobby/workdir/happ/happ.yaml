@@ -1,0 +1,15 @@
+---
+manifest_version: "1"
+name: kizuna
+description: ~
+slots:
+  - id: kizuna
+    provisioning:
+      strategy: create
+      deferred: false
+    dna:
+      bundled: "../dna/kizuna.dna"
+      properties: ~
+      uuid: ~
+      version: ~
+      clone_limit: 0
