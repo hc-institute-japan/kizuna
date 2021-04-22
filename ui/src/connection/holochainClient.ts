@@ -176,7 +176,7 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
     payload = null,
   } = config;
   try {
-    if (cellId && provenance)
+    if (cellId && provenance) {
       return await client?.callZome({
         cap: cap,
         cell_id: cellId,
@@ -185,6 +185,7 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
         payload,
         provenance,
       });
+    }
   } catch (e) {
     console.warn(e);
     return e;

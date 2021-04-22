@@ -46,5 +46,6 @@
   "app.groups.media.september": "9月",
   "app.groups.media.october": "10月",
   "app.groups.media.november": "11月",
-  "app.groups.media.december": "12月"
+  "app.groups.media.december": "12月",
+  "app.groups.media.no-media": "メディアファイルはこのチャットではまだ共有されていません。"
 }
