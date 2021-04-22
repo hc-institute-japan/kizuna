@@ -115,7 +115,7 @@ const Media: React.FC<Props> = ({ groupId, fileMessages }) => {
 
 
   return !loading ? (
-    (Object.keys(indexedFileMessages).length === 0) ? (
+    (Object.keys(indexedFileMessages).length !== 0) ? (
       <IonContent className={styles.content}> 
       <IonGrid>
         {Object.keys(indexedFileMessages).map((month: string) => {

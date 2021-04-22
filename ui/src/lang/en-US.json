@@ -47,5 +47,6 @@
   "app.groups.media.october": "October",
   "app.groups.media.november": "November",
   "app.groups.media.december": "December",
-  "app.groups.media.no-media": "There is no media sent in the chat yet..."
+  "app.groups.media.no-media": "There is no media sent in the chat yet...",
+  "app.groups.files.no-files": "There is no file sent in the chat yet..."
 }

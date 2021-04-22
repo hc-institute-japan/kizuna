@@ -21,6 +21,7 @@ import { FUNCTIONS, ZOMES } from "./types";
 let client: null | AppWebsocket = null;
 
 let signalHandler: AppSignalCb = (signal) => {
+  console.log("is this shit even triggering sir?", signal);
   switch (signal.data.payload.name) {
     case "added_to_group":
       let payload = signal.data.payload.payload.payload;
@@ -86,6 +87,7 @@ let signalHandler: AppSignalCb = (signal) => {
       break;
     case "group_messsage_data": {
       let payload = signal.data.payload.payload.payload;
+      console.log("is this shit even triggering sir?", payload);
       let groupMessage: GroupMessage = {
         groupMessageEntryHash: Uint8ArrayToBase64(payload.id),
         groupEntryHash: Uint8ArrayToBase64(payload.content.groupHash),
