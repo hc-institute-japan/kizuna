@@ -1,4 +1,9 @@
-import { IonItem, IonText } from "@ionic/react";
+import {
+  IonInfiniteScroll,
+  IonInfiniteScrollContent,
+  IonItem,
+  IonText,
+} from "@ionic/react";
 import React from "react";
 import {
   FilePayload,
@@ -12,6 +17,7 @@ import Text from "../Text";
 import { useIntl } from "react-intl";
 import { personCircleOutline } from "ionicons/icons";
 import styles from "../style.module.css";
+import MessageTimestamp from "../MessageTimestamp";
 
 const Others: React.FC<ChatProps> = ({
   id,
@@ -20,6 +26,7 @@ const Others: React.FC<ChatProps> = ({
   timestamp,
   payload,
   readList,
+  onSeen,
   showProfilePicture,
   showName,
   isSeen = false,
@@ -63,11 +70,7 @@ const Others: React.FC<ChatProps> = ({
               timestamp={timestamp}
             />
           )}
-          <IonText>
-            <h6 className="ion-no-margin ion-text-end">
-              {intl.formatTime(timestamp)}
-            </h6>
-          </IonText>
+          <MessageTimestamp onSeen={onSeen} timestamp={timestamp} />
         </div>
       </IonItem>
     </>

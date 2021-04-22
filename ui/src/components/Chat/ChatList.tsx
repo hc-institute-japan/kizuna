@@ -112,14 +112,13 @@ const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
   }));
 
   return (
-    <IonList className={`${styles.chat}`}>
+    <IonList className={`${styles.chat} chat-list`}>
       {onScrollTop ? (
         <IonInfiniteScroll
+          threshold="0px"
           ref={infiniteScroll}
           position="top"
-          onIonInfinite={(e) => {
-            onScrollTop(complete, e);
-          }}
+          onIonInfinite={(e) => onScrollTop(complete, e)}
         >
           <IonInfiniteScrollContent loadingSpinner="crescent" />
         </IonInfiniteScroll>

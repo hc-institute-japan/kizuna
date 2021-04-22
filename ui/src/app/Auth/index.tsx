@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { RootState } from "../../redux/types";
 import Authenticated from "../Authenticated";
 import Unauthenticated from "../Unauthenticated";
+import Playground from "../Playground";
 
 const Auth: React.FC = () => {
   const { username } = useSelector((state: RootState) => state.profile);

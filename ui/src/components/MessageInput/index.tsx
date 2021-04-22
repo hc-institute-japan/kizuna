@@ -46,12 +46,12 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
 
   const onFileSelectCallback = useCallback(() => {
     if (onFileSelect) onFileSelect(files);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [files]);
 
   const onChangeCallback = useCallback(() => {
     if (onChange) onChange(message);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [message]);
 
   const reset = () => {
@@ -77,7 +77,6 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
           if (fileSize < 15728640) {
             const fileBytes = new Uint8Array(arrBuffer);
             const type = determineFileType(file.type);
-
             if (type === "IMAGE" || type === "VIDEO") {
               const encoder = new TextEncoder();
               const reader = new FileReader();
@@ -89,7 +88,7 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
 
                 const final = {
                   metadata: { fileName, fileType: type, fileSize },
-                  fileType: { type, payload: {thumbnail: encoded} },
+                  fileType: { type, payload: { thumbnail: encoded } },
                   fileBytes,
                 };
 
@@ -109,7 +108,7 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
                 return [...currFiles];
               });
             }
-          } else {
+          } else
             showToast({
               message: intl.formatMessage(
                 {
@@ -120,7 +119,6 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
               color: "danger",
               duration: 2500,
             });
-          }
         });
       }
     );

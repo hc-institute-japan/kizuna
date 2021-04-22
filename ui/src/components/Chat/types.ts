@@ -22,6 +22,7 @@ export interface ChatProps {
   showProfilePicture?: boolean;
   showName?: boolean;
   isSeen?: boolean;
+  onSeen?(complete: () => any): any;
 }
 
 export interface ChatListMethods {
