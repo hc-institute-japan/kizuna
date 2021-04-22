@@ -1,4 +1,5 @@
-import { IonContent, IonList, IonLoading } from "@ionic/react";
+import { IonContent, IonIcon, IonLabel, IonList, IonLoading } from "@ionic/react";
+import { sadOutline } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import {
@@ -107,7 +108,7 @@ const File: React.FC<Props> = ({ groupId, fileMessages }) => {
   }, []);
 
   return !loading ? (
-    <IonContent>
+    (Object.keys(indexedFileMessages).length !== 0) ? (<IonContent>
       <IonList>
         {Object.keys(indexedFileMessages).map((month: string) => {
           const fileMessages = indexedFileMessages[month];
@@ -131,8 +132,16 @@ const File: React.FC<Props> = ({ groupId, fileMessages }) => {
           );
         })}
       </IonList>
-    </IonContent>
-  ) : (
+    </IonContent>) : (
+      <IonContent>
+        <IonIcon icon={sadOutline} />
+        <IonLabel className="ion-padding ion-margin-bottom ">
+          {intl.formatMessage({
+            id: "app.groups.files.no-files",
+          })}
+        </IonLabel>
+      </IonContent>
+    )) : (
     <IonLoading isOpen={loading} />
   );
 };

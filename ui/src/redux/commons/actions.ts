@@ -11,6 +11,7 @@ import { convertFetchedResToGroupMessagesOutput } from "../group/actions";
 import { SET_PREFERENCE } from "../preference/types";
 import { Profile, SET_USERNAME } from "../profile/types";
 import { ThunkAction } from "../types";
+import { getLatestMessages } from "../p2pmessages/actions";
 
 export const getLatestData = (): ThunkAction => async (
   dispatch,
@@ -101,6 +102,8 @@ export const getLatestData = (): ThunkAction => async (
     groupMessagesOutput,
     members,
   });
+
+  dispatch(getLatestMessages(5));
 
   return null;
 };
