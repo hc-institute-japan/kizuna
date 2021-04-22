@@ -47,6 +47,7 @@ const Conversation: React.FC<Props> = ({
   });
   const history = useHistory();
   const dispatch = useAppDispatch();
+
   const handleOnClick = () => {
     if (isGroup) {
       history.push(`/g/${groupId}`);

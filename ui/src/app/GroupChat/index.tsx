@@ -179,12 +179,7 @@ const GroupChat: React.FC = () => {
                   />
                 )
               ) : (
-                <img
-                  src={
-                    "https://upload.wikimedia.org/wikipedia/commons/8/8c/Lauren_Tsai_by_Gage_Skidmore.jpg"
-                  }
-                  alt={groupInfo!.name}
-                />
+                <img src={peopleCircleOutline} alt={groupInfo!.name} />
               )}
             </IonAvatar>
             <IonTitle className="ion-no-padding"> {groupInfo!.name}</IonTitle>
@@ -206,14 +201,14 @@ const GroupChat: React.FC = () => {
             members={groupInfo!.members}
             messageIds={messages}
             chatList={chatList}
-          ></MessageList>
+          />
         ) : (
           <IonLoading isOpen={loading} />
         )}
       </IonContent>
 
       <MessageInput
-        onSend={() => handleOnSend()}
+        onSend={handleOnSend}
         onChange={(message) => setMessage(message)}
         onFileSelect={(files) => setFiles(files)}
       />

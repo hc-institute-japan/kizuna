@@ -15,7 +15,6 @@ const FileView: React.FC<Props> = ({ files, setFiles }) => {
     });
   };
   const decoder = new TextDecoder();
-
   return (
     <IonRow className={styles.row}>
       {files.map((file, index) => {
@@ -26,7 +25,7 @@ const FileView: React.FC<Props> = ({ files, setFiles }) => {
               ? {
                   style: {
                     backgroundImage: `url(${decoder.decode(
-                      file.fileType.thumbnail
+                      file.fileType.payload.thumbnail
                     )})`,
                     backgroundRepeat: "no-repeat",
                     backgroundPosition: "center",

@@ -18,9 +18,9 @@ const ProfileMenuItems: React.FC<Props> = ({ profile }) => {
   return (
     <>
       <IonButtons slot="end">
-        <IonButton>
+        {/* <IonButton>
           <IonIcon icon={shieldHalf}></IonIcon>
-        </IonButton>
+        </IonButton> */}
         <IonButton onClick={handleOnClick}>
           <IonIcon icon={ellipsisVertical}></IonIcon>
         </IonButton>
