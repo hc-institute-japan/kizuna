@@ -20,6 +20,7 @@ import {
 import MediaIndex from "./MediaIndex";
 import styles from "../../style.module.css";
 import { sadOutline } from "ionicons/icons";
+import OldestFetchedToast from "./OldestFetchedToast";
 
 interface Props {
   groupId: string;
@@ -28,7 +29,9 @@ interface Props {
 
 const Media: React.FC<Props> = ({ groupId, fileMessages }) => {
   const [loading, setLoading] = useState<boolean>(true);
+  const [oldestFetched, setOldestFetched] = useState<boolean>(false);
   const [fetchLoading, setFetchLoading] = useState<boolean>(false);
+  const [toast, setToast] = useState<boolean>(false);
 
   const dispatch = useAppDispatch();
   const intl = useIntl();
@@ -83,10 +86,7 @@ const Media: React.FC<Props> = ({ groupId, fileMessages }) => {
 
   const onScrollBottom = (complete: () => Promise<void>, files: GroupMessage[]) => {
     setFetchLoading(true);
-    console.log("Details scrolls");
-    // var lastFile: P2PMessage = Object.values(files)[Object.entries(files).length - 1];
-    var lastFile: GroupMessage = files[files.length - 1]
-    console.log("Details last file", lastFile);
+    let lastFile: GroupMessage = files[files.length - 1]
     dispatch(
       getNextBatchGroupMessages({
         groupId: base64ToUint8Array(groupId),
@@ -96,16 +96,23 @@ const Media: React.FC<Props> = ({ groupId, fileMessages }) => {
         lastFetched: lastFile !== undefined ? Buffer.from(base64ToUint8Array(lastFile.groupMessageEntryHash)) : undefined
       })
     ).then((res: GroupMessagesOutput) => {
-      console.log("here are the new files", res);
-      let newFiles = Object.keys(res.groupMessagesContents).map((key: string) => {
-        let message: GroupMessage = res.groupMessagesContents[key];
-        return message
-      });
-      const indexedMedia: {
-        [key: string]: GroupMessage[];
-      } = indexMedia(newFiles);
-      setIndexedFileMessages(indexedMedia);
-      setFetchLoading(false)
+      if (Object.keys(res.groupMessagesContents).length !== 0) {
+        console.log("here are the new files", res);
+        let newFiles = Object.keys(res.groupMessagesContents).map((key: string) => {
+          let message: GroupMessage = res.groupMessagesContents[key];
+          return message
+        });
+        const indexedMedia: {
+          [key: string]: GroupMessage[];
+        } = indexMedia(newFiles);
+        setIndexedFileMessages(indexedMedia);
+        setFetchLoading(false)
+      } else {
+        console.log("is this reaching here?")
+        setOldestFetched(true);
+        setToast(true);
+        setFetchLoading(false);
+      }
     });
     complete();
     return
@@ -184,6 +191,7 @@ const Media: React.FC<Props> = ({ groupId, fileMessages }) => {
           </IonRow>
           <IonRow>
             <IonInfiniteScroll
+              disabled= {oldestFetched ? true: false}
               threshold="10px"
               ref={infiniteFileScroll}
               position="bottom"
@@ -195,6 +203,7 @@ const Media: React.FC<Props> = ({ groupId, fileMessages }) => {
             </IonInfiniteScroll>
           </IonRow>
         </IonGrid>
+        <OldestFetchedToast toast={toast} onDismiss={() => setToast(false)} />
       </IonContent>
     ) : (
       <IonContent className={styles["empty-media"]}>
