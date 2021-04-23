@@ -108,31 +108,33 @@ const File: React.FC<Props> = ({ groupId, fileMessages }) => {
   }, []);
 
   return !loading ? (
-    (Object.keys(indexedFileMessages).length !== 0) ? (<IonContent>
-      <IonList>
-        {Object.keys(indexedFileMessages).map((month: string) => {
-          const fileMessages = indexedFileMessages[month];
-          let files: FilePayload[] = [];
-          fileMessages.forEach((fileMessage: GroupMessage) => {
-            if (!isTextPayload(fileMessage.payload)) {
-              files.push(fileMessage.payload);
-            }
-          });
+    (Object.keys(indexedFileMessages).length !== 0) ? (
+      <IonContent>
+        <IonList>
+          {Object.keys(indexedFileMessages).map((month: string) => {
+            const fileMessages = indexedFileMessages[month];
+            let files: FilePayload[] = [];
+            fileMessages.forEach((fileMessage: GroupMessage) => {
+              if (!isTextPayload(fileMessage.payload)) {
+                files.push(fileMessage.payload);
+              }
+            });
 
-          return (
-            <FileIndex
-              onCompletion={() => {
-                return true;
-              }}
-              key={month}
-              index={month}
-              fileMessages={fileMessages}
-              files={files}
-            />
-          );
-        })}
-      </IonList>
-    </IonContent>) : (
+            return (
+              <FileIndex
+                onCompletion={() => {
+                  return true;
+                }}
+                key={month}
+                index={month}
+                fileMessages={fileMessages}
+                files={files}
+              />
+            );
+          })}
+        </IonList>
+      </IonContent>
+    ) : (
       <IonContent>
         <IonIcon icon={sadOutline} />
         <IonLabel className="ion-padding ion-margin-bottom ">

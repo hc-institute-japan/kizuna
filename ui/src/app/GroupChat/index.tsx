@@ -26,6 +26,7 @@ import {
 import { RootState } from "../../redux/types";
 import { FilePayloadInput } from "../../redux/commons/types";
 import MessageList from "./MessageList";
+import OldestFetchedToast from "./OldestFetchedToast"
 import {
   base64ToUint8Array,
   Uint8ArrayToBase64,
@@ -56,6 +57,7 @@ const GroupChat: React.FC = () => {
   const [myAgentId, setMyAgentId] = useState<string>("");
   const [files, setFiles] = useState<object[]>([]);
   const [groupInfo, setGroupInfo] = useState<GroupConversation | undefined>();
+  const [toast, setToast] = useState<boolean>(false);
   const [messages, setMessages] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [message, setMessage] = useState("");
@@ -135,9 +137,7 @@ const GroupChat: React.FC = () => {
 
   useEffect(() => {
     if (groupData) {
-      dispatch(getLatestGroupVersion(group)).then((res: GroupConversation) => {
-        setGroupInfo(res);
-      });
+      setGroupInfo(groupData);
       setLoading(false);
     } else {
       dispatch(getLatestGroupVersion(group)).then((res: GroupConversation) => {
@@ -198,6 +198,8 @@ const GroupChat: React.FC = () => {
       <IonContent>
         {groupData ? (
           <MessageList
+            setToast={setToast}
+            groupId={groupInfo.originalGroupEntryHash}
             myAgentId={myAgentId}
             members={groupInfo!.members}
             messageIds={messages}
@@ -213,6 +215,7 @@ const GroupChat: React.FC = () => {
         onChange={(message) => setMessage(message)}
         onFileSelect={(files) => setFiles(files)}
       />
+    <OldestFetchedToast toast={toast} onDismiss={() => setToast(false)} />
     </IonPage>
   ) : (
     <IonLoading isOpen={loading} />

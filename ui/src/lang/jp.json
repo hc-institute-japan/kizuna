@@ -28,6 +28,7 @@
   "components.chat.chat-list.today": "今日",
   "app.conversation.me-file-string": "あなたは{fileName}を送りました",
   "app.conversation.other-file-string": "{name}が{fileName}を送信しました",
+  "app.groups.oldest-message-fetched": "全てのメッセージを取得しました",
   "app.groups.add-member-contacts": "連絡先",
   "app.groups.add-member-close": "閉じる",
   "app.groups.add-member": "追加",
