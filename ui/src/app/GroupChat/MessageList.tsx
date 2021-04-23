@@ -120,7 +120,7 @@ const MessageList: React.FC<Props> = ({
 
   useEffect(() => {
     setMessages(messagesData!);
-  }, [])
+  }, [messageIds])
 
   return (
     <Chat.ChatList

@@ -112,9 +112,9 @@ const GroupChat: React.FC = () => {
       dispatch(sendGroupMessage(groupMessage))
     );
 
-    Promise.all(messagePromises).then((messages: GroupMessage[]) => {
-      messages.forEach((msg: GroupMessage, i) => {
-        groupInfo?.messages.push(msg.groupMessageEntryHash);
+    Promise.all(messagePromises).then((sentMessages: GroupMessage[]) => {
+      sentMessages.forEach((msg: GroupMessage, i) => {
+        setMessages([...messages, msg.groupMessageEntryHash]);
       });
       // TODO: bring this back
       chatList.current!.scrollToBottom();
