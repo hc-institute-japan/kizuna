@@ -1,11 +1,19 @@
 import {
   IonButton,
   IonButtons,
+  IonContent,
+  IonGrid,
   IonHeader,
   IonIcon,
+  IonLabel,
   IonLoading,
   IonModal,
   IonPage,
+  IonRow,
+  IonSegment,
+  IonSegmentButton,
+  IonSlide,
+  IonSlides,
   IonText,
   IonTitle,
   IonToolbar,
@@ -33,6 +41,7 @@ interface GroupChatParams {
 }
 
 const GroupChatInfo: React.FC = () => {
+  const slideRef = React.createRef<HTMLIonSlidesElement>();
   const history = useHistory();
   const { group } = useParams<GroupChatParams>();
 
@@ -54,9 +63,15 @@ const GroupChatInfo: React.FC = () => {
         return message;
       })
     : [];
+  
+  const slideOpts = {
+    initialSlide: 0,
+    speed: 400
+  };
+
   const tabs = [
     {
-      label: "Members",
+      label: "Info",
       tab: groupInfo ? (
         <Members
           groupId={group}
@@ -119,13 +134,12 @@ const GroupChatInfo: React.FC = () => {
         </IonToolbar>
         <IonTitle className={styles.groupname}>{groupInfo!.name}</IonTitle>
         <IonToolbar className={styles.menu}>
-          <IonButtons slot="start">
+          <IonSegment slot="start">
             {tabs.map((tab, i) => {
               const isSelected = selected === i;
               return (
-                <IonButton
+                <IonSegmentButton
                   key={tab.label}
-                  strong={selected === i}
                   onClick={() => setSelected(i)}
                 >
                   <IonText
@@ -135,10 +149,10 @@ const GroupChatInfo: React.FC = () => {
                   >
                     {tab.label}
                   </IonText>
-                </IonButton>
+                </IonSegmentButton>
               );
             })}
-          </IonButtons>
+          </IonSegment>
         </IonToolbar>
       </IonHeader>
       {tabs[selected].tab}

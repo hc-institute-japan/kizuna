@@ -18,7 +18,7 @@ const MediaCol: React.FC<Props> = ({ file, size = 3 }) => {
   }, []);
 
   return (
-    <IonCol ref={handleRef} size="3" style={{ height }}>
+    <IonCol size="3">
       <MediaItem file={file} />
     </IonCol>
   );

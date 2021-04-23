@@ -22,16 +22,12 @@ const MediaIndex: React.FC<Props> = ({ index, files }) => {
 
   return files.length > 0 ? (
     <React.Fragment key={index}>
-      <IonRow>
-        <IonCol>
-          <IonLabel className={styles["month"]}>{index}</IonLabel>
-        </IonCol>
-      </IonRow>
-      <IonRow className={styles["image-row"]}>
-        {files.map((file, i) => (
-          <MediaCol key={i} file={file} />
-        ))}
-      </IonRow>
+      <IonCol size="12">
+        <h2 className={styles.month}>{index}</h2>
+      </IonCol>
+      {files.map((file, i) => (
+        <MediaCol key={i} file={file} />
+      ))}
     </React.Fragment>
   ) : null;
 };
