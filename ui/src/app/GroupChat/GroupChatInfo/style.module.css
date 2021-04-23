@@ -189,3 +189,13 @@
 .no-media-label {
   font-size: xx-large;
 }
+
+/* FOR FILE */
+
+.filelist {
+  width: 100%;
+}
+
+.filecard {
+  width: 100%;
+}

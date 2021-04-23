@@ -1,6 +1,6 @@
-import { IonContent, IonIcon, IonLabel, IonList, IonLoading } from "@ionic/react";
+import { IonContent, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonLabel, IonList, IonLoading } from "@ionic/react";
 import { sadOutline } from "ionicons/icons";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import {
   FilePayload,
@@ -19,6 +19,8 @@ import {
   useAppDispatch,
 } from "../../../../../utils/helpers";
 import FileIndex from "./FileIndex";
+import styles from "../../style.module.css"
+import OldestFetchedToast from "./OldestFetchedToast";
 
 interface Props {
   groupId: string;
@@ -27,7 +29,13 @@ interface Props {
 
 const File: React.FC<Props> = ({ groupId, fileMessages }) => {
   const [loading, setLoading] = useState<boolean>(true);
+  const [oldestFetched, setOldestFetched] = useState<boolean>(false);
+
+  const [toast, setToast] = useState<boolean>(true);
+  const [fetchLoading, setFetchLoading] = useState<boolean>(false);
   const dispatch = useAppDispatch();
+  const infiniteFileScroll = useRef<HTMLIonInfiniteScrollElement>(null);
+  const complete = () => infiniteFileScroll.current!.complete();
   const intl = useIntl();
   const [indexedFileMessages, setIndexedFileMessages] = useState<{
     [key: string]: GroupMessage[];
@@ -44,13 +52,15 @@ const File: React.FC<Props> = ({ groupId, fileMessages }) => {
     })
     let indexedFiles: {
       [key: string]: GroupMessage[];
-    } = {};
+    } = indexedFileMessages;
     if (filteredMessages.length > 0) {
       let monthNumber = new Date(
         fileMessages[0].timestamp[0] * 1000
       ).getMonth();
       let month = monthToString(monthNumber, intl)!;
-      indexedFiles[month] = [];
+      if (!indexedFiles[month]) {
+        indexedFiles[month] = [];
+      }
       fileMessages.forEach((fileMessage: GroupMessage) => {
         const currMonth = monthToString(
           new Date(fileMessage.timestamp[0] * 1000).getMonth(),
@@ -69,6 +79,39 @@ const File: React.FC<Props> = ({ groupId, fileMessages }) => {
     }
     return indexedFiles;
   };
+
+  const onScrollBottom = (complete: () => Promise<void>, files: GroupMessage[]) => {
+    setFetchLoading(true);
+    // var lastFile: P2PMessage = Object.values(files)[Object.entries(files).length - 1];
+    var lastFile: GroupMessage = files[files.length - 1]
+    dispatch(
+      getNextBatchGroupMessages({
+        groupId: base64ToUint8Array(groupId),
+        batchSize: 4,
+        payloadType: { type: "FILE", payload: null },
+        lastMessageTimestamp: lastFile !== undefined ? lastFile.timestamp : undefined,
+        lastFetched: lastFile !== undefined ? Buffer.from(base64ToUint8Array(lastFile.groupMessageEntryHash)) : undefined
+      })
+    ).then((res: GroupMessagesOutput) => {
+      if (Object.keys(res.groupMessagesContents).length !== 0) {
+        let newFiles = Object.keys(res.groupMessagesContents).map((key: string) => {
+          let message: GroupMessage = res.groupMessagesContents[key];
+          return message
+        });
+        const indexedMedia: {
+          [key: string]: GroupMessage[];
+        } = indexMedia(newFiles);
+        setIndexedFileMessages(indexedMedia);
+        setFetchLoading(false)
+      } else {
+        setToast(true);
+        setOldestFetched(true);
+        setFetchLoading(false);
+      }
+    });
+    complete();
+    return
+  }
 
   useEffect(() => {
     if (fileMessages) {
@@ -114,7 +157,7 @@ const File: React.FC<Props> = ({ groupId, fileMessages }) => {
   return !loading ? (
     (Object.keys(indexedFileMessages).length !== 0) ? (
       <IonContent>
-        <IonList>
+        <IonList className={styles.filelist}>
           {Object.keys(indexedFileMessages).map((month: string) => {
             const fileMessages = indexedFileMessages[month];
             let files: FilePayload[] = [];
@@ -136,7 +179,19 @@ const File: React.FC<Props> = ({ groupId, fileMessages }) => {
               />
             );
           })}
+          <IonInfiniteScroll
+            disabled={oldestFetched ? true : false}
+            threshold="10px"
+            ref={infiniteFileScroll}
+            position="bottom"
+            onIonInfinite={(e) => onScrollBottom(complete, fileMessages)}
+          >
+            <IonInfiniteScrollContent>
+              <IonLoading isOpen={fetchLoading} message={'fetching more media...'}/>
+            </IonInfiniteScrollContent>
+          </IonInfiniteScroll>
         </IonList>
+        <OldestFetchedToast toast={toast} onDismiss={() => setToast(false)} />
       </IonContent>
     ) : (
       <IonContent>

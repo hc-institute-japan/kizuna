@@ -7,6 +7,7 @@ import Chat from "../../components/Chat";
 import { ChatListMethods } from "../../components/Chat/types";
 import { base64ToUint8Array, useAppDispatch } from "../../utils/helpers";
 import { getNextBatchGroupMessages } from "../../redux/group/actions";
+import { IonLoading } from "@ionic/react";
 interface Props {
   messageIds: string[];
   members: string[];
@@ -29,6 +30,7 @@ const MessageList: React.FC<Props> = ({
   // LOCAL STATE
   const [messages, setMessages] = useState<any[]>([]);
   const [oldestMessage, setOldestMessage] = useState<any>();
+  const [loading, setLoading] = useState<boolean>(false);
 
   const allMembers = useSelector((state: RootState) => state.groups.members);
   const username = useSelector((state: RootState) => state.profile.username);
@@ -68,6 +70,7 @@ const MessageList: React.FC<Props> = ({
   });
 
   const handleOnScrollTop = (complete: any) => {
+    setLoading(true);
     if (messagesData?.length) {
       let lastMessage = messagesData![0];
       console.log("here is the last message", oldestMessage)
@@ -107,7 +110,9 @@ const MessageList: React.FC<Props> = ({
           let newOldestMessage = res.groupMessagesContents[res.messagesByGroup[groupId][res.messagesByGroup[groupId].length - 1]]
           setOldestMessage(newOldestMessage);
           setMessages(newMessages);
+          setLoading(false);
         } else {
+          setLoading(false);
           setToast(true);
         }
       })
@@ -123,15 +128,29 @@ const MessageList: React.FC<Props> = ({
   }, [messageIds])
 
   return (
-    <Chat.ChatList
-      onScrollTop={(complete) => handleOnScrollTop(complete)}
-      ref={chatList}
-      type="group"
-    >
-      {messages!.map((message, i) => {
-        if (message.author.id === myAgentId)
+    <>
+    <IonLoading isOpen={loading} />
+      <Chat.ChatList
+        onScrollTop={(complete) => handleOnScrollTop(complete)}
+        ref={chatList}
+        type="group"
+      >
+        {messages!.map((message, i) => {
+          if (message.author.id === myAgentId)
+            return (
+              <Chat.Me
+                key={message.groupMessageEntryHash}
+                author={message.author.username}
+                timestamp={new Date(message.timestamp[0] * 1000)}
+                payload={message.payload}
+                readList={message.readList}
+                type="group"
+                showName={true}
+                showProfilePicture={true}
+              />
+            );
           return (
-            <Chat.Me
+            <Chat.Others
               key={message.groupMessageEntryHash}
               author={message.author.username}
               timestamp={new Date(message.timestamp[0] * 1000)}
@@ -139,28 +158,17 @@ const MessageList: React.FC<Props> = ({
               readList={message.readList}
               type="group"
               showName={true}
+              onSeen={(complete) => {
+                if (i === messagesData!.length - 1) {
+                  complete();
+                }
+              }}
               showProfilePicture={true}
             />
           );
-        return (
-          <Chat.Others
-            key={message.groupMessageEntryHash}
-            author={message.author.username}
-            timestamp={new Date(message.timestamp[0] * 1000)}
-            payload={message.payload}
-            readList={message.readList}
-            type="group"
-            showName={true}
-            onSeen={(complete) => {
-              if (i === messagesData!.length - 1) {
-                complete();
-              }
-            }}
-            showProfilePicture={true}
-          />
-        );
-      })}
-    </Chat.ChatList>
+        })}
+      </Chat.ChatList>
+    </>
   );
 };
 

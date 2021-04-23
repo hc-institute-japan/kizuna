@@ -49,5 +49,7 @@
   "app.groups.media.november": "11月",
   "app.groups.media.december": "12月",
   "app.groups.media.no-media": "メディアファイルはこのチャットではまだ共有されていません。",
-  "app.groups.files.no-files": "ファイルはこのチャットではまだ共有されていません。"
+  "app.groups.oldest-media-fetched": "全てのメディアを取得しました",
+  "app.groups.files.no-files": "ファイルはこのチャットではまだ共有されていません。",
+  "app.groups.oldest-file-fetched": "全てのファイルを取得しました"
 }
