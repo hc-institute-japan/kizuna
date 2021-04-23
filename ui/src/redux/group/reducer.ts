@@ -133,6 +133,8 @@ const reducer = (
       let groupConversation: GroupConversation =
         groupConversations[action.groupId];
       // we probably won't have any duplicates of hash but just in case we do we dedupe here
+      console.log(groupConversation.messages);
+
       groupConversation.messages = groupConversation.messages
         ? Array.from(
             new Set(
@@ -151,6 +153,8 @@ const reducer = (
         ...messages,
         ...action.groupMessagesOutput.groupMessagesContents,
       };
+      console.log(groupConversation.messages);
+      console.log(messages);
       return { ...state, messages, conversations: groupConversations };
     }
     case SET_LATEST_GROUP_STATE: {

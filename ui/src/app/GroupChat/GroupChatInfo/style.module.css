@@ -155,6 +155,9 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+
+  height: max-content;
+  width: max-content;
 }
 
 .no-media-label {

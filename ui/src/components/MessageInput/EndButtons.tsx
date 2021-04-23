@@ -21,6 +21,7 @@ const EndButtons: React.FC<Props> = ({ message, files, onSend }) => (
       </>
     )}
     <IonButton
+      type={"submit"}
       onClick={onSend}
       disabled={message.length === 0 && files.length === 0}
     >

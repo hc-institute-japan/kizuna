@@ -28,6 +28,7 @@
   "components.chat.chat-list.today": "Today",
   "app.conversation.other-file-string": "{name} has sent {fileName}",
   "app.conversation.me-file-string": "You sent {fileName}",
+  "app.groups.oldest-message-fetched": "You have already fetched the oldest message",
   "app.groups.add-member-contacts": "Contacts",
   "app.groups.add-member-close": "Close",
   "app.groups.add-member": "Add",

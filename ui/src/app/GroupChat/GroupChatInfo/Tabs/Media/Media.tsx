@@ -119,6 +119,7 @@ const Media: React.FC<Props> = ({ groupId, fileMessages }) => {
       <IonContent className={styles.content}> 
       <IonGrid>
         {Object.keys(indexedFileMessages).map((month: string) => {
+          console.log(indexedFileMessages);
           const fileMessages = indexedFileMessages[month];
           let files: FilePayload[] = [];
           fileMessages.forEach((fileMessage: GroupMessage) => {

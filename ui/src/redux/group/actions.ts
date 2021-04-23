@@ -429,6 +429,8 @@ export const getNextBatchGroupMessages = (
     payload: groupMessageBatchFetchFilter,
   });
 
+  console.log("is this working or what", groupMessagesRes);
+
   let groupMessagesOutput: GroupMessagesOutput = convertFetchedResToGroupMessagesOutput(
     groupMessagesRes
   );
