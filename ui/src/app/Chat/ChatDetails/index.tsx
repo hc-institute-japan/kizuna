@@ -60,10 +60,10 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
   const slideRef = React.createRef<HTMLIonSlidesElement>();
 
   useEffect(() => {
-    if (state.conversant != undefined && conversations[("u" + state.conversant.id)] != undefined) {
-      conversations[("u" + state.conversant.id)].messages.map((messageID) => {
+    if (state.conversant !== undefined && conversations[("u" + state.conversant.id)] !== undefined) {
+      conversations[("u" + state.conversant.id)].messages.forEach((messageID) => {
         let message = messages[messageID];
-        if (message.payload.type == "FILE") {
+        if (message.payload.type === "FILE") {
           let payload = message.payload;
           let type = message.payload.fileType;
           // console.log("Details appending message", message)
@@ -92,6 +92,7 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
         }
       })
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversations, messages]);
 
   const handleOnSegmentChange = (value: any) => {
@@ -143,10 +144,10 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
         conversant: Buffer.from(base64ToUint8Array(state.conversant.id)),
         batch_size: 3,
         payload_type: "File",
-        last_fetched_timestamp: lastFile != undefined 
+        last_fetched_timestamp: lastFile !== undefined 
                                   ? dateToTimestamp(lastFile.timestamp) 
                                   : undefined,
-        last_fetched_message_id: lastFile != undefined 
+        last_fetched_message_id: lastFile !== undefined 
                                   ? Buffer.from(base64ToUint8Array(lastFile.p2pMessageEntryHash.slice(1))) 
                                   : undefined
       })
@@ -209,7 +210,7 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
                 let year = file.timestamp.getFullYear();
                 return (
                   <React.Fragment>
-                    { month != currentMonth 
+                    { month !== currentMonth 
                       ? (currentMonth = month,
                         <IonCol size="12">
                           <h2 className={styles.month}>{monthText[month]}</h2>
@@ -218,7 +219,7 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
                     }
                     <IonCol size="3">
                       <IonCard className={styles.mediacard}>
-                        { (file.payload as FilePayload).fileType == "VIDEO"
+                        { (file.payload as FilePayload).fileType === "VIDEO"
                           ? <div className={styles.mediadiv}>
                               <VideoView 
                                 file={file.payload as FilePayload} 
@@ -256,7 +257,7 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
                 let year = file.timestamp.getFullYear();
                 return (
                   <React.Fragment>
-                    { month != currentMonth2 
+                    { month !== currentMonth2 
                       ? (currentMonth2 = month,
                         <IonListHeader>
                           <h2 className={styles.month}>{monthText[month]}</h2>

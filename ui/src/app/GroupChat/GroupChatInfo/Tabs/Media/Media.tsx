@@ -1,4 +1,4 @@
-import { IonContent, IonGrid, IonIcon, IonLabel, IonLoading } from "@ionic/react";
+import { IonContent, IonGrid, IonIcon, IonLabel, IonLoading, IonRow, IonSlide } from "@ionic/react";
 import React, {useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import {
@@ -116,32 +116,32 @@ const Media: React.FC<Props> = ({ groupId, fileMessages }) => {
 
   return !loading ? (
     (Object.keys(indexedFileMessages).length !== 0) ? (
-      <IonContent className={styles.content}> 
       <IonGrid>
-        {Object.keys(indexedFileMessages).map((month: string) => {
-          console.log(indexedFileMessages);
-          const fileMessages = indexedFileMessages[month];
-          let files: FilePayload[] = [];
-          fileMessages.forEach((fileMessage: GroupMessage) => {
-            if (!isTextPayload(fileMessage.payload)) {
-              files.push(fileMessage.payload);
-            }
-          });
-  
-          return (
-            <MediaIndex
-              onCompletion={() => {
-                return true;
-              }}
-              key={month}
-              index={month}
-              fileMessages={fileMessages}
-              files={files}
-            />
-          );
-        })}
+          <IonRow>
+            {Object.keys(indexedFileMessages).map((month: string) => {
+              console.log(indexedFileMessages);
+              const fileMessages = indexedFileMessages[month];
+              let files: FilePayload[] = [];
+              fileMessages.forEach((fileMessage: GroupMessage) => {
+                if (!isTextPayload(fileMessage.payload)) {
+                  files.push(fileMessage.payload);
+                }
+              });
+      
+              return (
+                <MediaIndex
+                  onCompletion={() => {
+                    return true;
+                  }}
+                  key={month}
+                  index={month}
+                  fileMessages={fileMessages}
+                  files={files}
+                />
+              );
+            })}
+          </IonRow>
       </IonGrid>
-    </IonContent>
     ) : (
       <IonContent className={styles["empty-media"]}>
         <IonIcon icon={sadOutline} />
