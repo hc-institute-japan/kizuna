@@ -38,10 +38,14 @@ const File: React.FC<Props> = ({ groupId, fileMessages }) => {
   ) => {
     [key: string]: GroupMessage[];
   } = (fileMessages) => {
+    let filteredMessages = fileMessages.filter(message => {
+      const payload: Payload = message.payload;
+      return !isTextPayload(payload) && payload.fileType === "OTHER"
+    })
     let indexedFiles: {
       [key: string]: GroupMessage[];
     } = {};
-    if (fileMessages.length > 0) {
+    if (filteredMessages.length > 0) {
       let monthNumber = new Date(
         fileMessages[0].timestamp[0] * 1000
       ).getMonth();
