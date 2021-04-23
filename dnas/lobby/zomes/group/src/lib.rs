@@ -84,13 +84,13 @@ fn recv_remote_signal(signal: ExternIO) -> ExternResult<()> {
             emit_signal(&signal_detail)?;
         }
         SignalPayload::GroupTypingDetail(_) => {
-            emit_signal(&signal)?;
+            emit_signal(&signal_detail)?;
         }
         SignalPayload::GroupMessageRead(_) => {
-            emit_signal(&signal)?;
+            emit_signal(&signal_detail)?;
         }
         SignalPayload::GroupMessageData(_) => {
-            emit_signal(&signal)?;
+            emit_signal(&signal_detail)?;
         }
     }
     Ok(())
