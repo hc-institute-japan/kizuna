@@ -4,6 +4,7 @@ import { Payload } from "../../redux/commons/types";
 export interface ChatListProps {
   type?: "p2p" | "group";
   children: ReactElement<ChatProps> | Array<ReactElement<ChatProps>>;
+  disabled?: boolean;
   onScrollTop?: (
     complete: () => Promise<void>,
     event: CustomEvent<void>

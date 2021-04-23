@@ -3,8 +3,6 @@ import {
   IonPage, 
   IonButtons, 
   IonBackButton, 
-  IonText, 
-  IonTitle, 
   IonHeader, 
   IonToolbar,
   IonSegment,
@@ -20,12 +18,11 @@ import {
   IonSlides,
   IonContent,
   IonCard,
-  IonCardContent,
   IonInfiniteScroll,
   IonInfiniteScrollContent
 } from "@ionic/react";
 import { Profile } from "../../../redux/profile/types";
-import { P2PMessage, P2PMessageConversationState } from "../../../redux/p2pmessages/types";
+import { P2PMessage } from "../../../redux/p2pmessages/types";
 import { FilePayload } from "../../../redux/commons/types";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../redux/types";

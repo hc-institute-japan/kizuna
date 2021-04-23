@@ -81,11 +81,11 @@ const GroupChatInfo: React.FC = () => {
     },
     {
       label: "Media",
-      tab: <Media fileMessages={messages} groupId={group} />,
+      tab: <Media groupId={group} />,
     },
     {
       label: "Files",
-      tab: <File fileMessages={messages} groupId={group} />,
+      tab: <File groupId={group} />,
     },
   ];
 

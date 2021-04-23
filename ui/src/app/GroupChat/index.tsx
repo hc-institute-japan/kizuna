@@ -69,7 +69,6 @@ const GroupChat: React.FC = () => {
 
   // Handlers
   const handleOnSend = () => {
-    setLoading(true);
     let inputs: GroupMessageInput[] = [];
     if (files.length) {
       files.forEach((file: any) => {
@@ -117,7 +116,6 @@ const GroupChat: React.FC = () => {
       sentMessages.forEach((msg: GroupMessage, i) => {
         setMessages([...messages, msg.groupMessageEntryHash]);
       });
-      setLoading(false);
       chatList.current!.scrollToBottom();
 
     });

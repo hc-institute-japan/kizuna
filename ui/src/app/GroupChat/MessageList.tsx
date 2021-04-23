@@ -29,6 +29,7 @@ const MessageList: React.FC<Props> = ({
 
   // LOCAL STATE
   const [messages, setMessages] = useState<any[]>([]);
+  const [oldestFetched, setOldestFetched] = useState<boolean>(false);
   const [oldestMessage, setOldestMessage] = useState<any>();
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -112,6 +113,7 @@ const MessageList: React.FC<Props> = ({
           setMessages(newMessages);
           setLoading(false);
         } else {
+          setOldestFetched(true);
           setLoading(false);
           setToast(true);
         }
@@ -131,6 +133,7 @@ const MessageList: React.FC<Props> = ({
     <>
     <IonLoading isOpen={loading} />
       <Chat.ChatList
+        disabled={oldestFetched}
         onScrollTop={(complete) => handleOnScrollTop(complete)}
         ref={chatList}
         type="group"
