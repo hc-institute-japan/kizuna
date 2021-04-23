@@ -1,4 +1,4 @@
-import { IonContent, IonGrid, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonLabel, IonLoading, IonRow, IonSlide, IonText } from "@ionic/react";
+import { IonContent, IonGrid, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonLoading, IonRow, IonText } from "@ionic/react";
 import React, {useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import {
@@ -24,10 +24,9 @@ import OldestFetchedToast from "./OldestFetchedToast";
 
 interface Props {
   groupId: string;
-  fileMessages: GroupMessage[];
 }
 
-const Media: React.FC<Props> = ({ groupId, fileMessages }) => {
+const Media: React.FC<Props> = ({ groupId }) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [oldestFetched, setOldestFetched] = useState<boolean>(false);
   const [fetchLoading, setFetchLoading] = useState<boolean>(false);
@@ -41,6 +40,8 @@ const Media: React.FC<Props> = ({ groupId, fileMessages }) => {
   const [indexedFileMessages, setIndexedFileMessages] = useState<{
     [key: string]: GroupMessage[];
   }>({});
+
+  const [fileMessages, setFileMessages] = useState<GroupMessage[]>([]);
 
   const indexMedia: (
     fileMessages: GroupMessage[]
@@ -97,11 +98,11 @@ const Media: React.FC<Props> = ({ groupId, fileMessages }) => {
       })
     ).then((res: GroupMessagesOutput) => {
       if (Object.keys(res.groupMessagesContents).length !== 0) {
-        console.log("here are the new files", res);
         let newFiles = Object.keys(res.groupMessagesContents).map((key: string) => {
           let message: GroupMessage = res.groupMessagesContents[key];
           return message
         });
+        setFileMessages([...fileMessages, ...newFiles])
         const indexedMedia: {
           [key: string]: GroupMessage[];
         } = indexMedia(newFiles);
@@ -120,43 +121,37 @@ const Media: React.FC<Props> = ({ groupId, fileMessages }) => {
 
 
   useEffect(() => {
-    if (fileMessages) {
-      const indexedMedia: {
-        [key: string]: GroupMessage[];
-      } = indexMedia(fileMessages);
-      setIndexedFileMessages(indexedMedia);
-      setLoading(false);
-    } else {
-      let filter: GroupMessageBatchFetchFilter = {
-        groupId: base64ToUint8Array(groupId),
-        batchSize: 4,
-        payloadType: { type: "FILE", payload: null },
-      };
-      dispatch(getNextBatchGroupMessages(filter)).then(
-        (res: GroupMessagesOutput) => {
-          let fileMessages: (GroupMessage | undefined)[] = Object.keys(
-            res.groupMessagesContents
-          ).map((key: any) => {
-            if (!isTextPayload(res.groupMessagesContents[key].payload)) {
-              let message = res.groupMessagesContents[key];
-              return message;
-            } else {
-              return undefined;
-            }
-          });
+    let filter: GroupMessageBatchFetchFilter = {
+      groupId: base64ToUint8Array(groupId),
+      batchSize: 10,
+      payloadType: { type: "FILE", payload: null },
+    };
+    dispatch(getNextBatchGroupMessages(filter)).then(
+      (res: GroupMessagesOutput) => {
+        let maybeFileMessages: (GroupMessage | undefined)[] = Object.keys(
+          res.groupMessagesContents
+        ).map((key: any) => {
+          if (!isTextPayload(res.groupMessagesContents[key].payload)) {
+            let message = res.groupMessagesContents[key];
+            return message;
+          } else {
+            return undefined;
+          }
+        });
 
-          let fileMessagesCleaned = fileMessages.flatMap(
-            (x: GroupMessage | undefined) => (x ? [x] : [])
-          );
+        let fileMessagesCleaned = maybeFileMessages.flatMap(
+          (x: GroupMessage | undefined) => (x ? [x] : [])
+        );
 
-          const indexedMedia: {
-            [key: string]: GroupMessage[];
-          } = indexMedia(fileMessagesCleaned);
-          setIndexedFileMessages(indexedMedia);
-          setLoading(false);
-        }
-      );
-    }
+        setFileMessages([...fileMessages, ...fileMessagesCleaned])
+
+        const indexedMedia: {
+          [key: string]: GroupMessage[];
+        } = indexMedia(fileMessagesCleaned);
+        setIndexedFileMessages(indexedMedia);
+        setLoading(false);
+      }
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

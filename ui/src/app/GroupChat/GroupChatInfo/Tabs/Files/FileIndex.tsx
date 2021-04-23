@@ -1,4 +1,4 @@
-import { IonLabel, IonListHeader } from "@ionic/react";
+import { IonListHeader } from "@ionic/react";
 import React from "react";
 import { FilePayload } from "../../../../../redux/commons/types";
 import { GroupMessage } from "../../../../../redux/group/types";
