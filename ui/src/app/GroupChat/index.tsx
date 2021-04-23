@@ -117,7 +117,7 @@ const GroupChat: React.FC = () => {
         groupInfo?.messages.push(msg.groupMessageEntryHash);
       });
       // TODO: bring this back
-      // chatList.current!.scrollToBottom();
+      chatList.current!.scrollToBottom();
     });
   };
 
