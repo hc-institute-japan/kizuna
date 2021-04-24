@@ -27,7 +27,7 @@ const Typing: React.FC<Props> = ({ profiles, disabled }) => {
 
   const animateDots = () => {
     return [".", ".", "."].map((dot, i) => (
-      <span style={{ animationDelay: `${0.3 * i}s` }} className={styles.dot}>
+      <span key={i} style={{ animationDelay: `${0.3 * i}s` }} className={styles.dot}>
         {dot}
       </span>
     ));
