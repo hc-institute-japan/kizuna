@@ -163,12 +163,7 @@ const Conversations: React.FC = () => {
     }
     conversationsArray.sort((x: any, y: any) => {
       let timestampX = (x.content.messages.length !== 0) ?  x.content.messages[x.content.messages.length - 1].timestamp.valueOf() : x.createdAt.valueOf()
-      let timestampY = (y.content.messages.length !== 0) ?  y.content.messages[x.content.messages.length - 1].timestamp.valueOf() : y.createdAt.valueOf()
-
-      if (x.content.messages.length !== 0 || y.content.messages.length !== 0) {
-        console.log("heello?");
-        console.log(x.content.messages.length !== 0, y.content.messages.length !== 0)
-      }
+      let timestampY = (y.content.messages.length !== 0) ?  y.content.messages[y.content.messages.length - 1].timestamp.valueOf() : y.createdAt.valueOf()
 
       return timestampX < timestampY ? 1 : -1
     })

@@ -13,7 +13,7 @@ import {
 } from "@ionic/react";
 import React, { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
-import { useHistory, useParams } from "react-router";
+import { useHistory, useLocation, useParams } from "react-router";
 import {
   sendGroupMessage,
   getLatestGroupVersion,
@@ -60,16 +60,13 @@ const GroupChat: React.FC = () => {
   const [files, setFiles] = useState<object[]>([]);
   const [groupInfo, setGroupInfo] = useState<GroupConversation | undefined>();
   const [toast, setToast] = useState<boolean>(false);
-  const [messages, setMessages] = useState<string[]>([]);
+  const [messages, setMessages] = useState<string[]>();
   const [loading, setLoading] = useState<boolean>(true);
   const [message, setMessage] = useState("");
 
   // Selectors
   const groupData = useSelector(
     (state: RootState) => state.groups.conversations[group]
-  );
-  const allMessages = useSelector(
-    (state: RootState) => state.groups.messages
   );
 
   const typing = useSelector((state: RootState) => state.groups.typing);
@@ -121,7 +118,7 @@ const GroupChat: React.FC = () => {
 
     Promise.all(messagePromises).then((sentMessages: GroupMessage[]) => {
       sentMessages.forEach((msg: GroupMessage, i) => {
-        setMessages([...messages, msg.groupMessageEntryHash]);
+        setMessages([...messages!, msg.groupMessageEntryHash]);
       });
       chatList.current!.scrollToBottom();
 
@@ -134,7 +131,6 @@ const GroupChat: React.FC = () => {
     });
   };
 
-  // useEffects
   useEffect(() => {
     // setLoading(true);
     dispatch(fetchId()).then((res: AgentPubKey | null) => {
@@ -143,27 +139,22 @@ const GroupChat: React.FC = () => {
   }, [dispatch]);
 
   useEffect(() => {
+    console.log(groupData);
     if (groupData) {
       setGroupInfo(groupData);
+      setMessages(groupData.messages)
       setLoading(false);
     } else {
       dispatch(getLatestGroupVersion(group)).then((res: GroupConversation) => {
         setGroupInfo(res);
+        setMessages(res.messages)
         setLoading(false);
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    groupData
-      ? groupData.messages
-        ? setMessages(groupData.messages)
-        : setMessages([])
-      : setMessages([]);
-  }, [groupData]);
-
-  return !loading && groupInfo ? (
+  return !loading && groupInfo && messages ? (
     <IonPage>
       <IonHeader>
         <IonToolbar>
