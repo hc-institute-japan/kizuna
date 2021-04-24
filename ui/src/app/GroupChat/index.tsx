@@ -17,6 +17,7 @@ import { useHistory, useParams } from "react-router";
 import {
   sendGroupMessage,
   getLatestGroupVersion,
+  indicateGroupTyping,
 } from "../../redux/group/actions";
 import {
   GroupConversation,
@@ -42,6 +43,7 @@ import {
 } from "ionicons/icons";
 import { ChatListMethods } from "../../components/Chat/types";
 import styles from "./style.module.css";
+import Typing from "../../components/Chat/Typing";
 
 interface GroupChatParams {
   group: string;
@@ -66,6 +68,11 @@ const GroupChat: React.FC = () => {
   const groupData = useSelector(
     (state: RootState) => state.groups.conversations[group]
   );
+  const allMessages = useSelector(
+    (state: RootState) => state.groups.messages
+  );
+
+  const typing = useSelector((state: RootState) => state.groups.typing);
 
   // Handlers
   const handleOnSend = () => {
@@ -210,9 +217,31 @@ const GroupChat: React.FC = () => {
         )}
       </IonContent>
 
+      <Typing profiles={typing[groupInfo.originalGroupEntryHash] ? typing[groupInfo.originalGroupEntryHash] : []}/>
       <MessageInput
         onSend={handleOnSend}
-        onChange={(message) => setMessage(message)}
+        onChange={(message) => {
+          if (message.length !== 0) {
+            dispatch(indicateGroupTyping({
+              groupId: base64ToUint8Array(groupInfo.originalGroupEntryHash),
+              indicatedBy: Buffer.from(base64ToUint8Array(myAgentId).buffer),
+              members: [...groupInfo.members.map(member => 
+                Buffer.from(base64ToUint8Array(member).buffer)
+              ), Buffer.from(base64ToUint8Array(groupInfo.creator).buffer)],
+              isTyping: true
+            }))
+          } else {
+            dispatch(indicateGroupTyping({
+              groupId: base64ToUint8Array(groupInfo.originalGroupEntryHash),
+              indicatedBy: Buffer.from(base64ToUint8Array(myAgentId).buffer),
+              members: [...groupInfo.members.map(member => 
+                Buffer.from(base64ToUint8Array(member).buffer)
+              ), Buffer.from(base64ToUint8Array(groupInfo.creator).buffer)],
+              isTyping: false
+            }))
+          }
+          return setMessage(message)
+        }}
         onFileSelect={(files) => setFiles(files)}
       />
     <OldestFetchedToast toast={toast} onDismiss={() => setToast(false)} />

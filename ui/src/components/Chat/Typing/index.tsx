@@ -8,9 +8,10 @@ import styles from "./style.module.css";
 
 interface Props {
   profiles: Profile[];
+  disabled?: boolean;
 }
 
-const Typing: React.FC<Props> = ({ profiles }) => {
+const Typing: React.FC<Props> = ({ profiles, disabled }) => {
   const intl = useIntl();
 
   const others = (remaining: Profile[]) => {
@@ -36,12 +37,15 @@ const Typing: React.FC<Props> = ({ profiles }) => {
     const limit = 3;
     if (profiles.length === 1)
       return (
-        intl.formatMessage(
+      <span>
+        {intl.formatMessage(
           {
             id: "components.typing.is-typing",
           },
           { user: profiles[0].username }
-        ) + animateDots()
+        )}
+        {animateDots()}
+      </span>
       );
     const names = `${profiles
       .slice(0, limit - 1)
@@ -56,11 +60,11 @@ const Typing: React.FC<Props> = ({ profiles }) => {
       </span>
     );
   };
-  return (
+  return (profiles.length) ? (
     <div className={`${styles.typing} ion-padding-start`}>
       {displayNames(profiles)}
     </div>
-  );
+  ) : null;
 };
 
 export default Typing;

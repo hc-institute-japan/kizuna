@@ -93,60 +93,66 @@ const Conversations: React.FC = () => {
       Object.keys(groups).forEach((key: string ) => {
         // TODO: change to actual pic chosen by group creator
         let src = "https://upload.wikimedia.org/wikipedia/commons/8/8c/Lauren_Tsai_by_Gage_Skidmore.jpg";
-        let messages: Message[] =  groups[key].messages ? groups[key].messages.map((messageId: string) => {
-          console.log(groupMessagesLocal);
-          let groupMessage: GroupMessage = Object.keys(groupMessagesLocal).length ? groupMessagesLocal[messageId] : groupMessages[messageId];
-          if (isTextPayload(groupMessage.payload)) {
-            let message: Message = {
-              id: groupMessage.groupMessageEntryHash,
-              sender: groupMembers[groupMessage.author] ? {
-                id: groupMembers[groupMessage.author].id,
-                username: groupMembers[groupMessage.author].username
-              } : {
-                id: myAgentId,
-                username: myUsername!
-              },
-              timestamp: groupMessage.timestamp,
-              message: groupMessage.payload.payload.payload
-            };
-            return message
-          } else {
-            let maybeOther: any | undefined = groupMembers[groupMessage.author];
-            let fileString: string = "";
-            if (maybeOther) {
-              // TODO: format for i18n
-              fileString = String(maybeOther.username + " has sent " + groupMessage.payload.fileName).toString();
+        let messages: (Message | undefined)[] =  groups[key].messages ? groups[key].messages.map((messageId: string) => {
+          let groupMessage = Object.keys(groupMessagesLocal).length ? groupMessagesLocal[messageId] : groupMessages[messageId];
+          
+          if (groupMessage) {
+            console.log(groupMessage)
+            if (isTextPayload(groupMessage.payload)) {
+              let message: Message = {
+                id: groupMessage.groupMessageEntryHash,
+                sender: groupMembers[groupMessage.author] ? {
+                  id: groupMembers[groupMessage.author].id,
+                  username: groupMembers[groupMessage.author].username
+                } : {
+                  id: myAgentId,
+                  username: myUsername!
+                },
+                timestamp: groupMessage.timestamp,
+                message: groupMessage.payload.payload.payload
+              };
+              return message
             } else {
-              // MAYBE BUG: assumption is you sent it.
-              // TODO: format for i18n
-              fileString = String("You sent " + groupMessage.payload.fileName).toString();
-            }
-            
-            let message: Message = {
-              id: groupMessage.groupMessageEntryHash,
-              sender: groupMembers[groupMessage.author] ? {
-                id: groupMembers[groupMessage.author].id,
-                username: groupMembers[groupMessage.author].username
-              } : {
-                id: myAgentId,
-                username: myUsername!
-              },
-              timestamp: groupMessage.timestamp,
-              // TODO: this part is file
-              message: fileString,
-              fileName: groupMessage.payload.fileName
+              let maybeOther: any | undefined = groupMembers[groupMessage.author];
+              let fileString: string = "";
+              if (maybeOther) {
+                // TODO: format for i18n
+                fileString = String(maybeOther.username + " has sent " + groupMessage.payload.fileName).toString();
+              } else {
+                // MAYBE BUG: assumption is you sent it.
+                // TODO: format for i18n
+                fileString = String("You sent " + groupMessage.payload.fileName).toString();
+              }
+              
+              let message: Message = {
+                id: groupMessage.groupMessageEntryHash,
+                sender: groupMembers[groupMessage.author] ? {
+                  id: groupMembers[groupMessage.author].id,
+                  username: groupMembers[groupMessage.author].username
+                } : {
+                  id: myAgentId,
+                  username: myUsername!
+                },
+                timestamp: groupMessage.timestamp,
+                // TODO: this part is file
+                message: fileString,
+                fileName: groupMessage.payload.fileName
+              };
+              return message
             };
-            return message
-          };
+          }
         }) : [];
-        messages.sort((x: Message, y: Message) => 
+        let messagesCleaned = messages.flatMap(
+          (x: Message | undefined) => (x ? [x] : [])
+        );
+        messagesCleaned = messagesCleaned.sort((x: Message, y: Message) => 
           y.timestamp.valueOf() < x.timestamp.valueOf() ? 1 : -1
         );
         let conversation = {
           isGroup: true,
           createdAt: groups[key].createdAt,
           groupId: groups[key].originalGroupEntryHash,
-          content: { src, name: groups[key].name, messages },
+          content: { src, name: groups[key].name, messages: messagesCleaned },
         };
         
         if (!(conversationsArray.find((group: any) => group.id === conversation.groupId))) {
@@ -155,17 +161,17 @@ const Conversations: React.FC = () => {
         
         });
     }
-    // conversationsArray.sort((x: any, y: any) => {
-    //   let timestampX = (x.content.messages.length !== 0) ?  x.content.messages[x.content.messages.length - 1].timestamp.valueOf() : x.createdAt.valueOf()
-    //   let timestampY = (y.content.messages.length !== 0) ?  y.content.messages[x.content.messages.length - 1].timestamp.valueOf() : y.createdAt.valueOf()
+    conversationsArray.sort((x: any, y: any) => {
+      let timestampX = (x.content.messages.length !== 0) ?  x.content.messages[x.content.messages.length - 1].timestamp.valueOf() : x.createdAt.valueOf()
+      let timestampY = (y.content.messages.length !== 0) ?  y.content.messages[x.content.messages.length - 1].timestamp.valueOf() : y.createdAt.valueOf()
 
-    //   if (x.content.messages.length !== 0 || y.content.messages.length !== 0) {
-    //     console.log("heello?");
-    //     console.log(x.content.messages.length !== 0, y.content.messages.length !== 0)
-    //   }
+      if (x.content.messages.length !== 0 || y.content.messages.length !== 0) {
+        console.log("heello?");
+        console.log(x.content.messages.length !== 0, y.content.messages.length !== 0)
+      }
 
-    //   return timestampX < timestampY ? 1 : -1
-    // })
+      return timestampX < timestampY ? 1 : -1
+    })
 
     return conversationsArray;
   };

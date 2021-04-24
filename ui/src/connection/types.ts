@@ -53,6 +53,7 @@ export const FUNCTIONS: FunctionNameType = {
     GET_NEXT_BATCH_GROUP_MESSAGES: "get_next_batch_group_messages",
     GET_MESSAGES_BY_GROUP_BY_TIMESTAMP: "get_messages_by_group_by_timestamp",
     GET_GROUP_LATEST_VERSION: "get_group_latest_version",
+    INDICATE_GROUP_TYPING: "indicate_group_typing",
   },
   [ZOMES.AGGREGATOR]: {
     RETRIEVE_LATEST_DATA: "retrieve_latest_data",
@@ -62,6 +63,6 @@ export const FUNCTIONS: FunctionNameType = {
     GET_LATEST_MESSAGES: "get_latest_messages",
     GET_MESSAGES_BY_AGENT_BY_TIMESTAMP: "get_messages_by_agent_by_timestamp",
     GET_NEXT_BATCH_MESSAGES: "get_next_batch_messages",
-    GET_ALL_MESSAGES: "get_all_messages"
-  }
+    GET_ALL_MESSAGES: "get_all_messages",
+  },
 };
