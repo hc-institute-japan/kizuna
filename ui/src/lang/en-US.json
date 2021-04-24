@@ -19,7 +19,7 @@
   "app.new-conversation.no-contacts-toast": "Please select a contact...",
   "app.new-conversation.problem-occured-toast": "A problem occurred...",
   "app.register.error-invalid-username": "Username must be at least 3 characters and contain 1 alphanumberic character",
-  "app.register.error-existing-username": "There's already a username registered for this user",
+  "app.register.error-existing-username": "Sorry! That username is already taken",
   "app.register.username-label": "Username",
   "app.register.username-placeholder": "Type your username...",
   "app.register.register": "Create an account",
