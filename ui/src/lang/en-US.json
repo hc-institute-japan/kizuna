@@ -26,6 +26,7 @@
   "components.message-input.over-size-limit": "{fileName} exceeds the 15mb file limit",
   "components.chat.image-modal-download": "Download",
   "components.chat.chat-list.today": "Today",
+  "components.typing.is-typing": "{user} is typing",
   "app.conversation.other-file-string": "{name} has sent {fileName}",
   "app.conversation.me-file-string": "You sent {fileName}",
   "app.groups.oldest-message-fetched": "You have already fetched the oldest message",

@@ -11,6 +11,10 @@ import {
   ADD_GROUP,
   GroupConversation,
   GroupMessage,
+  GroupTypingDetail,
+  GroupTypingDetailData,
+  SetGroupTyingIndicator,
+  SET_GROUP_TYPING_INDICATOR,
 } from "../redux/group/types";
 import { SET_GROUP_MESSAGE, SetGroupMessageAction } from "../redux/group/types";
 import { base64ToUint8Array, Uint8ArrayToBase64 } from "../utils/helpers";
@@ -87,7 +91,6 @@ let signalHandler: AppSignalCb = (signal) => {
       break;
     case "group_messsage_data": {
       let payload = signal.data.payload.payload.payload;
-      console.log("is this shit even triggering sir?", payload);
       let groupMessage: GroupMessage = {
         groupMessageEntryHash: Uint8ArrayToBase64(payload.id),
         groupEntryHash: Uint8ArrayToBase64(payload.content.groupHash),
@@ -113,13 +116,67 @@ let signalHandler: AppSignalCb = (signal) => {
         timestamp: payload.content.created,
         // TODO: work on this
         // replyTo: undefined,
-        // TODO: work on this too
         readList: {},
       };
       store.dispatch<SetGroupMessageAction>({
         type: SET_GROUP_MESSAGE,
         groupMessage,
       });
+      break;
+    }
+    case "group_typing_detail": {
+      let payload = signal.data.payload.payload.payload;
+
+      let contacts = store.getState().contacts.contacts;
+      let indicatedBy: Profile;
+      let undefinedProfiles: AgentPubKey[] = [];
+
+      getAgentId()
+        .then((res: any) => Uint8ArrayToBase64(res))
+        .then((myAgentIdBase64: any) => {
+          let memberId = Uint8ArrayToBase64(payload.indicatedBy);
+          if (contacts[memberId]) {
+            indicatedBy = contacts[memberId];
+          } else if (memberId === myAgentIdBase64) {
+          } else {
+            undefinedProfiles.push(payload.indicatedBy);
+          }
+          if (undefinedProfiles?.length) {
+            callZome({
+              zomeName: ZOMES.USERNAME,
+              fnName: FUNCTIONS[ZOMES.USERNAME].GET_USERNAMES,
+              payload: undefinedProfiles,
+            }).then((res: any) => {
+              res.forEach((profile: any) => {
+                let base64 = Uint8ArrayToBase64(profile.agentId);
+                indicatedBy = {
+                  id: base64,
+                  username: profile.username,
+                };
+              });
+
+              let GroupTypingDetail: GroupTypingDetail = {
+                groupId: Uint8ArrayToBase64(payload.groupId),
+                indicatedBy: indicatedBy,
+                isTyping: payload.isTyping,
+              };
+              store.dispatch<SetGroupTyingIndicator>({
+                type: SET_GROUP_TYPING_INDICATOR,
+                GroupTyingIndicator: GroupTypingDetail,
+              });
+            });
+          } else if (indicatedBy) {
+            let GroupTypingDetail: GroupTypingDetail = {
+              groupId: Uint8ArrayToBase64(payload.groupId),
+              indicatedBy: indicatedBy,
+              isTyping: payload.isTyping,
+            };
+            store.dispatch<SetGroupTyingIndicator>({
+              type: SET_GROUP_TYPING_INDICATOR,
+              GroupTyingIndicator: GroupTypingDetail,
+            });
+          }
+        });
       break;
     }
     default:

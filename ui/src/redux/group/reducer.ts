@@ -13,6 +13,7 @@ import {
   SET_LATEST_GROUP_STATE,
   GroupMessagesOutput,
   SET_LATEST_GROUP_VERSION,
+  SET_GROUP_TYPING_INDICATOR,
 } from "./types";
 import { isTextPayload } from "../commons/types";
 import { Profile } from "../profile/types";
@@ -22,6 +23,7 @@ const initialState: GroupConversationsState = {
   messages: {},
   groupFiles: {},
   members: {},
+  typing: {},
 };
 
 const reducer = (
@@ -198,6 +200,25 @@ const reducer = (
       });
 
       return { ...state, conversations: groupConversations, members, messages };
+    }
+    case SET_GROUP_TYPING_INDICATOR: {
+      let typing = state.typing;
+      let groupTyping = typing[action.GroupTyingIndicator.groupId]
+        ? typing[action.GroupTyingIndicator.groupId]
+        : [];
+      let userNames = groupTyping.map((profile: Profile) => profile.id);
+      if (action.GroupTyingIndicator.isTyping) {
+        if (!userNames.includes(action.GroupTyingIndicator.indicatedBy.id)) {
+          groupTyping.push(action.GroupTyingIndicator.indicatedBy);
+        }
+      } else {
+        console.log("is this working?");
+        groupTyping = groupTyping.filter((profile) => {
+          return profile.id !== action.GroupTyingIndicator.indicatedBy.id;
+        });
+      }
+      typing = { ...typing, [action.GroupTyingIndicator.groupId]: groupTyping };
+      return { ...state, typing };
     }
     default:
       return state;

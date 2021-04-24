@@ -26,6 +26,7 @@
   "components.message-input.over-size-limit": "{fileName}が15MBのファイル制限を超えています",
   "components.chat.image-modal-download": "ダウンロード",
   "components.chat.chat-list.today": "今日",
+  "components.typing.is-typing": "{name}が入力しています",
   "app.conversation.me-file-string": "あなたは{fileName}を送りました",
   "app.conversation.other-file-string": "{name}が{fileName}を送信しました",
   "app.groups.oldest-message-fetched": "全てのメッセージを取得しました",

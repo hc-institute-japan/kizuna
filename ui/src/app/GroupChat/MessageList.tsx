@@ -35,14 +35,13 @@ const MessageList: React.FC<Props> = ({
 
   const allMembers = useSelector((state: RootState) => state.groups.members);
   const username = useSelector((state: RootState) => state.profile.username);
-  const allMessages = useSelector((state: RootState) => state.groups.messages);
   const messagesData = useSelector((state: RootState) => {
     let uniqueArray = messageIds.filter(function (item, pos, self) {
       return self.indexOf(item) === pos;
     });
     const messages: (any | undefined)[] = uniqueArray
       ? uniqueArray.map((messageId) => {
-          let message: GroupMessage = allMessages[messageId];
+          let message: GroupMessage = state.groups.messages[messageId];
 
           if (message) {
             const authorProfile = allMembers[message.author];
@@ -131,7 +130,7 @@ const MessageList: React.FC<Props> = ({
 
   return (
     <>
-    <IonLoading isOpen={loading} />
+    <IonLoading isOpen={loading} message="Fetching more" />
       <Chat.ChatList
         disabled={oldestFetched}
         onScrollTop={(complete) => handleOnScrollTop(complete)}

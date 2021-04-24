@@ -17,6 +17,7 @@ export const SET_MESSAGES_BY_GROUP_BY_TIMESTAMP =
   "SET_MESSAGES_BY_GROUP_BY_TIMESTAMP";
 export const SET_LATEST_GROUP_STATE = "SET_LATEST_GROUP_STATE";
 export const SET_LATEST_GROUP_VERSION = "SET_LATEST_GROUP_VERSION";
+export const SET_GROUP_TYPING_INDICATOR = "SET_GROUP_TYPING_INDICATOR";
 
 // type declarations
 type GroupMessageID = string; // Group Message EntryHash in base64 string
@@ -74,7 +75,20 @@ export interface GroupMessageByDateFetchFilter {
   date: [number, number];
   payloadType: FetchPayloadType;
 }
+
+export interface GroupTypingDetailData {
+  groupId: GroupEntryHash;
+  indicatedBy: AgentPubKey;
+  members: AgentPubKey[];
+  isTyping: boolean;
+}
 // end
+
+export interface GroupTypingDetail {
+  groupId: GroupID;
+  indicatedBy: Profile;
+  isTyping: boolean;
+}
 
 export interface GroupMessage {
   groupMessageEntryHash: GroupMessageID;
@@ -172,11 +186,11 @@ export interface GroupConversationsState {
   members: {
     [key: string]: Profile;
   };
-  // typing: {
-  //   // key is GroupID
-  //   // TODO: finish this
-  //   [key: string]: Profile[]
-  // }
+  typing: {
+    // key is GroupID
+    // TODO: finish this
+    [key: string]: Profile[];
+  };
 }
 
 // TODO: use it for typing action
@@ -241,6 +255,11 @@ export interface SetLatestGroupVersionAction {
   };
 }
 
+export interface SetGroupTyingIndicator {
+  type: typeof SET_GROUP_TYPING_INDICATOR;
+  GroupTyingIndicator: GroupTypingDetail;
+}
+
 export type GroupConversationsActionTypes =
   | AddGroupAction
   | AddGroupMembersAction
@@ -250,4 +269,5 @@ export type GroupConversationsActionTypes =
   | SetNextBatchGroupMessagesAction
   | SetMessagesByGroupByTimestampAction
   | SetLatestGroupState
-  | SetLatestGroupVersionAction;
+  | SetLatestGroupVersionAction
+  | SetGroupTyingIndicator;
