@@ -72,9 +72,9 @@ const GroupChat: React.FC = () => {
 
   // Handlers
   const handleOnSend = () => {
-    setSendingLoading(true);
     let inputs: GroupMessageInput[] = [];
     if (files.length) {
+      setSendingLoading(true);
       files.forEach((file: any) => {
         let filePayloadInput: FilePayloadInput = {
           type: "FILE",
@@ -156,7 +156,7 @@ const GroupChat: React.FC = () => {
 
   return !loading && groupInfo && messages ? (
     <IonPage>
-      <IonLoading isOpen={sendingLoading} />
+      <IonLoading isOpen={sendingLoading} message="sending..."/>
       <IonHeader>
         <IonToolbar>
           <IonButtons>

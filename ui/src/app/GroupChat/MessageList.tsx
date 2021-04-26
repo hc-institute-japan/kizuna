@@ -123,6 +123,7 @@ const MessageList: React.FC<Props> = ({
 
   useEffect(() => {
     setMessages(messagesData!);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messageIds])
 
   return (

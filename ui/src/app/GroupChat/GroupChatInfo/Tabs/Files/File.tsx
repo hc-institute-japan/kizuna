@@ -43,6 +43,7 @@ const File: React.FC<Props> = ({ groupId }) => {
 
   // USE SELECTORS
   const groupFileMessages: GroupMessage[] = useSelector((state: RootState) => {
+    // eslint-disable-next-line array-callback-return
     let groupMessages = state.groups.conversations[groupId].messages.map((key: string) => {
       let messageContent: GroupMessage = state.groups.messages[key];
       let payload: FilePayload | null = isTextPayload(messageContent.payload) ? null : (messageContent.payload.fileType === "OTHER") ? messageContent.payload : null;
