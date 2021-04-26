@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 import { RootState } from "../../redux/types";
-import { GroupMessage, GroupMessagesContents, GroupMessagesOutput } from "../../redux/group/types";
+import { GroupMessage, GroupMessageReadData, GroupMessagesContents, GroupMessagesOutput } from "../../redux/group/types";
 import Chat from "../../components/Chat";
 import { ChatListMethods } from "../../components/Chat/types";
-import { base64ToUint8Array, useAppDispatch } from "../../utils/helpers";
-import { getNextBatchGroupMessages } from "../../redux/group/actions";
+import { base64ToUint8Array, Uint8ArrayToBase64, useAppDispatch } from "../../utils/helpers";
+import { getNextBatchGroupMessages, readGroupMessage } from "../../redux/group/actions";
 import { IonLoading } from "@ionic/react";
 import { useIntl } from "react-intl";
 interface Props {
@@ -65,7 +65,6 @@ const MessageList: React.FC<Props> = ({
     messages.sort((x, y) => {
       return x.timestamp.valueOf()[0] - y.timestamp.valueOf()[0];
     });
-    console.log("here are the new messages", messages)
     return messages;
   });
 
@@ -73,7 +72,6 @@ const MessageList: React.FC<Props> = ({
     setLoading(true);
     if (messagesData?.length) {
       let lastMessage = messagesData![0];
-      console.log("here is the last message", oldestMessage)
       dispatch(
         getNextBatchGroupMessages({
           groupId: base64ToUint8Array(groupId),
@@ -87,7 +85,6 @@ const MessageList: React.FC<Props> = ({
       ).then((res: GroupMessagesOutput) => {
         if (Object.keys(res.groupMessagesContents).length !== 0) {
           let groupMesssageContents: GroupMessagesContents = res.groupMessagesContents;
-          console.log("here are the new messages", res)
           const fetchedMessages: (any | undefined)[] = [];
           Object.keys(groupMesssageContents).forEach((key: any) => {
             const authorProfile = allMembers[groupMesssageContents[key].author];
@@ -162,7 +159,16 @@ const MessageList: React.FC<Props> = ({
               showName={true}
               onSeen={(complete) => {
                 if (i === messagesData!.length - 1) {
-                  complete();
+                  let groupMessageReadData: GroupMessageReadData = {
+                    groupId: base64ToUint8Array(groupId),
+                    messageIds: [base64ToUint8Array(message.groupMessageEntryHash)],
+                    reader: Buffer.from(base64ToUint8Array(myAgentId).buffer),
+                    timestamp: message.timestamp,
+                    members: members.map((member: string) => Buffer.from(base64ToUint8Array(member).buffer)),
+                  }
+                  dispatch(readGroupMessage(groupMessageReadData)).then((res: any) => {
+                    complete();
+                  })
                 }
               }}
               showProfilePicture={true}
