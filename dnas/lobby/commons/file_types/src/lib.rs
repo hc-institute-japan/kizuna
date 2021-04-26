@@ -81,5 +81,6 @@ pub enum Payload {
 pub enum PayloadType {
     Text,
     File,
+    Media,
     All,
 }
