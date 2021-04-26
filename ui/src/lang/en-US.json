@@ -64,8 +64,8 @@
   "app.groups.media.october": "October",
   "app.groups.media.november": "November",
   "app.groups.media.december": "December",
-  "app.groups.media.fetching": "メディア取得中...",
+  "app.groups.media.fetching": "Fetching media...",
   "app.groups.media.no-media": "There is no media sent in the chat yet...",
   "app.groups.files.no-files": "There is no file sent in the chat yet...",
-  "app.groups.files.fetching": "ファイル取得中..."
+  "app.groups.files.fetching": "Fetching files..."
 }

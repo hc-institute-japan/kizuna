@@ -214,14 +214,14 @@ const File: React.FC<Props> = ({ groupId }) => {
         </IonList>
       </IonContent>
     ) : (
-      <IonContent>
-        <IonIcon icon={sadOutline} />
-        <IonLabel className="ion-padding ion-margin-bottom ">
+      <div className={styles["empty-media"]}>
+        <IonIcon icon={sadOutline} size={"large"}/>
+        <IonLabel className={styles["no-media-label"]}>
           {intl.formatMessage({
             id: "app.groups.files.no-files",
           })}
         </IonLabel>
-      </IonContent>
+      </div>
     )) : (
     <IonLoading isOpen={loading} />
   );
