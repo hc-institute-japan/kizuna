@@ -98,6 +98,10 @@ const Media: React.FC<Props> = ({ groupId }) => {
         }
       });
     }
+    Object.keys(indexedFiles).forEach((month: string) => {
+      let uniqueMessages: GroupMessage[] = [...new Set(indexedFiles[month])];
+      indexedFiles[month] = uniqueMessages
+    })
     return indexedFiles;
   };
 
@@ -138,18 +142,17 @@ const Media: React.FC<Props> = ({ groupId }) => {
 
   useEffect(() => {
     setLoading(true)
-    console.log("this shoud only get triggered once", groupMediaMessages)
     if (groupMediaMessages.length >= 10) {
       setFileMessages([...fileMessages, ...groupMediaMessages]);
       const indexedMedia: {
         [key: string]: GroupMessage[];
-      } = indexMedia([...fileMessages, ...groupMediaMessages]);
+      } = indexMedia(groupMediaMessages);
       setIndexedFileMessages(indexedMedia);
       setLoading(false);
     } else {
       let filter: GroupMessageBatchFetchFilter = {
         groupId: base64ToUint8Array(groupId),
-        batchSize: 10,
+        batchSize: 20,
         payloadType: { type: "MEDIA", payload: null },
       };
       dispatch(getNextBatchGroupMessages(filter)).then(
