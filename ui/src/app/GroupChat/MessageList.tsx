@@ -33,12 +33,10 @@ const MessageList: React.FC<Props> = ({
   const [oldestMessage, setOldestMessage] = useState<any>();
   const [loading, setLoading] = useState<boolean>(false);
 
-  const groupMessages = useSelector((state: RootState) => state.groups.conversations[groupId].messages)
-
   const allMembers = useSelector((state: RootState) => state.groups.members);
   const username = useSelector((state: RootState) => state.profile.username);
   const messagesData = useSelector((state: RootState) => {
-    let uniqueArray = groupMessages.filter(function (item, pos, self) {
+    let uniqueArray = messageIds.filter(function (item, pos, self) {
       return self.indexOf(item) === pos;
     });
     const messages: (any | undefined)[] = uniqueArray
@@ -128,7 +126,7 @@ const MessageList: React.FC<Props> = ({
   useEffect(() => {
     setMessages(messagesData!);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [groupMessages])
+  }, [messageIds])
 
   return (
     <>

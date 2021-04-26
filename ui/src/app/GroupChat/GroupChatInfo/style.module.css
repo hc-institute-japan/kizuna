@@ -187,7 +187,8 @@
 }
 
 .no-media-label {
-  font-size: xx-large;
+  padding: 1%;
+  font-size: large;
 }
 
 /* FOR FILE */

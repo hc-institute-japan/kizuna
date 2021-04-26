@@ -1,9 +1,6 @@
-import { IonAvatar, IonImg, IonItem } from "@ionic/react";
 import React from "react";
 import { useIntl } from "react-intl";
-import { isBuffer } from "util";
 import { Profile } from "../../../redux/profile/types";
-import Others from "../Others";
 import styles from "./style.module.css";
 
 interface Props {

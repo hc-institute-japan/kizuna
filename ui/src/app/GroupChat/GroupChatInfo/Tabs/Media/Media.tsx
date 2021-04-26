@@ -1,4 +1,4 @@
-import { IonContent, IonGrid, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonLoading, IonRow, IonText } from "@ionic/react";
+import { IonContent, IonGrid, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonLabel, IonLoading, IonRow, IonText } from "@ionic/react";
 import React, {useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import {
@@ -228,14 +228,14 @@ const Media: React.FC<Props> = ({ groupId }) => {
         </IonGrid>
       </IonContent>
     ) : (
-      <IonContent className={styles["empty-media"]}>
-        <IonIcon icon={sadOutline} />
-        <IonText className="ion-padding ion-margin-bottom no-media-label">
+      <div className={styles["empty-media"]}>
+        <IonIcon icon={sadOutline} size={"large"} />
+        <IonLabel className={styles["no-media-label"]}>
             {intl.formatMessage({
               id: "app.groups.media.no-media",
             })}
-        </IonText>
-      </IonContent>
+        </IonLabel>
+      </div>
     )
   ) : (
     <IonLoading isOpen={loading} />
