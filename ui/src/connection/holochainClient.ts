@@ -12,7 +12,6 @@ import {
   GroupConversation,
   GroupMessage,
   GroupTypingDetail,
-  GroupTypingDetailData,
   SetGroupTyingIndicator,
   SET_GROUP_TYPING_INDICATOR,
 } from "../redux/group/types";

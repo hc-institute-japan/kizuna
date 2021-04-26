@@ -8,7 +8,7 @@ import {
 import { peopleCircleOutline, personCircleOutline } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import { getAgentId } from "../../redux/profile/actions";
 
