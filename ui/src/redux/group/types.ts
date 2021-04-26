@@ -176,7 +176,6 @@ export interface GroupConversationsState {
   messages: {
     [key: string]: GroupMessage;
   };
-  // This saves memory for duplicate files because they have the same hash
   groupFiles: {
     [key: string]: Uint8Array;
   };
