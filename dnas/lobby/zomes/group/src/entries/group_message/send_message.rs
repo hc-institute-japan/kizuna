@@ -4,7 +4,7 @@ use super::{GroupFileBytes, GroupMessage, GroupMessageData, GroupMessageInput};
 use crate::group_helpers::get_group_latest_version;
 use crate::signals::{SignalDetails, SignalName, SignalPayload};
 use crate::utils::*;
-use file_types::{FileMetadata, Payload, PayloadInput};
+use file_types::{FileMetadata, FileType, Payload, PayloadInput};
 
 pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<GroupMessageData> {
     let payload = match message_input.payload_input.clone() {
@@ -49,12 +49,16 @@ pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<Gr
     create_link(
         group_hash_timestamp_path_hash,
         hash_entry(&message)?,
-        LinkTag::new(match message.payload {
+        LinkTag::new(match message.payload.clone() {
             Payload::Text { payload: _ } => "text".to_owned(),
             Payload::File {
                 metadata: _,
-                file_type: _,
-            } => "file".to_owned(),
+                file_type,
+            } => match file_type {
+                FileType::Image { thumbnail: _ } => "media".to_owned(),
+                FileType::Video { thumbnail: _ } => "media".to_owned(),
+                FileType::Other => "file".to_owned(),
+            },
         }),
     )?;
 

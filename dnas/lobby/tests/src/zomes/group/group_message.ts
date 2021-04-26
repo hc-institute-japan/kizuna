@@ -1280,7 +1280,7 @@ function sendMessageswithFilesTest(config, installables) {
         Object.values(group_messages_2.messagesByGroup)[0]
       );
 
-      t.deepEqual(
+      t.equal(
         [messages[0].id, messages[1].id, messages[2].id, messages[4].id],
         Object.values(group_messages.messagesByGroup)[0]
       );
@@ -1306,7 +1306,7 @@ function sendMessageswithFilesTest(config, installables) {
         messages_with_files
       );
 
-      t.deepEqual(messages_one_by_one, messages_with_files);
+      t.equal(messages_one_by_one, messages_with_files);
     }
   );
 
@@ -1413,7 +1413,7 @@ function sendLargeSetOfFilesTest(config, installables) {
       );
       await delay(5000);
 
-      t.deepEqual(messages, output);
+      t.equal(messages, output);
     }
   );
   orchestrator.run();
