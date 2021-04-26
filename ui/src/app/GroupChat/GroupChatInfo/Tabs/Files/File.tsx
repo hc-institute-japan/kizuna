@@ -20,6 +20,8 @@ import {
 } from "../../../../../utils/helpers";
 import FileIndex from "./FileIndex";
 import styles from "../../style.module.css"
+import { useSelector } from "react-redux";
+import { RootState } from "../../../../../redux/types";
 
 interface Props {
   groupId: string;
@@ -39,10 +41,19 @@ const File: React.FC<Props> = ({ groupId }) => {
   }>({});
   const [fileMessages, setFileMessages] = useState<GroupMessage[]>([]);
 
-  // TODO: check if files are already fetched and display those instead of fetching the latest
-  // const allFiles = useSelector((state: RootState) => {
-
-  // });
+  // USE SELECTORS
+  const groupFileMessages: GroupMessage[] = useSelector((state: RootState) => {
+    let groupMessages = state.groups.conversations[groupId].messages.map((key: string) => {
+      let messageContent: GroupMessage = state.groups.messages[key];
+      let payload: FilePayload | null = isTextPayload(messageContent.payload) ? null : (messageContent.payload.fileType === "OTHER") ? messageContent.payload : null;
+      if (payload) {
+        return messageContent;
+      }
+    }).flatMap(
+      (x: GroupMessage | undefined) => (x ? [x] : [])
+    );
+    return groupMessages
+  });
 
   const indexMedia: (
     fileMessages: GroupMessage[]
@@ -80,6 +91,10 @@ const File: React.FC<Props> = ({ groupId }) => {
         }
       });
     }
+    Object.keys(indexedFiles).forEach((month: string) => {
+      let uniqueMessages: GroupMessage[] = [...new Set(indexedFiles[month])];
+      indexedFiles[month] = uniqueMessages
+    })
     return indexedFiles;
   };
 
@@ -117,36 +132,45 @@ const File: React.FC<Props> = ({ groupId }) => {
   }
 
   useEffect(() => {
-    let filter: GroupMessageBatchFetchFilter = {
-      groupId: base64ToUint8Array(groupId),
-      batchSize: 10,
-      payloadType: { type: "FILE", payload: null },
-    };
-    dispatch(getNextBatchGroupMessages(filter)).then(
-      (res: GroupMessagesOutput) => {
-        let maybeFileMessages: (GroupMessage | undefined)[] = Object.keys(
-          res.groupMessagesContents
-        ).map((key: any) => {
-          if (!isTextPayload(res.groupMessagesContents[key].payload)) {
-            let message = res.groupMessagesContents[key];
-            return message;
-          } else {
-            return undefined;
-          }
-        });
-
-        let fileMessagesCleaned = maybeFileMessages.flatMap(
-          (x: GroupMessage | undefined) => (x ? [x] : [])
-        );
-        setFileMessages([...fileMessages, ...fileMessagesCleaned]);
-
-        const indexedMedia: {
-          [key: string]: GroupMessage[];
-        } = indexMedia(fileMessagesCleaned);
-        setIndexedFileMessages(indexedMedia);
-        setLoading(false);
-      }
-    );
+    if (groupFileMessages.length >= 10) {
+      setFileMessages([...fileMessages, ...groupFileMessages]);
+      const indexedMedia: {
+        [key: string]: GroupMessage[];
+      } = indexMedia(groupFileMessages);
+      setIndexedFileMessages(indexedMedia);
+      setLoading(false);
+    } else {
+      let filter: GroupMessageBatchFetchFilter = {
+        groupId: base64ToUint8Array(groupId),
+        batchSize: 20,
+        payloadType: { type: "FILE", payload: null },
+      };
+      dispatch(getNextBatchGroupMessages(filter)).then(
+        (res: GroupMessagesOutput) => {
+          let maybeFileMessages: (GroupMessage | undefined)[] = Object.keys(
+            res.groupMessagesContents
+          ).map((key: any) => {
+            if (!isTextPayload(res.groupMessagesContents[key].payload)) {
+              let message = res.groupMessagesContents[key];
+              return message;
+            } else {
+              return undefined;
+            }
+          });
+  
+          let fileMessagesCleaned = maybeFileMessages.flatMap(
+            (x: GroupMessage | undefined) => (x ? [x] : [])
+          );
+          setFileMessages([...fileMessages, ...fileMessagesCleaned]);
+  
+          const indexedMedia: {
+            [key: string]: GroupMessage[];
+          } = indexMedia(fileMessagesCleaned);
+          setIndexedFileMessages(indexedMedia);
+          setLoading(false);
+        }
+      );
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
