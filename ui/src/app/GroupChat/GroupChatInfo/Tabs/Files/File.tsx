@@ -208,7 +208,7 @@ const File: React.FC<Props> = ({ groupId }) => {
             onIonInfinite={(e) => onScrollBottom(complete, fileMessages)}
           >
             <IonInfiniteScrollContent>
-              <IonLoading isOpen={fetchLoading} message={'fetching more files...'}/>
+              <IonLoading isOpen={fetchLoading} message={intl.formatMessage({id: "app.groups.files.fetching"})}/>
             </IonInfiniteScrollContent>
           </IonInfiniteScroll>
         </IonList>

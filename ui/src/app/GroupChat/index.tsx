@@ -43,6 +43,7 @@ import {
 import { ChatListMethods } from "../../components/Chat/types";
 import styles from "./style.module.css";
 import Typing from "../../components/Chat/Typing";
+import { useIntl } from "react-intl";
 
 interface GroupChatParams {
   group: string;
@@ -51,6 +52,7 @@ interface GroupChatParams {
 const GroupChat: React.FC = () => {
   const history = useHistory();
   const dispatch = useAppDispatch();
+  const intl = useIntl();
   const { group } = useParams<GroupChatParams>();
   const chatList = useRef<ChatListMethods>(null);
 
@@ -58,7 +60,7 @@ const GroupChat: React.FC = () => {
   const [myAgentId, setMyAgentId] = useState<string>("");
   const [files, setFiles] = useState<object[]>([]);
   const [groupInfo, setGroupInfo] = useState<GroupConversation | undefined>();
-  const [messages, setMessages] = useState<string[]>();
+  const [messages, setMessages] = useState<string[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [sendingLoading, setSendingLoading] = useState<boolean>(false);
   const [message, setMessage] = useState("");
@@ -142,21 +144,35 @@ const GroupChat: React.FC = () => {
   useEffect(() => {
     if (groupData) {
       setGroupInfo(groupData);
-      setMessages(groupData.messages)
       setLoading(false);
     } else {
       dispatch(getLatestGroupVersion(group)).then((res: GroupConversation) => {
         setGroupInfo(res);
-        setMessages(res.messages)
         setLoading(false);
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [groupData]);
+
+  useEffect(() => {
+    setLoading(true)
+    if (groupData) {
+      setMessages([...messages!, ...groupData.messages])
+      setLoading(false);
+    } else {
+      dispatch(getLatestGroupVersion(group)).then((res: GroupConversation) => {
+        setMessages([...messages!, ...res.messages])
+        setLoading(false);
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupData]);
 
   return !loading && groupInfo && messages ? (
     <IonPage>
-      <IonLoading isOpen={sendingLoading} message="sending..."/>
+      <IonLoading isOpen={sendingLoading} message={intl.formatMessage({
+        id: "app.groups.sending"
+      })}/>
       <IonHeader>
         <IonToolbar>
           <IonButtons>

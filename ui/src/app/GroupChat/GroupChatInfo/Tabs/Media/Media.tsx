@@ -123,7 +123,6 @@ const Media: React.FC<Props> = ({ groupId }) => {
           let message: GroupMessage = res.groupMessagesContents[key];
           return message
         });
-        console.log("here are all files", [...fileMessages, ...newFiles])
         setFileMessages([...fileMessages, ...newFiles])
         const indexedMedia: {
           [key: string]: GroupMessage[];
@@ -131,7 +130,6 @@ const Media: React.FC<Props> = ({ groupId }) => {
         setIndexedFileMessages(indexedMedia);
         setFetchLoading(false)
       } else {
-        console.log("is this reaching here?")
         setOldestFetched(true);
         setFetchLoading(false);
       }
@@ -223,7 +221,7 @@ const Media: React.FC<Props> = ({ groupId }) => {
               onIonInfinite={(e) => onScrollBottom(complete, fileMessages)}
             >
               <IonInfiniteScrollContent>
-                <IonLoading isOpen={fetchLoading} message={'fetching more media...'}/>
+                <IonLoading isOpen={fetchLoading} message={intl.formatMessage({id: "app.groups.media.fetching"})}/>
               </IonInfiniteScrollContent>
             </IonInfiniteScroll>
           </IonRow>

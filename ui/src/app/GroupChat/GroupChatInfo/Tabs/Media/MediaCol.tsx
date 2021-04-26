@@ -9,14 +9,6 @@ interface Props {
 }
 
 const MediaCol: React.FC<Props> = ({ file, size = 3 }) => {
-  const [height, setHeight] = useState(300);
-  const handleRef = useCallback((el: HTMLIonColElement) => {
-    if (el) {
-      if (el.getBoundingClientRect().width !== 0)
-        setHeight(el.getBoundingClientRect().width);
-    }
-  }, []);
-
   return (
     <IonCol size="3">
       <MediaItem file={file} />

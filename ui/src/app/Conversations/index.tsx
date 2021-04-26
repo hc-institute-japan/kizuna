@@ -18,7 +18,7 @@ import { GroupConversation, GroupMessage } from "../../redux/group/types";
 import { fetchId } from "../../redux/profile/actions";
 import { RootState } from "../../redux/types";
 import { Uint8ArrayToBase64, useAppDispatch, dateToTimestamp } from "../../utils/helpers";
-import { Conversations as ConversationsType, Message } from "../../utils/types";
+import { Message } from "../../utils/types";
 import EmptyConversations from "./EmptyConversations";
 import { P2PMessageConversationState } from "../../redux/p2pmessages/types";
 import { FilePayload, TextPayload } from "../../redux/commons/types";
@@ -113,17 +113,6 @@ const Conversations: React.FC = () => {
               };
               return message
             } else {
-              let maybeOther: any | undefined = groupMembers[groupMessage.author];
-              let fileString: string = "";
-              if (maybeOther) {
-                // TODO: format for i18n
-                fileString = String(maybeOther.username + " has sent " + groupMessage.payload.fileName).toString();
-              } else {
-                // MAYBE BUG: assumption is you sent it.
-                // TODO: format for i18n
-                fileString = String("You sent " + groupMessage.payload.fileName).toString();
-              }
-              
               let message: Message = {
                 id: groupMessage.groupMessageEntryHash,
                 sender: groupMembers[groupMessage.author] ? {
@@ -134,8 +123,7 @@ const Conversations: React.FC = () => {
                   username: myUsername!
                 },
                 timestamp: groupMessage.timestamp,
-                // TODO: this part is file
-                message: fileString,
+                message: "",
                 fileName: groupMessage.payload.fileName
               };
               return message
@@ -179,12 +167,10 @@ const Conversations: React.FC = () => {
   }, [])
 
   useEffect(() => {
-    console.log("here is the groupData", groupsData)
     setGroups(groupsData);
   }, [groupsData])
 
   useEffect(() => {
-    console.log("there are the messages", groupMessages);
     setGroupMessagesLocal(groupMessages);
   }, [groupMessages])
 

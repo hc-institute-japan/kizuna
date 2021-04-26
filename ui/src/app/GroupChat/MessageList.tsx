@@ -8,6 +8,7 @@ import { ChatListMethods } from "../../components/Chat/types";
 import { base64ToUint8Array, useAppDispatch } from "../../utils/helpers";
 import { getNextBatchGroupMessages } from "../../redux/group/actions";
 import { IonLoading } from "@ionic/react";
+import { useIntl } from "react-intl";
 interface Props {
   messageIds: string[];
   members: string[];
@@ -24,6 +25,7 @@ const MessageList: React.FC<Props> = ({
   groupId,
 }) => {
   const dispatch = useAppDispatch();
+  const intl = useIntl();
 
   // LOCAL STATE
   const [messages, setMessages] = useState<any[]>([]);
@@ -31,16 +33,17 @@ const MessageList: React.FC<Props> = ({
   const [oldestMessage, setOldestMessage] = useState<any>();
   const [loading, setLoading] = useState<boolean>(false);
 
+  const groupMessages = useSelector((state: RootState) => state.groups.conversations[groupId].messages)
+
   const allMembers = useSelector((state: RootState) => state.groups.members);
   const username = useSelector((state: RootState) => state.profile.username);
   const messagesData = useSelector((state: RootState) => {
-    let uniqueArray = messageIds.filter(function (item, pos, self) {
+    let uniqueArray = groupMessages.filter(function (item, pos, self) {
       return self.indexOf(item) === pos;
     });
     const messages: (any | undefined)[] = uniqueArray
       ? uniqueArray.map((messageId) => {
           let message: GroupMessage = state.groups.messages[messageId];
-
           if (message) {
             const authorProfile = allMembers[message.author];
             return {
@@ -64,6 +67,7 @@ const MessageList: React.FC<Props> = ({
     messages.sort((x, y) => {
       return x.timestamp.valueOf()[0] - y.timestamp.valueOf()[0];
     });
+    console.log("here are the new messages", messages)
     return messages;
   });
 
@@ -124,11 +128,11 @@ const MessageList: React.FC<Props> = ({
   useEffect(() => {
     setMessages(messagesData!);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messageIds])
+  }, [groupMessages])
 
   return (
     <>
-    <IonLoading isOpen={loading} message="Fetching more" />
+    <IonLoading isOpen={loading} message={intl.formatMessage({id: "app.groups.fetching"})} />
       <Chat.ChatList
         disabled={oldestFetched}
         onScrollTop={(complete) => handleOnScrollTop(complete)}

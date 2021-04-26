@@ -1,5 +1,6 @@
 import { IonButton, IonButtons, IonInput, IonItem, IonLabel, IonLoading, IonTitle, IonToolbar } from "@ionic/react";
 import React, {  useState } from "react";
+import { useIntl } from "react-intl";
 import { GroupConversation } from "../../../redux/group/types";
 import styles from "../style.module.css";
 
@@ -13,6 +14,7 @@ interface Props {
 }
 
 const UpdateGroupName: React.FC<Props> = ({ onCancel, groupData, onSave, loading}) => {
+  const intl = useIntl();
   const [name, setName] = useState<string>("");
   const handleOnChange = (e: CustomEvent) => setName(e.detail.value!);
   return (!loading) ? (
@@ -20,23 +22,23 @@ const UpdateGroupName: React.FC<Props> = ({ onCancel, groupData, onSave, loading
       <div className={styles.modal}>
 
       <IonToolbar>
-        <IonTitle>Edit Group</IonTitle>
+        <IonTitle>{intl.formatMessage({id: "app.groups.update-group-name-title"})}</IonTitle>
       </IonToolbar>
 
       <IonItem className="input">
-        <IonLabel color="medium" position="floating">Group Name</IonLabel>
+        <IonLabel color="medium" position="floating">{intl.formatMessage({id: "app.groups.update-group-name-placeholder"})}</IonLabel>
         <IonInput clearInput className={styles["ion-input"]} value={name} onIonChange={handleOnChange}></IonInput>
       </IonItem>
 
       <IonButtons slot="end" className="input">
         <IonButton slot="end" onClick={onCancel}>
-          <IonLabel>Cancel</IonLabel>
+          <IonLabel>{intl.formatMessage({id: "app.groups.update-group-name-cancel"})}</IonLabel>
         </IonButton>
         <IonButton disabled={!name.length ? true : false} slot="end" onClick={() => {
           onSave(name);
           setName("");
         }}>
-          <IonLabel>Save</IonLabel>
+          <IonLabel>{intl.formatMessage({id: "app.groups.update-group-name-save"})}</IonLabel>
         </IonButton>
       </IonButtons>
 

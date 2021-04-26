@@ -15,6 +15,7 @@ import {
 } from "@ionic/react";
 import { arrowBackSharp } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
+import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router";
 import {
@@ -38,6 +39,7 @@ interface GroupChatParams {
 
 const GroupChatInfo: React.FC = () => {
   const history = useHistory();
+  const intl = useIntl();
   const { group } = useParams<GroupChatParams>();
 
   const groupData = useSelector(
@@ -56,7 +58,7 @@ const GroupChatInfo: React.FC = () => {
 
   const tabs = [
     {
-      label: "Info",
+      label: intl.formatMessage({id: "app.groups.label-info"}),
       tab: groupInfo ? (
         <Members
           groupId={group}
@@ -65,11 +67,11 @@ const GroupChatInfo: React.FC = () => {
       ) : null,
     },
     {
-      label: "Media",
+      label: intl.formatMessage({id: "app.groups.label-media"}),
       tab: <Media groupId={group} />,
     },
     {
-      label: "Files",
+      label: intl.formatMessage({id: "app.groups.label-files"}),
       tab: <File groupId={group} />,
     },
   ];
