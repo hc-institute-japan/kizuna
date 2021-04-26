@@ -20,26 +20,29 @@ import {
 } from "../../../../../utils/helpers";
 import FileIndex from "./FileIndex";
 import styles from "../../style.module.css"
-import OldestFetchedToast from "./OldestFetchedToast";
 
 interface Props {
   groupId: string;
 }
 
 const File: React.FC<Props> = ({ groupId }) => {
-  const [loading, setLoading] = useState<boolean>(true);
-  const [oldestFetched, setOldestFetched] = useState<boolean>(false);
-
-  const [toast, setToast] = useState<boolean>(true);
-  const [fetchLoading, setFetchLoading] = useState<boolean>(false);
   const dispatch = useAppDispatch();
+  const intl = useIntl();
   const infiniteFileScroll = useRef<HTMLIonInfiniteScrollElement>(null);
   const complete = () => infiniteFileScroll.current!.complete();
-  const intl = useIntl();
+
+  const [loading, setLoading] = useState<boolean>(true);
+  const [oldestFetched, setOldestFetched] = useState<boolean>(false);
+  const [fetchLoading, setFetchLoading] = useState<boolean>(false);
   const [indexedFileMessages, setIndexedFileMessages] = useState<{
     [key: string]: GroupMessage[];
   }>({});
   const [fileMessages, setFileMessages] = useState<GroupMessage[]>([]);
+
+  // TODO: check if files are already fetched and display those instead of fetching the latest
+  // const allFiles = useSelector((state: RootState) => {
+
+  // });
 
   const indexMedia: (
     fileMessages: GroupMessage[]
@@ -105,7 +108,6 @@ const File: React.FC<Props> = ({ groupId }) => {
         setIndexedFileMessages(indexedMedia);
         setFetchLoading(false)
       } else {
-        setToast(true);
         setOldestFetched(true);
         setFetchLoading(false);
       }
@@ -181,11 +183,10 @@ const File: React.FC<Props> = ({ groupId }) => {
             onIonInfinite={(e) => onScrollBottom(complete, fileMessages)}
           >
             <IonInfiniteScrollContent>
-              <IonLoading isOpen={fetchLoading} message={'fetching more media...'}/>
+              <IonLoading isOpen={fetchLoading} message={'fetching more files...'}/>
             </IonInfiniteScrollContent>
           </IonInfiniteScroll>
         </IonList>
-        <OldestFetchedToast toast={toast} onDismiss={() => setToast(false)} />
       </IonContent>
     ) : (
       <IonContent>

@@ -1,5 +1,5 @@
-import { IonCol, IonLabel, IonRow } from "@ionic/react";
-import React, {useRef, useState } from "react";
+import { IonCol } from "@ionic/react";
+import React from "react";
 import { FilePayload } from "../../../../../redux/commons/types";
 import { GroupMessage } from "../../../../../redux/group/types";
 import { Profile } from "../../../../../redux/profile/types";
@@ -16,11 +16,7 @@ interface Props {
   files: FilePayload[];
 }
 
-const MediaIndex: React.FC<Props> = ({ index, files }) => {
-  const row = useRef<HTMLIonRowElement>(null);
-  const [height, setHeight] = useState(0);
-
-  return files.length > 0 ? (
+const MediaIndex: React.FC<Props> = ({ index, files }) => files.length > 0 ? (
     <React.Fragment key={index}>
       <IonCol size="12">
         <h2 className={styles.month}>{index}</h2>
@@ -30,6 +26,5 @@ const MediaIndex: React.FC<Props> = ({ index, files }) => {
       ))}
     </React.Fragment>
   ) : null;
-};
 
 export default MediaIndex;

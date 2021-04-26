@@ -13,7 +13,6 @@ interface Props {
   members: string[];
   myAgentId: string;
   groupId: string;
-  setToast: (bool: boolean) => void;
   // TODO: not really sure what type this is
   chatList: React.RefObject<ChatListMethods>;
 }
@@ -23,7 +22,6 @@ const MessageList: React.FC<Props> = ({
   myAgentId,
   chatList,
   groupId,
-  setToast
 }) => {
   const dispatch = useAppDispatch();
 
@@ -114,7 +112,6 @@ const MessageList: React.FC<Props> = ({
         } else {
           setOldestFetched(true);
           setLoading(false);
-          setToast(true);
         }
       })
     }

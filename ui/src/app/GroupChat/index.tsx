@@ -13,7 +13,7 @@ import {
 } from "@ionic/react";
 import React, { useState, useEffect, useRef } from "react";
 import { useSelector } from "react-redux";
-import { useHistory, useLocation, useParams } from "react-router";
+import { useHistory, useParams } from "react-router";
 import {
   sendGroupMessage,
   getLatestGroupVersion,
@@ -27,7 +27,6 @@ import {
 import { RootState } from "../../redux/types";
 import { FilePayloadInput } from "../../redux/commons/types";
 import MessageList from "./MessageList";
-import OldestFetchedToast from "./OldestFetchedToast"
 import {
   base64ToUint8Array,
   Uint8ArrayToBase64,
@@ -59,9 +58,9 @@ const GroupChat: React.FC = () => {
   const [myAgentId, setMyAgentId] = useState<string>("");
   const [files, setFiles] = useState<object[]>([]);
   const [groupInfo, setGroupInfo] = useState<GroupConversation | undefined>();
-  const [toast, setToast] = useState<boolean>(false);
   const [messages, setMessages] = useState<string[]>();
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [sendingLoading, setSendingLoading] = useState<boolean>(false);
   const [message, setMessage] = useState("");
 
   // Selectors
@@ -73,6 +72,7 @@ const GroupChat: React.FC = () => {
 
   // Handlers
   const handleOnSend = () => {
+    setSendingLoading(true);
     let inputs: GroupMessageInput[] = [];
     if (files.length) {
       files.forEach((file: any) => {
@@ -120,6 +120,7 @@ const GroupChat: React.FC = () => {
       sentMessages.forEach((msg: GroupMessage, i) => {
         setMessages([...messages!, msg.groupMessageEntryHash]);
       });
+      setSendingLoading(false);
       chatList.current!.scrollToBottom();
 
     });
@@ -139,7 +140,6 @@ const GroupChat: React.FC = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    console.log(groupData);
     if (groupData) {
       setGroupInfo(groupData);
       setMessages(groupData.messages)
@@ -156,6 +156,7 @@ const GroupChat: React.FC = () => {
 
   return !loading && groupInfo && messages ? (
     <IonPage>
+      <IonLoading isOpen={sendingLoading} />
       <IonHeader>
         <IonToolbar>
           <IonButtons>
@@ -196,7 +197,6 @@ const GroupChat: React.FC = () => {
       <IonContent>
         {groupData ? (
           <MessageList
-            setToast={setToast}
             groupId={groupInfo.originalGroupEntryHash}
             myAgentId={myAgentId}
             members={groupInfo!.members}
@@ -235,7 +235,6 @@ const GroupChat: React.FC = () => {
         }}
         onFileSelect={(files) => setFiles(files)}
       />
-    <OldestFetchedToast toast={toast} onDismiss={() => setToast(false)} />
     </IonPage>
   ) : (
     <IonLoading isOpen={loading} />
