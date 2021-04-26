@@ -18,6 +18,7 @@ export const SET_MESSAGES_BY_GROUP_BY_TIMESTAMP =
 export const SET_LATEST_GROUP_STATE = "SET_LATEST_GROUP_STATE";
 export const SET_LATEST_GROUP_VERSION = "SET_LATEST_GROUP_VERSION";
 export const SET_GROUP_TYPING_INDICATOR = "SET_GROUP_TYPING_INDICATOR";
+export const SET_GROUP_READ_MESSAGE = "SET_GROUP_READ_MESSAGE";
 
 // type declarations
 type GroupMessageID = string; // Group Message EntryHash in base64 string
@@ -82,12 +83,27 @@ export interface GroupTypingDetailData {
   members: AgentPubKey[];
   isTyping: boolean;
 }
+
+export interface GroupMessageReadData {
+  groupId: GroupEntryHash;
+  messageIds: GroupMessageEntryHash[];
+  reader: AgentPubKey;
+  timestamp: [number, number];
+  members: AgentPubKey[];
+}
 // end
 
 export interface GroupTypingDetail {
   groupId: GroupID;
   indicatedBy: Profile;
   isTyping: boolean;
+}
+
+export interface GroupMessageReadDetail {
+  groupId: GroupID;
+  messageIds: GroupMessageID[];
+  reader: string;
+  timestamp: [number, number];
 }
 
 export interface GroupMessage {
@@ -259,6 +275,11 @@ export interface SetGroupTyingIndicator {
   GroupTyingIndicator: GroupTypingDetail;
 }
 
+export interface SetGroupReadMessage {
+  type: typeof SET_GROUP_READ_MESSAGE;
+  GroupReadMessage: GroupMessageReadDetail;
+}
+
 export type GroupConversationsActionTypes =
   | AddGroupAction
   | AddGroupMembersAction
@@ -269,4 +290,5 @@ export type GroupConversationsActionTypes =
   | SetMessagesByGroupByTimestampAction
   | SetLatestGroupState
   | SetLatestGroupVersionAction
-  | SetGroupTyingIndicator;
+  | SetGroupTyingIndicator
+  | SetGroupReadMessage;

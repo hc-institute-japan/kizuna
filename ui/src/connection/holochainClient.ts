@@ -20,6 +20,8 @@ import { base64ToUint8Array, Uint8ArrayToBase64 } from "../utils/helpers";
 import { isImage, isOther, isTextPayload } from "../redux/commons/types";
 import { Profile } from "../redux/profile/types";
 import { FUNCTIONS, ZOMES } from "./types";
+import { SetGroupReadMessage } from "../redux/group/types";
+import { SET_GROUP_READ_MESSAGE } from "../redux/group/types";
 
 let client: null | AppWebsocket = null;
 
@@ -176,6 +178,22 @@ let signalHandler: AppSignalCb = (signal) => {
             });
           }
         });
+      break;
+    }
+    case "group_message_read": {
+      let payload = signal.data.payload.payload.payload;
+
+      store.dispatch<SetGroupReadMessage>({
+        type: SET_GROUP_READ_MESSAGE,
+        GroupReadMessage: {
+          groupId: Uint8ArrayToBase64(payload.groupId),
+          messageIds: payload.messageIds.map((messageId: Uint8Array) =>
+            Uint8ArrayToBase64(messageId)
+          ),
+          reader: Uint8ArrayToBase64(payload.reader),
+          timestamp: payload.timestamp,
+        },
+      });
       break;
     }
     default:

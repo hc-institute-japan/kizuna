@@ -14,6 +14,7 @@ import {
   GroupMessagesOutput,
   SET_LATEST_GROUP_VERSION,
   SET_GROUP_TYPING_INDICATOR,
+  SET_GROUP_READ_MESSAGE,
 } from "./types";
 import { isTextPayload } from "../commons/types";
 import { Profile } from "../profile/types";
@@ -215,6 +216,23 @@ const reducer = (
       }
       typing = { ...typing, [action.GroupTyingIndicator.groupId]: groupTyping };
       return { ...state, typing };
+    }
+    case SET_GROUP_READ_MESSAGE: {
+      let reader = action.GroupReadMessage.reader;
+      let messageIds = action.GroupReadMessage.messageIds;
+      let timestamp = action.GroupReadMessage.timestamp;
+
+      let messages = state.messages;
+
+      messageIds.forEach((messageId: string) => {
+        let groupMessage = messages[messageId];
+        groupMessage.readList = {
+          ...groupMessage.readList,
+          [reader]: new Date(timestamp[0] * 1000),
+        };
+      });
+
+      return { ...state, messages };
     }
     default:
       return state;
