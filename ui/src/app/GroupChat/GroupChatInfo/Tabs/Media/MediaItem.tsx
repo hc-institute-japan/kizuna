@@ -10,7 +10,6 @@ interface Props {
 }
 
 const MediaItem: React.FC<Props> = ({ file }) => {
-  // const [selectedItem, setSelectedItem] = useState<boolean>(false);
   const decoder = new TextDecoder();
 
   const renderFile = () => {
@@ -24,7 +23,6 @@ const MediaItem: React.FC<Props> = ({ file }) => {
           </IonCard>
         );
       case "VIDEO":
-        // TODO: fix this
         return (
           <IonCard className={styles.mediacard}>
             <div className={styles.mediadiv}>
@@ -38,11 +36,6 @@ const MediaItem: React.FC<Props> = ({ file }) => {
         return null;
     }
   };
-
-  // const handleOnClick = () => {
-  //   let selected = onCompletion(contact);
-  //   if (selected) setSelectedItem(selectedItem ? false : true);
-  // };
 
   return renderFile();
 };

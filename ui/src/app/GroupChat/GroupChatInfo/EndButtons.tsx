@@ -1,5 +1,5 @@
 import { IonButton, IonButtons, IonIcon } from "@ionic/react";
-import { pencil, notifications } from "ionicons/icons";
+import { pencil } from "ionicons/icons";
 import React from "react";
 
 interface Props {

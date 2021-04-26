@@ -90,15 +90,11 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
   useEffect(() => {
     let membersProfile: Profile[] = [];
     let members = [...groupData.members, groupData.creator];
-    console.log("here are the groupMembers", groupMembers);
 
     // We have to account for creator and members here
     members.forEach((member: string) => {
       if (groupMembers[member]) membersProfile.push(groupMembers[member]);
     });
-
-    console.log("here are the membersProfile", membersProfile);
-    console.log("here are the members", members);
 
     setMembers(membersProfile);
     setLoading(false);
@@ -110,7 +106,10 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
         <IonList className={styles.memberInfo}>
           <IonItem lines="none" key={"member-numbers"}>
             <IonIcon className={styles.icon} icon={peopleOutline}></IonIcon>
-            <IonLabel>{members.length + " members"}</IonLabel>
+            <IonLabel>{intl.formatMessage(
+              {id: "app.groups.members"},
+              {length: members.length},
+            )}</IonLabel>
           </IonItem>
 
           {(myAgentId === groupData.creator) ? (<IonItem
@@ -120,7 +119,7 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
             key={"add-members-button"}
           >
             <IonIcon className={styles.icon} icon={personAddOutline}></IonIcon>
-            <IonLabel>Add Members</IonLabel>
+            <IonLabel>{intl.formatMessage({id: "app.groups.add-members"})}</IonLabel>
           </IonItem>) : null}
 
           <IonItem
@@ -128,7 +127,7 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
             className={styles.memberTitle}
             key={"members-label"}
           >
-            <h3>Members</h3>
+            <h3>{intl.formatMessage({id: "app.groups.members-label"})}</h3>
           </IonItem>
 
           {/* This is for members and admin*/}
@@ -142,7 +141,7 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
                       <h3>
                         {member.username}
                         <br />
-                        member
+                        {intl.formatMessage({id: "app.groups.member-role"})}
                       </h3>
                     </IonLabel>
                   </IonItem>
@@ -151,7 +150,7 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
                       onClick={() => handleRemoveMembers(member)}
                       color="danger"
                     >
-                      REMOVE
+                      {intl.formatMessage({id: "app.groups.remove-member"})}
                     </IonItemOption>
                   </IonItemOptions>
                 </IonItemSliding>
@@ -163,7 +162,7 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
                     <h3>
                       {member.username}
                       <br />
-                      admin
+                      {intl.formatMessage({id: "app.groups.admin-role"})}
                     </h3>
                   </IonLabel>
                 </IonItem>

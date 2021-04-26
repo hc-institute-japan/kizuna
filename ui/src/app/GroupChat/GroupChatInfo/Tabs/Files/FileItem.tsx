@@ -27,12 +27,6 @@ import styles from "../../style.module.css";
           return null;
       }
     };
-    
-  
-    // const handleOnClick = () => {
-    //   let selected = onCompletion(contact);
-    //   if (selected) setSelectedItem(selectedItem ? false : true);
-    // };
   
     return (renderFile());
   };
