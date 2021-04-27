@@ -97,7 +97,6 @@ const Conversations: React.FC = () => {
           let groupMessage = Object.keys(groupMessagesLocal).length ? groupMessagesLocal[messageId] : groupMessages[messageId];
           
           if (groupMessage) {
-            console.log(groupMessage)
             if (isTextPayload(groupMessage.payload)) {
               let message: Message = {
                 id: groupMessage.groupMessageEntryHash,
