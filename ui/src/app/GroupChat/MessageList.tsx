@@ -166,7 +166,6 @@ const MessageList: React.FC<Props> = ({
                 }).includes(myAgentId.slice(4));
 
                 if (i === messagesData!.length - 1 && !read) {
-                  console.log("this should only get triggered once.")
                   let groupMessageReadData: GroupMessageReadData = {
                     groupId: base64ToUint8Array(groupId),
                     messageIds: [base64ToUint8Array(message.groupMessageEntryHash)],
