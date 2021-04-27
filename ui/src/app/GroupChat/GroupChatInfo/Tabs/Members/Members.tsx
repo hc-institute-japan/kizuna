@@ -103,7 +103,6 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
   return !loading ? (
     <IonSlide>
       <IonContent>
-        <IonList className={styles.memberInfo}>
           <IonItem lines="none" key={"member-numbers"}>
             <IonIcon className={styles.icon} icon={peopleOutline}></IonIcon>
             <IonLabel>{intl.formatMessage(
@@ -111,7 +110,6 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
               {length: members.length},
             )}</IonLabel>
           </IonItem>
-
           {(myAgentId === groupData.creator) ? (<IonItem
             lines="none"
             button
@@ -121,18 +119,15 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
             <IonIcon className={styles.icon} icon={personAddOutline}></IonIcon>
             <IonLabel>{intl.formatMessage({id: "app.groups.add-members"})}</IonLabel>
           </IonItem>) : null}
-
           <IonItem
             lines="none"
             className={styles.memberTitle}
-            key={"members-label"}
-          >
+            >
             <h3>{intl.formatMessage({id: "app.groups.members-label"})}</h3>
           </IonItem>
-
+        <IonList className={styles.memberInfo}>
           {/* This is for members and admin*/}
           {members.map((member: any) => {
-            console.log(members)
             return member.id !== groupData.creator ? (
               <React.Fragment key={member.id}>
                 <IonItemSliding>
