@@ -61,14 +61,20 @@ const Conversation: React.FC<Props> = ({
       if (group) {
         dispatch(getAgentId()).then((id: any) => {
           const messagesReadList = group.messages.map(
-            (message) => state.groups.messages[message].readList
-          );
+            (message) => {
+              if (state.groups.messages[message].author === Uint8ArrayToBase64(id)) {
+                return null
+              } else {
+                return state.groups.messages[message].readList
+              }
+            }
+          ).filter(value => value !== null);
           if (id) {
             // TODO: The slice() here is only a temporary method. 
             // We should fix the hc side so that we dont have to do something like this in the UI.
             let badgeCount = messagesReadList.filter(
               (messageReadList) => {
-                let maybeRead = Object.keys(messageReadList).map((key: string) => {
+                let maybeRead = Object.keys(messageReadList!).map((key: string) => {
                   key = key.slice(5)
                   return key;
                 }).filter((key: string) => key === Uint8ArrayToBase64(id).slice(4));
