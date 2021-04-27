@@ -3,7 +3,9 @@ use hdk::prelude::*;
 use crate::group::group_helpers::get_group_entry_from_element;
 use crate::group::group_helpers::get_group_latest_version;
 
-use crate::group::{Group, GroupOutput};
+use crate::group::{
+    Group,
+};
 
 pub fn validate_update_group_handler(data: ValidateData) -> ExternResult<ValidateCallbackResult> {
     //data = { element = { signed_header, entry } , validation_package <Option> }
@@ -29,7 +31,7 @@ pub fn validate_update_group_handler(data: ValidateData) -> ExternResult<Validat
                 HeaderType::Create => {
                     // THIS PREV GROUP ENTRY VERSION SHOULD CONTAIN THE PREV VERSION TO THIS ENTRY,
                     // BECAUSE WHEN THE VALIDATIONS ARE RUNNING THE HEADER UPDATE HISTORY DOSENT HAVE THIS UPDATE ON IT YET
-                    let prev_group_entry_version: GroupOutput = get_group_latest_version(group_id)?;
+                    let prev_group_entry_version: Group = get_group_latest_version(group_id)?;
                     let updated_group_name_length: usize = updated_group_entry.name.clone().len();
                     let updated_group_members_length: usize =
                         updated_group_entry.get_group_members().len();
@@ -47,10 +49,10 @@ pub fn validate_update_group_handler(data: ValidateData) -> ExternResult<Validat
 
                     if updated_group_entry
                         .name
-                        .eq(&prev_group_entry_version.latest_name.clone())
+                        .eq(&prev_group_entry_version.name.clone())
                         && updated_group_entry
                             .get_group_members()
-                            .eq(&prev_group_entry_version.members)
+                            .eq(&prev_group_entry_version.get_group_members())
                     {
                         return Ok(ValidateCallbackResult::Invalid(
                             "nothing have been updated since the last commited group version"

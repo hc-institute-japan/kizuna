@@ -16,7 +16,6 @@ use group::remove_members::remove_members_handler;
 use group::update_group_name::update_group_name_handler;
 
 use group_message::get_all_messages::get_all_messages_handler;
-use group_message::get_files_bytes::get_files_bytes_handler;
 use group_message::get_latest_messages_for_all_groups::get_latest_messages_for_all_groups_handler;
 use group_message::get_messages_by_group_by_timestamp::get_messages_by_group_by_timestamp_handler;
 use group_message::get_next_batch_group_messages::get_next_batch_group_messages_handler;
@@ -31,13 +30,13 @@ use validation_rules::ValidationInput;
 use signals::{SignalDetails, SignalPayload};
 
 use group_message::{
-    BatchSize, FileBytes, GroupChatFilter, GroupFileBytes, GroupMessage, GroupMessageData,
+    BatchSize, GroupChatFilter, GroupFileBytes, GroupMessage, GroupMessageData,
     GroupMessageDataWrapper, GroupMessageInput, GroupMessageInputWithDate, GroupMessageReadData,
     GroupMessagesOutput, GroupMsgBatchFetchFilter, GroupTypingDetailData,
 };
 
 use group::{
-    CreateGroupInput, CreateGroupOutput, EntryHashWrapper, Group, GroupOutput, MyGroupListWrapper,
+    CreateGroupInput, CreateGroupOutput, EntryHashWrapper, Group, MyGroupListWrapper,
     UpdateGroupNameIO, UpdateMembersIO,
 };
 
@@ -54,13 +53,11 @@ pub fn init(_: ()) -> ExternResult<InitCallbackResult> {
     let mut fuctions = HashSet::new();
 
     // TODO: name may be changed to better suit the context of cap grant.s
-    let tag: String = "create_group_cap_grant".into();
+    let tag: String = "group_zome_cap_grant".into();
     let access: CapAccess = CapAccess::Unrestricted;
-
     let zome_name: ZomeName = zome_info()?.zome_name;
-    let function_name: FunctionName = FunctionName("recv_remote_signal".into());
 
-    fuctions.insert((zome_name, function_name));
+    fuctions.insert((zome_name.clone(), FunctionName("recv_remote_signal".into()) ));
 
     let cap_grant_entry: CapGrantEntry = CapGrantEntry::new(
         tag,    // A string by which to later query for saved grants.
@@ -130,7 +127,7 @@ fn get_all_my_groups(_: ()) -> ExternResult<MyGroupListWrapper> {
 }
 
 #[hdk_extern]
-fn get_group_latest_version(group_id: EntryHashWrapper) -> ExternResult<GroupOutput> {
+fn get_group_latest_version(group_id: EntryHashWrapper) -> ExternResult<Group> {
     return group_helpers::get_group_latest_version(group_id.group_hash);
 }
 
@@ -159,20 +156,15 @@ fn get_latest_messages_for_all_groups(batch_size: BatchSize) -> ExternResult<Gro
 }
 
 #[hdk_extern]
+fn indicate_group_typing(group_typing_detail_data: GroupTypingDetailData) -> ExternResult<()> {
+    return indicate_group_typing_handler(group_typing_detail_data);
+}
+
+#[hdk_extern]
 fn get_messages_by_group_by_timestamp(
     group_chat_filter: GroupChatFilter,
 ) -> ExternResult<GroupMessagesOutput> {
     return get_messages_by_group_by_timestamp_handler(group_chat_filter);
-}
-
-#[hdk_extern]
-fn get_files_bytes(file_hashes: Vec<EntryHash>) -> ExternResult<FileBytes> {
-    return get_files_bytes_handler(file_hashes);
-}
-
-#[hdk_extern]
-fn indicate_group_typing(group_typing_detail_data: GroupTypingDetailData) -> ExternResult<()> {
-    return indicate_group_typing_handler(group_typing_detail_data);
 }
 
 #[hdk_extern]
