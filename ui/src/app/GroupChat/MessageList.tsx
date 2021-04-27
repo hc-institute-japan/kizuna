@@ -158,7 +158,15 @@ const MessageList: React.FC<Props> = ({
               type="group"
               showName={true}
               onSeen={(complete) => {
-                if (i === messagesData!.length - 1) {
+                // TODO: This is only a temporary fix. The HashType should be changed to Agent in the hc side when ReadList is constrcuted
+                // to avoid doing something like this in UI.
+                let read: boolean = Object.keys(message.readList).map((key: string) => {
+                  key = key.slice(5)
+                  return key;
+                }).includes(myAgentId.slice(4));
+
+                if (i === messagesData!.length - 1 && !read) {
+                  console.log("this should only get triggered once.")
                   let groupMessageReadData: GroupMessageReadData = {
                     groupId: base64ToUint8Array(groupId),
                     messageIds: [base64ToUint8Array(message.groupMessageEntryHash)],
