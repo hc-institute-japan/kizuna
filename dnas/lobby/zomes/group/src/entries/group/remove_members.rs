@@ -1,6 +1,6 @@
 use hdk::prelude::*;
 
-use super::{Group, GroupOutput, UpdateMembersIO};
+use super::{Group, UpdateMembersIO};
 
 use super::group_helpers::get_group_latest_version;
 use crate::utils::error;
@@ -19,15 +19,15 @@ pub fn remove_members_handler(
     }
 
     // get most recent Group Entry
-    let latest_group_version: GroupOutput = get_group_latest_version(group_id.clone())?;
-    let mut group_members: Vec<AgentPubKey> = latest_group_version.members;
+    let latest_group_version: Group = get_group_latest_version(group_id.clone())?;
+    let mut group_members: Vec<AgentPubKey> = latest_group_version.get_group_members();
 
     // remove the members for the group members list
     group_members.retain(|member| !members_to_remove.contains(&member));
 
     // update_entry the Group with new members field using the  original HeaderHash
     let creator: AgentPubKey = agent_info()?.agent_latest_pubkey;
-    let group_name: String = latest_group_version.latest_name;
+    let group_name: String = latest_group_version.name;
     let created: Timestamp = to_timestamp(sys_time()?);
 
     let updated_group: Group = Group::new(group_name, created, creator, group_members.clone());
