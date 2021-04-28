@@ -30,9 +30,10 @@ import styles from "./style.module.css";
 interface Props {
   src: string;
   open: [boolean, React.Dispatch<SetStateAction<boolean>>];
+  download?(): any;
 }
 
-const VideoPlayerModal: React.FC<Props> = ({ open, src }) => {
+const VideoPlayerModal: React.FC<Props> = ({ open, src, download }) => {
   const [isOpen, setIsOpen] = open;
   const [popover, setPopover] = useState({ isOpen: false, event: undefined });
   const footer = useRef<HTMLIonToolbarElement>(null);
@@ -157,9 +158,16 @@ const VideoPlayerModal: React.FC<Props> = ({ open, src }) => {
           onDidDismiss={() => setPopover({ isOpen: false, event: undefined })}
         >
           <IonList>
-            <IonItem onClick={() => {}}>
-              <IonLabel>Download</IonLabel>
-            </IonItem>
+            {download ? (
+              <IonItem
+                onClick={() => {
+                  download();
+                  setPopover({ isOpen: false, event: undefined });
+                }}
+              >
+                <IonLabel>Download</IonLabel>
+              </IonItem>
+            ) : null}
           </IonList>
         </IonPopover>
       </IonPage>

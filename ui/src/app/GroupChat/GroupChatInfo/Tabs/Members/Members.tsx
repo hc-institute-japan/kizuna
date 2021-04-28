@@ -53,18 +53,18 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
     // display error when non-admin members are trying to remove members
     if (myAgentId !== groupData.creator) {
       setLoading(false);
-      setErrMsg(intl.formatMessage(
-        { id: "app.groups.non-admin-cannot-remove" },
-      ));
+      setErrMsg(
+        intl.formatMessage({ id: "app.groups.non-admin-cannot-remove" })
+      );
       setToast(true);
-      return null
+      return null;
     }
 
     if (groupData.members.length <= 2) {
       setLoading(false);
-      setErrMsg(intl.formatMessage(
-        { id: "app.groups.minimum-member-required-reached" },
-      ));
+      setErrMsg(
+        intl.formatMessage({ id: "app.groups.minimum-member-required-reached" })
+      );
       setToast(true);
       return null;
     }
@@ -90,15 +90,15 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
   useEffect(() => {
     let membersProfile: Profile[] = [];
     let members = [...groupData.members, groupData.creator];
-    console.log("here are the groupMembers", groupMembers);
+    // console.log("here are the groupMembers", groupMembers);
 
     // We have to account for creator and members here
     members.forEach((member: string) => {
       if (groupMembers[member]) membersProfile.push(groupMembers[member]);
     });
 
-    console.log("here are the membersProfile", membersProfile);
-    console.log("here are the members", members);
+    // console.log("here are the membersProfile", membersProfile);
+    // console.log("here are the members", members);
 
     setMembers(membersProfile);
     setLoading(false);
@@ -113,15 +113,20 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
             <IonLabel>{members.length + " members"}</IonLabel>
           </IonItem>
 
-          {(myAgentId === groupData.creator) ? (<IonItem
-            lines="none"
-            button
-            onClick={() => setIsOpen(true)}
-            key={"add-members-button"}
-          >
-            <IonIcon className={styles.icon} icon={personAddOutline}></IonIcon>
-            <IonLabel>Add Members</IonLabel>
-          </IonItem>) : null}
+          {myAgentId === groupData.creator ? (
+            <IonItem
+              lines="none"
+              button
+              onClick={() => setIsOpen(true)}
+              key={"add-members-button"}
+            >
+              <IonIcon
+                className={styles.icon}
+                icon={personAddOutline}
+              ></IonIcon>
+              <IonLabel>Add Members</IonLabel>
+            </IonItem>
+          ) : null}
 
           <IonItem
             lines="none"
@@ -133,7 +138,7 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
 
           {/* This is for members and admin*/}
           {members.map((member: any) => {
-            console.log(members)
+            // console.log(members);
             return member.id !== groupData.creator ? (
               <React.Fragment key={member.id}>
                 <IonItemSliding>
@@ -168,7 +173,7 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
                   </IonLabel>
                 </IonItem>
               </IonItemSliding>
-            ) ;
+            );
           })}
         </IonList>
 
@@ -185,7 +190,11 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
           myAgentId={myAgentId}
         />
 
-        <RemoveMemberToast toast={toast} onDismiss={() => setToast(false)} message={errMsg}/>
+        <RemoveMemberToast
+          toast={toast}
+          onDismiss={() => setToast(false)}
+          message={errMsg}
+        />
       </IonContent>
     </IonSlide>
   ) : (

@@ -265,9 +265,9 @@ const Playground = () => {
       </IonHeader>
       <IonContent>
         <ChatList ref={chatList} type="group" onScrollTop={(complete, e) => {}}>
-          {data.map((data, index) => {
-            if (data.author === username) return <Me key={index} {...data} />;
-            return <Others key={index} {...data} />;
+          {data.map((item, index) => {
+            if (item.author === username) return <Me key={index} {...item} />;
+            return <Others onSeen={(complete) => {}} key={index} {...item} />;
           })}
         </ChatList>
       </IonContent>

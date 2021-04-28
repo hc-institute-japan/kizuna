@@ -2,11 +2,23 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 import { RootState } from "../../redux/types";
-import { GroupMessage, GroupMessagesContents, GroupMessagesOutput } from "../../redux/group/types";
+import {
+  GroupMessage,
+  GroupMessagesContents,
+  GroupMessagesOutput,
+} from "../../redux/group/types";
 import Chat from "../../components/Chat";
 import { ChatListMethods } from "../../components/Chat/types";
-import { base64ToUint8Array, useAppDispatch } from "../../utils/helpers";
-import { getNextBatchGroupMessages } from "../../redux/group/actions";
+import {
+  base64ToUint8Array,
+  isTextPayload,
+  useAppDispatch,
+} from "../../utils/helpers";
+import {
+  fetchFilesBytes,
+  getNextBatchGroupMessages,
+} from "../../redux/group/actions";
+import { FilePayload } from "../../redux/commons/types";
 interface Props {
   messageIds: string[];
   members: string[];
@@ -22,7 +34,7 @@ const MessageList: React.FC<Props> = ({
   myAgentId,
   chatList,
   groupId,
-  setToast
+  setToast,
 }) => {
   const dispatch = useAppDispatch();
 
@@ -41,10 +53,25 @@ const MessageList: React.FC<Props> = ({
       ? uniqueArray.map((messageId) => {
           let message: GroupMessage = allMessages[messageId];
 
+          let payload = message.payload;
+
+          if (!isTextPayload(payload)) {
+            payload = payload as FilePayload;
+
+            if (state.groups.groupFiles["u" + payload.fileHash]) {
+              payload = {
+                ...payload,
+                fileHash: payload.fileHash,
+              };
+            } else {
+              dispatch(fetchFilesBytes([base64ToUint8Array(payload.fileHash)]));
+            }
+          }
           if (message) {
             const authorProfile = allMembers[message.author];
             return {
               ...message,
+              payload,
               author: authorProfile
                 ? authorProfile
                 : // if profile was not found from allMembers, then the author is self
@@ -70,21 +97,24 @@ const MessageList: React.FC<Props> = ({
   const handleOnScrollTop = (complete: any) => {
     if (messagesData?.length) {
       let lastMessage = messagesData![0];
-      console.log("here is the last message", oldestMessage)
+      // console.log("here is the last message", oldestMessage);
       dispatch(
         getNextBatchGroupMessages({
           groupId: base64ToUint8Array(groupId),
           // the entry hash of the last message in the last batch fetched
-          lastFetched: oldestMessage ? base64ToUint8Array(oldestMessage.groupMessageEntryHash) : base64ToUint8Array(lastMessage.groupMessageEntryHash),
+          lastFetched: oldestMessage
+            ? base64ToUint8Array(oldestMessage.groupMessageEntryHash)
+            : base64ToUint8Array(lastMessage.groupMessageEntryHash),
           // 0 - seconds since epoch, 1 - nanoseconds. See Timestamp type in hdk doc for more info.
           lastMessageTimestamp: lastMessage.timestamp,
           batchSize: 10,
-          payloadType: { type: "ALL", payload: null }
+          payloadType: { type: "ALL", payload: null },
         })
       ).then((res: GroupMessagesOutput) => {
         if (Object.keys(res.groupMessagesContents).length !== 0) {
-          let groupMesssageContents: GroupMessagesContents = res.groupMessagesContents;
-          console.log("here are the new messages", res)
+          let groupMesssageContents: GroupMessagesContents =
+            res.groupMessagesContents;
+          // console.log("here are the new messages", res);
           const fetchedMessages: (any | undefined)[] = [];
           Object.keys(groupMesssageContents).forEach((key: any) => {
             const authorProfile = allMembers[groupMesssageContents[key].author];
@@ -100,27 +130,31 @@ const MessageList: React.FC<Props> = ({
                   },
             });
           });
-          let newMessages = [...messages, ...fetchedMessages]
+          let newMessages = [...messages, ...fetchedMessages];
           newMessages.sort((x, y) => {
             return x.timestamp.valueOf()[0] - y.timestamp.valueOf()[0];
           });
-          let newOldestMessage = res.groupMessagesContents[res.messagesByGroup[groupId][res.messagesByGroup[groupId].length - 1]]
+          let newOldestMessage =
+            res.groupMessagesContents[
+              res.messagesByGroup[groupId][
+                res.messagesByGroup[groupId].length - 1
+              ]
+            ];
           setOldestMessage(newOldestMessage);
           setMessages(newMessages);
         } else {
           setToast(true);
         }
-      })
+      });
     }
 
-
-    complete()
+    complete();
     return null;
   };
 
   useEffect(() => {
     setMessages(messagesData!);
-  }, [messageIds])
+  }, [messageIds]);
 
   return (
     <Chat.ChatList
@@ -153,7 +187,9 @@ const MessageList: React.FC<Props> = ({
             showName={true}
             onSeen={(complete) => {
               if (i === messagesData!.length - 1) {
-                complete();
+                setTimeout(function () {
+                  complete();
+                }, 5000);
               }
             }}
             showProfilePicture={true}

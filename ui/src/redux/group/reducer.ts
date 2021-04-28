@@ -13,6 +13,7 @@ import {
   SET_LATEST_GROUP_STATE,
   GroupMessagesOutput,
   SET_LATEST_GROUP_VERSION,
+  SET_FILES_BYTES,
 } from "./types";
 import { isTextPayload } from "../commons/types";
 import { Profile } from "../profile/types";
@@ -29,6 +30,11 @@ const reducer = (
   action: GroupConversationsActionTypes
 ) => {
   switch (action.type) {
+    case SET_FILES_BYTES:
+      return {
+        ...state,
+        groupFiles: action.filesBytes,
+      };
     case ADD_GROUP: {
       let groupEntryHash: string = action.groupData.originalGroupEntryHash;
       let newConversation: { [key: string]: GroupConversation } = {
@@ -133,7 +139,7 @@ const reducer = (
       let groupConversation: GroupConversation =
         groupConversations[action.groupId];
       // we probably won't have any duplicates of hash but just in case we do we dedupe here
-      console.log(groupConversation.messages);
+      // console.log(groupConversation.messages);
 
       groupConversation.messages = groupConversation.messages
         ? Array.from(
@@ -153,8 +159,8 @@ const reducer = (
         ...messages,
         ...action.groupMessagesOutput.groupMessagesContents,
       };
-      console.log(groupConversation.messages);
-      console.log(messages);
+      // console.log(groupConversation.messages);
+      // console.log(messages);
       return { ...state, messages, conversations: groupConversations };
     }
     case SET_LATEST_GROUP_STATE: {

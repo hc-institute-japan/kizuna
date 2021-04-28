@@ -9,14 +9,16 @@ interface Props {
   type?: string;
   height?: number;
   width?: number;
+  download?(): any;
 }
 
 const VideoPlayer: React.FC<Props> = ({
   src,
   className,
-  type,
+  // type,
   height,
   width,
+  download,
 }) => {
   const style = [styles["video-player"]];
   if (className) style.push(className);
@@ -49,9 +51,10 @@ const VideoPlayer: React.FC<Props> = ({
         ref={video}
         controls={false}
         loop={false}
-        autoPlay={true}
+        autoPlay={false}
+        src={src}
       >
-        <source src={src} {...(type ? { type } : {})} />
+        {/* <source src={src} {...(type ? { type } : {})} /> */}
       </video>
 
       {video.current ? (
@@ -62,7 +65,11 @@ const VideoPlayer: React.FC<Props> = ({
           modal={[isModalOpen, setIsModalOpen]}
         />
       ) : null}
-      <VideoPlayerModal src={src} open={[isModalOpen, setIsModalOpen]} />
+      <VideoPlayerModal
+        download={download}
+        src={src}
+        open={[isModalOpen, setIsModalOpen]}
+      />
     </div>
   );
 };

@@ -17,6 +17,7 @@ export const SET_MESSAGES_BY_GROUP_BY_TIMESTAMP =
   "SET_MESSAGES_BY_GROUP_BY_TIMESTAMP";
 export const SET_LATEST_GROUP_STATE = "SET_LATEST_GROUP_STATE";
 export const SET_LATEST_GROUP_VERSION = "SET_LATEST_GROUP_VERSION";
+export const SET_FILES_BYTES = "SET_FILES_BYTES";
 
 // type declarations
 type GroupMessageID = string; // Group Message EntryHash in base64 string
@@ -241,6 +242,13 @@ export interface SetLatestGroupVersionAction {
   };
 }
 
+export interface SetFilesBytes {
+  type: typeof SET_FILES_BYTES;
+  filesBytes: {
+    [key: string]: Uint8Array;
+  };
+}
+
 export type GroupConversationsActionTypes =
   | AddGroupAction
   | AddGroupMembersAction
@@ -250,4 +258,5 @@ export type GroupConversationsActionTypes =
   | SetNextBatchGroupMessagesAction
   | SetMessagesByGroupByTimestampAction
   | SetLatestGroupState
-  | SetLatestGroupVersionAction;
+  | SetLatestGroupVersionAction
+  | SetFilesBytes;

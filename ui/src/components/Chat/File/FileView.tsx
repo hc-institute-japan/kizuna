@@ -1,7 +1,9 @@
 import { IonGrid, IonIcon, IonLabel, IonRow, IonText } from "@ionic/react";
 import { documentOutline } from "ionicons/icons";
 import React from "react";
+import { useSelector } from "react-redux";
 import { FilePayload } from "../../../redux/commons/types";
+import { RootState } from "../../../redux/types";
 import { base64ToUint8Array } from "../../../utils/helpers";
 import styles from "./style.module.css";
 
@@ -11,8 +13,11 @@ interface Props {
 
 const File: React.FC<Props> = ({ file }) => {
   const { fileName, fileSize } = file;
+  const fileBytes = useSelector(
+    (state: RootState) => state.groups.groupFiles[`u${file.fileHash}`]
+  );
   const handleOnClick = () => {
-    const blob = new Blob([base64ToUint8Array(file.fileHash)]); // change resultByte to bytes
+    const blob = new Blob([fileBytes]); // change resultByte to bytes
 
     const link = document.createElement("a");
     link.href = window.URL.createObjectURL(blob);

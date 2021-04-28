@@ -11,36 +11,37 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import React, { useState, useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
-import { useHistory, useParams } from "react-router";
-import {
-  sendGroupMessage,
-  getLatestGroupVersion,
-} from "../../redux/group/actions";
-import {
-  GroupConversation,
-  GroupMessageInput,
-  GroupMessage,
-} from "../../redux/group/types";
-import { RootState } from "../../redux/types";
-import { FilePayloadInput } from "../../redux/commons/types";
-import MessageList from "./MessageList";
-import OldestFetchedToast from "./OldestFetchedToast"
-import {
-  base64ToUint8Array,
-  Uint8ArrayToBase64,
-  useAppDispatch,
-} from "../../utils/helpers";
-import { fetchId } from "../../redux/profile/actions";
-
-import MessageInput from "../../components/MessageInput";
 import {
   arrowBackSharp,
   informationCircleOutline,
   peopleCircleOutline,
 } from "ionicons/icons";
+import React, { useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import { useHistory, useParams } from "react-router";
 import { ChatListMethods } from "../../components/Chat/types";
+import MessageInput from "../../components/MessageInput";
+import { FilePayloadInput } from "../../redux/commons/types";
+import {
+  getLatestGroupVersion,
+  sendGroupMessage,
+} from "../../redux/group/actions";
+import {
+  GroupConversation,
+  GroupMessage,
+  GroupMessageInput,
+} from "../../redux/group/types";
+import { fetchId } from "../../redux/profile/actions";
+import { RootState } from "../../redux/types";
+
+import MessageList from "./MessageList";
+import OldestFetchedToast from "./OldestFetchedToast";
+import {
+  base64ToUint8Array,
+  Uint8ArrayToBase64,
+  useAppDispatch,
+} from "../../utils/helpers";
+
 import styles from "./style.module.css";
 
 interface GroupChatParams {
@@ -117,7 +118,7 @@ const GroupChat: React.FC = () => {
         setMessages([...messages, msg.groupMessageEntryHash]);
       });
       // TODO: bring this back
-      chatList.current!.scrollToBottom();
+      chatList.current?.scrollToBottom();
     });
   };
 
@@ -215,7 +216,7 @@ const GroupChat: React.FC = () => {
         onChange={(message) => setMessage(message)}
         onFileSelect={(files) => setFiles(files)}
       />
-    <OldestFetchedToast toast={toast} onDismiss={() => setToast(false)} />
+      <OldestFetchedToast toast={toast} onDismiss={() => setToast(false)} />
     </IonPage>
   ) : (
     <IonLoading isOpen={loading} />

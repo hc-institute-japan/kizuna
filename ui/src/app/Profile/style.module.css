@@ -33,3 +33,30 @@
   --background: var(--ion-item-background) !important;
   cursor: pointer;
 }
+
+.content {
+  display: flex;
+
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.content p {
+  font-size: 2rem;
+  font-weight: lighter;
+}
+
+.content-icon {
+  padding-right: 1.5rem;
+  font-size: 2.5rem;
+}
+
+@media only screen and (max-width: 768px) {
+  .content {
+    flex-direction: column;
+  }
+  .content-icon {
+    font-size: 4rem;
+  }
+}

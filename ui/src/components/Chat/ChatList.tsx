@@ -98,7 +98,7 @@ const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
   useEffect(() => {
     if (scroll.current) {
       setTimeout(() => {
-        scroll.current!.scrollIntoView({ behavior: "smooth" });
+        scroll.current?.scrollIntoView({ behavior: "smooth" });
       }, 100);
     }
   }, [scroll]);
@@ -107,7 +107,7 @@ const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
 
   useImperativeHandle(ref, () => ({
     scrollToBottom: () => {
-      scroll.current!.scrollIntoView({ behavior: "smooth" });
+      scroll.current?.scrollIntoView({ behavior: "smooth" });
     },
   }));
 
