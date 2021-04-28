@@ -25,6 +25,8 @@ import { FilePayloadInput } from "../../redux/commons/types";
 import {
   getLatestGroupVersion,
   sendGroupMessage,
+  getLatestGroupVersion,
+  indicateGroupTyping,
 } from "../../redux/group/actions";
 import {
   GroupConversation,
@@ -35,7 +37,6 @@ import { fetchId } from "../../redux/profile/actions";
 import { RootState } from "../../redux/types";
 
 import MessageList from "./MessageList";
-import OldestFetchedToast from "./OldestFetchedToast";
 import {
   base64ToUint8Array,
   Uint8ArrayToBase64,
@@ -43,6 +44,8 @@ import {
 } from "../../utils/helpers";
 
 import styles from "./style.module.css";
+import Typing from "../../components/Chat/Typing";
+import { useIntl } from "react-intl";
 
 interface GroupChatParams {
   group: string;
@@ -51,6 +54,7 @@ interface GroupChatParams {
 const GroupChat: React.FC = () => {
   const history = useHistory();
   const dispatch = useAppDispatch();
+  const intl = useIntl();
   const { group } = useParams<GroupChatParams>();
   const chatList = useRef<ChatListMethods>(null);
 
@@ -58,9 +62,9 @@ const GroupChat: React.FC = () => {
   const [myAgentId, setMyAgentId] = useState<string>("");
   const [files, setFiles] = useState<object[]>([]);
   const [groupInfo, setGroupInfo] = useState<GroupConversation | undefined>();
-  const [toast, setToast] = useState<boolean>(false);
   const [messages, setMessages] = useState<string[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [sendingLoading, setSendingLoading] = useState<boolean>(false);
   const [message, setMessage] = useState("");
 
   // Selectors
@@ -68,10 +72,13 @@ const GroupChat: React.FC = () => {
     (state: RootState) => state.groups.conversations[group]
   );
 
+  const typing = useSelector((state: RootState) => state.groups.typing);
+
   // Handlers
   const handleOnSend = () => {
     let inputs: GroupMessageInput[] = [];
     if (files.length) {
+      setSendingLoading(true);
       files.forEach((file: any) => {
         let filePayloadInput: FilePayloadInput = {
           type: "FILE",
@@ -115,10 +122,11 @@ const GroupChat: React.FC = () => {
 
     Promise.all(messagePromises).then((sentMessages: GroupMessage[]) => {
       sentMessages.forEach((msg: GroupMessage, i) => {
-        setMessages([...messages, msg.groupMessageEntryHash]);
+        setMessages([...messages!, msg.groupMessageEntryHash]);
       });
-      // TODO: bring this back
-      chatList.current?.scrollToBottom();
+      setSendingLoading(false);
+      chatList.current!.scrollToBottom();
+
     });
   };
 
@@ -128,7 +136,6 @@ const GroupChat: React.FC = () => {
     });
   };
 
-  // useEffects
   useEffect(() => {
     // setLoading(true);
     dispatch(fetchId()).then((res: AgentPubKey | null) => {
@@ -147,18 +154,27 @@ const GroupChat: React.FC = () => {
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
-    groupData
-      ? groupData.messages
-        ? setMessages(groupData.messages)
-        : setMessages([])
-      : setMessages([]);
   }, [groupData]);
 
-  return !loading && groupInfo ? (
+  useEffect(() => {
+    setLoading(true)
+    if (groupData) {
+      setMessages([...messages!, ...groupData.messages])
+      setLoading(false);
+    } else {
+      dispatch(getLatestGroupVersion(group)).then((res: GroupConversation) => {
+        setMessages([...messages!, ...res.messages])
+        setLoading(false);
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupData]);
+
+  return !loading && groupInfo && messages ? (
     <IonPage>
+      <IonLoading isOpen={sendingLoading} message={intl.formatMessage({
+        id: "app.groups.sending"
+      })}/>
       <IonHeader>
         <IonToolbar>
           <IonButtons>
@@ -177,6 +193,7 @@ const GroupChat: React.FC = () => {
                   <img
                     className={styles.avatar}
                     src={peopleCircleOutline}
+                    color="white"
                     alt={groupInfo!.name}
                   />
                 )
@@ -199,7 +216,6 @@ const GroupChat: React.FC = () => {
       <IonContent>
         {groupData ? (
           <MessageList
-            setToast={setToast}
             groupId={groupInfo.originalGroupEntryHash}
             myAgentId={myAgentId}
             members={groupInfo!.members}
@@ -211,12 +227,33 @@ const GroupChat: React.FC = () => {
         )}
       </IonContent>
 
+      <Typing profiles={typing[groupInfo.originalGroupEntryHash] ? typing[groupInfo.originalGroupEntryHash] : []}/>
       <MessageInput
         onSend={handleOnSend}
-        onChange={(message) => setMessage(message)}
+        onChange={(message) => {
+          if (message.length !== 0) {
+            dispatch(indicateGroupTyping({
+              groupId: base64ToUint8Array(groupInfo.originalGroupEntryHash),
+              indicatedBy: Buffer.from(base64ToUint8Array(myAgentId).buffer),
+              members: [...groupInfo.members.map(member => 
+                Buffer.from(base64ToUint8Array(member).buffer)
+              ), Buffer.from(base64ToUint8Array(groupInfo.creator).buffer)],
+              isTyping: true
+            }))
+          } else {
+            dispatch(indicateGroupTyping({
+              groupId: base64ToUint8Array(groupInfo.originalGroupEntryHash),
+              indicatedBy: Buffer.from(base64ToUint8Array(myAgentId).buffer),
+              members: [...groupInfo.members.map(member => 
+                Buffer.from(base64ToUint8Array(member).buffer)
+              ), Buffer.from(base64ToUint8Array(groupInfo.creator).buffer)],
+              isTyping: false
+            }))
+          }
+          return setMessage(message)
+        }}
         onFileSelect={(files) => setFiles(files)}
       />
-      <OldestFetchedToast toast={toast} onDismiss={() => setToast(false)} />
     </IonPage>
   ) : (
     <IonLoading isOpen={loading} />

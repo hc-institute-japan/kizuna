@@ -13,6 +13,8 @@ import {
   SET_LATEST_GROUP_STATE,
   GroupMessagesOutput,
   SET_LATEST_GROUP_VERSION,
+  SET_GROUP_TYPING_INDICATOR,
+  SET_GROUP_READ_MESSAGE,
   SET_FILES_BYTES,
 } from "./types";
 import { isTextPayload } from "../commons/types";
@@ -23,6 +25,7 @@ const initialState: GroupConversationsState = {
   messages: {},
   groupFiles: {},
   members: {},
+  typing: {},
 };
 
 const reducer = (
@@ -139,7 +142,6 @@ const reducer = (
       let groupConversation: GroupConversation =
         groupConversations[action.groupId];
       // we probably won't have any duplicates of hash but just in case we do we dedupe here
-      // console.log(groupConversation.messages);
 
       groupConversation.messages = groupConversation.messages
         ? Array.from(
@@ -159,8 +161,6 @@ const reducer = (
         ...messages,
         ...action.groupMessagesOutput.groupMessagesContents,
       };
-      // console.log(groupConversation.messages);
-      // console.log(messages);
       return { ...state, messages, conversations: groupConversations };
     }
     case SET_LATEST_GROUP_STATE: {
@@ -204,6 +204,41 @@ const reducer = (
       });
 
       return { ...state, conversations: groupConversations, members, messages };
+    }
+    case SET_GROUP_TYPING_INDICATOR: {
+      let typing = state.typing;
+      let groupTyping = typing[action.GroupTyingIndicator.groupId]
+        ? typing[action.GroupTyingIndicator.groupId]
+        : [];
+      let userNames = groupTyping.map((profile: Profile) => profile.id);
+      if (action.GroupTyingIndicator.isTyping) {
+        if (!userNames.includes(action.GroupTyingIndicator.indicatedBy.id)) {
+          groupTyping.push(action.GroupTyingIndicator.indicatedBy);
+        }
+      } else {
+        groupTyping = groupTyping.filter((profile) => {
+          return profile.id !== action.GroupTyingIndicator.indicatedBy.id;
+        });
+      }
+      typing = { ...typing, [action.GroupTyingIndicator.groupId]: groupTyping };
+      return { ...state, typing };
+    }
+    case SET_GROUP_READ_MESSAGE: {
+      let reader = action.GroupReadMessage.reader;
+      let messageIds = action.GroupReadMessage.messageIds;
+      let timestamp = action.GroupReadMessage.timestamp;
+
+      let messages = state.messages;
+
+      messageIds.forEach((messageId: string) => {
+        let groupMessage = messages[messageId];
+        groupMessage.readList = {
+          ...groupMessage.readList,
+          [reader]: new Date(timestamp[0] * 1000),
+        };
+      });
+
+      return { ...state, messages };
     }
     default:
       return state;

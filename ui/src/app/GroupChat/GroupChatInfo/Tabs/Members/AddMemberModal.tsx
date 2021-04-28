@@ -8,6 +8,7 @@ import { Profile, ProfileListType } from "../../../../../redux/profile/types";
 import { addGroupMembers } from "../../../../../redux/group/actions";
 import { IonButton, IonButtons, IonContent, IonLabel, IonList, IonModal, IonToolbar } from "@ionic/react";
 import React, { useState } from "react";
+import { useIntl } from "react-intl";
 
 interface Props {
   isOpen: boolean;
@@ -23,6 +24,7 @@ interface Props {
 }
 
 const AddContactModal: React.FC<Props> = ({ isOpen, setIsOpen, onCancel, contacts, groupId, groupRevisionId, setLoading, myAgentId, members, setMembers }) => {
+  const intl = useIntl();
   const dispatch = useAppDispatch();
   const [filter, setFilter] = useState<string>("");
   const [toast, setToast] = useState<string | null>(null);
@@ -109,7 +111,7 @@ const AddContactModal: React.FC<Props> = ({ isOpen, setIsOpen, onCancel, contact
           <IonToolbar>
             <IonButtons slot="end">
               <IonButton disabled={selected.length === 0} onClick={() => onAdded()}>
-                <IonLabel className={styles["add-label"]}>Add</IonLabel>
+                <IonLabel className={styles["add-label"]}>{intl.formatMessage({id: "app.groups.add-member"})}</IonLabel>
               </IonButton>
             </IonButtons>
           </IonToolbar>

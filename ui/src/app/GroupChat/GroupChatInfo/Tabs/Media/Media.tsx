@@ -1,16 +1,5 @@
-import {
-  IonContent,
-  IonGrid,
-  IonIcon,
-  IonInfiniteScroll,
-  IonInfiniteScrollContent,
-  IonLabel,
-  IonLoading,
-  IonRow,
-  IonSlide,
-  IonText,
-} from "@ionic/react";
-import React, { useEffect, useRef, useState } from "react";
+import { IonContent, IonGrid, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonLabel, IonLoading, IonRow, IonText } from "@ionic/react";
+import React, {useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import {
   FilePayload,
@@ -31,24 +20,45 @@ import {
 import MediaIndex from "./MediaIndex";
 import styles from "../../style.module.css";
 import { sadOutline } from "ionicons/icons";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../../../redux/types";
 
 interface Props {
   groupId: string;
-  fileMessages: GroupMessage[];
 }
 
-const Media: React.FC<Props> = ({ groupId, fileMessages }) => {
-  const [loading, setLoading] = useState<boolean>(true);
-  const [fetchLoading, setFetchLoading] = useState<boolean>(false);
-
+const Media: React.FC<Props> = ({ groupId }) => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
   const infiniteFileScroll = useRef<HTMLIonInfiniteScrollElement>(null);
-  const complete = () => infiniteFileScroll.current!.complete();
 
+
+  const [loading, setLoading] = useState<boolean>(true);
+  const [oldestFetched, setOldestFetched] = useState<boolean>(false);
+  const [fetchLoading, setFetchLoading] = useState<boolean>(false);
   const [indexedFileMessages, setIndexedFileMessages] = useState<{
     [key: string]: GroupMessage[];
   }>({});
+  const [fileMessages, setFileMessages] = useState<GroupMessage[]>([]);
+
+  // USE SELECTORS
+  const groupMediaMessages: GroupMessage[] = useSelector((state: RootState) => {
+    // eslint-disable-next-line array-callback-return
+    let groupMessages = state.groups.conversations[groupId].messages.map((key: string) => {
+      let messageContent: GroupMessage = state.groups.messages[key];
+      let payload: FilePayload | null = isTextPayload(messageContent.payload) ? null : (messageContent.payload.fileType === "IMAGE" || messageContent.payload.fileType === "VIDEO") ? messageContent.payload : null;
+      if (payload) {
+        return messageContent;
+      }
+    }).flatMap(
+      (x: GroupMessage | undefined) => (x ? [x] : [])
+    );
+    return groupMessages
+  });
+
+
+
+  const complete = () => infiniteFileScroll.current!.complete();
 
   const indexMedia: (
     fileMessages: GroupMessage[]
@@ -89,6 +99,10 @@ const Media: React.FC<Props> = ({ groupId, fileMessages }) => {
         }
       });
     }
+    Object.keys(indexedFiles).forEach((month: string) => {
+      let uniqueMessages: GroupMessage[] = [...new Set(indexedFiles[month])];
+      indexedFiles[month] = uniqueMessages
+    })
     return indexedFiles;
   };
 
@@ -97,56 +111,54 @@ const Media: React.FC<Props> = ({ groupId, fileMessages }) => {
     files: GroupMessage[]
   ) => {
     setFetchLoading(true);
-    // console.log("Details scrolls");
-    // var lastFile: P2PMessage = Object.values(files)[Object.entries(files).length - 1];
-    var lastFile: GroupMessage = files[files.length - 1];
-    // console.log("Details last file", lastFile);
+    let lastFile: GroupMessage = files[files.length - 1];
     dispatch(
       getNextBatchGroupMessages({
         groupId: base64ToUint8Array(groupId),
         batchSize: 4,
-        payloadType: { type: "FILE", payload: null },
-        lastMessageTimestamp:
-          lastFile !== undefined ? lastFile.timestamp : undefined,
-        lastFetched:
-          lastFile !== undefined
-            ? Buffer.from(base64ToUint8Array(lastFile.groupMessageEntryHash))
-            : undefined,
+        payloadType: { type: "MEDIA", payload: null },
+        lastMessageTimestamp: lastFile !== undefined ? lastFile.timestamp : undefined,
+        lastFetched: lastFile !== undefined ? Buffer.from(base64ToUint8Array(lastFile.groupMessageEntryHash)) : undefined
       })
     ).then((res: GroupMessagesOutput) => {
-      // console.log("here are the new files", res);
-      let newFiles = Object.keys(res.groupMessagesContents).map(
-        (key: string) => {
+      if (Object.keys(res.groupMessagesContents).length !== 0) {
+        let newFiles = Object.keys(res.groupMessagesContents).map((key: string) => {
           let message: GroupMessage = res.groupMessagesContents[key];
-          return message;
-        }
-      );
-      const indexedMedia: {
-        [key: string]: GroupMessage[];
-      } = indexMedia(newFiles);
-      setIndexedFileMessages(indexedMedia);
-      setFetchLoading(false);
+          return message
+        });
+        setFileMessages([...fileMessages, ...newFiles])
+        const indexedMedia: {
+          [key: string]: GroupMessage[];
+        } = indexMedia(newFiles);
+        setIndexedFileMessages(indexedMedia);
+        setFetchLoading(false)
+      } else {
+        setOldestFetched(true);
+        setFetchLoading(false);
+      }
     });
     complete();
     return;
   };
 
   useEffect(() => {
-    if (fileMessages) {
+    setLoading(true)
+    if (groupMediaMessages.length >= 10) {
+      setFileMessages([...fileMessages, ...groupMediaMessages]);
       const indexedMedia: {
         [key: string]: GroupMessage[];
-      } = indexMedia(fileMessages);
+      } = indexMedia(groupMediaMessages);
       setIndexedFileMessages(indexedMedia);
       setLoading(false);
     } else {
       let filter: GroupMessageBatchFetchFilter = {
         groupId: base64ToUint8Array(groupId),
-        batchSize: 4,
-        payloadType: { type: "FILE", payload: null },
+        batchSize: 20,
+        payloadType: { type: "MEDIA", payload: null },
       };
       dispatch(getNextBatchGroupMessages(filter)).then(
         (res: GroupMessagesOutput) => {
-          let fileMessages: (GroupMessage | undefined)[] = Object.keys(
+          let maybeFileMessages: (GroupMessage | undefined)[] = Object.keys(
             res.groupMessagesContents
           ).map((key: any) => {
             if (!isTextPayload(res.groupMessagesContents[key].payload)) {
@@ -156,11 +168,13 @@ const Media: React.FC<Props> = ({ groupId, fileMessages }) => {
               return undefined;
             }
           });
-
-          let fileMessagesCleaned = fileMessages.flatMap(
+  
+          let fileMessagesCleaned = maybeFileMessages.flatMap(
             (x: GroupMessage | undefined) => (x ? [x] : [])
           );
-
+  
+          setFileMessages([...fileMessages, ...fileMessagesCleaned])
+  
           const indexedMedia: {
             [key: string]: GroupMessage[];
           } = indexMedia(fileMessagesCleaned);
@@ -178,7 +192,6 @@ const Media: React.FC<Props> = ({ groupId, fileMessages }) => {
         <IonGrid>
           <IonRow>
             {Object.keys(indexedFileMessages).map((month: string) => {
-              // console.log(indexedFileMessages);
               const fileMessages = indexedFileMessages[month];
               let files: FilePayload[] = [];
               fileMessages.forEach((fileMessage: GroupMessage) => {
@@ -202,30 +215,28 @@ const Media: React.FC<Props> = ({ groupId, fileMessages }) => {
           </IonRow>
           <IonRow>
             <IonInfiniteScroll
+              disabled= {oldestFetched ? true: false}
               threshold="10px"
               ref={infiniteFileScroll}
               position="bottom"
               onIonInfinite={(e) => onScrollBottom(complete, fileMessages)}
             >
               <IonInfiniteScrollContent>
-                <IonLoading
-                  isOpen={fetchLoading}
-                  message={"fetching more media..."}
-                />
+                <IonLoading isOpen={fetchLoading} message={intl.formatMessage({id: "app.groups.media.fetching"})}/>
               </IonInfiniteScrollContent>
             </IonInfiniteScroll>
           </IonRow>
         </IonGrid>
       </IonContent>
     ) : (
-      <IonContent className={styles["empty-media"]}>
-        <IonIcon icon={sadOutline} />
-        <IonText className="ion-padding ion-margin-bottom no-media-label">
-          {intl.formatMessage({
-            id: "app.groups.media.no-media",
-          })}
-        </IonText>
-      </IonContent>
+      <div className={styles["empty-media"]}>
+        <IonIcon icon={sadOutline} size={"large"} />
+        <IonLabel className={styles["no-media-label"]}>
+            {intl.formatMessage({
+              id: "app.groups.media.no-media",
+            })}
+        </IonLabel>
+      </div>
     )
   ) : (
     <IonLoading isOpen={loading} />

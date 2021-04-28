@@ -1,4 +1,4 @@
-import { IonLabel } from "@ionic/react";
+import { IonCol } from "@ionic/react";
 import React from "react";
 import { FilePayload } from "../../../../../redux/commons/types";
 import { GroupMessage } from "../../../../../redux/group/types";
@@ -22,8 +22,10 @@ const FileIndex: React.FC<Props> = ({
 }) => {
   return (
     <React.Fragment key={index}>
-      <IonLabel className={styles["month"]}>{index}</IonLabel>
-        {files.map((file) => <FileItem file={file}/>)}
+      <IonCol size="12">
+        <h2 className={styles["month"]}>{index}</h2>
+      </IonCol>
+      {files.map((file) => <FileItem file={file}/>)}
     </React.Fragment>
   );
 };

@@ -1,34 +1,31 @@
+import { AgentPubKey } from "@holochain/conductor-api";
 import {
   IonButton,
   IonButtons,
-  IonContent,
-  IonGrid,
   IonHeader,
   IonIcon,
-  IonLabel,
   IonLoading,
   IonModal,
   IonPage,
-  IonRow,
   IonSegment,
   IonSegmentButton,
-  IonSlide,
-  IonSlides,
   IonText,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
 import { arrowBackSharp } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
+import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router";
 import {
   getLatestGroupVersion,
   updateGroupName,
 } from "../../../redux/group/actions";
-import { GroupConversation, GroupMessage } from "../../../redux/group/types";
+import { GroupConversation } from "../../../redux/group/types";
+import { fetchId } from "../../../redux/profile/actions";
 import { RootState } from "../../../redux/types";
-import { useAppDispatch } from "../../../utils/helpers";
+import { Uint8ArrayToBase64, useAppDispatch } from "../../../utils/helpers";
 import EndButtons from "./EndButtons";
 import styles from "./style.module.css";
 import File from "./Tabs/Files/File";
@@ -41,37 +38,27 @@ interface GroupChatParams {
 }
 
 const GroupChatInfo: React.FC = () => {
-  const slideRef = React.createRef<HTMLIonSlidesElement>();
   const history = useHistory();
+  const intl = useIntl();
   const { group } = useParams<GroupChatParams>();
 
   const groupData = useSelector(
     (state: RootState) => state.groups.conversations[group]
   );
-  const allMessages = useSelector((state: RootState) => state.groups.messages);
 
+  const [myAgentId, setMyAgentId] = useState<string>("");
   const [editGroupName, setEditGroupName] = useState<boolean>(false);
+  const [disabled, setDisabled] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [modalLoading, setModalLoading] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [groupInfo, setGroupInfo] = useState<GroupConversation | undefined>();
 
   const [selected, setSelected] = useState(0);
-  const messages: GroupMessage[] = groupInfo
-    ? groupInfo?.messages.map((key: string) => {
-        let message = allMessages[key];
-        return message;
-      })
-    : [];
-  
-  const slideOpts = {
-    initialSlide: 0,
-    speed: 400
-  };
 
   const tabs = [
     {
-      label: "Info",
+      label: intl.formatMessage({id: "app.groups.label-info"}),
       tab: groupInfo ? (
         <Members
           groupId={group}
@@ -80,12 +67,12 @@ const GroupChatInfo: React.FC = () => {
       ) : null,
     },
     {
-      label: "Media",
-      tab: <Media fileMessages={messages} groupId={group} />,
+      label: intl.formatMessage({id: "app.groups.label-media"}),
+      tab: <Media groupId={group} />,
     },
     {
-      label: "Files",
-      tab: <File fileMessages={messages} groupId={group} />,
+      label: intl.formatMessage({id: "app.groups.label-files"}),
+      tab: <File groupId={group} />,
     },
   ];
 
@@ -102,14 +89,33 @@ const GroupChatInfo: React.FC = () => {
 
   useEffect(() => {
     if (groupData) {
-      dispatch(getLatestGroupVersion(group)).then((res: GroupConversation) => {
-        setGroupInfo(res);
+      dispatch(getLatestGroupVersion(group)).then((groupRes: GroupConversation) => {
+        setGroupInfo(groupRes);
+        dispatch(fetchId()).then((res: AgentPubKey | null) => {
+          if (res) setMyAgentId(Uint8ArrayToBase64(res));
+          if (groupRes.creator !== Uint8ArrayToBase64(res!)) {
+            console.log((groupRes!.creator))
+            console.log((groupRes!.creator !== myAgentId))
+            console.log(myAgentId)
+            
+            setDisabled(true)
+          }
+          console.log(disabled)
+        });
       });
       setLoading(false);
     } else {
-      dispatch(getLatestGroupVersion(group)).then((res: GroupConversation) => {
-        setGroupInfo(res);
-        setLoading(false);
+      dispatch(getLatestGroupVersion(group)).then((groupRes: GroupConversation) => {
+        setGroupInfo(groupRes);
+        dispatch(fetchId()).then((res: AgentPubKey | null) => {
+          if (res) setMyAgentId(Uint8ArrayToBase64(res));
+          if (groupRes.creator !== Uint8ArrayToBase64(res!)) {
+            console.log(groupRes!.creator)
+            console.log(myAgentId)
+            setDisabled(true)
+            setLoading(false);
+          }
+        });
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -130,6 +136,7 @@ const GroupChatInfo: React.FC = () => {
           <EndButtons
             onClickEdit={() => handleOnClickEdit()}
             onClickNotif={() => {}}
+            disabled={disabled}
           />
         </IonToolbar>
         <IonTitle className={styles.groupname}>{groupInfo!.name}</IonTitle>

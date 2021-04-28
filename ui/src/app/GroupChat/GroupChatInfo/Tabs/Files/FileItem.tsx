@@ -1,7 +1,8 @@
-import { IonItem } from "@ionic/react";
+import { IonCard, IonItem } from "@ionic/react";
   import React from "react";
 import { FilePayload } from "../../../../../redux/commons/types";
 import FileView from "./FileView";
+import styles from "../../style.module.css";
   
   interface Props {
     file?: FilePayload;
@@ -11,7 +12,13 @@ import FileView from "./FileView";
     const renderFile = () => {
       switch (file?.fileType) {
         case "OTHER":
-          return <FileView file={file} />;
+          return (
+            <IonItem button　lines="none" key={JSON.stringify(file?.fileHash)}>
+              <IonCard className={styles.filecard}>
+                <FileView file={file} />
+              </IonCard>
+            </IonItem>
+            );
         case "IMAGE":
           return null;
         case "VIDEO":
@@ -20,18 +27,8 @@ import FileView from "./FileView";
           return null;
       }
     };
-    
   
-    // const handleOnClick = () => {
-    //   let selected = onCompletion(contact);
-    //   if (selected) setSelectedItem(selectedItem ? false : true);
-    // };
-  
-    return (
-      <IonItem button　lines="none" key={JSON.stringify(file?.fileHash)} >
-          {renderFile()}
-      </IonItem>
-    );
+    return (renderFile());
   };
   
   export default FileItem;

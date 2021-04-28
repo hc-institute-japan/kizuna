@@ -26,6 +26,7 @@ export type FileType =
 export type FetchPayloadType =
   | { type: "TEXT"; payload: null }
   | { type: "FILE"; payload: null }
+  | { type: "MEDIA"; payload: null }
   | { type: "ALL"; payload: null };
 
 export interface FileMetadataInput {

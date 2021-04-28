@@ -18,10 +18,9 @@ import { RootState } from "../../redux/types";
 import { sendMessage, getNextBatchMessages } from "../../redux/p2pmessages/actions";
 import { ChatList, Me, Others } from "../../components/Chat";
 import MessageInput from "../../components/MessageInput";
-import { useAppDispatch, Uint8ArrayToBase64, base64ToUint8Array, dateToTimestamp } from "../../utils/helpers";
-import { Conversation, Message } from "../../utils/types";
-import { ChatListMethods, ChatListProps } from "../../components/Chat/types";
-import styles from "./style.module.css";
+import { useAppDispatch, base64ToUint8Array, dateToTimestamp } from "../../utils/helpers";
+import { Conversation } from "../../utils/types";
+import { ChatListMethods } from "../../components/Chat/types";
 
 type Props = {
   location: RouteComponentProps<{}, {}, { state: Conversation }>
@@ -46,7 +45,7 @@ const Chat: React.FC<Props> = ({ location }) => {
   const [message, setMessage] = useState<string>("");
   const [files, setFiles] = useState<any[]>([]);
 
-  const [error, setError] = useState<string | null>(null);
+  // const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   
   const dispatch = useAppDispatch();
@@ -68,7 +67,7 @@ const Chat: React.FC<Props> = ({ location }) => {
   }, [])
   
   useEffect(() => {
-    if (conversant != undefined && conversations[("u" + conversant.id)] != undefined) {
+    if (conversant !== undefined && conversations[("u" + conversant.id)] !== undefined) {
       let filteredMessages = Object.values(conversations[("u" + conversant.id)].messages).map((messageID) => {
         let message = messages[messageID];
         let receiptIDs = message.receipts;
@@ -113,6 +112,7 @@ const Chat: React.FC<Props> = ({ location }) => {
       
       setTransConversations(filteredMessages.reverse());
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversations, messages, receipts]);
 
   const handleOnClick = () => {
@@ -124,9 +124,9 @@ const Chat: React.FC<Props> = ({ location }) => {
 
   const displayStatus = (messageID: string) => {
     var ret;
-    if (lastSent != null && messageID == lastSent.messageID) ret = <IonText>{"Sent " + lastSent.timestamp}</IonText>;
-    if (lastDelivered != null && messageID == lastDelivered.messageID) ret = <IonText>{"Delivered " + lastDelivered.timestamp}</IonText>;
-    if (lastRead != null && messageID == lastRead.messageID) ret = <IonText>{"Read " + lastRead.timestamp}</IonText>;
+    if (lastSent != null && messageID === lastSent.messageID) ret = <IonText>{"Sent " + lastSent.timestamp}</IonText>;
+    if (lastDelivered != null && messageID === lastDelivered.messageID) ret = <IonText>{"Delivered " + lastDelivered.timestamp}</IonText>;
+    if (lastRead != null && messageID === lastRead.messageID) ret = <IonText>{"Read " + lastRead.timestamp}</IonText>;
     return ret
   };
 
@@ -148,7 +148,7 @@ const Chat: React.FC<Props> = ({ location }) => {
   const scrollRef = React.createRef<HTMLIonInfiniteScrollElement>();
 
   const displayMessage = (messageBundle: any) => {
-    if (conversant.id != messageBundle.message.author) {
+    if (conversant.id !== messageBundle.message.author) {
       return (
         <Me 
           key={messageBundle.message.p2pMessageEntryHash}
@@ -191,7 +191,7 @@ const Chat: React.FC<Props> = ({ location }) => {
     });
 
     // send the message if any
-    if (message != "") {
+    if (message !== "") {
       dispatch(
         sendMessage(
           Buffer.from(base64ToUint8Array(conversant.id)), 
