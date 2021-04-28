@@ -191,6 +191,7 @@ const GroupChat: React.FC = () => {
                   <img
                     className={styles.avatar}
                     src={peopleCircleOutline}
+                    color="white"
                     alt={groupInfo!.name}
                   />
                 )
