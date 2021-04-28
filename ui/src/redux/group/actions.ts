@@ -40,6 +40,7 @@ import {
   SetMessagesByGroupByTimestampAction,
   SET_LATEST_GROUP_VERSION,
   SetLatestGroupVersionAction,
+  SET_FILES_BYTES,
 } from "./types";
 import {
   Payload,
@@ -274,11 +275,32 @@ export const updateGroupName = (
   return updateGroupNameData;
 };
 
+export const fetchFilesBytes = (
+  fileHashes: Uint8Array[]
+): ThunkAction => async (dispatch, getState, { callZome }) => {
+  const res = await callZome({
+    zomeName: ZOMES.GROUP,
+    fnName: FUNCTIONS[ZOMES.GROUP].GET_FILES_BYTES,
+    payload: fileHashes,
+  });
+
+  if (res?.type !== "error") {
+    const { groupFiles } = getState().groups;
+
+    dispatch(
+      setFilesBytes({
+        ...groupFiles,
+        ...res,
+      })
+    );
+  }
+};
+
 export const sendGroupMessage = (
   groupMessageData: GroupMessageInput
 ): ThunkAction => async (
   dispatch,
-  _getState,
+  getState,
   { callZome }
 ): Promise<GroupMessage> => {
   // TODO: error handling
@@ -306,6 +328,17 @@ export const sendGroupMessage = (
       ? fileType.payload.thumbnail
       : fileType.payload.thumbnail;
     fileBytes = groupMessageData.payloadInput.payload.fileBytes;
+    const fetchedFileBytes = await callZome({
+      zomeName: ZOMES.GROUP,
+      fnName: FUNCTIONS[ZOMES.GROUP].GET_FILES_BYTES,
+      payload: [
+        sendGroupMessageOutput.content.payload.payload.metadata.fileHash,
+      ],
+    });
+
+    if (fetchedFileBytes?.type !== "error") {
+      dispatch(setFilesBytes({ ...fetchedFileBytes }));
+    }
     let filePayload: FilePayload = {
       type: "FILE",
       fileName:
@@ -343,6 +376,19 @@ export const sendGroupMessage = (
   });
 
   return groupMessageDataFromRes;
+};
+
+export const setFilesBytes = (filesBytes: {
+  [key: string]: Uint8Array;
+}): ThunkAction => async (dispatch, getState) => {
+  const { groupFiles } = getState().groups;
+  dispatch({
+    type: SET_FILES_BYTES,
+    filesBytes: {
+      ...groupFiles,
+      ...filesBytes,
+    },
+  });
 };
 
 export const sendInitialGroupMessage = (

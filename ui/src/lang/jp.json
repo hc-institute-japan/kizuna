@@ -18,6 +18,10 @@
   "app.new-conversation.message-placeholder": "メッセージを作成します...",
   "app.new-conversation.no-contacts-toast": "連絡先を選択してください...",
   "app.new-conversation.problem-occured-toast": "問題が発生しました...",
+  "app.profile.to-be-implemented-header": "Oops!",
+
+  "app.profile.to-be-implemented": "Page under construction",
+
   "app.register.error-invalid-username": "ユーザー名は3文字以上で、1つの英字を含める必要があります",
   "app.register.error-existing-username": "このユーザーにはすでにユーザー名が登録されています",
   "app.register.username-label": "ユーザー名",

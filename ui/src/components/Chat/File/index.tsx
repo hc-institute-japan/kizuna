@@ -14,7 +14,7 @@ interface Props {
 
 const File: React.FC<Props> = ({ timestamp, file, type }) => {
   const intl = useIntl();
-  const decoder = new TextDecoder();
+  const decoder = new TextDecoder("utf-8");
 
   const renderFile = () => {
     switch (file?.fileType) {

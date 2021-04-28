@@ -51,7 +51,7 @@ const Conversation: React.FC<Props> = ({
   const handleOnClick = () => {
     if (isGroup) {
       history.push(`/g/${groupId}`);
-    } else { 
+    } else {
       history.push(`/u/${name}`);
     }
   };
@@ -59,11 +59,16 @@ const Conversation: React.FC<Props> = ({
     if (groupId) {
       const group = state.groups.conversations[groupId];
       if (group) {
-        const messages = group.messages
-          .map((message) => state.groups.messages[message])
-          .filter((message) => message !== undefined);
         dispatch(getAgentId()).then((id: any) => {
-          if (id) setBadgeCount(messages.reduce((total) => total + 1, 0));
+          const messagesReadList = group.messages.map(
+            (message) => state.groups.messages[message].readList
+          );
+          if (id)
+            setBadgeCount(
+              messagesReadList.filter(
+                (messageReadList) => messageReadList[id] === undefined
+              ).length
+            );
         });
       }
     }
@@ -96,7 +101,7 @@ const Conversation: React.FC<Props> = ({
       return x.timestamp[0] - y.timestamp[0];
     });
   }, [messages]);
-  return (latestMessageDetail.sender || isGroup) ? (
+  return latestMessageDetail.sender || isGroup ? (
     <IonItem onClick={handleOnClick}>
       <IonAvatar slot="start">
         <img

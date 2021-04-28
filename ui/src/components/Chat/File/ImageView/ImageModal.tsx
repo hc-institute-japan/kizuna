@@ -14,7 +14,9 @@ import {
 } from "@ionic/react";
 import { arrowBack, ellipsisVerticalOutline } from "ionicons/icons";
 import React, { SetStateAction, useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
 import { FilePayload } from "../../../../redux/commons/types";
+import { RootState } from "../../../../redux/types";
 import { base64ToUint8Array } from "../../../../utils/helpers";
 import styles from "../style.module.css";
 
@@ -36,6 +38,9 @@ const ImageModal: React.FC<Props> = ({ state, src, file }) => {
     isOpen: false,
     event: undefined,
   });
+  const fileBytes = useSelector(
+    (state: RootState) => state.groups.groupFiles[`u${file.fileHash}`]
+  );
 
   useEffect(() => {
     if (isOpen)
@@ -49,7 +54,7 @@ const ImageModal: React.FC<Props> = ({ state, src, file }) => {
   }, [isOpen]);
 
   const download = () => {
-    const blob = new Blob([base64ToUint8Array(file.fileHash)]); // change resultByte to bytes
+    const blob = new Blob([fileBytes]); // change resultByte to bytes
 
     const link = document.createElement("a");
     link.href = window.URL.createObjectURL(blob);

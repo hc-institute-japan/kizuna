@@ -4,11 +4,15 @@ import {
   IonButtons,
   IonContent,
   IonHeader,
+  IonIcon,
   IonSpinner,
+  IonText,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
+import { buildOutline } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
+import { useIntl } from "react-intl";
 import { useLocation, useParams } from "react-router";
 import { fetchProfileFromUsername } from "../../redux/profile/actions";
 import { Profile as ProfileType } from "../../redux/profile/types";
@@ -54,6 +58,14 @@ const Profile: React.FC = () => {
     } else setProfile(location.state.contact);
   }, [dispatch, location?.state?.contact, username]);
 
+  const [contentHeight, setContentHeight] = useState(0);
+
+  const handleRef = (el: HTMLIonHeaderElement) => {
+    if (el) {
+      setContentHeight(window.innerHeight - el.getBoundingClientRect().height);
+    }
+  };
+  const intl = useIntl();
   return (
     <IonApp>
       <IonHeader
@@ -61,6 +73,7 @@ const Profile: React.FC = () => {
           backgroundImage: `url("https://instagram.fmnl3-2.fna.fbcdn.net/v/t51.2885-15/e35/p1080x1080/153183681_221786689635197_8533112046939022296_n.jpg?tp=1&_nc_ht=instagram.fmnl3-2.fna.fbcdn.net&_nc_cat=105&_nc_ohc=aiSb_B85lnsAX_ZSkr8&oh=485389a978d593f60ac1e88dd01d326a&oe=60649831")`,
         }}
         className={styles.header}
+        ref={handleRef}
       >
         <IonToolbar>
           <IonButtons>
@@ -76,7 +89,29 @@ const Profile: React.FC = () => {
           <IonTitle>{profile ? profile.username : ""}</IonTitle>
         </IonToolbar>
       </IonHeader>
-      <IonContent>{loading ? <IonSpinner></IonSpinner> : null}</IonContent>
+
+      <div
+        style={{ height: contentHeight }}
+        className={`${styles.content} ion-padding-start ion-padding-end`}
+      >
+        <div className={styles["content-icon"]}>
+          <IonIcon icon={buildOutline} />
+        </div>
+        <div>
+          <h2 className="ion-no-margin ion-text-uppercase">
+            <IonText>
+              {intl.formatMessage({
+                id: "app.profile.to-be-implemented-header",
+              })}
+            </IonText>
+          </h2>
+          <p className="ion-no-margin">
+            <IonText>
+              {intl.formatMessage({ id: "app.profile.to-be-implemented" })}
+            </IonText>
+          </p>
+        </div>
+      </div>
     </IonApp>
   );
 };

@@ -18,6 +18,9 @@
   "app.new-conversation.message-placeholder": "Compose message...",
   "app.new-conversation.no-contacts-toast": "Please select a contact...",
   "app.new-conversation.problem-occured-toast": "A problem occurred...",
+  "app.profile.to-be-implemented-header": "Oops!",
+
+  "app.profile.to-be-implemented": "Page under construction",
   "app.register.error-invalid-username": "Username must be at least 3 characters and contain 1 alphanumberic character",
   "app.register.error-existing-username": "There's already a username registered for this user",
   "app.register.username-label": "Username",
