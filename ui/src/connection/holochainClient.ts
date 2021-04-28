@@ -26,7 +26,6 @@ import { FUNCTIONS, ZOMES } from "./types";
 let client: null | AppWebsocket = null;
 
 let signalHandler: AppSignalCb = (signal) => {
-  // console.log("is this shit even triggering sir?", signal);
   switch (signal.data.payload.name) {
     case "added_to_group":
       let payload = signal.data.payload.payload.payload;

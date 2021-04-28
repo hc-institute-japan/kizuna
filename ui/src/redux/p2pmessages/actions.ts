@@ -23,7 +23,6 @@ import { getConstructorTypeOfClassLikeDeclaration } from "tsutils";
 export const setMessages = (
   state: P2PMessageConversationState
 ): ThunkAction => async (dispatch) => {
-  // console.log("Actions dispatchinmg SET_MESSAGES", state)
   dispatch({
     type: SET_MESSAGES,
     state,
@@ -34,7 +33,6 @@ export const setMessages = (
 export const appendMessage = (state: P2PMessage): ThunkAction => async (
   dispatch
 ) => {
-  //   console.log("Actions dispatching APPEND_MESSAGE");
   dispatch({
     type: APPEND_MESSAGE,
     state,
@@ -49,8 +47,6 @@ export const sendMessage = (
   replyTo?: HoloHash,
   file?: any
 ): ThunkAction => async (dispatch, _getState, { callZome }) => {
-  //   console.log("Actions calling send message");
-
   var payload;
   if (type == "TEXT") {
     let textPayload: TextPayload = {
