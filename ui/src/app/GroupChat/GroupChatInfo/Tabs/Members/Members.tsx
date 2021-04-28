@@ -90,92 +90,83 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
   useEffect(() => {
     let membersProfile: Profile[] = [];
     let members = [...groupData.members, groupData.creator];
-    // console.log("here are the groupMembers", groupMembers);
 
     // We have to account for creator and members here
     members.forEach((member: string) => {
       if (groupMembers[member]) membersProfile.push(groupMembers[member]);
     });
 
-    // console.log("here are the membersProfile", membersProfile);
-    // console.log("here are the members", members);
-
     setMembers(membersProfile);
     setLoading(false);
   }, [groupData, groupMembers]);
 
   return !loading ? (
-    <IonSlide>
+    
       <IonContent>
-        <IonList className={styles.memberInfo}>
           <IonItem lines="none" key={"member-numbers"}>
             <IonIcon className={styles.icon} icon={peopleOutline}></IonIcon>
-            <IonLabel>{members.length + " members"}</IonLabel>
+            <IonLabel>{intl.formatMessage(
+              {id: "app.groups.members"},
+              {length: members.length},
+            )}</IonLabel>
           </IonItem>
-
-          {myAgentId === groupData.creator ? (
-            <IonItem
-              lines="none"
-              button
-              onClick={() => setIsOpen(true)}
-              key={"add-members-button"}
-            >
-              <IonIcon
-                className={styles.icon}
-                icon={personAddOutline}
-              ></IonIcon>
-              <IonLabel>Add Members</IonLabel>
-            </IonItem>
-          ) : null}
-
+          {(myAgentId === groupData.creator) ? (<IonItem
+            lines="none"
+            button
+            onClick={() => setIsOpen(true)}
+            key={"add-members-button"}
+          >
+            <IonIcon className={styles.icon} icon={personAddOutline}></IonIcon>
+            <IonLabel>{intl.formatMessage({id: "app.groups.add-members"})}</IonLabel>
+          </IonItem>) : null}
           <IonItem
             lines="none"
             className={styles.memberTitle}
-            key={"members-label"}
-          >
-            <h3>Members</h3>
+            >
+            <h3>{intl.formatMessage({id: "app.groups.members-label"})}</h3>
           </IonItem>
-
-          {/* This is for members and admin*/}
-          {members.map((member: any) => {
-            // console.log(members);
-            return member.id !== groupData.creator ? (
-              <React.Fragment key={member.id}>
-                <IonItemSliding>
-                  <IonItem lines="none" key={member.id}>
-                    <IonLabel className={styles.memberName} key={member.id}>
-                      <h3>
-                        {member.username}
-                        <br />
-                        member
-                      </h3>
-                    </IonLabel>
+            <IonList>
+              {members.map((member: any) => {
+                return member.id !== groupData.creator ? (
+                  <IonItem>
+                    <IonItemSliding>
+                      <IonItem lines="none" key={member.id}>
+                        <IonLabel className={styles.memberName} key={member.id}>
+                          <h3>
+                            {member.username}
+                            <br />
+                            {intl.formatMessage({id: "app.groups.member-role"})}
+                          </h3>
+                        </IonLabel>
+                      </IonItem>
+                      <IonItemOptions side={"end"}>
+                        <IonItemOption
+                          onClick={() => handleRemoveMembers(member)}
+                          color="danger"
+                        >
+                          {intl.formatMessage({id: "app.groups.remove-member"})}
+                        </IonItemOption>
+                      </IonItemOptions>
+                    </IonItemSliding>
                   </IonItem>
-                  <IonItemOptions side={"end"}>
-                    <IonItemOption
-                      onClick={() => handleRemoveMembers(member)}
-                      color="danger"
-                    >
-                      REMOVE
-                    </IonItemOption>
-                  </IonItemOptions>
-                </IonItemSliding>
-              </React.Fragment>
-            ) : (
-              <IonItemSliding>
-                <IonItem lines="none" key={member.id}>
-                  <IonLabel className={styles.memberName}>
-                    <h3>
-                      {member.username}
-                      <br />
-                      admin
-                    </h3>
-                  </IonLabel>
-                </IonItem>
-              </IonItemSliding>
-            );
-          })}
-        </IonList>
+                ) : (
+                  <IonItem>
+                    <IonItemSliding>
+                      <IonItem lines="none" key={member.id}>
+                        <IonLabel className={styles.memberName}>
+                          <h3>
+                            {member.username}
+                            <br />
+                            {intl.formatMessage({id: "app.groups.admin-role"})}
+                          </h3>
+                        </IonLabel>
+                      </IonItem>
+                    </IonItemSliding>
+                  </IonItem>
+                ) ;
+              })}
+            </IonList>
+          {/* This is for members and admin*/}
 
         <AddMemberModal
           contacts={contacts}
@@ -189,14 +180,8 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
           setLoading={setLoading}
           myAgentId={myAgentId}
         />
-
-        <RemoveMemberToast
-          toast={toast}
-          onDismiss={() => setToast(false)}
-          message={errMsg}
-        />
+        <RemoveMemberToast toast={toast} onDismiss={() => setToast(false)} message={errMsg}/>
       </IonContent>
-    </IonSlide>
   ) : (
     <IonLoading isOpen={loading} />
   );

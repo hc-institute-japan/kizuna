@@ -71,7 +71,7 @@ const NewConversation: React.FC = () => {
           ))
       });
 
-      if (message != "") {
+      if (message !== "") {
         dispatch(
           sendMessage(
             Buffer.from(base64ToUint8Array(contacts[0].id)), 

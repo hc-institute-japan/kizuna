@@ -5,6 +5,11 @@
   flex-direction: column;
 }
 
+.scroll-vertically{
+  overflow: auto;
+  height: 100%;
+}
+
 .memberName {
   font-size: x-large;
 }
@@ -131,7 +136,7 @@
 .month {
   font-size: 120%;
   text-align: left;
-  padding-left: 1%;
+  padding-left: 2%;
 }
 
 .mediadiv {
@@ -187,5 +192,16 @@
 }
 
 .no-media-label {
-  font-size: xx-large;
+  padding: 1%;
+  font-size: large;
+}
+
+/* FOR FILE */
+
+.filelist {
+  width: 100%;
+}
+
+.filecard {
+  width: 100%;
 }

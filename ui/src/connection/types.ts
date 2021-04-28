@@ -53,6 +53,8 @@ export const FUNCTIONS: FunctionNameType = {
     GET_NEXT_BATCH_GROUP_MESSAGES: "get_next_batch_group_messages",
     GET_MESSAGES_BY_GROUP_BY_TIMESTAMP: "get_messages_by_group_by_timestamp",
     GET_GROUP_LATEST_VERSION: "get_group_latest_version",
+    INDICATE_GROUP_TYPING: "indicate_group_typing",
+    READ_GROUP_MESSAGE: "read_group_message",
     GET_FILES_BYTES: "get_files_bytes",
   },
   [ZOMES.AGGREGATOR]: {

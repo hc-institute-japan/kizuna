@@ -2,29 +2,18 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 import { RootState } from "../../redux/types";
-import {
-  GroupMessage,
-  GroupMessagesContents,
-  GroupMessagesOutput,
-} from "../../redux/group/types";
+import { GroupMessage, GroupMessageReadData, GroupMessagesContents, GroupMessagesOutput } from "../../redux/group/types";
 import Chat from "../../components/Chat";
 import { ChatListMethods } from "../../components/Chat/types";
-import {
-  base64ToUint8Array,
-  isTextPayload,
-  useAppDispatch,
-} from "../../utils/helpers";
-import {
-  fetchFilesBytes,
-  getNextBatchGroupMessages,
-} from "../../redux/group/actions";
-import { FilePayload } from "../../redux/commons/types";
+import { base64ToUint8Array, Uint8ArrayToBase64, useAppDispatch } from "../../utils/helpers";
+import { getNextBatchGroupMessages, readGroupMessage } from "../../redux/group/actions";
+import { IonLoading } from "@ionic/react";
+import { useIntl } from "react-intl";
 interface Props {
   messageIds: string[];
   members: string[];
   myAgentId: string;
   groupId: string;
-  setToast: (bool: boolean) => void;
   // TODO: not really sure what type this is
   chatList: React.RefObject<ChatListMethods>;
 }
@@ -34,39 +23,25 @@ const MessageList: React.FC<Props> = ({
   myAgentId,
   chatList,
   groupId,
-  setToast,
 }) => {
   const dispatch = useAppDispatch();
+  const intl = useIntl();
 
   // LOCAL STATE
   const [messages, setMessages] = useState<any[]>([]);
+  const [oldestFetched, setOldestFetched] = useState<boolean>(false);
   const [oldestMessage, setOldestMessage] = useState<any>();
+  const [loading, setLoading] = useState<boolean>(false);
 
   const allMembers = useSelector((state: RootState) => state.groups.members);
   const username = useSelector((state: RootState) => state.profile.username);
-  const allMessages = useSelector((state: RootState) => state.groups.messages);
   const messagesData = useSelector((state: RootState) => {
     let uniqueArray = messageIds.filter(function (item, pos, self) {
       return self.indexOf(item) === pos;
     });
     const messages: (any | undefined)[] = uniqueArray
       ? uniqueArray.map((messageId) => {
-          let message: GroupMessage = allMessages[messageId];
-
-          let payload = message.payload;
-
-          if (!isTextPayload(payload)) {
-            payload = payload as FilePayload;
-
-            if (state.groups.groupFiles["u" + payload.fileHash]) {
-              payload = {
-                ...payload,
-                fileHash: payload.fileHash,
-              };
-            } else {
-              dispatch(fetchFilesBytes([base64ToUint8Array(payload.fileHash)]));
-            }
-          }
+          let message: GroupMessage = state.groups.messages[messageId];
           if (message) {
             const authorProfile = allMembers[message.author];
             return {
@@ -95,9 +70,9 @@ const MessageList: React.FC<Props> = ({
   });
 
   const handleOnScrollTop = (complete: any) => {
+    setLoading(true);
     if (messagesData?.length) {
       let lastMessage = messagesData![0];
-      // console.log("here is the last message", oldestMessage);
       dispatch(
         getNextBatchGroupMessages({
           groupId: base64ToUint8Array(groupId),
@@ -112,9 +87,7 @@ const MessageList: React.FC<Props> = ({
         })
       ).then((res: GroupMessagesOutput) => {
         if (Object.keys(res.groupMessagesContents).length !== 0) {
-          let groupMesssageContents: GroupMessagesContents =
-            res.groupMessagesContents;
-          // console.log("here are the new messages", res);
+          let groupMesssageContents: GroupMessagesContents = res.groupMessagesContents;
           const fetchedMessages: (any | undefined)[] = [];
           Object.keys(groupMesssageContents).forEach((key: any) => {
             const authorProfile = allMembers[groupMesssageContents[key].author];
@@ -142,8 +115,10 @@ const MessageList: React.FC<Props> = ({
             ];
           setOldestMessage(newOldestMessage);
           setMessages(newMessages);
+          setLoading(false);
         } else {
-          setToast(true);
+          setOldestFetched(true);
+          setLoading(false);
         }
       });
     }
@@ -154,18 +129,34 @@ const MessageList: React.FC<Props> = ({
 
   useEffect(() => {
     setMessages(messagesData!);
-  }, [messageIds]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messageIds])
 
   return (
-    <Chat.ChatList
-      onScrollTop={(complete) => handleOnScrollTop(complete)}
-      ref={chatList}
-      type="group"
-    >
-      {messages!.map((message, i) => {
-        if (message.author.id === myAgentId)
+    <>
+    <IonLoading isOpen={loading} message={intl.formatMessage({id: "app.groups.fetching"})} />
+      <Chat.ChatList
+        disabled={oldestFetched}
+        onScrollTop={(complete) => handleOnScrollTop(complete)}
+        ref={chatList}
+        type="group"
+      >
+        {messages!.map((message, i) => {
+          if (message.author.id === myAgentId)
+            return (
+              <Chat.Me
+                key={message.groupMessageEntryHash}
+                author={message.author.username}
+                timestamp={new Date(message.timestamp[0] * 1000)}
+                payload={message.payload}
+                readList={message.readList}
+                type="group"
+                showName={true}
+                showProfilePicture={true}
+              />
+            );
           return (
-            <Chat.Me
+            <Chat.Others
               key={message.groupMessageEntryHash}
               author={message.author.username}
               timestamp={new Date(message.timestamp[0] * 1000)}
@@ -173,30 +164,33 @@ const MessageList: React.FC<Props> = ({
               readList={message.readList}
               type="group"
               showName={true}
+              onSeen={(complete) => {
+                // TODO: This is only a temporary fix. The HashType should be changed to Agent in the hc side when ReadList is constrcuted
+                // to avoid doing something like this in UI.
+                let read: boolean = Object.keys(message.readList).map((key: string) => {
+                  key = key.slice(5)
+                  return key;
+                }).includes(myAgentId.slice(4));
+
+                if (i === messagesData!.length - 1 && !read) {
+                  let groupMessageReadData: GroupMessageReadData = {
+                    groupId: base64ToUint8Array(groupId),
+                    messageIds: [base64ToUint8Array(message.groupMessageEntryHash)],
+                    reader: Buffer.from(base64ToUint8Array(myAgentId).buffer),
+                    timestamp: message.timestamp,
+                    members: members.map((member: string) => Buffer.from(base64ToUint8Array(member).buffer)),
+                  }
+                  dispatch(readGroupMessage(groupMessageReadData)).then((res: any) => {
+                    complete();
+                  })
+                }
+              }}
               showProfilePicture={true}
             />
           );
-        return (
-          <Chat.Others
-            key={message.groupMessageEntryHash}
-            author={message.author.username}
-            timestamp={new Date(message.timestamp[0] * 1000)}
-            payload={message.payload}
-            readList={message.readList}
-            type="group"
-            showName={true}
-            onSeen={(complete) => {
-              if (i === messagesData!.length - 1) {
-                setTimeout(function () {
-                  complete();
-                }, 5000);
-              }
-            }}
-            showProfilePicture={true}
-          />
-        );
-      })}
-    </Chat.ChatList>
+        })}
+      </Chat.ChatList>
+    </>
   );
 };
 

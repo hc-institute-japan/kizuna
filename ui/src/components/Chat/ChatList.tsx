@@ -18,7 +18,7 @@ import styles from "./style.module.css";
 import { ChatListMethods, ChatListProps } from "./types";
 
 const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
-  { children, type = "p2p", onScrollTop },
+  { children, type = "p2p", onScrollTop, disabled },
   ref: Ref<ChatListMethods>
 ) => {
   const arrChildren = React.Children.toArray(children);
@@ -115,6 +115,7 @@ const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
     <IonList className={`${styles.chat} chat-list`}>
       {onScrollTop ? (
         <IonInfiniteScroll
+          disabled={disabled ? true : false}
           threshold="0px"
           ref={infiniteScroll}
           position="top"

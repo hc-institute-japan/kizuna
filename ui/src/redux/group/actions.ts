@@ -40,6 +40,8 @@ import {
   SetMessagesByGroupByTimestampAction,
   SET_LATEST_GROUP_VERSION,
   SetLatestGroupVersionAction,
+  GroupTypingDetailData,
+  GroupMessageReadData,
   SET_FILES_BYTES,
 } from "./types";
 import {
@@ -475,8 +477,6 @@ export const getNextBatchGroupMessages = (
     payload: groupMessageBatchFetchFilter,
   });
 
-  console.log("is this working or what", groupMessagesRes);
-
   let groupMessagesOutput: GroupMessagesOutput = convertFetchedResToGroupMessagesOutput(
     groupMessagesRes
   );
@@ -575,6 +575,29 @@ export const getLatestGroupVersion = (groupId: string): ThunkAction => async (
   });
 
   return groupData;
+};
+
+export const indicateGroupTyping = (
+  groupTypingDetailData: GroupTypingDetailData
+): ThunkAction => async (dispatch, getState, { callZome, getAgentId }) => {
+  await callZome({
+    zomeName: ZOMES.GROUP,
+    fnName: FUNCTIONS[ZOMES.GROUP].INDICATE_GROUP_TYPING,
+    payload: groupTypingDetailData,
+  });
+  return null;
+};
+
+export const readGroupMessage = (
+  groupMessageReadData: GroupMessageReadData
+): ThunkAction => async (dispatch, getState, { callZome, getAgentId }) => {
+  let res = await callZome({
+    zomeName: ZOMES.GROUP,
+    fnName: FUNCTIONS[ZOMES.GROUP].READ_GROUP_MESSAGE,
+    payload: groupMessageReadData,
+  });
+  console.log(res);
+  return null;
 };
 
 // helper function

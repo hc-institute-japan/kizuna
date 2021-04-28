@@ -8,13 +8,13 @@ import {
 import { peopleCircleOutline, personCircleOutline } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import { getAgentId } from "../../redux/profile/actions";
 
 import { Profile } from "../../redux/profile/types";
 import { RootState } from "../../redux/types";
-import { useAppDispatch } from "../../utils/helpers";
+import { Uint8ArrayToBase64, useAppDispatch } from "../../utils/helpers";
 import { Message } from "../../utils/types";
 import styles from "./style.module.css";
 
@@ -61,14 +61,33 @@ const Conversation: React.FC<Props> = ({
       if (group) {
         dispatch(getAgentId()).then((id: any) => {
           const messagesReadList = group.messages.map(
-            (message) => state.groups.messages[message].readList
-          );
-          if (id)
-            setBadgeCount(
-              messagesReadList.filter(
-                (messageReadList) => messageReadList[id] === undefined
-              ).length
-            );
+            (message) => {
+              if (state.groups.messages[message].author === Uint8ArrayToBase64(id)) {
+                return null
+              } else {
+                return state.groups.messages[message].readList
+              }
+            }
+          ).filter(value => value !== null);
+          if (id) {
+            // TODO: The slice() here is only a temporary method. 
+            // We should fix the hc side so that we dont have to do something like this in the UI.
+            let badgeCount = messagesReadList.filter(
+              (messageReadList) => {
+                let maybeRead = Object.keys(messageReadList!).map((key: string) => {
+                  key = key.slice(5)
+                  return key;
+                }).filter((key: string) => key === Uint8ArrayToBase64(id).slice(4));
+                if (maybeRead.length === 0) {
+                  return true
+                } else {
+                  return false
+                }
+              }
+            ).length;
+            console.log(badgeCount)
+            setBadgeCount(badgeCount);
+          }
         });
       }
     }
@@ -131,7 +150,7 @@ const Conversation: React.FC<Props> = ({
               )}
         </p>
       </IonLabel>
-      {badgeCount > 1 ? <IonBadge slot="">{badgeCount}</IonBadge> : null}
+      {badgeCount > 0 ? <IonBadge slot="">{badgeCount}</IonBadge> : null}
     </IonItem>
   ) : (
     <IonLoading isOpen={latestMessageDetail.sender ? false : true} />

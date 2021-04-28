@@ -20,7 +20,6 @@ import {
   IonSlides,
   IonContent,
   IonCard,
-  IonCardContent,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
 } from "@ionic/react";
