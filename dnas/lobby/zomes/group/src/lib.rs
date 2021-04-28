@@ -5,7 +5,7 @@ mod signals;
 mod utils;
 mod validation_rules;
 
-use entries::group;
+use entries::group::{self, GroupOutput};
 use entries::group_message;
 
 use group::add_members::add_members_handler;
@@ -57,7 +57,7 @@ pub fn init(_: ()) -> ExternResult<InitCallbackResult> {
     let access: CapAccess = CapAccess::Unrestricted;
     let zome_name: ZomeName = zome_info()?.zome_name;
 
-    fuctions.insert((zome_name.clone(), FunctionName("recv_remote_signal".into()) ));
+    fuctions.insert((zome_name.clone(), FunctionName("recv_remote_signal".into())));
 
     let cap_grant_entry: CapGrantEntry = CapGrantEntry::new(
         tag,    // A string by which to later query for saved grants.
@@ -127,7 +127,7 @@ fn get_all_my_groups(_: ()) -> ExternResult<MyGroupListWrapper> {
 }
 
 #[hdk_extern]
-fn get_group_latest_version(group_id: EntryHashWrapper) -> ExternResult<Group> {
+fn get_group_latest_version(group_id: EntryHashWrapper) -> ExternResult<GroupOutput> {
     return group_helpers::get_group_latest_version(group_id.group_hash);
 }
 
