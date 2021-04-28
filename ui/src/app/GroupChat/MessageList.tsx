@@ -46,8 +46,10 @@ const MessageList: React.FC<Props> = ({
   const [messages, setMessages] = useState<any[]>([]);
   const [oldestFetched, setOldestFetched] = useState<boolean>(false);
   const [oldestMessage, setOldestMessage] = useState<any>();
+  const [newestMessage, setNewestMessage] = useState<GroupMessage>();
   const [loading, setLoading] = useState<boolean>(false);
 
+  const allMessages = useSelector((state: RootState) => state.groups.messages);
   const allMembers = useSelector((state: RootState) => state.groups.members);
   const username = useSelector((state: RootState) => state.profile.username);
   const messagesData = useSelector((state: RootState) => {
@@ -164,6 +166,33 @@ const MessageList: React.FC<Props> = ({
     setMessages(messagesData!);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messageIds]);
+
+  useEffect(() => {
+    let maybeThisGroupNewestMessageKey = Object.keys(allMessages)[Object.keys(allMessages).length - 1]
+    let maybeThisGroupNewestMessage = allMessages[maybeThisGroupNewestMessageKey];
+    if (maybeThisGroupNewestMessage.groupEntryHash === groupId && maybeThisGroupNewestMessage.groupMessageEntryHash !== newestMessage?.groupMessageEntryHash) {
+      setNewestMessage(maybeThisGroupNewestMessage)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [allMessages]);
+
+  useEffect(() => {
+    if (newestMessage) {
+      const authorProfile = allMembers[newestMessage.author]
+      messages.push({
+        ...newestMessage,
+        author: authorProfile
+          ? authorProfile
+          : // if profile was not found from allMembers, then the author is self
+            // assuming that allMembers have all the members of group at all times
+            {
+              username: username!,
+              id: newestMessage.author,
+            },
+      })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [newestMessage]);
 
   return (
     <>
