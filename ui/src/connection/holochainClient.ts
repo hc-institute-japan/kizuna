@@ -3,25 +3,25 @@ import {
   AppSignalCb,
   AppWebsocket,
 } from "@holochain/conductor-api";
-
-import store from "../redux/store";
-import { CallZomeConfig } from "../redux/types";
+import { isImage, isOther, isTextPayload } from "../redux/commons/types";
 import {
   AddGroupAction,
   ADD_GROUP,
   GroupConversation,
   GroupMessage,
   GroupTypingDetail,
+  SetGroupMessageAction,
+  SetGroupReadMessage,
   SetGroupTyingIndicator,
+  SET_GROUP_MESSAGE,
+  SET_GROUP_READ_MESSAGE,
   SET_GROUP_TYPING_INDICATOR,
 } from "../redux/group/types";
-import { SET_GROUP_MESSAGE, SetGroupMessageAction } from "../redux/group/types";
-import { base64ToUint8Array, Uint8ArrayToBase64 } from "../utils/helpers";
-import { isImage, isOther, isTextPayload } from "../redux/commons/types";
 import { Profile } from "../redux/profile/types";
+import store from "../redux/store";
+import { CallZomeConfig } from "../redux/types";
+import { base64ToUint8Array, Uint8ArrayToBase64 } from "../utils/helpers";
 import { FUNCTIONS, ZOMES } from "./types";
-import { SetGroupReadMessage } from "../redux/group/types";
-import { SET_GROUP_READ_MESSAGE } from "../redux/group/types";
 
 let client: null | AppWebsocket = null;
 
