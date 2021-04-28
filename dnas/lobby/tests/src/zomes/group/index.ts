@@ -15,16 +15,16 @@ import {
   sendMessageswithFilesTest,
   sendLargeSetOfFilesTest,
   fetchFilesForAParticularDateTest,
-  FetchFilesBytesTest,
 } from "./group_message";
 
 export default (config, installables) => {
+
   // Group CRUD and validation related tests.
   createGroupTest(config, installables); // good
   addAndRemoveMembersTest(config, installables); // good
   updateGroupNameTest(config, installables); // good
   validateCreateGroupTest(config, installables); //good
-
+  
   // GroupMessage related tests
   sendMessageTest(config, installables); // good
   sendMessageswithFilesTest(config, installables); // good
@@ -33,8 +33,9 @@ export default (config, installables) => {
   getMessagesByGroupByTimestampTest(config, installables); // good
   getLatestMessagesForAllGroupsTest(config, installables); // good
   fetchFilesForAParticularDateTest(config, installables); // good
-  // FetchFilesBytesTest(config, installables); // TATS: not good. Bytes are exactly the same but the tape is failing
+  groupTypingIndicatorTest(config, installables); // good
+  readGroupMessageTest(config, installables); // good
 
-  // groupTypingIndicatorTest(config, installables); // not-goodk
-  // readGroupMessageTest(config, installables); // not-good
+
+  
 };
