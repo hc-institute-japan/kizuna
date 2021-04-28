@@ -1,7 +1,7 @@
 use hdk::prelude::*;
 
 use super::group_helpers::get_group_latest_version;
-use super::{Group, GroupOutput, UpdateGroupNameIO};
+use super::{Group, UpdateGroupNameIO};
 use crate::utils::error;
 use crate::utils::to_timestamp;
 
@@ -13,17 +13,17 @@ pub fn update_group_name_handler(
     let group_id: EntryHash = update_group_name_input.group_id.clone();
 
     // 1 - we've to get the latest group entry version for the recived entryhash (group_id)
-    let latest_group_version: GroupOutput = get_group_latest_version(group_id.clone())?;
+    let latest_group_version: Group = get_group_latest_version(group_id)?;
 
     // 2 - check whether the new name is the same with old name and return error if so
-    let old_group_name: String = latest_group_version.latest_name.clone();
+    let old_group_name: String = latest_group_version.name.clone();
     if new_group_name.eq(&old_group_name) {
         return error("the new name and old name of the group are the same.");
     }
 
     let created: Timestamp = to_timestamp(sys_time()?);
     let creator: AgentPubKey = agent_info()?.agent_latest_pubkey;
-    let members: Vec<AgentPubKey> = latest_group_version.members;
+    let members: Vec<AgentPubKey> = latest_group_version.get_group_members();
 
     let updated_group: Group = Group::new(new_group_name, created, creator, members);
 
