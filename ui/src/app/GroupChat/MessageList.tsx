@@ -2,13 +2,28 @@ import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 import { RootState } from "../../redux/types";
-import { GroupMessage, GroupMessageReadData, GroupMessagesContents, GroupMessagesOutput } from "../../redux/group/types";
+import {
+  GroupMessage,
+  GroupMessageReadData,
+  GroupMessagesContents,
+  GroupMessagesOutput,
+} from "../../redux/group/types";
 import Chat from "../../components/Chat";
 import { ChatListMethods } from "../../components/Chat/types";
-import { base64ToUint8Array, Uint8ArrayToBase64, useAppDispatch } from "../../utils/helpers";
-import { getNextBatchGroupMessages, readGroupMessage } from "../../redux/group/actions";
+import {
+  base64ToUint8Array,
+  isTextPayload,
+  Uint8ArrayToBase64,
+  useAppDispatch,
+} from "../../utils/helpers";
+import {
+  fetchFilesBytes,
+  getNextBatchGroupMessages,
+  readGroupMessage,
+} from "../../redux/group/actions";
 import { IonLoading } from "@ionic/react";
 import { useIntl } from "react-intl";
+import { FilePayload } from "../../redux/commons/types";
 interface Props {
   messageIds: string[];
   members: string[];
@@ -44,6 +59,23 @@ const MessageList: React.FC<Props> = ({
           let message: GroupMessage = state.groups.messages[messageId];
           if (message) {
             const authorProfile = allMembers[message.author];
+
+            let payload = message.payload;
+
+            if (!isTextPayload(payload)) {
+              payload = payload as FilePayload;
+
+              if (state.groups.groupFiles["u" + payload.fileHash]) {
+                payload = {
+                  ...payload,
+                  fileHash: payload.fileHash,
+                };
+              } else {
+                dispatch(
+                  fetchFilesBytes([base64ToUint8Array(payload.fileHash)])
+                );
+              }
+            }
             return {
               ...message,
               payload,
@@ -87,7 +119,8 @@ const MessageList: React.FC<Props> = ({
         })
       ).then((res: GroupMessagesOutput) => {
         if (Object.keys(res.groupMessagesContents).length !== 0) {
-          let groupMesssageContents: GroupMessagesContents = res.groupMessagesContents;
+          let groupMesssageContents: GroupMessagesContents =
+            res.groupMessagesContents;
           const fetchedMessages: (any | undefined)[] = [];
           Object.keys(groupMesssageContents).forEach((key: any) => {
             const authorProfile = allMembers[groupMesssageContents[key].author];
@@ -129,12 +162,15 @@ const MessageList: React.FC<Props> = ({
 
   useEffect(() => {
     setMessages(messagesData!);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messageIds])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messageIds]);
 
   return (
     <>
-    <IonLoading isOpen={loading} message={intl.formatMessage({id: "app.groups.fetching"})} />
+      <IonLoading
+        isOpen={loading}
+        message={intl.formatMessage({ id: "app.groups.fetching" })}
+      />
       <Chat.ChatList
         disabled={oldestFetched}
         onScrollTop={(complete) => handleOnScrollTop(complete)}
@@ -167,22 +203,30 @@ const MessageList: React.FC<Props> = ({
               onSeen={(complete) => {
                 // TODO: This is only a temporary fix. The HashType should be changed to Agent in the hc side when ReadList is constrcuted
                 // to avoid doing something like this in UI.
-                let read: boolean = Object.keys(message.readList).map((key: string) => {
-                  key = key.slice(5)
-                  return key;
-                }).includes(myAgentId.slice(4));
+                let read: boolean = Object.keys(message.readList)
+                  .map((key: string) => {
+                    key = key.slice(5);
+                    return key;
+                  })
+                  .includes(myAgentId.slice(4));
 
                 if (i === messagesData!.length - 1 && !read) {
                   let groupMessageReadData: GroupMessageReadData = {
                     groupId: base64ToUint8Array(groupId),
-                    messageIds: [base64ToUint8Array(message.groupMessageEntryHash)],
+                    messageIds: [
+                      base64ToUint8Array(message.groupMessageEntryHash),
+                    ],
                     reader: Buffer.from(base64ToUint8Array(myAgentId).buffer),
                     timestamp: message.timestamp,
-                    members: members.map((member: string) => Buffer.from(base64ToUint8Array(member).buffer)),
-                  }
-                  dispatch(readGroupMessage(groupMessageReadData)).then((res: any) => {
-                    complete();
-                  })
+                    members: members.map((member: string) =>
+                      Buffer.from(base64ToUint8Array(member).buffer)
+                    ),
+                  };
+                  dispatch(readGroupMessage(groupMessageReadData)).then(
+                    (res: any) => {
+                      complete();
+                    }
+                  );
                 }
               }}
               showProfilePicture={true}

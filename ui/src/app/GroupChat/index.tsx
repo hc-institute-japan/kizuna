@@ -17,16 +17,17 @@ import {
   peopleCircleOutline,
 } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
+import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router";
 import { ChatListMethods } from "../../components/Chat/types";
+import Typing from "../../components/Chat/Typing";
 import MessageInput from "../../components/MessageInput";
 import { FilePayloadInput } from "../../redux/commons/types";
 import {
   getLatestGroupVersion,
-  sendGroupMessage,
-  getLatestGroupVersion,
   indicateGroupTyping,
+  sendGroupMessage,
 } from "../../redux/group/actions";
 import {
   GroupConversation,
@@ -35,17 +36,13 @@ import {
 } from "../../redux/group/types";
 import { fetchId } from "../../redux/profile/actions";
 import { RootState } from "../../redux/types";
-
-import MessageList from "./MessageList";
 import {
   base64ToUint8Array,
   Uint8ArrayToBase64,
   useAppDispatch,
 } from "../../utils/helpers";
-
+import MessageList from "./MessageList";
 import styles from "./style.module.css";
-import Typing from "../../components/Chat/Typing";
-import { useIntl } from "react-intl";
 
 interface GroupChatParams {
   group: string;
@@ -126,7 +123,6 @@ const GroupChat: React.FC = () => {
       });
       setSendingLoading(false);
       chatList.current!.scrollToBottom();
-
     });
   };
 
@@ -157,13 +153,13 @@ const GroupChat: React.FC = () => {
   }, [groupData]);
 
   useEffect(() => {
-    setLoading(true)
+    setLoading(true);
     if (groupData) {
-      setMessages([...messages!, ...groupData.messages])
+      setMessages([...messages!, ...groupData.messages]);
       setLoading(false);
     } else {
       dispatch(getLatestGroupVersion(group)).then((res: GroupConversation) => {
-        setMessages([...messages!, ...res.messages])
+        setMessages([...messages!, ...res.messages]);
         setLoading(false);
       });
     }
@@ -172,9 +168,12 @@ const GroupChat: React.FC = () => {
 
   return !loading && groupInfo && messages ? (
     <IonPage>
-      <IonLoading isOpen={sendingLoading} message={intl.formatMessage({
-        id: "app.groups.sending"
-      })}/>
+      <IonLoading
+        isOpen={sendingLoading}
+        message={intl.formatMessage({
+          id: "app.groups.sending",
+        })}
+      />
       <IonHeader>
         <IonToolbar>
           <IonButtons>
@@ -227,30 +226,46 @@ const GroupChat: React.FC = () => {
         )}
       </IonContent>
 
-      <Typing profiles={typing[groupInfo.originalGroupEntryHash] ? typing[groupInfo.originalGroupEntryHash] : []}/>
+      <Typing
+        profiles={
+          typing[groupInfo.originalGroupEntryHash]
+            ? typing[groupInfo.originalGroupEntryHash]
+            : []
+        }
+      />
       <MessageInput
         onSend={handleOnSend}
         onChange={(message) => {
           if (message.length !== 0) {
-            dispatch(indicateGroupTyping({
-              groupId: base64ToUint8Array(groupInfo.originalGroupEntryHash),
-              indicatedBy: Buffer.from(base64ToUint8Array(myAgentId).buffer),
-              members: [...groupInfo.members.map(member => 
-                Buffer.from(base64ToUint8Array(member).buffer)
-              ), Buffer.from(base64ToUint8Array(groupInfo.creator).buffer)],
-              isTyping: true
-            }))
+            dispatch(
+              indicateGroupTyping({
+                groupId: base64ToUint8Array(groupInfo.originalGroupEntryHash),
+                indicatedBy: Buffer.from(base64ToUint8Array(myAgentId).buffer),
+                members: [
+                  ...groupInfo.members.map((member) =>
+                    Buffer.from(base64ToUint8Array(member).buffer)
+                  ),
+                  Buffer.from(base64ToUint8Array(groupInfo.creator).buffer),
+                ],
+                isTyping: true,
+              })
+            );
           } else {
-            dispatch(indicateGroupTyping({
-              groupId: base64ToUint8Array(groupInfo.originalGroupEntryHash),
-              indicatedBy: Buffer.from(base64ToUint8Array(myAgentId).buffer),
-              members: [...groupInfo.members.map(member => 
-                Buffer.from(base64ToUint8Array(member).buffer)
-              ), Buffer.from(base64ToUint8Array(groupInfo.creator).buffer)],
-              isTyping: false
-            }))
+            dispatch(
+              indicateGroupTyping({
+                groupId: base64ToUint8Array(groupInfo.originalGroupEntryHash),
+                indicatedBy: Buffer.from(base64ToUint8Array(myAgentId).buffer),
+                members: [
+                  ...groupInfo.members.map((member) =>
+                    Buffer.from(base64ToUint8Array(member).buffer)
+                  ),
+                  Buffer.from(base64ToUint8Array(groupInfo.creator).buffer),
+                ],
+                isTyping: false,
+              })
+            );
           }
-          return setMessage(message)
+          return setMessage(message);
         }}
         onFileSelect={(files) => setFiles(files)}
       />

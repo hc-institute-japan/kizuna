@@ -298,7 +298,7 @@ export type GroupConversationsActionTypes =
   | SetMessagesByGroupByTimestampAction
   | SetLatestGroupState
   | SetLatestGroupVersionAction
-  | SetFilesBytes;
+  | SetFilesBytes
   | SetLatestGroupVersionAction
   | SetGroupTyingIndicator
   | SetGroupReadMessage;
