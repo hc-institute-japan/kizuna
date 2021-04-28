@@ -1,11 +1,11 @@
 use hdk::prelude::*;
 
-use super::Group;
+use super::{Group, GroupOutput};
 use crate::signals::{SignalDetails, SignalName, SignalPayload};
 
 use crate::utils::error;
 
-pub fn get_group_latest_version(group_id: EntryHash) -> ExternResult<Group> {
+pub fn get_group_latest_version(group_id: EntryHash) -> ExternResult<GroupOutput> {
     // 1 - we have to get details from the recived entry_hash as arg (group_id), based in the details we get back for this function we should have one or other behavior
     if let Some(details) = get_details(group_id.clone(), GetOptions::latest())? {
         match details {
@@ -21,8 +21,19 @@ pub fn get_group_latest_version(group_id: EntryHash) -> ExternResult<Group> {
                     if let Entry::App(group_entry_bytes) = group_entry_details.entry {
                         let group_sb: SerializedBytes = group_entry_bytes.into_sb();
                         let latest_group_version: Group = group_sb.try_into()?;
+                        let group_output = GroupOutput {
+                            group_id,
+                            group_revision_id: group_entry_details.headers[0]
+                                .clone()
+                                .as_hash()
+                                .to_owned(),
+                            latest_name: latest_group_version.name,
+                            members: latest_group_version.members,
+                            creator: latest_group_version.creator,
+                            created: latest_group_version.created,
+                        };
 
-                        return Ok(latest_group_version);
+                        return Ok(group_output);
                     }
                 }
 
@@ -46,7 +57,18 @@ pub fn get_group_latest_version(group_id: EntryHash) -> ExternResult<Group> {
                             latest_group_element.entry().to_app_option()?;
 
                         if let Some(group) = latest_group_version {
-                            return Ok(group);
+                            let group_output = GroupOutput {
+                                group_id,
+                                group_revision_id: group_entry_details.headers[0]
+                                    .clone()
+                                    .as_hash()
+                                    .to_owned(),
+                                latest_name: group.name,
+                                members: group.members,
+                                creator: group.creator,
+                                created: group.created,
+                            };
+                            return Ok(group_output);
                         }
                     }
                 }
@@ -72,8 +94,8 @@ pub fn link_and_emit_added_to_group_signals(
         name: SignalName::ADDED_TO_GROUP.to_owned(),
         payload: signal_payload,
     };
-    
-    remote_signal( ExternIO::encode(signal)?, agents)?;
+
+    remote_signal(ExternIO::encode(signal)?, agents)?;
 
     Ok(())
 }
