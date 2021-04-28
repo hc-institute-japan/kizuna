@@ -21,6 +21,7 @@ import MessageInput from "../../components/MessageInput";
 import { useAppDispatch, base64ToUint8Array, dateToTimestamp } from "../../utils/helpers";
 import { Conversation } from "../../utils/types";
 import { ChatListMethods } from "../../components/Chat/types";
+import { personCircleOutline } from "ionicons/icons";
 
 type Props = {
   location: RouteComponentProps<{}, {}, { state: Conversation }>
@@ -215,7 +216,7 @@ const Chat: React.FC<Props> = ({ location }) => {
           <IonButtons slot="start">
             <IonBackButton defaultHref="/home" className="ion-no-padding" />
             <IonAvatar className="ion-padding">
-              {data ? <img src={data?.src} alt={username} /> : <IonSpinner />}
+              <img src={personCircleOutline} alt={username} />
             </IonAvatar>
             {/* <IonButton href={`/u/${username}/details`} fill="clear" onClick={handleOnClick}> */}
             <IonButton fill="clear" onClick={handleOnClick}>
