@@ -85,7 +85,6 @@ const Conversation: React.FC<Props> = ({
                 }
               }
             ).length;
-            console.log(badgeCount)
             setBadgeCount(badgeCount);
           }
         });

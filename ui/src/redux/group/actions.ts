@@ -124,8 +124,6 @@ export const createGroup = (
 //   // This includes both members and admin of the group
 //   let members = [...groupData.members, groupData.creator];
 
-//   console.log("here are all the members of the group", members);
-
 //   let membersUsernames: {
 //     [key: string]: Profile;
 //   } = await fetchUsernameOfMembers(
@@ -134,8 +132,6 @@ export const createGroup = (
 //     callZome,
 //     Uint8ArrayToBase64(myAgentId!)
 //   );
-
-//   console.log("here are the memberUsernames", membersUsernames);
 
 //   dispatch<AddGroupAction>({
 //     type: ADD_GROUP,
