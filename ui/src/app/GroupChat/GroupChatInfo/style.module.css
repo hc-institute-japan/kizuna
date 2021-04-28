@@ -5,6 +5,11 @@
   flex-direction: column;
 }
 
+.scroll-vertically{
+  overflow: auto;
+  height: 100%;
+}
+
 .memberName {
   font-size: x-large;
 }

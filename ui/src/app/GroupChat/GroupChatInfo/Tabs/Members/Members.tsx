@@ -101,7 +101,7 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
   }, [groupData, groupMembers]);
 
   return !loading ? (
-    <IonSlide>
+    
       <IonContent>
           <IonItem lines="none" key={"member-numbers"}>
             <IonIcon className={styles.icon} icon={peopleOutline}></IonIcon>
@@ -125,46 +125,48 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
             >
             <h3>{intl.formatMessage({id: "app.groups.members-label"})}</h3>
           </IonItem>
-        <IonList className={styles.memberInfo}>
-          {/* This is for members and admin*/}
-          {members.map((member: any) => {
-            return member.id !== groupData.creator ? (
-              <React.Fragment key={member.id}>
-                <IonItemSliding>
-                  <IonItem lines="none" key={member.id}>
-                    <IonLabel className={styles.memberName} key={member.id}>
-                      <h3>
-                        {member.username}
-                        <br />
-                        {intl.formatMessage({id: "app.groups.member-role"})}
-                      </h3>
-                    </IonLabel>
+            <IonList>
+              {members.map((member: any) => {
+                return member.id !== groupData.creator ? (
+                  <IonItem>
+                    <IonItemSliding>
+                      <IonItem lines="none" key={member.id}>
+                        <IonLabel className={styles.memberName} key={member.id}>
+                          <h3>
+                            {member.username}
+                            <br />
+                            {intl.formatMessage({id: "app.groups.member-role"})}
+                          </h3>
+                        </IonLabel>
+                      </IonItem>
+                      <IonItemOptions side={"end"}>
+                        <IonItemOption
+                          onClick={() => handleRemoveMembers(member)}
+                          color="danger"
+                        >
+                          {intl.formatMessage({id: "app.groups.remove-member"})}
+                        </IonItemOption>
+                      </IonItemOptions>
+                    </IonItemSliding>
                   </IonItem>
-                  <IonItemOptions side={"end"}>
-                    <IonItemOption
-                      onClick={() => handleRemoveMembers(member)}
-                      color="danger"
-                    >
-                      {intl.formatMessage({id: "app.groups.remove-member"})}
-                    </IonItemOption>
-                  </IonItemOptions>
-                </IonItemSliding>
-              </React.Fragment>
-            ) : (
-              <IonItemSliding>
-                <IonItem lines="none" key={member.id}>
-                  <IonLabel className={styles.memberName}>
-                    <h3>
-                      {member.username}
-                      <br />
-                      {intl.formatMessage({id: "app.groups.admin-role"})}
-                    </h3>
-                  </IonLabel>
-                </IonItem>
-              </IonItemSliding>
-            ) ;
-          })}
-        </IonList>
+                ) : (
+                  <IonItem>
+                    <IonItemSliding>
+                      <IonItem lines="none" key={member.id}>
+                        <IonLabel className={styles.memberName}>
+                          <h3>
+                            {member.username}
+                            <br />
+                            {intl.formatMessage({id: "app.groups.admin-role"})}
+                          </h3>
+                        </IonLabel>
+                      </IonItem>
+                    </IonItemSliding>
+                  </IonItem>
+                ) ;
+              })}
+            </IonList>
+          {/* This is for members and admin*/}
 
         <AddMemberModal
           contacts={contacts}
@@ -178,10 +180,8 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
           setLoading={setLoading}
           myAgentId={myAgentId}
         />
-
         <RemoveMemberToast toast={toast} onDismiss={() => setToast(false)} message={errMsg}/>
       </IonContent>
-    </IonSlide>
   ) : (
     <IonLoading isOpen={loading} />
   );
