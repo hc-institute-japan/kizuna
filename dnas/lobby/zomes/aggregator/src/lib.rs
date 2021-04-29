@@ -74,15 +74,15 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
     let latest_group_messages: GroupMessagesOutput =
         call_response_handler(latest_group_messages_call_response)?.decode()?;
 
-    let latest_p2p_messages_call_response: ZomeCallResponse = call(
-        None,
-        "p2pmessage".into(),
-        "get_latest_messages".into(),
-        None,
-        &batch_size,
-    )?;
-    let latest_p2p_messages: P2PMessageHashTables =
-        call_response_handler(latest_p2p_messages_call_response)?.decode()?;
+    // let latest_p2p_messages_call_response: ZomeCallResponse = call(
+    //     None,
+    //     "p2pmessage".into(),
+    //     "get_latest_messages".into(),
+    //     None,
+    //     &batch_size,
+    // )?;
+    // let latest_p2p_messages: P2PMessageHashTables =
+    //     call_response_handler(latest_p2p_messages_call_response)?.decode()?;
 
     // let global_preference_call_response: ZomeCallResponse = call(
     //     None,
@@ -121,7 +121,7 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
         groups,
         latest_group_messages,
         member_profiles,
-        latest_p2p_messages,
+        // latest_p2p_messages,
         // global_preference,
         // per_agent_preference,
         // per_group_preference,
