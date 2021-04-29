@@ -1,26 +1,20 @@
-use std::{collections::HashMap, time::SystemTime};
+use hdk::prelude::*;
 
 use element::ElementEntry;
-use hdk3::prelude::*;
+use std::collections::HashMap;
+use timestamp::Timestamp;
 
+use crate::utils::error;
 use crate::utils::timestamp_to_days;
 
 use super::{
-    GroupChatFilter, GroupMessage, GroupMessageContent, GroupMessageElement, GroupMessageHash,
+    GroupChatFilter, GroupMessageContent, GroupMessageElement, GroupMessageHash,
     GroupMessagesContents, GroupMessagesOutput, MessagesByGroup, PayloadType, ReadList,
 };
 
-/*
-
-Initial implementation of get_message_by_group_by_timestamp
-
-Notes:
-1. Would it be better to separate zome functions like this?
-2. Or should we just categorize them? Like have files like "getters.rs" then put all the getters there.
-
-*/
-
-pub fn handler(group_chat_filter: GroupChatFilter) -> ExternResult<GroupMessagesOutput> {
+pub fn get_messages_by_group_by_timestamp_handler(
+    group_chat_filter: GroupChatFilter,
+) -> ExternResult<GroupMessagesOutput> {
     let path = Path::from(
         [
             group_chat_filter.clone().group_id.to_string(),
@@ -35,6 +29,7 @@ pub fn handler(group_chat_filter: GroupChatFilter) -> ExternResult<GroupMessages
         match group_chat_filter.payload_type {
             PayloadType::Text => Some(LinkTag::new("text".to_owned())),
             PayloadType::File => Some(LinkTag::new("file".to_owned())),
+            PayloadType::Media => Some(LinkTag::new("media".to_owned())),
             PayloadType::All => None,
         },
     ) {
@@ -52,7 +47,7 @@ pub fn handler(group_chat_filter: GroupChatFilter) -> ExternResult<GroupMessages
                         message_link.clone().target,
                         Some(LinkTag::new("read".to_owned())),
                     )?;
-                    let mut read_list: HashMap<String, SystemTime> = HashMap::new();
+                    let mut read_list: HashMap<String, Timestamp> = HashMap::new();
 
                     for j in 0..read_links.clone().into_inner().len() {
                         let read_link = read_links.clone().into_inner()[j].clone();
@@ -66,27 +61,35 @@ pub fn handler(group_chat_filter: GroupChatFilter) -> ExternResult<GroupMessages
                         };
                     }
 
-                    let group_message: GroupMessage = element
-                        .entry()
-                        .to_owned()
-                        .to_app_option::<GroupMessage>()?
-                        .ok_or(HdkError::Wasm(WasmError::Zome(
-                            "the group message ElementEntry enum is not of Present variant".into(),
-                        )))?;
-                    let group_message_element: GroupMessageElement = GroupMessageElement {
-                        entry: group_message,
-                        signed_header: element.signed_header().to_owned(),
-                    };
+                    match element.entry().to_owned().to_app_option() {
+                        Ok(option) => match option {
+                            Some(group_message) => {
+                                let group_message_element: GroupMessageElement =
+                                    GroupMessageElement {
+                                        entry: group_message,
+                                        signed_header: element.signed_header().to_owned(),
+                                    };
 
-                    group_messages_content.insert(
-                        message_link.clone().target.to_string(),
-                        GroupMessageContent {
-                            group_message_element,
-                            read_list: ReadList(read_list),
+                                group_messages_content.insert(
+                                    message_link.clone().target.to_string(),
+                                    GroupMessageContent {
+                                        group_message_element,
+                                        read_list: ReadList(read_list),
+                                    },
+                                );
+
+                                messages_hashes.push(GroupMessageHash(message_link.clone().target));
+                            }
+
+                            None => {}
                         },
-                    );
 
-                    messages_hashes.push(GroupMessageHash(message_link.clone().target));
+                        Err(_) => {
+                            return error(
+                                "the group message ElementEntry enum is not of Present variant",
+                            );
+                        }
+                    }
                 };
             }
 
@@ -100,8 +103,6 @@ pub fn handler(group_chat_filter: GroupChatFilter) -> ExternResult<GroupMessages
                 group_messages_contents: GroupMessagesContents(group_messages_content),
             })
         }
-        Err(_) => Err(HdkError::Wasm(WasmError::Zome(
-            "Cannot get links on this path".into(),
-        ))),
+        Err(_) => error("Cannot get links on this path"),
     }
 }

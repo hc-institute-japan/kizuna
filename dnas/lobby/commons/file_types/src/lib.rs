@@ -1,4 +1,4 @@
-use hdk3::prelude::*;
+use hdk::prelude::*;
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -81,5 +81,6 @@ pub enum Payload {
 pub enum PayloadType {
     Text,
     File,
+    Media,
     All,
 }

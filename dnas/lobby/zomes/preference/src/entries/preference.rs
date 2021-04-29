@@ -1,7 +1,7 @@
-use hdk3::prelude::*;
+use hdk::prelude::*;
 pub mod handlers;
 
-#[derive(Serialize, Deserialize, SerializedBytes, PartialEq)]
+#[derive(Serialize, Deserialize, SerializedBytes, PartialEq, Debug )]
 #[serde(rename_all = "camelCase")]
 pub struct Preference {
     typing_indicator: bool,
@@ -16,7 +16,7 @@ entry_def!(Preference EntryDef {
     required_validation_type: RequiredValidationType::Element
 });
 
-#[derive(Serialize, Deserialize, SerializedBytes, PartialEq)]
+#[derive(Serialize, Deserialize, SerializedBytes, PartialEq, Debug )]
 #[serde(rename_all = "camelCase")]
 pub struct PerAgentPreference {
     typing_indicator: Vec<AgentPubKey>,
@@ -31,7 +31,7 @@ entry_def!(PerAgentPreference EntryDef {
     required_validation_type: RequiredValidationType::Element
 });
 
-#[derive(Serialize, Deserialize, SerializedBytes, PartialEq)]
+#[derive(Serialize, Deserialize, SerializedBytes, PartialEq, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct PerGroupPreference {
     typing_indicator: Vec<String>,
@@ -46,23 +46,29 @@ entry_def!(PerGroupPreference EntryDef {
     required_validation_type: RequiredValidationType::Element
 });
 
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, PartialEq, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct PreferenceIO {
     typing_indicator: Option<bool>,
     read_receipt: Option<bool>,
 }
 
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, PartialEq, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct PerAgentPreferenceIO {
     typing_indicator: Option<Vec<AgentPubKey>>,
     read_receipt: Option<Vec<AgentPubKey>>,
 }
 
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, PartialEq, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct PerGroupPreferenceIO {
     typing_indicator: Option<Vec<String>>,
     read_receipt: Option<Vec<String>>,
+}
+
+pub enum QueryTarget{
+    Preference,
+    AgentPreference,
+    GroupPreference,
 }
