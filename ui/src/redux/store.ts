@@ -6,6 +6,12 @@ import rootReducer from "./reducers";
 
 const modifiedThunk = thunk.withExtraArgument({ callZome, getAgentId });
 
-const store = createStore(rootReducer, applyMiddleware(modifiedThunk, logger));
+const store = createStore(
+  rootReducer,
+  applyMiddleware(
+    modifiedThunk
+    // logger
+  )
+);
 
 export default store;
