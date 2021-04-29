@@ -8,3 +8,12 @@
 .chat > ion-item {
   --background: var(--ion-background-color);
 }
+
+.info-button {
+  height: 100%;
+  width: 100%;
+}
+
+.title {
+  overflow: hidden;
+}
