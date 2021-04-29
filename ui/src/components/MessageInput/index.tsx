@@ -141,6 +141,7 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
         </IonButtons>
         <IonTextarea
           value={message}
+          className={styles["textarea"]}
           onIonChange={handleOnChange}
           autoGrow={true}
           placeholder={intl.formatMessage({

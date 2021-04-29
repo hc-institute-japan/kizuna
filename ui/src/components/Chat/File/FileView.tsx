@@ -43,8 +43,8 @@ const File: React.FC<Props> = ({ file }) => {
         </div>
         <div className="ion-align-items-center">
           <IonRow>
-            <IonLabel className="ion-text-wrap">
-              <p className="ion-no-margin">{fileName}</p>
+            <IonLabel className={`${styles["file-name"]}`}>
+              <p className="ion-no-margin ion-text-wrap">{fileName}</p>
             </IonLabel>
           </IonRow>
           <IonRow>
