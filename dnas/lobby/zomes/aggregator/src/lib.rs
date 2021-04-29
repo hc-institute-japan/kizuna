@@ -6,7 +6,7 @@ use crate::types::*;
 fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
     //AggregatedLatestData
 
-    let batch_size: BatchSize = BatchSize(20);
+    let batch_size: BatchSize = BatchSize(10);
     let mut agent_pub_keys: Vec<AgentPubKey> = Vec::new(); // agentPubKeys of members
 
     let blocked_contacts_call_response: ZomeCallResponse =

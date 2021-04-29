@@ -1,9 +1,9 @@
 use hdk::prelude::*;
 
-use crate::group::group_helpers::get_group_entry_from_element;
 use crate::group::group_helpers::get_group_latest_version;
+use crate::{entries::group::GroupOutput, group::group_helpers::get_group_entry_from_element};
 
-use crate::group::{Group, GroupOutput};
+use crate::group::Group;
 
 pub fn validate_update_group_handler(data: ValidateData) -> ExternResult<ValidateCallbackResult> {
     //data = { element = { signed_header, entry } , validation_package <Option> }

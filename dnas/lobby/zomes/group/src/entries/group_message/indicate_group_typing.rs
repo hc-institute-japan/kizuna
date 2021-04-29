@@ -13,8 +13,9 @@ pub fn indicate_group_typing_handler(
     };
 
     remote_signal(
-        ExternIO::encode(&signal_detail)?,
+        ExternIO::encode(signal_detail)?,
         group_typing_detail_data.members,
     )?;
+
     Ok(())
 }

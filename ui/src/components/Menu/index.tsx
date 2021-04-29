@@ -69,6 +69,7 @@ const Menu: React.FC = () => {
           <IonItemGroup className="ion-no-margin">
             <IonAvatar className="ion-margin">
               <img
+                className={styles.avatar}
                 alt="Your user"
                 src={personCircleOutline}
                 className={styles.avatar}
