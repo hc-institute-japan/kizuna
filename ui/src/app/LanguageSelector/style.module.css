@@ -1,0 +1,26 @@
+.page {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+  min-height: 100vh;
+  min-width: 100vw;
+}
+
+.language-container {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.language:hover {
+  cursor: pointer;
+}
+
+.selected {
+  color: rgb(var(--ion-color-primary-rgb));
+}
