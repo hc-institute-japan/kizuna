@@ -17,20 +17,25 @@ import {
   fetchFilesForAParticularDateTest,
 } from "./group_message";
 
-export default (orchestrator, config, installables) => {
+export default (config, installables) => {
+
   // Group CRUD and validation related tests.
-  createGroupTest(orchestrator, config, installables);
-  addAndRemoveMembersTest(orchestrator, config, installables);
-  updateGroupNameTest(orchestrator, config, installables);
-  validateCreateGroupTest(orchestrator, config, installables);
+  createGroupTest(config, installables); // good
+  addAndRemoveMembersTest(config, installables); // good
+  updateGroupNameTest(config, installables); // good
+  validateCreateGroupTest(config, installables); //good
+  
   // GroupMessage related tests
-  sendMessageTest(orchestrator, config, installables); // good
-  sendMessageswithFilesTest(orchestrator, config, installables); // good
-  sendLargeSetOfFilesTest(orchestrator, config, installables); // good
-  getNextBatchOfMessagesTest(orchestrator, config, installables); // good
-  getMessagesByGroupByTimestampTest(orchestrator, config, installables); // good
-  getLatestMessagesForAllGroupsTest(orchestrator, config, installables); // good
-  fetchFilesForAParticularDateTest(orchestrator, config, installables); // good
-  groupTypingIndicatorTest(orchestrator, config, installables); // good
-  readGroupMessageTest(orchestrator, config, installables); // good
+  sendMessageTest(config, installables); // good
+  sendMessageswithFilesTest(config, installables); // good
+  sendLargeSetOfFilesTest(config, installables); // good
+  getNextBatchOfMessagesTest(config, installables); // good
+  getMessagesByGroupByTimestampTest(config, installables); // good
+  getLatestMessagesForAllGroupsTest(config, installables); // good
+  fetchFilesForAParticularDateTest(config, installables); // good
+  groupTypingIndicatorTest(config, installables); // good
+  readGroupMessageTest(config, installables); // good
+
+
+  
 };
