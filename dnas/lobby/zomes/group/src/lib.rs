@@ -16,6 +16,7 @@ use group::remove_members::remove_members_handler;
 use group::update_group_name::update_group_name_handler;
 
 use group_message::get_all_messages::get_all_messages_handler;
+use group_message::get_files_bytes::get_files_bytes_handler;
 use group_message::get_latest_messages_for_all_groups::get_latest_messages_for_all_groups_handler;
 use group_message::get_messages_by_group_by_timestamp::get_messages_by_group_by_timestamp_handler;
 use group_message::get_next_batch_group_messages::get_next_batch_group_messages_handler;
@@ -30,7 +31,7 @@ use validation_rules::ValidationInput;
 use signals::{SignalDetails, SignalPayload};
 
 use group_message::{
-    BatchSize, GroupChatFilter, GroupFileBytes, GroupMessage, GroupMessageData,
+    BatchSize, FileBytes, GroupChatFilter, GroupFileBytes, GroupMessage, GroupMessageData,
     GroupMessageDataWrapper, GroupMessageInput, GroupMessageInputWithDate, GroupMessageReadData,
     GroupMessagesOutput, GroupMsgBatchFetchFilter, GroupTypingDetailData,
 };
@@ -165,6 +166,11 @@ fn get_messages_by_group_by_timestamp(
     group_chat_filter: GroupChatFilter,
 ) -> ExternResult<GroupMessagesOutput> {
     return get_messages_by_group_by_timestamp_handler(group_chat_filter);
+}
+
+#[hdk_extern]
+fn get_files_bytes(file_hashes: Vec<EntryHash>) -> ExternResult<FileBytes> {
+    return get_files_bytes_handler(file_hashes);
 }
 
 #[hdk_extern]
