@@ -50,23 +50,23 @@ interface Props {
 
 const ChatDetails: React.FC<Props> = ({ location }) => {
   const { state }: any = { ...location };
-  const { conversations, messages, receipts } = useSelector(
-    (state: RootState) => state.p2pmessages
-  );
-  const [media, setMedia] = useState<{ [key: string]: boolean }>({});
-  const [files, setFiles] = useState<{ [key: string]: P2PMessage }>({});
-  const [orderedMedia, setOrderedMedia] = useState<P2PMessage[]>([]);
-  const [orderedFiles, setOrderedFiles] = useState<P2PMessage[]>([]);
-
+  const { conversations, messages, receipts } = useSelector((state: RootState) => state.p2pmessages);
+  const [ media, setMedia ] = useState< { [key: string]: boolean }>({});
+  const [ files, setFiles ] = useState< { [key: string]: P2PMessage }>({});
+  const [ orderedMedia, setOrderedMedia ] = useState<P2PMessage[]>([]);
+  const [ orderedFiles, setOrderedFiles ] = useState<P2PMessage[]>([]);
   const dispatch = useAppDispatch();
-
   const slideOpts = {
     initialSlide: 0,
     speed: 400,
   };
 
+  // REFS
   const slideRef = React.createRef<HTMLIonSlidesElement>();
+  const infiniteFileScroll = useRef<HTMLIonInfiniteScrollElement>(null);
+  const infiniteFileScroll2 = useRef<HTMLIonInfiniteScrollElement>(null);
 
+  // USE EFFECTS
   useEffect(() => {
     if (
       state.conversant !== undefined &&
@@ -103,9 +103,23 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
         }
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    console.log("chatdetails media", orderedMedia)
   }, [conversations, messages]);
 
+  useEffect(() => {
+    let initialFetchFilter = {
+      conversant: Buffer.from(base64ToUint8Array(state.conversant.id)),
+      batch_size: 40,
+      payload_type: "File",
+      last_fetched_timestamp: undefined,
+      last_fetched_message_id: undefined
+    };
+    dispatch(
+      getNextBatchMessages(initialFetchFilter)
+    )
+  }, []);
+
+  // HANDLERS
   const handleOnSegmentChange = (value: any) => {
     var index;
     switch (value) {
@@ -139,8 +153,6 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
     );
   };
 
-  const infiniteFileScroll = useRef<HTMLIonInfiniteScrollElement>(null);
-  const infiniteFileScroll2 = useRef<HTMLIonInfiniteScrollElement>(null);
   const complete = () => infiniteFileScroll.current!.complete();
   const complete2 = () => infiniteFileScroll2.current!.complete();
 
@@ -156,7 +168,7 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
     dispatch(
       getNextBatchMessages({
         conversant: Buffer.from(base64ToUint8Array(state.conversant.id)),
-        batch_size: 3,
+        batch_size: 5,
         payload_type: "File",
         last_fetched_timestamp:
           lastFile !== undefined
@@ -261,21 +273,18 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
                         : null}
                       <IonCol size="3">
                         <IonCard className={styles.mediacard}>
-                          {(file.payload as FilePayload).fileType ===
-                          "VIDEO" ? (
-                            <div className={styles.mediadiv}>
+                          {(file.payload as FilePayload).fileType ==="VIDEO" 
+                          ? <div className={styles.mediadiv}>
                               <VideoView file={file.payload as FilePayload} />
                             </div>
-                          ) : (
-                            <div className={styles.mediadiv}>
-                              <ImageView
-                                file={file.payload as FilePayload}
-                                src={decoder.decode(
-                                  (file.payload as FilePayload).thumbnail!
-                                )}
+                          : <div className={styles.mediadiv}>
+                                        {console.log("rendering chat media")}
+                              <ImageView 
+                                file={file.payload as FilePayload} 
+                                src={decoder.decode((file.payload as FilePayload).thumbnail!)} 
                               />
                             </div>
-                          )}
+                          }
                         </IonCard>
                       </IonCol>
                     </React.Fragment>
