@@ -161,7 +161,7 @@ pub struct AggregatedLatestData {
     // for p2pmessage
     pub latest_p2p_messages: P2PMessageHashTables,
     // for preference
-    pub global_preference: Preference,
-    pub per_agent_preference: PerAgentPreference,
-    pub per_group_preference: PerGroupPreference,
+    // pub global_preference: Preference,
+    // pub per_agent_preference: PerAgentPreference,
+    // pub per_group_preference: PerGroupPreference,
 }
