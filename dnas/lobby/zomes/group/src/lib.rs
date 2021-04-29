@@ -5,7 +5,7 @@ mod signals;
 mod utils;
 mod validation_rules;
 
-use entries::group;
+use entries::group::{self, GroupOutput};
 use entries::group_message;
 
 use group::add_members::add_members_handler;
@@ -37,7 +37,7 @@ use group_message::{
 };
 
 use group::{
-    CreateGroupInput, CreateGroupOutput, EntryHashWrapper, Group, GroupOutput, MyGroupListWrapper,
+    CreateGroupInput, CreateGroupOutput, EntryHashWrapper, Group, MyGroupListWrapper,
     UpdateGroupNameIO, UpdateMembersIO,
 };
 
@@ -54,13 +54,11 @@ pub fn init(_: ()) -> ExternResult<InitCallbackResult> {
     let mut fuctions = HashSet::new();
 
     // TODO: name may be changed to better suit the context of cap grant.s
-    let tag: String = "create_group_cap_grant".into();
+    let tag: String = "group_zome_cap_grant".into();
     let access: CapAccess = CapAccess::Unrestricted;
-
     let zome_name: ZomeName = zome_info()?.zome_name;
-    let function_name: FunctionName = FunctionName("recv_remote_signal".into());
 
-    fuctions.insert((zome_name, function_name));
+    fuctions.insert((zome_name.clone(), FunctionName("recv_remote_signal".into())));
 
     let cap_grant_entry: CapGrantEntry = CapGrantEntry::new(
         tag,    // A string by which to later query for saved grants.
@@ -159,6 +157,11 @@ fn get_latest_messages_for_all_groups(batch_size: BatchSize) -> ExternResult<Gro
 }
 
 #[hdk_extern]
+fn indicate_group_typing(group_typing_detail_data: GroupTypingDetailData) -> ExternResult<()> {
+    return indicate_group_typing_handler(group_typing_detail_data);
+}
+
+#[hdk_extern]
 fn get_messages_by_group_by_timestamp(
     group_chat_filter: GroupChatFilter,
 ) -> ExternResult<GroupMessagesOutput> {
@@ -168,11 +171,6 @@ fn get_messages_by_group_by_timestamp(
 #[hdk_extern]
 fn get_files_bytes(file_hashes: Vec<EntryHash>) -> ExternResult<FileBytes> {
     return get_files_bytes_handler(file_hashes);
-}
-
-#[hdk_extern]
-fn indicate_group_typing(group_typing_detail_data: GroupTypingDetailData) -> ExternResult<()> {
-    return indicate_group_typing_handler(group_typing_detail_data);
 }
 
 #[hdk_extern]

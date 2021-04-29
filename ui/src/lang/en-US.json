@@ -1,7 +1,7 @@
 {
   "app.contacts.add-message": "{name} has been added to your contacts.",
   "app.contacts.empty-contact-list": "Your contact list is empty as of the moment.",
-  "app.conversations.empty-conversations-list": "Filler...",
+  "app.conversations.empty-conversations-list": "You have no conversations yet...",
   "app.landing.login": "Start Messaging",
   "app.landing.register": "Don't have an account?",
   "app.login.login": "Login",

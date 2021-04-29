@@ -94,13 +94,8 @@ const GroupChatInfo: React.FC = () => {
         dispatch(fetchId()).then((res: AgentPubKey | null) => {
           if (res) setMyAgentId(Uint8ArrayToBase64(res));
           if (groupRes.creator !== Uint8ArrayToBase64(res!)) {
-            console.log((groupRes!.creator))
-            console.log((groupRes!.creator !== myAgentId))
-            console.log(myAgentId)
-            
             setDisabled(true)
           }
-          console.log(disabled)
         });
       });
       setLoading(false);
@@ -110,8 +105,6 @@ const GroupChatInfo: React.FC = () => {
         dispatch(fetchId()).then((res: AgentPubKey | null) => {
           if (res) setMyAgentId(Uint8ArrayToBase64(res));
           if (groupRes.creator !== Uint8ArrayToBase64(res!)) {
-            console.log(groupRes!.creator)
-            console.log(myAgentId)
             setDisabled(true)
             setLoading(false);
           }

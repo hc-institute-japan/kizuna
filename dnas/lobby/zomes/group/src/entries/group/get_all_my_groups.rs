@@ -32,12 +32,12 @@ pub fn get_all_my_groups_handler() -> ExternResult<MyGroupListWrapper> {
                     }
 
                     if !group_entry_details.updates.is_empty() {
-                        let latest_group_version: GroupOutput =
-                            get_group_latest_version(group_id.clone())?;
+                        let latest_group: GroupOutput =
+                            get_group_latest_version(link.target.clone())?;
 
-                        group.name = latest_group_version.latest_name; // latest group name
+                        group.name = latest_group.latest_name; // latest group name
 
-                        group.members = latest_group_version.members; // latest group members
+                        group.members = latest_group.members; // latest group members
                     }
 
                     my_linked_groups_entries.push(GroupOutput::new(

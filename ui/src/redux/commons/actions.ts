@@ -103,7 +103,7 @@ export const getLatestData = (): ThunkAction => async (
     members,
   });
 
-  dispatch(getLatestMessages(5));
+  dispatch(getLatestMessages(20));
 
   return null;
 };

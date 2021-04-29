@@ -2,6 +2,10 @@
   background: var(--ion-background-color) !important;
 }
 
+.avatar {
+  filter: invert(0%);
+}
+
 .menu ion-item,
 .menu ion-item-group {
   --background: var(--ion-background-color) !important;
