@@ -6,6 +6,7 @@ import {
   IonContent,
   IonHeader,
   IonIcon,
+  IonItem,
   IonLoading,
   IonPage,
   IonTitle,
@@ -200,7 +201,11 @@ const GroupChat: React.FC = () => {
                 <img src={peopleCircleOutline} alt={groupInfo!.name} />
               )}
             </IonAvatar>
-            <IonTitle className="ion-no-padding"> {groupInfo!.name}</IonTitle>
+            <IonTitle className={styles["title"]}>
+              <div>
+                {groupInfo!.name}
+              </div>
+            </IonTitle>
             <IonButton
               onClick={() => {
                 history.push(`/g/${groupInfo.originalGroupEntryHash}/info`);
