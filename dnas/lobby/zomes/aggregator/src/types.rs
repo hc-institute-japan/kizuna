@@ -159,7 +159,7 @@ pub struct AggregatedLatestData {
     pub latest_group_messages: GroupMessagesOutput,
     pub member_profiles: UsernameList,
     // for p2pmessage
-    pub latest_p2p_messages: P2PMessageHashTables,
+    // pub latest_p2p_messages: P2PMessageHashTables,
     // for preference
     // pub global_preference: Preference,
     // pub per_agent_preference: PerAgentPreference,
