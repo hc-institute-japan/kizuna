@@ -58,7 +58,7 @@ const GroupChatInfo: React.FC = () => {
 
   const tabs = [
     {
-      label: intl.formatMessage({id: "app.groups.label-info"}),
+      label: intl.formatMessage({ id: "app.groups.label-info" }),
       tab: groupInfo ? (
         <Members
           groupId={group}
@@ -67,11 +67,11 @@ const GroupChatInfo: React.FC = () => {
       ) : null,
     },
     {
-      label: intl.formatMessage({id: "app.groups.label-media"}),
+      label: intl.formatMessage({ id: "app.groups.label-media" }),
       tab: <Media groupId={group} />,
     },
     {
-      label: intl.formatMessage({id: "app.groups.label-files"}),
+      label: intl.formatMessage({ id: "app.groups.label-files" }),
       tab: <File groupId={group} />,
     },
   ];
@@ -89,27 +89,38 @@ const GroupChatInfo: React.FC = () => {
 
   useEffect(() => {
     if (groupData) {
-      dispatch(getLatestGroupVersion(group)).then((groupRes: GroupConversation) => {
-        setGroupInfo(groupRes);
-        dispatch(fetchId()).then((res: AgentPubKey | null) => {
-          if (res) setMyAgentId(Uint8ArrayToBase64(res));
-          if (groupRes.creator !== Uint8ArrayToBase64(res!)) {
-            setDisabled(true)
-          }
-        });
-      });
+      dispatch(getLatestGroupVersion(group)).then(
+        (groupRes: GroupConversation) => {
+          setGroupInfo(groupRes);
+          dispatch(fetchId()).then((res: AgentPubKey | null) => {
+            if (res) setMyAgentId(Uint8ArrayToBase64(res));
+            if (groupRes.creator !== Uint8ArrayToBase64(res!)) {
+              // console.log((groupRes!.creator))
+              // console.log((groupRes!.creator !== myAgentId))
+              // console.log(myAgentId)
+
+              setDisabled(true);
+            }
+            // console.log(disabled);
+          });
+        }
+      );
       setLoading(false);
     } else {
-      dispatch(getLatestGroupVersion(group)).then((groupRes: GroupConversation) => {
-        setGroupInfo(groupRes);
-        dispatch(fetchId()).then((res: AgentPubKey | null) => {
-          if (res) setMyAgentId(Uint8ArrayToBase64(res));
-          if (groupRes.creator !== Uint8ArrayToBase64(res!)) {
-            setDisabled(true)
-            setLoading(false);
-          }
-        });
-      });
+      dispatch(getLatestGroupVersion(group)).then(
+        (groupRes: GroupConversation) => {
+          setGroupInfo(groupRes);
+          dispatch(fetchId()).then((res: AgentPubKey | null) => {
+            if (res) setMyAgentId(Uint8ArrayToBase64(res));
+            if (groupRes.creator !== Uint8ArrayToBase64(res!)) {
+              console.log(groupRes!.creator);
+              console.log(myAgentId);
+              setDisabled(true);
+              setLoading(false);
+            }
+          });
+        }
+      );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

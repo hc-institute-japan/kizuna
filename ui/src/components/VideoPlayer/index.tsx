@@ -41,6 +41,9 @@ const VideoPlayer: React.FC<Props> = ({
         ...(height ? { height } : {}),
         ...(width ? { width } : {}),
       }}
+      onDoubleClick={() => {
+        setIsModalOpen(true);
+      }}
     >
       <video
         onTimeUpdate={() =>

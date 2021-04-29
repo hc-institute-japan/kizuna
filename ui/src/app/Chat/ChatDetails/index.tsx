@@ -161,10 +161,9 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
     complete: () => Promise<void>,
     files: P2PMessage[]
   ) => {
-    // console.log("Details scrolls");
     // var lastFile: P2PMessage = Object.values(files)[Object.entries(files).length - 1];
     var lastFile: P2PMessage = files[files.length - 1];
-    // console.log("Details last file", lastFile);
+
     dispatch(
       getNextBatchMessages({
         conversant: Buffer.from(base64ToUint8Array(state.conversant.id)),
