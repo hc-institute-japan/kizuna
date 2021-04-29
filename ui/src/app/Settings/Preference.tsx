@@ -6,6 +6,7 @@ import {
   IonToggle,
 } from "@ionic/react";
 import React from "react";
+import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { setPreference } from "../../redux/preference/actions";
 import { RootState } from "../../redux/types";
@@ -16,6 +17,7 @@ const Preference: React.FC = () => {
     (state: RootState) => state.preference
   );
   const dispatch = useAppDispatch();
+  const intl = useIntl();
 
   const handleReadChange = () =>
     dispatch(setPreference({ readReceipt: !readReceipt }));
@@ -27,15 +29,15 @@ const Preference: React.FC = () => {
     <IonList>
       <IonListHeader>
         <IonLabel>
-          <h1>Preference</h1>
+          <h1>{intl.formatMessage({id: "app.setting.preference-label"})}</h1>
         </IonLabel>
       </IonListHeader>
       <IonItem>
-        <IonLabel>Typing Indicator</IonLabel>
+        <IonLabel>{intl.formatMessage({id: "app.setting.typing-indicator-label"})}</IonLabel>
         <IonToggle checked={typingIndicator} onIonChange={handleTypingChange} />
       </IonItem>
       <IonItem>
-        <IonLabel>Read Receipt</IonLabel>
+        <IonLabel>{intl.formatMessage({id: "app.setting.read-receipt-label"})}</IonLabel>
         <IonToggle checked={readReceipt} onIonChange={handleReadChange} />
       </IonItem>
     </IonList>
