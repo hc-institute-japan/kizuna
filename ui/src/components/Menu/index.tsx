@@ -72,7 +72,6 @@ const Menu: React.FC = () => {
                 className={styles.avatar}
                 alt="Your user"
                 src={personCircleOutline}
-                className={styles.avatar}
               ></img>
             </IonAvatar>
 
