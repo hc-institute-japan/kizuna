@@ -155,8 +155,9 @@ const GroupChat: React.FC = () => {
 
   useEffect(() => {
     setLoading(true);
-    if (groupData) {
-      setMessages([...messages!, ...groupData.messages]);
+    if (groupData && groupData.messages.length) {
+      let newMessages = [...messages!, ...groupData.messages]
+      setMessages(newMessages);
       setLoading(false);
     } else {
       dispatch(getLatestGroupVersion(group)).then((res: GroupConversation) => {
@@ -202,7 +203,7 @@ const GroupChat: React.FC = () => {
               )}
             </IonAvatar>
             <IonTitle className={styles["title"]}>
-              <div>
+              <div className="item item-text-wrap">
                 {groupInfo!.name}
               </div>
             </IonTitle>
