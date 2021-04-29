@@ -106,7 +106,9 @@ const Chat: React.FC<Props> = ({ location }) => {
   }, [conversations, messages]);
 
   useEffect(() => {
-    dispatch(isTyping(Buffer.from(base64ToUint8Array(conversant.id)), true))
+    if (conversant) {
+      dispatch(isTyping(Buffer.from(base64ToUint8Array(conversant.id)), true))
+    }
   }, [message])
 
   // HANDLERS

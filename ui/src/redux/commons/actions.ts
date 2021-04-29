@@ -24,6 +24,7 @@ export const getLatestData = (): ThunkAction => async (
     zomeName: ZOMES.AGGREGATOR,
     fnName: FUNCTIONS[ZOMES.AGGREGATOR].RETRIEVE_LATEST_DATA,
   });
+  console.log(latestData);
 
   dispatch({
     type: SET_USERNAME,
@@ -58,13 +59,13 @@ export const getLatestData = (): ThunkAction => async (
   });
 
   // TODO: store per agent and group prefenrece as well
-  dispatch({
-    type: SET_PREFERENCE,
-    preference: {
-      readReceipt: latestData.globalPreference.readReceipt,
-      typingIndicator: latestData.globalPreference.typingIndicator,
-    },
-  });
+  // dispatch({
+  //   type: SET_PREFERENCE,
+  //   preference: {
+  //     readReceipt: latestData.globalPreference.readReceipt,
+  //     typingIndicator: latestData.globalPreference.typingIndicator,
+  //   },
+  // });
 
   let groupMessagesOutput: GroupMessagesOutput = convertFetchedResToGroupMessagesOutput(
     latestData.latestGroupMessages
