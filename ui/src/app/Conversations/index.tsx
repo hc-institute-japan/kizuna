@@ -192,7 +192,7 @@ const Conversations: React.FC = () => {
     <IonPage>
       <Toolbar noSearch onChange={() => {}} />
       <IonContent>
-        {Object.keys(groups).length > 0 || p2pState !== undefined ? (
+        {Object.keys(groups).length > 0 || Object.keys(p2pState.conversations).length > 0 ? (
           <IonList className={styles.conversation}>
             {renderConversation(groups, p2pState).map((conversation: any) => (
               <Conversation
