@@ -169,18 +169,25 @@ const MessageList: React.FC<Props> = ({
   }, [messageIds]);
 
   useEffect(() => {
-    let maybeThisGroupNewestMessageKey = Object.keys(allMessages)[Object.keys(allMessages).length - 1]
-    let maybeThisGroupNewestMessage = allMessages[maybeThisGroupNewestMessageKey];
+    let maybeThisGroupNewestMessageKey = Object.keys(allMessages)[
+      Object.keys(allMessages).length - 1
+    ];
+    let maybeThisGroupNewestMessage =
+      allMessages[maybeThisGroupNewestMessageKey];
     if (maybeThisGroupNewestMessageKey) {
-      if (maybeThisGroupNewestMessage.groupEntryHash === groupId && maybeThisGroupNewestMessage.groupMessageEntryHash !== newestMessage?.groupMessageEntryHash) {
-        setNewestMessage(maybeThisGroupNewestMessage)
+      if (
+        maybeThisGroupNewestMessage.groupEntryHash === groupId &&
+        maybeThisGroupNewestMessage.groupMessageEntryHash !==
+          newestMessage?.groupMessageEntryHash
+      ) {
+        setNewestMessage(maybeThisGroupNewestMessage);
       }
     }
   }, [allMessages, groupId, newestMessage?.groupMessageEntryHash]);
 
   useEffect(() => {
     if (newestMessage) {
-      const authorProfile = allMembers[newestMessage.author]
+      const authorProfile = allMembers[newestMessage.author];
       messages.push({
         ...newestMessage,
         author: authorProfile
@@ -191,7 +198,7 @@ const MessageList: React.FC<Props> = ({
               username: username!,
               id: newestMessage.author,
             },
-      })
+      });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newestMessage]);
@@ -212,7 +219,8 @@ const MessageList: React.FC<Props> = ({
           if (message.author.id === myAgentId)
             return (
               <Chat.Me
-                key={message.groupMessageEntryHash}
+                // key={message.groupMessageEntryHash}
+                key={i}
                 author={message.author.username}
                 timestamp={new Date(message.timestamp[0] * 1000)}
                 payload={message.payload}
@@ -224,7 +232,8 @@ const MessageList: React.FC<Props> = ({
             );
           return (
             <Chat.Others
-              key={message.groupMessageEntryHash}
+              // key={message.groupMessageEntryHash}
+              key={i}
               author={message.author.username}
               timestamp={new Date(message.timestamp[0] * 1000)}
               payload={message.payload}
@@ -232,37 +241,37 @@ const MessageList: React.FC<Props> = ({
               type="group"
               showName={true}
               onSeen={(complete) => {
+                console.log(i);
                 dispatch(fetchId()).then((res: AgentPubKey | null) => {
                   setMyAgentId(Uint8ArrayToBase64(res!));
                   let read: boolean = Object.keys(message.readList)
-                  .map((key: string) => {
-                    key = key.slice(5);
-                    return key;
-                  })
-                  .includes(Uint8ArrayToBase64(res!).slice(4));
+                    .map((key: string) => {
+                      key = key.slice(5);
+                      return key;
+                    })
+                    .includes(Uint8ArrayToBase64(res!).slice(4));
 
-                if (i === messagesData!.length - 1 && !read) {
-                  let groupMessageReadData: GroupMessageReadData = {
-                    groupId: base64ToUint8Array(groupId),
-                    messageIds: [
-                      base64ToUint8Array(message.groupMessageEntryHash),
-                    ],
-                    reader: res!,
-                    timestamp: message.timestamp,
-                    members: members.map((member: string) =>
-                      Buffer.from(base64ToUint8Array(member).buffer)
-                    ),
-                  };
-                  dispatch(readGroupMessage(groupMessageReadData)).then(
-                    (res: any) => {
-                      complete();
-                    }
-                  );
-                }
-                })
+                  if (!read) {
+                    let groupMessageReadData: GroupMessageReadData = {
+                      groupId: base64ToUint8Array(groupId),
+                      messageIds: [
+                        base64ToUint8Array(message.groupMessageEntryHash),
+                      ],
+                      reader: res!,
+                      timestamp: message.timestamp,
+                      members: members.map((member: string) =>
+                        Buffer.from(base64ToUint8Array(member).buffer)
+                      ),
+                    };
+                    dispatch(readGroupMessage(groupMessageReadData)).then(
+                      (res: any) => {
+                        complete();
+                      }
+                    );
+                  }
+                });
                 // TODO: This is only a temporary fix. The HashType should be changed to Agent in the hc side when ReadList is constrcuted
                 // to avoid doing something like this in UI.
-
               }}
               showProfilePicture={true}
             />

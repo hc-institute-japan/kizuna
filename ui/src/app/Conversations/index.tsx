@@ -7,7 +7,11 @@ import {
   IonList,
   IonPage,
 } from "@ionic/react";
-import { pencil } from "ionicons/icons";
+import {
+  pencil,
+  peopleCircleOutline,
+  personCircleOutline,
+} from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
@@ -17,7 +21,11 @@ import { isTextPayload } from "../../redux/commons/types";
 import { GroupConversation, GroupMessage } from "../../redux/group/types";
 import { fetchId, fetchProfileFromUsername } from "../../redux/profile/actions";
 import { RootState } from "../../redux/types";
-import { Uint8ArrayToBase64, useAppDispatch, dateToTimestamp } from "../../utils/helpers";
+import {
+  Uint8ArrayToBase64,
+  useAppDispatch,
+  dateToTimestamp,
+} from "../../utils/helpers";
 import { Message } from "../../utils/types";
 import EmptyConversations from "./EmptyConversations";
 import { P2PMessageConversationState } from "../../redux/p2pmessages/types";
@@ -60,14 +68,15 @@ const Conversations: React.FC = () => {
 
     if (p2p !== undefined) {
       for (let key in p2p.conversations) {
-        
         // for people not in contacts list
         if (contacts[key.slice(1)] == undefined) continue;
 
-        let src = "https://upload.wikimedia.org/wikipedia/commons/8/8c/Lauren_Tsai_by_Gage_Skidmore.jpg";
+        let src = personCircleOutline;
         let conversant = contacts[key.slice(1)].username;
 
-        let messages: Message[] = Object.values(p2p.conversations[key].messages).map(p2pMessageID => {
+        let messages: Message[] = Object.values(
+          p2p.conversations[key].messages
+        ).map((p2pMessageID) => {
           let p2pMessage = p2p.messages[p2pMessageID];
           let message: Message = {
             id: p2pMessage.p2pMessageEntryHash,
@@ -92,10 +101,10 @@ const Conversations: React.FC = () => {
           groupId: key,
           isGroup: false,
           content: {
-            src: src, 
+            src: src,
             name: conversant,
-            messages: messages
-          }
+            messages: messages,
+          },
         };
         conversationsArray.push(conversation);
       }
@@ -104,47 +113,55 @@ const Conversations: React.FC = () => {
     if (groups !== undefined) {
       Object.keys(groups).forEach((key: string) => {
         // TODO: change to actual pic chosen by group creator
-        let src = "https://upload.wikimedia.org/wikipedia/commons/8/8c/Lauren_Tsai_by_Gage_Skidmore.jpg";
-        let messages: (Message | undefined)[] =  groups[key].messages ? groups[key].messages.map((messageId: string) => {
-          let groupMessage = Object.keys(groupMessagesLocal).length ? groupMessagesLocal[messageId] : groupMessages[messageId];
-          
-          if (groupMessage) {
-            if (isTextPayload(groupMessage.payload)) {
-              let message: Message = {
-                id: groupMessage.groupMessageEntryHash,
-                sender: groupMembers[groupMessage.author] ? {
-                  id: groupMembers[groupMessage.author].id,
-                  username: groupMembers[groupMessage.author].username
-                } : {
-                  id: myAgentId,
-                  username: myUsername!
-                },
-                timestamp: groupMessage.timestamp,
-                message: groupMessage.payload.payload.payload
-              };
-              return message
-            } else {
-              let message: Message = {
-                id: groupMessage.groupMessageEntryHash,
-                sender: groupMembers[groupMessage.author] ? {
-                  id: groupMembers[groupMessage.author].id,
-                  username: groupMembers[groupMessage.author].username
-                } : {
-                  id: myAgentId,
-                  username: myUsername!
-                },
-                timestamp: groupMessage.timestamp,
-                message: "",
-                fileName: groupMessage.payload.fileName
-              };
-              return message
-            };
-          }
-        }) : [];
-        let messagesCleaned = messages.flatMap(
-          (x: Message | undefined) => (x ? [x] : [])
+        let src = peopleCircleOutline;
+        let messages: (Message | undefined)[] = groups[key].messages
+          ? groups[key].messages.map((messageId: string) => {
+              let groupMessage = Object.keys(groupMessagesLocal).length
+                ? groupMessagesLocal[messageId]
+                : groupMessages[messageId];
+
+              if (groupMessage) {
+                if (isTextPayload(groupMessage.payload)) {
+                  let message: Message = {
+                    id: groupMessage.groupMessageEntryHash,
+                    sender: groupMembers[groupMessage.author]
+                      ? {
+                          id: groupMembers[groupMessage.author].id,
+                          username: groupMembers[groupMessage.author].username,
+                        }
+                      : {
+                          id: myAgentId,
+                          username: myUsername!,
+                        },
+                    timestamp: groupMessage.timestamp,
+                    message: groupMessage.payload.payload.payload,
+                  };
+                  return message;
+                } else {
+                  let message: Message = {
+                    id: groupMessage.groupMessageEntryHash,
+                    sender: groupMembers[groupMessage.author]
+                      ? {
+                          id: groupMembers[groupMessage.author].id,
+                          username: groupMembers[groupMessage.author].username,
+                        }
+                      : {
+                          id: myAgentId,
+                          username: myUsername!,
+                        },
+                    timestamp: groupMessage.timestamp,
+                    message: "",
+                    fileName: groupMessage.payload.fileName,
+                  };
+                  return message;
+                }
+              }
+            })
+          : [];
+        let messagesCleaned = messages.flatMap((x: Message | undefined) =>
+          x ? [x] : []
         );
-        messagesCleaned = messagesCleaned.sort((x: Message, y: Message) => 
+        messagesCleaned = messagesCleaned.sort((x: Message, y: Message) =>
           y.timestamp.valueOf() < x.timestamp.valueOf() ? 1 : -1
         );
         let conversation = {
@@ -164,11 +181,21 @@ const Conversations: React.FC = () => {
       });
     }
     conversationsArray.sort((x: any, y: any) => {
-      let timestampX = (x.content.messages.length !== 0) ?  x.content.messages[x.content.messages.length - 1].timestamp.valueOf() : x.createdAt.valueOf()
-      let timestampY = (y.content.messages.length !== 0) ?  y.content.messages[y.content.messages.length - 1].timestamp.valueOf() : y.createdAt.valueOf()
+      let timestampX =
+        x.content.messages.length !== 0
+          ? x.content.messages[
+              x.content.messages.length - 1
+            ].timestamp.valueOf()
+          : x.createdAt.valueOf();
+      let timestampY =
+        y.content.messages.length !== 0
+          ? y.content.messages[
+              y.content.messages.length - 1
+            ].timestamp.valueOf()
+          : y.createdAt.valueOf();
 
-      return timestampX < timestampY ? 1 : -1
-    })
+      return timestampX < timestampY ? 1 : -1;
+    });
 
     return conversationsArray;
   };
@@ -187,27 +214,29 @@ const Conversations: React.FC = () => {
   useEffect(() => {
     setGroupMessagesLocal(groupMessages);
   }, [groupMessages]);
-
+  console.log(p2pState, Object.keys(groups).length);
   return (
     <IonPage>
       <Toolbar noSearch onChange={() => {}} />
       <IonContent>
-        {Object.keys(groups).length > 0 || p2pState !== undefined ? (
-          <IonList className={styles.conversation}>
-            {renderConversation(groups, p2pState).map((conversation: any) => (
-              <Conversation
-                key={
-                  conversation.groupId !== undefined
-                    ? conversation.groupId
-                    : conversation.conversant
-                }
-                isGroup={conversation.isGroup}
-                groupId={conversation.groupId}
-                content={conversation.content}
-                myAgentId={myAgentId}
-              />
-            ))}
-          </IonList>
+        {Object.keys(groups).length > 0 ? (
+          p2pState !== undefined ? (
+            <IonList className={styles.conversation}>
+              {renderConversation(groups, p2pState).map((conversation: any) => (
+                <Conversation
+                  key={
+                    conversation.groupId !== undefined
+                      ? conversation.groupId
+                      : conversation.conversant
+                  }
+                  isGroup={conversation.isGroup}
+                  groupId={conversation.groupId}
+                  content={conversation.content}
+                  myAgentId={myAgentId}
+                />
+              ))}
+            </IonList>
+          ) : null
         ) : (
           <EmptyConversations />
         )}
