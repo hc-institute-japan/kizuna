@@ -73,6 +73,8 @@
   "app.groups.oldest-media-fetched": "全てのメディアを取得しました",
   "app.groups.files.no-files": "ファイルはこのチャットではまだ共有されていません。",
   "app.groups.oldest-file-fetched": "全てのファイルを取得しました",
-  "app.groups.files.fetching": "ファイル取得中..."
+  "app.groups.files.fetching": "ファイル取得中...",
+  "app.settings.language-label": "言語"
+
   
 }

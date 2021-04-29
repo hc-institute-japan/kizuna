@@ -70,5 +70,6 @@
   "app.groups.media.fetching": "Fetching media...",
   "app.groups.media.no-media": "There is no media sent in the chat yet...",
   "app.groups.files.no-files": "There is no file sent in the chat yet...",
-  "app.groups.files.fetching": "Fetching files..."
+  "app.groups.files.fetching": "Fetching files...",
+  "app.settings.language-label": "Language"
 }
