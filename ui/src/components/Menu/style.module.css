@@ -12,3 +12,13 @@
   --background: var(--ion-item-background) !important;
   cursor: pointer;
 }
+
+.avatar {
+  filter: invert(0%);
+}
+
+@media (prefers-color-scheme: dark) {
+  .avatar {
+    filter: invert(100%);
+  }
+}

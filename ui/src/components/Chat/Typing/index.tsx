@@ -16,7 +16,7 @@ const Typing: React.FC<Props> = ({ profiles, disabled }) => {
       case 0:
         return null;
       case 1:
-        return remaining[0].username;
+        return `, ${remaining[0].username}`;
       default:
         return <span>, {remaining.length} others </span>;
     }
@@ -24,7 +24,11 @@ const Typing: React.FC<Props> = ({ profiles, disabled }) => {
 
   const animateDots = () => {
     return [".", ".", "."].map((dot, i) => (
-      <span key={i} style={{ animationDelay: `${0.3 * i}s` }} className={styles.dot}>
+      <span
+        key={i}
+        style={{ animationDelay: `${0.3 * i}s` }}
+        className={styles.dot}
+      >
         {dot}
       </span>
     ));
@@ -34,15 +38,15 @@ const Typing: React.FC<Props> = ({ profiles, disabled }) => {
     const limit = 3;
     if (profiles.length === 1)
       return (
-      <span>
-        {intl.formatMessage(
-          {
-            id: "components.typing.is-typing",
-          },
-          { user: profiles[0].username }
-        )}
-        {animateDots()}
-      </span>
+        <span>
+          {intl.formatMessage(
+            {
+              id: "components.typing.is-typing",
+            },
+            { user: profiles[0].username }
+          )}
+          {animateDots()}
+        </span>
       );
     const names = `${profiles
       .slice(0, limit - 1)
@@ -57,7 +61,7 @@ const Typing: React.FC<Props> = ({ profiles, disabled }) => {
       </span>
     );
   };
-  return (profiles.length) ? (
+  return profiles.length ? (
     <div className={`${styles.typing} ion-padding-start`}>
       {displayNames(profiles)}
     </div>

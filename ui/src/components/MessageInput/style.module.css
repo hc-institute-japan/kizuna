@@ -1,7 +1,6 @@
 .toolbar {
   display: flex;
   flex-direction: row;
-  
 }
 
 .file-view {
@@ -9,7 +8,6 @@
   height: 100%;
   flex-direction: row;
 }
-
 
 .row {
   display: flex;
@@ -48,4 +46,8 @@
 
 .close-button:hover {
   cursor: pointer;
+}
+
+.textarea {
+  font-size: 0.97rem;
 }

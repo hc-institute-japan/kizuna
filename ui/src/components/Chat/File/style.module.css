@@ -24,3 +24,7 @@
 .video {
   width: 100% !important;
 }
+
+.file-name {
+  word-break: break-all;
+}
