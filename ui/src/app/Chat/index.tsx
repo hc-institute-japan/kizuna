@@ -91,8 +91,9 @@ const Chat: React.FC<Props> = ({ location }) => {
           return receipt
         });
         filteredReceipts.sort((a: any, b: any) => {
-          let receiptTimestampA = a.timeReceived.getTime();
-          let receiptTimestampB = b.timeReceived.getTime();
+          console.log("Chat a", a);
+          let receiptTimestampA = a.timestamp.getTime();
+          let receiptTimestampB = b.timestamp.getTime();
           if (receiptTimestampA > receiptTimestampB) return -1;
           if (receiptTimestampA < receiptTimestampB) return 1;
           return 0;
