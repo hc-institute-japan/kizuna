@@ -216,7 +216,6 @@ const GroupChat: React.FC = () => {
         {groupData ? (
           <MessageList
             groupId={groupInfo.originalGroupEntryHash}
-            myAgentId={myAgentId}
             members={groupInfo!.members}
             messageIds={messages}
             chatList={chatList}
@@ -237,33 +236,38 @@ const GroupChat: React.FC = () => {
         onSend={handleOnSend}
         onChange={(message) => {
           if (message.length !== 0) {
-            dispatch(
-              indicateGroupTyping({
-                groupId: base64ToUint8Array(groupInfo.originalGroupEntryHash),
-                indicatedBy: Buffer.from(base64ToUint8Array(myAgentId).buffer),
-                members: [
-                  ...groupInfo.members.map((member) =>
-                    Buffer.from(base64ToUint8Array(member).buffer)
-                  ),
-                  Buffer.from(base64ToUint8Array(groupInfo.creator).buffer),
-                ],
-                isTyping: true,
-              })
-            );
+            dispatch(fetchId()).then((res: AgentPubKey | null) => {
+              dispatch(
+                indicateGroupTyping({
+                  groupId: base64ToUint8Array(groupInfo.originalGroupEntryHash),
+                  indicatedBy: res!,
+                  members: [
+                    ...groupInfo.members.map((member) =>
+                      Buffer.from(base64ToUint8Array(member).buffer)
+                    ),
+                    Buffer.from(base64ToUint8Array(groupInfo.creator).buffer),
+                  ],
+                  isTyping: true,
+                })
+              );
+            })
+
           } else {
-            dispatch(
-              indicateGroupTyping({
-                groupId: base64ToUint8Array(groupInfo.originalGroupEntryHash),
-                indicatedBy: Buffer.from(base64ToUint8Array(myAgentId).buffer),
-                members: [
-                  ...groupInfo.members.map((member) =>
-                    Buffer.from(base64ToUint8Array(member).buffer)
-                  ),
-                  Buffer.from(base64ToUint8Array(groupInfo.creator).buffer),
-                ],
-                isTyping: false,
-              })
-            );
+            dispatch(fetchId()).then((res: AgentPubKey | null) => {
+              dispatch(
+                indicateGroupTyping({
+                  groupId: base64ToUint8Array(groupInfo.originalGroupEntryHash),
+                  indicatedBy: res!,
+                  members: [
+                    ...groupInfo.members.map((member) =>
+                      Buffer.from(base64ToUint8Array(member).buffer)
+                    ),
+                    Buffer.from(base64ToUint8Array(groupInfo.creator).buffer),
+                  ],
+                  isTyping: false,
+                })
+              );
+            })
           }
           return setMessage(message);
         }}
