@@ -4,6 +4,7 @@ use hdk::prelude::{element::SignedHeaderHashed, timestamp::Timestamp};
 use std::collections::hash_map::HashMap;
 
 pub mod get_all_messages;
+pub mod get_files_bytes;
 pub mod get_latest_messages_for_all_groups;
 pub mod get_messages_by_group_by_timestamp;
 pub mod get_next_batch_group_messages;
@@ -12,7 +13,6 @@ pub mod indicate_group_typing;
 pub mod read_group_message;
 pub mod send_message;
 pub mod send_message_in_target_date;
-
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -158,6 +158,9 @@ pub struct GroupMessageElement {
     pub entry: GroupMessage,
     pub signed_header: SignedHeaderHashed,
 }
+
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+pub struct FileBytes(pub HashMap<String, SerializedBytes>);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
