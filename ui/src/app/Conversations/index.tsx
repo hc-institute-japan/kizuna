@@ -15,7 +15,7 @@ import Conversation from "../../components/Conversation";
 import Toolbar from "../../components/Toolbar";
 import { isTextPayload } from "../../redux/commons/types";
 import { GroupConversation, GroupMessage } from "../../redux/group/types";
-import { fetchId } from "../../redux/profile/actions";
+import { fetchId, fetchProfileFromUsername } from "../../redux/profile/actions";
 import { RootState } from "../../redux/types";
 import { Uint8ArrayToBase64, useAppDispatch, dateToTimestamp } from "../../utils/helpers";
 import { Message } from "../../utils/types";
@@ -60,13 +60,14 @@ const Conversations: React.FC = () => {
 
     if (p2p !== undefined) {
       for (let key in p2p.conversations) {
-        let src =
-          "https://upload.wikimedia.org/wikipedia/commons/8/8c/Lauren_Tsai_by_Gage_Skidmore.jpg";
+        
+        // for people not in contacts list
+        if (contacts[key.slice(1)] == undefined) continue;
+
+        let src = "https://upload.wikimedia.org/wikipedia/commons/8/8c/Lauren_Tsai_by_Gage_Skidmore.jpg";
         let conversant = contacts[key.slice(1)].username;
 
-        let messages: Message[] = Object.values(
-          p2p.conversations[key].messages
-        ).map((p2pMessageID) => {
+        let messages: Message[] = Object.values(p2p.conversations[key].messages).map(p2pMessageID => {
           let p2pMessage = p2p.messages[p2pMessageID];
           let message: Message = {
             id: p2pMessage.p2pMessageEntryHash,
@@ -88,12 +89,13 @@ const Conversations: React.FC = () => {
         );
 
         let conversation = {
+          groupId: key,
           isGroup: false,
           content: {
-            src: src,
+            src: src, 
             name: conversant,
-            messages: messages,
-          },
+            messages: messages
+          }
         };
         conversationsArray.push(conversation);
       }
@@ -200,11 +202,7 @@ const Conversations: React.FC = () => {
                     : conversation.conversant
                 }
                 isGroup={conversation.isGroup}
-                groupId={
-                  conversation.groupId !== undefined
-                    ? conversation.groupId
-                    : undefined
-                }
+                groupId={conversation.groupId}
                 content={conversation.content}
                 myAgentId={myAgentId}
               />

@@ -17,15 +17,18 @@ import {
   SET_GROUP_READ_MESSAGE,
   SET_GROUP_TYPING_INDICATOR,
 } from "../redux/group/types";
+import { base64ToUint8Array, Uint8ArrayToBase64, timestampToDate } from "../utils/helpers";
 import { Profile } from "../redux/profile/types";
 import store from "../redux/store";
 import { CallZomeConfig } from "../redux/types";
-import { base64ToUint8Array, Uint8ArrayToBase64 } from "../utils/helpers";
 import { FUNCTIONS, ZOMES } from "./types";
+import { APPEND_MESSAGE, APPEND_RECEIPT, P2PMessage, P2PMessageReceipt, SET_TYPING } from "../redux/p2pmessages/types";
+import { appendMessage, getLatestMessages, setTyping } from "../redux/p2pmessages/actions";
 
 let client: null | AppWebsocket = null;
 
 let signalHandler: AppSignalCb = (signal) => {
+  console.log("connections", signal);
   switch (signal.data.payload.name) {
     case "added_to_group":
       let payload = signal.data.payload.payload.payload;
@@ -118,6 +121,7 @@ let signalHandler: AppSignalCb = (signal) => {
         // replyTo: undefined,
         readList: {},
       };
+      console.log("connection group message data", groupMessage)
       store.dispatch<SetGroupMessageAction>({
         type: SET_GROUP_MESSAGE,
         groupMessage,
@@ -195,6 +199,110 @@ let signalHandler: AppSignalCb = (signal) => {
       });
       break;
     }
+    case "RECEIVE_P2P_MESSAGE":
+      let receivedMessage = signal.data.payload.message;
+      console.log(receivedMessage);
+
+      const [ messageTuple, receiptTuple ] = receivedMessage;
+      const [ messageID, message ] = messageTuple
+      const [ receiptID, receipt ] = receiptTuple!;
+
+      callZome({
+        zomeName: ZOMES.P2PMESSAGE,
+        fnName: FUNCTIONS[ZOMES.P2PMESSAGE].GET_LATEST_MESSAGES,
+        payload: 1
+      }).then((res: any) => {
+
+        let messageHash = "u" + Uint8ArrayToBase64(messageID);
+        let receiptHash = "u" + Uint8ArrayToBase64(receiptID);
+        
+        var payload;
+        switch (message.payload.type) {
+        case "TEXT":
+            payload = message.payload;
+            break;
+        case "FILE":
+            payload = {
+            type: "FILE",
+            fileName: message.payload.payload.metadata.fileName,
+            fileSize: message.payload.payload.metadata.fileSize,
+            fileType: message.payload.payload.fileType.type,
+            fileHash:"u" + Uint8ArrayToBase64(message.payload.payload.metadata.fileHash),
+            thumbnail: message.payload.payload.fileType.type != "OTHER" 
+                        ? message.payload.payload.fileType.payload.thumbnail
+                        : null
+            }
+            break
+        default:
+            break
+        }
+
+        let p2pMessage: P2PMessage = {
+            p2pMessageEntryHash: messageHash,
+            author: "u" + Uint8ArrayToBase64(message.author),
+            receiver: "u" + Uint8ArrayToBase64(message.receiver),
+            payload: payload,
+            timestamp: timestampToDate(message.timeSent),
+            replyTo: message.replyTo,
+            receipts: [receiptHash]
+        }
+
+        let messageEntryHash = "u" + Uint8ArrayToBase64((receipt.id)[0]);
+        let p2pReceipt: P2PMessageReceipt = {
+            p2pMessageReceiptEntryHash: "u" + Uint8ArrayToBase64(receiptID),
+            p2pMessageEntryHashes: [messageEntryHash],
+            timestamp: timestampToDate(receipt.status.timestamp),
+            status: receipt.status.status
+        };
+
+        store.dispatch({
+          type: APPEND_MESSAGE,
+          state: {
+            message: p2pMessage,
+            receipt: p2pReceipt,
+            key: p2pMessage.author  
+          }
+        });
+      });
+      break;
+    case "RECEIVE_P2P_RECEIPT":
+      let receiptHash = Object.keys(signal.data.payload.receipt)[0];
+      console.log("receipt signal", signal.data.payload.receipt);
+      
+      let messageIDs: string[] = [];
+      signal.data.payload.receipt[receiptHash].id.forEach((id: Uint8Array) => {
+        messageIDs.push("u" + Uint8ArrayToBase64(id))
+      });
+
+      console.log("connection", messageIDs)
+
+      let p2pReceipt = {
+        p2pMessageReceiptEntryHash:receiptHash,
+        p2pMessageEntryHash: messageIDs,
+        timestamp: signal.data.payload.receipt[receiptHash].status.timestamp,
+        status: signal.data.payload.receipt[receiptHash].status.status
+      }
+      console.log(p2pReceipt)
+
+      store.dispatch({
+        type: APPEND_RECEIPT,
+        state: p2pReceipt
+      });
+      break;
+    case "TYPING_P2P":
+      console.log("client typing", signal.data.payload);
+      let contacts2 = store.getState().contacts.contacts;
+      let usernameTyping = contacts2[signal.data.payload.agent]
+      store.dispatch({
+        type: SET_TYPING,
+        state: {
+          profile: {
+            id: signal.data.payload.agent,
+            username: usernameTyping
+          }
+        }
+      })
+      break;
     default:
       break;
   }

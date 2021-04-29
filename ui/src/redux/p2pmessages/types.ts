@@ -1,5 +1,4 @@
 import { AgentPubKey, HoloHash } from "@holochain/conductor-api";
-import Profile from "../../app/Profile";
 import {
     ProfileID,
     MessageID,
@@ -9,9 +8,14 @@ import {
     FilePayload,
     FilePayloadInput
 } from "../commons/types";
+import { SET_GROUP_TYPING_INDICATOR } from "../group/types";
+import { Profile } from "../profile/types";
 
 export const SET_MESSAGES = "SET_MESSAGES";
 export const APPEND_MESSAGE = "APPEND_MESSAGE";
+export const APPEND_RECEIPT = "APPEND_RECEIPT";
+export const SET_FILES = "SET_FILES";
+export const SET_TYPING = "SET_TYPING";
 
 // export type ProfileID = string;
 // export type MessageID = string;
@@ -32,6 +36,13 @@ export const APPEND_MESSAGE = "APPEND_MESSAGE";
 export type P2PMessageReceiptID = string;
 export type P2PMessageStatus = "sent" | "delivered" | "read";
 
+export interface Read {
+    timestamp: [number, number]
+}
+export interface Delivered {
+    timestamp: [number, number]
+}
+
 export interface P2PConversation {
     messages: MessageID[]
 }
@@ -39,6 +50,7 @@ export interface P2PConversation {
 export interface P2PMessage {
     p2pMessageEntryHash: MessageID,
     author: ProfileID,
+    receiver: ProfileID,
     payload: Payload,
     timestamp: Date,
     replyTo?: MessageID,
@@ -61,6 +73,12 @@ export interface P2PMessageConversationState {
     };
     receipts: {
         [key: string]: P2PMessageReceipt
+    };
+    files: {
+        [key: string]: Uint8Array
+    },
+    typing: {
+        [key: string]: Profile
     }
 }
 
@@ -87,7 +105,29 @@ interface SetP2PMessagesAction {
 
 interface AppendP2PMessageAction {
     type: typeof APPEND_MESSAGE;
-    state: P2PMessage
+    state: {
+        message: P2PMessage,
+        receipt: P2PMessageReceipt,
+        key?: string
+    }
 }
 
-export type P2PMessageActionType = SetP2PMessagesAction | AppendP2PMessageAction;
+interface AppendP2PMessageReceipt {
+    type: typeof APPEND_RECEIPT
+    state: P2PMessageReceipt
+}
+
+interface SetP2PFiles {
+    type: typeof SET_FILES;
+    state: { [key: string]: Uint8Array }
+}
+
+interface SetP2PTyping {
+    type: typeof SET_TYPING
+    state: {
+        profile: Profile,
+        isTyping: boolean
+    }
+}
+
+export type P2PMessageActionType = SetP2PMessagesAction | AppendP2PMessageAction | AppendP2PMessageReceipt | SetP2PFiles | SetP2PTyping;
