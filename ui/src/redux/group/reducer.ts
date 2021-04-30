@@ -111,7 +111,10 @@ const reducer = (
       let groupMessageEntryHash: string = groupMessage.groupMessageEntryHash;
       let groupConversation: GroupConversation =
         state.conversations[groupEntryHash];
-      groupConversation.messages.push(groupMessage.groupMessageEntryHash);
+
+      if (groupConversation) {
+        groupConversation.messages.push(groupMessage.groupMessageEntryHash);
+      }
       let newMessage: { [key: string]: GroupMessage } = {
         [groupMessageEntryHash]: groupMessage,
       };
