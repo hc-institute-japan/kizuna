@@ -278,8 +278,8 @@ let signalHandler: AppSignalCb = (signal) => {
 
       let p2pReceipt = {
         p2pMessageReceiptEntryHash:receiptHash,
-        p2pMessageEntryHash: messageIDs,
-        timestamp: signal.data.payload.receipt[receiptHash].status.timestamp,
+        p2pMessageEntryHashes: messageIDs,
+        timestamp: timestampToDate(signal.data.payload.receipt[receiptHash].status.timestamp),
         status: signal.data.payload.receipt[receiptHash].status.status
       }
       console.log(p2pReceipt)

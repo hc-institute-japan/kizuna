@@ -19,7 +19,7 @@ import { RootState } from "../../redux/types";
 import { Conversation } from "../../utils/types";
 import { Profile } from "../../redux/profile/types";
 import { ChatListMethods } from "../../components/Chat/types";
-import { personCircleOutline } from "ionicons/icons";
+import { fileTrayStackedSharp, personCircleOutline } from "ionicons/icons";
 import { P2PMessage, P2PMessageReceipt } from "../../redux/p2pmessages/types";
 import { fetchId } from "../../redux/profile/actions";
 import { sendMessage, getNextBatchMessages, readMessage, isTyping } from "../../redux/p2pmessages/actions";
@@ -78,10 +78,7 @@ const Chat: React.FC<Props> = ({ location }) => {
   }, [location]);
 
   useEffect(() => {
-    // console.log("Chat conv", conversations);
-    // console.log("Chat mess", messages);
-    // console.log("Chat rece", receipts);
-
+    
     if (conversant !== undefined && conversations[("u" + conversant.id)] !== undefined) {
       let filteredMessages = Object.values(conversations[("u" + conversant.id)].messages).map((messageID) => {
         let message = messages[messageID];
@@ -91,7 +88,6 @@ const Chat: React.FC<Props> = ({ location }) => {
           return receipt
         });
         filteredReceipts.sort((a: any, b: any) => {
-          console.log("Chat a", a);
           let receiptTimestampA = a.timestamp.getTime();
           let receiptTimestampB = b.timestamp.getTime();
           if (receiptTimestampA > receiptTimestampB) return -1;
@@ -101,10 +97,9 @@ const Chat: React.FC<Props> = ({ location }) => {
         let latestReceipt = filteredReceipts[0];
         return { message: message, receipt: latestReceipt }
       });
-      
       setTransConversations(filteredMessages.reverse());
     }
-  }, [conversations, messages]);
+  }, [conversations, messages, receipts]);
 
   useEffect(() => {
     if (conversant) {
@@ -171,6 +166,12 @@ const Chat: React.FC<Props> = ({ location }) => {
   //   dispatch(isTyping(Buffer.from(base64ToUint8Array(conversant.id)), true));
   // })
 
+  const onSeenHandler = (messageBundle: { message: P2PMessage, receipt: P2PMessageReceipt}) => {
+    if (messageBundle.receipt.status != "read") {
+      dispatch(readMessage([messageBundle.message]))
+    }
+  }
+
   const displayMessage = (messageBundle: { message: P2PMessage, receipt: P2PMessageReceipt}) => {
     // assume that this will be called in sorted order
 
@@ -201,9 +202,7 @@ const Chat: React.FC<Props> = ({ location }) => {
         readList={readlist ? readlist : {}}
         showProfilePicture={true}
         showName={true}
-        onSeen={(complete) => {
-          dispatch(readMessage([messageBundle.message]))
-        }}
+        onSeen={(complete) => onSeenHandler(messageBundle)}
       />
   };
 
@@ -218,7 +217,6 @@ const Chat: React.FC<Props> = ({ location }) => {
             <IonAvatar className="ion-padding">
               <img src={personCircleOutline} alt={username} />
             </IonAvatar>
-            {/* <IonButton href={`/u/${username}/details`} fill="clear" onClick={handleOnClick}> */}
             <IonButton fill="clear" onClick={handleOnClick}>
               <IonTitle className="ion-no-padding">{username}</IonTitle>
             </IonButton>
