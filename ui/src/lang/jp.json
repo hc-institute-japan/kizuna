@@ -1,6 +1,10 @@
 {
   "app.contacts.add-message": "{name}が連絡先に追加されました。",
   "app.contacts.empty-contact-list": "現時点では、連絡先リストは空です。",
+  "app.contacts.remove": "連絡先から削除",
+  "app.contacts.add": "連絡先に追加",
+  "app.contacts.unblock": "プロフィールをアンブロック",
+  "app.contacts.block": "プロフィールをブロック",
   "app.conversations.empty-conversations-list": "まだ会話がないようです...",
   "app.landing.login": "チャットを開始する",
   "app.landing.register": "アカウントをお持ちではありませんか？",
