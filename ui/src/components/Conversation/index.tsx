@@ -5,7 +5,7 @@ import {
   IonLabel,
   IonLoading,
 } from "@ionic/react";
-import { peopleCircleOutline, personCircleOutline } from "ionicons/icons";
+import { filter, peopleCircleOutline, personCircleOutline } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
@@ -98,6 +98,7 @@ const Conversation: React.FC<Props> = ({
       } else {
         const { conversations, messages, receipts } = state.p2pmessages;
         const conversation = conversations[groupId].messages;
+        var unreadCounter = 0;
         const filteredMessages = conversation.map((messageID) => {
           let message = messages[messageID];
           let receiptIDs = message.receipts;
@@ -112,11 +113,11 @@ const Conversation: React.FC<Props> = ({
             if (receiptTimestampA < receiptTimestampB) return 1;
             return 0;
           });
-          return message 
+          let latestReceipt = filteredReceipts[0];
+          if (latestReceipt.status != "read") unreadCounter = unreadCounter + 1;
         });
-        // setUnread(filteredMessages);
         dispatch(getAgentId()).then((id: any) => {
-          if (id) setBadgeCount(filteredMessages.length);
+          if (id) setBadgeCount(unreadCounter);
         });
       }
     }
