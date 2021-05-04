@@ -64,6 +64,11 @@ export interface P2PMessageReceipt {
     status: P2PMessageStatus
 }
 
+export interface P2PFile {
+    fileHash: FileBytesID,
+    fileBytes: Uint8Array
+}
+
 export interface P2PMessageConversationState {
     conversations: {
         [key: string]: P2PConversation
@@ -108,6 +113,7 @@ interface AppendP2PMessageAction {
     state: {
         message: P2PMessage,
         receipt: P2PMessageReceipt,
+        file? : P2PFile,
         key?: string
     }
 }

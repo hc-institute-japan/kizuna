@@ -1,11 +1,12 @@
 // import { AgentPubKey } from "@holochain/conductor-api";
 import { FUNCTIONS, ZOMES } from "../../connection/types";
 import { ThunkAction } from "../types";
-import { TextPayload, FilePayload } from "../commons/types";
+import { TextPayload, FilePayload, FileBytesID } from "../commons/types";
 import { 
     BatchSize,
     MessageInput, 
     P2PChatFilterBatch, 
+    P2PFile,
     SET_FILES, 
     SET_TYPING,
     SET_MESSAGES,  
@@ -24,7 +25,7 @@ import { AgentPubKey, HoloHash } from "@holochain/conductor-api";
 import { 
     FilePayloadInput, 
     FileType,
-    MessageID
+    MessageID,
 } from "../commons/types";
 import { receipt } from "ionicons/icons";
 import { Profile } from "../profile/types";
@@ -45,6 +46,7 @@ export const transformZomeDataToUIData = (zomeResults: P2PMessageConversationSta
     };
 
     // transform messages
+    var filesToFetch: { [key: string]: Uint8Array } = {};
     var transformedMesssages: { [key: string]: P2PMessage } = {};
     for (const [key, value] of Object.entries(zomeMessages)) {
         let { 0: message, 1: receiptArray } = Object(value);
@@ -63,7 +65,8 @@ export const transformZomeDataToUIData = (zomeResults: P2PMessageConversationSta
                 thumbnail: message.payload.payload.fileType.type != "OTHER" 
                             ? message.payload.payload.fileType.payload.thumbnail
                             : null
-                }
+                };
+                filesToFetch[message.payload.payload.metadata.fileHash] = new Uint8Array;
                 break
             default:
                 break
@@ -102,7 +105,7 @@ export const transformZomeDataToUIData = (zomeResults: P2PMessageConversationSta
         conversations: transformedConversations, 
         messages: transformedMesssages, 
         receipts: transformedReceipts,
-        files: {},
+        files: filesToFetch,
         typing: {}
     };
 
@@ -122,7 +125,30 @@ export const setMessages = (state: P2PMessageConversationState): ThunkAction => 
     return true;
 }
 
-export const appendMessage = (state: { message: P2PMessage, receipt: P2PMessageReceipt}): ThunkAction => async (
+export const setFiles = ( filesToFetch: { [key: string]: Uint8Array }): ThunkAction => async (
+    dispatch,
+    _getState,
+    { callZome }
+) => {
+    console.log("Actions fetching files", filesToFetch);
+    const fetchedFiles = await callZome({
+        zomeName: ZOMES.P2PMESSAGE,
+        fnName: FUNCTIONS[ZOMES.P2PMESSAGE].SEND_MESSAGE,
+        payload: Object.keys(filesToFetch)
+    });
+
+    if (fetchedFiles?.type !== "error") {
+        console.log("Actions SET_FILES dispatching to reducer", fetchedFiles)
+        dispatch({
+            type: SET_FILES,
+            sate: fetchedFiles
+        });
+        return true;
+    }
+    console.log("Actions error in fetching files", fetchedFiles)
+}
+
+export const appendMessage = (state: { message: P2PMessage, receipt: P2PMessageReceipt, file?: P2PFile}): ThunkAction => async (
     dispatch
 ) => {
     console.log("Actions dispatching APPEND_MESSAGE")
@@ -151,7 +177,7 @@ export const sendMessage = (receiver: AgentPubKey, message: string, type: string
 ) => {
     console.log("Actions send message")
 
-    var payload;
+    var payloadInput;
     if (type == "TEXT") {
         let textPayload: TextPayload = {
             type: "TEXT",
@@ -159,7 +185,7 @@ export const sendMessage = (receiver: AgentPubKey, message: string, type: string
                 payload: message
             }
         };
-        payload = textPayload;
+        payloadInput = textPayload;
     } else {
         console.log("actions file", file)
         let fileType: FileType = {
@@ -174,12 +200,12 @@ export const sendMessage = (receiver: AgentPubKey, message: string, type: string
                 fileBytes: file.fileBytes,
             }
         };
-        payload = filePayload;
+        payloadInput = filePayload;
     }
 
     let input: MessageInput = {
         receiver: receiver,
-        payload: payload,
+        payload: payloadInput,
         reply_to: replyTo
     };
 
@@ -209,7 +235,7 @@ export const sendMessage = (receiver: AgentPubKey, message: string, type: string
             fileName: message.payload.payload.metadata.fileName,
             fileSize: message.payload.payload.metadata.fileSize,
             fileType: message.payload.payload.fileType.type,
-            fileHash:"u" + Uint8ArrayToBase64(message.payload.payload.metadata.fileHash),
+            fileHash: Uint8ArrayToBase64(message.payload.payload.metadata.fileHash),
             thumbnail: message.payload.payload.fileType.type != "OTHER" 
                         ? message.payload.payload.fileType.payload.thumbnail
                         : null
@@ -237,7 +263,18 @@ export const sendMessage = (receiver: AgentPubKey, message: string, type: string
             status: receipt.status.status
         }
 
-        dispatch(appendMessage({message: p2pMessage, receipt: p2pReceipt}));
+        let p2pFile = type == "FILE" ? {
+            fileHash: "u" + payload.fileHash, 
+            fileBytes: file.fileBytes 
+        } : undefined;
+
+        dispatch(appendMessage({
+            message: p2pMessage, 
+            receipt: p2pReceipt, 
+            file: p2pFile != undefined
+                ? p2pFile : undefined 
+            }
+        ));
         
         console.log("actions successfully sent message");
         return true;
@@ -388,21 +425,26 @@ export const getFileBytes = (hashes: Uint8Array[]): ThunkAction => async (
     { callZome }
 ) => {
     console.log("Actions getting file bytes");
-    const files = await callZome({
+    const fetchedFiles = await callZome({
         zomeName: ZOMES.P2PMESSAGE,
         fnName: FUNCTIONS[ZOMES.P2PMESSAGE].GET_FILE_BYTES,
         payload: hashes
     });
-
-    if (files?.type !== "error") {
-        console.log("Actions get file bytes", files);
-        if (Object.entries(files).length > 0) dispatch({
-            type: SET_FILES,
-            state: files
+    
+    let transformedFiles: { [key:string]: Uint8Array } = {};
+    if (fetchedFiles?.type !== "error") {
+        console.log("Actions get file bytes", fetchedFiles);
+        Object.keys(fetchedFiles).map((key) => {
+            transformedFiles["u" + key] = fetchedFiles[key];
         });
-        return files;
+
+        if (Object.entries(transformedFiles).length > 0) dispatch({
+            type: SET_FILES,
+            state: transformedFiles
+        });
+        return transformedFiles;
     };
-    console.log("actions failed to get next batch", files)
+    console.log("actions failed to get next batch", transformedFiles);
     return false;
 }
 

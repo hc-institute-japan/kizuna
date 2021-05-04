@@ -28,7 +28,6 @@ import { appendMessage, getLatestMessages, setTyping } from "../redux/p2pmessage
 let client: null | AppWebsocket = null;
 
 let signalHandler: AppSignalCb = (signal) => {
-  console.log("connections", signal);
   switch (signal.data.payload.name) {
     case "added_to_group":
       let payload = signal.data.payload.payload.payload;
@@ -201,7 +200,7 @@ let signalHandler: AppSignalCb = (signal) => {
     }
     case "RECEIVE_P2P_MESSAGE":
       let receivedMessage = signal.data.payload.message;
-      console.log(receivedMessage);
+      console.log("Connection received signal for new p2p message", receivedMessage);
 
       const [ messageTuple, receiptTuple ] = receivedMessage;
       const [ messageID, message ] = messageTuple
@@ -267,22 +266,19 @@ let signalHandler: AppSignalCb = (signal) => {
       break;
     case "RECEIVE_P2P_RECEIPT":
       let receiptHash = Object.keys(signal.data.payload.receipt)[0];
-      console.log("receipt signal", signal.data.payload.receipt);
+      console.log("Connection received signal for new p2p receipt", signal.data.payload.receipt);
       
       let messageIDs: string[] = [];
       signal.data.payload.receipt[receiptHash].id.forEach((id: Uint8Array) => {
         messageIDs.push("u" + Uint8ArrayToBase64(id))
       });
 
-      console.log("connection", messageIDs)
-
       let p2pReceipt = {
         p2pMessageReceiptEntryHash:receiptHash,
         p2pMessageEntryHashes: messageIDs,
         timestamp: timestampToDate(signal.data.payload.receipt[receiptHash].status.timestamp),
         status: signal.data.payload.receipt[receiptHash].status.status
-      }
-      console.log(p2pReceipt)
+      };
 
       store.dispatch({
         type: APPEND_RECEIPT,
@@ -290,7 +286,7 @@ let signalHandler: AppSignalCb = (signal) => {
       });
       break;
     case "TYPING_P2P":
-      console.log("client typing", signal.data.payload);
+      console.log("Connection received typing signal", signal.data.payload);
       let contacts2 = store.getState().contacts.contacts;
       let usernameTyping = contacts2[signal.data.payload.agent]
       store.dispatch({
