@@ -12,9 +12,13 @@ interface Props {
 }
 
 const Video: React.FC<Props> = ({ file }) => {
-  const fileBytes = useSelector((state: RootState) => {
-    return state.groups.groupFiles[`u${file.fileHash}`];
-  });
+  const fileBytes = useSelector((state: RootState) => 
+    // state.groups.groupFiles[`u${file.fileHash}`]
+    {
+      let fileSet = Object.assign({}, state.groups.groupFiles, state.p2pmessages.files);
+      return fileSet[`u${file.fileHash}`];
+    }
+  );
 
   const download = () => {
     const blob = new Blob([fileBytes]); // change resultByte to bytes

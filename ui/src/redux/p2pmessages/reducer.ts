@@ -12,6 +12,7 @@ import {
 } from "./types";
 import { MessageID } from "../commons/types";
 import { Uint8ArrayToBase64, timestampToDate } from "../../utils/helpers";
+import { bindActionCreators } from "redux";
 
 const initialState: P2PMessageConversationState = {
   conversations: {},
@@ -70,6 +71,12 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
       if (stateToAppendMessage.conversations[key] == undefined) stateToAppendMessage.conversations[key]={messages: [messageHash]}
       else stateToAppendMessage.conversations[key]={messages: [messageHash, ...stateToAppendMessage.conversations[key].messages]}
       
+      if (action.state.file != undefined) {
+        // if (stateToAppendMessage.files[action.state.file.fileHash] == undefined) {
+          stateToAppendMessage.files[action.state.file.fileHash] = action.state.file.fileBytes
+        // }
+      }
+
       stateToAppendMessage = {
         conversations: {
           ...stateToAppendMessage.conversations
@@ -83,10 +90,10 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
           [receiptHash]: action.state.receipt
         },
         files: {
-          ...stateToAppendMessage.files
+          ...stateToAppendMessage.files,
         },
         typing: {
-          ...stateToAppendMessage.typing
+          ...stateToAppendMessage.typing,
         }
       }
 
@@ -141,7 +148,8 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
           ...ret4.receipts
         },
         files: {
-          ...action.state
+          ...ret4.files,
+          ...action.state,
         },
         typing: {
           ...state.typing

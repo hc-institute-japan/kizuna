@@ -14,7 +14,12 @@ interface Props {
 const File: React.FC<Props> = ({ file }) => {
   const { fileName, fileSize } = file;
   const fileBytes = useSelector(
-    (state: RootState) => state.groups.groupFiles[`u${file.fileHash}`]
+    (state: RootState) => 
+      // state.groups.groupFiles[`u${file.fileHash}`]
+      {
+        let fileSet = Object.assign({}, state.groups.groupFiles, state.p2pmessages.files);
+        return fileSet[`u${file.fileHash}`];
+      }
   );
   const handleOnClick = () => {
     const blob = new Blob([fileBytes]); // change resultByte to bytes
