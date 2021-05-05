@@ -55,6 +55,8 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
   // REFS
   const infiniteFileScroll = useRef<HTMLIonInfiniteScrollElement>(null);
   const infiniteFileScroll2 = useRef<HTMLIonInfiniteScrollElement>(null);
+  // const slideRef = React.createRef<HTMLIonSlidesElement>();
+  const slideRef = useRef<HTMLIonSlidesElement>(null);
 
   // USE EFFECTS
   useEffect(() => {
@@ -124,7 +126,6 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
       default:
         index = 0;
     }
-    console.log("changing slides", index);
     slideRef.current?.slideTo(index);
   };
 
@@ -142,7 +143,7 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
       </IonItem>
     );
   };
-  const slideRef = React.createRef<HTMLIonSlidesElement>();
+
   const complete = () => infiniteFileScroll.current!.complete();
   const complete2 = () => infiniteFileScroll2.current!.complete();
 
@@ -208,16 +209,12 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
             </span>
           </IonToolbar>
           <div className={styles.titlebar}>
-            {/* <IonText className={styles.title}>{state.conversant.username}</IonText> */}
             <p className={styles.title}>{state.conversant.username}</p>
           </div>
         </div>
         <IonToolbar>
           <IonSegment
-            onIonChange={(e) => {
-              console.log("changing segment")
-              handleOnSegmentChange(e.detail.value)
-            }}
+            onIonChange={(e) => handleOnSegmentChange(e.detail.value)}
           >
             <IonSegmentButton value="Info">
               <IonLabel>Info</IonLabel>
