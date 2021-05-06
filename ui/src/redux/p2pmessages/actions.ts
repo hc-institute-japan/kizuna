@@ -1,7 +1,24 @@
-// import { AgentPubKey } from "@holochain/conductor-api";
 import { FUNCTIONS, ZOMES } from "../../connection/types";
 import { ThunkAction } from "../types";
-import { TextPayload, FilePayload, FileBytesID } from "../commons/types";
+import { AgentPubKey, HoloHash } from "@holochain/conductor-api";
+import { 
+    debounce,
+    timestampToDate, 
+    Uint8ArrayToBase64, 
+    base64ToUint8Array 
+} from "../../utils/helpers";
+import { 
+    TextPayload,
+    FilePayloadInput, 
+    FileType,
+    MessageID 
+} from "../commons/types";
+import { 
+    P2PMessageConversationState,
+    P2PConversation,
+    P2PMessage, 
+    P2PMessageReceipt
+} from "../../redux/p2pmessages/types";
 import { 
     BatchSize,
     MessageInput, 
@@ -13,25 +30,10 @@ import {
     APPEND_MESSAGE, 
     APPEND_RECEIPT 
 } from "./types";
-import { Uint8ArrayToBase64, timestampToDate, base64ToUint8Array } from "../../utils/helpers";
-import { 
-    P2PMessageConversationState,
-    P2PConversation,
-    P2PMessage, 
-    P2PMessageReceipt,
-    Read 
-} from "../../redux/p2pmessages/types";
-import { AgentPubKey, HoloHash } from "@holochain/conductor-api";
-import { 
-    FilePayloadInput, 
-    FileType,
-    MessageID,
-} from "../commons/types";
-import { receipt } from "ionicons/icons";
-import { Profile } from "../profile/types";
-import store from "../../redux/store";
 
+// helper function to transform HC data structures to UI/redux data structures
 export const transformZomeDataToUIData = (zomeResults: P2PMessageConversationState) => {
+
     // destructure zome hashmap results
     let { 0: zomeConversations, 1: zomeMessages, 2: zomeReceipts } = Object.values(zomeResults);
 
@@ -45,8 +47,9 @@ export const transformZomeDataToUIData = (zomeResults: P2PMessageConversationSta
         transformedConversations[key] = conversation;
     };
 
-    // transform messages
+    // get a list of files to fetch from HC (on a different zome call)
     var filesToFetch: { [key: string]: Uint8Array } = {};
+    // transform messages
     var transformedMesssages: { [key: string]: P2PMessage } = {};
     for (const [key, value] of Object.entries(zomeMessages)) {
         let { 0: message, 1: receiptArray } = Object(value);
@@ -101,6 +104,7 @@ export const transformZomeDataToUIData = (zomeResults: P2PMessageConversationSta
         transformedReceipts[key] = p2preceipt;
     }
 
+    // consolidate transformed objects
     let consolidatedUIObject: P2PMessageConversationState = { 
         conversations: transformedConversations, 
         messages: transformedMesssages, 
@@ -109,15 +113,16 @@ export const transformZomeDataToUIData = (zomeResults: P2PMessageConversationSta
         typing: {}
     };
 
-    console.log("Actions transformZomeDataToUIData", consolidatedUIObject);
+    // console.log("Actions transformZomeDataToUIData", consolidatedUIObject);
 
     return consolidatedUIObject;
 }
 
+// action to set P2PMessageConversations into the redux state
 export const setMessages = (state: P2PMessageConversationState): ThunkAction => async (
     dispatch,
 ) => {
-    console.log("Actions dispatching SET_MESSAGES", state)
+    // console.log("Actions dispatching SET_MESSAGES", state)
     dispatch({
         type: SET_MESSAGES,
         state,
@@ -125,12 +130,14 @@ export const setMessages = (state: P2PMessageConversationState): ThunkAction => 
     return true;
 }
 
+// action to set the FileBytes into the redux state
 export const setFiles = ( filesToFetch: { [key: string]: Uint8Array }): ThunkAction => async (
     dispatch,
     _getState,
     { callZome }
 ) => {
-    console.log("Actions fetching files", filesToFetch);
+    // takes a list of file addresses to fetch from HC
+    // console.log("Actions fetching files", filesToFetch);
     const fetchedFiles = await callZome({
         zomeName: ZOMES.P2PMESSAGE,
         fnName: FUNCTIONS[ZOMES.P2PMESSAGE].SEND_MESSAGE,
@@ -138,20 +145,22 @@ export const setFiles = ( filesToFetch: { [key: string]: Uint8Array }): ThunkAct
     });
 
     if (fetchedFiles?.type !== "error") {
-        console.log("Actions SET_FILES dispatching to reducer", fetchedFiles)
+        // console.log("Actions SET_FILES dispatching to reducer", fetchedFiles)
         dispatch({
             type: SET_FILES,
             sate: fetchedFiles
         });
         return true;
     }
-    console.log("Actions error in fetching files", fetchedFiles)
+    // console.log("Actions error in fetching files", fetchedFiles)
 }
 
+// action to append a message and receipt (return values of p2p send_message) into the redux state after a user sends a message
+// will also append the file bytes if message type is file (does not fetch from HC)
 export const appendMessage = (state: { message: P2PMessage, receipt: P2PMessageReceipt, file?: P2PFile}): ThunkAction => async (
     dispatch
 ) => {
-    console.log("Actions dispatching APPEND_MESSAGE")
+    // console.log("Actions dispatching APPEND_MESSAGE")
     dispatch({
         type: APPEND_MESSAGE,
         state
@@ -159,10 +168,11 @@ export const appendMessage = (state: { message: P2PMessage, receipt: P2PMessageR
     return true;
 }
 
+// action to append a receipt (carried by signals when a message is read) into the redux state
 export const appendReceipt = (state: P2PMessageReceipt): ThunkAction => async (
     dispatch
 ) => {
-    console.log("Actions dispatching APPEND_RECEIPT");
+    // console.log("Actions dispatching APPEND_RECEIPT");
     dispatch({
         type: APPEND_RECEIPT,
         state
@@ -170,13 +180,22 @@ export const appendReceipt = (state: P2PMessageReceipt): ThunkAction => async (
     return true;
 }
 
-export const sendMessage = (receiver: AgentPubKey, message: string, type: string, replyTo?: HoloHash, file?: any): ThunkAction => async (
+// action to send a message
+// takes in the parameters of message_input
+export const sendMessage = (
+    receiver: AgentPubKey, 
+    message: string, 
+    type: string, 
+    replyTo?: HoloHash, 
+    file?: any
+): ThunkAction => async (
     dispatch,
     _getState,
     { callZome }
 ) => {
-    console.log("Actions send message")
+    // console.log("Actions send message")
 
+    // construct the payload input structure (text or file)
     var payloadInput;
     if (type == "TEXT") {
         let textPayload: TextPayload = {
@@ -187,7 +206,6 @@ export const sendMessage = (receiver: AgentPubKey, message: string, type: string
         };
         payloadInput = textPayload;
     } else {
-        console.log("actions file", file)
         let fileType: FileType = {
             type: file.fileType.type,
             payload: file.fileType.type != "OTHER" ? { thumbnail: file.fileType.payload.thumbnail } : null
@@ -203,18 +221,23 @@ export const sendMessage = (receiver: AgentPubKey, message: string, type: string
         payloadInput = filePayload;
     }
 
+    // construct the message input structure
     let input: MessageInput = {
         receiver: receiver,
         payload: payloadInput,
         reply_to: replyTo
     };
 
+    // CALL ZOME
     const sentMessage = await callZome({
         zomeName: ZOMES.P2PMESSAGE,
         fnName: FUNCTIONS[ZOMES.P2PMESSAGE].SEND_MESSAGE,
         payload: input
     });
 
+    // transform the return value of the send_message function (message and receipt)
+    // send_message return value is not consistent with the structures of the get functions
+    // TODO: standardize return values in HC
     if (sentMessage?.type !== "error") {
         console.log("Action sent Message", sentMessage);
         const [ messageTuple, receiptTuple ] = sentMessage;
@@ -268,6 +291,7 @@ export const sendMessage = (receiver: AgentPubKey, message: string, type: string
             fileBytes: file.fileBytes 
         } : undefined;
 
+        // DISPATCH TO REDUCER
         dispatch(appendMessage({
             message: p2pMessage, 
             receipt: p2pReceipt, 
@@ -279,17 +303,21 @@ export const sendMessage = (receiver: AgentPubKey, message: string, type: string
         console.log("actions successfully sent message");
         return true;
     };
+
+    // ERROR
     console.log("actions failed to send message", sentMessage);
     return false;
 }
 
-// TODO: use the aggregator
+
+// action to get the latest messages (called when the application starts)
+// takes in a the batch size as input
 export const getLatestMessages = (size: number): ThunkAction => async (
     dispatch,
     _getState,
     { callZome }
 ) => {
-    console.log("Actions get latest");
+    // console.log("Actions get latest");
 
     // CALL ZOME
     const batchSize: BatchSize = size; 
@@ -298,27 +326,29 @@ export const getLatestMessages = (size: number): ThunkAction => async (
         fnName: FUNCTIONS[ZOMES.P2PMESSAGE].GET_LATEST_MESSAGES,
         payload: batchSize
     });
+    // console.log("Actions get latest", p2pLatestState)
     
     // DISPATCH TO REDUCER
     if (p2pLatestState?.type !== "error") {
         let toDispatch = transformZomeDataToUIData(p2pLatestState);
-        console.log("Actions setting messages after getting latest", p2pLatestState, ">", toDispatch);
+        // console.log("Actions setting messages after getting latest", p2pLatestState, ">", toDispatch);
         dispatch(setMessages(toDispatch));
 
         return toDispatch;
     };
 
     // ERROR
-    console.log("failed to get latest messages", p2pLatestState);
+    // console.log("failed to get latest messages", p2pLatestState);
     return false;
 }
 
+// action to get messages in batches (called while scrolling in chat boxes and media boxes)
 export const getNextBatchMessages = (filter: P2PChatFilterBatch): ThunkAction => async (
     dispatch,
     _getState,
     { callZome }
 ) => {
-    console.log("Actions getting next batch")
+    // console.log("Actions getting next batch")
     
     // CALL ZOME
     const nextBatchOfMessages = await callZome({
@@ -330,7 +360,7 @@ export const getNextBatchMessages = (filter: P2PChatFilterBatch): ThunkAction =>
     // DISPATCH TO REDUCER
     if (nextBatchOfMessages?.type !== "error") {
         let toDispatch = transformZomeDataToUIData(nextBatchOfMessages);
-        console.log("Actions get next batch complete", nextBatchOfMessages);
+        // console.log("Actions get next batch complete", nextBatchOfMessages);
         if (Object.values(nextBatchOfMessages[1]).length > 0) dispatch({
             type: SET_MESSAGES,
             state: toDispatch
@@ -339,7 +369,7 @@ export const getNextBatchMessages = (filter: P2PChatFilterBatch): ThunkAction =>
     };
 
     // ERROR
-    console.log("actions failed to get next batch", nextBatchOfMessages)
+    // console.log("actions failed to get next batch", nextBatchOfMessages)
     return false;
 }
 
@@ -362,21 +392,26 @@ export const getNextBatchMessages = (filter: P2PChatFilterBatch): ThunkAction =>
 //     return false;
 // }
 
+// action to mark an array of messages as read (called in the onSeen callback)
 export const readMessage = (messages: P2PMessage[]): ThunkAction => async (
     dispatch,
     _getState,
     { callZome }
 ) => {
-    console.log("actions reading message");
+    // console.log("actions reading message");
+
+    // CONSTRUCT ZOME INPUT
+    // construct the timestamp
     let now = Date.now();
     let seconds = (now/1000)>>0;
     let nanoseconds = (now%1000)*10**6;
-    // let status: Read = { timestamp: [seconds, nanoseconds] }
     let timestamp = [seconds, nanoseconds];
 
+    // get hashes of messages to be marked
     let hashes: any = [];
     messages.map((message) => hashes.push(base64ToUint8Array(message.p2pMessageEntryHash.slice(1))));
 
+    // get the sender (sender = conversant since p2p)
     let sender = Buffer.from(base64ToUint8Array(messages[0].author.slice(1)));
 
     let input = {
@@ -385,12 +420,14 @@ export const readMessage = (messages: P2PMessage[]): ThunkAction => async (
         timestamp: timestamp,
     }
 
+    // CALL ZOME
     const readReceiptMap = await callZome({
         zomeName: ZOMES.P2PMESSAGE,
         fnName: FUNCTIONS[ZOMES.P2PMESSAGE].READ_MESSAGE,
         payload: input
     })
         
+    // DISPATCH TO REDUCER
     if (readReceiptMap?.type !== "error") {
         let [key] = Object.keys(readReceiptMap);
 
@@ -406,7 +443,7 @@ export const readMessage = (messages: P2PMessage[]): ThunkAction => async (
             status: readReceiptMap[key].status.status
         }
 
-        console.log("actions appending receipt", p2preceipt);
+        // console.log("actions appending receipt", p2preceipt);
         dispatch({
             type: APPEND_RECEIPT,
             state: p2preceipt
@@ -414,17 +451,19 @@ export const readMessage = (messages: P2PMessage[]): ThunkAction => async (
         return true;
     }
 
-    console.log("actions failed to read messags", readReceiptMap)
+    // ERROR
+    // console.log("actions failed to read messags", readReceiptMap)
     return false;
 
 }
 
+// action to get the file bytes of a list of file addresses
 export const getFileBytes = (hashes: Uint8Array[]): ThunkAction => async (
     dispatch,
     _getState,
     { callZome }
 ) => {
-    console.log("Actions getting file bytes");
+    // console.log("Actions getting file bytes");
     const fetchedFiles = await callZome({
         zomeName: ZOMES.P2PMESSAGE,
         fnName: FUNCTIONS[ZOMES.P2PMESSAGE].GET_FILE_BYTES,
@@ -433,7 +472,7 @@ export const getFileBytes = (hashes: Uint8Array[]): ThunkAction => async (
     
     let transformedFiles: { [key:string]: Uint8Array } = {};
     if (fetchedFiles?.type !== "error") {
-        console.log("Actions get file bytes", fetchedFiles);
+        // console.log("Actions get file bytes", fetchedFiles);
         Object.keys(fetchedFiles).map((key) => {
             transformedFiles["u" + key] = fetchedFiles[key];
         });
@@ -444,31 +483,11 @@ export const getFileBytes = (hashes: Uint8Array[]): ThunkAction => async (
         });
         return transformedFiles;
     };
-    console.log("actions failed to get next batch", transformedFiles);
+    // console.log("actions failed to get next batch", transformedFiles);
     return false;
 }
 
-export const setTyping = (data: any): ThunkAction => async (
-    dispatch,
-    _getState,
-    { callZome }
-) => {
-    console.log("Actions setting typing profile", data);
-    let username = store.getState().profile.username!;
-
-    let profile = {
-        id: data.agent,
-        username: username
-    }
-    dispatch({
-        type: SET_TYPING,
-        state: {
-            profile: profile,
-            isTyping: data.isTyping
-        }
-    })
-}
-
+// action to call typing
 export const isTyping = (agent: AgentPubKey, isTyping: boolean): ThunkAction => async (
     dispatch,
     _getState,
@@ -479,16 +498,31 @@ export const isTyping = (agent: AgentPubKey, isTyping: boolean): ThunkAction => 
         isTyping: isTyping
 
     }
-    let typing = await callZome({
+
+    callZome({
         zomeName: ZOMES.P2PMESSAGE,
         fnName: FUNCTIONS[ZOMES.P2PMESSAGE].TYPING,
         payload: payload
-    });
+    })
+    
+    setTimeout(
+        () => callZome({
+            zomeName: ZOMES.P2PMESSAGE,
+            fnName: FUNCTIONS[ZOMES.P2PMESSAGE].TYPING,
+            payload: {
+                agent: agent,
+                isTyping: false
+            }
+        }), 
+        5000
+    )
 
-    if (typing?.type !== "error") {
-        // console.log("Actions indicated i am typing");
-        return true;
-    }
-    // console.log("error in indicating i am typing", typing);
-    return false;
+    return
+
+    // if (typing?.type !== "error") {
+    //     // console.log("Actions indicated i am typing", typing);
+    //     return true;
+    // }
+    // // console.log("error in indicating i am typing", typing);
+    // return false;
 }
