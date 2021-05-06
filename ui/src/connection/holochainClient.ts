@@ -23,7 +23,6 @@ import store from "../redux/store";
 import { CallZomeConfig } from "../redux/types";
 import { FUNCTIONS, ZOMES } from "./types";
 import { APPEND_MESSAGE, APPEND_RECEIPT, P2PMessage, P2PMessageReceipt, SET_TYPING } from "../redux/p2pmessages/types";
-import { appendMessage, getLatestMessages, setTyping } from "../redux/p2pmessages/actions";
 
 let client: null | AppWebsocket = null;
 
@@ -200,7 +199,6 @@ let signalHandler: AppSignalCb = (signal) => {
     }
     case "RECEIVE_P2P_MESSAGE":
       let receivedMessage = signal.data.payload.message;
-      console.log("Connection received signal for new p2p message", receivedMessage);
 
       const [ messageTuple, receiptTuple ] = receivedMessage;
       const [ messageID, message ] = messageTuple
@@ -266,7 +264,6 @@ let signalHandler: AppSignalCb = (signal) => {
       break;
     case "RECEIVE_P2P_RECEIPT":
       let receiptHash = Object.keys(signal.data.payload.receipt)[0];
-      console.log("Connection received signal for new p2p receipt", signal.data.payload.receipt);
       
       let messageIDs: string[] = [];
       signal.data.payload.receipt[receiptHash].id.forEach((id: Uint8Array) => {
@@ -286,16 +283,17 @@ let signalHandler: AppSignalCb = (signal) => {
       });
       break;
     case "TYPING_P2P":
-      console.log("Connection received typing signal", signal.data.payload);
       let contacts2 = store.getState().contacts.contacts;
-      let usernameTyping = contacts2[signal.data.payload.agent]
+      let agentHash = Uint8ArrayToBase64(signal.data.payload.agent);
+      let usernameTyping = contacts2[agentHash].username;
       store.dispatch({
         type: SET_TYPING,
         state: {
           profile: {
-            id: signal.data.payload.agent,
-            username: usernameTyping
-          }
+            id: agentHash,
+            username: usernameTyping,
+          },
+          isTyping: signal.data.payload.is_typing
         }
       })
       break;
