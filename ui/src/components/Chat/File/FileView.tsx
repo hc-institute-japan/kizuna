@@ -4,38 +4,40 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { FilePayload } from "../../../redux/commons/types";
 import { RootState } from "../../../redux/types";
-import { base64ToUint8Array } from "../../../utils/helpers";
+import {
+  base64ToUint8Array,
+  convertSizeToReadableSize,
+} from "../../../utils/helpers";
 import styles from "./style.module.css";
 
 interface Props {
   file: FilePayload;
+  onDownload?(file: FilePayload): any;
 }
 
-const File: React.FC<Props> = ({ file }) => {
+const File: React.FC<Props> = ({ file, onDownload }) => {
   const { fileName, fileSize } = file;
   const fileBytes = useSelector(
     (state: RootState) => state.groups.groupFiles[`u${file.fileHash}`]
   );
-  const handleOnClick = () => {
-    const blob = new Blob([fileBytes]); // change resultByte to bytes
+  const download = () => {
+    if (fileBytes) {
+      const blob = new Blob([fileBytes]); // change resultByte to bytes
 
-    const link = document.createElement("a");
-    link.href = window.URL.createObjectURL(blob);
-    link.download = file.fileName;
-    link.click();
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = file.fileName;
+      link.click();
+    }
   };
 
   const renderSize = () => {
-    const size =
-      (fileSize / 1024 / 1024).toFixed(2) === "0.00"
-        ? `${(fileSize / 1024 / 1024).toFixed(2)}mb`
-        : `${(fileSize / 1024).toFixed(2)}kb`;
-    return size;
+    return convertSizeToReadableSize(fileSize);
   };
   return (
     <IonGrid>
       <IonRow
-        onClick={handleOnClick}
+        onClick={onDownload ? () => onDownload(file) : download}
         className={`ion-align-items-center ${styles.file}`}
       >
         <div className="ion-padding-end">

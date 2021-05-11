@@ -24,6 +24,7 @@ const Me: React.FC<ChatProps> = ({
   type,
   showProfilePicture,
   isSeen = false,
+  onDownload,
 }) => {
   const isText = isTextPayload(payload);
   const isP2P = type === "p2p";
@@ -39,7 +40,12 @@ const Me: React.FC<ChatProps> = ({
         {isText ? (
           <Text message={payload as TextPayload} />
         ) : (
-          <File type="me" timestamp={timestamp} file={payload as FilePayload} />
+          <File
+            onDownload={onDownload}
+            type="me"
+            timestamp={timestamp}
+            file={payload as FilePayload}
+          />
         )}
         <IonText>
           <h6 className="ion-no-margin ion-text-end">

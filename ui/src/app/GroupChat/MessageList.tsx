@@ -203,6 +203,32 @@ const MessageList: React.FC<Props> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [newestMessage]);
 
+  const filesBytes = useSelector((state: RootState) => state.groups.groupFiles);
+
+  const onDownload = (file: FilePayload) => {
+    const fileBytes = filesBytes[`u${file.fileHash}`];
+    if (fileBytes) {
+      const blob = new Blob([fileBytes]); // change resultByte to bytes
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = file.fileName;
+      link.click();
+    } else {
+      dispatch(fetchFilesBytes([base64ToUint8Array(file.fileHash)])).then(
+        (res: any) => {
+          if (res) {
+            const fetchedFileBytes = res[`u${file.fileHash}`];
+            const blob = new Blob([fetchedFileBytes]); // change resultByte to bytes
+            const link = document.createElement("a");
+            link.href = window.URL.createObjectURL(blob);
+            link.download = file.fileName;
+            link.click();
+          }
+        }
+      );
+    }
+  };
+
   return (
     <>
       <IonLoading
@@ -220,6 +246,7 @@ const MessageList: React.FC<Props> = ({
             return (
               <Chat.Me
                 // key={message.groupMessageEntryHash}
+                onDownload={onDownload}
                 key={i}
                 author={message.author.username}
                 timestamp={new Date(message.timestamp[0] * 1000)}
@@ -233,6 +260,7 @@ const MessageList: React.FC<Props> = ({
           return (
             <Chat.Others
               // key={message.groupMessageEntryHash}
+              onDownload={onDownload}
               key={i}
               author={message.author.username}
               timestamp={new Date(message.timestamp[0] * 1000)}

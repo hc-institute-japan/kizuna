@@ -24,9 +24,10 @@ interface Props {
   state: [boolean, React.Dispatch<SetStateAction<boolean>>];
   src: string;
   file: FilePayload;
+  onDownload?(file: FilePayload): any;
 }
 
-const ImageModal: React.FC<Props> = ({ state, src, file }) => {
+const ImageModal: React.FC<Props> = ({ state, src, file, onDownload }) => {
   const [isOpen, setIsOpen] = state;
   const footer = useRef<HTMLIonToolbarElement>(null);
   const header = useRef<HTMLIonToolbarElement>(null);
@@ -54,16 +55,18 @@ const ImageModal: React.FC<Props> = ({ state, src, file }) => {
   }, [isOpen]);
 
   const download = () => {
-    const blob = new Blob([fileBytes]); // change resultByte to bytes
+    if (fileBytes) {
+      const blob = new Blob([fileBytes]); // change resultByte to bytes
 
-    const link = document.createElement("a");
-    link.href = window.URL.createObjectURL(blob);
-    link.download = file.fileName;
-    link.click();
-    setPopover({
-      isOpen: false,
-      event: undefined,
-    });
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = file.fileName;
+      link.click();
+      setPopover({
+        isOpen: false,
+        event: undefined,
+      });
+    }
   };
 
   return (
@@ -121,7 +124,7 @@ const ImageModal: React.FC<Props> = ({ state, src, file }) => {
           onDidDismiss={() => setPopover({ isOpen: false, event: undefined })}
         >
           <IonList>
-            <IonItem onClick={download}>
+            <IonItem onClick={onDownload ? () => onDownload(file) : download}>
               <IonLabel>Download</IonLabel>
             </IonItem>
           </IonList>

@@ -8,9 +8,10 @@ interface Props {
   src: string;
   file: FilePayload;
   className?: string;
+  onDownload?(file: FilePayload): any;
 }
 
-const Image: React.FC<Props> = ({ src, file, className }) => {
+const Image: React.FC<Props> = ({ src, file, className, onDownload }) => {
   const [isOpen, setIsOpen] = useState(false);
   const handleOnImageOnClick = () => {
     setIsOpen(true);
@@ -18,7 +19,12 @@ const Image: React.FC<Props> = ({ src, file, className }) => {
 
   return (
     <>
-      <ImageModal state={[isOpen, setIsOpen]} src={src} file={file} />
+      <ImageModal
+        onDownload={onDownload}
+        state={[isOpen, setIsOpen]}
+        src={src}
+        file={file}
+      />
       <IonImg
         {...(className ? { className } : {})}
         onClick={handleOnImageOnClick}

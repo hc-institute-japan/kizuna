@@ -5,7 +5,9 @@ import Me from "./Me";
 import Others from "./Others";
 
 const Chat: {
-  ChatList: ForwardRefExoticComponent<ChatListProps & RefAttributes<ChatListMethods>>;
+  ChatList: ForwardRefExoticComponent<
+    ChatListProps & RefAttributes<ChatListMethods>
+  >;
   Me: React.FC<ChatProps>;
   Others: React.FC<ChatProps>;
 } = {
