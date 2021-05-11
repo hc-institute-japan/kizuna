@@ -23,12 +23,10 @@ import store from "../redux/store";
 import { CallZomeConfig } from "../redux/types";
 import { FUNCTIONS, ZOMES } from "./types";
 import { APPEND_MESSAGE, APPEND_RECEIPT, P2PMessage, P2PMessageReceipt, SET_TYPING } from "../redux/p2pmessages/types";
-import { appendMessage, getLatestMessages, setTyping } from "../redux/p2pmessages/actions";
 
 let client: null | AppWebsocket = null;
 
 let signalHandler: AppSignalCb = (signal) => {
-  console.log("connections", signal);
   switch (signal.data.payload.name) {
     case "added_to_group":
       let payload = signal.data.payload.payload.payload;
@@ -201,7 +199,6 @@ let signalHandler: AppSignalCb = (signal) => {
     }
     case "RECEIVE_P2P_MESSAGE":
       let receivedMessage = signal.data.payload.message;
-      console.log(receivedMessage);
 
       const [ messageTuple, receiptTuple ] = receivedMessage;
       const [ messageID, message ] = messageTuple
@@ -267,22 +264,18 @@ let signalHandler: AppSignalCb = (signal) => {
       break;
     case "RECEIVE_P2P_RECEIPT":
       let receiptHash = Object.keys(signal.data.payload.receipt)[0];
-      console.log("receipt signal", signal.data.payload.receipt);
       
       let messageIDs: string[] = [];
       signal.data.payload.receipt[receiptHash].id.forEach((id: Uint8Array) => {
         messageIDs.push("u" + Uint8ArrayToBase64(id))
       });
 
-      console.log("connection", messageIDs)
-
       let p2pReceipt = {
         p2pMessageReceiptEntryHash:receiptHash,
-        p2pMessageEntryHash: messageIDs,
-        timestamp: signal.data.payload.receipt[receiptHash].status.timestamp,
+        p2pMessageEntryHashes: messageIDs,
+        timestamp: timestampToDate(signal.data.payload.receipt[receiptHash].status.timestamp),
         status: signal.data.payload.receipt[receiptHash].status.status
-      }
-      console.log(p2pReceipt)
+      };
 
       store.dispatch({
         type: APPEND_RECEIPT,
@@ -290,16 +283,17 @@ let signalHandler: AppSignalCb = (signal) => {
       });
       break;
     case "TYPING_P2P":
-      console.log("client typing", signal.data.payload);
       let contacts2 = store.getState().contacts.contacts;
-      let usernameTyping = contacts2[signal.data.payload.agent]
+      let agentHash = Uint8ArrayToBase64(signal.data.payload.agent);
+      let usernameTyping = contacts2[agentHash].username;
       store.dispatch({
         type: SET_TYPING,
         state: {
           profile: {
-            id: signal.data.payload.agent,
-            username: usernameTyping
-          }
+            id: agentHash,
+            username: usernameTyping,
+          },
+          isTyping: signal.data.payload.is_typing
         }
       })
       break;

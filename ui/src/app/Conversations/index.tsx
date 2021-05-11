@@ -187,6 +187,7 @@ const Conversations: React.FC = () => {
               x.content.messages.length - 1
             ].timestamp.valueOf()
           : x.createdAt.valueOf();
+                    
       let timestampY =
         y.content.messages.length !== 0
           ? y.content.messages[
@@ -214,21 +215,16 @@ const Conversations: React.FC = () => {
   useEffect(() => {
     setGroupMessagesLocal(groupMessages);
   }, [groupMessages]);
-  console.log(p2pState, Object.keys(groups).length);
+
   return (
     <IonPage>
       <Toolbar noSearch onChange={() => {}} />
       <IonContent>
-        {Object.keys(groups).length > 0 ? (
-          p2pState !== undefined ? (
+        {Object.keys(groups).length > 0 || p2pState !== undefined ? (
             <IonList className={styles.conversation}>
               {renderConversation(groups, p2pState).map((conversation: any) => (
                 <Conversation
-                  key={
-                    conversation.groupId !== undefined
-                      ? conversation.groupId
-                      : conversation.conversant
-                  }
+                  key={conversation.groupId}
                   isGroup={conversation.isGroup}
                   groupId={conversation.groupId}
                   content={conversation.content}
@@ -236,8 +232,7 @@ const Conversations: React.FC = () => {
                 />
               ))}
             </IonList>
-          ) : null
-        ) : (
+          ) : (
           <EmptyConversations />
         )}
 

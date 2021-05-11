@@ -1,6 +1,10 @@
 {
   "app.contacts.add-message": "{name} has been added to your contacts.",
   "app.contacts.empty-contact-list": "Your contact list is empty as of the moment.",
+  "app.contacts.remove": "Remove from contacts",
+  "app.contacts.add": "Add to contacts",
+  "app.contacts.unblock": "Unblock profile",
+  "app.contacts.block": "Block profile",
   "app.conversations.empty-conversations-list": "You have no conversations yet...",
   "app.landing.login": "Start Messaging",
   "app.landing.register": "Don't have an account?",

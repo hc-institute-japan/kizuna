@@ -24,7 +24,6 @@ export const getLatestData = (): ThunkAction => async (
     zomeName: ZOMES.AGGREGATOR,
     fnName: FUNCTIONS[ZOMES.AGGREGATOR].RETRIEVE_LATEST_DATA,
   });
-  console.log(latestData);
 
   dispatch({
     type: SET_USERNAME,
