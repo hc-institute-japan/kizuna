@@ -5,33 +5,15 @@ import {
     FileBytesID,
     Payload,
     TextPayload,
-    FilePayload,
     FilePayloadInput
 } from "../commons/types";
-import { SET_GROUP_TYPING_INDICATOR } from "../group/types";
 import { Profile } from "../profile/types";
 
 export const SET_MESSAGES = "SET_MESSAGES";
-export const APPEND_MESSAGE = "APPEND_MESSAGE";
-export const APPEND_RECEIPT = "APPEND_RECEIPT";
 export const SET_FILES = "SET_FILES";
 export const SET_TYPING = "SET_TYPING";
-
-// export type ProfileID = string;
-// export type MessageID = string;
-// export type P2PFileBytes = string;
-// export type Payload = Text | File;
-// export interface Text {
-//     type: string,
-//     payload: string
-// }
-// export interface File {
-//     fileName: string,
-//     fileSize: number,
-//     fileType: string,
-//     fileHash?: string,
-//     bytes?: Uint8Array
-// }
+export const APPEND_MESSAGE = "APPEND_MESSAGE";
+export const APPEND_RECEIPT = "APPEND_RECEIPT";
 
 export type P2PMessageReceiptID = string;
 export type P2PMessageStatus = "sent" | "delivered" | "read";
@@ -62,6 +44,11 @@ export interface P2PMessageReceipt {
     p2pMessageEntryHashes: MessageID[],
     timestamp: Date,
     status: P2PMessageStatus
+}
+
+export interface P2PFile {
+    fileHash: FileBytesID,
+    fileBytes: Uint8Array
 }
 
 export interface P2PMessageConversationState {
@@ -108,6 +95,7 @@ interface AppendP2PMessageAction {
     state: {
         message: P2PMessage,
         receipt: P2PMessageReceipt,
+        file? : P2PFile,
         key?: string
     }
 }
@@ -130,4 +118,9 @@ interface SetP2PTyping {
     }
 }
 
-export type P2PMessageActionType = SetP2PMessagesAction | AppendP2PMessageAction | AppendP2PMessageReceipt | SetP2PFiles | SetP2PTyping;
+export type P2PMessageActionType = 
+    SetP2PMessagesAction 
+    | AppendP2PMessageAction 
+    | AppendP2PMessageReceipt 
+    | SetP2PFiles 
+    | SetP2PTyping;

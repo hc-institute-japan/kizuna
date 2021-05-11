@@ -1,17 +1,12 @@
 import {
   P2PMessageActionType,
   P2PMessageConversationState,
-  P2PConversation,
-  P2PMessage,
-  P2PMessageReceipt,
   SET_MESSAGES,
   APPEND_MESSAGE,
   APPEND_RECEIPT,
   SET_FILES,
   SET_TYPING
 } from "./types";
-import { MessageID } from "../commons/types";
-import { Uint8ArrayToBase64, timestampToDate } from "../../utils/helpers";
 
 const initialState: P2PMessageConversationState = {
   conversations: {},
@@ -21,88 +16,39 @@ const initialState: P2PMessageConversationState = {
   typing: {}
 };
 
+// Hashes within the redux state are base64 strings with u prepended except for FileHash (except when used as key)
 const reducer = (state = initialState, action: P2PMessageActionType) => {
 
-  
   switch (action.type) {
     case SET_MESSAGES:
-      console.log("Reducer setting messages");
-      let { 0: p2pconversations, 1: p2pmessages, 2: p2preceipts } = Object.values(action.state);
+      // console.log("Reducer setting messages");
 
-      var mergedConversations: { [key: string]: P2PConversation } = {};
-      for (const [key, value] of Object.entries(p2pconversations)) {
-        let messageIDs: MessageID[] = value as MessageID[];
-        let conversation: P2PConversation = {
-          messages: messageIDs
-        };
-        var existing = state.conversations[key];
-        if (existing == undefined) mergedConversations[key] = conversation
-        else mergedConversations[key] = {messages: [...new Set(existing.messages.concat(messageIDs))]}
+      // copy state
+      let stateToSet = state;
+      let { conversations, messages, receipts, files, typing } = action.state;
+
+      // iterate through conversations
+      for (const [key, value] of Object.entries(conversations)) {
+        let existing = state.conversations[key];
+        // if conversation is not yet existing, create new
+        if (existing == undefined) stateToSet.conversations[key] = value
+        // else simply append messages to the array value
+        else stateToSet.conversations[key] = { messages: [...new Set(existing.messages.concat(value.messages))]}
       };
-
-      var transformedMesssages: { [key: string]: P2PMessage } = {};
-      for (const [key, value] of Object.entries(p2pmessages)) {
-        let { 0: message, 1: receiptArray } = Object(value);
-        var payload;
-        switch (message.payload.type) {
-          case "TEXT":
-            payload = message.payload;
-            break;
-          case "FILE":
-            payload = {
-              type: "FILE",
-              fileName: message.payload.payload.metadata.fileName,
-              fileSize: message.payload.payload.metadata.fileSize,
-              fileType: message.payload.payload.fileType.type,
-              fileHash: Uint8ArrayToBase64(message.payload.payload.metadata.fileHash),
-              thumbnail: message.payload.payload.fileType.type != "OTHER" 
-                          ? message.payload.payload.fileType.payload.thumbnail
-                          : null
-            }
-            break
-          default:
-            break
-        }
-
-        let p2pMessage = {
-          p2pMessageEntryHash: key,
-          author: Uint8ArrayToBase64(message.author),
-          receiver: Uint8ArrayToBase64(message.receiver),
-          payload: payload,
-          timestamp: timestampToDate(message.timeSent),
-          replyTo: message.replyTo,
-          receipts: receiptArray
-        }
-
-        transformedMesssages[key] = p2pMessage
-      }
       
-      var transformedReceipts: { [key: string]: P2PMessageReceipt } = {};
-      for (const [key, value] of Object.entries(p2preceipts)) {
-        const { id, status: statusTuple } = Object(value);
-        const { status, timestamp } = statusTuple;
-
-        let p2preceipt = {
-          p2pMessageReceiptEntryHash: key,
-          p2pMessageEntryHashes: id,
-          timestamp: timestampToDate(timestamp),
-          status: status
-        }
-
-        transformedReceipts[key] = p2preceipt;
-      }
-
-      let ret: P2PMessageConversationState = {
+      // update copied state
+      let stateSet: P2PMessageConversationState = {
         conversations: {
-          ...mergedConversations
+          ...state.conversations,
+          ...stateToSet.conversations
         },
         messages: {
           ...state.messages,
-          ...transformedMesssages
+          ...messages
         },
         receipts: {
           ...state.receipts,
-          ...transformedReceipts
+          ...receipts
         },
         files: {
           ...state.files,
@@ -112,91 +58,98 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
         }
       }
 
-      console.log("Reducer finished setting messages", ret);
-      return ret;
+      // console.log("Reducer finished setting messages", stateSet);
+      return stateSet;
+
     case APPEND_MESSAGE:
-      console.log("Reducer appending message", action.state);
-      var ret2 = state;
-      let { 0: currConversations, 1: currMessages, 2: currReceipts } = Object.values(state);
-      
+      // console.log("Reducer appending message", action.state);
+
+      // copy state
+      var stateToAppendMessage = state; 
+
+      // destructure inputs
       let key = action.state.key ? action.state.key : action.state.message.receiver;
       let messageHash = action.state.message.p2pMessageEntryHash;
       let receiptHash = action.state.receipt.p2pMessageReceiptEntryHash;
 
-      var currConversationConversant = {};
-      if (state.conversations[key] == undefined) {
-        currConversationConversant = {
-          ...currConversations,
-          [key]: {messages: [messageHash]}
-        }
-      } else {
-        currConversationConversant = {
-          ...currConversations,
-          [key]: {messages: [
-            messageHash,
-            ...state.conversations[key].messages
-          ]}
-        }
-      }
+      // if conversation is not yet existing, create new
+      if (stateToAppendMessage.conversations[key] == undefined) stateToAppendMessage.conversations[key]={messages: [messageHash]}
+      // else simply append messages to the array value
+      else stateToAppendMessage.conversations[key]={messages: [messageHash, ...stateToAppendMessage.conversations[key].messages]}
+      
+      // create a new file entry (allows duplicates)
+      if (action.state.file != undefined) stateToAppendMessage.files[action.state.file.fileHash] = action.state.file.fileBytes;
 
-      ret2 = {
+      // update state
+      stateToAppendMessage = {
         conversations: {
-          ...currConversationConversant
+          ...stateToAppendMessage.conversations
         },
         messages: {
-          ...currMessages,
+          ...stateToAppendMessage.messages,
           [messageHash]: action.state.message
         },
         receipts: {
-          ...currReceipts,
+          ...stateToAppendMessage.receipts,
           [receiptHash]: action.state.receipt
         },
         files: {
-          ...state.files
+          ...stateToAppendMessage.files,
         },
         typing: {
-          ...state.typing
+          ...stateToAppendMessage.typing,
         }
       }
 
-      console.log("Reducer finished appening message", ret2);
-      return ret2;
+      // console.log("Reducer finished appending message", stateToAppendMessage);
+      return stateToAppendMessage;
+
     case APPEND_RECEIPT:
-      console.log("Reducer appending receipt", action.state);
-      var ret3 = state;
+      // console.log("Reducer appending receipt", action.state);
+
+      // copy state
+      var stateToAppendReceipt = state;
+
+      // destructure inputs
       let receiptHashToAppend = action.state.p2pMessageReceiptEntryHash;
       let receiptToAppend = action.state;
-      
-      for (let hash in action.state.p2pMessageEntryHashes) {
-        if (ret3.messages[hash]) {
-          ret3.messages[hash].receipts.push(receiptHashToAppend)
-        }
-      }
 
-      ret3 = {
+      // iterate over the hashes in a receipt (single receipt can correspond to multiple messages)
+      action.state.p2pMessageEntryHashes.forEach((hash) => {
+        if (stateToAppendReceipt.messages[hash] != undefined) {
+          stateToAppendReceipt.messages[hash].receipts.push(receiptHashToAppend)
+        }
+      })
+
+      // update state
+      stateToAppendReceipt = {
         conversations: {
-          ...ret3.conversations
+          ...stateToAppendReceipt.conversations
         },
         messages: {
-          ...ret3.messages
+          ...stateToAppendReceipt.messages
         },
         receipts: {
-          ...ret3.receipts,
+          ...stateToAppendReceipt.receipts,
           [receiptHashToAppend]: receiptToAppend
         },
         files: {
-          ...ret3.files
+          ...stateToAppendReceipt.files
         },
         typing: {
-          ...state.typing
+          ...stateToAppendReceipt.typing
         }
       }     
-      console.log("Reducer finished appending receipt", ret3);
-      return ret3;
+      // console.log("Reducer finished appending receipt", stateToAppendReceipt);
+      return stateToAppendReceipt;
+
     case SET_FILES:
-      console.log("Reducer setting files")
+      // console.log("Reducer setting files")
+
+      // copy state
       var ret4 = state;
 
+      //update state
       ret4 = {
         conversations: {
           ...ret4.conversations
@@ -208,46 +161,47 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
           ...ret4.receipts
         },
         files: {
-          ...action.state
+          ...ret4.files,
+          ...action.state,
         },
         typing: {
           ...state.typing
         }
       }
       return ret4
+      
     case SET_TYPING:
-      console.log("Reducer setting typing profile")
-      var ret5 = state;
+      var stateToAppendTyping = state;
       let id = action.state.profile.id;
+      let profile = {
+        id: id,
+        username: action.state.profile.username
+      };
+      let status = action.state.isTyping;
 
-      let currTyping = ret5.typing;
-      if (currTyping[id]) {
-        if (!action.state.isTyping) {
-          delete currTyping[id]
-        }
-      } else {
-        currTyping[id] = action.state.profile
+      if (stateToAppendTyping.typing[id] == undefined && status) stateToAppendTyping.typing[id] = profile
+      else {
+        if (!status) delete stateToAppendTyping.typing[id]
       }
 
-      ret5 = {
+      stateToAppendTyping = {
         conversations: {
-          ...ret5.conversations
+          ...stateToAppendTyping.conversations
         },
         messages: {
-          ...ret5.messages
+          ...stateToAppendTyping.messages
         },
         receipts: {
-          ...ret5.receipts
+          ...stateToAppendTyping.receipts
         },
         files: {
-          ...ret5.files
+          ...stateToAppendTyping.files
         },
         typing: {
-          ...currTyping
+          ...stateToAppendTyping.typing
         }
       }
-
-      return ret5
+      return stateToAppendTyping
     default:
       return state;
   }

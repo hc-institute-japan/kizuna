@@ -5,6 +5,7 @@ import {
   personRemoveOutline,
 } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
+import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import {
   addContact,
@@ -28,6 +29,7 @@ const ProfilePopover: React.FC<Props> = ({ isOpen, dismiss, profile }) => {
   const [isBlocked, setIsBlocked] = useState(false);
   const stringifiedId = profile.id;
   const dispatch = useAppDispatch();
+  const intl = useIntl();
   const username = useSelector((state: RootState) => state.profile.username);
 
   const { contacts, blocked } = useSelector(
@@ -70,25 +72,25 @@ const ProfilePopover: React.FC<Props> = ({ isOpen, dismiss, profile }) => {
           <IonItem onClick={remove}>
             <IonIcon icon={personRemoveOutline} />
             <IonLabel className="ion-padding-start">
-              Remove from contacts
+              {intl.formatMessage({id: "app.contacts.remove"})}
             </IonLabel>
           </IonItem>
         ) : (
           <IonItem disabled={isBlocked} onClick={add}>
             <IonIcon icon={personAddOutline} />
-            <IonLabel className="ion-padding-start">Add to contacts</IonLabel>
+            <IonLabel className="ion-padding-start">{intl.formatMessage({id: "app.contacts.add"})}</IonLabel>
           </IonItem>
         )}
         {username !== profile.username ? (
           isBlocked ? (
             <IonItem onClick={unblock}>
               <IonIcon icon={banOutline}></IonIcon>
-              <IonLabel className="ion-padding-start">Unblock profile</IonLabel>
+              <IonLabel className="ion-padding-start">{intl.formatMessage({id: "app.contacts.unblock"})}</IonLabel>
             </IonItem>
           ) : (
             <IonItem onClick={block}>
               <IonIcon icon={banOutline}></IonIcon>
-              <IonLabel className="ion-padding-start">Block profile</IonLabel>
+              <IonLabel className="ion-padding-start">{intl.formatMessage({id: "app.contacts.block"})}</IonLabel>
             </IonItem>
           )
         ) : null}

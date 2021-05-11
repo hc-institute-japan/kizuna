@@ -3,8 +3,6 @@ import {
   IonPage,
   IonButtons,
   IonBackButton,
-  IonText,
-  IonTitle,
   IonHeader,
   IonToolbar,
   IonSegment,
@@ -23,26 +21,19 @@ import {
   IonInfiniteScroll,
   IonInfiniteScrollContent,
 } from "@ionic/react";
-import { Profile } from "../../../redux/profile/types";
-import {
-  P2PMessage,
-  P2PMessageConversationState,
-} from "../../../redux/p2pmessages/types";
-import { FilePayload } from "../../../redux/commons/types";
 import { useSelector } from "react-redux";
-import { RootState } from "../../../redux/types";
-import styles from "./style.module.css";
 import { RouteComponentProps } from "react-router";
+import { RootState } from "../../../redux/types";
+import { Profile } from "../../../redux/profile/types";
+import { FilePayload } from "../../../redux/commons/types";
+import { P2PMessage } from "../../../redux/p2pmessages/types";
 import ImageView from "../../../components/Chat/File/ImageView/index";
 import VideoView from "../../../components/Chat/File/VideoView";
 import FileView from "../../../components/Chat/File/FileView";
-
-import {
-  useAppDispatch,
-  base64ToUint8Array,
-  dateToTimestamp,
-} from "../../../utils/helpers";
 import { getNextBatchMessages } from "../../../redux/p2pmessages/actions";
+import { useAppDispatch, base64ToUint8Array, dateToTimestamp } from "../../../utils/helpers";
+import styles from "./style.module.css";
+
 
 interface Props {
   location: RouteComponentProps<{}, {}, { conversant: Profile }>;
@@ -57,14 +48,15 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
   const [ orderedFiles, setOrderedFiles ] = useState<P2PMessage[]>([]);
   const dispatch = useAppDispatch();
   const slideOpts = {
-    initialSlide: 0,
+    initialSlide: 1,
     speed: 400,
   };
 
   // REFS
-  const slideRef = React.createRef<HTMLIonSlidesElement>();
   const infiniteFileScroll = useRef<HTMLIonInfiniteScrollElement>(null);
   const infiniteFileScroll2 = useRef<HTMLIonInfiniteScrollElement>(null);
+  // const slideRef = React.createRef<HTMLIonSlidesElement>();
+  const slideRef = useRef<HTMLIonSlidesElement>(null);
 
   // USE EFFECTS
   useEffect(() => {
@@ -103,7 +95,6 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
         }
       });
     }
-    console.log("chatdetails media", orderedMedia)
   }, [conversations, messages]);
 
   useEffect(() => {
@@ -133,7 +124,7 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
         index = 2;
         break;
       default:
-        return;
+        index = 0;
     }
     slideRef.current?.slideTo(index);
   };
@@ -218,7 +209,6 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
             </span>
           </IonToolbar>
           <div className={styles.titlebar}>
-            {/* <IonText className={styles.title}>{state.conversant.username}</IonText> */}
             <p className={styles.title}>{state.conversant.username}</p>
           </div>
         </div>
@@ -277,10 +267,9 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
                               <VideoView file={file.payload as FilePayload} />
                             </div>
                           : <div className={styles.mediadiv}>
-                                        {console.log("rendering chat media")}
                               <ImageView 
                                 file={file.payload as FilePayload} 
-                                src={decoder.decode((file.payload as FilePayload).thumbnail!)} 
+                                src={decoder.decode((file.payload as FilePayload).thumbnail!)}
                               />
                             </div>
                           }
