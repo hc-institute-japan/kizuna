@@ -156,7 +156,7 @@ const GroupChat: React.FC = () => {
   useEffect(() => {
     setLoading(true);
     if (groupData && groupData.messages.length) {
-      let newMessages = [...messages!, ...groupData.messages]
+      let newMessages = [...messages!, ...groupData.messages];
       setMessages(newMessages);
       setLoading(false);
     } else {
@@ -203,9 +203,7 @@ const GroupChat: React.FC = () => {
               )}
             </IonAvatar>
             <IonTitle className={styles["title"]}>
-              <div className="item item-text-wrap">
-                {groupInfo!.name}
-              </div>
+              <div className="item item-text-wrap">{groupInfo!.name}</div>
             </IonTitle>
             <IonButton
               onClick={() => {
@@ -256,8 +254,7 @@ const GroupChat: React.FC = () => {
                   isTyping: true,
                 })
               );
-            })
-
+            });
           } else {
             dispatch(fetchId()).then((res: AgentPubKey | null) => {
               dispatch(
@@ -273,7 +270,7 @@ const GroupChat: React.FC = () => {
                   isTyping: false,
                 })
               );
-            })
+            });
           }
           return setMessage(message);
         }}

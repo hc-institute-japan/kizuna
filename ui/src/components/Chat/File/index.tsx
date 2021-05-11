@@ -10,20 +10,26 @@ interface Props {
   timestamp?: Date;
   file?: FilePayload;
   type: "others" | "me";
+  onDownload?(file: FilePayload): any;
 }
 
-const File: React.FC<Props> = ({ timestamp, file, type }) => {
-  const intl = useIntl();
+const File: React.FC<Props> = ({ timestamp, file, type, onDownload }) => {
   const decoder = new TextDecoder("utf-8");
 
   const renderFile = () => {
     switch (file?.fileType) {
       case "IMAGE":
-        return <ImageView file={file} src={decoder.decode(file.thumbnail!)} />;
+        return (
+          <ImageView
+            onDownload={onDownload}
+            file={file}
+            src={decoder.decode(file.thumbnail!)}
+          />
+        );
       case "OTHER":
-        return <FileView file={file} />;
+        return <FileView onDownload={onDownload} file={file} />;
       case "VIDEO":
-        return <VideoView file={file} />;
+        return <VideoView onDownload={onDownload} file={file} />;
       default:
         return null;
     }

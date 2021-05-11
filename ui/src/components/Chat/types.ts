@@ -1,5 +1,5 @@
 import { ReactElement } from "react";
-import { Payload } from "../../redux/commons/types";
+import { FilePayload, Payload } from "../../redux/commons/types";
 
 export interface ChatListProps {
   type?: "p2p" | "group";
@@ -24,6 +24,7 @@ export interface ChatProps {
   showName?: boolean;
   isSeen?: boolean;
   onSeen?(complete: () => any): any;
+  onDownload?(file: FilePayload): any;
 }
 
 export interface ChatListMethods {

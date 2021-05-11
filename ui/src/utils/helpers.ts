@@ -113,6 +113,11 @@ export const base64ToUint8Array = (base64: string) =>
     ).buffer
   );
 
+export const convertSizeToReadableSize = (size: number) =>
+  (size / 1024 / 1024).toFixed(2) === "0.00"
+    ? `${(size / 1024 / 1024).toFixed(2)}mb`
+    : `${(size / 1024).toFixed(2)}kb`;
+
 type SearchContacts = (
   contacts: { [key: string]: Profile },
   username: string
