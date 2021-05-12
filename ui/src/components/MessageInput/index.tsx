@@ -128,16 +128,17 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
       {files.length > 0 ? <FileView files={files} setFiles={setFiles} /> : null}
       <IonToolbar className={styles.toolbar}>
         <IonButtons slot="start">
-          <IonButton onClick={handleOnFileClick}>
-            <IonIcon color="medium" icon={attachOutline} />
-            <input
-              ref={file}
-              multiple
-              type="file"
-              hidden
-              onChange={handleOnFileChange}
-            />
-          </IonButton>
+          {files.length > 0 ? null : (
+            <IonButton onClick={handleOnFileClick}>
+              <IonIcon color="medium" icon={attachOutline} />
+              <input
+                ref={file}
+                type="file"
+                hidden
+                onChange={handleOnFileChange}
+              />
+            </IonButton>
+          )}
         </IonButtons>
         <IonTextarea
           value={message}
