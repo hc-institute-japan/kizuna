@@ -10,56 +10,61 @@ import {
   IonButton,
 } from "@ionic/react";
 import React, { useEffect, useState, useRef } from "react";
-import { RouteComponentProps, useHistory, useLocation, useParams } from "react-router";
+import {
+  RouteComponentProps,
+  useHistory,
+  useLocation,
+  useParams,
+} from "react-router";
 import { useSelector } from "react-redux";
 import { RootState } from "../../redux/types";
 import { Conversation } from "../../utils/types";
 import { ChatListMethods } from "../../components/Chat/types";
 import { personCircleOutline } from "ionicons/icons";
 import { P2PMessage, P2PMessageReceipt } from "../../redux/p2pmessages/types";
-import { 
-  sendMessage, 
-  getNextBatchMessages, 
-  readMessage, 
-  isTyping 
+import {
+  sendMessage,
+  getNextBatchMessages,
+  readMessage,
+  isTyping,
 } from "../../redux/p2pmessages/actions";
-import { 
-  useAppDispatch, 
-  base64ToUint8Array, 
+import {
+  useAppDispatch,
+  base64ToUint8Array,
   dateToTimestamp,
-  debounce 
+  debounce,
 } from "../../utils/helpers";
-import { 
-  ChatList, 
-  Me, 
-  Others 
-} from "../../components/Chat";
+import { ChatList, Me, Others } from "../../components/Chat";
 import Typing from "../../components/Chat/Typing";
 import MessageInput from "../../components/MessageInput";
 import styles from "./style.module.css";
 
 type Props = {
-  location: RouteComponentProps<{}, {}, { state: Conversation }>
+  location: RouteComponentProps<{}, {}, { state: Conversation }>;
 };
 
 const Chat: React.FC<Props> = ({ location }) => {
-  const [ message, setMessage ] = useState<string>("");
-  const [ files, setFiles ] = useState<any[]>([]);
-  const [ transConversations, setTransConversations ] = useState<any[]>([]);
-  const [ loading, setLoading ] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>("");
+  const [files, setFiles] = useState<any[]>([]);
+  const [transConversations, setTransConversations] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
   const { username } = useParams<{ username: string }>();
-  const { conversations, messages, receipts } = useSelector((state: RootState) => state.p2pmessages);
+  const { conversations, messages, receipts } = useSelector(
+    (state: RootState) => state.p2pmessages
+  );
   const conversant = useSelector((state: RootState) => {
     let contacts = state.contacts.contacts;
-    let conversant = Object.values(contacts).filter(contact => contact.username == username);
+    let conversant = Object.values(contacts).filter(
+      (contact) => contact.username == username
+    );
     return conversant[0];
   });
-  const typing = useSelector((state:RootState) => state.p2pmessages.typing);
+  const typing = useSelector((state: RootState) => state.p2pmessages.typing);
 
   const dispatch = useAppDispatch();
   const history = useHistory();
   const location2 = useLocation();
-  
+
   /* REFS */
   const scroller = useRef<ChatListMethods>(null);
   const scrollRef = React.createRef<HTMLIonInfiniteScrollElement>();
@@ -68,17 +73,22 @@ const Chat: React.FC<Props> = ({ location }) => {
   /* scroll the chat box to bottom when opening */
   useEffect(() => {
     scroller.current!.scrollToBottom();
-  }, [])
+  }, []);
 
   /* filter messages from conversant and sort receipt */
   useEffect(() => {
-    if (conversant !== undefined && conversations[("u" + conversant.id)] !== undefined) {
-      let filteredMessages = Object.values(conversations[("u" + conversant.id)].messages).map((messageID) => {
+    if (
+      conversant !== undefined &&
+      conversations["u" + conversant.id] !== undefined
+    ) {
+      let filteredMessages = Object.values(
+        conversations["u" + conversant.id].messages
+      ).map((messageID) => {
         let message = messages[messageID];
         let receiptIDs = message.receipts;
         let filteredReceipts = receiptIDs.map((id) => {
           let receipt = receipts[id];
-          return receipt
+          return receipt;
         });
         filteredReceipts.sort((a: any, b: any) => {
           let receiptTimestampA = a.timestamp.getTime();
@@ -88,7 +98,7 @@ const Chat: React.FC<Props> = ({ location }) => {
           return 0;
         });
         let latestReceipt = filteredReceipts[0];
-        return { message: message, receipt: latestReceipt }
+        return { message: message, receipt: latestReceipt };
       });
       setTransConversations(filteredMessages.reverse());
     }
@@ -97,16 +107,21 @@ const Chat: React.FC<Props> = ({ location }) => {
   /* issue a dispatch to ask the holochain who is typing */
   useEffect(() => {
     if (conversant) {
-      debounce(dispatch(isTyping(Buffer.from(base64ToUint8Array(conversant.id)), true)), 5000)
+      debounce(
+        dispatch(
+          isTyping(Buffer.from(base64ToUint8Array(conversant.id)), true)
+        ),
+        5000
+      );
     }
-  }, [message])
+  }, [message]);
 
   /* HANDLERS */
   const handleOnClick = () => {
     history.push({
       pathname: `${location2.pathname}/details`,
-      state: { conversant: conversant }
-    })
+      state: { conversant: conversant },
+    });
   };
 
   const handleOnSubmit = () => {
@@ -114,24 +129,25 @@ const Chat: React.FC<Props> = ({ location }) => {
     files.forEach((file) => {
       dispatch(
         sendMessage(
-          Buffer.from(base64ToUint8Array(conversant.id)), 
-          message, 
+          Buffer.from(base64ToUint8Array(conversant.id)),
+          message,
           "FILE",
           undefined,
           file
-        ))
+        )
+      );
     });
 
     if (message !== "") {
       dispatch(
         sendMessage(
-          Buffer.from(base64ToUint8Array(conversant.id)), 
-          message, 
+          Buffer.from(base64ToUint8Array(conversant.id)),
+          message,
           "TEXT",
-          undefined, 
-          )
+          undefined
         )
-    };
+      );
+    }
 
     setLoading(false);
     scroller.current!.scrollToBottom();
@@ -145,31 +161,38 @@ const Chat: React.FC<Props> = ({ location }) => {
         batch_size: 5,
         payload_type: "All",
         last_fetched_timestamp: dateToTimestamp(lastMessage.timestamp),
-        last_fetched_message_id: Buffer.from(base64ToUint8Array(lastMessage.p2pMessageEntryHash.slice(1)))
+        last_fetched_message_id: Buffer.from(
+          base64ToUint8Array(lastMessage.p2pMessageEntryHash.slice(1))
+        ),
       })
-    )
+    );
     complete();
-    return
+    return;
   };
 
-  const onSeenHandler = (messageBundle: { message: P2PMessage, receipt: P2PMessageReceipt}) => {
+  const onSeenHandler = (messageBundle: {
+    message: P2PMessage;
+    receipt: P2PMessageReceipt;
+  }) => {
     if (messageBundle.receipt.status != "read") {
-      dispatch(readMessage([messageBundle.message]))
+      dispatch(readMessage([messageBundle.message]));
     }
-  }
+  };
 
-  const displayMessage = (messageBundle: { message: P2PMessage, receipt: P2PMessageReceipt}) => {
+  const displayMessage = (messageBundle: {
+    message: P2PMessage;
+    receipt: P2PMessageReceipt;
+  }) => {
     // assume that this will be called in sorted order
 
     let key = messageBundle.message.p2pMessageEntryHash;
     let author = messageBundle.message.author;
     let timestamp = messageBundle.receipt.timestamp;
     let payload = messageBundle.message.payload;
-    let readlist = messageBundle.receipt.status == "read" 
-      ? { key: timestamp } 
-      : undefined
-    return conversant.id != author.slice(1)
-    ? <Me 
+    let readlist =
+      messageBundle.receipt.status == "read" ? { key: timestamp } : undefined;
+    return conversant.id != author.slice(1) ? (
+      <Me
         key={key}
         type="p2p"
         author={author}
@@ -179,7 +202,8 @@ const Chat: React.FC<Props> = ({ location }) => {
         showProfilePicture={true}
         showName={true}
       />
-    : <Others
+    ) : (
+      <Others
         key={key}
         type="p2p"
         author={author}
@@ -190,8 +214,8 @@ const Chat: React.FC<Props> = ({ location }) => {
         showName={true}
         onSeen={(complete) => onSeenHandler(messageBundle)}
       />
+    );
   };
-
 
   /* RENDER */
   return (
@@ -211,17 +235,21 @@ const Chat: React.FC<Props> = ({ location }) => {
       </IonHeader>
 
       <IonContent>
-        <ChatList 
+        <ChatList
           type="p2p"
-          onScrollTop={(complete) => handleOnScrollTop(complete, transConversations)}
+          onScrollTop={(complete) =>
+            handleOnScrollTop(complete, transConversations)
+          }
           ref={scroller}
         >
-          { transConversations.map((messageBundle) => displayMessage(messageBundle)) }
+          {transConversations.map((messageBundle) =>
+            displayMessage(messageBundle)
+          )}
         </ChatList>
       </IonContent>
 
       <Typing profiles={Object.values(typing)}></Typing>
-      
+
       <MessageInput
         onSend={handleOnSubmit}
         onChange={(message) => setMessage(message)}
