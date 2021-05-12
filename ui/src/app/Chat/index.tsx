@@ -21,7 +21,8 @@ import {
   sendMessage, 
   getNextBatchMessages, 
   readMessage, 
-  isTyping 
+  isTyping, 
+  getFileBytes
 } from "../../redux/p2pmessages/actions";
 import { 
   useAppDispatch, 
@@ -37,6 +38,7 @@ import {
 import Typing from "../../components/Chat/Typing";
 import MessageInput from "../../components/MessageInput";
 import styles from "./style.module.css";
+import { FilePayload } from "../../redux/commons/types";
 
 type Props = {
   location: RouteComponentProps<{}, {}, { state: Conversation }>
@@ -55,6 +57,7 @@ const Chat: React.FC<Props> = ({ location }) => {
     return conversant[0];
   });
   const typing = useSelector((state:RootState) => state.p2pmessages.typing);
+  const fetchedFiles = useSelector((state: RootState) => state.p2pmessages.files);
 
   const dispatch = useAppDispatch();
   const history = useHistory();
@@ -158,6 +161,21 @@ const Chat: React.FC<Props> = ({ location }) => {
     }
   }
 
+  const downloadFile = (fileBytes: Uint8Array, fileName: string) => {
+    const blob = new Blob([fileBytes]); // change resultByte to bytes  
+    const link = document.createElement("a");
+    link.href = window.URL.createObjectURL(blob);
+    link.download = fileName;
+    link.click();
+  };
+  
+  const onDownloadHandler = (file: FilePayload) => {
+    fetchedFiles["u" + file.fileHash] != undefined
+    ? downloadFile(fetchedFiles["u" + file.fileHash], file.fileName)
+    : dispatch(getFileBytes([base64ToUint8Array(file.fileHash)]))
+      .then((res: {[key:string]: Uint8Array}) => downloadFile(res["u" + file.fileHash], file.fileName))
+  }
+
   const displayMessage = (messageBundle: { message: P2PMessage, receipt: P2PMessageReceipt}) => {
     // assume that this will be called in sorted order
 
@@ -178,6 +196,7 @@ const Chat: React.FC<Props> = ({ location }) => {
         readList={readlist ? readlist : {}}
         showProfilePicture={true}
         showName={true}
+        onDownload={file => onDownloadHandler(file)}
       />
     : <Others
         key={key}
@@ -189,6 +208,7 @@ const Chat: React.FC<Props> = ({ location }) => {
         showProfilePicture={true}
         showName={true}
         onSeen={(complete) => onSeenHandler(messageBundle)}
+        onDownload={file => onDownloadHandler(file)}
       />
   };
 

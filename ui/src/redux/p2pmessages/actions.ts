@@ -474,7 +474,7 @@ export const getFileBytes = (hashes: Uint8Array[]): ThunkAction => async (
     if (fetchedFiles?.type !== "error") {
         // console.log("Actions get file bytes", fetchedFiles);
         Object.keys(fetchedFiles).map((key) => {
-            transformedFiles["u" + key] = fetchedFiles[key];
+            transformedFiles[key] = fetchedFiles[key];
         });
 
         if (Object.entries(transformedFiles).length > 0) dispatch({
