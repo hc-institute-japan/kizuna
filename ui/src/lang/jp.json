@@ -26,9 +26,7 @@
   "app.new-conversation.no-contacts-toast": "連絡先を選択してください...",
   "app.new-conversation.problem-occured-toast": "問題が発生しました...",
   "app.profile.to-be-implemented-header": "おっと!",
-
   "app.profile.to-be-implemented": "工事中...",
-
   "app.register.error-invalid-username": "ユーザー名は3文字以上で、1つの英字を含める必要があります",
   "app.register.error-existing-username": "このユーザー名はすでに登録されています",
   "app.register.username-label": "ユーザー名",
