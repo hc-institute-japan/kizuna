@@ -132,6 +132,45 @@ const GroupChat: React.FC = () => {
     });
   };
 
+  const handleOnChange = (message: string, groupInfo: GroupConversation) => {
+    if (message.length !== 0) {
+      // fetch agent's own AgentPubKey
+      dispatch(fetchId()).then((res: AgentPubKey | null) => {
+        // dispatch an indication of typing
+        dispatch(
+          indicateGroupTyping({
+            groupId: base64ToUint8Array(groupInfo.originalGroupEntryHash),
+            indicatedBy: res!,
+            members: [
+              ...groupInfo.members.map((member) =>
+                Buffer.from(base64ToUint8Array(member).buffer)
+              ),
+              Buffer.from(base64ToUint8Array(groupInfo.creator).buffer),
+            ],
+            isTyping: true,
+          })
+        );
+      });
+    } else {
+      dispatch(fetchId()).then((res: AgentPubKey | null) => {
+        dispatch(
+          indicateGroupTyping({
+            groupId: base64ToUint8Array(groupInfo.originalGroupEntryHash),
+            indicatedBy: res!,
+            members: [
+              ...groupInfo.members.map((member) =>
+                Buffer.from(base64ToUint8Array(member).buffer)
+              ),
+              Buffer.from(base64ToUint8Array(groupInfo.creator).buffer),
+            ],
+            isTyping: false,
+          })
+        );
+      });
+    }
+    return setMessage(message);
+  }
+
   useEffect(() => {
     // setLoading(true);
     dispatch(fetchId()).then((res: AgentPubKey | null) => {
@@ -237,42 +276,7 @@ const GroupChat: React.FC = () => {
       />
       <MessageInput
         onSend={handleOnSend}
-        onChange={(message) => {
-          if (message.length !== 0) {
-            dispatch(fetchId()).then((res: AgentPubKey | null) => {
-              dispatch(
-                indicateGroupTyping({
-                  groupId: base64ToUint8Array(groupInfo.originalGroupEntryHash),
-                  indicatedBy: res!,
-                  members: [
-                    ...groupInfo.members.map((member) =>
-                      Buffer.from(base64ToUint8Array(member).buffer)
-                    ),
-                    Buffer.from(base64ToUint8Array(groupInfo.creator).buffer),
-                  ],
-                  isTyping: true,
-                })
-              );
-            });
-          } else {
-            dispatch(fetchId()).then((res: AgentPubKey | null) => {
-              dispatch(
-                indicateGroupTyping({
-                  groupId: base64ToUint8Array(groupInfo.originalGroupEntryHash),
-                  indicatedBy: res!,
-                  members: [
-                    ...groupInfo.members.map((member) =>
-                      Buffer.from(base64ToUint8Array(member).buffer)
-                    ),
-                    Buffer.from(base64ToUint8Array(groupInfo.creator).buffer),
-                  ],
-                  isTyping: false,
-                })
-              );
-            });
-          }
-          return setMessage(message);
-        }}
+        onChange={(message: string) => handleOnChange(message, groupInfo)}
         onFileSelect={(files) => setFiles(files)}
       />
     </IonPage>
