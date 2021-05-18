@@ -22,23 +22,23 @@ const UpdateGroupName: React.FC<Props> = ({ onCancel, groupData, onSave, loading
       <div className={styles.modal}>
 
       <IonToolbar>
-        <IonTitle>{intl.formatMessage({id: "app.groups.update-group-name-title"})}</IonTitle>
+        <IonTitle>{intl.formatMessage({id: "app.group-chat.update-group-name-title"})}</IonTitle>
       </IonToolbar>
 
       <IonItem className="input">
-        <IonLabel color="medium" position="floating">{intl.formatMessage({id: "app.groups.update-group-name-placeholder"})}</IonLabel>
+        <IonLabel color="medium" position="floating">{intl.formatMessage({id: "app.group-chat.update-group-name-placeholder"})}</IonLabel>
         <IonInput clearInput className={styles["ion-input"]} value={name} onIonChange={handleOnChange}></IonInput>
       </IonItem>
 
       <IonButtons slot="end" className="input">
         <IonButton slot="end" onClick={onCancel}>
-          <IonLabel>{intl.formatMessage({id: "app.groups.update-group-name-cancel"})}</IonLabel>
+          <IonLabel>{intl.formatMessage({id: "app.group-chat.update-group-name-cancel"})}</IonLabel>
         </IonButton>
         <IonButton disabled={!name.length ? true : false} slot="end" onClick={() => {
           onSave(name);
           setName("");
         }}>
-          <IonLabel>{intl.formatMessage({id: "app.groups.update-group-name-save"})}</IonLabel>
+          <IonLabel>{intl.formatMessage({id: "app.group-chat.update-group-name-save"})}</IonLabel>
         </IonButton>
       </IonButtons>
 

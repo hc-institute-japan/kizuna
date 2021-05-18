@@ -167,11 +167,11 @@ const Conversation: React.FC<Props> = ({
             ? latestMessageDetail.message
             : myAgentId === latestMessageDetail.sender?.id
             ? intl.formatMessage(
-                { id: "app.conversation.me-file-string" },
+                { id: "components.conversation.me-file-string" },
                 { fileName: latestMessageDetail.fileName! }
               )
             : intl.formatMessage(
-                { id: "app.conversation.other-file-string" },
+                { id: "components.conversation.other-file-string" },
                 {
                   fileName: latestMessageDetail.fileName!,
                   // this is non nullable since no file will be sent if there is no message sent

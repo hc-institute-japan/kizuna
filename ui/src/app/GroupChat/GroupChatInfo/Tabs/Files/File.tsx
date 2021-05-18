@@ -208,7 +208,7 @@ const File: React.FC<Props> = ({ groupId }) => {
             onIonInfinite={(e) => onScrollBottom(complete, fileMessages)}
           >
             <IonInfiniteScrollContent>
-              <IonLoading isOpen={fetchLoading} message={intl.formatMessage({id: "app.groups.files.fetching"})}/>
+              <IonLoading isOpen={fetchLoading} message={intl.formatMessage({id: "app.group-chat.files.fetching"})}/>
             </IonInfiniteScrollContent>
           </IonInfiniteScroll>
         </IonList>
@@ -218,7 +218,7 @@ const File: React.FC<Props> = ({ groupId }) => {
         <IonIcon icon={sadOutline} size={"large"}/>
         <IonLabel className={styles["no-media-label"]}>
           {intl.formatMessage({
-            id: "app.groups.files.no-files",
+            id: "app.group-chat.files.no-files",
           })}
         </IonLabel>
       </div>
