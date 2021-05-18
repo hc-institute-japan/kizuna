@@ -8,6 +8,7 @@ import {
   IonTitle,
   IonToolbar,
   IonButton,
+  IonIcon,
 } from "@ionic/react";
 import React, { useEffect, useState, useRef } from "react";
 import {
@@ -17,7 +18,7 @@ import {
   useParams,
 } from "react-router";
 import { useSelector } from "react-redux";
-import { personCircleOutline } from "ionicons/icons";
+import { informationCircleOutline, personCircleOutline } from "ionicons/icons";
 
 import Typing from "../../components/Chat/Typing";
 import MessageInput from "../../components/MessageInput";
@@ -280,13 +281,16 @@ const Chat: React.FC<Props> = ({ location }) => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonButtons slot="start">
+          <IonButtons>
             <IonBackButton defaultHref="/home" className="ion-no-padding" />
             <IonAvatar className="ion-padding">
               <img src={personCircleOutline} alt={username} />
             </IonAvatar>
-            <IonButton fill="clear" onClick={handleOnClick}>
-              <IonTitle className="ion-no-padding">{username}</IonTitle>
+            <IonTitle className="item item-text-wrap">{username}</IonTitle>
+            <IonButton
+              onClick={handleOnClick}
+            >
+              <IonIcon slot="icon-only" icon={informationCircleOutline} />
             </IonButton>
           </IonButtons>
         </IonToolbar>
