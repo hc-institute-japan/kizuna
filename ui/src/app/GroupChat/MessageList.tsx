@@ -233,7 +233,7 @@ const MessageList: React.FC<Props> = ({
     <>
       <IonLoading
         isOpen={loading}
-        message={intl.formatMessage({ id: "app.groups.fetching" })}
+        message={intl.formatMessage({ id: "app.group-chat.fetching" })}
       />
       <Chat.ChatList
         disabled={oldestFetched}

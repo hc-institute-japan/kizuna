@@ -6,7 +6,6 @@ import {
   IonContent,
   IonHeader,
   IonIcon,
-  IonItem,
   IonLoading,
   IonPage,
   IonTitle,
@@ -173,7 +172,7 @@ const GroupChat: React.FC = () => {
       <IonLoading
         isOpen={sendingLoading}
         message={intl.formatMessage({
-          id: "app.groups.sending",
+          id: "app.group-chat.sending",
         })}
       />
       <IonHeader>
