@@ -75,7 +75,7 @@ const Conversations: React.FC = () => {
       for (let key in p2p.conversations) {
         // do not display people who are not in contacts list
         // TODO: may change depending on design implementation for blocked contacts
-        if (contacts[key.slice(1)] == undefined) continue;
+        if (contacts[key.slice(1)] === undefined) continue;
 
         let src = personCircleOutline;
         let conversant = contacts[key.slice(1)].username;
