@@ -62,7 +62,7 @@ const Chat: React.FC<Props> = ({ location }) => {
   const conversant = useSelector((state: RootState) => {
     let contacts = state.contacts.contacts;
     let conversant = Object.values(contacts).filter(
-      (contact) => contact.username == username
+      (contact) => contact.username === username
     );
     return conversant[0];
   });
@@ -211,7 +211,7 @@ const Chat: React.FC<Props> = ({ location }) => {
     message: P2PMessage;
     receipt: P2PMessageReceipt;
   }) => {
-    if (messageBundle.receipt.status != "read") {
+    if (messageBundle.receipt.status !== "read") {
       dispatch(readMessage([messageBundle.message]));
     }
   };
@@ -222,7 +222,7 @@ const Chat: React.FC<Props> = ({ location }) => {
     when clicking the file download button
   */
   const onDownloadHandler = (file: FilePayload) => {
-    fetchedFiles["u" + file.fileHash] != undefined
+    fetchedFiles["u" + file.fileHash] !== undefined
     ? downloadFile(fetchedFiles["u" + file.fileHash], file.fileName)
     : dispatch(getFileBytes([base64ToUint8Array(file.fileHash)]))
       .then((res: {[key:string]: Uint8Array}) => downloadFile(res["u" + file.fileHash], file.fileName))
@@ -246,8 +246,8 @@ const Chat: React.FC<Props> = ({ location }) => {
     let timestamp = messageBundle.receipt.timestamp;
     let payload = messageBundle.message.payload;
     let readlist =
-      messageBundle.receipt.status == "read" ? { key: timestamp } : undefined;
-    return conversant.id != author.slice(1) ? (
+      messageBundle.receipt.status === "read" ? { key: timestamp } : undefined;
+    return conversant.id !== author.slice(1) ? (
       <Me
         key={key}
         type="p2p"
