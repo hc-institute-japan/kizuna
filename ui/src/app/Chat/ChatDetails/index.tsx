@@ -31,8 +31,9 @@ import ImageView from "../../../components/Chat/File/ImageView/index";
 import VideoView from "../../../components/Chat/File/VideoView";
 import FileView from "../../../components/Chat/File/FileView";
 import { getNextBatchMessages } from "../../../redux/p2pmessages/actions";
-import { useAppDispatch, base64ToUint8Array, dateToTimestamp } from "../../../utils/helpers";
+import { useAppDispatch, base64ToUint8Array, dateToTimestamp, monthToString } from "../../../utils/helpers";
 import styles from "./style.module.css";
+import { useIntl } from "react-intl";
 
 
 interface Props {
@@ -41,6 +42,7 @@ interface Props {
 
 const ChatDetails: React.FC<Props> = ({ location }) => {
   const { state }: any = { ...location };
+  const intl = useIntl();
   const { conversations, messages, receipts } = useSelector((state: RootState) => state.p2pmessages);
   const [ media, setMedia ] = useState< { [key: string]: boolean }>({});
   const [ files, setFiles ] = useState< { [key: string]: P2PMessage }>({});
@@ -178,20 +180,6 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
 
   const decoder = new TextDecoder();
 
-  const monthText = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
   var currentMonth = -1;
   var currentMonth2 = -1;
   return (
@@ -217,13 +205,13 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
             onIonChange={(e) => handleOnSegmentChange(e.detail.value)}
           >
             <IonSegmentButton value="Info">
-              <IonLabel>Info</IonLabel>
+              <IonLabel>{intl.formatMessage({id: "app.chat.chat-details.info"})}</IonLabel>
             </IonSegmentButton>
             <IonSegmentButton value="Media">
-              <IonLabel>Media</IonLabel>
+              <IonLabel>{intl.formatMessage({id: "app.chat.chat-details.media"})}</IonLabel>
             </IonSegmentButton>
             <IonSegmentButton value="Files">
-              <IonLabel>Files</IonLabel>
+              <IonLabel>{intl.formatMessage({id: "app.chat.chat-details.files"})}</IonLabel>
             </IonSegmentButton>
           </IonSegment>
         </IonToolbar>
@@ -255,7 +243,7 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
                           (
                             <IonCol size="12">
                               <h2 className={styles.month}>
-                                {monthText[month]}
+                                {monthToString(month, intl)}
                               </h2>
                             </IonCol>
                           ))
@@ -302,7 +290,7 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
                       ? ((currentMonth2 = month),
                         (
                           <IonListHeader>
-                            <h2 className={styles.month}>{monthText[month]}</h2>
+                            <h2 className={styles.month}>{monthToString(month, intl)}</h2>
                           </IonListHeader>
                         ))
                       : null}
