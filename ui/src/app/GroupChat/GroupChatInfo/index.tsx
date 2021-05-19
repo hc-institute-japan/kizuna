@@ -58,7 +58,7 @@ const GroupChatInfo: React.FC = () => {
 
   const tabs = [
     {
-      label: intl.formatMessage({ id: "app.groups.label-info" }),
+      label: intl.formatMessage({ id: "app.group-chat.label-info" }),
       tab: groupInfo ? (
         <Members
           groupId={group}
@@ -67,11 +67,11 @@ const GroupChatInfo: React.FC = () => {
       ) : null,
     },
     {
-      label: intl.formatMessage({ id: "app.groups.label-media" }),
+      label: intl.formatMessage({ id: "app.group-chat.label-media" }),
       tab: <Media groupId={group} />,
     },
     {
-      label: intl.formatMessage({ id: "app.groups.label-files" }),
+      label: intl.formatMessage({ id: "app.group-chat.label-files" }),
       tab: <File groupId={group} />,
     },
   ];

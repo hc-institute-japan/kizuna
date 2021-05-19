@@ -111,7 +111,7 @@ const AddContactModal: React.FC<Props> = ({ isOpen, setIsOpen, onCancel, contact
           <IonToolbar>
             <IonButtons slot="end">
               <IonButton disabled={selected.length === 0} onClick={() => onAdded()}>
-                <IonLabel className={styles["add-label"]}>{intl.formatMessage({id: "app.groups.add-member"})}</IonLabel>
+                <IonLabel className={styles["add-label"]}>{intl.formatMessage({id: "app.group-chat.add-member"})}</IonLabel>
               </IonButton>
             </IonButtons>
           </IonToolbar>

@@ -11,7 +11,7 @@ const EmptyConversations = () => {
       <IonIcon icon={sadOutline} />
       <IonText className="ion-padding ion-margin-bottom">
         {intl.formatMessage({
-          id: "app.conversations.empty-conversations-list",
+          id: "app.conversations.empty-conversations",
         })}
       </IonText>
     </div>

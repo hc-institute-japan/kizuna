@@ -29,15 +29,15 @@ const Preference: React.FC = () => {
     <IonList>
       <IonListHeader>
         <IonLabel>
-          <h1>{intl.formatMessage({id: "app.setting.preference-label"})}</h1>
+          <h1>{intl.formatMessage({id: "app.settings.preference-label"})}</h1>
         </IonLabel>
       </IonListHeader>
       <IonItem>
-        <IonLabel>{intl.formatMessage({id: "app.setting.typing-indicator-label"})}</IonLabel>
+        <IonLabel>{intl.formatMessage({id: "app.settings.typing-indicator-label"})}</IonLabel>
         <IonToggle checked={typingIndicator} onIonChange={handleTypingChange} />
       </IonItem>
       <IonItem>
-        <IonLabel>{intl.formatMessage({id: "app.setting.read-receipt-label"})}</IonLabel>
+        <IonLabel>{intl.formatMessage({id: "app.settings.read-receipt-label"})}</IonLabel>
         <IonToggle checked={readReceipt} onIonChange={handleReadChange} />
       </IonItem>
     </IonList>

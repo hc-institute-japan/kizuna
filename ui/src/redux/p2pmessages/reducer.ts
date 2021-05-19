@@ -147,28 +147,29 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
       // console.log("Reducer setting files")
 
       // copy state
-      var ret4 = state;
+      var stateToSetFiles = state;
 
       //update state
-      ret4 = {
+      stateToSetFiles = {
         conversations: {
-          ...ret4.conversations
+          ...stateToSetFiles.conversations
         },
         messages: {
-          ...ret4.messages
+          ...stateToSetFiles.messages
         },
         receipts: {
-          ...ret4.receipts
+          ...stateToSetFiles.receipts
         },
         files: {
-          ...ret4.files,
+          ...stateToSetFiles.files,
           ...action.state,
         },
         typing: {
-          ...state.typing
+          ...stateToSetFiles.typing
         }
       }
-      return ret4
+      // console.log("reducer file set", ret4)
+      return stateToSetFiles
       
     case SET_TYPING:
       var stateToAppendTyping = state;

@@ -25,29 +25,29 @@ export const objectMap = (
 export const monthToString = (month: number, intl: IntlShape) => {
   switch (month) {
     case 0:
-      return intl.formatMessage({ id: "app.groups.media.january" })!;
+      return intl.formatMessage({ id: "app.group-chat.media.month.1" })!;
     case 1:
-      return intl.formatMessage({ id: "app.groups.media.february" })!;
+      return intl.formatMessage({ id: "app.group-chat.media.month.2" })!;
     case 2:
-      return intl.formatMessage({ id: "app.groups.media.march" })!;
+      return intl.formatMessage({ id: "app.group-chat.media.month.3" })!;
     case 3:
-      return intl.formatMessage({ id: "app.groups.media.april" })!;
+      return intl.formatMessage({ id: "app.group-chat.media.month.4" })!;
     case 4:
-      return intl.formatMessage({ id: "app.groups.media.may" })!;
+      return intl.formatMessage({ id: "app.group-chat.media.month.5" })!;
     case 5:
-      return intl.formatMessage({ id: "app.groups.media.june" })!;
+      return intl.formatMessage({ id: "app.group-chat.media.month.6" })!;
     case 6:
-      return intl.formatMessage({ id: "app.groups.media.july" })!;
+      return intl.formatMessage({ id: "app.group-chat.media.month.7" })!;
     case 7:
-      return intl.formatMessage({ id: "app.groups.media.august" })!;
+      return intl.formatMessage({ id: "app.group-chat.media.month.8" })!;
     case 8:
-      return intl.formatMessage({ id: "app.groups.media.september" })!;
+      return intl.formatMessage({ id: "app.group-chat.media.month.9" })!;
     case 9:
-      return intl.formatMessage({ id: "app.groups.media.october" })!;
+      return intl.formatMessage({ id: "app.group-chat.media.month.10" })!;
     case 10:
-      return intl.formatMessage({ id: "app.groups.media.november" })!;
+      return intl.formatMessage({ id: "app.group-chat.media.month.11" })!;
     case 11:
-      return intl.formatMessage({ id: "app.groups.media.december" })!;
+      return intl.formatMessage({ id: "app.group-chat.media.month.12" })!;
     default:
       break;
   }
