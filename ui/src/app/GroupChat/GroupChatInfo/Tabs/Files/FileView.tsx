@@ -2,7 +2,10 @@ import { IonGrid, IonIcon, IonLabel, IonRow, IonText } from "@ionic/react";
 import { documentOutline } from "ionicons/icons";
 import React from "react";
 import { FilePayload } from "../../../../../redux/commons/types";
-import { base64ToUint8Array } from "../../../../../utils/helpers";
+import {
+  base64ToUint8Array,
+  convertSizeToReadableSize,
+} from "../../../../../utils/helpers";
 import styles from "../../style.module.css";
 
 interface Props {
@@ -36,7 +39,7 @@ const File: React.FC<Props> = ({ file }) => {
           </IonRow>
           <IonRow>
             <IonText>
-              <span>{(fileSize / 1024 / 1024).toFixed(2)} mb</span>
+              <span>{convertSizeToReadableSize(fileSize)} mb</span>
             </IonText>
           </IonRow>
         </div>

@@ -25,11 +25,11 @@ const ContactItem: React.FC<Props> = ({ contact }) => {
   return (
     <IonItem onClick={handleOnClick} lines="none" key={JSON.stringify(contact)}>
       <IonLabel>{contact.username}</IonLabel>
-      <IonButtons slot="end">
+      {/* <IonButtons slot="end">
         <IonButton>
           <IonIcon icon={chatboxOutline} />
         </IonButton>
-      </IonButtons>
+      </IonButtons> */}
     </IonItem>
   );
 };
