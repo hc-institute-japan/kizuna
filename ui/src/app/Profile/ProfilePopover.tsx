@@ -4,7 +4,7 @@ import {
   personAddOutline,
   personRemoveOutline,
 } from "ionicons/icons";
-import React, { useEffect, useState } from "react";
+import React, { MouseEvent, useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import {
@@ -19,12 +19,15 @@ import { useAppDispatch } from "../../utils/helpers";
 import styles from "./style.module.css";
 
 interface Props {
-  isOpen: boolean;
+  popover: {
+    isVisible: boolean;
+    event: Event | undefined;
+  };
   dismiss: () => any;
   profile: Profile;
 }
 
-const ProfilePopover: React.FC<Props> = ({ isOpen, dismiss, profile }) => {
+const ProfilePopover: React.FC<Props> = ({ popover, dismiss, profile }) => {
   const [isContact, setIsContact] = useState(false);
   const [isBlocked, setIsBlocked] = useState(false);
   const stringifiedId = profile.id;
@@ -66,31 +69,41 @@ const ProfilePopover: React.FC<Props> = ({ isOpen, dismiss, profile }) => {
   };
 
   return (
-    <IonPopover isOpen={isOpen} onDidDismiss={dismiss}>
+    <IonPopover
+      {...(popover.event ? { event: popover.event as Event } : {})}
+      isOpen={popover.isVisible}
+      onDidDismiss={dismiss}
+    >
       <IonList className={`${styles["popover-list"]}`}>
         {!isBlocked && isContact ? (
           <IonItem onClick={remove}>
             <IonIcon icon={personRemoveOutline} />
             <IonLabel className="ion-padding-start">
-              {intl.formatMessage({id: "app.contacts.remove"})}
+              {intl.formatMessage({ id: "app.contacts.remove" })}
             </IonLabel>
           </IonItem>
         ) : (
           <IonItem disabled={isBlocked} onClick={add}>
             <IonIcon icon={personAddOutline} />
-            <IonLabel className="ion-padding-start">{intl.formatMessage({id: "app.contacts.add"})}</IonLabel>
+            <IonLabel className="ion-padding-start">
+              {intl.formatMessage({ id: "app.contacts.add" })}
+            </IonLabel>
           </IonItem>
         )}
         {username !== profile.username ? (
           isBlocked ? (
             <IonItem onClick={unblock}>
               <IonIcon icon={banOutline}></IonIcon>
-              <IonLabel className="ion-padding-start">{intl.formatMessage({id: "app.contacts.unblock"})}</IonLabel>
+              <IonLabel className="ion-padding-start">
+                {intl.formatMessage({ id: "app.contacts.unblock" })}
+              </IonLabel>
             </IonItem>
           ) : (
             <IonItem onClick={block}>
               <IonIcon icon={banOutline}></IonIcon>
-              <IonLabel className="ion-padding-start">{intl.formatMessage({id: "app.contacts.block"})}</IonLabel>
+              <IonLabel className="ion-padding-start">
+                {intl.formatMessage({ id: "app.contacts.block" })}
+              </IonLabel>
             </IonItem>
           )
         ) : null}
