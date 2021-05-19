@@ -1,6 +1,6 @@
 import { IonButton, IonButtons, IonIcon } from "@ionic/react";
 import { ellipsisVertical, shieldHalf } from "ionicons/icons";
-import React, { useState } from "react";
+import React, { MouseEvent, useState } from "react";
 import { Profile } from "../../redux/profile/types";
 import ProfilePopover from "./ProfilePopover";
 
@@ -9,12 +9,16 @@ interface Props {
 }
 
 const ProfileMenuItems: React.FC<Props> = ({ profile }) => {
-  const [isPopoverOpen, setIsPopoverOpen] = useState(false);
-  const handleOnClick = () => {
-    setIsPopoverOpen(true);
+  const [popover, setPopover] = useState<{
+    isVisible: boolean;
+    event: Event | undefined;
+  }>({ isVisible: false, event: undefined });
+  const handleOnClick = (event: any) => {
+    event.persist();
+    setPopover({ isVisible: true, event });
   };
 
-  const dismiss = () => setIsPopoverOpen(false);
+  const dismiss = () => setPopover({ isVisible: false, event: undefined });
   return (
     <>
       <IonButtons slot="end">
@@ -27,7 +31,7 @@ const ProfileMenuItems: React.FC<Props> = ({ profile }) => {
       </IonButtons>
       <ProfilePopover
         profile={profile}
-        isOpen={isPopoverOpen}
+        popover={popover}
         dismiss={dismiss}
       ></ProfilePopover>
     </>
