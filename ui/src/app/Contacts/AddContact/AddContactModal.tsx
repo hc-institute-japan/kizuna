@@ -1,8 +1,10 @@
 import { IonContent, IonList, IonModal } from "@ionic/react";
 import React, { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { fetchAllUsernames } from "../../../redux/contacts/actions";
-import { IndexedContacts } from "../../../redux/contacts/types";
+import { IndexedContacts, SET_CONTACTS } from "../../../redux/contacts/types";
 import { Profile, ProfileListType } from "../../../redux/profile/types";
+import { RootState } from "../../../redux/types";
 import { indexContacts, useAppDispatch } from "../../../utils/helpers";
 import styles from "../style.module.css";
 import AddContactHeader from "./AddContactHeader";
@@ -19,6 +21,8 @@ const AddContactModal: React.FC<Props> = ({ isOpen, onCancel }) => {
   const [filter, setFilter] = useState<string>("");
   const [users, setUsers] = useState<Profile[]>([]);
   const [toast, setToast] = useState<string | null>(null);
+  const contacts = useSelector((state: RootState) => state.contacts.contacts);
+
   const dispatch = useAppDispatch();
 
   useEffect(() => {
@@ -33,6 +37,10 @@ const AddContactModal: React.FC<Props> = ({ isOpen, onCancel }) => {
 
   const onCompletion = (contact: Profile) => {
     setToast(contact.username);
+    dispatch({
+      type: SET_CONTACTS,
+      contacts: { ...contacts },
+    });
     setUsers((users) =>
       users.filter((user) => user.username !== contact.username)
     );
