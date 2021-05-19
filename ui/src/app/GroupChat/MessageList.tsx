@@ -269,7 +269,6 @@ const MessageList: React.FC<Props> = ({
               type="group"
               showName={true}
               onSeen={(complete) => {
-                console.log(i);
                 dispatch(fetchId()).then((res: AgentPubKey | null) => {
                   setMyAgentId(Uint8ArrayToBase64(res!));
                   let read: boolean = Object.keys(message.readList)
