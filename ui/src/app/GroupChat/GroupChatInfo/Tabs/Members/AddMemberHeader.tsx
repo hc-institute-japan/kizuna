@@ -16,10 +16,10 @@ const AddMemberHeader: React.FC<Props> = ({ onChange, onCancel }) => {
       <IonToolbar>
         <IonButtons>
           <IonTitle className={styles["contacts"]}>
-            {intl.formatMessage({id: "app.groups.add-member-contacts"})}
+            {intl.formatMessage({id: "app.group-chat.add-member-contacts"})}
           </IonTitle>
           <IonButton className={styles["close-button"]} onClick={onCancel} slot="end">
-            <IonLabel className={styles["close-label"]}>{intl.formatMessage({id: "app.groups.add-member-close"})}</IonLabel>
+            <IonLabel className={styles["close-label"]}>{intl.formatMessage({id: "app.group-chat.add-member-close"})}</IonLabel>
           </IonButton>
         </IonButtons>
       </IonToolbar>

@@ -14,7 +14,7 @@ const AddMemberToast: React.FC<Props> = ({ toast, onDismiss }) => {
       isOpen={toast !== null}
       onDidDismiss={onDismiss}
       message={intl.formatMessage(
-        { id: "app.groups.already-member" },
+        { id: "app.group-chat.already-member" },
         { name: toast }
       )}
       duration={1000}

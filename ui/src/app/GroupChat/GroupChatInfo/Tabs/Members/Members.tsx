@@ -54,7 +54,7 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
     if (myAgentId !== groupData.creator) {
       setLoading(false);
       setErrMsg(
-        intl.formatMessage({ id: "app.groups.non-admin-cannot-remove" })
+        intl.formatMessage({ id: "app.group-chat.non-admin-cannot-remove" })
       );
       setToast(true);
       return null;
@@ -63,7 +63,7 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
     if (groupData.members.length <= 2) {
       setLoading(false);
       setErrMsg(
-        intl.formatMessage({ id: "app.groups.minimum-member-required-reached" })
+        intl.formatMessage({ id: "app.group-chat.minimum-member-required-reached" })
       );
       setToast(true);
       return null;
@@ -106,24 +106,26 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
           <IonItem lines="none" key={"member-numbers"}>
             <IonIcon className={styles.icon} icon={peopleOutline}></IonIcon>
             <IonLabel>{intl.formatMessage(
-              {id: "app.groups.members"},
+              {id: "app.group-chat.members"},
               {length: members.length},
             )}</IonLabel>
           </IonItem>
-          {(myAgentId === groupData.creator) ? (<IonItem
-            lines="none"
-            button
-            onClick={() => setIsOpen(true)}
-            key={"add-members-button"}
-          >
-            <IonIcon className={styles.icon} icon={personAddOutline}></IonIcon>
-            <IonLabel>{intl.formatMessage({id: "app.groups.add-members"})}</IonLabel>
-          </IonItem>) : null}
+          {(myAgentId === groupData.creator) ? (
+            <IonItem
+              lines="none"
+              button
+              onClick={() => setIsOpen(true)}
+              key={"add-members-button"}
+            >
+              <IonIcon className={styles.icon} icon={personAddOutline}></IonIcon>
+              <IonLabel>{intl.formatMessage({id: "app.group-chat.add-members"})}</IonLabel>
+            </IonItem>
+          ) : null}
           <IonItem
             lines="none"
             className={styles.memberTitle}
             >
-            <h3>{intl.formatMessage({id: "app.groups.members-label"})}</h3>
+            <h3>{intl.formatMessage({id: "app.group-chat.members-label"})}</h3>
           </IonItem>
             <IonList>
               {members.map((member: any) => {
@@ -135,7 +137,7 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
                           <h3>
                             {member.username}
                             <br />
-                            {intl.formatMessage({id: "app.groups.member-role"})}
+                            {intl.formatMessage({id: "app.group-chat.member-role"})}
                           </h3>
                         </IonLabel>
                       </IonItem>
@@ -144,7 +146,7 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
                           onClick={() => handleRemoveMembers(member)}
                           color="danger"
                         >
-                          {intl.formatMessage({id: "app.groups.remove-member"})}
+                          {intl.formatMessage({id: "app.group-chat.remove-member"})}
                         </IonItemOption>
                       </IonItemOptions>
                     </IonItemSliding>
@@ -157,7 +159,7 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
                           <h3>
                             {member.username}
                             <br />
-                            {intl.formatMessage({id: "app.groups.admin-role"})}
+                            {intl.formatMessage({id: "app.group-chat.admin-role"})}
                           </h3>
                         </IonLabel>
                       </IonItem>

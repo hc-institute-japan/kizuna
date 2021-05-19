@@ -14,6 +14,7 @@ import {
 } from "@ionic/react";
 import { arrowBack, ellipsisVerticalOutline } from "ionicons/icons";
 import React, { SetStateAction, useEffect, useRef, useState } from "react";
+import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { FilePayload } from "../../../../redux/commons/types";
 import { RootState } from "../../../../redux/types";
@@ -28,6 +29,7 @@ interface Props {
 }
 
 const ImageModal: React.FC<Props> = ({ state, src, file, onDownload }) => {
+  const intl = useIntl();
   const [isOpen, setIsOpen] = state;
   const footer = useRef<HTMLIonToolbarElement>(null);
   const header = useRef<HTMLIonToolbarElement>(null);
@@ -129,8 +131,8 @@ const ImageModal: React.FC<Props> = ({ state, src, file, onDownload }) => {
           onDidDismiss={() => setPopover({ isOpen: false, event: undefined })}
         >
           <IonList>
-            <IonItem onClick={onDownload ? () => onDownload(file) : download}>
-              <IonLabel>Download</IonLabel>
+            <IonItem button onClick={onDownload ? () => onDownload(file) : download}>
+              <IonLabel>{intl.formatMessage({id: "components.chat.image-modal-download"})}</IonLabel>
             </IonItem>
           </IonList>
         </IonPopover>

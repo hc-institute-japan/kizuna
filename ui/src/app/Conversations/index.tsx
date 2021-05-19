@@ -60,16 +60,22 @@ const Conversations: React.FC = () => {
       state: { contacts: { ...contacts } },
     });
   };
+
+  /*
+    Handle the display of Conversations
+  */
   const renderConversation = (
     groups: { [key: string]: GroupConversation },
     p2p: P2PMessageConversationState
   ) => {
     let conversationsArray: any[] = [];
 
+    /* code block for p2p logic */
     if (p2p !== undefined) {
       for (let key in p2p.conversations) {
-        // for people not in contacts list
-        if (contacts[key.slice(1)] == undefined) continue;
+        // do not display people who are not in contacts list
+        // TODO: may change depending on design implementation for blocked contacts
+        if (contacts[key.slice(1)] === undefined) continue;
 
         let src = personCircleOutline;
         let conversant = contacts[key.slice(1)].username;
@@ -77,6 +83,8 @@ const Conversations: React.FC = () => {
         let messages: Message[] = Object.values(
           p2p.conversations[key].messages
         ).map((p2pMessageID) => {
+          
+          // convert p2pMessage to Message as input to Conversation component
           let p2pMessage = p2p.messages[p2pMessageID];
           let message: Message = {
             id: p2pMessage.p2pMessageEntryHash,
@@ -93,10 +101,12 @@ const Conversations: React.FC = () => {
           return message;
         });
 
+        // sort messages according to time sent
         messages.sort((x: Message, y: Message) =>
           y.timestamp.valueOf() < x.timestamp.valueOf() ? 1 : -1
         );
 
+        // create input to Conversation component
         let conversation = {
           groupId: key,
           isGroup: false,
@@ -109,7 +119,9 @@ const Conversations: React.FC = () => {
         conversationsArray.push(conversation);
       }
     }
+    /* end of code block for p2p logic */
 
+    /* code block for group logic */
     if (groups !== undefined) {
       Object.keys(groups).forEach((key: string) => {
         // TODO: change to actual pic chosen by group creator
@@ -180,6 +192,9 @@ const Conversations: React.FC = () => {
         }
       });
     }
+    /* end of code block for group logic */
+
+    /* sort merged p2p and group conversations */
     conversationsArray.sort((x: any, y: any) => {
       let timestampX =
         x.content.messages.length !== 0
@@ -220,7 +235,7 @@ const Conversations: React.FC = () => {
     <IonPage>
       <Toolbar noSearch onChange={() => {}} />
       <IonContent>
-        {Object.keys(groups).length > 0 || p2pState !== undefined ? (
+        {Object.keys(groups).length > 0 || Object.keys(p2pState.conversations).length > 0 ? (
             <IonList className={styles.conversation}>
               {renderConversation(groups, p2pState).map((conversation: any) => (
                 <Conversation

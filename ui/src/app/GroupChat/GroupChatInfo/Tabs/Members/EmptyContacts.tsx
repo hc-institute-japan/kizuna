@@ -10,7 +10,7 @@ const EmptyContacts: React.FC = () => {
     <div className={styles["empty-contacts"]}>
       <IonIcon size="large" icon={sadOutline} />
       <IonText className="ion-padding ion-margin-bottom">
-        {intl.formatMessage({ id: "app.groups.no-member-to-add" })}
+        {intl.formatMessage({ id: "app.group-chat.no-member-to-add" })}
       </IonText>
     </div>
   );

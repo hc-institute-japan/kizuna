@@ -30,6 +30,7 @@ const Others: React.FC<ChatProps> = ({
   showProfilePicture,
   showName,
   isSeen = false,
+  onDownload
 }) => {
   const isText = isTextPayload(payload);
   const isP2P = type === "p2p";
@@ -65,6 +66,7 @@ const Others: React.FC<ChatProps> = ({
             <Text message={payload as TextPayload} />
           ) : (
             <File
+              onDownload={onDownload}
               type="others"
               file={payload as FilePayload}
               timestamp={timestamp}
