@@ -2,7 +2,7 @@ import { IonChip, IonIcon, IonInput, IonLabel } from "@ionic/react";
 import { close } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
-import { Profile, ProfileListType } from "../../redux/profile/types";
+import { Profile, ProfileListType } from "../../../redux/profile/types";
 import styles from "./style.module.css";
 
 interface Props {
@@ -29,7 +29,7 @@ const SelectedContactsHeader: React.FC<Props> = ({
       </IonLabel>
       {Object.values(contacts).map((contact) => (
         <IonChip color="primary" key={JSON.stringify(contact)}>
-          <IonLabel className={styles["chip-label"]}>
+          <IonLabel>
             {contact.username}
           </IonLabel>
           <IonIcon icon={close} onClick={() => onCloseButtonPress(contact)} />

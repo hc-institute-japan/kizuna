@@ -1,8 +1,8 @@
 import { IonButton, IonButtons, IonIcon } from "@ionic/react";
-import { ellipsisVertical, shieldHalf } from "ionicons/icons";
-import React, { MouseEvent, useState } from "react";
-import { Profile } from "../../redux/profile/types";
-import ProfilePopover from "./ProfilePopover";
+import { ellipsisVertical } from "ionicons/icons";
+import React, { useState } from "react";
+import { Profile } from "../../../redux/profile/types";
+import ProfilePopover from "../ProfilePopover";
 
 interface Props {
   profile: Profile;

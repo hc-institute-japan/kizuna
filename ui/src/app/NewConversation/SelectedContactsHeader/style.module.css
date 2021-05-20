@@ -1,0 +1,11 @@
+.recipients {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.to {
+  font-size: 0.9rem;
+  color: var(--ion-color-medium-shade);
+}

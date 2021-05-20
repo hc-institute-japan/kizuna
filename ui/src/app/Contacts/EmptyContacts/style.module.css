@@ -1,0 +1,19 @@
+.empty-contacts {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  height: 100%;
+  width: 100%;
+}
+
+.empty-contacts ion-icon {
+  font-size: 4rem;
+}
+
+.empty-contacts ion-text {
+  font-size: 1.2rem;
+  text-align: center;
+  width: 70vw;
+}

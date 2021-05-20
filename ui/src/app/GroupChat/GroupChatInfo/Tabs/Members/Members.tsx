@@ -101,89 +101,90 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
   }, [groupData, groupMembers]);
 
   return !loading ? (
-    
-      <IonContent>
-          <IonItem lines="none" key={"member-numbers"}>
-            <IonIcon className={styles.icon} icon={peopleOutline}></IonIcon>
-            <IonLabel>{intl.formatMessage(
-              {id: "app.group-chat.members"},
-              {length: members.length},
-            )}</IonLabel>
-          </IonItem>
-          {(myAgentId === groupData.creator) ? (
-            <IonItem
-              lines="none"
-              button
-              onClick={() => setIsOpen(true)}
-              key={"add-members-button"}
-            >
-              <IonIcon className={styles.icon} icon={personAddOutline}></IonIcon>
-              <IonLabel>{intl.formatMessage({id: "app.group-chat.add-members"})}</IonLabel>
-            </IonItem>
-          ) : null}
-          <IonItem
-            lines="none"
-            className={styles.memberTitle}
-            >
-            <h3>{intl.formatMessage({id: "app.group-chat.members-label"})}</h3>
-          </IonItem>
-            <IonList>
-              {members.map((member: any) => {
-                return member.id !== groupData.creator ? (
-                  <IonItem>
-                    <IonItemSliding>
-                      <IonItem lines="none" key={member.id}>
-                        <IonLabel className={styles.memberName} key={member.id}>
-                          <h3>
-                            {member.username}
-                            <br />
-                            {intl.formatMessage({id: "app.group-chat.member-role"})}
-                          </h3>
-                        </IonLabel>
-                      </IonItem>
-                      <IonItemOptions side={"end"}>
-                        <IonItemOption
-                          onClick={() => handleRemoveMembers(member)}
-                          color="danger"
-                        >
-                          {intl.formatMessage({id: "app.group-chat.remove-member"})}
-                        </IonItemOption>
-                      </IonItemOptions>
-                    </IonItemSliding>
-                  </IonItem>
-                ) : (
-                  <IonItem>
-                    <IonItemSliding>
-                      <IonItem lines="none" key={member.id}>
-                        <IonLabel className={styles.memberName}>
-                          <h3>
-                            {member.username}
-                            <br />
-                            {intl.formatMessage({id: "app.group-chat.admin-role"})}
-                          </h3>
-                        </IonLabel>
-                      </IonItem>
-                    </IonItemSliding>
-                  </IonItem>
-                ) ;
-              })}
-            </IonList>
-          {/* This is for members and admin*/}
+    <IonContent>
+      <IonItem lines="none" key={"member-numbers"}>
+        <IonIcon className={styles.icon} icon={peopleOutline}></IonIcon>
+        <IonLabel>
+          {intl.formatMessage({id: "app.group-chat.members"}, {length: members.length})}
+        </IonLabel>
+      </IonItem>
 
-        <AddMemberModal
-          contacts={contacts}
-          members={members}
-          setMembers={setMembers}
-          isOpen={isOpen}
-          onCancel={() => setIsOpen(false)}
-          setIsOpen={setIsOpen}
-          groupId={groupId}
-          groupRevisionId={groupRevisionId}
-          setLoading={setLoading}
-          myAgentId={myAgentId}
-        />
-        <RemoveMemberToast toast={toast} onDismiss={() => setToast(false)} message={errMsg}/>
-      </IonContent>
+      {(myAgentId === groupData.creator) ? (
+        <IonItem
+          lines="none"
+          button
+          onClick={() => setIsOpen(true)}
+          key={"add-members-button"}
+        >
+          <IonIcon className={styles.icon} icon={personAddOutline}></IonIcon>
+          <IonLabel>{intl.formatMessage({id: "app.group-chat.add-members"})}</IonLabel>
+        </IonItem>
+      ) : null}
+
+      <IonItem
+        lines="none"
+        className={styles.memberTitle}
+        >
+        <h3>{intl.formatMessage({id: "app.group-chat.members-label"})}</h3>
+      </IonItem>
+
+      <IonList>
+        {members.map((member: any) => {
+          return member.id !== groupData.creator ? (
+            <IonItem>
+              <IonItemSliding>
+                <IonItem lines="none" key={member.id}>
+                  <IonLabel className={styles.memberName} key={member.id}>
+                    <h3>
+                      {member.username}
+                      <br />
+                      {intl.formatMessage({id: "app.group-chat.member-role"})}
+                    </h3>
+                  </IonLabel>
+                </IonItem>
+                <IonItemOptions side={"end"}>
+                  <IonItemOption
+                    onClick={() => handleRemoveMembers(member)}
+                    color="danger"
+                  >
+                    {intl.formatMessage({id: "app.group-chat.remove-member"})}
+                  </IonItemOption>
+                </IonItemOptions>
+              </IonItemSliding>
+            </IonItem>
+          ) : (
+            <IonItem>
+              <IonItemSliding>
+                <IonItem lines="none" key={member.id}>
+                  <IonLabel className={styles.memberName}>
+                    <h3>
+                      {member.username}
+                      <br />
+                      {intl.formatMessage({id: "app.group-chat.admin-role"})}
+                    </h3>
+                  </IonLabel>
+                </IonItem>
+              </IonItemSliding>
+            </IonItem>
+          ) ;
+        })}
+      </IonList>
+        {/* This is for members and admin*/}
+
+      <AddMemberModal
+        contacts={contacts}
+        members={members}
+        setMembers={setMembers}
+        isOpen={isOpen}
+        onCancel={() => setIsOpen(false)}
+        setIsOpen={setIsOpen}
+        groupId={groupId}
+        groupRevisionId={groupRevisionId}
+        setLoading={setLoading}
+        myAgentId={myAgentId}
+      />
+      <RemoveMemberToast toast={toast} onDismiss={() => setToast(false)} message={errMsg}/>
+    </IonContent>
   ) : (
     <IonLoading isOpen={loading} />
   );

@@ -2,12 +2,9 @@ import { IonGrid, IonIcon, IonLabel, IonRow, IonText } from "@ionic/react";
 import { documentOutline } from "ionicons/icons";
 import React from "react";
 import { useSelector } from "react-redux";
-import { FilePayload } from "../../../redux/commons/types";
-import { RootState } from "../../../redux/types";
-import {
-  base64ToUint8Array,
-  convertSizeToReadableSize,
-} from "../../../utils/helpers";
+import { FilePayload } from "../../../../redux/commons/types";
+import { RootState } from "../../../../redux/types";
+import { convertSizeToReadableSize } from "../../../../utils/helpers";
 import styles from "./style.module.css";
 
 interface Props {

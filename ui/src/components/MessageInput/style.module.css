@@ -9,25 +9,6 @@
   flex-direction: row;
 }
 
-.row {
-  display: flex;
-  width: 100% !important;
-  padding-top: 5px;
-  padding-bottom: 5px;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  /* background-color: red; */
-}
-
-.chip {
-  position: relative;
-  height: 56px !important;
-  /* width: auto !important; */
-  margin-left: 12px !important;
-  border-radius: 10px;
-  flex: none;
-}
-
 .col > * {
   position: absolute;
   right: -5px;

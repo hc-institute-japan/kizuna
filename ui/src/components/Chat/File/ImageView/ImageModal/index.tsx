@@ -16,10 +16,9 @@ import { arrowBack, ellipsisVerticalOutline } from "ionicons/icons";
 import React, { SetStateAction, useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
-import { FilePayload } from "../../../../redux/commons/types";
-import { RootState } from "../../../../redux/types";
-import { base64ToUint8Array } from "../../../../utils/helpers";
-import styles from "../style.module.css";
+import { FilePayload } from "../../../../../redux/commons/types";
+import { RootState } from "../../../../../redux/types";
+import styles from "./style.module.css";
 
 interface Props {
   state: [boolean, React.Dispatch<SetStateAction<boolean>>];

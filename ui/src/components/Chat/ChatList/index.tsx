@@ -15,7 +15,7 @@ import React, {
 } from "react";
 import { useIntl } from "react-intl";
 import styles from "./style.module.css";
-import { ChatListMethods, ChatListProps } from "./types";
+import { ChatListMethods, ChatListProps } from "../types";
 
 const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
   { children, type = "p2p", onScrollTop, disabled },
