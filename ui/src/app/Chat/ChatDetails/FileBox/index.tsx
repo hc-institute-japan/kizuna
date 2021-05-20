@@ -19,9 +19,10 @@ import { Profile } from "../../../../redux/profile/types";
 
 import { getNextBatchMessages } from "../../../../redux/p2pmessages/actions";
 
-import { useAppDispatch, base64ToUint8Array, dateToTimestamp } from "../../../../utils/helpers";
+import { useAppDispatch, base64ToUint8Array, dateToTimestamp, monthToString } from "../../../../utils/helpers";
 
 import styles from "../style.module.css";
+import { useIntl } from "react-intl";
 
 
 interface Props {
@@ -37,6 +38,9 @@ interface Props {
 const FileBox: React.FC<Props> = ({ type, orderedFiles, conversant }) => {
 	const dispatch = useAppDispatch();
 
+	/* i18n */
+	let intl = useIntl();
+
 	/* REFS */
 	const infiniteFileScroll = useRef<HTMLIonInfiniteScrollElement>(null);
 	const complete = () => infiniteFileScroll.current!.complete();
@@ -47,32 +51,18 @@ const FileBox: React.FC<Props> = ({ type, orderedFiles, conversant }) => {
 	
 	// helper code for displaying date
 	const decoder = new TextDecoder();
-  const monthText = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-  var currentMonth = -1;
+  	let currentMonth = -1;
 
 	/* HANDLERS */
 	/* 
     disptaches an action to hc to get the next batch of older messages of type File
     when reaching the end/bottom of the file box
-  */
+  	*/
 	const onScrollBottom = (
 		complete: () => Promise<void>,
 		files: P2PMessage[]
 	) => {
-		var lastFile: P2PMessage = files[files.length - 1];
+		let lastFile: P2PMessage = files[files.length - 1];
 	
 		dispatch(
 			getNextBatchMessages({
@@ -110,7 +100,7 @@ const FileBox: React.FC<Props> = ({ type, orderedFiles, conversant }) => {
 										(
 											<IonCol size="12">
 												<h2 className={styles.month}>
-													{monthText[month]}
+													{monthToString(month, intl)}
 												</h2>
 											</IonCol>
 										))

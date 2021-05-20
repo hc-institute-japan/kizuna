@@ -243,11 +243,7 @@ const GroupChat: React.FC = () => {
             <IonTitle className={styles["title"]}>
               <div className="item item-text-wrap">{groupInfo!.name}</div>
             </IonTitle>
-            <IonButton
-              onClick={() => {
-                history.push(`/g/${groupInfo.originalGroupEntryHash}/info`);
-              }}
-            >
+            <IonButton onClick={() => history.push(`/g/${groupInfo.originalGroupEntryHash}/info`)}>
               <IonIcon slot="icon-only" icon={informationCircleOutline} />
             </IonButton>
           </IonButtons>
