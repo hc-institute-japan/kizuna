@@ -409,14 +409,14 @@ version = "0.0.1"
 dependencies = [
  "derive_more",
  "hdk",
- "p2pmessage 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=signal-fix)",
+ "p2pmessage 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=bump-hdk-0.0.100)",
  "serde",
 ]
 
 [[package]]
 name = "p2pmessage"
 version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=signal-fix#afeba9cf4992ef25762ee3cfd64aca7145821d6d"
+source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=bump-hdk-0.0.100#ca737303db78c04e498a5c882d39b52952cb232e"
 dependencies = [
  "derive_more",
  "file_types 0.0.1 (git+https://github.com/hc-institute-japan/Kizuna?branch=develop)",
