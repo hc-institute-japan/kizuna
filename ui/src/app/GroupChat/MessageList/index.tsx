@@ -1,30 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
-import { RootState } from "../../redux/types";
+import { RootState } from "../../../redux/types";
 import {
   GroupMessage,
   GroupMessageReadData,
   GroupMessagesContents,
   GroupMessagesOutput,
-} from "../../redux/group/types";
-import Chat from "../../components/Chat";
-import { ChatListMethods } from "../../components/Chat/types";
+} from "../../../redux/group/types";
+import Chat from "../../../components/Chat";
+import { ChatListMethods } from "../../../components/Chat/types";
 import {
   base64ToUint8Array,
   isTextPayload,
   Uint8ArrayToBase64,
   useAppDispatch,
-} from "../../utils/helpers";
+} from "../../../utils/helpers";
 import {
   fetchFilesBytes,
   getNextBatchGroupMessages,
   readGroupMessage,
-} from "../../redux/group/actions";
+} from "../../../redux/group/actions";
 import { IonLoading } from "@ionic/react";
 import { useIntl } from "react-intl";
-import { FilePayload } from "../../redux/commons/types";
-import { fetchId } from "../../redux/profile/actions";
+import { FilePayload } from "../../../redux/commons/types";
+import { fetchId } from "../../../redux/profile/actions";
 import { AgentPubKey } from "@holochain/conductor-api";
 interface Props {
   messageIds: string[];

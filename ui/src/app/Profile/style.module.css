@@ -21,19 +21,6 @@
   justify-content: flex-end;
 }
 
-.popover-list {
-  background: var(--ion-background-color);
-}
-
-.popover-list ion-item {
-  --background: var(--ion-background-color);
-}
-
-.popover-list ion-item:hover {
-  --background: var(--ion-item-background) !important;
-  cursor: pointer;
-}
-
 .content {
   display: flex;
 

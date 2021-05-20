@@ -1,13 +1,3 @@
-.video-player {
-  position: relative;
-  overflow: hidden;
-}
-
-.video-player > video {
-  height: 100%;
-  width: 100%;
-}
-
 .content {
   display: flex;
   position: relative;
@@ -18,6 +8,17 @@
   box-sizing: border-box;
   width: 100%;
   overflow: hidden;
+}
+
+.play-pause {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.play-pause > * {
+  font-size: 4rem;
 }
 
 .modal-control {

@@ -1,7 +1,7 @@
 import { IonItemDivider, IonLabel } from "@ionic/react";
 import React from "react";
-import { Profile } from "../../redux/profile/types";
-import ContactItem from "./ContactItem";
+import { Profile } from "../../../redux/profile/types";
+import ContactItem from "../ContactItem";
 
 interface Props {
   char: string;

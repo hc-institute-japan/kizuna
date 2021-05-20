@@ -8,7 +8,7 @@ import {
 import { chatboxOutline } from "ionicons/icons";
 import React from "react";
 import { useHistory } from "react-router";
-import { Profile } from "../../redux/profile/types";
+import { Profile } from "../../../redux/profile/types";
 
 interface Props {
   contact: Profile;

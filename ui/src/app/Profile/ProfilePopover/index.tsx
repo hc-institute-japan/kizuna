@@ -4,7 +4,7 @@ import {
   personAddOutline,
   personRemoveOutline,
 } from "ionicons/icons";
-import React, { MouseEvent, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import {
@@ -12,10 +12,10 @@ import {
   blockContact,
   removeContact,
   unblockContact,
-} from "../../redux/contacts/actions";
-import { Profile } from "../../redux/profile/types";
-import { RootState } from "../../redux/types";
-import { useAppDispatch } from "../../utils/helpers";
+} from "../../../redux/contacts/actions";
+import { Profile } from "../../../redux/profile/types";
+import { RootState } from "../../../redux/types";
+import { useAppDispatch } from "../../../utils/helpers";
 import styles from "./style.module.css";
 
 interface Props {

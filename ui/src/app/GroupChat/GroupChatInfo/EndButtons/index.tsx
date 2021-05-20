@@ -14,9 +14,6 @@ const EndButtons: React.FC<Props> = ({onClickEdit, onClickNotif, disabled}) => (
       <IonButton onClick={onClickEdit} disabled={disabled ? true : false}>
         <IonIcon color="medium" icon={pencil} />
       </IonButton>
-      {/* <IonButton onClick={onClickNotif}>
-        <IonIcon color="medium" icon={notifications} />
-      </IonButton> */}
     </>
   </IonButtons>
 );

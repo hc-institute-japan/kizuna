@@ -1,7 +1,7 @@
 import { IonButton, IonButtons, IonInput, IonItem, IonLabel, IonLoading, IonTitle, IonToolbar } from "@ionic/react";
 import React, {  useState } from "react";
 import { useIntl } from "react-intl";
-import { GroupConversation } from "../../../redux/group/types";
+import { GroupConversation } from "../../../../redux/group/types";
 import styles from "../style.module.css";
 
 

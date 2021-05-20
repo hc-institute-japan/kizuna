@@ -1,0 +1,15 @@
+.chat {
+  display: flex !important;
+  flex-direction: column !important;
+  background: transparent;
+}
+
+.chat ion-item {
+  --background: transparent;
+  --min-height: auto;
+  margin-bottom: 0.1rem;
+}
+
+.chat .item-inner {
+  padding: 0 !important;
+}

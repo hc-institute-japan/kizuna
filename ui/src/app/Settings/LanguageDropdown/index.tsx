@@ -1,6 +1,5 @@
 import {
   IonItem,
-  IonLabel,
   IonList,
   IonListHeader,
   IonSelect,
@@ -11,10 +10,10 @@ import React from "react";
 import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
-import { setLanguage } from "../../redux/language/actions";
-import { Languages } from "../../redux/language/types";
-import { RootState } from "../../redux/types";
-import { useAppDispatch } from "../../utils/helpers";
+import { setLanguage } from "../../../redux/language/actions";
+import { Languages } from "../../../redux/language/types";
+import { RootState } from "../../../redux/types";
+import { useAppDispatch } from "../../../utils/helpers";
 import styles from "./style.module.css";
 
 const languages: Languages[] = [
@@ -42,7 +41,6 @@ const LanguageDropdown: React.FC = () => {
       </IonListHeader>
       <IonItem>
         <IonSelect
-          interfaceOptions={styles.dropdown}
           onIonChange={(value) => {
             dispatch(setLanguage(value.detail.value));
             history.push("/");

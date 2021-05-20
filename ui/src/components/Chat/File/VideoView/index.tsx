@@ -1,8 +1,8 @@
 import React from "react";
 import { useSelector } from "react-redux";
-import { FilePayload } from "../../../redux/commons/types";
-import { RootState } from "../../../redux/types";
-import VideoPlayer from "../../VideoPlayer";
+import { FilePayload } from "../../../../redux/commons/types";
+import { RootState } from "../../../../redux/types";
+import VideoPlayer from "../../../VideoPlayer";
 import styles from "./style.module.css";
 
 interface Props {
