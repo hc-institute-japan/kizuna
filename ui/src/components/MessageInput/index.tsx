@@ -142,6 +142,17 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
         </IonButtons>
         <IonTextarea
           value={message}
+          onKeyUp={(event) => {
+            console.log(event.key);
+            if (
+              onSend &&
+              event.key === "Enter" &&
+              message.trim().length !== 0
+            ) {
+              onSend();
+              reset();
+            }
+          }}
           className={styles["textarea"]}
           onIonChange={handleOnChange}
           autoGrow={true}
