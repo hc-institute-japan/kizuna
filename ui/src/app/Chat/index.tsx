@@ -18,7 +18,7 @@ import {
   useParams,
 } from "react-router";
 import { useSelector } from "react-redux";
-import { informationCircleOutline, personCircleOutline } from "ionicons/icons";
+import { arrowBackSharp, informationCircleOutline, personCircleOutline } from "ionicons/icons";
 
 import Typing from "../../components/Chat/Typing";
 import MessageInput from "../../components/MessageInput";
@@ -203,6 +203,11 @@ const Chat: React.FC<Props> = ({ location }) => {
     return;
   };
 
+  /*
+    Handle back button
+  */
+  const handleOnBack = () => history.push({pathname: `/home`});
+
   /* 
     dispatches an action to hc to mark a message as read 
     which emits a signal to the sender
@@ -282,7 +287,9 @@ const Chat: React.FC<Props> = ({ location }) => {
       <IonHeader>
         <IonToolbar>
           <IonButtons>
-            <IonBackButton defaultHref="/home" className="ion-no-padding" />
+            <IonButton onClick={() => handleOnBack()} className="ion-no-padding">
+              <IonIcon slot="icon-only" icon={arrowBackSharp} />
+            </IonButton>
             <IonAvatar className="ion-padding">
               <img src={personCircleOutline} alt={username} />
             </IonAvatar>
