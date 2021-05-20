@@ -1,7 +1,7 @@
 import { IonButton, IonButtons, IonHeader, IonLabel, IonSearchbar, IonTitle, IonToolbar } from "@ionic/react";
 import React from "react";
 import { useIntl } from "react-intl";
-import styles from "../../style.module.css";
+import styles from "./style.module.css";
 
 interface Props {
   onChange(e: CustomEvent): any;

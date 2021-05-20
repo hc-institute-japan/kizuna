@@ -1,14 +1,19 @@
-import styles from "../../style.module.css";
-import EmptyContacts from "./EmptyContacts";
+import React, { useState } from "react";
+import { IonButton, IonButtons, IonContent, IonLabel, IonList, IonModal, IonToolbar } from "@ionic/react";
+import { useIntl } from "react-intl";
+
+// redux
+import { Profile, ProfileListType } from "../../../../../../redux/profile/types";
+import { addGroupMembers } from "../../../../../../redux/group/actions";
+
+// components
+import EmptyContacts from "../EmptyContacts";
 import AddMemberToast from "./AddMemberToast";
 import AddMemberIndex from "./AddMemberIndex";
 import AddMemberHeader from "./AddMemberHeader";
-import { indexContacts, useAppDispatch } from "../../../../../utils/helpers";
-import { Profile, ProfileListType } from "../../../../../redux/profile/types";
-import { addGroupMembers } from "../../../../../redux/group/actions";
-import { IonButton, IonButtons, IonContent, IonLabel, IonList, IonModal, IonToolbar } from "@ionic/react";
-import React, { useState } from "react";
-import { useIntl } from "react-intl";
+
+import { indexContacts, useAppDispatch } from "../../../../../../utils/helpers";
+import styles from "./style.module.css";
 
 interface Props {
   isOpen: boolean;
@@ -35,7 +40,6 @@ const AddContactModal: React.FC<Props> = ({ isOpen, setIsOpen, onCancel, contact
       contact.username.toLowerCase().includes(filter.toLowerCase())
     )
   );
-
 
   const onCompletion = (contact: Profile) => {
     if (contact.id === myAgentId) {
@@ -67,8 +71,6 @@ const AddContactModal: React.FC<Props> = ({ isOpen, setIsOpen, onCancel, contact
       setLoading(false);
     })
   }
-
-  
 
   return (
     <IonModal isOpen={isOpen}>

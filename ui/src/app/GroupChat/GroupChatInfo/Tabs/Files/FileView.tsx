@@ -1,12 +1,8 @@
 import { IonGrid, IonIcon, IonLabel, IonRow, IonText } from "@ionic/react";
-import { documentOutline } from "ionicons/icons";
 import React from "react";
+import { documentOutline } from "ionicons/icons";
 import { FilePayload } from "../../../../../redux/commons/types";
-import {
-  base64ToUint8Array,
-  convertSizeToReadableSize,
-} from "../../../../../utils/helpers";
-import styles from "../../style.module.css";
+import { base64ToUint8Array, convertSizeToReadableSize } from "../../../../../utils/helpers";
 
 interface Props {
   file: FilePayload;
@@ -24,10 +20,7 @@ const File: React.FC<Props> = ({ file }) => {
   };
   return (
     <IonGrid>
-      <IonRow
-        onClick={handleOnClick}
-        className={`ion-align-items-center ${styles.file}`}
-      >
+      <IonRow onClick={handleOnClick} className={`ion-align-items-center`}>
         <div className="ion-padding-end">
           <IonIcon size="small" icon={documentOutline}></IonIcon>
         </div>

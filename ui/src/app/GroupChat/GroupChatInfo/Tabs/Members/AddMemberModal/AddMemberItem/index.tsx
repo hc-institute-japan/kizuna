@@ -3,7 +3,7 @@ import {
   IonLabel,
 } from "@ionic/react";
 import React, { useState } from "react";
-import { Profile } from "../../../../../redux/profile/types";
+import { Profile } from "../../../../../../../redux/profile/types";
 
 interface Props {
   contact: Profile;
