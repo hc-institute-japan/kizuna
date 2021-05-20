@@ -1,31 +1,22 @@
+import { AgentPubKey } from "@holochain/conductor-api";
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-
-import { RootState } from "../../../redux/types";
-import {
-  GroupMessage,
-  GroupMessageReadData,
-  GroupMessagesContents,
-  GroupMessagesOutput,
-} from "../../../redux/group/types";
-import Chat from "../../../components/Chat";
-import { ChatListMethods } from "../../../components/Chat/types";
-import {
-  base64ToUint8Array,
-  isTextPayload,
-  Uint8ArrayToBase64,
-  useAppDispatch,
-} from "../../../utils/helpers";
-import {
-  fetchFilesBytes,
-  getNextBatchGroupMessages,
-  readGroupMessage,
-} from "../../../redux/group/actions";
 import { IonLoading } from "@ionic/react";
+import { useSelector } from "react-redux";
 import { useIntl } from "react-intl";
+
+// Redux
+import { GroupMessage, GroupMessageReadData, GroupMessagesContents, GroupMessagesOutput } from "../../../redux/group/types";
+import { fetchFilesBytes, getNextBatchGroupMessages, readGroupMessage } from "../../../redux/group/actions";
+import { RootState } from "../../../redux/types";
 import { FilePayload } from "../../../redux/commons/types";
 import { fetchId } from "../../../redux/profile/actions";
-import { AgentPubKey } from "@holochain/conductor-api";
+
+// Components
+import Chat from "../../../components/Chat";
+import { ChatListMethods } from "../../../components/Chat/types";
+
+import { base64ToUint8Array, isTextPayload, Uint8ArrayToBase64, useAppDispatch } from "../../../utils/helpers";
+
 interface Props {
   messageIds: string[];
   members: string[];

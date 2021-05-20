@@ -1,8 +1,8 @@
 import { IonItemDivider, IonLabel } from "@ionic/react";
 import React from "react";
-import { IndexedContacts } from "../../../../../redux/contacts/types";
-import { Profile } from "../../../../../redux/profile/types";
-import AddContactItem from "./AddMemberItem";
+import { IndexedContacts } from "../../../../../../../redux/contacts/types";
+import { Profile } from "../../../../../../../redux/profile/types";
+import AddContactItem from "../AddMemberItem";
 
 interface Props {
   indexedContacts?: IndexedContacts;

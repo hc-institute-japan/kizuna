@@ -1,8 +1,9 @@
-import { IonIcon, IonText } from "@ionic/react";
-import { sadOutline } from "ionicons/icons";
 import React from "react";
+import { IonIcon, IonText } from "@ionic/react";
 import { useIntl } from "react-intl";
-import styles from "../../style.module.css";
+import { sadOutline } from "ionicons/icons";
+
+import styles from "./style.module.css";
 
 const EmptyContacts: React.FC = () => {
   const intl = useIntl();

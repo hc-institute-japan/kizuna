@@ -1,6 +1,5 @@
 import { AgentPubKey } from "@holochain/conductor-api";
 import React, { useEffect, useRef, useState } from "react";
-import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router";
 import {
@@ -9,12 +8,9 @@ import {
   IonContent,
   IonHeader,
   IonIcon,
-  IonLabel,
   IonLoading,
   IonModal,
   IonPage,
-  IonSegment,
-  IonSegmentButton,
   IonSlide,
   IonSlides,
   IonTitle,
@@ -23,10 +19,7 @@ import {
 import { arrowBackSharp } from "ionicons/icons";
 
 // Redux
-import {
-  getLatestGroupVersion,
-  updateGroupName,
-} from "../../../redux/group/actions";
+import { getLatestGroupVersion, updateGroupName } from "../../../redux/group/actions";
 import { GroupConversation } from "../../../redux/group/types";
 import { fetchId } from "../../../redux/profile/actions";
 import { RootState } from "../../../redux/types";
@@ -37,7 +30,7 @@ import SegmentTabs from "./SegmentTabs";
 import EndButtons from "./EndButtons";
 import File from "./Tabs/Files/File";
 import Media from "./Tabs/Media/Media";
-import Members from "./Tabs/Members/Members";
+import Members from "./Tabs/Members";
 import UpdateGroupName from "./UpdateGroupName";
 
 import styles from "./style.module.css";
@@ -48,7 +41,6 @@ interface GroupChatParams {
 
 const GroupChatInfo: React.FC = () => {
   const history = useHistory();
-  const intl = useIntl();
   const { group } = useParams<GroupChatParams>();
   const dispatch = useAppDispatch();
 
@@ -64,7 +56,6 @@ const GroupChatInfo: React.FC = () => {
   const [modalLoading, setModalLoading] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [groupInfo, setGroupInfo] = useState<GroupConversation | undefined>();
-  const [selected, setSelected] = useState(0);
 
   const handleOnBack = () => {
     history.goBack();
@@ -170,9 +161,7 @@ const GroupChatInfo: React.FC = () => {
           options={slideOpts}
         >
           <IonSlide>
-            {groupInfo ? (
-              <Members groupId={group} groupRevisionId={groupInfo!.originalGroupHeaderHash}/>
-            ) : null}
+            <Members groupId={group} groupRevisionId={groupInfo!.originalGroupHeaderHash}/>
           </IonSlide>
 
           <IonSlide>

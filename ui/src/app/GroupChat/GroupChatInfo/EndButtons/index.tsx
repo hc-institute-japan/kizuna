@@ -1,6 +1,6 @@
+import React from "react";
 import { IonButton, IonButtons, IonIcon } from "@ionic/react";
 import { pencil } from "ionicons/icons";
-import React from "react";
 
 interface Props {
   onClickEdit: () => void;
