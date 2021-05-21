@@ -14,11 +14,10 @@ import { setLanguage } from "../../../redux/language/actions";
 import { Languages } from "../../../redux/language/types";
 import { RootState } from "../../../redux/types";
 import { useAppDispatch } from "../../../utils/helpers";
-import styles from "./style.module.css";
 
 const languages: Languages[] = [
   { language: "English", code: "en" },
-  { language: "Japanese", code: "jp" },
+  { language: "日本語", code: "jp" },
 ];
 
 const LanguageDropdown: React.FC = () => {
