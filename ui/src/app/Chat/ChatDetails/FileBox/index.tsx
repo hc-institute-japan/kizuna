@@ -29,13 +29,14 @@ interface Props {
 	type: "media" | "files",
 	conversant: Profile,
 	orderedFiles: P2PMessage[]
+	onDownload(file: FilePayload): any;
 }
 
 /*
 	displays the grid of files
 	or the conversant's details (TODO)
 */
-const FileBox: React.FC<Props> = ({ type, orderedFiles, conversant }) => {
+const FileBox: React.FC<Props> = ({ type, orderedFiles, conversant, onDownload }) => {
 	const dispatch = useAppDispatch();
 
 	/* i18n */
@@ -92,7 +93,7 @@ const FileBox: React.FC<Props> = ({ type, orderedFiles, conversant }) => {
 				<IonRow className={styles.mediarow}>
 					{orderedFiles.map((file) => {
 						let month = file.timestamp.getMonth();
-						let year = file.timestamp.getFullYear();
+						// let year = file.timestamp.getFullYear();
 						return (
 							<React.Fragment>
 								{month !== currentMonth
@@ -108,16 +109,23 @@ const FileBox: React.FC<Props> = ({ type, orderedFiles, conversant }) => {
 								<IonCol size={colsize}>    
 									<IonCard className={styles.mediacard}>
 										{type === "files"
-											? <FileView file={file.payload as FilePayload} />
+											? <FileView 
+												file={file.payload as FilePayload} 
+												onDownload={onDownload}
+											/>
 											: <IonCard className={styles.mediacard}>
 													{(file.payload as FilePayload).fileType ==="VIDEO" 
 													? <div className={styles.mediadiv}>
-															<VideoView file={file.payload as FilePayload} />
+															<VideoView 
+																file={file.payload as FilePayload} 
+																onDownload={onDownload}
+															/>
 														</div>
 													: <div className={styles.mediadiv}>
 															<ImageView 
 																file={file.payload as FilePayload} 
 																src={decoder.decode((file.payload as FilePayload).thumbnail!)}
+																onDownload={onDownload}
 															/>
 														</div>
 													}

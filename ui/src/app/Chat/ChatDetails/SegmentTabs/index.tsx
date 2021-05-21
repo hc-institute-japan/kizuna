@@ -9,18 +9,19 @@ import { useIntl } from "react-intl";
 
 interface Props {
 	onSegmentChange(index: any): any
+	value: string
 }
 
 /*
 	displays the tab segments in ChatDetails
 	which controls the displayed slides
 */
-const SegmentTabs: React.FC<Props> = ({ onSegmentChange }) => {
+const SegmentTabs: React.FC<Props> = ({ onSegmentChange, value }) => {
 	let intl = useIntl();
 
 	return (				
 		<IonToolbar>
-			<IonSegment onIonChange={(e) => onSegmentChange(e.detail.value)}>
+			<IonSegment value={value} onIonChange={(e) => onSegmentChange(e.detail.value)}>
 				<IonSegmentButton value="Info">
 					<IonLabel>{intl.formatMessage({id: "app.chat.chat-details.info"})}</IonLabel>
 				</IonSegmentButton>

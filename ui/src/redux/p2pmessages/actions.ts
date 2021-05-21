@@ -34,7 +34,10 @@ import {
     base64ToUint8Array 
 } from "../../utils/helpers";
 
-// helper function to transform HC data structures to UI/redux data structures
+/* HELPER FUNCTIONS */
+/* 
+    transform HC data structures to UI/redux data structures
+*/
 export const transformZomeDataToUIData = (zomeResults: P2PMessageConversationState) => {
 
     // destructure zome hashmap results
@@ -51,7 +54,10 @@ export const transformZomeDataToUIData = (zomeResults: P2PMessageConversationSta
     };
 
     // get a list of files to fetch from HC (on a different zome call)
-    var filesToFetch: { [key: string]: Uint8Array } = {};
+    // let fileHashes = [];
+    // let transformedFiles: { [key: string]: Uint8Array } = {};
+    // var filesToFetch: { [key: string]: Uint8Array } = {};
+
     // transform messages
     var transformedMesssages: { [key: string]: P2PMessage } = {};
     for (const [key, value] of Object.entries(zomeMessages)) {
@@ -63,16 +69,17 @@ export const transformZomeDataToUIData = (zomeResults: P2PMessageConversationSta
                 break;
             case "FILE":
                 payload = {
-                type: "FILE",
-                fileName: message.payload.payload.metadata.fileName,
-                fileSize: message.payload.payload.metadata.fileSize,
-                fileType: message.payload.payload.fileType.type,
-                fileHash: Uint8ArrayToBase64(message.payload.payload.metadata.fileHash),
-                thumbnail: message.payload.payload.fileType.type != "OTHER" 
-                            ? message.payload.payload.fileType.payload.thumbnail
-                            : null
+                    type: "FILE",
+                    fileName: message.payload.payload.metadata.fileName,
+                    fileSize: message.payload.payload.metadata.fileSize,
+                    fileType: message.payload.payload.fileType.type,
+                    fileHash: Uint8ArrayToBase64(message.payload.payload.metadata.fileHash),
+                    thumbnail: message.payload.payload.fileType.type !== "OTHER" 
+                                ? message.payload.payload.fileType.payload.thumbnail
+                                : null
                 };
-                filesToFetch[message.payload.payload.metadata.fileHash] = new Uint8Array;
+                // filesToFetch[message.payload.payload.metadata.fileHash] = new Uint8Array();
+                // fileHashes.push(message.payload.payload.metadata.fileHash)
                 break
             default:
                 break
@@ -90,7 +97,7 @@ export const transformZomeDataToUIData = (zomeResults: P2PMessageConversationSta
 
         transformedMesssages[key] = p2pMessage
     };
-    
+
     // transform receipts
     var transformedReceipts: { [key: string]: P2PMessageReceipt } = {};
     for (const [key, value] of Object.entries(zomeReceipts)) {
@@ -112,14 +119,17 @@ export const transformZomeDataToUIData = (zomeResults: P2PMessageConversationSta
         conversations: transformedConversations, 
         messages: transformedMesssages, 
         receipts: transformedReceipts,
-        files: filesToFetch,
+        files: {},
         typing: {}
     };
 
     return consolidatedUIObject;
 }
 
-// action to set P2PMessageConversations into the redux state
+/* SETTERS */
+/*
+    set P2PMessageConversations into the redux state
+*/
 export const setMessages = (state: P2PMessageConversationState): ThunkAction => async (
     dispatch,
 ) => {
@@ -130,14 +140,14 @@ export const setMessages = (state: P2PMessageConversationState): ThunkAction => 
     return true;
 }
 
-// action to set the FileBytes into the redux state
-export const setFiles = ( filesToFetch: { [key: string]: Uint8Array }): ThunkAction => async (
+/* 
+    set the FileBytes into the redux state
+*/
+    export const setFiles = ( filesToFetch: { [key: string]: Uint8Array }): ThunkAction => async (
     dispatch,
     _getState,
     { callZome }
 ) => {
-    // takes a list of file addresses to fetch from HC
-    // console.log("Actions fetching files", filesToFetch);
     const fetchedFiles = await callZome({
         zomeName: ZOMES.P2PMESSAGE,
         fnName: FUNCTIONS[ZOMES.P2PMESSAGE].SEND_MESSAGE,
@@ -145,18 +155,19 @@ export const setFiles = ( filesToFetch: { [key: string]: Uint8Array }): ThunkAct
     });
 
     if (fetchedFiles?.type !== "error") {
-        // console.log("Actions SET_FILES dispatching to reducer", fetchedFiles)
+        console.log("Actions SET_FILES dispatching to reducer", fetchedFiles)
         dispatch({
             type: SET_FILES,
             sate: fetchedFiles
         });
         return true;
     }
-    // console.log("Actions error in fetching files", fetchedFiles)
 }
 
-// action to append a message and receipt (return values of p2p send_message) into the redux state after a user sends a message
-// will also append the file bytes if message type is file (does not fetch from HC)
+/*
+    append a message, receipt, file bytes [no fetch] into the redux after a user sends a message
+    append a message, receipt, file bytes [with fetch] into the redux after a receiver receives a signal
+*/
 export const appendMessage = (state: { message: P2PMessage, receipt: P2PMessageReceipt, file?: P2PFile}): ThunkAction => async (
     dispatch
 ) => {
@@ -167,7 +178,10 @@ export const appendMessage = (state: { message: P2PMessage, receipt: P2PMessageR
     return true;
 }
 
-// action to append a receipt (carried by signals when a message is read) into the redux state
+/*
+    append a receipt into the redux state 
+    after receving a signal (e.g., message has been read)
+*/
 export const appendReceipt = (state: P2PMessageReceipt): ThunkAction => async (
     dispatch
 ) => {
@@ -178,8 +192,10 @@ export const appendReceipt = (state: P2PMessageReceipt): ThunkAction => async (
     return true;
 }
 
-// action to send a message
-// takes in the parameters of message_input
+/* SENDER */
+/* 
+    action to send a message
+*/
 export const sendMessage = (
     receiver: AgentPubKey, 
     message: string, 
@@ -193,7 +209,7 @@ export const sendMessage = (
 ) => {
     // construct the payload input structure (text or file)
     var payloadInput;
-    if (type == "TEXT") {
+    if (type === "TEXT") {
         let textPayload: TextPayload = {
             type: "TEXT",
             payload: { 
@@ -204,7 +220,7 @@ export const sendMessage = (
     } else {
         let fileType: FileType = {
             type: file.fileType.type,
-            payload: file.fileType.type != "OTHER" ? { thumbnail: file.fileType.payload.thumbnail } : null
+            payload: file.fileType.type !== "OTHER" ? { thumbnail: file.fileType.payload.thumbnail } : null
         }
         let filePayload: FilePayloadInput = {
             type: "FILE",
@@ -255,7 +271,7 @@ export const sendMessage = (
             fileSize: message.payload.payload.metadata.fileSize,
             fileType: message.payload.payload.fileType.type,
             fileHash: Uint8ArrayToBase64(message.payload.payload.metadata.fileHash),
-            thumbnail: message.payload.payload.fileType.type != "OTHER" 
+            thumbnail: message.payload.payload.fileType.type !== "OTHER" 
                         ? message.payload.payload.fileType.payload.thumbnail
                         : null
             }
@@ -282,7 +298,7 @@ export const sendMessage = (
             status: receipt.status.status
         }
 
-        let p2pFile = type == "FILE" ? {
+        let p2pFile = type === "FILE" ? {
             fileHash: "u" + payload.fileHash, 
             fileBytes: file.fileBytes 
         } : undefined;
@@ -291,7 +307,7 @@ export const sendMessage = (
         dispatch(appendMessage({
             message: p2pMessage, 
             receipt: p2pReceipt, 
-            file: p2pFile != undefined
+            file: p2pFile !== undefined
                 ? p2pFile : undefined 
             }
         ));
@@ -306,8 +322,11 @@ export const sendMessage = (
 }
 
 
-// action to get the latest messages (called when the application starts)
-// takes in a the batch size as input
+/* GETTERS */
+/* 
+    get the latest messages 
+    when the application starts, is refreshed
+*/
 export const getLatestMessages = (size: number): ThunkAction => async (
     dispatch,
     _getState,
@@ -429,6 +448,7 @@ export const getFileBytes = (hashes: Uint8Array[]): ThunkAction => async (
     _getState,
     { callZome }
 ) => {
+    console.log("actions getting file bytes", hashes)
     const fetchedFiles = await callZome({
         zomeName: ZOMES.P2PMESSAGE,
         fnName: FUNCTIONS[ZOMES.P2PMESSAGE].GET_FILE_BYTES,
@@ -440,13 +460,16 @@ export const getFileBytes = (hashes: Uint8Array[]): ThunkAction => async (
         Object.keys(fetchedFiles).map((key) => {
             transformedFiles[key] = fetchedFiles[key];
         });
-
-        if (Object.entries(transformedFiles).length > 0) dispatch({
-            type: SET_FILES,
-            state: transformedFiles
-        });
+        console.log("actions transformed", transformedFiles)
+        if (Object.entries(transformedFiles).length > 0) {
+            dispatch({
+                type: SET_FILES,
+                state: transformedFiles
+            });
+        };
         return transformedFiles;
     };
+    console.log("actiosn failed to get file bytes", fetchedFiles)
     return false;
 }
 

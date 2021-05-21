@@ -10,11 +10,11 @@ import { useSelector } from "react-redux";
 import { RouteComponentProps } from "react-router";
 import { RootState } from "../../../redux/types";
 import { Profile } from "../../../redux/profile/types";
+import { FilePayload } from "../../../redux/commons/types";
 import { P2PMessage } from "../../../redux/p2pmessages/types";
-import { getNextBatchMessages } from "../../../redux/p2pmessages/actions";
+import { getNextBatchMessages, getFileBytes } from "../../../redux/p2pmessages/actions";
 import { useAppDispatch, base64ToUint8Array } from "../../../utils/helpers";
-import styles from "./style.module.css";
-import { useIntl } from "react-intl";
+// import { useIntl } from "react-intl";
 
 import ContactHeader from "./ContactHeader";
 import SegmentTabs from "./SegmentTabs";
@@ -27,12 +27,14 @@ interface Props {
 const ChatDetails: React.FC<Props> = ({ location }) => {
   /* STATES */
   const { state }: any = { ...location };
-  const intl = useIntl();
-  const { conversations, messages, receipts } = useSelector((state: RootState) => state.p2pmessages);
-  const [ media, setMedia ] = useState< { [key: string]: boolean }>({});
-  const [ files, setFiles ] = useState< { [key: string]: P2PMessage }>({});
-  const [ orderedMedia, setOrderedMedia ] = useState<P2PMessage[]>([]);
-  const [ orderedFiles, setOrderedFiles ] = useState<P2PMessage[]>([]);
+  // const intl = useIntl();
+  const { conversations, messages } = useSelector((state: RootState) => state.p2pmessages);
+  const fetchedFiles = useSelector((state: RootState) => state.p2pmessages.files);
+  const [ media ] = useState< { [key: string]: boolean }>({});
+  const [ files ] = useState< { [key: string]: P2PMessage }>({});
+  const [ orderedMedia ] = useState<P2PMessage[]>([]);
+  const [ orderedFiles ] = useState<P2PMessage[]>([]);
+  const [ currentSegment, setCurrentSegment ] = useState<string>("Info");
   const dispatch = useAppDispatch();
 
   /* REFS */
@@ -43,18 +45,19 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
     fetches files from hc
     when the page is initially opened
   */
-    useEffect(() => {
-      let initialFetchFilter = {
-        conversant: Buffer.from(base64ToUint8Array(state.conversant.id)),
-        batch_size: 40,
-        payload_type: "File",
-        last_fetched_timestamp: undefined,
-        last_fetched_message_id: undefined
-      };
-      dispatch(
-        getNextBatchMessages(initialFetchFilter)
-      )
-    }, []);
+  useEffect(() => {
+    let initialFetchFilter = {
+      conversant: Buffer.from(base64ToUint8Array(state.conversant.id)),
+      batch_size: 40,
+      payload_type: "File",
+      last_fetched_timestamp: undefined,
+      last_fetched_message_id: undefined
+    };
+    dispatch(
+      getNextBatchMessages(initialFetchFilter)
+    )
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /* 
     sorts files according to type
@@ -97,6 +100,7 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
         }
       });
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversations, messages]);
 
   /* HANDLERS */
@@ -105,7 +109,7 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
     when clicking on a segment
   */
   const handleOnSegmentChange = (value: any) => {
-    var index;
+    let index;
     switch (value) {
       case "Info":
         index = 0;
@@ -122,10 +126,40 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
     slideRef.current?.slideTo(index);
   };
 
+  /*
+    changes which segment is highlighted
+    when the slide is changed
+  */
+  const handleSlideChange = () => {
+    const segmentValues = ["Info", "Media", "Files"]
+    slideRef.current?.getActiveIndex()
+      .then((currentIndex) => setCurrentSegment(segmentValues[currentIndex]));
+  }
+
+  /* 
+    downloads a file when already in redux state
+    if not, dispatches an action to get the file from hc
+    when clicking the file download button
+  */
+  const onDownloadHandler = (file: FilePayload) => {
+    console.log("Chat onDownloadHandler", file)
+    fetchedFiles["u" + file.fileHash] !== undefined
+    ? downloadFile(fetchedFiles["u" + file.fileHash], file.fileName)
+    : dispatch(getFileBytes([base64ToUint8Array(file.fileHash)]))
+      .then((res: {[key:string]: Uint8Array}) => downloadFile(res["u" + file.fileHash], file.fileName))
+  }
+  const downloadFile = (fileBytes: Uint8Array, fileName: string) => {
+    const blob = new Blob([fileBytes]); // change resultByte to bytes  
+    const link = document.createElement("a");
+    link.href = window.URL.createObjectURL(blob);
+    link.download = fileName;
+    link.click();
+  };
+
   // slider options
   const slideOpts = {
     initialSlide: 0,
-    speed: 400,
+    speed: 100,
   };
 
   return (
@@ -133,7 +167,9 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
 
       <IonHeader>
         <ContactHeader username={state.conversant.username} />
-        <SegmentTabs onSegmentChange={handleOnSegmentChange} />
+        <SegmentTabs 
+          value={currentSegment}
+          onSegmentChange={handleOnSegmentChange} />
       </IonHeader>
 
 
@@ -143,6 +179,7 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
           className="slides"
           pager={false}
           options={slideOpts}
+          onIonSlideDidChange={handleSlideChange}
         >
           
           {/* Contact Info */}
@@ -154,6 +191,7 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
             type={"media"}
             conversant={state.conversant}
             orderedFiles={orderedMedia}
+            onDownload={file => onDownloadHandler(file)}
           />
 
           {/* Files */}
@@ -161,6 +199,7 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
             type={"files"}
             conversant={state.conversant}
             orderedFiles={orderedFiles}
+            onDownload={file => onDownloadHandler(file)}
           />
 
         </IonSlides>
