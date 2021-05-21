@@ -21,13 +21,21 @@ const AddContactModal: React.FC<Props> = ({ isOpen, onCancel }) => {
   const [filter, setFilter] = useState<string>("");
   const [users, setUsers] = useState<Profile[]>([]);
   const [toast, setToast] = useState<string | null>(null);
-  const contacts = useSelector((state: RootState) => state.contacts.contacts);
+  const { contacts, username } = useSelector((state: RootState) => ({
+    contacts: state.contacts.contacts,
+    username: state.profile.username,
+  }));
 
   const dispatch = useAppDispatch();
 
   useEffect(() => {
     dispatch(fetchAllUsernames()).then((res: any) => {
-      if (res) setUsers(res);
+      if (res) {
+        const filteredRes = res.filter(
+          (user: Profile) => username !== user.username
+        );
+        setUsers(filteredRes);
+      }
     });
   }, [dispatch]);
 
