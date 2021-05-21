@@ -232,9 +232,7 @@ let signalHandler: AppSignalCb = (signal) => {
               fileName: message.payload.payload.metadata.fileName,
               fileSize: message.payload.payload.metadata.fileSize,
               fileType: message.payload.payload.fileType.type,
-              fileHash:
-                "u" +
-                Uint8ArrayToBase64(message.payload.payload.metadata.fileHash),
+              fileHash: Uint8ArrayToBase64(message.payload.payload.metadata.fileHash),
               thumbnail:
                 message.payload.payload.fileType.type != "OTHER"
                   ? message.payload.payload.fileType.payload.thumbnail

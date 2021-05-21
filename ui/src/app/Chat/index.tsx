@@ -45,8 +45,6 @@ import {
   debounce,
 } from "../../utils/helpers";
 
-import styles from "./style.module.css";
-
 type Props = {
   location: RouteComponentProps<{}, {}, { state: Conversation }>;
 };
@@ -116,7 +114,7 @@ const Chat: React.FC<Props> = ({ location }) => {
       });
       setMessagesWithConversant(filteredMessages.reverse());
     }
-  }, [conversations, messages, receipts]);
+  }, [conversations, messages, receipts, conversant]);
 
   /* 
     dispatches an action to notify hc that you are typing
@@ -136,7 +134,7 @@ const Chat: React.FC<Props> = ({ location }) => {
     } else {
       didMountRef.current = true;
     }
-  }, [message]);
+  }, [message, conversant, dispatch]);
 
   /* HANDLERS */
   /* 
@@ -251,8 +249,20 @@ const Chat: React.FC<Props> = ({ location }) => {
     let author = messageBundle.message.author;
     let timestamp = messageBundle.receipt.timestamp;
     let payload = messageBundle.message.payload;
-    let readlist =
-      messageBundle.receipt.status === "read" ? { key: timestamp } : undefined;
+    let readlist = messageBundle.receipt.status === "read" 
+      ? { key: timestamp } 
+      : undefined;
+
+    // get file bytes when rendering video messages
+    // TODO: will change to getting file bytes when played
+    if (
+      payload.type === "FILE"
+      && (payload as FilePayload).fileType === "VIDEO"
+      && fetchedFiles["u" + payload.fileHash] === undefined
+    ) {
+      dispatch(getFileBytes([base64ToUint8Array(payload.fileHash)]))
+    }
+
     return conversant.id !== author.slice(1) ? (
       <Me
         key={key}
