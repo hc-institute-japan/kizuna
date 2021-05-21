@@ -1,37 +1,39 @@
 import { AgentPubKey } from "@holochain/conductor-api";
+import React, { useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import { useHistory, useParams } from "react-router";
 import {
   IonButton,
   IonButtons,
+  IonContent,
   IonHeader,
   IonIcon,
   IonLoading,
   IonModal,
   IonPage,
-  IonSegment,
-  IonSegmentButton,
-  IonText,
+  IonSlide,
+  IonSlides,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
 import { arrowBackSharp } from "ionicons/icons";
-import React, { useEffect, useState } from "react";
-import { useIntl } from "react-intl";
-import { useSelector } from "react-redux";
-import { useHistory, useParams } from "react-router";
-import {
-  getLatestGroupVersion,
-  updateGroupName,
-} from "../../../redux/group/actions";
+
+// Redux
+import { getLatestGroupVersion, updateGroupName } from "../../../redux/group/actions";
 import { GroupConversation } from "../../../redux/group/types";
 import { fetchId } from "../../../redux/profile/actions";
 import { RootState } from "../../../redux/types";
 import { Uint8ArrayToBase64, useAppDispatch } from "../../../utils/helpers";
+
+// Components
+import SegmentTabs from "./SegmentTabs";
 import EndButtons from "./EndButtons";
-import styles from "./style.module.css";
 import File from "./Tabs/Files/File";
 import Media from "./Tabs/Media/Media";
-import Members from "./Tabs/Members/Members";
+import Members from "./Tabs/Members";
 import UpdateGroupName from "./UpdateGroupName";
+
+import styles from "./style.module.css";
 
 interface GroupChatParams {
   group: string;
@@ -39,13 +41,14 @@ interface GroupChatParams {
 
 const GroupChatInfo: React.FC = () => {
   const history = useHistory();
-  const intl = useIntl();
   const { group } = useParams<GroupChatParams>();
+  const dispatch = useAppDispatch();
 
   const groupData = useSelector(
     (state: RootState) => state.groups.conversations[group]
   );
 
+  /* Local state */
   const [myAgentId, setMyAgentId] = useState<string>("");
   const [editGroupName, setEditGroupName] = useState<boolean>(false);
   const [disabled, setDisabled] = useState<boolean>(false);
@@ -53,30 +56,6 @@ const GroupChatInfo: React.FC = () => {
   const [modalLoading, setModalLoading] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [groupInfo, setGroupInfo] = useState<GroupConversation | undefined>();
-
-  const [selected, setSelected] = useState(0);
-
-  const tabs = [
-    {
-      label: intl.formatMessage({ id: "app.group-chat.label-info" }),
-      tab: groupInfo ? (
-        <Members
-          groupId={group}
-          groupRevisionId={groupInfo!.originalGroupHeaderHash}
-        />
-      ) : null,
-    },
-    {
-      label: intl.formatMessage({ id: "app.group-chat.label-media" }),
-      tab: <Media groupId={group} />,
-    },
-    {
-      label: intl.formatMessage({ id: "app.group-chat.label-files" }),
-      tab: <File groupId={group} />,
-    },
-  ];
-
-  const dispatch = useAppDispatch();
 
   const handleOnBack = () => {
     history.goBack();
@@ -125,9 +104,34 @@ const GroupChatInfo: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const slideRef = useRef<HTMLIonSlidesElement>(null);
+  const handleOnSegmentChange = (value: string) => {
+    var index;
+    switch (value) {
+      case "info":
+        index = 0;
+        break;
+      case "media":
+        index = 1;
+        break;
+      case "files":
+        index = 2;
+        break;
+      default:
+        index = 0;
+    }
+    slideRef.current?.slideTo(index);
+  };
+
+  const slideOpts = {
+    initialSlide: 0,
+    speed: 400,
+  };
+
   return !loading && groupInfo ? (
     <IonPage>
       <IonHeader className={styles.header}>
+
         <IonToolbar>
           <IonButtons>
             <IonButton
@@ -143,30 +147,34 @@ const GroupChatInfo: React.FC = () => {
             disabled={disabled}
           />
         </IonToolbar>
+
         <IonTitle className={styles.groupname}>{groupInfo!.name}</IonTitle>
-        <IonToolbar className={styles.menu}>
-          <IonSegment slot="start">
-            {tabs.map((tab, i) => {
-              const isSelected = selected === i;
-              return (
-                <IonSegmentButton
-                  key={tab.label}
-                  onClick={() => setSelected(i)}
-                >
-                  <IonText
-                    {...(isSelected
-                      ? { className: styles.selected, color: "primary" }
-                      : {})}
-                  >
-                    {tab.label}
-                  </IonText>
-                </IonSegmentButton>
-              );
-            })}
-          </IonSegment>
-        </IonToolbar>
+
+        <SegmentTabs onSegmentChange={handleOnSegmentChange}/>
       </IonHeader>
-      {tabs[selected].tab}
+
+      <IonContent>
+        <IonSlides
+          ref={slideRef}
+          className="slides"
+          pager={false}
+          options={slideOpts}
+        >
+          <IonSlide>
+            <Members groupId={group} groupRevisionId={groupInfo!.originalGroupHeaderHash}/>
+          </IonSlide>
+
+          <IonSlide>
+            <Media groupId={group} />
+          </IonSlide>
+
+          <IonSlide>
+            <File groupId={group} />
+          </IonSlide>
+        </IonSlides>
+
+      </IonContent>
+
 
       <IonModal isOpen={showModal} cssClass="my-custom-modal-css">
         <UpdateGroupName

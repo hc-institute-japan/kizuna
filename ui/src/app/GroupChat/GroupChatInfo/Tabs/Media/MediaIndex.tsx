@@ -3,8 +3,9 @@ import React from "react";
 import { FilePayload } from "../../../../../redux/commons/types";
 import { GroupMessage } from "../../../../../redux/group/types";
 import { Profile } from "../../../../../redux/profile/types";
-import styles from "../../style.module.css";
 import MediaCol from "./MediaCol";
+
+import styles from "./style.module.css";
 
 interface Props {
   indexedFileMessages?: {

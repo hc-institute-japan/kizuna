@@ -9,12 +9,6 @@ import {
 } from "../commons/types";
 import { Profile } from "../profile/types";
 
-export const SET_MESSAGES = "SET_MESSAGES";
-export const SET_FILES = "SET_FILES";
-export const SET_TYPING = "SET_TYPING";
-export const APPEND_MESSAGE = "APPEND_MESSAGE";
-export const APPEND_RECEIPT = "APPEND_RECEIPT";
-
 export type P2PMessageReceiptID = string;
 export type P2PMessageStatus = "sent" | "delivered" | "read";
 
@@ -75,8 +69,6 @@ export interface MessageInput {
     reply_to: HoloHash | undefined,
 }
 
-export type BatchSize = number;
-
 export interface P2PChatFilterBatch {
     conversant: AgentPubKey,
     batch_size: number,
@@ -85,10 +77,34 @@ export interface P2PChatFilterBatch {
     last_fetched_message_id?: HoloHash
 }
 
+export type BatchSize = number;
+
+/* ACTION TYPES */
+export const SET_MESSAGES = "SET_MESSAGES";
+export const SET_FILES = "SET_FILES";
+export const SET_TYPING = "SET_TYPING";
+export const APPEND_MESSAGE = "APPEND_MESSAGE";
+export const APPEND_RECEIPT = "APPEND_RECEIPT";
+
 interface SetP2PMessagesAction {
     type: typeof SET_MESSAGES;
     state: P2PMessageConversationState;
 } 
+
+
+interface SetP2PFiles {
+    type: typeof SET_FILES;
+    state: { [key: string]: Uint8Array }
+}
+
+
+interface SetP2PTyping {
+    type: typeof SET_TYPING
+    state: {
+        profile: Profile,
+        isTyping: boolean
+    }
+}
 
 interface AppendP2PMessageAction {
     type: typeof APPEND_MESSAGE;
@@ -105,18 +121,7 @@ interface AppendP2PMessageReceipt {
     state: P2PMessageReceipt
 }
 
-interface SetP2PFiles {
-    type: typeof SET_FILES;
-    state: { [key: string]: Uint8Array }
-}
 
-interface SetP2PTyping {
-    type: typeof SET_TYPING
-    state: {
-        profile: Profile,
-        isTyping: boolean
-    }
-}
 
 export type P2PMessageActionType = 
     SetP2PMessagesAction 

@@ -18,7 +18,7 @@ import {
   useParams,
 } from "react-router";
 import { useSelector } from "react-redux";
-import { informationCircleOutline, personCircleOutline } from "ionicons/icons";
+import { arrowBackSharp, informationCircleOutline, personCircleOutline } from "ionicons/icons";
 
 import Typing from "../../components/Chat/Typing";
 import MessageInput from "../../components/MessageInput";
@@ -44,8 +44,6 @@ import {
   dateToTimestamp,
   debounce,
 } from "../../utils/helpers";
-
-import styles from "./style.module.css";
 
 type Props = {
   location: RouteComponentProps<{}, {}, { state: Conversation }>;
@@ -116,7 +114,7 @@ const Chat: React.FC<Props> = ({ location }) => {
       });
       setMessagesWithConversant(filteredMessages.reverse());
     }
-  }, [conversations, messages, receipts]);
+  }, [conversations, messages, receipts, conversant]);
 
   /* 
     dispatches an action to notify hc that you are typing
@@ -136,7 +134,7 @@ const Chat: React.FC<Props> = ({ location }) => {
     } else {
       didMountRef.current = true;
     }
-  }, [message]);
+  }, [message, conversant, dispatch]);
 
   /* HANDLERS */
   /* 
@@ -203,6 +201,11 @@ const Chat: React.FC<Props> = ({ location }) => {
     return;
   };
 
+  /*
+    Handle back button
+  */
+  const handleOnBack = () => history.push({pathname: `/home`});
+
   /* 
     dispatches an action to hc to mark a message as read 
     which emits a signal to the sender
@@ -246,8 +249,20 @@ const Chat: React.FC<Props> = ({ location }) => {
     let author = messageBundle.message.author;
     let timestamp = messageBundle.receipt.timestamp;
     let payload = messageBundle.message.payload;
-    let readlist =
-      messageBundle.receipt.status === "read" ? { key: timestamp } : undefined;
+    let readlist = messageBundle.receipt.status === "read" 
+      ? { key: timestamp } 
+      : undefined;
+
+    // get file bytes when rendering video messages
+    // TODO: will change to getting file bytes when played
+    if (
+      payload.type === "FILE"
+      && (payload as FilePayload).fileType === "VIDEO"
+      && fetchedFiles["u" + payload.fileHash] === undefined
+    ) {
+      dispatch(getFileBytes([base64ToUint8Array(payload.fileHash)]))
+    }
+
     return conversant.id !== author.slice(1) ? (
       <Me
         key={key}
@@ -282,7 +297,9 @@ const Chat: React.FC<Props> = ({ location }) => {
       <IonHeader>
         <IonToolbar>
           <IonButtons>
-            <IonBackButton defaultHref="/home" className="ion-no-padding" />
+            <IonButton onClick={() => handleOnBack()} className="ion-no-padding">
+              <IonIcon slot="icon-only" icon={arrowBackSharp} />
+            </IonButton>
             <IonAvatar className="ion-padding">
               <img src={personCircleOutline} alt={username} />
             </IonAvatar>

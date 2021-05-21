@@ -1,0 +1,11 @@
+.contacts {
+  font-size: large;
+}
+
+.close-label {
+  font-size: large;
+}
+
+.close-button {
+  --padding-end: 20px !important;
+}

@@ -1,27 +1,20 @@
-import { IonContent, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonLabel, IonList, IonLoading } from "@ionic/react";
-import { sadOutline } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
+import { IonContent, IonInfiniteScroll, IonInfiniteScrollContent, IonList, IonLoading } from "@ionic/react";
 import { useIntl } from "react-intl";
-import {
-  FilePayload,
-  isTextPayload,
-  Payload,
-} from "../../../../../redux/commons/types";
-import { getNextBatchGroupMessages } from "../../../../../redux/group/actions";
-import {
-  GroupMessageBatchFetchFilter,
-  GroupMessagesOutput,
-  GroupMessage,
-} from "../../../../../redux/group/types";
-import {
-  base64ToUint8Array,
-  monthToString,
-  useAppDispatch,
-} from "../../../../../utils/helpers";
-import FileIndex from "./FileIndex";
-import styles from "../../style.module.css"
 import { useSelector } from "react-redux";
+
+// Redux
+import { FilePayload, isTextPayload, Payload } from "../../../../../redux/commons/types";
+import { getNextBatchGroupMessages } from "../../../../../redux/group/actions";
+import { GroupMessageBatchFetchFilter, GroupMessagesOutput, GroupMessage } from "../../../../../redux/group/types";
 import { RootState } from "../../../../../redux/types";
+
+// Components
+import FileIndex from "./FileIndex";
+import EmptyFile from "./EmptyFile";
+
+import { base64ToUint8Array, monthToString, useAppDispatch } from "../../../../../utils/helpers";
+import styles from "./style.module.css"
 
 interface Props {
   groupId: string;
@@ -213,16 +206,8 @@ const File: React.FC<Props> = ({ groupId }) => {
           </IonInfiniteScroll>
         </IonList>
       </IonContent>
-    ) : (
-      <div className={styles["empty-media"]}>
-        <IonIcon icon={sadOutline} size={"large"}/>
-        <IonLabel className={styles["no-media-label"]}>
-          {intl.formatMessage({
-            id: "app.group-chat.files.no-files",
-          })}
-        </IonLabel>
-      </div>
-    )) : (
+    ) : <EmptyFile />
+  ) : (
     <IonLoading isOpen={loading} />
   );
 };

@@ -2,7 +2,7 @@ import { IonCard, IonItem } from "@ionic/react";
   import React from "react";
 import { FilePayload } from "../../../../../redux/commons/types";
 import FileView from "./FileView";
-import styles from "../../style.module.css";
+import styles from "./style.module.css";
   
   interface Props {
     file?: FilePayload;

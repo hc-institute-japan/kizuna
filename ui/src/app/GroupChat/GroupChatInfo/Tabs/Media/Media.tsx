@@ -1,27 +1,20 @@
-import { IonContent, IonGrid, IonIcon, IonInfiniteScroll, IonInfiniteScrollContent, IonLabel, IonLoading, IonRow, IonText } from "@ionic/react";
+import { IonContent, IonGrid, IonInfiniteScroll, IonInfiniteScrollContent, IonLoading, IonRow, IonSlide } from "@ionic/react";
 import React, {useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
-import {
-  FilePayload,
-  isTextPayload,
-  Payload,
-} from "../../../../../redux/commons/types";
-import { getNextBatchGroupMessages } from "../../../../../redux/group/actions";
-import {
-  GroupMessageBatchFetchFilter,
-  GroupMessagesOutput,
-  GroupMessage,
-} from "../../../../../redux/group/types";
-import {
-  base64ToUint8Array,
-  monthToString,
-  useAppDispatch,
-} from "../../../../../utils/helpers";
-import MediaIndex from "./MediaIndex";
-import styles from "../../style.module.css";
-import { sadOutline } from "ionicons/icons";
 import { useSelector } from "react-redux";
+
+// redux
+import { FilePayload, isTextPayload, Payload } from "../../../../../redux/commons/types";
+import { getNextBatchGroupMessages } from "../../../../../redux/group/actions";
+import { GroupMessageBatchFetchFilter, GroupMessagesOutput, GroupMessage } from "../../../../../redux/group/types";
 import { RootState } from "../../../../../redux/types";
+
+// utils
+import { base64ToUint8Array, monthToString, useAppDispatch } from "../../../../../utils/helpers";
+// components
+import MediaIndex from "./MediaIndex";
+import EmptyMedia from "./EmptyMedia";
+
 
 interface Props {
   groupId: string;
@@ -188,56 +181,49 @@ const Media: React.FC<Props> = ({ groupId }) => {
 
   return !loading ? (
     Object.keys(indexedFileMessages).length !== 0 ? (
-      <IonContent>
-        <IonGrid>
-          <IonRow>
-            {Object.keys(indexedFileMessages).map((month: string) => {
-              const fileMessages = indexedFileMessages[month];
-              let files: FilePayload[] = [];
-              fileMessages.forEach((fileMessage: GroupMessage) => {
-                if (!isTextPayload(fileMessage.payload)) {
-                  files.push(fileMessage.payload);
-                }
-              });
+      <IonSlide>
+        <IonContent>
+          <IonGrid>
+            <IonRow>
+              {Object.keys(indexedFileMessages).map((month: string) => {
+                const fileMessages = indexedFileMessages[month];
+                let files: FilePayload[] = [];
+                fileMessages.forEach((fileMessage: GroupMessage) => {
+                  if (!isTextPayload(fileMessage.payload)) {
+                    files.push(fileMessage.payload);
+                  }
+                });
 
-              return (
-                <MediaIndex
-                  onCompletion={() => {
-                    return true;
-                  }}
-                  key={month}
-                  index={month}
-                  fileMessages={fileMessages}
-                  files={files}
-                />
-              );
-            })}
-          </IonRow>
-          <IonRow>
-            <IonInfiniteScroll
-              disabled= {oldestFetched ? true: false}
-              threshold="10px"
-              ref={infiniteFileScroll}
-              position="bottom"
-              onIonInfinite={(e) => onScrollBottom(complete, fileMessages)}
-            >
-              <IonInfiniteScrollContent>
-                <IonLoading isOpen={fetchLoading} message={intl.formatMessage({id: "app.group-chat.media.fetching"})}/>
-              </IonInfiniteScrollContent>
-            </IonInfiniteScroll>
-          </IonRow>
-        </IonGrid>
-      </IonContent>
-    ) : (
-      <div className={styles["empty-media"]}>
-        <IonIcon icon={sadOutline} size={"large"} />
-        <IonLabel className={styles["no-media-label"]}>
-            {intl.formatMessage({
-              id: "app.group-chat.media.no-media",
-            })}
-        </IonLabel>
-      </div>
-    )
+                return (
+                  <MediaIndex
+                    onCompletion={() => {
+                      return true;
+                    }}
+                    key={month}
+                    index={month}
+                    fileMessages={fileMessages}
+                    files={files}
+                  />
+                );
+              })}
+            </IonRow>
+            <IonRow>
+              <IonInfiniteScroll
+                disabled= {oldestFetched ? true: false}
+                threshold="10px"
+                ref={infiniteFileScroll}
+                position="bottom"
+                onIonInfinite={(e) => onScrollBottom(complete, fileMessages)}
+              >
+                <IonInfiniteScrollContent>
+                  <IonLoading isOpen={fetchLoading} message={intl.formatMessage({id: "app.group-chat.media.fetching"})}/>
+                </IonInfiniteScrollContent>
+              </IonInfiniteScroll>
+            </IonRow>
+          </IonGrid>
+        </IonContent>
+      </IonSlide>
+    ) : <EmptyMedia/>
   ) : (
     <IonLoading isOpen={loading} />
   );
