@@ -11,37 +11,26 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import {
-  arrowBackSharp,
-  informationCircleOutline,
-  peopleCircleOutline,
-} from "ionicons/icons";
+import { arrowBackSharp, informationCircleOutline, peopleCircleOutline } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router";
+
+// Redux
+import { FilePayloadInput } from "../../redux/commons/types";
+import { getLatestGroupVersion, indicateGroupTyping, sendGroupMessage } from "../../redux/group/actions";
+import { GroupConversation, GroupMessage, GroupMessageInput } from "../../redux/group/types";
+import { fetchId } from "../../redux/profile/actions";
+import { RootState } from "../../redux/types";
+
+// Components
 import { ChatListMethods } from "../../components/Chat/types";
 import Typing from "../../components/Chat/Typing";
 import MessageInput from "../../components/MessageInput";
-import { FilePayloadInput } from "../../redux/commons/types";
-import {
-  getLatestGroupVersion,
-  indicateGroupTyping,
-  sendGroupMessage,
-} from "../../redux/group/actions";
-import {
-  GroupConversation,
-  GroupMessage,
-  GroupMessageInput,
-} from "../../redux/group/types";
-import { fetchId } from "../../redux/profile/actions";
-import { RootState } from "../../redux/types";
-import {
-  base64ToUint8Array,
-  Uint8ArrayToBase64,
-  useAppDispatch,
-} from "../../utils/helpers";
 import MessageList from "./MessageList";
+
+import { base64ToUint8Array, Uint8ArrayToBase64, useAppDispatch } from "../../utils/helpers";
 import styles from "./style.module.css";
 
 interface GroupChatParams {
@@ -126,11 +115,7 @@ const GroupChat: React.FC = () => {
     });
   };
 
-  const handleOnBack = () => {
-    history.push({
-      pathname: `/home`,
-    });
-  };
+  const handleOnBack = () => history.push({pathname: `/home`});
 
   const handleOnChange = (message: string, groupInfo: GroupConversation) => {
     if (message.length !== 0) {
@@ -217,10 +202,7 @@ const GroupChat: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons>
-            <IonButton
-              onClick={() => handleOnBack()}
-              className="ion-no-padding"
-            >
+            <IonButton onClick={() => handleOnBack()} className="ion-no-padding">
               <IonIcon slot="icon-only" icon={arrowBackSharp} />
             </IonButton>
             <IonAvatar className="ion-padding">
@@ -229,12 +211,7 @@ const GroupChat: React.FC = () => {
                 groupInfo!.avatar ? (
                   <img src={groupInfo!.avatar} alt={groupInfo!.name} />
                 ) : (
-                  <img
-                    className={styles.avatar}
-                    src={peopleCircleOutline}
-                    color="white"
-                    alt={groupInfo!.name}
-                  />
+                  <img src={peopleCircleOutline} color="white" alt={groupInfo!.name} />
                 )
               ) : (
                 <img src={peopleCircleOutline} alt={groupInfo!.name} />

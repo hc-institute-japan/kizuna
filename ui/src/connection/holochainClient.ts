@@ -14,6 +14,267 @@ let signalHandler: AppSignalCb = (signal) =>
     handleSignal(signal.data.payload.name, signal.data.payload.payload)
   );
 
+      let contacts = store.getState().contacts.contacts;
+      // At this point, username is non-nullable
+      let username = store.getState().profile.username!;
+      let undefinedProfiles: AgentPubKey[] = [];
+      let membersUsernames: { [key: string]: Profile } = {};
+      let groupMembers = [...groupData.members, groupData.creator];
+
+      // TODO: simplify this
+      getAgentId()
+        .then((res: any) => Uint8ArrayToBase64(res))
+        .then((myAgentIdBase64: any) => {
+          // to ensure that the Profile of members (including creator) are available
+          groupMembers.forEach((member: any) => {
+            if (contacts[member]) {
+              membersUsernames[member] = contacts[member];
+            } else if (member === myAgentIdBase64) {
+              membersUsernames[myAgentIdBase64] = {
+                id: myAgentIdBase64,
+                username,
+              };
+            } else {
+              undefinedProfiles.push(
+                Buffer.from(base64ToUint8Array(member).buffer)
+              );
+            }
+          });
+          if (undefinedProfiles?.length) {
+            callZome({
+              zomeName: ZOMES.USERNAME,
+              fnName: FUNCTIONS[ZOMES.USERNAME].GET_USERNAMES,
+              payload: undefinedProfiles,
+            }).then((res: any) => {
+              res.forEach((profile: any) => {
+                let base64 = Uint8ArrayToBase64(profile.agentId);
+                membersUsernames[base64] = {
+                  id: base64,
+                  username: profile.username,
+                };
+              });
+              store.dispatch<AddGroupAction>({
+                type: ADD_GROUP,
+                groupData,
+                membersUsernames,
+              });
+            });
+          }
+        });
+      break;
+    case "group_messsage_data": {
+      let payload = signal.data.payload.payload.payload;
+      let groupMessage: GroupMessage = {
+        groupMessageEntryHash: Uint8ArrayToBase64(payload.id),
+        groupEntryHash: Uint8ArrayToBase64(payload.content.groupHash),
+        author: Uint8ArrayToBase64(payload.content.sender),
+        payload: isTextPayload(payload.content.payload)
+          ? payload.content.payload
+          : {
+              type: "FILE",
+              fileName: payload.content.payload.payload.metadata.fileName,
+              fileSize: payload.content.payload.payload.metadata.fileSize,
+              fileType: isOther(payload.content.payload.payload.fileType)
+                ? "OTHER"
+                : isImage(payload.content.payload.payload.fileType)
+                ? "IMAGE"
+                : "VIDEO",
+              fileHash: Uint8ArrayToBase64(
+                payload.content.payload.payload.metadata.fileHash
+              ),
+              thumbnail: isOther(payload.content.payload.payload.fileType)
+                ? undefined
+                : payload.content.payload.payload.fileType.payload.thumbnail,
+            },
+        timestamp: payload.content.created,
+        // TODO: work on this
+        // replyTo: undefined,
+        readList: {},
+      };
+      store.dispatch<SetGroupMessageAction>({
+        type: SET_GROUP_MESSAGE,
+        groupMessage,
+      });
+      break;
+    }
+    case "group_typing_detail": {
+      let payload = signal.data.payload.payload.payload;
+
+      let contacts = store.getState().contacts.contacts;
+      let indicatedBy: Profile;
+      let undefinedProfiles: AgentPubKey[] = [];
+
+      getAgentId()
+        .then((res: any) => Uint8ArrayToBase64(res))
+        .then((myAgentIdBase64: any) => {
+          let memberId = Uint8ArrayToBase64(payload.indicatedBy);
+          if (contacts[memberId] && contacts[memberId].id !== myAgentIdBase64) {
+            indicatedBy = contacts[memberId];
+          } else if (memberId === myAgentIdBase64) {
+          } else {
+            undefinedProfiles.push(payload.indicatedBy);
+          }
+          if (undefinedProfiles?.length) {
+            callZome({
+              zomeName: ZOMES.USERNAME,
+              fnName: FUNCTIONS[ZOMES.USERNAME].GET_USERNAMES,
+              payload: undefinedProfiles,
+            }).then((res: any) => {
+              res.forEach((profile: any) => {
+                let base64 = Uint8ArrayToBase64(profile.agentId);
+                indicatedBy = {
+                  id: base64,
+                  username: profile.username,
+                };
+              });
+
+              let GroupTypingDetail: GroupTypingDetail = {
+                groupId: Uint8ArrayToBase64(payload.groupId),
+                indicatedBy: indicatedBy,
+                isTyping: payload.isTyping,
+              };
+              store.dispatch<SetGroupTyingIndicator>({
+                type: SET_GROUP_TYPING_INDICATOR,
+                GroupTyingIndicator: GroupTypingDetail,
+              });
+            });
+          } else if (indicatedBy) {
+            let GroupTypingDetail: GroupTypingDetail = {
+              groupId: Uint8ArrayToBase64(payload.groupId),
+              indicatedBy: indicatedBy,
+              isTyping: payload.isTyping,
+            };
+            store.dispatch<SetGroupTyingIndicator>({
+              type: SET_GROUP_TYPING_INDICATOR,
+              GroupTyingIndicator: GroupTypingDetail,
+            });
+          }
+        });
+      break;
+    }
+    case "group_message_read": {
+      let payload = signal.data.payload.payload.payload;
+
+      store.dispatch<SetGroupReadMessage>({
+        type: SET_GROUP_READ_MESSAGE,
+        GroupReadMessage: {
+          groupId: Uint8ArrayToBase64(payload.groupId),
+          messageIds: payload.messageIds.map((messageId: Uint8Array) =>
+            Uint8ArrayToBase64(messageId)
+          ),
+          reader: Uint8ArrayToBase64(payload.reader),
+          timestamp: payload.timestamp,
+        },
+      });
+      break;
+    }
+    case "RECEIVE_P2P_MESSAGE":
+      let receivedMessage = signal.data.payload.message;
+
+      const [messageTuple, receiptTuple] = receivedMessage;
+      const [messageID, message] = messageTuple;
+      const [receiptID, receipt] = receiptTuple!;
+
+      callZome({
+        zomeName: ZOMES.P2PMESSAGE,
+        fnName: FUNCTIONS[ZOMES.P2PMESSAGE].GET_LATEST_MESSAGES,
+        payload: 1,
+      }).then((res: any) => {
+        let messageHash = "u" + Uint8ArrayToBase64(messageID);
+        let receiptHash = "u" + Uint8ArrayToBase64(receiptID);
+
+        var payload;
+        switch (message.payload.type) {
+          case "TEXT":
+            payload = message.payload;
+            break;
+          case "FILE":
+            payload = {
+              type: "FILE",
+              fileName: message.payload.payload.metadata.fileName,
+              fileSize: message.payload.payload.metadata.fileSize,
+              fileType: message.payload.payload.fileType.type,
+              fileHash: Uint8ArrayToBase64(message.payload.payload.metadata.fileHash),
+              thumbnail:
+                message.payload.payload.fileType.type != "OTHER"
+                  ? message.payload.payload.fileType.payload.thumbnail
+                  : null,
+            };
+            break;
+          default:
+            break;
+        }
+
+        let p2pMessage: P2PMessage = {
+          p2pMessageEntryHash: messageHash,
+          author: "u" + Uint8ArrayToBase64(message.author),
+          receiver: "u" + Uint8ArrayToBase64(message.receiver),
+          payload: payload,
+          timestamp: timestampToDate(message.timeSent),
+          replyTo: message.replyTo,
+          receipts: [receiptHash],
+        };
+
+        let messageEntryHash = "u" + Uint8ArrayToBase64(receipt.id[0]);
+        let p2pReceipt: P2PMessageReceipt = {
+          p2pMessageReceiptEntryHash: "u" + Uint8ArrayToBase64(receiptID),
+          p2pMessageEntryHashes: [messageEntryHash],
+          timestamp: timestampToDate(receipt.status.timestamp),
+          status: receipt.status.status,
+        };
+
+        store.dispatch({
+          type: APPEND_MESSAGE,
+          state: {
+            message: p2pMessage,
+            receipt: p2pReceipt,
+            key: p2pMessage.author,
+          },
+        });
+      });
+      break;
+    case "RECEIVE_P2P_RECEIPT":
+      let receiptHash = Object.keys(signal.data.payload.receipt)[0];
+
+      let messageIDs: string[] = [];
+      signal.data.payload.receipt[receiptHash].id.forEach((id: Uint8Array) => {
+        messageIDs.push("u" + Uint8ArrayToBase64(id));
+      });
+
+      let p2pReceipt = {
+        p2pMessageReceiptEntryHash: receiptHash,
+        p2pMessageEntryHashes: messageIDs,
+        timestamp: timestampToDate(
+          signal.data.payload.receipt[receiptHash].status.timestamp
+        ),
+        status: signal.data.payload.receipt[receiptHash].status.status,
+      };
+
+      store.dispatch({
+        type: APPEND_RECEIPT,
+        state: p2pReceipt,
+      });
+      break;
+    case "TYPING_P2P":
+      let contacts2 = store.getState().contacts.contacts;
+      let agentHash = Uint8ArrayToBase64(signal.data.payload.agent);
+      let usernameTyping = contacts2[agentHash].username;
+      store.dispatch({
+        type: SET_TYPING,
+        state: {
+          profile: {
+            id: agentHash,
+            username: usernameTyping,
+          },
+          isTyping: signal.data.payload.is_typing,
+        },
+      });
+      break;
+    default:
+      break;
+  }
+};
+
 const init: () => any = async () => {
   if (client) {
     return client;

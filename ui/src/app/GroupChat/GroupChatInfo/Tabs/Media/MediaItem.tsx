@@ -3,7 +3,7 @@ import React from "react";
 import { FilePayload } from "../../../../../redux/commons/types";
 import ImageView from "../../../../../components/Chat/File/ImageView/index";
 import VideoView from "../../../../../components/Chat/File/VideoView";
-import styles from "../../style.module.css";
+import styles from "./style.module.css";
 
 interface Props {
   file?: FilePayload;

@@ -19,7 +19,7 @@ import Conversation from "../../components/Conversation";
 import Toolbar from "../../components/Toolbar";
 import { isTextPayload } from "../../redux/commons/types";
 import { GroupConversation, GroupMessage } from "../../redux/group/types";
-import { fetchId, fetchProfileFromUsername } from "../../redux/profile/actions";
+import { fetchId } from "../../redux/profile/actions";
 import { RootState } from "../../redux/types";
 import {
   Uint8ArrayToBase64,

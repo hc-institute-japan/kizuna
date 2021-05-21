@@ -25,13 +25,13 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
 
       // copy state
       let stateToSet = state;
-      let { conversations, messages, receipts, files, typing } = action.state;
+      let { conversations, messages, receipts } = action.state;
 
       // iterate through conversations
       for (const [key, value] of Object.entries(conversations)) {
         let existing = state.conversations[key];
         // if conversation is not yet existing, create new
-        if (existing == undefined) stateToSet.conversations[key] = value
+        if (existing === undefined) stateToSet.conversations[key] = value
         // else simply append messages to the array value
         else stateToSet.conversations[key] = { messages: [...new Set(existing.messages.concat(value.messages))]}
       };
@@ -73,12 +73,12 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
       let receiptHash = action.state.receipt.p2pMessageReceiptEntryHash;
 
       // if conversation is not yet existing, create new
-      if (stateToAppendMessage.conversations[key] == undefined) stateToAppendMessage.conversations[key]={messages: [messageHash]}
+      if (stateToAppendMessage.conversations[key] === undefined) stateToAppendMessage.conversations[key]={messages: [messageHash]}
       // else simply append messages to the array value
       else stateToAppendMessage.conversations[key]={messages: [messageHash, ...stateToAppendMessage.conversations[key].messages]}
       
       // create a new file entry (allows duplicates)
-      if (action.state.file != undefined) stateToAppendMessage.files[action.state.file.fileHash] = action.state.file.fileBytes;
+      if (action.state.file !== undefined) stateToAppendMessage.files[action.state.file.fileHash] = action.state.file.fileBytes;
 
       // update state
       stateToAppendMessage = {
@@ -116,7 +116,7 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
 
       // iterate over the hashes in a receipt (single receipt can correspond to multiple messages)
       action.state.p2pMessageEntryHashes.forEach((hash) => {
-        if (stateToAppendReceipt.messages[hash] != undefined) {
+        if (stateToAppendReceipt.messages[hash] !== undefined) {
           stateToAppendReceipt.messages[hash].receipts.push(receiptHashToAppend)
         }
       })
@@ -168,7 +168,7 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
           ...stateToSetFiles.typing
         }
       }
-      // console.log("reducer file set", ret4)
+      console.log("reducer file set", stateToSetFiles)
       return stateToSetFiles
       
     case SET_TYPING:
@@ -180,7 +180,7 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
       };
       let status = action.state.isTyping;
 
-      if (stateToAppendTyping.typing[id] == undefined && status) stateToAppendTyping.typing[id] = profile
+      if (stateToAppendTyping.typing[id] === undefined && status) stateToAppendTyping.typing[id] = profile
       else {
         if (!status) delete stateToAppendTyping.typing[id]
       }

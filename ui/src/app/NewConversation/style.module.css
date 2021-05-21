@@ -3,10 +3,6 @@
   height: 100%;
 }
 
-.header::after {
-  background-image: none !important;
-}
-
 .contacts-list {
   background: var(--ion-background-color) !important;
   flex: 1;
@@ -23,16 +19,4 @@
 .contacts-list > ion-item:hover {
   --background: var(--ion-item-background) !important;
   cursor: pointer;
-}
-
-.recipients {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  width: 100%;
-}
-
-.to {
-  font-size: 0.9rem;
-  color: var(--ion-color-medium-shade);
 }

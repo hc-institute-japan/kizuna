@@ -1,6 +1,4 @@
-import { IonText } from "@ionic/react";
 import React from "react";
-import { useIntl } from "react-intl";
 import { FilePayload } from "../../../redux/commons/types";
 import FileView from "./FileView";
 import ImageView from "./ImageView";
