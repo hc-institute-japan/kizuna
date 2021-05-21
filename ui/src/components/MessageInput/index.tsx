@@ -143,7 +143,6 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
         <IonTextarea
           value={message}
           onKeyUp={(event) => {
-            console.log(event.key);
             if (
               onSend &&
               event.key === "Enter" &&

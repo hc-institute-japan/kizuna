@@ -8,6 +8,12 @@ interface FunctionNameType {
   };
 }
 
+interface SignalNameType {
+  [key: string]: {
+    [key: string]: string;
+  };
+}
+
 export const ZOMES: ZomeNameType = {
   USERNAME: "username",
   PREFERENCE: "preference",
@@ -15,6 +21,19 @@ export const ZOMES: ZomeNameType = {
   CONTACTS: "contacts",
   GROUP: "group",
   AGGREGATOR: "aggregator",
+};
+export const SIGNALS: SignalNameType = {
+  [ZOMES.GROUP]: {
+    ADDED_TO_GROUP: "added_to_group",
+    GROUP_MESSAGE_DATA: "group_messsage_data",
+    GROUP_TYPING_DETAIL: "group_typing_detail",
+    GROUP_MESSAGE_READ: "group_message_read",
+  },
+  [ZOMES.P2PMESSAGE]: {
+    RECEIVE_P2P_MESSAGE: "RECEIVE_P2P_MESSAGE",
+    RECEIVE_P2P_RECEIPT: "RECEIVE_P2P_RECEIPT",
+    TYPING_P2P: "TYPING_P2P",
+  },
 };
 
 export const FUNCTIONS: FunctionNameType = {
@@ -68,6 +87,6 @@ export const FUNCTIONS: FunctionNameType = {
     GET_ALL_MESSAGES: "get_all_messages",
     READ_MESSAGE: "read_message",
     GET_FILE_BYTES: "get_file_bytes",
-    TYPING: "typing"
-  }
+    TYPING: "typing",
+  },
 };
