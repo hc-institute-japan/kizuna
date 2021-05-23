@@ -25,7 +25,7 @@ export const ZOMES: ZomeNameType = {
 export const SIGNALS: SignalNameType = {
   [ZOMES.GROUP]: {
     ADDED_TO_GROUP: "added_to_group",
-    GROUP_MESSAGE_DATA: "group_messsage_data",
+    GROUP_MESSAGE_DATA: "group_message_data",
     GROUP_TYPING_DETAIL: "group_typing_detail",
     GROUP_MESSAGE_READ: "group_message_read",
   },
