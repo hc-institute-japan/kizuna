@@ -9,7 +9,7 @@ interface Props {
   isOpen: boolean;
   onCancel: () => void;
   groupData: GroupConversation;
-  onSave: (x? : any) => void;
+  onSave: (newGroupName : string) => void;
   loading: boolean;
 }
 
