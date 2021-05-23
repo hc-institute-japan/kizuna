@@ -91,7 +91,7 @@ export const createGroup = (
   let myAgentId = await getAgentId();
   let groupMembers = [...groupData.members, groupData.creator];
 
-  let membersUsernames: {
+  let membersProfile: {
     [key: string]: Profile;
   } = await fetchUsernameOfMembers(
     state,
@@ -103,7 +103,7 @@ export const createGroup = (
   dispatch<AddGroupAction>({
     type: ADD_GROUP,
     groupData,
-    membersUsernames,
+    membersProfile,
   });
 
   return groupData;
