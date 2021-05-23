@@ -8,4 +8,5 @@
 
 .close-button {
   --padding-end: 20px !important;
+  text-transform: none;
 }
