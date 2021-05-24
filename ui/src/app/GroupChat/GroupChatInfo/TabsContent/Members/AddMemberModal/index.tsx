@@ -28,7 +28,7 @@ interface Props {
   setMembers: (profiles: Profile[]) => void;
 }
 
-const AddContactModal: React.FC<Props> = ({ isOpen, setIsOpen, onCancel, contacts, groupId, groupRevisionId, setLoading, myAgentId, members, setMembers }) => {
+const AddMemberModal: React.FC<Props> = ({ isOpen, setIsOpen, onCancel, contacts, groupId, groupRevisionId, setLoading, myAgentId, members, setMembers }) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const [filter, setFilter] = useState<string>("");
@@ -74,10 +74,7 @@ const AddContactModal: React.FC<Props> = ({ isOpen, setIsOpen, onCancel, contact
 
   return (
     <IonModal isOpen={isOpen}>
-      <AddMemberHeader
-        onChange={(e) => setFilter(e.detail.value!)}
-        onCancel={onCancel}
-      />
+      <AddMemberHeader onChange={(e) => setFilter(e.detail.value!)} onCancel={onCancel} />
       {!contacts.length ? 
         <IonContent>
           {filter.length === 0 ? 
@@ -85,14 +82,7 @@ const AddContactModal: React.FC<Props> = ({ isOpen, setIsOpen, onCancel, contact
             <IonList className={styles["contacts-list"]}>
               {Object.keys(indexedContacts).map((char) => {
                 const contacts = indexedContacts[char];
-                return (
-                  <AddMemberIndex
-                  onCompletion={onCompletion}
-                  key={char}
-                  index={char}
-                  contacts={contacts}
-                />
-                );
+                return <AddMemberIndex onCompletion={onCompletion} key={char} index={char} contacts={contacts} />
               })}
             </IonList>
           ) : (
@@ -126,4 +116,4 @@ const AddContactModal: React.FC<Props> = ({ isOpen, setIsOpen, onCancel, contact
   );
 };
 
-export default AddContactModal;
+export default AddMemberModal;

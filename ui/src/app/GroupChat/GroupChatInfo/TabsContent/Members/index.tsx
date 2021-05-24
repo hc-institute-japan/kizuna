@@ -52,24 +52,7 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
     (state: RootState) => state.groups.conversations[groupId]
   );
 
-  useEffect(() => {
-    dispatch(fetchId()).then((res: AgentPubKey | null) => {
-      if (res) setMyAgentId(Uint8ArrayToBase64(res));
-    });
-  }, [dispatch]);
 
-  useEffect(() => {
-    let membersProfile: Profile[] = [];
-    let members = [...groupData.members, groupData.creator];
-
-    // We have to account for creator and members here
-    members.forEach((member: string) => {
-      if (groupMembers[member]) membersProfile.push(groupMembers[member]);
-    });
-
-    setMembers(membersProfile);
-    setLoading(false);
-  }, [groupData, groupMembers]);
 
   /* Handlers */
   const handleRemoveMembers = (memberProfile: Profile) => {
@@ -106,6 +89,26 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
     });
   };
 
+  /* Use Effects */
+  useEffect(() => {
+    dispatch(fetchId()).then((res: AgentPubKey | null) => {
+      if (res) setMyAgentId(Uint8ArrayToBase64(res));
+    });
+  }, [dispatch]);
+
+  useEffect(() => {
+    let membersProfile: Profile[] = [];
+    let members = [...groupData.members, groupData.creator];
+
+    // We have to account for creator and members here
+    members.forEach((member: string) => {
+      if (groupMembers[member]) membersProfile.push(groupMembers[member]);
+    });
+
+    setMembers(membersProfile);
+    setLoading(false);
+  }, [groupData, groupMembers]);
+
   /* Renderer */
   const renderAddMemberButton = (groupData: GroupConversation) => {
     return (myAgentId === groupData.creator) ? (
@@ -115,6 +118,38 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
       </IonItem>
     ) : null
   }
+
+  const renderGroupMembers = (members: Profile[]) => members.map((member: any) => member.id !== groupData.creator ? 
+    (
+      <IonItemSliding>
+        <IonItem lines="none" key={member.id}>
+          <IonLabel className={styles.memberName} key={member.id}>
+            {member.username}
+          </IonLabel>
+          <IonText>
+            {intl.formatMessage({id: "app.group-chat.member-role"})}
+          </IonText>
+        </IonItem>
+        <IonItemOptions side={"end"}>
+          <IonItemOption onClick={() => handleRemoveMembers(member)} color="danger">
+            {intl.formatMessage({id: "app.group-chat.remove-member"})}
+          </IonItemOption>
+        </IonItemOptions>
+      </IonItemSliding>
+    ) : (
+      <IonItemSliding>
+        <IonItem lines="none" key={member.id}>
+          <IonLabel className={styles.memberName}>
+            <h3>
+              {member.username}
+              <br />
+              {intl.formatMessage({id: "app.group-chat.admin-role"})}
+            </h3>
+          </IonLabel>
+        </IonItem>
+      </IonItemSliding>
+    )
+  );
 
   return !loading ? (
     <>
@@ -134,38 +169,7 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
       </IonItemGroup>
 
       <IonItemGroup>
-        {members.map((member: any) => {
-          return member.id !== groupData.creator ? (
-            <IonItemSliding>
-              <IonItem lines="none" key={member.id}>
-                <IonLabel className={styles.memberName} key={member.id}>
-                  {member.username}
-                  {intl.formatMessage({id: "app.group-chat.member-role"})}
-                </IonLabel>
-              </IonItem>
-              <IonItemOptions side={"end"}>
-                <IonItemOption
-                  onClick={() => handleRemoveMembers(member)}
-                  color="danger"
-                >
-                  {intl.formatMessage({id: "app.group-chat.remove-member"})}
-                </IonItemOption>
-              </IonItemOptions>
-            </IonItemSliding>
-          ) : (
-            <IonItemSliding>
-              <IonItem lines="none" key={member.id}>
-                <IonLabel className={styles.memberName}>
-                  <h3>
-                    {member.username}
-                    <br />
-                    {intl.formatMessage({id: "app.group-chat.admin-role"})}
-                  </h3>
-                </IonLabel>
-              </IonItem>
-            </IonItemSliding>
-          ) ;
-        })}
+        {renderGroupMembers(members)}
       </IonItemGroup>
         {/* This is for members and admin*/}
 

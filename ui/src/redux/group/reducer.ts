@@ -51,7 +51,7 @@ const reducer = (
       let members = state.members;
       members = {
         ...members,
-        ...action.membersUsernames,
+        ...action.membersProfile,
       };
       return { ...state, conversations: groupConversations, members };
     }
