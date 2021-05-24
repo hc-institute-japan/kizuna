@@ -119,7 +119,8 @@ const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
           threshold="0px"
           ref={infiniteScroll}
           position="top"
-          onIonInfinite={(e) => onScrollTop(complete, e)}
+          /* Adding a 1 second timeout just because messages are being fetched too freakin' fast locally :D */
+          onIonInfinite={(e) => setTimeout(() => onScrollTop(complete, e), 1000)}
         >
           <IonInfiniteScrollContent loadingSpinner="crescent" />
         </IonInfiniteScroll>
