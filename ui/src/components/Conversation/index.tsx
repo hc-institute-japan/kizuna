@@ -7,7 +7,7 @@ import {
 } from "@ionic/react";
 import { filter, peopleCircleOutline, personCircleOutline } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
-import { useIntl } from "react-intl";
+import { MessageFormatError, useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import { getAgentId } from "../../redux/profile/actions";
@@ -17,9 +17,6 @@ import { RootState } from "../../redux/types";
 import { Uint8ArrayToBase64, useAppDispatch } from "../../utils/helpers";
 import { Message } from "../../utils/types";
 import styles from "./style.module.css";
-
-import {P2PMessage} from "../../redux/p2pmessages/types";
-import {readMessage} from "../../redux/p2pmessages/actions";
 
 interface Props {
   isGroup: boolean;
@@ -38,7 +35,6 @@ const Conversation: React.FC<Props> = ({
   const { src, name, messages } = content;
   const [badgeCount, setBadgeCount] = useState(0);
 
-  const [unread, setUnread] = useState<P2PMessage[]>([]);
   const [latestMessageDetail, setLatestMessageDetail] = useState<{
     message: string;
     fileName?: string;
@@ -98,8 +94,8 @@ const Conversation: React.FC<Props> = ({
       } else {
         const { conversations, messages, receipts } = state.p2pmessages;
         const conversation = conversations[groupId].messages;
-        var unreadCounter = 0;
-        const filteredMessages = conversation.map((messageID) => {
+        let unreadCounter = 0;
+        conversation.map((messageID) => {
           let message = messages[messageID];
           let receiptIDs = message.receipts;
           let filteredReceipts = receiptIDs.map((receiptID) => {
@@ -114,7 +110,7 @@ const Conversation: React.FC<Props> = ({
             return 0;
           });
           let latestReceipt = filteredReceipts[0];
-          if (latestReceipt.status != "read") unreadCounter = unreadCounter + 1;
+          if (latestReceipt.status !== "read" && message.author === groupId ) unreadCounter = unreadCounter + 1;
         });
         dispatch(getAgentId()).then((id: any) => {
           if (id) setBadgeCount(unreadCounter);
