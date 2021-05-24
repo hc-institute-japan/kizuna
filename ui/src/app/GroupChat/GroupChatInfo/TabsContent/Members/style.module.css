@@ -1,11 +1,15 @@
+.member-page {
+  height: 100%;
+  width: 100%
+}
 .icon {
   padding-right: 1%;
 }
 
-.memberTitle {
+.member-title {
   font-size: x-large;
 }
 
-.memberName {
+.member-name {
   font-size: x-large;
 }

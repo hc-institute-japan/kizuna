@@ -53,14 +53,14 @@ const GroupChat: React.FC = () => {
   const [sendingLoading, setSendingLoading] = useState<boolean>(false);
   const [message, setMessage] = useState("");
 
-  // Selectors
+  /* Selectors */
   const groupData = useSelector(
     (state: RootState) => state.groups.conversations[group]
   );
 
   const typing = useSelector((state: RootState) => state.groups.typing);
 
-  // Handlers
+  /* Handlers */
   const handleOnSend = () => {
     let inputs: GroupMessageInput[] = [];
     if (files.length) {
@@ -138,8 +138,8 @@ const GroupChat: React.FC = () => {
     return setMessage(message);
   }
 
+  /* UseEffects */
   useEffect(() => {
-    // setLoading(true);
     dispatch(fetchId()).then((res: AgentPubKey | null) => {
       if (res) setMyAgentId(Uint8ArrayToBase64(res));
     });

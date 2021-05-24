@@ -1,21 +1,8 @@
 import { AgentPubKey } from "@holochain/conductor-api";
 import React, { useEffect, useState } from "react";
-import {
-  IonContent,
-  IonIcon,
-  IonItem,
-  IonItemGroup,
-  IonItemOption,
-  IonItemOptions,
-  IonItemSliding,
-  IonLabel,
-  IonList,
-  IonLoading,
-  IonSlide,
-  IonText,
-} from "@ionic/react";
 import { useIntl } from "react-intl";
-import { peopleOutline, personAddOutline } from "ionicons/icons";
+import { IonIcon, IonItem, IonItemGroup, IonLabel, IonLoading } from "@ionic/react";
+import { peopleOutline, personAddOutline, removeCircleOutline } from "ionicons/icons";
 
 // Redux
 import { Profile } from "../../../../../redux/profile/types";
@@ -40,34 +27,26 @@ interface Props {
 const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
+
+  /* Local state */
   const [myAgentId, setMyAgentId] = useState("");
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [toast, setToast] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [members, setMembers] = useState<Profile[]>([]);
   const [errMsg, setErrMsg] = useState<string>("");
+
+  /* Selectors */
   const contacts = useSelector((state: RootState) => state.contacts.contacts);
   const groupMembers = useSelector((state: RootState) => state.groups.members);
   const groupData = useSelector(
     (state: RootState) => state.groups.conversations[groupId]
   );
 
-
-
   /* Handlers */
   const handleRemoveMembers = (memberProfile: Profile) => {
     setLoading(true);
-
-    // display error when non-admin members are trying to remove members
-    if (myAgentId !== groupData.creator) {
-      setLoading(false);
-      setErrMsg(
-        intl.formatMessage({ id: "app.group-chat.non-admin-cannot-remove" })
-      );
-      setToast(true);
-      return null;
-    }
-
+    /* err if member is being removed when total member <= 2 */
     if (groupData.members.length <= 2) {
       setLoading(false);
       setErrMsg(
@@ -100,7 +79,7 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
     let membersProfile: Profile[] = [];
     let members = [...groupData.members, groupData.creator];
 
-    // We have to account for creator and members here
+    // We include the creator in the membersProfile here
     members.forEach((member: string) => {
       if (groupMembers[member]) membersProfile.push(groupMembers[member]);
     });
@@ -110,6 +89,15 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
   }, [groupData, groupMembers]);
 
   /* Renderer */
+  const renderNoOfMembers = () => (
+    <IonItem lines="none">
+      <IonIcon className={styles.icon} icon={peopleOutline}></IonIcon>
+      <IonLabel>
+      {intl.formatMessage({id: "app.group-chat.members"}, {length: members.length})}
+      </IonLabel>
+    </IonItem>
+  );
+
   const renderAddMemberButton = (groupData: GroupConversation) => {
     return (myAgentId === groupData.creator) ? (
       <IonItem lines="none" button onClick={() => setIsOpen(true)}>
@@ -117,61 +105,71 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
         <IonLabel>{intl.formatMessage({id: "app.group-chat.add-members"})}</IonLabel>
       </IonItem>
     ) : null
-  }
+  };
 
-  const renderGroupMembers = (members: Profile[]) => members.map((member: any) => member.id !== groupData.creator ? 
-    (
-      <IonItemSliding>
-        <IonItem lines="none" key={member.id}>
-          <IonLabel className={styles.memberName} key={member.id}>
-            {member.username}
-          </IonLabel>
-          <IonText>
-            {intl.formatMessage({id: "app.group-chat.member-role"})}
-          </IonText>
-        </IonItem>
-        <IonItemOptions side={"end"}>
-          <IonItemOption onClick={() => handleRemoveMembers(member)} color="danger">
-            {intl.formatMessage({id: "app.group-chat.remove-member"})}
-          </IonItemOption>
-        </IonItemOptions>
-      </IonItemSliding>
-    ) : (
-      <IonItemSliding>
-        <IonItem lines="none" key={member.id}>
-          <IonLabel className={styles.memberName}>
-            <h3>
-              {member.username}
-              <br />
-              {intl.formatMessage({id: "app.group-chat.admin-role"})}
-            </h3>
-          </IonLabel>
-        </IonItem>
-      </IonItemSliding>
-    )
-  );
+  /* This is a version of remove member that is a button */
+  const renderRemoveMemberButton = (member: Profile) => {
+    /*
+      - check that the agent is a creator 
+      - check also that the remove button will not appear to self
+    */
+    return (myAgentId === groupData.creator && member.id !== groupData.creator) ? (
+      <IonItem lines="none" slot="end"  button onClick={() => handleRemoveMembers(member)}>
+        <IonIcon color="danger" icon={removeCircleOutline}/>
+      </IonItem>
+    ) : null
+  };
+
+  /* This is a version of remove member that is a slide (currently unused) */
+  // const renderRemoveMemberSlide = (member: Profile) => {
+  //   return (myAgentId === groupData.creator && member.id !== groupData.creator) ? (
+  //     <IonItemOptions side={"end"}>
+  //       <IonItemOption onClick={() => handleRemoveMembers(member)} color="danger">
+  //         {intl.formatMessage({id: "app.group-chat.remove-member"})}
+  //       </IonItemOption>
+  //     </IonItemOptions>
+  //   ) : null
+  // }
+
+  /*
+    Currently, we are rending a button for remove member feature
+    TODO: Discuss and decide whether we will use button or slide for remove member
+    What would be nice is for us to use button for browser and slide for mobile app maybe.
+  */
+  const renderGroupMembers = (members: Profile[]) => members.map((member: Profile) => {
+    let isCreator = member.id === groupData.creator;
+    /* 
+      Uncomment IonItemSliding and renderRemoveMemberSlide(member) and comment out 
+      renderRemoveMemberButton(member) to change to slide
+    */
+    return (
+      // <IonItemSliding>
+      <IonItem lines="none" key={member.id}>
+        <IonLabel className={styles["member-name"]}>
+          {member.username}
+          {/* TOOD: remove this <br /> and find a less uglier way of breaking line */}
+          <br/>
+          {isCreator ? intl.formatMessage({id: "app.group-chat.admin-role"}) : intl.formatMessage({id: "app.group-chat.member-role"})}
+        </IonLabel>
+        {renderRemoveMemberButton(member)}
+        {/* {renderRemoveMemberSlide(member)} */}
+      </IonItem>
+      // </IonItemSliding>
+    );
+  });
 
   return !loading ? (
     <>
-      <IonItemGroup>
-        <IonItem lines="none">
-          <IonIcon className={styles.icon} icon={peopleOutline}></IonIcon>
-          <IonLabel>
-            {intl.formatMessage({id: "app.group-chat.members"}, {length: members.length})}
-          </IonLabel>
-        </IonItem>
-
+      <IonItemGroup className={styles["member-page"]}>
+        {renderNoOfMembers()}
         {renderAddMemberButton(groupData)}
 
-        <IonItem lines="none" className={styles.memberTitle}>
+        <IonItem lines="none" className={styles["member-title"]}>
           <h3>{intl.formatMessage({id: "app.group-chat.members-label"})}</h3>
         </IonItem>
-      </IonItemGroup>
 
-      <IonItemGroup>
         {renderGroupMembers(members)}
       </IonItemGroup>
-        {/* This is for members and admin*/}
 
       <AddMemberModal
         contacts={contacts}
