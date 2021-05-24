@@ -24,6 +24,7 @@ import React, {
   useRef,
   useState,
 } from "react";
+import { useIntl } from "react-intl";
 import styles from "./style.module.css";
 
 interface Props {
@@ -33,6 +34,7 @@ interface Props {
 }
 
 const VideoPlayerModal: React.FC<Props> = ({ open, src, download }) => {
+  const intl = useIntl();
   const [isOpen, setIsOpen] = open;
   const [popover, setPopover] = useState({ isOpen: false, event: undefined });
   const footer = useRef<HTMLIonToolbarElement>(null);
@@ -159,12 +161,14 @@ const VideoPlayerModal: React.FC<Props> = ({ open, src, download }) => {
           <IonList>
             {download ? (
               <IonItem
+                lines="none"
+                button
                 onClick={() => {
                   download();
                   setPopover({ isOpen: false, event: undefined });
                 }}
               >
-                <IonLabel>Download</IonLabel>
+                <IonLabel>{intl.formatMessage({id: "components.chat.media-modal-download"})}</IonLabel>
               </IonItem>
             ) : null}
           </IonList>

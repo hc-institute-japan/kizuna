@@ -75,7 +75,7 @@
   "app.settings.read-receipt-label": "Read Receipt",
   "app.settings.typing-indicator-label": "Typing Indicator",
   "components.chat.chat-list.today": "Today",
-  "components.chat.image-modal-download": "Download",
+  "components.chat.media-modal-download": "Download",
   "components.conversation.me-file-string": "You sent {fileName}",
   "components.conversation.other-file-string": "{name} has sent {fileName}",
   "components.message-input.over-size-limit": "{fileName} exceeds the 15mb file limit",
