@@ -40,7 +40,6 @@
   "app.group-chat.members-label": "メンバー",
   "app.group-chat.minimum-member-required-reached": "グループのメンバーは最低３名です",
   "app.group-chat.no-member-to-add": "追加できるユーザーがいません",
-  "app.group-chat.non-admin-cannot-remove": "グループ管理者以外はメンバーを外せません",
   "app.group-chat.oldest-message-fetched": "全てのメッセージを取得しました",
   "app.group-chat.remove-member": "グループ退会",
   "app.group-chat.sending": "送信中...",
