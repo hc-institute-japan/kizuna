@@ -118,41 +118,23 @@ const GroupChat: React.FC = () => {
   const handleOnBack = () => history.push({pathname: `/home`});
 
   const handleOnChange = (message: string, groupInfo: GroupConversation) => {
-    if (message.length !== 0) {
-      // fetch agent's own AgentPubKey
-      dispatch(fetchId()).then((res: AgentPubKey | null) => {
-        // dispatch an indication of typing
-        dispatch(
-          indicateGroupTyping({
-            groupId: base64ToUint8Array(groupInfo.originalGroupEntryHash),
-            indicatedBy: res!,
-            members: [
-              ...groupInfo.members.map((member) =>
-                Buffer.from(base64ToUint8Array(member).buffer)
-              ),
-              Buffer.from(base64ToUint8Array(groupInfo.creator).buffer),
-            ],
-            isTyping: true,
-          })
-        );
-      });
-    } else {
-      dispatch(fetchId()).then((res: AgentPubKey | null) => {
-        dispatch(
-          indicateGroupTyping({
-            groupId: base64ToUint8Array(groupInfo.originalGroupEntryHash),
-            indicatedBy: res!,
-            members: [
-              ...groupInfo.members.map((member) =>
-                Buffer.from(base64ToUint8Array(member).buffer)
-              ),
-              Buffer.from(base64ToUint8Array(groupInfo.creator).buffer),
-            ],
-            isTyping: false,
-          })
-        );
-      });
-    }
+    dispatch(fetchId()).then((myAgentId: AgentPubKey | null) => {
+      let myAgentIdBase64 = Uint8ArrayToBase64(myAgentId!); // AgentPubKey should be non-nullable here
+
+      // Remove self from the recipient of typing signal
+      let members = [...groupInfo.members, groupInfo.creator]
+        .filter(member => member !== myAgentIdBase64)
+        .map(member => Buffer.from(base64ToUint8Array(member).buffer));
+
+      dispatch(
+        indicateGroupTyping({
+          groupId: base64ToUint8Array(groupInfo.originalGroupEntryHash),
+          indicatedBy: myAgentId!,
+          members,
+          isTyping: (message.length !== 0) ? true : false,
+        })
+      );
+    })
     return setMessage(message);
   }
 
@@ -206,8 +188,10 @@ const GroupChat: React.FC = () => {
               <IonIcon slot="icon-only" icon={arrowBackSharp} />
             </IonButton>
             <IonAvatar className="ion-padding">
+              <img src={peopleCircleOutline} alt={groupInfo!.name} />
               {/* TODO: proper picture for default avatar if none is set */}
-              {groupInfo ? (
+              {/* TODO: Display an actual avatar set by the group creator */}
+              {/* {groupInfo ? (
                 groupInfo!.avatar ? (
                   <img src={groupInfo!.avatar} alt={groupInfo!.name} />
                 ) : (
@@ -215,7 +199,7 @@ const GroupChat: React.FC = () => {
                 )
               ) : (
                 <img src={peopleCircleOutline} alt={groupInfo!.name} />
-              )}
+              )} */}
             </IonAvatar>
             <IonTitle className={styles["title"]}>
               <div className="item item-text-wrap">{groupInfo!.name}</div>
