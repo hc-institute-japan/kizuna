@@ -57,24 +57,31 @@ const FileBox: React.FC<Props> = ({
         ))
       : null;
 
-  const renderFileMessages = () =>
-    orderedFileMessages.map((message: P2PMessage | GroupMessage) => {
-      let month = message.timestamp.getMonth();
-      // let year = file.timestamp.getFullYear();
-      return (
-        <React.Fragment>
-          {renderMonth(month)}
-          <IonCol size="12">
-            <IonCard className={styles.mediacard}>
-              <FileView
-                file={message.payload as FilePayload}
-                onDownload={onDownload}
-              />
-            </IonCard>
-          </IonCol>
-        </React.Fragment>
-      );
-    });
+  const renderFileMessages = () => {
+    /* 
+			the orderedFileMessages is declared as any[] here as a union of array is uncallable.
+			see https://github.com/microsoft/TypeScript/issues/36390 for more info
+		*/
+    return (orderedFileMessages as any[]).map(
+      (message: P2PMessage | GroupMessage) => {
+        let month = message.timestamp.getMonth();
+        // let year = file.timestamp.getFullYear();
+        return (
+          <React.Fragment>
+            {renderMonth(month)}
+            <IonCol size="12">
+              <IonCard className={styles.mediacard}>
+                <FileView
+                  file={message.payload as FilePayload}
+                  onDownload={onDownload}
+                />
+              </IonCard>
+            </IonCol>
+          </React.Fragment>
+        );
+      }
+    );
+  };
 
   /* RENDER */
   return (
