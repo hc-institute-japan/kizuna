@@ -1,6 +1,5 @@
 import {
   IonAvatar,
-  IonBackButton,
   IonButtons,
   IonContent,
   IonHeader,
@@ -28,7 +27,7 @@ import { RootState } from "../../redux/types";
 import { Conversation } from "../../utils/types";
 import { FilePayload } from "../../redux/commons/types";
 import { ChatListMethods } from "../../components/Chat/types";
-import { P2PMessage, P2PMessageReceipt } from "../../redux/p2pmessages/types";
+import { P2PMessage, P2PMessageReceipt, P2PHashMap } from "../../redux/p2pmessages/types";
 
 import { 
   sendMessage, 
@@ -55,6 +54,7 @@ const Chat: React.FC<Props> = ({ location }) => {
   const [ message, setMessage ] = useState<string>("");
   const [ files, setFiles ] = useState<any[]>([]);
   const [ messagesWithConversant, setMessagesWithConversant ] = useState<any[]>([]);
+  const [ disableGetNextBatch, setDisableGetNextBatch ] = useState<boolean>(false);
   const { conversations, messages, receipts } = useSelector((state: RootState) => state.p2pmessages);
   const fetchedFiles = useSelector((state: RootState) => state.p2pmessages.files);
   const typing = useSelector((state:RootState) => state.p2pmessages.typing);
@@ -73,7 +73,6 @@ const Chat: React.FC<Props> = ({ location }) => {
   /* REFS */
   const scrollerRef = useRef<ChatListMethods>(null);
   const didMountRef = useRef(false);
-
   /* USE EFFECTS */
   /* 
     scrolls the conversation to the bottom 
@@ -82,6 +81,10 @@ const Chat: React.FC<Props> = ({ location }) => {
   useEffect(() => {
     scrollerRef.current!.scrollToBottom();
   }, []);
+
+  // useEffect(() => {
+  //   scrollerRef.current!.scrollToBottom();
+  // }, []);
 
   /* 
     filters messages with conversant and
@@ -97,6 +100,7 @@ const Chat: React.FC<Props> = ({ location }) => {
         conversations["u" + conversant.id].messages
       ).map((messageID) => {
         let message = messages[messageID];
+        // console.log("chat message", message)
         let receiptIDs = message.receipts;
         let filteredReceipts = receiptIDs.map((id) => {
           let receipt = receipts[id];
@@ -185,19 +189,24 @@ const Chat: React.FC<Props> = ({ location }) => {
     when reaching the beginning/top of the chat box
   */
   const handleOnScrollTop = (complete: any, messages: any) => {
-    let lastMessage = messagesWithConversant[0].message;
-    dispatch(
-      getNextBatchMessages({
-        conversant: Buffer.from(base64ToUint8Array(conversant.id)),
-        batch_size: 5,
-        payload_type: "All",
-        last_fetched_timestamp: dateToTimestamp(lastMessage.timestamp),
-        last_fetched_message_id: Buffer.from(
-          base64ToUint8Array(lastMessage.p2pMessageEntryHash.slice(1))
-        ),
-      })
-    );
-    complete();
+    if (disableGetNextBatch === false) {
+      let lastMessage = messagesWithConversant[0].message;
+      dispatch(
+        getNextBatchMessages({
+          conversant: Buffer.from(base64ToUint8Array(conversant.id)),
+          batch_size: 5,
+          payload_type: "All",
+          last_fetched_timestamp: dateToTimestamp(lastMessage.timestamp),
+          last_fetched_message_id: Buffer.from(
+            base64ToUint8Array(lastMessage.p2pMessageEntryHash.slice(1))
+          ),
+        })
+      ).then((res: P2PHashMap) => {
+        // disable getNextBatch if return value is empty
+        if (Object.values(res)[0]["u" + conversant.id].length <= 0) setDisableGetNextBatch(true)
+      });
+      complete();
+    }
     return;
   };
 
