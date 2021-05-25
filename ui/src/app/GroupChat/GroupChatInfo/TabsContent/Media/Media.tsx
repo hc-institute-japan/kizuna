@@ -10,7 +10,7 @@ import { GroupMessageBatchFetchFilter, GroupMessagesOutput, GroupMessage } from 
 import { RootState } from "../../../../../redux/types";
 
 // utils
-import { base64ToUint8Array, monthToString, useAppDispatch } from "../../../../../utils/helpers";
+import { base64ToUint8Array, dateToTimestamp, monthToString, useAppDispatch } from "../../../../../utils/helpers";
 // components
 import MediaIndex from "./MediaIndex";
 import EmptyMedia from "./EmptyMedia";
@@ -66,18 +66,13 @@ const Media: React.FC<Props> = ({ groupId }) => {
       [key: string]: GroupMessage[];
     } = indexedFileMessages;
     if (filteredMessages.length > 0) {
-      let monthNumber = new Date(
-        fileMessages[0].timestamp[0] * 1000
-      ).getMonth();
+      let monthNumber = fileMessages[0].timestamp.getMonth();
       let month = monthToString(monthNumber, intl)!;
       if (!indexedFiles[month]) {
         indexedFiles[month] = [];
       }
       fileMessages.forEach((fileMessage: GroupMessage) => {
-        const currMonth = monthToString(
-          new Date(fileMessage.timestamp[0] * 1000).getMonth(),
-          intl
-        );
+        const currMonth = monthToString(fileMessage.timestamp.getMonth(), intl);
         if (currMonth !== month) {
           month = currMonth!;
           indexedFiles[month] = [];
@@ -110,7 +105,7 @@ const Media: React.FC<Props> = ({ groupId }) => {
         groupId: base64ToUint8Array(groupId),
         batchSize: 4,
         payloadType: { type: "MEDIA", payload: null },
-        lastMessageTimestamp: lastFile !== undefined ? lastFile.timestamp : undefined,
+        lastMessageTimestamp: lastFile !== undefined ? dateToTimestamp(lastFile.timestamp) : undefined,
         lastFetched: lastFile !== undefined ? Buffer.from(base64ToUint8Array(lastFile.groupMessageEntryHash)) : undefined
       })
     ).then((res: GroupMessagesOutput) => {

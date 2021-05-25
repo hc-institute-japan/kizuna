@@ -112,7 +112,7 @@ export interface GroupMessage {
   groupEntryHash: GroupID;
   author: string;
   payload: Payload; // subject to change
-  timestamp: [number, number];
+  timestamp: Date;
   replyTo?: GroupMessageID;
   readList: {
     // key is AgentPubKey

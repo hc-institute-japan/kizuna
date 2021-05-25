@@ -91,7 +91,7 @@ const FileBox: React.FC<Props> = ({ type, orderedFiles, conversant, onDownload }
 		return;
 	};
 
-	/* REMDER */
+	/* RENDER */
 	return (
 		<IonSlide>
 			<IonGrid>

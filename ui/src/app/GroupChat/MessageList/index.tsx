@@ -1,3 +1,5 @@
+/* TODO: CONVERT ALL TIMESTAMP TO APPROPRIATE TYPE */
+
 import { AgentPubKey } from "@holochain/conductor-api";
 import React, { useEffect, useState } from "react";
 import { IonLoading } from "@ionic/react";

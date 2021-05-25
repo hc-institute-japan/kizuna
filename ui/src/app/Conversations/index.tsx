@@ -145,7 +145,7 @@ const Conversations: React.FC = () => {
                           id: myAgentId,
                           username: myUsername!,
                         },
-                    timestamp: groupMessage.timestamp,
+                    timestamp: dateToTimestamp(groupMessage.timestamp),
                     message: groupMessage.payload.payload.payload,
                   };
                   return message;
@@ -161,7 +161,7 @@ const Conversations: React.FC = () => {
                           id: myAgentId,
                           username: myUsername!,
                         },
-                    timestamp: groupMessage.timestamp,
+                    timestamp: dateToTimestamp(groupMessage.timestamp),
                     message: "",
                     fileName: groupMessage.payload.fileName,
                   };
