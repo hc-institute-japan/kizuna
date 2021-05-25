@@ -93,38 +93,44 @@ const FileBox: React.FC<Props> = ({
     );
 
   const renderMediaMessages = () =>
-    orderedMediaMessages.map((message: P2PMessage | GroupMessage) => {
-      // fetch video filebytes if not yet in redux
-      // temp fix. most likely will change when this gets turned into a component
-      // TODO: fix the "u" append thing so that this component can be used both for P2P and Group
-      // TODO: find a better way to fix this problem than this current fix
-      if (
-        (message.payload as FilePayload).fileType === "VIDEO" &&
-        fetchedFiles["u" + (message.payload as FilePayload).fileHash] ===
-          undefined
-      ) {
-        dispatch(
-          getFileBytes([
-            base64ToUint8Array((message.payload as FilePayload).fileHash),
-          ])
+    /* 
+			the orderedFileMessages is declared as any[] here as a union of array is uncallable.
+			see https://github.com/microsoft/TypeScript/issues/36390 for more info
+    */
+    (orderedMediaMessages as any[]).map(
+      (message: P2PMessage | GroupMessage) => {
+        // fetch video filebytes if not yet in redux
+        // temp fix. most likely will change when this gets turned into a component
+        // TODO: fix the "u" append thing so that this component can be used both for P2P and Group
+        // TODO: find a better way to fix this problem than this current fix
+        if (
+          (message.payload as FilePayload).fileType === "VIDEO" &&
+          fetchedFiles["u" + (message.payload as FilePayload).fileHash] ===
+            undefined
+        ) {
+          dispatch(
+            getFileBytes([
+              base64ToUint8Array((message.payload as FilePayload).fileHash),
+            ])
+          );
+        }
+
+        let month = message.timestamp.getMonth();
+        // let year = file.timestamp.getFullYear();
+        return (
+          <React.Fragment>
+            {renderMonth(month)}
+            <IonCol size="3">
+              <IonCard className={styles.mediacard}>
+                <IonCard className={styles.mediacard}>
+                  {renderPayload(message)}
+                </IonCard>
+              </IonCard>
+            </IonCol>
+          </React.Fragment>
         );
       }
-
-      let month = message.timestamp.getMonth();
-      // let year = file.timestamp.getFullYear();
-      return (
-        <React.Fragment>
-          {renderMonth(month)}
-          <IonCol size="3">
-            <IonCard className={styles.mediacard}>
-              <IonCard className={styles.mediacard}>
-                {renderPayload(message)}
-              </IonCard>
-            </IonCard>
-          </IonCol>
-        </React.Fragment>
-      );
-    });
+    );
 
   /* RENDER */
   return (
