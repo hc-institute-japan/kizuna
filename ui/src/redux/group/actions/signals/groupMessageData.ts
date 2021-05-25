@@ -31,7 +31,6 @@ const groupMessageData =
   (signalPayload: any): ThunkAction =>
   async (dispatch) => {
     const { payload } = signalPayload;
-    console.log(payload);
     let groupMessage: GroupMessage = {
       groupMessageEntryHash: Uint8ArrayToBase64(payload.id),
       groupEntryHash: Uint8ArrayToBase64(payload.content.groupHash),

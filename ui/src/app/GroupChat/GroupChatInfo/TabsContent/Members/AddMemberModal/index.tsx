@@ -4,7 +4,7 @@ import { useIntl } from "react-intl";
 
 // redux
 import { Profile, ProfileListType } from "../../../../../../redux/profile/types";
-import { addGroupMembers } from "../../../../../../redux/group/actions";
+import { addGroupMembers } from "../../../../../../redux/group/actions/addGroupMembers";
 
 // components
 import EmptyContacts from "../EmptyContacts";
