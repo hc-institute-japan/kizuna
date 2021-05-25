@@ -1,7 +1,4 @@
 import { AgentPubKey } from "@holochain/conductor-api";
-import React, { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
-import { useHistory, useParams } from "react-router";
 import {
   IonButton,
   IonButtons,
@@ -14,26 +11,28 @@ import {
   IonSlide,
   IonSlides,
   IonTitle,
-  IonToolbar,
+  IonToolbar
 } from "@ionic/react";
 import { arrowBackSharp } from "ionicons/icons";
-
+import React, { useEffect, useRef, useState } from "react";
+import { useHistory, useParams } from "react-router";
 // Redux
-import { getLatestGroupVersion, updateGroupName } from "../../../redux/group/actions";
+import {  updateGroupName } from "../../../redux/group/actions/updateGroupName";
+import { getLatestGroupVersion } from "../../../redux/group/actions/getLatestGroupVersion";
 import { GroupConversation } from "../../../redux/group/types";
 import { fetchId } from "../../../redux/profile/actions";
-import { RootState } from "../../../redux/types";
 import { Uint8ArrayToBase64, useAppDispatch } from "../../../utils/helpers";
-
+import EndButtons from "./EndButtons";
 // Components
 import SegmentTabs from "./SegmentTabs";
-import EndButtons from "./EndButtons";
+import styles from "./style.module.css";
 import File from "./TabsContent/Files/File";
 import Media from "./TabsContent/Media/Media";
 import Members from "./TabsContent/Members";
 import UpdateGroupName from "./UpdateGroupName";
 
-import styles from "./style.module.css";
+
+
 
 interface GroupChatParams {
   group: string;
