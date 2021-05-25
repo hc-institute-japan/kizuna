@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 
 // Redux
 import { FilePayload, isTextPayload, Payload } from "../../../../../redux/commons/types";
-import { getNextBatchGroupMessages } from "../../../../../redux/group/actions";
+import { getNextBatchGroupMessages } from "../../../../../redux/group/actions/getNextBatchGroupMessages";
 import { GroupMessageBatchFetchFilter, GroupMessagesOutput, GroupMessage } from "../../../../../redux/group/types";
 import { RootState } from "../../../../../redux/types";
 

@@ -4,7 +4,7 @@ import { useIntl } from "react-intl";
 import { useHistory, useLocation } from "react-router";
 import MessageInput from "../../components/MessageInput";
 import { FilePayloadInput } from "../../redux/commons/types";
-import { sendInitialGroupMessage } from "../../redux/group/actions";
+import { sendInitialGroupMessage } from "../../redux/group/actions/sendInitialGroupMessage";
 import { sendMessage } from "../../redux/p2pmessages/actions";
 import { Profile, ProfileListType } from "../../redux/profile/types";
 import { base64ToUint8Array, useAppDispatch } from "../../utils/helpers";
