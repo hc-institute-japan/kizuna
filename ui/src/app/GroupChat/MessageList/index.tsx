@@ -8,7 +8,9 @@ import { useIntl } from "react-intl";
 
 // Redux
 import { GroupMessage, GroupMessageReadData, GroupMessagesContents, GroupMessagesOutput } from "../../../redux/group/types";
-import { fetchFilesBytes, getNextBatchGroupMessages, readGroupMessage } from "../../../redux/group/actions";
+import { readGroupMessage } from "../../../redux/group/actions/readGroupMessage";
+import { getNextBatchGroupMessages } from "../../../redux/group/actions/getNextBatchGroupMessages";
+import { fetchFilesBytes } from "../../../redux/group/actions/setFilesBytes";
 import { RootState } from "../../../redux/types";
 import { FilePayload } from "../../../redux/commons/types";
 import { fetchId } from "../../../redux/profile/actions";

@@ -10,7 +10,7 @@ import { useSelector } from "react-redux";
 import { fetchId } from "../../../../../redux/profile/actions";
 import { RootState } from "../../../../../redux/types";
 import { GroupConversation } from "../../../../../redux/group/types";
-import { removeGroupMembers } from "../../../../../redux/group/actions";
+import { removeGroupMembers } from "../../../../../redux/group/actions/removeGroupMembers";
 
 // Components
 import RemoveMemberToast from "./RemoveMemberToast";

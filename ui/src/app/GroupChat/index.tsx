@@ -19,7 +19,9 @@ import { useHistory, useParams } from "react-router";
 
 // Redux
 import { FilePayloadInput } from "../../redux/commons/types";
-import { getLatestGroupVersion, indicateGroupTyping, sendGroupMessage } from "../../redux/group/actions";
+import { sendGroupMessage } from "../../redux/group/actions/sendGroupMessage";
+import { indicateGroupTyping } from "../../redux/group/actions/indicateGroupTyping";
+import { getLatestGroupVersion } from "../../redux/group/actions/getLatestGroupVersion";
 import { GroupConversation, GroupMessage, GroupMessageInput } from "../../redux/group/types";
 import { fetchId } from "../../redux/profile/actions";
 import { RootState } from "../../redux/types";
@@ -32,6 +34,7 @@ import MessageList from "./MessageList";
 
 import { base64ToUint8Array, Uint8ArrayToBase64, useAppDispatch } from "../../utils/helpers";
 import styles from "./style.module.css";
+
 
 interface GroupChatParams {
   group: string;

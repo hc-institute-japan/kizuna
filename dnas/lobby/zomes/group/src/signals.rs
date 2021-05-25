@@ -26,8 +26,8 @@ pub enum SignalPayload {
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 pub struct SignalName;
 impl SignalName {
-    pub const ADDED_TO_GROUP: &'static str = "added_to_group";
-    pub const GROUP_TYPING_DETAIL: &'static str = &"group_typing_detail";
-    pub const GROUP_MESSAGE_READ: &'static str = &"group_message_read";
-    pub const GROUP_MESSAGE_DATA: &'static str = &"group_message_data";
+    pub const ADDED_TO_GROUP: &'static str = "ADDED_TO_GROUP";
+    pub const GROUP_TYPING_DETAIL: &'static str = &"GROUP_TYPING_DETAIL";
+    pub const GROUP_MESSAGE_READ: &'static str = &"GROUP_MESSAGE_READ";
+    pub const GROUP_MESSAGE_DATA: &'static str = &"GROUP_MESSAGE_DATA";
 }
