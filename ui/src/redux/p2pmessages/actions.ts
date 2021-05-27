@@ -1,35 +1,31 @@
-import { ThunkAction } from "../types";
-import { AgentPubKey, HoloHash } from "@holochain/conductor-api";
-
+import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
+import { HoloHash } from "@holochain/conductor-api";
 import { FUNCTIONS, ZOMES } from "../../connection/types";
 import {
-  BatchSize,
-  MessageInput,
-  P2PChatFilterBatch,
-  P2PFile,
-  SET_FILES,
-  SET_MESSAGES,
-  APPEND_MESSAGE,
-  APPEND_RECEIPT,
-} from "./types";
+  P2PConversation,
+  P2PMessage,
+  P2PMessageConversationState,
+  P2PMessageReceipt,
+} from "../../redux/p2pmessages/types";
+import { timestampToDate } from "../../utils/helpers";
 import {
-  TextPayload,
   FilePayloadInput,
   FileType,
   MessageID,
+  TextPayload,
 } from "../commons/types";
+import { ThunkAction } from "../types";
 import {
-  P2PMessageConversationState,
-  P2PConversation,
-  P2PMessage,
-  P2PMessageReceipt,
-} from "../../redux/p2pmessages/types";
-
-import {
-  timestampToDate,
-  Uint8ArrayToBase64,
-  base64ToUint8Array,
-} from "../../utils/helpers";
+  AgentPubKeyBase64,
+  APPEND_MESSAGE,
+  APPEND_RECEIPT,
+  BatchSize,
+  HoloHashBase64,
+  MessageInput,
+  P2PFile,
+  SET_FILES,
+  SET_MESSAGES,
+} from "./types";
 
 /* HELPER FUNCTIONS */
 /* 
@@ -46,7 +42,7 @@ export const transformZomeDataToUIData = (
   } = Object.values(zomeResults);
 
   // transform conversations
-  var transformedConversations: { [key: string]: P2PConversation } = {};
+  let transformedConversations: { [key: string]: P2PConversation } = {};
   for (const [key, value] of Object.entries(zomeConversations)) {
     let messageIDs: MessageID[] = value as MessageID[];
     let conversation: P2PConversation = {
@@ -56,10 +52,10 @@ export const transformZomeDataToUIData = (
   }
 
   // transform messages
-  var transformedMesssages: { [key: string]: P2PMessage } = {};
+  let transformedMesssages: { [key: string]: P2PMessage } = {};
   for (const [key, value] of Object.entries(zomeMessages)) {
     let { 0: message, 1: receiptArray } = Object(value);
-    var payload;
+    let payload;
     switch (message.payload.type) {
       case "TEXT":
         payload = message.payload;
@@ -70,9 +66,7 @@ export const transformZomeDataToUIData = (
           fileName: message.payload.payload.metadata.fileName,
           fileSize: message.payload.payload.metadata.fileSize,
           fileType: message.payload.payload.fileType.type,
-          fileHash: Uint8ArrayToBase64(
-            message.payload.payload.metadata.fileHash
-          ),
+          fileHash: serializeHash(message.payload.payload.metadata.fileHash),
           thumbnail:
             message.payload.payload.fileType.type !== "OTHER"
               ? message.payload.payload.fileType.payload.thumbnail
@@ -85,8 +79,8 @@ export const transformZomeDataToUIData = (
 
     let p2pMessage = {
       p2pMessageEntryHash: key,
-      author: "u" + Uint8ArrayToBase64(message.author),
-      receiver: "u" + Uint8ArrayToBase64(message.receiver),
+      author: serializeHash(message.author),
+      receiver: serializeHash(message.receiver),
       payload: payload,
       timestamp: timestampToDate(message.timeSent),
       replyTo: message.replyTo,
@@ -97,7 +91,7 @@ export const transformZomeDataToUIData = (
   }
 
   // transform receipts
-  var transformedReceipts: { [key: string]: P2PMessageReceipt } = {};
+  let transformedReceipts: { [key: string]: P2PMessageReceipt } = {};
   for (const [key, value] of Object.entries(zomeReceipts)) {
     const { id, status: statusTuple } = Object(value);
     const { status, timestamp } = statusTuple;
@@ -198,7 +192,8 @@ export const appendReceipt =
 */
 export const sendMessage =
   (
-    receiver: AgentPubKey,
+    // receiver: AgentPubKey,
+    receiver: string,
     message: string,
     type: string,
     replyTo?: HoloHash,
@@ -206,12 +201,12 @@ export const sendMessage =
   ): ThunkAction =>
   async (dispatch, _getState, { callZome }) => {
     // construct the payload input structure (text or file)
-    var payloadInput;
+    let payloadInput;
     if (type === "TEXT") {
       let textPayload: TextPayload = {
         type: "TEXT",
         payload: {
-          payload: message,
+          payload: message.trim(),
         },
       };
       payloadInput = textPayload;
@@ -236,7 +231,8 @@ export const sendMessage =
 
     // construct the message input structure
     let input: MessageInput = {
-      receiver: receiver,
+      // receiver: receiver,
+      receiver: Buffer.from(deserializeHash(receiver)),
       payload: payloadInput,
       reply_to: replyTo,
     };
@@ -257,10 +253,10 @@ export const sendMessage =
       const [messageID, message] = messageTuple;
       const [receiptID, receipt] = receiptTuple!;
 
-      let messageHash = "u" + Uint8ArrayToBase64(messageID);
-      let receiptHash = "u" + Uint8ArrayToBase64(receiptID);
+      let messageHash = serializeHash(messageID);
+      let receiptHash = serializeHash(receiptID);
 
-      var payload;
+      let payload;
       switch (message.payload.type) {
         case "TEXT":
           payload = message.payload;
@@ -271,9 +267,7 @@ export const sendMessage =
             fileName: message.payload.payload.metadata.fileName,
             fileSize: message.payload.payload.metadata.fileSize,
             fileType: message.payload.payload.fileType.type,
-            fileHash: Uint8ArrayToBase64(
-              message.payload.payload.metadata.fileHash
-            ),
+            fileHash: serializeHash(message.payload.payload.metadata.fileHash),
             thumbnail:
               message.payload.payload.fileType.type !== "OTHER"
                 ? message.payload.payload.fileType.payload.thumbnail
@@ -286,17 +280,17 @@ export const sendMessage =
 
       let p2pMessage: P2PMessage = {
         p2pMessageEntryHash: messageHash,
-        author: "u" + Uint8ArrayToBase64(message.author),
-        receiver: "u" + Uint8ArrayToBase64(message.receiver),
+        author: serializeHash(message.author),
+        receiver: serializeHash(message.receiver),
         payload: payload,
         timestamp: timestampToDate(message.timeSent),
         replyTo: message.replyTo,
         receipts: [receiptHash],
       };
 
-      let messageEntryHash = "u" + Uint8ArrayToBase64(receipt.id[0]);
+      let messageEntryHash = serializeHash(receipt.id[0]);
       let p2pReceipt: P2PMessageReceipt = {
-        p2pMessageReceiptEntryHash: "u" + Uint8ArrayToBase64(receiptID),
+        p2pMessageReceiptEntryHash: serializeHash(receiptID),
         p2pMessageEntryHashes: [messageEntryHash],
         timestamp: timestampToDate(receipt.status.timestamp),
         status: receipt.status.status,
@@ -305,7 +299,7 @@ export const sendMessage =
       let p2pFile =
         type === "FILE"
           ? {
-              fileHash: "u" + payload.fileHash,
+              fileHash: payload.fileHash,
               fileBytes: file.fileBytes,
             }
           : undefined;
@@ -358,13 +352,28 @@ export const getLatestMessages =
 
 // action to get messages in batches (called while scrolling in chat boxes and media boxes)
 export const getNextBatchMessages =
-  (filter: P2PChatFilterBatch): ThunkAction =>
+  (
+    conversant: AgentPubKeyBase64,
+    batch_size: number,
+    payload_type: String,
+    last_fetched_timestamp?: [number, number],
+    last_fetched_message_id?: HoloHashBase64
+  ): ThunkAction =>
   async (dispatch, _getState, { callZome }) => {
+    let zome_input = {
+      conversant: Buffer.from(deserializeHash(conversant)),
+      batch_size: batch_size,
+      payload_type: payload_type,
+      last_fetched_timestamp: last_fetched_timestamp,
+      last_fetched_message_id: last_fetched_message_id
+        ? Buffer.from(deserializeHash(last_fetched_message_id))
+        : undefined,
+    };
     // CALL ZOME
     const nextBatchOfMessages = await callZome({
       zomeName: ZOMES.P2PMESSAGE,
       fnName: FUNCTIONS[ZOMES.P2PMESSAGE].GET_NEXT_BATCH_MESSAGES,
-      payload: filter,
+      payload: zome_input,
     });
 
     // DISPATCH TO REDUCER
@@ -396,11 +405,11 @@ export const readMessage =
     // get hashes of messages to be marked
     let hashes: any = [];
     messages.map((message) =>
-      hashes.push(base64ToUint8Array(message.p2pMessageEntryHash.slice(1)))
+      hashes.push(deserializeHash(message.p2pMessageEntryHash))
     );
 
     // get the sender (sender = conversant since p2p)
-    let sender = Buffer.from(base64ToUint8Array(messages[0].author.slice(1)));
+    let sender = Buffer.from(deserializeHash(messages[0].author));
 
     let input = {
       message_hashes: hashes,
@@ -421,7 +430,7 @@ export const readMessage =
 
       let messageIDs: string[] = [];
       readReceiptMap[key].id.forEach((id: Uint8Array) => {
-        messageIDs.push("u" + Uint8ArrayToBase64(id));
+        messageIDs.push(serializeHash(id));
       });
 
       let p2preceipt = {
@@ -444,9 +453,10 @@ export const readMessage =
 
 // action to get the file bytes of a list of file addresses
 export const getFileBytes =
-  (hashes: Uint8Array[]): ThunkAction =>
+  (inputHashes: HoloHashBase64[]): ThunkAction =>
   async (dispatch, _getState, { callZome }) => {
-    console.log("actions getting file bytes", hashes);
+    console.log("actions getting file bytes", inputHashes);
+    let hashes = inputHashes.map((hash) => deserializeHash(hash));
     const fetchedFiles = await callZome({
       zomeName: ZOMES.P2PMESSAGE,
       fnName: FUNCTIONS[ZOMES.P2PMESSAGE].GET_FILE_BYTES,
@@ -472,11 +482,12 @@ export const getFileBytes =
   };
 
 // action to call typing
+// export const isTyping = (agent: AgentPubKey, isTyping: boolean): ThunkAction => async (
 export const isTyping =
-  (agent: AgentPubKey, isTyping: boolean): ThunkAction =>
+  (agent: string, isTyping: boolean): ThunkAction =>
   async (dispatch, _getState, { callZome }) => {
     let payload = {
-      agent: agent,
+      agent: Buffer.from(deserializeHash(agent)),
       isTyping: isTyping,
     };
 
@@ -505,6 +516,7 @@ export const isTyping =
 export const countUnread =
   (conversant: string): ThunkAction =>
   (dispatch, getState) => {
+    console.log("actions conversant", conversant);
     const { conversations, messages, receipts } = getState().p2pmessages;
     const conversation = conversations[conversant].messages;
     let unreadCounter = 0;

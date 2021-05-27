@@ -1,56 +1,46 @@
 import {
   IonAvatar,
+  IonButton,
   IonButtons,
   IonContent,
   IonHeader,
+  IonIcon,
   IonPage,
   IonTitle,
   IonToolbar,
-  IonButton,
-  IonIcon,
 } from "@ionic/react";
-import React, { useEffect, useState, useRef } from "react";
+import {
+  arrowBackSharp,
+  informationCircleOutline,
+  personCircleOutline,
+} from "ionicons/icons";
+import React, { useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
 import {
   RouteComponentProps,
   useHistory,
   useLocation,
   useParams,
 } from "react-router";
-import { useSelector } from "react-redux";
-import {
-  arrowBackSharp,
-  informationCircleOutline,
-  personCircleOutline,
-} from "ionicons/icons";
-
+import { ChatList, Me, Others } from "../../components/Chat";
+import { ChatListMethods } from "../../components/Chat/types";
 import Typing from "../../components/Chat/Typing";
 import MessageInput from "../../components/MessageInput";
-import { ChatList, Me, Others } from "../../components/Chat";
-
-import { RootState } from "../../redux/types";
-import { Conversation } from "../../redux/commons/types";
-import { FilePayload } from "../../redux/commons/types";
-import { ChatListMethods } from "../../components/Chat/types";
+import { Conversation, FilePayload } from "../../redux/commons/types";
 import {
+  getFileBytes,
+  getNextBatchMessages,
+  isTyping,
+  readMessage,
+  sendMessage,
+} from "../../redux/p2pmessages/actions";
+import {
+  P2PHashMap,
   P2PMessage,
   P2PMessageReceipt,
-  P2PHashMap,
 } from "../../redux/p2pmessages/types";
-
-import {
-  sendMessage,
-  getNextBatchMessages,
-  readMessage,
-  isTyping,
-  getFileBytes,
-} from "../../redux/p2pmessages/actions";
-
-import {
-  useAppDispatch,
-  base64ToUint8Array,
-  dateToTimestamp,
-  debounce,
-} from "../../utils/helpers";
+import { RootState } from "../../redux/types";
+import { dateToTimestamp, debounce, useAppDispatch } from "../../utils/helpers";
 
 type Props = {
   location: RouteComponentProps<{}, {}, { state: Conversation }>;
@@ -88,6 +78,7 @@ const Chat: React.FC<Props> = ({ location }) => {
   /* REFS */
   const scrollerRef = useRef<ChatListMethods>(null);
   const didMountRef = useRef(false);
+
   /* USE EFFECTS */
   /* 
     scrolls the conversation to the bottom 
@@ -97,9 +88,9 @@ const Chat: React.FC<Props> = ({ location }) => {
     scrollerRef.current!.scrollToBottom();
   }, []);
 
-  // useEffect(() => {
-  //   scrollerRef.current!.scrollToBottom();
-  // }, []);
+  useEffect(() => {
+    scrollerRef.current!.scrollToBottom();
+  }, [conversant, fetchedFiles]);
 
   /* 
     filters messages with conversant and
@@ -109,13 +100,12 @@ const Chat: React.FC<Props> = ({ location }) => {
   useEffect(() => {
     if (
       conversant !== undefined &&
-      conversations["u" + conversant.id] !== undefined
+      conversations[conversant.id] !== undefined
     ) {
       let filteredMessages = Object.values(
-        conversations["u" + conversant.id].messages
+        conversations[conversant.id].messages
       ).map((messageID) => {
         let message = messages[messageID];
-        // console.log("chat message", message)
         let receiptIDs = message.receipts;
         let filteredReceipts = receiptIDs.map((id) => {
           let receipt = receipts[id];
@@ -143,17 +133,13 @@ const Chat: React.FC<Props> = ({ location }) => {
   useEffect(() => {
     if (didMountRef.current) {
       if (conversant) {
-        debounce(
-          dispatch(
-            isTyping(Buffer.from(base64ToUint8Array(conversant.id)), true)
-          ),
-          5000
-        );
+        debounce(dispatch(isTyping(conversant.id, true)), 5000);
       }
     } else {
       didMountRef.current = true;
     }
-  }, [message, conversant, dispatch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [message]);
 
   /* HANDLERS */
   /* 
@@ -174,26 +160,11 @@ const Chat: React.FC<Props> = ({ location }) => {
   */
   const handleOnSubmit = () => {
     files.forEach((file) => {
-      dispatch(
-        sendMessage(
-          Buffer.from(base64ToUint8Array(conversant.id)),
-          message,
-          "FILE",
-          undefined,
-          file
-        )
-      );
+      dispatch(sendMessage(conversant.id, message, "FILE", undefined, file));
     });
 
     if (message !== "") {
-      dispatch(
-        sendMessage(
-          Buffer.from(base64ToUint8Array(conversant.id)),
-          message,
-          "TEXT",
-          undefined
-        )
-      );
+      dispatch(sendMessage(conversant.id, message, "TEXT", undefined));
     }
 
     scrollerRef.current!.scrollToBottom();
@@ -203,25 +174,25 @@ const Chat: React.FC<Props> = ({ location }) => {
     disptaches an action to hc to get the next batch of older messages
     when reaching the beginning/top of the chat box
   */
-  const handleOnScrollTop = (complete: any, messages: any) => {
+  const handleOnScrollTop = (complete: any) => {
     if (disableGetNextBatch === false) {
+      console.log("calling get next");
       let lastMessage = messagesWithConversant[0].message;
       dispatch(
-        getNextBatchMessages({
-          conversant: Buffer.from(base64ToUint8Array(conversant.id)),
-          batch_size: 5,
-          payload_type: "All",
-          last_fetched_timestamp: dateToTimestamp(lastMessage.timestamp),
-          last_fetched_message_id: Buffer.from(
-            base64ToUint8Array(lastMessage.p2pMessageEntryHash.slice(1))
-          ),
-        })
+        getNextBatchMessages(
+          conversant.id,
+          5,
+          "All",
+          dateToTimestamp(lastMessage.timestamp),
+          lastMessage.p2pMessageEntryHash
+        )
       ).then((res: P2PHashMap) => {
         // disable getNextBatch if return value is empty
-        if (Object.values(res)[0]["u" + conversant.id].length <= 0)
+        if (Object.values(res)[0][conversant.id].length <= 0) {
           setDisableGetNextBatch(true);
+        }
+        complete();
       });
-      complete();
     }
     return;
   };
@@ -251,11 +222,11 @@ const Chat: React.FC<Props> = ({ location }) => {
     when clicking the file download button
   */
   const onDownloadHandler = (file: FilePayload) => {
-    fetchedFiles["u" + file.fileHash] !== undefined
-      ? downloadFile(fetchedFiles["u" + file.fileHash], file.fileName)
-      : dispatch(getFileBytes([base64ToUint8Array(file.fileHash)])).then(
+    fetchedFiles[file.fileHash] !== undefined
+      ? downloadFile(fetchedFiles[file.fileHash], file.fileName)
+      : dispatch(getFileBytes([file.fileHash])).then(
           (res: { [key: string]: Uint8Array }) =>
-            downloadFile(res["u" + file.fileHash], file.fileName)
+            downloadFile(res[file.fileHash], file.fileName)
         );
   };
   const downloadFile = (fileBytes: Uint8Array, fileName: string) => {
@@ -287,12 +258,12 @@ const Chat: React.FC<Props> = ({ location }) => {
     if (
       payload.type === "FILE" &&
       (payload as FilePayload).fileType === "VIDEO" &&
-      fetchedFiles["u" + payload.fileHash] === undefined
+      fetchedFiles[payload.fileHash] === undefined
     ) {
-      dispatch(getFileBytes([base64ToUint8Array(payload.fileHash)]));
+      dispatch(getFileBytes([payload.fileHash]));
     }
 
-    return conversant.id !== author.slice(1) ? (
+    return conversant.id !== author ? (
       <Me
         key={key}
         type="p2p"
@@ -346,10 +317,9 @@ const Chat: React.FC<Props> = ({ location }) => {
       <IonContent>
         <ChatList
           type="p2p"
-          onScrollTop={(complete) =>
-            handleOnScrollTop(complete, messagesWithConversant)
-          }
+          onScrollTop={(complete) => handleOnScrollTop(complete)}
           ref={scrollerRef}
+          disabled={disableGetNextBatch}
         >
           {messagesWithConversant.map((messageBundle) =>
             displayMessage(messageBundle)

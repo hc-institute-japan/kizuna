@@ -69,7 +69,7 @@ const Conversations: React.FC = () => {
           we are not displaying people who are not in contacts list right now; this will not be undefined atm
           TODO: may change depending on design implementation for blocked contacts
           */
-        let conversant = contacts[key].username;
+        let conversant = contacts[key];
 
         // accessing the first index for the latest message
         // TODO: make sure that this is the latest
@@ -80,7 +80,9 @@ const Conversations: React.FC = () => {
           sender: {
             id: latestMessage.author,
             username:
-              latestMessage.author === myProfile.id ? "You" : conversant,
+              latestMessage.author === myProfile.id
+                ? "You"
+                : conversant.username,
           },
           payloadType: latestMessage.payload.type,
           textPayload: isTextPayload(latestMessage.payload)
@@ -97,9 +99,9 @@ const Conversations: React.FC = () => {
         let conversation: Conversation = {
           type: "p2p",
           id: key,
-          conversationName: conversant,
+          conversationName: conversant.username,
           latestMessage: message,
-          badgeCount: dispatch(countUnread(conversant)),
+          badgeCount: dispatch(countUnread(conversant.id)),
         };
         conversationsArray.push(conversation);
       }
