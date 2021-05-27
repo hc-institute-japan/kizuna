@@ -77,9 +77,10 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
           if (fileSize < 15728640) {
             const fileBytes = new Uint8Array(arrBuffer);
             const type = determineFileType(file.type);
-            if (type === "IMAGE" || type === "VIDEO") {
+            if (type === "IMAGE") {
               const encoder = new TextEncoder();
               const reader = new FileReader();
+
               reader.readAsDataURL(file);
               reader.onload = (readerEvent) => {
                 const encoded = encoder.encode(
@@ -97,6 +98,47 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
                   return [...currFiles];
                 });
               };
+            } else if (type === "VIDEO") {
+              const video = document.createElement("video");
+              const canvas = document.createElement("canvas");
+              video.src = URL.createObjectURL(
+                new Blob([fileBytes], { type: "video/mp4" })
+              );
+
+              video.addEventListener("loadeddata", function () {
+                const BASE_64 = ";base64,";
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+
+                canvas
+                  .getContext("2d")
+                  ?.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
+                const dataURI = canvas.toDataURL("image/jpeg");
+
+                const byteCharacters = window.atob(
+                  dataURI.split(BASE_64)[1].trim()
+                );
+
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++)
+                  byteNumbers[i] = byteCharacters.charCodeAt(i);
+
+                const uArr = new Uint8Array(byteNumbers);
+                const final = {
+                  metadata: { fileName, fileType: type, fileSize },
+                  fileType: {
+                    type,
+                    payload: { thumbnail: uArr },
+                  },
+                  fileBytes,
+                };
+
+                setFiles((currFiles) => {
+                  currFiles.push(final);
+                  return [...currFiles];
+                });
+              });
+              video.load();
             } else {
               const final = {
                 metadata: { fileName, fileType: type, fileSize },

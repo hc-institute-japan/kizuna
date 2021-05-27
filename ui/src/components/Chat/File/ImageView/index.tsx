@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import { FilePayload } from "../../../../redux/commons/types";
 
 import ImageModal from "./ImageModal";
+import styles from "./style.module.css";
 
 interface Props {
   src: string;
@@ -25,11 +26,9 @@ const Image: React.FC<Props> = ({ src, file, className, onDownload }) => {
         src={src}
         file={file}
       />
-      <IonImg
-        {...(className ? { className } : {})}
-        onClick={handleOnImageOnClick}
-        src={src}
-      />
+      <div className={`${styles.image} ${className ? className : ""}`}>
+        <IonImg onClick={handleOnImageOnClick} src={src} />
+      </div>
     </>
   );
 };
