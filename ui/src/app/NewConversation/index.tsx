@@ -8,7 +8,7 @@ import { sendInitialGroupMessage } from "../../redux/group/actions/sendInitialGr
 import { GroupConversation } from "../../redux/group/types";
 import { sendMessage } from "../../redux/p2pmessages/actions";
 import { Profile, ProfileListType } from "../../redux/profile/types";
-import { base64ToUint8Array, useAppDispatch } from "../../utils/helpers";
+import { useAppDispatch } from "../../utils/helpers";
 import ContactList from "./ContactList";
 import { ContactsContext } from "./context";
 import NewConversationHeader from "./NewConversationHeader";
@@ -62,26 +62,13 @@ const NewConversation: React.FC = () => {
     if (contacts.length === 1) {
       setIsLoading(true);
       files.forEach((file) => {
-        dispatch(
-          sendMessage(
-            Buffer.from(base64ToUint8Array(contacts[0].id)),
-            message,
-            "FILE",
-            undefined,
-            file
-          )
-        );
+        dispatch(sendMessage(contacts[0].id, message, "FILE", undefined, file));
       });
 
       if (message !== "") {
-        dispatch(
-          sendMessage(
-            Buffer.from(base64ToUint8Array(contacts[0].id)),
-            message,
-            "TEXT",
-            undefined
-          )
-        ).then(setIsLoading(false));
+        dispatch(sendMessage(contacts[0].id, message, "TEXT", undefined)).then(
+          setIsLoading(false)
+        );
       }
 
       history.push(`/u/${contacts[0].username}`);

@@ -12,6 +12,8 @@ import { Profile } from "../profile/types";
 
 export type P2PMessageReceiptID = string;
 export type P2PMessageStatus = "sent" | "delivered" | "read";
+export type AgentPubKeyBase64 = string;
+export type HoloHashBase64 = string;
 
 export interface Read {
   timestamp: [number, number];
@@ -83,7 +85,7 @@ export interface MessageInput {
 }
 
 export interface P2PChatFilterBatch {
-  conversant: AgentPubKey;
+  conversant: AgentPubKeyBase64;
   batch_size: number;
   payload_type: String;
   last_fetched_timestamp?: [number, number];

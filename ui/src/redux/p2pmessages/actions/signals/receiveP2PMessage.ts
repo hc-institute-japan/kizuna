@@ -1,40 +1,31 @@
+import { serializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../../connection/types";
-import { timestampToDate, Uint8ArrayToBase64 } from "../../../../utils/helpers";
+import { timestampToDate } from "../../../../utils/helpers";
 import { ThunkAction } from "../../../types";
 import { APPEND_MESSAGE, P2PMessage, P2PMessageReceipt } from "../../types";
 
-const receiveP2PMessage = (payload: any): ThunkAction => async (
-  dispatch,
-  getState,
-  { callZome }
-) => {
-  let receivedMessage = payload.message;
+const receiveP2PMessage =
+  (payload: any): ThunkAction =>
+  async (dispatch, getState, { callZome }) => {
+    let receivedMessage = payload.message;
+    console.log("signals", receivedMessage);
 
-  const [messageTuple, receiptTuple] = receivedMessage;
-  const [messageID, message] = messageTuple;
-  const [receiptID, receipt] = receiptTuple!;
+    const [messageTuple, receiptTuple] = receivedMessage;
+    const [messageID, message] = messageTuple;
+    const [receiptID, receipt] = receiptTuple!;
 
-  // TODO: review why you are still fetching
-  callZome({
-    zomeName: ZOMES.P2PMESSAGE,
-    fnName: FUNCTIONS[ZOMES.P2PMESSAGE].GET_LATEST_MESSAGES,
-    payload: 1,
-  }).then((res: any) => {
-    let messageHash = "u" + Uint8ArrayToBase64(messageID);
-    let receiptHash = "u" + Uint8ArrayToBase64(receiptID);
-
-    var payload;
+    let messagePayload;
     switch (message.payload.type) {
       case "TEXT":
-        payload = message.payload;
+        messagePayload = message.payload;
         break;
       case "FILE":
-        payload = {
+        messagePayload = {
           type: "FILE",
           fileName: message.payload.payload.metadata.fileName,
           fileSize: message.payload.payload.metadata.fileSize,
           fileType: message.payload.payload.fileType.type,
-          fileHash: Uint8ArrayToBase64(message.payload.payload.metadata.fileHash),
+          fileHash: serializeHash(message.payload.payload.metadata.fileHash),
           thumbnail:
             message.payload.payload.fileType.type !== "OTHER"
               ? message.payload.payload.fileType.payload.thumbnail
@@ -46,19 +37,18 @@ const receiveP2PMessage = (payload: any): ThunkAction => async (
     }
 
     let p2pMessage: P2PMessage = {
-      p2pMessageEntryHash: messageHash,
-      author: "u" + Uint8ArrayToBase64(message.author),
-      receiver: "u" + Uint8ArrayToBase64(message.receiver),
-      payload: payload,
+      p2pMessageEntryHash: serializeHash(messageID),
+      author: serializeHash(message.author),
+      receiver: serializeHash(message.receiver),
+      payload: messagePayload,
       timestamp: timestampToDate(message.timeSent),
       replyTo: message.replyTo,
-      receipts: [receiptHash],
+      receipts: [serializeHash(receiptID)],
     };
 
-    let messageEntryHash = "u" + Uint8ArrayToBase64(receipt.id[0]);
     let p2pReceipt: P2PMessageReceipt = {
-      p2pMessageReceiptEntryHash: "u" + Uint8ArrayToBase64(receiptID),
-      p2pMessageEntryHashes: [messageEntryHash],
+      p2pMessageReceiptEntryHash: serializeHash(receiptID),
+      p2pMessageEntryHashes: [serializeHash(receipt.id[0])],
       timestamp: timestampToDate(receipt.status.timestamp),
       status: receipt.status.status,
     };
@@ -71,7 +61,6 @@ const receiveP2PMessage = (payload: any): ThunkAction => async (
         key: p2pMessage.author,
       },
     });
-  });
-};
+  };
 
 export default receiveP2PMessage;
