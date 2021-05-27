@@ -19,6 +19,7 @@ import {
   play,
 } from "ionicons/icons";
 import React, { SetStateAction, useEffect, useRef, useState } from "react";
+import { useIntl } from "react-intl";
 import styles from "./style.module.css";
 
 interface Props {
@@ -35,7 +36,6 @@ const VideoPlayerModal: React.FC<Props> = ({
   download,
   onPlayPauseErrorHandler,
 }) => {
-const VideoPlayerModal: React.FC<Props> = ({ open, src, download }) => {
   const intl = useIntl();
   const [isOpen, setIsOpen] = open;
 
@@ -191,7 +191,11 @@ const VideoPlayerModal: React.FC<Props> = ({ open, src, download }) => {
                   setPopover({ isOpen: false, event: undefined });
                 }}
               >
-                <IonLabel>{intl.formatMessage({id: "components.chat.media-modal-download"})}</IonLabel>
+                <IonLabel>
+                  {intl.formatMessage({
+                    id: "components.chat.media-modal-download",
+                  })}
+                </IonLabel>
               </IonItem>
             ) : null}
           </IonList>

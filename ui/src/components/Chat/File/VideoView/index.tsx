@@ -1,7 +1,8 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { FilePayload } from "../../../../redux/commons/types";
-import { fetchFilesBytes } from "../../../../redux/group/actions";
+import { fetchFilesBytes } from "../../../../redux/group/actions/setFilesBytes";
+
 import { RootState } from "../../../../redux/types";
 import { base64ToUint8Array, useAppDispatch } from "../../../../utils/helpers";
 import VideoPlayer from "../../../VideoPlayer";
