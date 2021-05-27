@@ -55,7 +55,7 @@ const AddContactModal: React.FC<Props> = ({ isOpen, onCancel }) => {
   };
 
   return (
-    <IonModal isOpen={isOpen}>
+    <IonModal isOpen={isOpen} onDidDismiss={onCancel}>
       <AddContactHeader
         onChange={(e) => setFilter(e.detail.value!)}
         onCancel={onCancel}
