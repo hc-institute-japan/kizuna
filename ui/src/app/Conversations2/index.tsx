@@ -31,25 +31,17 @@ import EmptyConversations from "./EmptyConversations";
 import { P2PMessageConversationState } from "../../redux/p2pmessages/types";
 import { FilePayload, TextPayload } from "../../redux/commons/types";
 import styles from "./style.module.css";
-import { Profile } from "../../redux/profile/types";
-
-export interface Message {
-  id: string;
-  sender: Profile;
-  fileName?: string;
-  timestamp: Date;
-  message: string;
-}
+import { Message, Conversation } from "../../redux/commons/types";
 
 const Conversations: React.FC = () => {
   const history = useHistory();
   const dispatch = useAppDispatch();
 
-  const [latestMessageDetail, setLatestMessageDetail] = useState<MessageDetail>({
-    message: "",
-    fileName: "",
-    payload: "TEXT",
-  });
+  // const [latestMessageDetail, setLatestMessageDetail] = useState<MessageDetail>({
+  //   message: "",
+  //   fileName: "",
+  //   payload: "TEXT",
+  // });
 
   const contacts = useSelector((state: RootState) => state.contacts.contacts);
   const groupsData = useSelector(
@@ -73,13 +65,13 @@ const Conversations: React.FC = () => {
     });
   };
 
-  useEffect(() => { 
-    if(type === 'group')
-      setBadgeCount(dispatch(getBadgeCount()))
-    }, [ 
-      messages[groupId].something
-    ]
-  )
+  // useEffect(() => {
+  //   if(type === 'group')
+  //     setBadgeCount(dispatch(getBadgeCount()))
+  //   }, [
+  //     messages[groupId].something
+  //   ]
+  // )
 
   /*
     Handle the display of Conversations
@@ -115,7 +107,7 @@ const Conversations: React.FC = () => {
               p2pMessage.payload.type === "TEXT"
                 ? (p2pMessage.payload as TextPayload).payload.payload
                 : (p2pMessage.payload as FilePayload).fileName,
-            timestamp: p2pMessage.timestamp),
+            timestamp: dateToTimestamp(p2pMessage.timestamp),
           };
           return message;
         });
@@ -143,57 +135,52 @@ const Conversations: React.FC = () => {
     /* code block for group logic */
     if (Object.keys(groups).length > 0) {
       Object.keys(groups).forEach((key: string) => {
-
-        /* TODO: change to actual pic chosen by group creator */
+        // TODO: change to actual pic chosen by group creator
         let src = peopleCircleOutline;
-
-        let messages: Message[] = groups[key].messages
+        let messages: (Message | undefined)[] = groups[key].messages
           ? groups[key].messages.map((messageId: string) => {
+              let groupMessage = Object.keys(groupMessagesLocal).length
+                ? groupMessagesLocal[messageId]
+                : groupMessages[messageId];
 
-            let groupMessage: GroupMessage = allGroupMessages[messageId];
-
-            if (isTextPayload(groupMessage.payload)) {
-              let message: Message = {
-                id: groupMessage.groupMessageEntryHash,
-                /* 
-                  Check whether the sender is self or others 
-                  and retrieve the username from appropriate redux store 
-                */
-                sender: groupMembers[groupMessage.author]
-                  ? {
-                      id: groupMembers[groupMessage.author].id,
-                      username: groupMembers[groupMessage.author].username,
-                    }
-                  : {
-                      id: myAgentId,
-                      username: myUsername!,
-                    },
-                timestamp: timestampToDate(groupMessage.timestamp),
-                message: groupMessage.payload.payload.payload,
-              };
-              return message;
-            } else {
-              /* */
-              let message: Message = {
-                id: groupMessage.groupMessageEntryHash,
-                sender: groupMembers[groupMessage.author]
-                  ? {
-                      id: groupMembers[groupMessage.author].id,
-                      username: groupMembers[groupMessage.author].username,
-                    }
-                  : {
-                      id: myAgentId,
-                      username: myUsername!,
-                    },
-                timestamp: timestampToDate(groupMessage.timestamp),
-                message: "",
-                fileName: groupMessage.payload.fileName,
-              };
-              return message;
-            }
-          })
-        : [];
-
+              if (groupMessage) {
+                if (isTextPayload(groupMessage.payload)) {
+                  let message: Message = {
+                    id: groupMessage.groupMessageEntryHash,
+                    sender: groupMembers[groupMessage.author]
+                      ? {
+                          id: groupMembers[groupMessage.author].id,
+                          username: groupMembers[groupMessage.author].username,
+                        }
+                      : {
+                          id: myAgentId,
+                          username: myUsername!,
+                        },
+                    timestamp: groupMessage.timestamp,
+                    message: groupMessage.payload.payload.payload,
+                  };
+                  return message;
+                } else {
+                  let message: Message = {
+                    id: groupMessage.groupMessageEntryHash,
+                    sender: groupMembers[groupMessage.author]
+                      ? {
+                          id: groupMembers[groupMessage.author].id,
+                          username: groupMembers[groupMessage.author].username,
+                        }
+                      : {
+                          id: myAgentId,
+                          username: myUsername!,
+                        },
+                    timestamp: groupMessage.timestamp,
+                    message: "",
+                    fileName: groupMessage.payload.fileName,
+                  };
+                  return message;
+                }
+              }
+            })
+          : [];
         let messagesCleaned = messages.flatMap((x: Message | undefined) =>
           x ? [x] : []
         );
@@ -286,18 +273,24 @@ const Conversations: React.FC = () => {
         {Object.keys(groups).length > 0 ||
         Object.keys(p2pState.conversations).length > 0 ? (
           <IonList className={styles.conversation}>
-            {renderConversation(groups, p2pState).map((conversation: any) => (
-              <Conversation2
-                latestMessageDetail={}
-                type={conversation.isGroup ? "group" : "p2p"}
-                key={conversation.groupId}
-                isGroup={conversation.isGroup}
-                groupId={conversation.groupId}
-                content={conversation.content}
-                myAgentId={myAgentId}
-                onClick={() => conversation.isGroup ? history.push(`/g/${conversation.groupId}`) : history.push(`/u/${conversation.content.name}`)}
-              />
-            ))}
+            {renderConversation(groups, p2pState).map(
+              (conversation: Conversation) => (
+                <Conversation2
+                  latestMessageDetail={}
+                  type={conversation.isGroup ? "group" : "p2p"}
+                  key={conversation.groupId}
+                  isGroup={conversation.isGroup}
+                  groupId={conversation.groupId}
+                  content={conversation.content}
+                  myAgentId={myAgentId}
+                  onClick={() =>
+                    conversation.isGroup
+                      ? history.push(`/g/${conversation.groupId}`)
+                      : history.push(`/u/${conversation.content.name}`)
+                  }
+                />
+              )
+            )}
           </IonList>
         ) : (
           <EmptyConversations />

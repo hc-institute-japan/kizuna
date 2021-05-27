@@ -26,7 +26,7 @@ import {
   useAppDispatch,
   dateToTimestamp,
 } from "../../utils/helpers";
-import { Message } from "../../utils/types";
+import { Message } from "../../redux/commons/types";
 import EmptyConversations from "./EmptyConversations";
 import { P2PMessageConversationState } from "../../redux/p2pmessages/types";
 import { FilePayload, TextPayload } from "../../redux/commons/types";

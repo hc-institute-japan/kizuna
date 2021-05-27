@@ -17,24 +17,32 @@ import {
   useParams,
 } from "react-router";
 import { useSelector } from "react-redux";
-import { arrowBackSharp, informationCircleOutline, personCircleOutline } from "ionicons/icons";
+import {
+  arrowBackSharp,
+  informationCircleOutline,
+  personCircleOutline,
+} from "ionicons/icons";
 
 import Typing from "../../components/Chat/Typing";
 import MessageInput from "../../components/MessageInput";
 import { ChatList, Me, Others } from "../../components/Chat";
 
 import { RootState } from "../../redux/types";
-import { Conversation } from "../../utils/types";
+import { Conversation } from "../../redux/commons/types";
 import { FilePayload } from "../../redux/commons/types";
 import { ChatListMethods } from "../../components/Chat/types";
-import { P2PMessage, P2PMessageReceipt, P2PHashMap } from "../../redux/p2pmessages/types";
+import {
+  P2PMessage,
+  P2PMessageReceipt,
+  P2PHashMap,
+} from "../../redux/p2pmessages/types";
 
-import { 
-  sendMessage, 
-  getNextBatchMessages, 
-  readMessage, 
-  isTyping, 
-  getFileBytes
+import {
+  sendMessage,
+  getNextBatchMessages,
+  readMessage,
+  isTyping,
+  getFileBytes,
 } from "../../redux/p2pmessages/actions";
 
 import {
@@ -51,13 +59,20 @@ type Props = {
 const Chat: React.FC<Props> = ({ location }) => {
   /* STATES */
   const { username } = useParams<{ username: string }>();
-  const [ message, setMessage ] = useState<string>("");
-  const [ files, setFiles ] = useState<any[]>([]);
-  const [ messagesWithConversant, setMessagesWithConversant ] = useState<any[]>([]);
-  const [ disableGetNextBatch, setDisableGetNextBatch ] = useState<boolean>(false);
-  const { conversations, messages, receipts } = useSelector((state: RootState) => state.p2pmessages);
-  const fetchedFiles = useSelector((state: RootState) => state.p2pmessages.files);
-  const typing = useSelector((state:RootState) => state.p2pmessages.typing);
+  const [message, setMessage] = useState<string>("");
+  const [files, setFiles] = useState<any[]>([]);
+  const [messagesWithConversant, setMessagesWithConversant] = useState<any[]>(
+    []
+  );
+  const [disableGetNextBatch, setDisableGetNextBatch] =
+    useState<boolean>(false);
+  const { conversations, messages, receipts } = useSelector(
+    (state: RootState) => state.p2pmessages
+  );
+  const fetchedFiles = useSelector(
+    (state: RootState) => state.p2pmessages.files
+  );
+  const typing = useSelector((state: RootState) => state.p2pmessages.typing);
   const conversant = useSelector((state: RootState) => {
     let contacts = state.contacts.contacts;
     let conversant = Object.values(contacts).filter(
@@ -203,7 +218,8 @@ const Chat: React.FC<Props> = ({ location }) => {
         })
       ).then((res: P2PHashMap) => {
         // disable getNextBatch if return value is empty
-        if (Object.values(res)[0]["u" + conversant.id].length <= 0) setDisableGetNextBatch(true)
+        if (Object.values(res)[0]["u" + conversant.id].length <= 0)
+          setDisableGetNextBatch(true);
       });
       complete();
     }
@@ -213,7 +229,7 @@ const Chat: React.FC<Props> = ({ location }) => {
   /*
     Handle back button
   */
-  const handleOnBack = () => history.push({pathname: `/home`});
+  const handleOnBack = () => history.push({ pathname: `/home` });
 
   /* 
     dispatches an action to hc to mark a message as read 
@@ -236,12 +252,14 @@ const Chat: React.FC<Props> = ({ location }) => {
   */
   const onDownloadHandler = (file: FilePayload) => {
     fetchedFiles["u" + file.fileHash] !== undefined
-    ? downloadFile(fetchedFiles["u" + file.fileHash], file.fileName)
-    : dispatch(getFileBytes([base64ToUint8Array(file.fileHash)]))
-      .then((res: {[key:string]: Uint8Array}) => downloadFile(res["u" + file.fileHash], file.fileName))
-  }
+      ? downloadFile(fetchedFiles["u" + file.fileHash], file.fileName)
+      : dispatch(getFileBytes([base64ToUint8Array(file.fileHash)])).then(
+          (res: { [key: string]: Uint8Array }) =>
+            downloadFile(res["u" + file.fileHash], file.fileName)
+        );
+  };
   const downloadFile = (fileBytes: Uint8Array, fileName: string) => {
-    const blob = new Blob([fileBytes]); // change resultByte to bytes  
+    const blob = new Blob([fileBytes]); // change resultByte to bytes
     const link = document.createElement("a");
     link.href = window.URL.createObjectURL(blob);
     link.download = fileName;
@@ -251,25 +269,27 @@ const Chat: React.FC<Props> = ({ location }) => {
   /* 
     renders the appropriate chat bubble
   */
-  const displayMessage = (messageBundle: { message: P2PMessage, receipt: P2PMessageReceipt}) => {
+  const displayMessage = (messageBundle: {
+    message: P2PMessage;
+    receipt: P2PMessageReceipt;
+  }) => {
     // assume that this will be called with messages in sorted order
 
     let key = messageBundle.message.p2pMessageEntryHash;
     let author = messageBundle.message.author;
     let timestamp = messageBundle.receipt.timestamp;
     let payload = messageBundle.message.payload;
-    let readlist = messageBundle.receipt.status === "read" 
-      ? { key: timestamp } 
-      : undefined;
+    let readlist =
+      messageBundle.receipt.status === "read" ? { key: timestamp } : undefined;
 
     // get file bytes when rendering video messages
     // TODO: will change to getting file bytes when played
     if (
-      payload.type === "FILE"
-      && (payload as FilePayload).fileType === "VIDEO"
-      && fetchedFiles["u" + payload.fileHash] === undefined
+      payload.type === "FILE" &&
+      (payload as FilePayload).fileType === "VIDEO" &&
+      fetchedFiles["u" + payload.fileHash] === undefined
     ) {
-      dispatch(getFileBytes([base64ToUint8Array(payload.fileHash)]))
+      dispatch(getFileBytes([base64ToUint8Array(payload.fileHash)]));
     }
 
     return conversant.id !== author.slice(1) ? (
@@ -282,7 +302,7 @@ const Chat: React.FC<Props> = ({ location }) => {
         readList={readlist ? readlist : {}}
         showProfilePicture={true}
         showName={true}
-        onDownload={file => onDownloadHandler(file)}
+        onDownload={(file) => onDownloadHandler(file)}
       />
     ) : (
       <Others
@@ -295,7 +315,7 @@ const Chat: React.FC<Props> = ({ location }) => {
         showProfilePicture={true}
         showName={true}
         onSeen={(complete) => onSeenHandler(messageBundle)}
-        onDownload={file => onDownloadHandler(file)}
+        onDownload={(file) => onDownloadHandler(file)}
       />
     );
   };
@@ -306,16 +326,17 @@ const Chat: React.FC<Props> = ({ location }) => {
       <IonHeader>
         <IonToolbar>
           <IonButtons>
-            <IonButton onClick={() => handleOnBack()} className="ion-no-padding">
+            <IonButton
+              onClick={() => handleOnBack()}
+              className="ion-no-padding"
+            >
               <IonIcon slot="icon-only" icon={arrowBackSharp} />
             </IonButton>
             <IonAvatar className="ion-padding">
               <img src={personCircleOutline} alt={username} />
             </IonAvatar>
             <IonTitle className="item item-text-wrap">{username}</IonTitle>
-            <IonButton
-              onClick={handleOnClick}
-            >
+            <IonButton onClick={handleOnClick}>
               <IonIcon slot="icon-only" icon={informationCircleOutline} />
             </IonButton>
           </IonButtons>

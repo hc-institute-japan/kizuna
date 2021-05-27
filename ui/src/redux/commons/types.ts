@@ -1,5 +1,6 @@
 /* 
-  These are types that are commonly used across redux.
+  TODO: Discuss how to manage these types as it currently is being used in Redux and UI (dunno if that is problematic)
+  These are types that are commonly used across redux (and currently in the react components as well).
   As much as possible, use the types here and do not make any type on your own
   if it is not absolutely necessary.
 */
@@ -9,6 +10,9 @@
   as it is cumbersome to translate data types among Buffer, Uint8Array, and string. 
   TODO: This may be a temporary solution that may have better fix in the future
 */
+
+import { Profile } from "../profile/types";
+
 export type HoloHash = Uint8Array;
 
 export type ProfileID = string;
@@ -93,3 +97,27 @@ export function isVideo(
     "VIDEO"
   );
 }
+
+/* 
+  Temporarily placing these types here which is being used in the UI
+*/
+
+export interface Message {
+  id: string;
+  sender: Profile;
+  message: string;
+  fileName?: string;
+  /* TODO: tats needs to fix the timestamp type in GroupMessage so that this can be typed as Date  */
+  timestamp: [number, number];
+}
+
+/* used in Conversations page */
+export interface Conversation {
+  id: string;
+  name: string;
+  src: string;
+  sender?: string;
+  messages: Message[];
+}
+
+export type Conversations = Conversation[];
