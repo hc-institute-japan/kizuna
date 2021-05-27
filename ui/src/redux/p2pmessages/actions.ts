@@ -504,7 +504,7 @@ export const isTyping =
 
 export const countUnread =
   (conversant: string): ThunkAction =>
-  async (dispatch, getState) => {
+  (dispatch, getState) => {
     const { conversations, messages, receipts } = getState().p2pmessages;
     const conversation = conversations[conversant].messages;
     let unreadCounter = 0;

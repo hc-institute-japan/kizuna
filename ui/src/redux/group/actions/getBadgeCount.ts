@@ -1,15 +1,11 @@
-import { serializeHash } from "@holochain-open-dev/core-types";
 import { ThunkAction } from "../../types";
 import { GroupConversation } from "../types";
 
 export const getGroupConversationBadgeCount =
   (groupId: string): ThunkAction =>
-  async (dispatch, getState, { getAgentId }) => {
-    const myAgentId = await getAgentId();
-    /* tatssato: myAgentId AFAIK is non-nullable */
-    const myAgentIdB64 = serializeHash(myAgentId!);
+  (_dispatch, getState) => {
     const state = getState();
-
+    const myAgentId = state.profile.id;
     const groupConversation: GroupConversation =
       state.groups.conversations[groupId];
     const allGroupMessages = state.groups.messages;
@@ -20,8 +16,7 @@ export const getGroupConversationBadgeCount =
     */
     const readLists = groupConversation.messages
       .filter(
-        (messageId: string) =>
-          allGroupMessages[messageId].author !== myAgentIdB64
+        (messageId: string) => allGroupMessages[messageId].author !== myAgentId
       )
       .map((messageId: string) => allGroupMessages[messageId].readList);
 
@@ -30,8 +25,7 @@ export const getGroupConversationBadgeCount =
       present as key in the readList object.
     */
     let badgeCount = readLists.filter(
-      (readList: { [key: string]: Date }) =>
-        readList[myAgentIdB64] !== undefined
+      (readList: { [key: string]: Date }) => readList[myAgentId!] !== undefined
     ).length;
 
     return badgeCount;

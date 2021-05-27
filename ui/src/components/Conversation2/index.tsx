@@ -16,7 +16,6 @@ import styles from "./style.module.css";
 // }
 
 interface Props {
-  type: "p2p" | "group";
   conversation: ConversationDetail;
   /* name for p2p is the sender's username, and for group it is the name of the group */
   myAgentId: string;
@@ -24,7 +23,6 @@ interface Props {
 }
 
 const Conversation: React.FC<Props> = ({
-  type,
   conversation,
   myAgentId,
   onClick,
@@ -56,7 +54,11 @@ const Conversation: React.FC<Props> = ({
             TODO: add actual avatar of the conversation to the prop being passed
             to avoid this
           */
-          src={type === "group" ? peopleCircleOutline : personCircleOutline}
+          src={
+            conversation.type === "group"
+              ? peopleCircleOutline
+              : personCircleOutline
+          }
           alt={`${conversation.conversationName}'s chat`}
         />
       </IonAvatar>
