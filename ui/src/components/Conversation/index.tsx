@@ -1,4 +1,4 @@
-import { serializeHash } from "@holochain-open-dev/core-types";
+// import { serializeHash } from "@holochain-open-dev/core-types";
 import {
   IonAvatar,
   IonBadge,
@@ -9,13 +9,9 @@ import {
 import { peopleCircleOutline, personCircleOutline } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
-import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
-import { getAgentId } from "../../redux/profile/actions";
 
 import { Profile } from "../../redux/profile/types";
-import { RootState } from "../../redux/types";
-import { useAppDispatch } from "../../utils/helpers";
 import { Message } from "../../utils/types";
 import styles from "./style.module.css";
 
@@ -24,6 +20,7 @@ interface Props {
   groupId?: string;
   content: { src: string; sender?: string; name: string; messages: Message[] };
   myAgentId: string;
+  badgeCount: number;
 }
 
 const Conversation: React.FC<Props> = ({
@@ -31,10 +28,10 @@ const Conversation: React.FC<Props> = ({
   isGroup,
   groupId,
   myAgentId,
+  badgeCount
 }) => {
   const intl = useIntl();
   const { src, name, messages } = content;
-  const [badgeCount, setBadgeCount] = useState(0);
 
   const [latestMessageDetail, setLatestMessageDetail] = useState<{
     message: string;
@@ -47,7 +44,6 @@ const Conversation: React.FC<Props> = ({
     payload: "TEXT",
   });
   const history = useHistory();
-  const dispatch = useAppDispatch();
 
   const handleOnClick = () => {
     if (isGroup) {
@@ -57,68 +53,69 @@ const Conversation: React.FC<Props> = ({
     }
   };
 
-  useSelector((state: RootState) => {
-    if (groupId) {
-      if (isGroup) {
-        const group = state.groups.conversations[groupId];
-        if (group) {
-          dispatch(getAgentId()).then((myAgentPubKey: any) => {
-            console.log("here is the group", group);
-            const messagesReadList = group.messages
-              .map((message) => {
-                if (
-                  state.groups.messages[message].author ===
-                  serializeHash(myAgentPubKey)
-                ) {
-                  return null;
-                } else {
-                  return state.groups.messages[message].readList;
-                }
-              })
-              .filter((value) => value !== null);
-            if (myAgentPubKey) {
-              let badgeCount = messagesReadList.filter((messageReadList) => {
-                let maybeRead = Object.keys(messageReadList!).filter(
-                  (key: string) => key === serializeHash(myAgentPubKey)
-                );
-                if (maybeRead.length === 0) {
-                  return true;
-                } else {
-                  return false;
-                }
-              }).length;
-              setBadgeCount(badgeCount);
-            }
-          });
-        }
-      } else {
-        const { conversations, messages, receipts } = state.p2pmessages;
-        const conversation = conversations[groupId].messages;
-        let unreadCounter = 0;
-        conversation.map((messageID) => {
-          let message = messages[messageID];
-          let receiptIDs = message.receipts;
-          let filteredReceipts = receiptIDs.map((receiptID) => {
-            let receipt = receipts[receiptID];
-            return receipt;
-          });
-          filteredReceipts.sort((a: any, b: any) => {
-            let receiptTimestampA = a.timestamp.getTime();
-            let receiptTimestampB = b.timestamp.getTime();
-            if (receiptTimestampA > receiptTimestampB) return -1;
-            if (receiptTimestampA < receiptTimestampB) return 1;
-            return 0;
-          });
-          let latestReceipt = filteredReceipts[0];
-          if (latestReceipt.status !== "read" && message.author === groupId)
-            unreadCounter = unreadCounter + 1;
-        });
-        dispatch(getAgentId()).then((id: any) => {
-          if (id) setBadgeCount(unreadCounter);
-        });
-      }
-    }
-  });
+  // move this logic to parent page and pass the badge count value as prop
+  // useSelector((state: RootState) => {
+  //   if (groupId) {
+  //     if (isGroup) {
+  //       const group = state.groups.conversations[groupId];
+  //       if (group) {
+  //         dispatch(getAgentId()).then((myAgentPubKey: any) => {
+  //           console.log("here is the group", group);
+  //           const messagesReadList = group.messages
+  //             .map((message) => {
+  //               if (
+  //                 state.groups.messages[message].author ===
+  //                 serializeHash(myAgentPubKey)
+  //               ) {
+  //                 return null;
+  //               } else {
+  //                 return state.groups.messages[message].readList;
+  //               }
+  //             })
+  //             .filter((value) => value !== null);
+  //           if (myAgentPubKey) {
+  //             let badgeCount = messagesReadList.filter((messageReadList) => {
+  //               let maybeRead = Object.keys(messageReadList!).filter(
+  //                 (key: string) => key === serializeHash(myAgentPubKey)
+  //               );
+  //               if (maybeRead.length === 0) {
+  //                 return true;
+  //               } else {
+  //                 return false;
+  //               }
+  //             }).length;
+  //             setBadgeCount(badgeCount);
+  //           }
+  //         });
+  //       }
+  //     } else {
+  //       const { conversations, messages, receipts } = state.p2pmessages;
+  //       const conversation = conversations[groupId].messages;
+  //       let unreadCounter = 0;
+  //       conversation.map((messageID) => {
+  //         let message = messages[messageID];
+  //         let receiptIDs = message.receipts;
+  //         let filteredReceipts = receiptIDs.map((receiptID) => {
+  //           let receipt = receipts[receiptID];
+  //           return receipt;
+  //         });
+  //         filteredReceipts.sort((a: any, b: any) => {
+  //           let receiptTimestampA = a.timestamp.getTime();
+  //           let receiptTimestampB = b.timestamp.getTime();
+  //           if (receiptTimestampA > receiptTimestampB) return -1;
+  //           if (receiptTimestampA < receiptTimestampB) return 1;
+  //           return 0;
+  //         });
+  //         let latestReceipt = filteredReceipts[0];
+  //         if (latestReceipt.status !== "read" && message.author === groupId)
+  //           unreadCounter = unreadCounter + 1;
+  //       });
+  //       dispatch(getAgentId()).then((id: any) => {
+  //         if (id) setBadgeCount(unreadCounter);
+  //       });
+  //     }
+  //   }
+  // });
 
   useEffect(() => {
     setLatestMessageDetail(
