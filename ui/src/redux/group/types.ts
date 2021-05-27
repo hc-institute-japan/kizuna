@@ -209,11 +209,10 @@ export interface GroupConversationsState {
   };
 }
 
-// TODO: use it for typing action
 export interface AddGroupAction {
   type: typeof ADD_GROUP;
   groupData: GroupConversation;
-  membersUsernames: {
+  membersProfile: {
     [key: string]: Profile;
   };
 }

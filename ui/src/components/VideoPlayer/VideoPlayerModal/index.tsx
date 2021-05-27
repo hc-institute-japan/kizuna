@@ -35,6 +35,8 @@ const VideoPlayerModal: React.FC<Props> = ({
   download,
   onPlayPauseErrorHandler,
 }) => {
+const VideoPlayerModal: React.FC<Props> = ({ open, src, download }) => {
+  const intl = useIntl();
   const [isOpen, setIsOpen] = open;
 
   const [popover, setPopover] = useState({ isOpen: false, event: undefined });
@@ -182,12 +184,14 @@ const VideoPlayerModal: React.FC<Props> = ({
           <IonList>
             {download ? (
               <IonItem
+                lines="none"
+                button
                 onClick={() => {
                   download();
                   setPopover({ isOpen: false, event: undefined });
                 }}
               >
-                <IonLabel>Download</IonLabel>
+                <IonLabel>{intl.formatMessage({id: "components.chat.media-modal-download"})}</IonLabel>
               </IonItem>
             ) : null}
           </IonList>
