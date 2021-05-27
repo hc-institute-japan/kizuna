@@ -1,15 +1,22 @@
 import { serializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../connection/types";
 import { ThunkAction } from "../types";
-import { SET_USERNAME } from "./types";
+import { ProfileActionTypes, SET_USERNAME } from "./types";
 
 export const setUsername =
   (username: string | null): ThunkAction =>
-  (dispatch, _getState) =>
-    dispatch({
+  async (dispatch, _getState, { getAgentId }) => {
+    const myAgentId = await getAgentId();
+    /* assume that getAgentId() is non-nullable */
+    const myAgentIdB64 = serializeHash(myAgentId!);
+
+    dispatch<ProfileActionTypes>({
       type: SET_USERNAME,
-      username,
+      id: myAgentIdB64,
+      /* assert that username is non-nullable */
+      username: username!,
     });
+  };
 
 export const fetchMyUsername =
   (): ThunkAction =>
@@ -18,10 +25,14 @@ export const fetchMyUsername =
       zomeName: ZOMES.USERNAME,
       fnName: FUNCTIONS[ZOMES.USERNAME].GET_MY_USERNAME,
     });
+    const myAgentId = await getAgentId();
+    /* assume that getAgentId() is non-nullable */
+    const myAgentIdB64 = serializeHash(myAgentId!);
     if (res?.type !== "error") {
       dispatch({
         type: SET_USERNAME,
         username: res.username,
+        id: myAgentIdB64,
       });
     }
   };
@@ -35,9 +46,14 @@ export const registerUsername =
       payload: username,
     });
 
+    const myAgentId = await getAgentId();
+    /* assume that getAgentId() is non-nullable */
+    const myAgentIdB64 = serializeHash(myAgentId!);
+
     if (res?.type !== "error") {
-      dispatch({
+      dispatch<ProfileActionTypes>({
         type: SET_USERNAME,
+        id: myAgentIdB64,
         username: res.username,
       });
       return res;

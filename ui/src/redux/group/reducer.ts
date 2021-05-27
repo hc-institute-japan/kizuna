@@ -33,11 +33,6 @@ const reducer = (
   action: GroupConversationsActionTypes
 ) => {
   switch (action.type) {
-    case SET_FILES_BYTES:
-      return {
-        ...state,
-        groupFiles: action.filesBytes,
-      };
     case ADD_GROUP: {
       let groupEntryHash: string = action.groupData.originalGroupEntryHash;
       let newConversation: { [key: string]: GroupConversation } = {
@@ -113,7 +108,15 @@ const reducer = (
         state.conversations[groupEntryHash];
 
       if (groupConversation) {
-        groupConversation.messages.push(groupMessage.groupMessageEntryHash);
+        /*
+          New messageId should always be prepend as the first element of array
+          for easy retrieval in the view.
+          Question: Is unshift() better?
+        */
+        groupConversation.messages = [
+          groupMessage.groupMessageEntryHash,
+          ...groupConversation.messages,
+        ];
       }
       let newMessage: { [key: string]: GroupMessage } = {
         [groupMessageEntryHash]: groupMessage,
@@ -139,12 +142,16 @@ const reducer = (
         return { ...state, messages };
       }
     }
+    case SET_FILES_BYTES:
+      return {
+        ...state,
+        groupFiles: action.filesBytes,
+      };
     case SET_NEXT_BATCH_GROUP_MESSAGES: // fallthrough since its the same process with the next case
     case SET_MESSAGES_BY_GROUP_BY_TIMESTAMP: {
       let groupConversations = state.conversations;
       let groupConversation: GroupConversation =
         groupConversations[action.groupId];
-      // we probably won't have any duplicates of hash but just in case we do we dedupe here
 
       groupConversation.messages = groupConversation.messages
         ? Array.from(
@@ -155,6 +162,7 @@ const reducer = (
             )
           )
         : groupConversations[action.groupId].messages;
+
       groupConversations = {
         ...groupConversations,
         [action.groupId]: groupConversation,

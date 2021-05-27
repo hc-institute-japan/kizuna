@@ -9,7 +9,7 @@ import {
   SET_LATEST_GROUP_STATE,
 } from "../group/types";
 import { getLatestMessages } from "../p2pmessages/actions";
-import { Profile, SET_USERNAME } from "../profile/types";
+import { Profile, ProfileActionTypes, SET_USERNAME } from "../profile/types";
 import { ThunkAction } from "../types";
 
 export const getLatestData =
@@ -22,8 +22,13 @@ export const getLatestData =
       fnName: FUNCTIONS[ZOMES.AGGREGATOR].RETRIEVE_LATEST_DATA,
     });
 
-    dispatch({
+    const myAgentId = await getAgentId();
+    /* assume that getAgentId() is non-nullable */
+    const myAgentIdB64 = serializeHash(myAgentId!);
+
+    dispatch<ProfileActionTypes>({
       type: SET_USERNAME,
+      id: myAgentIdB64,
       username: latestData.userInfo.username,
     });
 
