@@ -5,19 +5,29 @@ import { useSelector } from "react-redux";
 import { useIntl } from "react-intl";
 
 // Redux
-import { GroupMessage, GroupMessageReadData, GroupMessagesContents, GroupMessagesOutput } from "../../../redux/group/types";
+import {
+  GroupMessage,
+  GroupMessageReadData,
+  GroupMessagesContents,
+  GroupMessagesOutput,
+} from "../../../redux/group/types";
 import { readGroupMessage } from "../../../redux/group/actions/readGroupMessage";
 import { getNextBatchGroupMessages } from "../../../redux/group/actions/getNextBatchGroupMessages";
 import { fetchFilesBytes } from "../../../redux/group/actions/setFilesBytes";
 import { RootState } from "../../../redux/types";
 import { FilePayload } from "../../../redux/commons/types";
-import { fetchId } from "../../../redux/profile/actions";
+import { getAgentId } from "../../../redux/profile/actions";
 
 // Components
 import Chat from "../../../components/Chat";
 import { ChatListMethods } from "../../../components/Chat/types";
 
-import { base64ToUint8Array, isTextPayload, Uint8ArrayToBase64, useAppDispatch } from "../../../utils/helpers";
+import {
+  deserializeAgentPubKey,
+  isTextPayload,
+  useAppDispatch,
+} from "../../../utils/helpers";
+import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
 
 interface Props {
   messageIds: string[];
@@ -67,9 +77,7 @@ const MessageList: React.FC<Props> = ({
                   fileHash: payload.fileHash,
                 };
               } else {
-                dispatch(
-                  fetchFilesBytes([base64ToUint8Array(payload.fileHash)])
-                );
+                dispatch(fetchFilesBytes([deserializeHash(payload.fileHash)]));
               }
             }
             return {
@@ -103,11 +111,11 @@ const MessageList: React.FC<Props> = ({
       let lastMessage = messagesData![0];
       dispatch(
         getNextBatchGroupMessages({
-          groupId: base64ToUint8Array(groupId),
+          groupId: deserializeHash(groupId),
           // the entry hash of the last message in the last batch fetched
           lastFetched: oldestMessage
-            ? base64ToUint8Array(oldestMessage.groupMessageEntryHash)
-            : base64ToUint8Array(lastMessage.groupMessageEntryHash),
+            ? deserializeHash(oldestMessage.groupMessageEntryHash)
+            : deserializeHash(lastMessage.groupMessageEntryHash),
           // 0 - seconds since epoch, 1 - nanoseconds. See Timestamp type in hdk doc for more info.
           lastMessageTimestamp: lastMessage.timestamp,
           batchSize: 10,
@@ -162,9 +170,8 @@ const MessageList: React.FC<Props> = ({
   }, [messageIds]);
 
   useEffect(() => {
-    let maybeThisGroupNewestMessageKey = Object.keys(allMessages)[
-      Object.keys(allMessages).length - 1
-    ];
+    let maybeThisGroupNewestMessageKey =
+      Object.keys(allMessages)[Object.keys(allMessages).length - 1];
     let maybeThisGroupNewestMessage =
       allMessages[maybeThisGroupNewestMessageKey];
     if (maybeThisGroupNewestMessageKey) {
@@ -207,7 +214,7 @@ const MessageList: React.FC<Props> = ({
       link.download = file.fileName;
       link.click();
     } else {
-      dispatch(fetchFilesBytes([base64ToUint8Array(file.fileHash)])).then(
+      dispatch(fetchFilesBytes([deserializeHash(file.fileHash)])).then(
         (res: any) => {
           if (res) {
             const fetchedFileBytes = res[`u${file.fileHash}`];
@@ -262,34 +269,33 @@ const MessageList: React.FC<Props> = ({
               type="group"
               showName={true}
               onSeen={(complete) => {
-                dispatch(fetchId()).then((res: AgentPubKey | null) => {
-                  setMyAgentId(Uint8ArrayToBase64(res!));
-                  let read: boolean = Object.keys(message.readList)
-                    .map((key: string) => {
-                      key = key.slice(5);
-                      return key;
-                    })
-                    .includes(Uint8ArrayToBase64(res!).slice(4));
-
-                  if (!read) {
-                    let groupMessageReadData: GroupMessageReadData = {
-                      groupId: base64ToUint8Array(groupId),
-                      messageIds: [
-                        base64ToUint8Array(message.groupMessageEntryHash),
-                      ],
-                      reader: res!,
-                      timestamp: message.timestamp,
-                      members: members.map((member: string) =>
-                        Buffer.from(base64ToUint8Array(member).buffer)
-                      ),
-                    };
-                    dispatch(readGroupMessage(groupMessageReadData)).then(
-                      (res: any) => {
-                        complete();
-                      }
+                dispatch(getAgentId()).then(
+                  (myAgentPubKey: AgentPubKey | null) => {
+                    setMyAgentId(serializeHash(myAgentPubKey!));
+                    let read: boolean = Object.keys(message.readList).includes(
+                      serializeHash(myAgentPubKey!)
                     );
+
+                    if (!read) {
+                      let groupMessageReadData: GroupMessageReadData = {
+                        groupId: deserializeHash(groupId),
+                        messageIds: [
+                          deserializeHash(message.groupMessageEntryHash),
+                        ],
+                        reader: myAgentPubKey!,
+                        timestamp: message.timestamp,
+                        members: members.map((member: string) =>
+                          deserializeAgentPubKey(member)
+                        ),
+                      };
+                      dispatch(readGroupMessage(groupMessageReadData)).then(
+                        (res: any) => {
+                          complete();
+                        }
+                      );
+                    }
                   }
-                });
+                );
                 // TODO: This is only a temporary fix. The HashType should be changed to Agent in the hc side when ReadList is constrcuted
                 // to avoid doing something like this in UI.
               }}

@@ -1,12 +1,10 @@
+import { serializeHash } from "@holochain-open-dev/core-types";
 import { AgentPubKey } from "@holochain/conductor-api";
 import { FUNCTIONS, ZOMES } from "../../../../connection/types";
+import { deserializeAgentPubKey } from "../../../../utils/helpers";
 import { Profile } from "../../../profile/types";
 import { ThunkAction } from "../../../types";
 import { AddGroupAction, ADD_GROUP, GroupConversation } from "../../types";
-import {
-  base64ToUint8Array,
-  Uint8ArrayToBase64,
-} from "../../../../utils/helpers";
 
 const addedToGroup =
   (signalPayload: any): ThunkAction =>
@@ -16,17 +14,15 @@ const addedToGroup =
     let contacts = state.contacts.contacts;
     let username = state.profile.username!; // At this point, username is non-nullable
     let myAgentId = await getAgentId();
-    let myAgentIdBase64 = Uint8ArrayToBase64(myAgentId!); // AgentPubKey should be non-nullable here
+    let myAgentIdBase64 = serializeHash(myAgentId!); // AgentPubKey should be non-nullable here
 
     const groupData: GroupConversation = {
-      originalGroupEntryHash: Uint8ArrayToBase64(payload.groupId),
-      originalGroupHeaderHash: Uint8ArrayToBase64(payload.groupRevisionId),
+      originalGroupEntryHash: serializeHash(payload.groupId),
+      originalGroupHeaderHash: serializeHash(payload.groupRevisionId),
       name: payload.latestName,
-      members: payload.members.map((member: Buffer) =>
-        Uint8ArrayToBase64(member)
-      ),
+      members: payload.members.map((member: Buffer) => serializeHash(member)),
       createdAt: payload.created,
-      creator: Uint8ArrayToBase64(payload.creator),
+      creator: serializeHash(payload.creator),
       messages: [],
     };
 
@@ -51,7 +47,7 @@ const addedToGroup =
       if (memberProfile) {
         membersProfile[member] = memberProfile;
       } else {
-        nonAddedProfiles.push(Buffer.from(base64ToUint8Array(member).buffer));
+        nonAddedProfiles.push(deserializeAgentPubKey(member));
       }
     });
 
@@ -63,7 +59,7 @@ const addedToGroup =
         payload: nonAddedProfiles,
       });
       profiles.forEach((profile: any) => {
-        let base64 = Uint8ArrayToBase64(profile.agentId);
+        let base64 = serializeHash(profile.agentId);
         membersProfile[base64] = {
           id: base64,
           username: profile.username,

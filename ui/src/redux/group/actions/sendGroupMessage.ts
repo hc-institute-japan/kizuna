@@ -1,6 +1,6 @@
+import { serializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
 import { ThunkAction } from "../../types";
-import { Uint8ArrayToBase64 } from "../../../utils/helpers";
 import {
   // action types
   SET_GROUP_MESSAGE,
@@ -27,6 +27,7 @@ export const sendGroupMessage =
     // TODO: error handling
     if (isTextPayload(groupMessageData.payloadInput)) {
       let message = groupMessageData.payloadInput.payload.payload;
+      /* input sanitization for text payload */
       groupMessageData.payloadInput.payload = { payload: message.trim() };
     }
 
@@ -38,11 +39,14 @@ export const sendGroupMessage =
 
     let payload: Payload;
     let fileBytes: Uint8Array | undefined;
+
+    /* convert the payload returned from HC to UI appropriate payload type */
     if (isTextPayload(groupMessageData.payloadInput)) {
       payload = sendGroupMessageOutput.content.payload;
     } else {
       let fileType: FileType =
         sendGroupMessageOutput.content.payload.payload.fileType;
+      /* set the thumbnail if the file type is either a media or video */
       let thumbnail: Uint8Array | undefined = isOther(fileType)
         ? undefined
         : isImage(fileType)
@@ -70,7 +74,7 @@ export const sendGroupMessage =
           sendGroupMessageOutput.content.payload.payload.metadata.fileSize,
         fileType:
           sendGroupMessageOutput.content.payload.payload.metadata.fileType,
-        fileHash: Uint8ArrayToBase64(
+        fileHash: serializeHash(
           sendGroupMessageOutput.content.payload.payload.metadata.fileHash
         ),
         thumbnail,
@@ -78,25 +82,24 @@ export const sendGroupMessage =
       payload = filePayload;
     }
 
-    let groupMessageDataFromRes: GroupMessage = {
-      groupMessageEntryHash: Uint8ArrayToBase64(sendGroupMessageOutput.id),
-      groupEntryHash: Uint8ArrayToBase64(
-        sendGroupMessageOutput.content.groupHash
-      ),
-      author: Uint8ArrayToBase64(sendGroupMessageOutput.content.sender),
+    /* the final GroupMessage data type converted from the returned value of the Zome fn above */
+    let groupMessageDataConverted: GroupMessage = {
+      groupMessageEntryHash: serializeHash(sendGroupMessageOutput.id),
+      groupEntryHash: serializeHash(sendGroupMessageOutput.content.groupHash),
+      author: serializeHash(sendGroupMessageOutput.content.sender),
       payload,
       timestamp: sendGroupMessageOutput.content.created,
       replyTo: !sendGroupMessageOutput.content.replyTo
         ? undefined
-        : Uint8ArrayToBase64(sendGroupMessageOutput.content.replyTo),
+        : serializeHash(sendGroupMessageOutput.content.replyTo),
       readList: {},
     };
 
     dispatch<SetGroupMessageAction>({
       type: SET_GROUP_MESSAGE,
-      groupMessage: groupMessageDataFromRes,
+      groupMessage: groupMessageDataConverted,
       fileBytes,
     });
 
-    return groupMessageDataFromRes;
+    return groupMessageDataConverted;
   };

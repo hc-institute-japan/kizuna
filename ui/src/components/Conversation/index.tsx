@@ -1,3 +1,4 @@
+import { serializeHash } from "@holochain-open-dev/core-types";
 import {
   IonAvatar,
   IonBadge,
@@ -5,16 +6,16 @@ import {
   IonLabel,
   IonLoading,
 } from "@ionic/react";
-import { filter, peopleCircleOutline, personCircleOutline } from "ionicons/icons";
+import { peopleCircleOutline, personCircleOutline } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
-import { MessageFormatError, useIntl } from "react-intl";
+import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import { getAgentId } from "../../redux/profile/actions";
 
 import { Profile } from "../../redux/profile/types";
 import { RootState } from "../../redux/types";
-import { Uint8ArrayToBase64, useAppDispatch } from "../../utils/helpers";
+import { useAppDispatch } from "../../utils/helpers";
 import { Message } from "../../utils/types";
 import styles from "./style.module.css";
 
@@ -61,32 +62,31 @@ const Conversation: React.FC<Props> = ({
       if (isGroup) {
         const group = state.groups.conversations[groupId];
         if (group) {
-          dispatch(getAgentId()).then((id: any) => {
-            const messagesReadList = group.messages.map(
-              (message) => {
-                if (state.groups.messages[message].author === Uint8ArrayToBase64(id)) {
-                  return null
+          dispatch(getAgentId()).then((myAgentPubKey: any) => {
+            console.log("here is the group", group);
+            const messagesReadList = group.messages
+              .map((message) => {
+                if (
+                  state.groups.messages[message].author ===
+                  serializeHash(myAgentPubKey)
+                ) {
+                  return null;
                 } else {
-                  return state.groups.messages[message].readList
+                  return state.groups.messages[message].readList;
                 }
-              }
-            ).filter(value => value !== null);
-            if (id) {
-              // TODO: The slice() here is only a temporary method. 
-              // We should fix the hc side so that we dont have to do something like this in the UI.
-              let badgeCount = messagesReadList.filter(
-                (messageReadList) => {
-                  let maybeRead = Object.keys(messageReadList!).map((key: string) => {
-                    key = key.slice(5)
-                    return key;
-                  }).filter((key: string) => key === Uint8ArrayToBase64(id).slice(4));
-                  if (maybeRead.length === 0) {
-                    return true
-                  } else {
-                    return false
-                  }
+              })
+              .filter((value) => value !== null);
+            if (myAgentPubKey) {
+              let badgeCount = messagesReadList.filter((messageReadList) => {
+                let maybeRead = Object.keys(messageReadList!).filter(
+                  (key: string) => key === serializeHash(myAgentPubKey)
+                );
+                if (maybeRead.length === 0) {
+                  return true;
+                } else {
+                  return false;
                 }
-              ).length;
+              }).length;
               setBadgeCount(badgeCount);
             }
           });
@@ -100,7 +100,7 @@ const Conversation: React.FC<Props> = ({
           let receiptIDs = message.receipts;
           let filteredReceipts = receiptIDs.map((receiptID) => {
             let receipt = receipts[receiptID];
-            return receipt
+            return receipt;
           });
           filteredReceipts.sort((a: any, b: any) => {
             let receiptTimestampA = a.timestamp.getTime();
@@ -110,7 +110,8 @@ const Conversation: React.FC<Props> = ({
             return 0;
           });
           let latestReceipt = filteredReceipts[0];
-          if (latestReceipt.status !== "read" && message.author === groupId ) unreadCounter = unreadCounter + 1;
+          if (latestReceipt.status !== "read" && message.author === groupId)
+            unreadCounter = unreadCounter + 1;
         });
         dispatch(getAgentId()).then((id: any) => {
           if (id) setBadgeCount(unreadCounter);
@@ -146,6 +147,7 @@ const Conversation: React.FC<Props> = ({
       return x.timestamp[0] - y.timestamp[0];
     });
   }, [messages]);
+
   return latestMessageDetail.sender || isGroup ? (
     <IonItem onClick={handleOnClick}>
       <IonAvatar slot="start">

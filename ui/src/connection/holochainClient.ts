@@ -31,7 +31,8 @@ const init: () => any = async () => {
 };
 
 let myAgentId: AgentPubKey | null;
-// DO NOT USE THIS AS IT IS BUT INSTEAD USE THE fetchId ACTION FROM PROFILE INSTEAD
+
+/* DO NOT USE THIS AS IT IS BUT INSTEAD USE THE getAgentId() ACTION FROM PROFILE INSTEAD */
 export const getAgentId: () => Promise<AgentPubKey | null> = async () => {
   if (myAgentId) {
     return myAgentId;

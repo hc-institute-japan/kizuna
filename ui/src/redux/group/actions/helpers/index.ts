@@ -1,17 +1,18 @@
+import { serializeHash } from "@holochain-open-dev/core-types";
 import { AgentPubKey } from "@holochain/conductor-api";
 import { CombinedState } from "redux";
 import { FUNCTIONS, ZOMES } from "../../../../connection/types";
 import {
-  base64ToUint8Array,
+  deserializeAgentPubKey,
   objectMap,
   Uint8ArrayToBase64,
 } from "../../../../utils/helpers";
 import {
-  Payload,
-  TextPayload,
+  isOther,
   // type guards
   isTextPayload,
-  isOther,
+  Payload,
+  TextPayload,
 } from "../../../commons/types";
 import { ContactsState } from "../../../contacts/types";
 import { PreferenceState } from "../../../preference/types";
@@ -99,13 +100,14 @@ export const fetchUsernameOfMembers = async (
   callZome: (config: CallZomeConfig) => Promise<any>,
   myAgentId: string
 ) => {
-  let contacts = state.contacts.contacts;
+  const contacts = state.contacts.contacts;
   // can assume that this is non-nullable since agent cannot call this
   // function without having a username.
-  let username = state.profile.username!;
-  let undefinedProfiles: AgentPubKey[] = [];
+  const username = state.profile.username!;
 
+  let undefinedProfiles: AgentPubKey[] = [];
   let membersUsernames: { [key: string]: Profile } = {};
+
   members.forEach((member) => {
     if (contacts[member]) {
       membersUsernames[member] = contacts[member];
@@ -115,7 +117,7 @@ export const fetchUsernameOfMembers = async (
         username,
       };
     } else {
-      undefinedProfiles.push(Buffer.from(base64ToUint8Array(member).buffer));
+      undefinedProfiles.push(deserializeAgentPubKey(member));
     }
   });
 
@@ -126,7 +128,7 @@ export const fetchUsernameOfMembers = async (
       payload: undefinedProfiles,
     });
     res.forEach((profile: any) => {
-      let base64 = Uint8ArrayToBase64(profile.agentId);
+      let base64 = serializeHash(profile.agentId);
       membersUsernames[base64] = { id: base64, username: profile.username };
     });
   }

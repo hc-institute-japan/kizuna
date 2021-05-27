@@ -1,5 +1,5 @@
+import { serializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../connection/types";
-import { Uint8ArrayToBase64 } from "../../utils/helpers";
 import { SET_BLOCKED, SET_CONTACTS } from "../contacts/types";
 import { convertFetchedResToGroupMessagesOutput } from "../group/actions/helpers";
 import {
@@ -30,14 +30,14 @@ export const getLatestData =
     let contacts: { [key: string]: Profile } = {};
     let blocked: { [key: string]: Profile } = {};
     latestData.addedContacts.forEach((profile: any) => {
-      const base64 = Uint8ArrayToBase64(profile.agentId);
+      const base64 = serializeHash(profile.agentId);
       contacts[base64] = {
         id: base64,
         username: profile.username,
       };
     });
     latestData.blockedContacts.forEach((profile: any) => {
-      const base64 = Uint8ArrayToBase64(profile.agentId);
+      const base64 = serializeHash(profile.agentId);
       blocked[base64] = {
         id: base64,
         username: profile.username,
@@ -69,16 +69,14 @@ export const getLatestData =
     let groups: GroupConversation[] = latestData.groups.map(
       (group: any): GroupConversation => {
         return {
-          originalGroupEntryHash: Uint8ArrayToBase64(group.groupId),
-          originalGroupHeaderHash: Uint8ArrayToBase64(group.groupRevisionId),
+          originalGroupEntryHash: serializeHash(group.groupId),
+          originalGroupHeaderHash: serializeHash(group.groupRevisionId),
           name: group.latestName,
-          members: group.members.map((id: Buffer) => Uint8ArrayToBase64(id)),
+          members: group.members.map((id: Buffer) => serializeHash(id)),
           createdAt: group.created,
-          creator: Uint8ArrayToBase64(group.creator),
+          creator: serializeHash(group.creator),
           messages:
-            groupMessagesOutput.messagesByGroup[
-              Uint8ArrayToBase64(group.groupId)
-            ],
+            groupMessagesOutput.messagesByGroup[serializeHash(group.groupId)],
         };
       }
     );
@@ -86,7 +84,7 @@ export const getLatestData =
     let members: Profile[] = latestData.memberProfiles.map(
       (profile: any): Profile => {
         return {
-          id: Uint8ArrayToBase64(profile.agentId),
+          id: serializeHash(profile.agentId),
           username: profile.username,
         };
       }

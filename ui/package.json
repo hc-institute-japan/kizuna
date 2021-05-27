@@ -6,7 +6,7 @@
     "@capacitor/core": "2.4.5",
     "@capacitor/ios": "^2.4.5",
     "@holochain-open-dev/core-types": "git+https://github.com/holochain-open-dev/core-types.git#build",
-    "@holochain/conductor-api": "^0.0.1-dev.15",
+    "@holochain/conductor-api": "^0.0.4",
     "@ionic-native/core": "^5.31.1",
     "@ionic-native/file": "^5.31.1",
     "@ionic-native/file-transfer": "^5.31.1",

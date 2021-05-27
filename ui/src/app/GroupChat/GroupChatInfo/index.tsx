@@ -11,17 +11,17 @@ import {
   IonSlide,
   IonSlides,
   IonTitle,
-  IonToolbar
+  IonToolbar,
 } from "@ionic/react";
 import { arrowBackSharp } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory, useParams } from "react-router";
 // Redux
-import {  updateGroupName } from "../../../redux/group/actions/updateGroupName";
+import { updateGroupName } from "../../../redux/group/actions/updateGroupName";
 import { getLatestGroupVersion } from "../../../redux/group/actions/getLatestGroupVersion";
 import { GroupConversation } from "../../../redux/group/types";
-import { fetchId } from "../../../redux/profile/actions";
-import { Uint8ArrayToBase64, useAppDispatch } from "../../../utils/helpers";
+import { getAgentId } from "../../../redux/profile/actions";
+import { useAppDispatch } from "../../../utils/helpers";
 import EndButtons from "./EndButtons";
 // Components
 import SegmentTabs from "./SegmentTabs";
@@ -30,9 +30,7 @@ import File from "./TabsContent/Files/File";
 import Media from "./TabsContent/Media/Media";
 import Members from "./TabsContent/Members";
 import UpdateGroupName from "./UpdateGroupName";
-
-
-
+import { serializeHash } from "@holochain-open-dev/core-types";
 
 interface GroupChatParams {
   group: string;
@@ -55,11 +53,10 @@ const GroupChatInfo: React.FC = () => {
   const [modalLoading, setModalLoading] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [groupInfo, setGroupInfo] = useState<GroupConversation | undefined>();
-  const [ currentSegment, setCurrentSegment ] = useState<string>("Info");
+  const [currentSegment, setCurrentSegment] = useState<string>("Info");
 
   /* Refs */
   const slideRef = useRef<HTMLIonSlidesElement>(null);
-
 
   /* Handlers */
   const handleOnBack = () => {
@@ -98,10 +95,11 @@ const GroupChatInfo: React.FC = () => {
     when the slide is changed
   */
   const handleSlideChange = () => {
-    const segmentValues = ["Info", "Media", "Files"]
-    slideRef.current?.getActiveIndex()
+    const segmentValues = ["Info", "Media", "Files"];
+    slideRef.current
+      ?.getActiveIndex()
       .then((currentIndex) => setCurrentSegment(segmentValues[currentIndex]));
-  }
+  };
 
   /*
     Handler for update of GroupName
@@ -118,7 +116,7 @@ const GroupChatInfo: React.FC = () => {
       setModalLoading(false);
       setShowModal(false);
     });
-  }
+  };
 
   /*
     This is to make sure that the latest state of the Group is being fetched.
@@ -127,8 +125,8 @@ const GroupChatInfo: React.FC = () => {
     dispatch(getLatestGroupVersion(group)).then(
       (groupRes: GroupConversation) => {
         setGroupInfo(groupRes);
-        dispatch(fetchId()).then((myAgentId: AgentPubKey | null) => {
-          if (groupRes.creator !== Uint8ArrayToBase64(myAgentId!)) setDisabled(true); // disable group name edit button if agent is not the creator
+        dispatch(getAgentId()).then((myAgentId: AgentPubKey | null) => {
+          if (groupRes.creator !== serializeHash(myAgentId!)) setDisabled(true); // disable group name edit button if agent is not the creator
           setLoading(false);
         });
       }
@@ -139,10 +137,12 @@ const GroupChatInfo: React.FC = () => {
   return !loading && groupInfo ? (
     <IonPage>
       <IonHeader className={styles.header}>
-
         <IonToolbar>
           <IonButtons>
-            <IonButton onClick={() => handleOnBack()} className="ion-no-padding">
+            <IonButton
+              onClick={() => handleOnBack()}
+              className="ion-no-padding"
+            >
               <IonIcon slot="icon-only" icon={arrowBackSharp} />
             </IonButton>
           </IonButtons>
@@ -155,7 +155,10 @@ const GroupChatInfo: React.FC = () => {
 
         <IonTitle className={styles.groupname}>{groupInfo!.name}</IonTitle>
 
-        <SegmentTabs value={currentSegment} onSegmentChange={handleOnSegmentChange}/>
+        <SegmentTabs
+          value={currentSegment}
+          onSegmentChange={handleOnSegmentChange}
+        />
       </IonHeader>
 
       <IonContent>
@@ -167,7 +170,10 @@ const GroupChatInfo: React.FC = () => {
           onIonSlideDidChange={handleSlideChange}
         >
           <IonSlide>
-            <Members groupId={group} groupRevisionId={groupInfo!.originalGroupHeaderHash}/>
+            <Members
+              groupId={group}
+              groupRevisionId={groupInfo!.originalGroupHeaderHash}
+            />
           </IonSlide>
 
           <IonSlide>
@@ -178,9 +184,7 @@ const GroupChatInfo: React.FC = () => {
             <File groupId={group} />
           </IonSlide>
         </IonSlides>
-
       </IonContent>
-
 
       <IonModal isOpen={showModal} cssClass="my-custom-modal-css">
         <UpdateGroupName
