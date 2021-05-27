@@ -8,6 +8,7 @@ import {
 	IonInfiniteScroll,
 	IonInfiniteScrollContent
 }	 from "@ionic/react";
+import { useSelector } from "react-redux";
 
 import ImageView from "../../../../components/Chat/File/ImageView/index";
 import VideoView from "../../../../components/Chat/File/VideoView";
@@ -16,8 +17,9 @@ import FileView from "../../../../components/Chat/File/FileView";
 import { P2PMessage } from "../../../../redux/p2pmessages/types";
 import { FilePayload } from "../../../../redux/commons/types";
 import { Profile } from "../../../../redux/profile/types";
+import { RootState } from "../../../../redux/types";
 
-import { getNextBatchMessages } from "../../../../redux/p2pmessages/actions";
+import { getNextBatchMessages, getFileBytes } from "../../../../redux/p2pmessages/actions";
 
 import { useAppDispatch, base64ToUint8Array, dateToTimestamp, monthToString } from "../../../../utils/helpers";
 
@@ -28,7 +30,7 @@ import { useIntl } from "react-intl";
 interface Props {
 	type: "media" | "files",
 	conversant: Profile,
-	orderedFiles: P2PMessage[]
+	orderedFiles: P2PMessage[],
 	onDownload(file: FilePayload): any;
 }
 
@@ -38,6 +40,7 @@ interface Props {
 */
 const FileBox: React.FC<Props> = ({ type, orderedFiles, conversant, onDownload }) => {
 	const dispatch = useAppDispatch();
+	const fetchedFiles = useSelector((state: RootState) => state.p2pmessages.files);
 
 	/* i18n */
 	let intl = useIntl();
@@ -56,15 +59,15 @@ const FileBox: React.FC<Props> = ({ type, orderedFiles, conversant, onDownload }
 
 	/* HANDLERS */
 	/* 
-    disptaches an action to hc to get the next batch of older messages of type File
-    when reaching the end/bottom of the file box
+		disptaches an action to hc to get the next batch of older messages of type File
+		when reaching the end/bottom of the file box
   	*/
 	const onScrollBottom = (
 		complete: () => Promise<void>,
 		files: P2PMessage[]
 	) => {
 		let lastFile: P2PMessage = files[files.length - 1];
-	
+
 		dispatch(
 			getNextBatchMessages({
 				conversant: Buffer.from(base64ToUint8Array(conversant.id)),
@@ -81,8 +84,10 @@ const FileBox: React.FC<Props> = ({ type, orderedFiles, conversant, onDownload }
 							)
 						: undefined,
 			})
-		);
-		complete();
+		).then(
+			(res: any) => complete()
+			);
+
 		return;
 	};
 
@@ -92,6 +97,16 @@ const FileBox: React.FC<Props> = ({ type, orderedFiles, conversant, onDownload }
 			<IonGrid>
 				<IonRow className={styles.mediarow}>
 					{orderedFiles.map((file) => {
+
+						// fetch video filebytes if not yet in redux
+						// temp fix. most likely will change when this gets turned into a component
+						if (
+							(file.payload as FilePayload).fileType === "VIDEO" 
+							&& fetchedFiles["u" + (file.payload as FilePayload).fileHash] === undefined
+						) {
+								dispatch(getFileBytes([base64ToUint8Array((file.payload as FilePayload).fileHash)]))
+						}
+						
 						let month = file.timestamp.getMonth();
 						// let year = file.timestamp.getFullYear();
 						return (
@@ -114,7 +129,7 @@ const FileBox: React.FC<Props> = ({ type, orderedFiles, conversant, onDownload }
 												onDownload={onDownload}
 											/>
 											: <IonCard className={styles.mediacard}>
-													{(file.payload as FilePayload).fileType ==="VIDEO" 
+													{(file.payload as FilePayload).fileType === "VIDEO" 
 													? <div className={styles.mediadiv}>
 															<VideoView 
 																file={file.payload as FilePayload} 

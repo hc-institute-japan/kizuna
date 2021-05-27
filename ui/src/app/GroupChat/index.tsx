@@ -19,7 +19,9 @@ import { useHistory, useParams } from "react-router";
 
 // Redux
 import { FilePayloadInput } from "../../redux/commons/types";
-import { getLatestGroupVersion, indicateGroupTyping, sendGroupMessage } from "../../redux/group/actions";
+import { sendGroupMessage } from "../../redux/group/actions/sendGroupMessage";
+import { indicateGroupTyping } from "../../redux/group/actions/indicateGroupTyping";
+import { getLatestGroupVersion } from "../../redux/group/actions/getLatestGroupVersion";
 import { GroupConversation, GroupMessage, GroupMessageInput } from "../../redux/group/types";
 import { fetchId } from "../../redux/profile/actions";
 import { RootState } from "../../redux/types";
@@ -32,6 +34,7 @@ import MessageList from "./MessageList";
 
 import { base64ToUint8Array, Uint8ArrayToBase64, useAppDispatch } from "../../utils/helpers";
 import styles from "./style.module.css";
+
 
 interface GroupChatParams {
   group: string;
@@ -53,14 +56,14 @@ const GroupChat: React.FC = () => {
   const [sendingLoading, setSendingLoading] = useState<boolean>(false);
   const [message, setMessage] = useState("");
 
-  // Selectors
+  /* Selectors */
   const groupData = useSelector(
     (state: RootState) => state.groups.conversations[group]
   );
 
   const typing = useSelector((state: RootState) => state.groups.typing);
 
-  // Handlers
+  /* Handlers */
   const handleOnSend = () => {
     let inputs: GroupMessageInput[] = [];
     if (files.length) {
@@ -118,46 +121,28 @@ const GroupChat: React.FC = () => {
   const handleOnBack = () => history.push({pathname: `/home`});
 
   const handleOnChange = (message: string, groupInfo: GroupConversation) => {
-    if (message.length !== 0) {
-      // fetch agent's own AgentPubKey
-      dispatch(fetchId()).then((res: AgentPubKey | null) => {
-        // dispatch an indication of typing
-        dispatch(
-          indicateGroupTyping({
-            groupId: base64ToUint8Array(groupInfo.originalGroupEntryHash),
-            indicatedBy: res!,
-            members: [
-              ...groupInfo.members.map((member) =>
-                Buffer.from(base64ToUint8Array(member).buffer)
-              ),
-              Buffer.from(base64ToUint8Array(groupInfo.creator).buffer),
-            ],
-            isTyping: true,
-          })
-        );
-      });
-    } else {
-      dispatch(fetchId()).then((res: AgentPubKey | null) => {
-        dispatch(
-          indicateGroupTyping({
-            groupId: base64ToUint8Array(groupInfo.originalGroupEntryHash),
-            indicatedBy: res!,
-            members: [
-              ...groupInfo.members.map((member) =>
-                Buffer.from(base64ToUint8Array(member).buffer)
-              ),
-              Buffer.from(base64ToUint8Array(groupInfo.creator).buffer),
-            ],
-            isTyping: false,
-          })
-        );
-      });
-    }
+    dispatch(fetchId()).then((myAgentId: AgentPubKey | null) => {
+      let myAgentIdBase64 = Uint8ArrayToBase64(myAgentId!); // AgentPubKey should be non-nullable here
+
+      // Remove self from the recipient of typing signal
+      let members = [...groupInfo.members, groupInfo.creator]
+        .filter(member => member !== myAgentIdBase64)
+        .map(member => Buffer.from(base64ToUint8Array(member).buffer));
+
+      dispatch(
+        indicateGroupTyping({
+          groupId: base64ToUint8Array(groupInfo.originalGroupEntryHash),
+          indicatedBy: myAgentId!,
+          members,
+          isTyping: (message.length !== 0) ? true : false,
+        })
+      );
+    })
     return setMessage(message);
   }
 
+  /* UseEffects */
   useEffect(() => {
-    // setLoading(true);
     dispatch(fetchId()).then((res: AgentPubKey | null) => {
       if (res) setMyAgentId(Uint8ArrayToBase64(res));
     });
@@ -206,8 +191,10 @@ const GroupChat: React.FC = () => {
               <IonIcon slot="icon-only" icon={arrowBackSharp} />
             </IonButton>
             <IonAvatar className="ion-padding">
+              <img src={peopleCircleOutline} alt={groupInfo!.name} />
               {/* TODO: proper picture for default avatar if none is set */}
-              {groupInfo ? (
+              {/* TODO: Display an actual avatar set by the group creator */}
+              {/* {groupInfo ? (
                 groupInfo!.avatar ? (
                   <img src={groupInfo!.avatar} alt={groupInfo!.name} />
                 ) : (
@@ -215,7 +202,7 @@ const GroupChat: React.FC = () => {
                 )
               ) : (
                 <img src={peopleCircleOutline} alt={groupInfo!.name} />
-              )}
+              )} */}
             </IonAvatar>
             <IonTitle className={styles["title"]}>
               <div className="item item-text-wrap">{groupInfo!.name}</div>

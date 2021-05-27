@@ -99,7 +99,7 @@ const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
     if (scroll.current) {
       setTimeout(() => {
         scroll.current?.scrollIntoView({ behavior: "smooth" });
-      }, 100);
+      }, 500);
     }
   }, [scroll]);
 
@@ -107,7 +107,8 @@ const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
 
   useImperativeHandle(ref, () => ({
     scrollToBottom: () => {
-      scroll.current?.scrollIntoView({ behavior: "smooth" });
+      /* TODO: come up with a better implementation than simply setting a timeout for scrollIntoView */
+      setTimeout(() => scroll.current?.scrollIntoView({ behavior: "smooth" }), 500)
     },
   }));
 
@@ -119,7 +120,8 @@ const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
           threshold="0px"
           ref={infiniteScroll}
           position="top"
-          onIonInfinite={(e) => onScrollTop(complete, e)}
+          /* Adding a 1 second timeout just because messages are being fetched too freakin' fast locally :D */
+          onIonInfinite={(e) => setTimeout(() => onScrollTop(complete, e), 1000)}
         >
           <IonInfiniteScrollContent loadingSpinner="crescent" />
         </IonInfiniteScroll>

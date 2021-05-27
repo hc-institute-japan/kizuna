@@ -45,6 +45,18 @@ export interface P2PFile {
     fileBytes: Uint8Array
 }
 
+export interface P2PHashMap {
+    conversations: {
+        [key: string]: P2PConversation
+    };
+    messages: {
+        [key: string]: P2PMessage
+    };
+    receipts: {
+        [key: string]: P2PMessageReceipt
+    };
+}
+
 export interface P2PMessageConversationState {
     conversations: {
         [key: string]: P2PConversation

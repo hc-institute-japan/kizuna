@@ -53,11 +53,6 @@ export const transformZomeDataToUIData = (zomeResults: P2PMessageConversationSta
         transformedConversations[key] = conversation;
     };
 
-    // get a list of files to fetch from HC (on a different zome call)
-    // let fileHashes = [];
-    // let transformedFiles: { [key: string]: Uint8Array } = {};
-    // var filesToFetch: { [key: string]: Uint8Array } = {};
-
     // transform messages
     var transformedMesssages: { [key: string]: P2PMessage } = {};
     for (const [key, value] of Object.entries(zomeMessages)) {
@@ -78,8 +73,6 @@ export const transformZomeDataToUIData = (zomeResults: P2PMessageConversationSta
                                 ? message.payload.payload.fileType.payload.thumbnail
                                 : null
                 };
-                // filesToFetch[message.payload.payload.metadata.fileHash] = new Uint8Array();
-                // fileHashes.push(message.payload.payload.metadata.fileHash)
                 break
             default:
                 break

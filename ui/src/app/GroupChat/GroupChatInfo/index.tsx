@@ -1,7 +1,4 @@
 import { AgentPubKey } from "@holochain/conductor-api";
-import React, { useEffect, useRef, useState } from "react";
-import { useSelector } from "react-redux";
-import { useHistory, useParams } from "react-router";
 import {
   IonButton,
   IonButtons,
@@ -14,26 +11,28 @@ import {
   IonSlide,
   IonSlides,
   IonTitle,
-  IonToolbar,
+  IonToolbar
 } from "@ionic/react";
 import { arrowBackSharp } from "ionicons/icons";
-
+import React, { useEffect, useRef, useState } from "react";
+import { useHistory, useParams } from "react-router";
 // Redux
-import { getLatestGroupVersion, updateGroupName } from "../../../redux/group/actions";
+import {  updateGroupName } from "../../../redux/group/actions/updateGroupName";
+import { getLatestGroupVersion } from "../../../redux/group/actions/getLatestGroupVersion";
 import { GroupConversation } from "../../../redux/group/types";
 import { fetchId } from "../../../redux/profile/actions";
-import { RootState } from "../../../redux/types";
 import { Uint8ArrayToBase64, useAppDispatch } from "../../../utils/helpers";
-
+import EndButtons from "./EndButtons";
 // Components
 import SegmentTabs from "./SegmentTabs";
-import EndButtons from "./EndButtons";
-import File from "./Tabs/Files/File";
-import Media from "./Tabs/Media/Media";
-import Members from "./Tabs/Members";
+import styles from "./style.module.css";
+import File from "./TabsContent/Files/File";
+import Media from "./TabsContent/Media/Media";
+import Members from "./TabsContent/Members";
 import UpdateGroupName from "./UpdateGroupName";
 
-import styles from "./style.module.css";
+
+
 
 interface GroupChatParams {
   group: string;
@@ -44,19 +43,25 @@ const GroupChatInfo: React.FC = () => {
   const { group } = useParams<GroupChatParams>();
   const dispatch = useAppDispatch();
 
-  const groupData = useSelector(
-    (state: RootState) => state.groups.conversations[group]
-  );
+  const slideOpts = {
+    initialSlide: 0,
+    speed: 100,
+  };
 
   /* Local state */
-  const [myAgentId, setMyAgentId] = useState<string>("");
   const [editGroupName, setEditGroupName] = useState<boolean>(false);
   const [disabled, setDisabled] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [modalLoading, setModalLoading] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
   const [groupInfo, setGroupInfo] = useState<GroupConversation | undefined>();
+  const [ currentSegment, setCurrentSegment ] = useState<string>("Info");
 
+  /* Refs */
+  const slideRef = useRef<HTMLIonSlidesElement>(null);
+
+
+  /* Handlers */
   const handleOnBack = () => {
     history.goBack();
   };
@@ -66,55 +71,20 @@ const GroupChatInfo: React.FC = () => {
     setShowModal(showModal ? false : true);
   };
 
-  useEffect(() => {
-    if (groupData) {
-      dispatch(getLatestGroupVersion(group)).then(
-        (groupRes: GroupConversation) => {
-          setGroupInfo(groupRes);
-          dispatch(fetchId()).then((res: AgentPubKey | null) => {
-            if (res) setMyAgentId(Uint8ArrayToBase64(res));
-            if (groupRes.creator !== Uint8ArrayToBase64(res!)) {
-              // console.log((groupRes!.creator))
-              // console.log((groupRes!.creator !== myAgentId))
-              // console.log(myAgentId)
-
-              setDisabled(true);
-            }
-            // console.log(disabled);
-          });
-        }
-      );
-      setLoading(false);
-    } else {
-      dispatch(getLatestGroupVersion(group)).then(
-        (groupRes: GroupConversation) => {
-          setGroupInfo(groupRes);
-          dispatch(fetchId()).then((res: AgentPubKey | null) => {
-            if (res) setMyAgentId(Uint8ArrayToBase64(res));
-            if (groupRes.creator !== Uint8ArrayToBase64(res!)) {
-              console.log(groupRes!.creator);
-              console.log(myAgentId);
-              setDisabled(true);
-              setLoading(false);
-            }
-          });
-        }
-      );
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const slideRef = useRef<HTMLIonSlidesElement>(null);
+  /*
+    changes which slide is displayed
+    when clicking on a segment
+  */
   const handleOnSegmentChange = (value: string) => {
     var index;
     switch (value) {
-      case "info":
+      case "Info":
         index = 0;
         break;
-      case "media":
+      case "Media":
         index = 1;
         break;
-      case "files":
+      case "Files":
         index = 2;
         break;
       default:
@@ -123,10 +93,48 @@ const GroupChatInfo: React.FC = () => {
     slideRef.current?.slideTo(index);
   };
 
-  const slideOpts = {
-    initialSlide: 0,
-    speed: 400,
-  };
+  /*
+    changes which segment is highlighted
+    when the slide is changed
+  */
+  const handleSlideChange = () => {
+    const segmentValues = ["Info", "Media", "Files"]
+    slideRef.current?.getActiveIndex()
+      .then((currentIndex) => setCurrentSegment(segmentValues[currentIndex]));
+  }
+
+  /*
+    Handler for update of GroupName
+  */
+  const handleOnSave = (newGroupName: string) => {
+    setModalLoading(true);
+    dispatch(
+      updateGroupName({
+        name: newGroupName,
+        groupId: groupInfo!.originalGroupEntryHash,
+        groupRevisionId: groupInfo!.originalGroupHeaderHash,
+      })
+    ).then((res: any) => {
+      setModalLoading(false);
+      setShowModal(false);
+    });
+  }
+
+  /*
+    This is to make sure that the latest state of the Group is being fetched.
+  */
+  useEffect(() => {
+    dispatch(getLatestGroupVersion(group)).then(
+      (groupRes: GroupConversation) => {
+        setGroupInfo(groupRes);
+        dispatch(fetchId()).then((myAgentId: AgentPubKey | null) => {
+          if (groupRes.creator !== Uint8ArrayToBase64(myAgentId!)) setDisabled(true); // disable group name edit button if agent is not the creator
+          setLoading(false);
+        });
+      }
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return !loading && groupInfo ? (
     <IonPage>
@@ -134,10 +142,7 @@ const GroupChatInfo: React.FC = () => {
 
         <IonToolbar>
           <IonButtons>
-            <IonButton
-              onClick={() => handleOnBack()}
-              className="ion-no-padding"
-            >
+            <IonButton onClick={() => handleOnBack()} className="ion-no-padding">
               <IonIcon slot="icon-only" icon={arrowBackSharp} />
             </IonButton>
           </IonButtons>
@@ -150,7 +155,7 @@ const GroupChatInfo: React.FC = () => {
 
         <IonTitle className={styles.groupname}>{groupInfo!.name}</IonTitle>
 
-        <SegmentTabs onSegmentChange={handleOnSegmentChange}/>
+        <SegmentTabs value={currentSegment} onSegmentChange={handleOnSegmentChange}/>
       </IonHeader>
 
       <IonContent>
@@ -159,6 +164,7 @@ const GroupChatInfo: React.FC = () => {
           className="slides"
           pager={false}
           options={slideOpts}
+          onIonSlideDidChange={handleSlideChange}
         >
           <IonSlide>
             <Members groupId={group} groupRevisionId={groupInfo!.originalGroupHeaderHash}/>
@@ -182,19 +188,7 @@ const GroupChatInfo: React.FC = () => {
           isOpen={showModal}
           onCancel={() => setShowModal(false)}
           groupData={groupInfo!}
-          onSave={(newName) => {
-            setModalLoading(true);
-            dispatch(
-              updateGroupName({
-                name: newName,
-                groupId: groupInfo!.originalGroupEntryHash,
-                groupRevisionId: groupInfo!.originalGroupHeaderHash,
-              })
-            ).then((res: any) => {
-              setModalLoading(false);
-              setShowModal(false);
-            });
-          }}
+          onSave={(newGroupName) => handleOnSave(newGroupName)}
         />
       </IonModal>
     </IonPage>

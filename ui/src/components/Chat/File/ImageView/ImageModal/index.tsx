@@ -130,8 +130,8 @@ const ImageModal: React.FC<Props> = ({ state, src, file, onDownload }) => {
           onDidDismiss={() => setPopover({ isOpen: false, event: undefined })}
         >
           <IonList>
-            <IonItem button onClick={onDownload ? () => onDownload(file) : download}>
-              <IonLabel>{intl.formatMessage({id: "components.chat.image-modal-download"})}</IonLabel>
+            <IonItem lines="none" button onClick={onDownload ? () => onDownload(file) : download}>
+              <IonLabel>{intl.formatMessage({id: "components.chat.media-modal-download"})}</IonLabel>
             </IonItem>
           </IonList>
         </IonPopover>
