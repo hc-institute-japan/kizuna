@@ -5,14 +5,13 @@
   if it is not absolutely necessary.
 */
 
+import { Profile } from "../profile/types";
+
 /* 
   We are avoiding the usage of Buffer (as these are typed in the @holochain/conductor-api) in the ui
   as it is cumbersome to translate data types among Buffer, Uint8Array, and string. 
   TODO: This may be a temporary solution that may have better fix in the future
 */
-
-import { Profile } from "../profile/types";
-
 export type HoloHash = Uint8Array;
 
 export type ProfileID = string;
@@ -110,7 +109,7 @@ export interface Message {
   textPayload?: string;
   fileName?: string;
   /* TODO: tats needs to fix the timestamp type in GroupMessage so that this can be typed as Date  */
-  timestamp: [number, number];
+  timestamp: Date;
 }
 
 /* used in Conversations page */

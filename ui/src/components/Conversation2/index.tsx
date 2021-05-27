@@ -1,19 +1,12 @@
 import { IonAvatar, IonBadge, IonItem, IonLabel } from "@ionic/react";
 import { peopleCircleOutline, personCircleOutline } from "ionicons/icons";
-import React, { useEffect } from "react";
+import React from "react";
 import { useIntl } from "react-intl";
 import {
   Conversation as ConversationDetail,
   Message,
 } from "../../redux/commons/types";
 import styles from "./style.module.css";
-
-// export interface MessageDetail {
-//   message: string;
-//   fileName?: string;
-//   sender: Profile;
-//   payloadType: "TEXT" | "FILE";
-// }
 
 interface Props {
   conversation: ConversationDetail;

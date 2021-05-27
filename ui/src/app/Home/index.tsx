@@ -11,7 +11,7 @@ import React from "react";
 import { FormattedMessage } from "react-intl";
 import { Redirect, Route } from "react-router";
 import Contacts from "../Contacts";
-import Conversations from "../Conversations";
+import Conversations2 from "../Conversations2";
 import styles from "./style.module.css";
 
 const HomeTabBar: React.FC = () => (
@@ -20,7 +20,7 @@ const HomeTabBar: React.FC = () => (
       <Redirect exact path="/home" to="/home/messaging"></Redirect>
       <Route
         path="/home/messaging"
-        render={() => <Conversations />}
+        render={() => <Conversations2 />}
         exact={true}
       />
       <Route path="/home/contacts" render={() => <Contacts />} exact={true} />
