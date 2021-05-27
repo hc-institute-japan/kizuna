@@ -1,11 +1,12 @@
 .video-player {
   position: relative;
   overflow: hidden;
+  width: 100%;
+  background-color: black;
 }
 
-.video-player > video {
-  height: 100%;
-  width: 100%;
+.video {
+  width: 100% !important;
 }
 
 .content {

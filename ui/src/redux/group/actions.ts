@@ -327,19 +327,7 @@ export const sendGroupMessage = (
       ? fileType.payload.thumbnail
       : fileType.payload.thumbnail;
     fileBytes = groupMessageData.payloadInput.payload.fileBytes;
-    if (fileType.type === "VIDEO") {
-      const fetchedFileBytes = await callZome({
-        zomeName: ZOMES.GROUP,
-        fnName: FUNCTIONS[ZOMES.GROUP].GET_FILES_BYTES,
-        payload: [
-          sendGroupMessageOutput.content.payload.payload.metadata.fileHash,
-        ],
-      });
 
-      if (fetchedFileBytes?.type !== "error") {
-        dispatch(setFilesBytes({ ...fetchedFileBytes }));
-      }
-    }
     let filePayload: FilePayload = {
       type: "FILE",
       fileName:

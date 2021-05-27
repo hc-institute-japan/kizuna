@@ -1,6 +1,12 @@
-import { IonIcon } from "@ionic/react";
+import { IonIcon, IonSpinner } from "@ionic/react";
 import { expandOutline, pause, play } from "ionicons/icons";
-import React, { RefObject, SetStateAction, useRef, useState } from "react";
+import React, {
+  RefObject,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import styles from "./style.module.css";
 
 interface Props {
@@ -8,13 +14,29 @@ interface Props {
   isPlaying: boolean;
   duration: number;
   modal: [boolean, React.Dispatch<SetStateAction<boolean>>];
+  hasError: boolean;
+  onPlayPauseErrorHandler?(): any;
 }
 
-const Controls: React.FC<Props> = ({ video, isPlaying, duration, modal }) => {
+const Controls: React.FC<Props> = ({
+  video,
+  isPlaying,
+  duration,
+  modal,
+  hasError,
+  onPlayPauseErrorHandler,
+}) => {
   const [visible, setVisible] = useState(false);
   const [isOpen, setIsOpen] = modal;
+  const timeout = useRef<NodeJS.Timeout>();
+  const [isLoading, setIsLoading] = useState(false);
 
-  let timeout = useRef<NodeJS.Timeout>();
+  useEffect(
+    function () {
+      if (!hasError) setIsLoading(false);
+    },
+    [hasError]
+  );
 
   const resetTimeout = () => {
     if (timeout.current) clearTimeout(timeout.current);
@@ -38,8 +60,13 @@ const Controls: React.FC<Props> = ({ video, isPlaying, duration, modal }) => {
   };
 
   const onPlayPause = () => {
-    if (!isPlaying) video.current?.play();
-    else video.current?.pause();
+    if (!hasError) {
+      if (!isPlaying) video.current?.play();
+      else video.current?.pause();
+    } else {
+      setIsLoading(true);
+      if (onPlayPauseErrorHandler) onPlayPauseErrorHandler();
+    }
   };
 
   return (
@@ -52,7 +79,11 @@ const Controls: React.FC<Props> = ({ video, isPlaying, duration, modal }) => {
       style={{ opacity: visible ? 1 : 0 }}
     >
       <div className={styles["play-pause"]} onClick={onPlayPause}>
-        <IonIcon icon={!isPlaying ? play : pause} />
+        {isLoading ? (
+          <IonSpinner />
+        ) : (
+          <IonIcon icon={!isPlaying ? play : pause} />
+        )}
       </div>
       <div className={styles["range-slider-expand"]}>
         <div className={styles["range-slider"]}>

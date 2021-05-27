@@ -42,3 +42,7 @@
 .slider-volume input {
   width: 100%;
 }
+
+.toolbar {
+  --background: rgb(0, 0, 0) !important;
+}

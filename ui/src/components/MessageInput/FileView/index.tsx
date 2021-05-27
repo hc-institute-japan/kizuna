@@ -15,6 +15,12 @@ const FileView: React.FC<Props> = ({ files, setFiles }) => {
     });
   };
   const decoder = new TextDecoder();
+
+  const getThumbnail = (type: string, thumbnail: Uint8Array) => {
+    if (type === "IMAGE") return decoder.decode(thumbnail);
+    else
+      return URL.createObjectURL(new Blob([thumbnail], { type: "image/jpeg" }));
+  };
   return (
     <IonRow className={styles.row}>
       {files.map((file, index) => {
@@ -24,7 +30,8 @@ const FileView: React.FC<Props> = ({ files, setFiles }) => {
             file.fileType.type === "VIDEO"
               ? {
                   style: {
-                    backgroundImage: `url(${decoder.decode(
+                    backgroundImage: `url(${getThumbnail(
+                      file.fileType.type,
                       file.fileType.payload.thumbnail
                     )})`,
                     backgroundRepeat: "no-repeat",

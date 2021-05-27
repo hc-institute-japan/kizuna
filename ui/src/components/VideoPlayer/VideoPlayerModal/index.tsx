@@ -18,22 +18,25 @@ import {
   pause,
   play,
 } from "ionicons/icons";
-import React, {
-  SetStateAction,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { SetStateAction, useEffect, useRef, useState } from "react";
 import styles from "./style.module.css";
 
 interface Props {
   src: string;
   open: [boolean, React.Dispatch<SetStateAction<boolean>>];
+  onPlayPauseErrorHandler?(setErrorState: (bool: boolean) => any): any;
+
   download?(): any;
 }
 
-const VideoPlayerModal: React.FC<Props> = ({ open, src, download }) => {
+const VideoPlayerModal: React.FC<Props> = ({
+  open,
+  src,
+  download,
+  onPlayPauseErrorHandler,
+}) => {
   const [isOpen, setIsOpen] = open;
+
   const [popover, setPopover] = useState({ isOpen: false, event: undefined });
   const footer = useRef<HTMLIonToolbarElement>(null);
   const header = useRef<HTMLIonToolbarElement>(null);
@@ -41,9 +44,10 @@ const VideoPlayerModal: React.FC<Props> = ({ open, src, download }) => {
   const [currentTime, setCurrentTime] = useState(0);
   const [isControlVisible, setIsControlVisible] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
-  let timeout = useRef<NodeJS.Timeout>();
-
+  const timeout = useRef<NodeJS.Timeout>();
+  const [hasError, setHasError] = useState(false);
   const video = useRef<HTMLVideoElement>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     if (isOpen)
@@ -56,6 +60,13 @@ const VideoPlayerModal: React.FC<Props> = ({ open, src, download }) => {
       );
   }, [isOpen]);
 
+  useEffect(
+    function () {
+      if (!hasError) setIsLoading(false);
+    },
+    [hasError]
+  );
+
   const handleOnPlay = () => {
     setIsPlaying(true);
   };
@@ -65,8 +76,13 @@ const VideoPlayerModal: React.FC<Props> = ({ open, src, download }) => {
   };
 
   const onPlayPause = () => {
-    if (!isPlaying) video.current?.play();
-    else video.current?.pause();
+    if (!hasError) {
+      if (!isPlaying) video.current?.play();
+      else video.current?.pause();
+    } else {
+      setIsLoading(true);
+      if (onPlayPauseErrorHandler) errorHandler();
+    }
   };
 
   const onTimeUpdate = () =>
@@ -78,6 +94,13 @@ const VideoPlayerModal: React.FC<Props> = ({ open, src, download }) => {
     timeout.current = setTimeout(function () {
       setIsControlVisible(false);
     }, 3000);
+  };
+  const handleError = () => {
+    setHasError(true);
+  };
+
+  const errorHandler = () => {
+    if (onPlayPauseErrorHandler) onPlayPauseErrorHandler(setHasError);
   };
 
   return (
@@ -113,10 +136,10 @@ const VideoPlayerModal: React.FC<Props> = ({ open, src, download }) => {
           <video
             ref={video}
             style={{
-              [window.innerWidth > window.innerHeight
-                ? "height"
-                : "width"]: "100%",
+              [window.innerWidth > window.innerHeight ? "height" : "width"]:
+                "100%",
             }}
+            onError={handleError}
             autoPlay={false}
             controls={false}
             onTimeUpdate={onTimeUpdate}
@@ -138,7 +161,7 @@ const VideoPlayerModal: React.FC<Props> = ({ open, src, download }) => {
         </div>
 
         <IonFooter>
-          <IonToolbar ref={footer} className={styles.toolbar}>
+          <IonToolbar ref={footer}>
             <div className={styles["slider-volume"]}>
               <input
                 step={currentTime * 100}
