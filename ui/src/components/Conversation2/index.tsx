@@ -2,9 +2,7 @@ import { IonAvatar, IonBadge, IonItem, IonLabel } from "@ionic/react";
 import { peopleCircleOutline, personCircleOutline } from "ionicons/icons";
 import React, { useState } from "react";
 import { useIntl } from "react-intl";
-import { useSelector } from "react-redux";
 import { Profile } from "../../redux/profile/types";
-import { RootState } from "../../redux/types";
 import { Message } from "../../utils/types";
 import styles from "./style.module.css";
 
@@ -13,6 +11,7 @@ export interface MessageDetail {
   fileName?: string;
   sender?: Profile;
   payload: "TEXT" | "FILE";
+  badgeCount: number;
 }
 
 interface Props {
@@ -41,35 +40,6 @@ const Conversation: React.FC<Props> = ({
       payload: "TEXT",
     }
   );
-
-  // use useEffect and dispatch an action
-  // useSelector((state: RootState) => {
-  //   if (type === "group") {
-  //   } else {
-  //     const { conversations, messages, receipts } = state.p2pmessages;
-  //     const conversation = conversations[groupId].messages;
-  //     let unreadCounter = 0;
-  //     conversation.map((messageID) => {
-  //       let message = messages[messageID];
-  //       let receiptIDs = message.receipts;
-  //       let filteredReceipts = receiptIDs.map((receiptID) => {
-  //         let receipt = receipts[receiptID];
-  //         return receipt;
-  //       });
-  //       filteredReceipts.sort((a: any, b: any) => {
-  //         let receiptTimestampA = a.timestamp.getTime();
-  //         let receiptTimestampB = b.timestamp.getTime();
-  //         if (receiptTimestampA > receiptTimestampB) return -1;
-  //         if (receiptTimestampA < receiptTimestampB) return 1;
-  //         return 0;
-  //       });
-  //       let latestReceipt = filteredReceipts[0];
-  //       if (latestReceipt.status !== "read" && message.author === groupId)
-  //         unreadCounter = unreadCounter + 1;
-  //     });
-  //     if (myAgentId) setBadgeCount(unreadCounter);
-  //   }
-  // });
 
   const renderMyFileMessage = (latestMessageDetail: MessageDetail) =>
     intl.formatMessage(
