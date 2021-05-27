@@ -1,22 +1,22 @@
 import { IonAvatar, IonBadge, IonItem, IonLabel } from "@ionic/react";
 import { peopleCircleOutline, personCircleOutline } from "ionicons/icons";
-import React, { useState } from "react";
+import React from "react";
 import { useIntl } from "react-intl";
 import { Profile } from "../../redux/profile/types";
-import { Message } from "../../utils/types";
 import styles from "./style.module.css";
 
 export interface MessageDetail {
   message: string;
   fileName?: string;
-  sender?: Profile;
+  sender: Profile;
   payload: "TEXT" | "FILE";
   badgeCount: number;
 }
 
 interface Props {
   type: "p2p" | "group";
-  content: { src: string; sender?: string; name: string; messages: Message[] };
+  /* name for p2p is the sender's username, and for group it is the name of the group */
+  conversationName: string;
   onClick: () => void; // This onClick is for history.push(`/g/${groupId}`) | history.push(`/u/${name}`);
   latestMessageDetail: MessageDetail;
   myAgentId: string;
@@ -25,21 +25,13 @@ interface Props {
 
 const Conversation: React.FC<Props> = ({
   type,
-  content,
+  conversationName,
   myAgentId,
   onClick,
   badgeCount,
+  latestMessageDetail,
 }) => {
   const intl = useIntl();
-  const { src, name, messages } = content;
-
-  const [latestMessageDetail, setLatestMessageDetail] = useState<MessageDetail>(
-    {
-      message: "",
-      fileName: "",
-      payload: "TEXT",
-    }
-  );
 
   const renderMyFileMessage = (latestMessageDetail: MessageDetail) =>
     intl.formatMessage(
@@ -62,17 +54,21 @@ const Conversation: React.FC<Props> = ({
       <IonAvatar slot="start">
         <img
           className={styles.avatar}
+          /*
+            TODO: add actual avatar of the conversation to the prop being passed
+            to avoid this
+          */
           src={type === "group" ? peopleCircleOutline : personCircleOutline}
-          alt={`${name}'s chat`}
+          alt={`${conversationName}'s chat`}
         />
       </IonAvatar>
       <IonLabel>
-        <h2>{name}</h2>
-        <h3>{latestMessageDetail.sender?.username}</h3>
+        <h2>{conversationName}</h2>
+        <h3>{latestMessageDetail.sender.username}</h3>
         <p>
           {latestMessageDetail.payload === "TEXT"
             ? latestMessageDetail.message
-            : myAgentId === latestMessageDetail.sender?.id
+            : myAgentId === latestMessageDetail.sender.id
             ? renderMyFileMessage(latestMessageDetail)
             : renderOthersFileMessage(latestMessageDetail)}
         </p>
