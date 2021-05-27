@@ -506,7 +506,7 @@ export const countUnread = (conversant: string): ThunkAction => async (
     const { conversations, messages, receipts } = getState().p2pmessages;
     const conversation = conversations[conversant].messages;
     let unreadCounter = 0;
-    conversation.map((messageID) => {
+    conversation.forEach((messageID) => {
         let message = messages[messageID];
         let receiptIDs = message.receipts;
         let filteredReceipts = receiptIDs.map((receiptID) => {
