@@ -22,7 +22,11 @@ import { GroupConversationsState } from "../../redux/group/types";
 import { countUnread } from "../../redux/p2pmessages/actions";
 import { P2PMessageConversationState } from "../../redux/p2pmessages/types";
 import { RootState } from "../../redux/types";
-import { dateToTimestamp, useAppDispatch } from "../../utils/helpers";
+import {
+  dateToTimestamp,
+  timestampToDate,
+  useAppDispatch,
+} from "../../utils/helpers";
 import EmptyConversations from "./EmptyConversations";
 import styles from "./style.module.css";
 
@@ -86,7 +90,7 @@ const Conversations: React.FC = () => {
             ? latestMessage.payload.fileName
             : undefined,
           /* TODO: change to Date format */
-          timestamp: dateToTimestamp(latestMessage.timestamp),
+          timestamp: latestMessage.timestamp,
         };
 
         // create input to Conversation component
@@ -107,63 +111,63 @@ const Conversations: React.FC = () => {
       const allGroupMessages = groupsState.messages;
       const groupMembers = groupsState.members;
 
-      Object.keys(groupsState.conversations).forEach((groupId: string) => {
-        /* 
-          TODO: Make sure that the index 0 is the latest message at all times
-          especially when messages are received via signal or fetched
-        */
-        let latestMessageId = groupsState.conversations[groupId].messages[0];
-        let latestMessage = allGroupMessages[latestMessageId];
-        let message: Message = {
-          id: latestMessage.groupMessageEntryHash,
-          sender: groupMembers[latestMessage.author]
-            ? {
-                id: groupMembers[latestMessage.author].id,
-                username: groupMembers[latestMessage.author].username,
-              }
-            : {
-                id: myProfile.id!,
-                username: myProfile.username!,
-              },
-          payloadType: latestMessage.payload.type,
-          timestamp: latestMessage.timestamp,
-          textPayload: isTextPayload(latestMessage.payload)
-            ? latestMessage.payload.payload.payload
-            : undefined,
-          fileName: !isTextPayload(latestMessage.payload)
-            ? latestMessage.payload.fileName
-            : undefined,
-        };
+      /* 
+        Currently filtering freshly created group that has no message yet
+        TODO: discuss whether we should create group with an initial message already
+        to avoid this filter.
+      */
+      Object.keys(groupsState.conversations)
+        .filter(
+          (groupId: string) =>
+            groupsState.conversations[groupId].messages[0] !== undefined
+        )
+        .forEach((groupId: string) => {
+          /* 
+            TODO: Make sure that the index 0 is the latest message at all times
+            especially when messages are received via signal or fetched
+          */
+          let latestMessageId = groupsState.conversations[groupId].messages[0];
+          let latestMessage = allGroupMessages[latestMessageId];
 
-        let conversation: Conversation = {
-          id: groupId,
-          type: "group",
-          conversationName: groupsState.conversations[groupId].name,
-          latestMessage: message,
-          badgeCount: dispatch(getGroupConversationBadgeCount(groupId)),
-        };
+          let message: Message = {
+            id: latestMessage.groupMessageEntryHash,
+            sender: groupMembers[latestMessage.author]
+              ? {
+                  id: groupMembers[latestMessage.author].id,
+                  username: groupMembers[latestMessage.author].username,
+                }
+              : {
+                  id: myProfile.id!,
+                  username: myProfile.username!,
+                },
+            payloadType: latestMessage.payload.type,
+            /* TODO: change the data type of GroupMessage to Date to avoid this */
+            timestamp: timestampToDate(latestMessage.timestamp),
+            textPayload: isTextPayload(latestMessage.payload)
+              ? latestMessage.payload.payload.payload
+              : undefined,
+            fileName: !isTextPayload(latestMessage.payload)
+              ? latestMessage.payload.fileName
+              : undefined,
+          };
 
-        conversationsArray.push(conversation);
-      });
+          let conversation: Conversation = {
+            id: groupId,
+            type: "group",
+            conversationName: groupsState.conversations[groupId].name,
+            latestMessage: message,
+            badgeCount: dispatch(getGroupConversationBadgeCount(groupId)),
+          };
+
+          conversationsArray.push(conversation);
+        });
     }
     /* end of code block for group logic */
 
     /* sort merged p2p and group conversations */
-    conversationsArray.sort((x: any, y: any) => {
-      let timestampX =
-        x.content.messages.length !== 0
-          ? x.content.messages[
-              x.content.messages.length - 1
-            ].timestamp.valueOf()
-          : x.createdAt.valueOf();
-
-      let timestampY =
-        y.content.messages.length !== 0
-          ? y.content.messages[
-              y.content.messages.length - 1
-            ].timestamp.valueOf()
-          : y.createdAt.valueOf();
-
+    conversationsArray.sort((x: Conversation, y: Conversation) => {
+      let timestampX = x.latestMessage.timestamp.valueOf();
+      let timestampY = y.latestMessage.timestamp.valueOf();
       return timestampX < timestampY ? 1 : -1;
     });
 
@@ -174,10 +178,11 @@ const Conversations: React.FC = () => {
 
   /* Handle the display of conversations */
   const renderAllConversation = (conversationsArray: Conversation[]) => {
-    Object.keys(conversationsArray).length > 0 ? (
+    return Object.keys(conversationsArray).length > 0 ? (
       <IonList className={styles.conversation}>
         {conversationsArray.map((conversation: Conversation) => (
           <Conversation2
+            key={conversation.id}
             conversation={conversation}
             myAgentId={myProfile.id!}
             onClick={() => handleOnClick(conversation)}

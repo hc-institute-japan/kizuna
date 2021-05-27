@@ -23,6 +23,12 @@ const addedToGroup =
       members: payload.members.map((member: Buffer) => serializeHash(member)),
       createdAt: payload.created,
       creator: serializeHash(payload.creator),
+      /* 
+        Messages are empty at the creation of group
+        This creates a tad bit of delay in rendering group in Conversations page
+        as group conversation is created first and then the first message
+        arrives with signal
+      */
       messages: [],
     };
 
