@@ -1,6 +1,6 @@
+import { serializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
 import { ThunkAction } from "../../types";
-import { Uint8ArrayToBase64 } from "../../../utils/helpers";
 import { Profile } from "../../profile/types";
 import {
   ADD_GROUP, // action type
@@ -18,6 +18,9 @@ export const createGroup =
     getState,
     { callZome, getAgentId }
   ): Promise<GroupConversation> => {
+    const state = getState();
+    const myAgentId = await getAgentId();
+
     // TODO: error handling
     // TODO: input sanitation
     const createGroupRes = await callZome({
@@ -27,21 +30,17 @@ export const createGroup =
     });
 
     let groupData: GroupConversation = {
-      originalGroupEntryHash: Uint8ArrayToBase64(createGroupRes.groupId),
-      originalGroupHeaderHash: Uint8ArrayToBase64(
-        createGroupRes.groupRevisionId
-      ),
+      originalGroupEntryHash: serializeHash(createGroupRes.groupId),
+      originalGroupHeaderHash: serializeHash(createGroupRes.groupRevisionId),
       name: createGroupRes.content.name,
       members: createGroupRes.content.members.map((member: Buffer) =>
-        Uint8ArrayToBase64(member)
+        serializeHash(member)
       ),
       createdAt: createGroupRes.content.created,
-      creator: Uint8ArrayToBase64(createGroupRes.content.creator),
+      creator: serializeHash(createGroupRes.content.creator),
       messages: [],
     };
 
-    let state = getState();
-    let myAgentId = await getAgentId();
     let groupMembers = [...groupData.members, groupData.creator];
 
     let membersProfile: {
@@ -50,7 +49,7 @@ export const createGroup =
       state,
       groupMembers,
       callZome,
-      Uint8ArrayToBase64(myAgentId!)
+      serializeHash(myAgentId!)
     );
 
     dispatch<AddGroupAction>({

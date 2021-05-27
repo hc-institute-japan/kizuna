@@ -1,5 +1,5 @@
+import { serializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../../connection/types";
-import { Uint8ArrayToBase64 } from "../../../../utils/helpers";
 import { Profile } from "../../../profile/types";
 import { CallZomeConfig, ThunkAction } from "../../../types";
 import {
@@ -22,7 +22,7 @@ const fetchProfile = async (
     payload: [indicatedBy],
   });
   let typerProfile = fetchedProfiles[0]; // safe to access index here because of above assumption
-  let base64 = Uint8ArrayToBase64(typerProfile.agentId);
+  let base64 = serializeHash(typerProfile.agentId);
   return {
     id: base64,
     username: typerProfile.username,
@@ -35,12 +35,12 @@ const groupTypingDetail =
     const { payload } = signalPayload;
     const state = getState();
     let contacts = state.contacts.contacts;
-    let memberId = Uint8ArrayToBase64(payload.indicatedBy);
+    let memberId = serializeHash(payload.indicatedBy);
     let indicatedBy: Profile = contacts[memberId]
       ? contacts[memberId]
       : await fetchProfile(payload.indicatedBy, callZome);
     let GroupTypingDetail: GroupTypingDetail = {
-      groupId: Uint8ArrayToBase64(payload.groupId),
+      groupId: serializeHash(payload.groupId),
       indicatedBy: indicatedBy,
       isTyping: payload.isTyping,
     };

@@ -1,4 +1,4 @@
-import { Uint8ArrayToBase64 } from "../../../../utils/helpers";
+import { serializeHash } from "@holochain-open-dev/core-types";
 import { isImage, isOther, isTextPayload } from "../../../commons/types";
 import { ThunkAction } from "../../../types";
 import {
@@ -19,7 +19,7 @@ const handleGroupMessagePayload = (payload: any) =>
           : isImage(payload.content.payload.payload.fileType)
           ? "IMAGE"
           : "VIDEO",
-        fileHash: Uint8ArrayToBase64(
+        fileHash: serializeHash(
           payload.content.payload.payload.metadata.fileHash
         ),
         thumbnail: isOther(payload.content.payload.payload.fileType)
@@ -32,9 +32,9 @@ const groupMessageData =
   async (dispatch) => {
     const { payload } = signalPayload;
     let groupMessage: GroupMessage = {
-      groupMessageEntryHash: Uint8ArrayToBase64(payload.id),
-      groupEntryHash: Uint8ArrayToBase64(payload.content.groupHash),
-      author: Uint8ArrayToBase64(payload.content.sender),
+      groupMessageEntryHash: serializeHash(payload.id),
+      groupEntryHash: serializeHash(payload.content.groupHash),
+      author: serializeHash(payload.content.sender),
       payload: handleGroupMessagePayload(payload),
       timestamp: payload.content.created,
       // TODO: work on this

@@ -1,5 +1,5 @@
+import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
-import { base64ToUint8Array, Uint8ArrayToBase64 } from "../../../utils/helpers";
 import { ThunkAction } from "../../types";
 import {
   GroupConversation,
@@ -16,15 +16,17 @@ import {
 export const getLatestGroupVersion =
   (groupId: string): ThunkAction =>
   async (dispatch, getState, { callZome, getAgentId }) => {
-    const res = await callZome({
+    const myAgentId = await getAgentId();
+    const latestGroupVersionRes = await callZome({
       zomeName: ZOMES.GROUP,
       fnName: FUNCTIONS[ZOMES.GROUP].GET_GROUP_LATEST_VERSION,
       payload: {
-        groupHash: base64ToUint8Array(groupId),
+        groupHash: deserializeHash(groupId),
       },
     });
+
     let groupMessageBatchFetchFilter: GroupMessageBatchFetchFilter = {
-      groupId: base64ToUint8Array(groupId),
+      groupId: deserializeHash(groupId),
       batchSize: 10,
       payloadType: {
         type: "ALL",
@@ -42,21 +44,27 @@ export const getLatestGroupVersion =
       convertFetchedResToGroupMessagesOutput(groupMessagesRes);
 
     let groupData: GroupConversation = {
-      originalGroupEntryHash: Uint8ArrayToBase64(res.groupId),
-      originalGroupHeaderHash: Uint8ArrayToBase64(res.groupRevisionId),
-      name: res.latestName,
-      members: res.members.map((member: any) => Uint8ArrayToBase64(member)),
-      createdAt: res.created,
-      creator: Uint8ArrayToBase64(res.creator),
+      originalGroupEntryHash: serializeHash(latestGroupVersionRes.groupId),
+      originalGroupHeaderHash: serializeHash(
+        latestGroupVersionRes.groupRevisionId
+      ),
+      name: latestGroupVersionRes.latestName,
+      members: latestGroupVersionRes.members.map((member: any) =>
+        serializeHash(member)
+      ),
+      createdAt: latestGroupVersionRes.created,
+      creator: serializeHash(latestGroupVersionRes.creator),
       messages:
-        groupMessagesOutput.messagesByGroup[Uint8ArrayToBase64(res.groupId)],
+        groupMessagesOutput.messagesByGroup[
+          serializeHash(latestGroupVersionRes.groupId)
+        ],
     };
-    let myAgentId = await getAgentId();
+
     let membersUsernames = await fetchUsernameOfMembers(
       getState(),
       groupData.members,
       callZome,
-      Uint8ArrayToBase64(myAgentId!)
+      serializeHash(myAgentId!)
     );
 
     dispatch<SetLatestGroupVersionAction>({

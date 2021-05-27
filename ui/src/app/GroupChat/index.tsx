@@ -11,7 +11,11 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { arrowBackSharp, informationCircleOutline, peopleCircleOutline } from "ionicons/icons";
+import {
+  arrowBackSharp,
+  informationCircleOutline,
+  peopleCircleOutline,
+} from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
@@ -22,8 +26,12 @@ import { FilePayloadInput } from "../../redux/commons/types";
 import { sendGroupMessage } from "../../redux/group/actions/sendGroupMessage";
 import { indicateGroupTyping } from "../../redux/group/actions/indicateGroupTyping";
 import { getLatestGroupVersion } from "../../redux/group/actions/getLatestGroupVersion";
-import { GroupConversation, GroupMessage, GroupMessageInput } from "../../redux/group/types";
-import { fetchId } from "../../redux/profile/actions";
+import {
+  GroupConversation,
+  GroupMessage,
+  GroupMessageInput,
+} from "../../redux/group/types";
+import { getAgentId } from "../../redux/profile/actions";
 import { RootState } from "../../redux/types";
 
 // Components
@@ -32,9 +40,9 @@ import Typing from "../../components/Chat/Typing";
 import MessageInput from "../../components/MessageInput";
 import MessageList from "./MessageList";
 
-import { base64ToUint8Array, Uint8ArrayToBase64, useAppDispatch } from "../../utils/helpers";
+import { deserializeAgentPubKey, useAppDispatch } from "../../utils/helpers";
 import styles from "./style.module.css";
-
+import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
 
 interface GroupChatParams {
   group: string;
@@ -82,9 +90,9 @@ const GroupChat: React.FC = () => {
           },
         };
         let groupMessage: GroupMessageInput = {
-          groupHash: base64ToUint8Array(groupInfo!.originalGroupEntryHash),
+          groupHash: deserializeHash(groupInfo!.originalGroupEntryHash),
           payloadInput: filePayloadInput,
-          sender: Buffer.from(base64ToUint8Array(myAgentId).buffer),
+          sender: deserializeAgentPubKey(myAgentId),
           // TODO: handle replying to message here as well
           replyTo: undefined,
         };
@@ -93,12 +101,12 @@ const GroupChat: React.FC = () => {
     }
     if (message.length) {
       inputs.push({
-        groupHash: base64ToUint8Array(groupInfo!.originalGroupEntryHash),
+        groupHash: deserializeHash(groupInfo!.originalGroupEntryHash),
         payloadInput: {
           type: "TEXT",
           payload: { payload: message },
         },
-        sender: Buffer.from(base64ToUint8Array(myAgentId).buffer),
+        sender: deserializeAgentPubKey(myAgentId),
         // TODO: handle replying to message here as well
         replyTo: undefined,
       });
@@ -118,33 +126,33 @@ const GroupChat: React.FC = () => {
     });
   };
 
-  const handleOnBack = () => history.push({pathname: `/home`});
+  const handleOnBack = () => history.push({ pathname: `/home` });
 
   const handleOnChange = (message: string, groupInfo: GroupConversation) => {
-    dispatch(fetchId()).then((myAgentId: AgentPubKey | null) => {
-      let myAgentIdBase64 = Uint8ArrayToBase64(myAgentId!); // AgentPubKey should be non-nullable here
+    dispatch(getAgentId()).then((myAgentId: AgentPubKey | null) => {
+      let myAgentIdBase64 = serializeHash(myAgentId!); // AgentPubKey should be non-nullable here
 
       // Remove self from the recipient of typing signal
       let members = [...groupInfo.members, groupInfo.creator]
-        .filter(member => member !== myAgentIdBase64)
-        .map(member => Buffer.from(base64ToUint8Array(member).buffer));
+        .filter((member) => member !== myAgentIdBase64)
+        .map((member) => Buffer.from(deserializeHash(member).buffer));
 
       dispatch(
         indicateGroupTyping({
-          groupId: base64ToUint8Array(groupInfo.originalGroupEntryHash),
+          groupId: deserializeHash(groupInfo.originalGroupEntryHash),
           indicatedBy: myAgentId!,
           members,
-          isTyping: (message.length !== 0) ? true : false,
+          isTyping: message.length !== 0 ? true : false,
         })
       );
-    })
+    });
     return setMessage(message);
-  }
+  };
 
   /* UseEffects */
   useEffect(() => {
-    dispatch(fetchId()).then((res: AgentPubKey | null) => {
-      if (res) setMyAgentId(Uint8ArrayToBase64(res));
+    dispatch(getAgentId()).then((myAgentPubKey: AgentPubKey | null) => {
+      if (myAgentPubKey) setMyAgentId(serializeHash(myAgentPubKey));
     });
   }, [dispatch]);
 
@@ -187,7 +195,10 @@ const GroupChat: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons>
-            <IonButton onClick={() => handleOnBack()} className="ion-no-padding">
+            <IonButton
+              onClick={() => handleOnBack()}
+              className="ion-no-padding"
+            >
               <IonIcon slot="icon-only" icon={arrowBackSharp} />
             </IonButton>
             <IonAvatar className="ion-padding">
@@ -207,7 +218,11 @@ const GroupChat: React.FC = () => {
             <IonTitle className={styles["title"]}>
               <div className="item item-text-wrap">{groupInfo!.name}</div>
             </IonTitle>
-            <IonButton onClick={() => history.push(`/g/${groupInfo.originalGroupEntryHash}/info`)}>
+            <IonButton
+              onClick={() =>
+                history.push(`/g/${groupInfo.originalGroupEntryHash}/info`)
+              }
+            >
               <IonIcon slot="icon-only" icon={informationCircleOutline} />
             </IonButton>
           </IonButtons>

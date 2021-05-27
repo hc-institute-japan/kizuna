@@ -5,6 +5,7 @@ import { useHistory, useLocation } from "react-router";
 import MessageInput from "../../components/MessageInput";
 import { FilePayloadInput } from "../../redux/commons/types";
 import { sendInitialGroupMessage } from "../../redux/group/actions/sendInitialGroupMessage";
+import { GroupConversation } from "../../redux/group/types";
 import { sendMessage } from "../../redux/p2pmessages/actions";
 import { Profile, ProfileListType } from "../../redux/profile/types";
 import { base64ToUint8Array, useAppDispatch } from "../../utils/helpers";
@@ -63,30 +64,29 @@ const NewConversation: React.FC = () => {
       files.forEach((file) => {
         dispatch(
           sendMessage(
-            Buffer.from(base64ToUint8Array(contacts[0].id)), 
-            message, 
+            Buffer.from(base64ToUint8Array(contacts[0].id)),
+            message,
             "FILE",
             undefined,
             file
-          ))
+          )
+        );
       });
 
       if (message !== "") {
         dispatch(
           sendMessage(
-            Buffer.from(base64ToUint8Array(contacts[0].id)), 
-            message, 
+            Buffer.from(base64ToUint8Array(contacts[0].id)),
+            message,
             "TEXT",
-            undefined, 
-            )
+            undefined
           )
-          .then(setIsLoading(false)
-        );
+        ).then(setIsLoading(false));
       }
-      
+
       history.push(`/u/${contacts[0].username}`);
     } else if (contacts.length > 1) {
-      // create a Group and send the initial message
+      /* create a Group and send the initial message */
       setIsLoading(true);
       let fileInputs: FilePayloadInput[] = files.map((file: any) => {
         let filePayloadInput: FilePayloadInput = {
@@ -94,28 +94,30 @@ const NewConversation: React.FC = () => {
           payload: {
             metadata: {
               fileName: file.metadata.fileName,
-              fileSize:file.metadata.fileSize,
+              fileSize: file.metadata.fileSize,
               fileType: file.metadata.fileType,
             },
             fileType: file.fileType,
             fileBytes: file.fileBytes,
+          },
+        };
+        return filePayloadInput;
+      });
+      dispatch(sendInitialGroupMessage(contacts, message, fileInputs)).then(
+        (res: { groupResult: GroupConversation; messageResults: any[] }) => {
+          if (res) {
+            setIsLoading(false);
+            history.push(`/g/${res.groupResult.originalGroupEntryHash}`);
+          } else {
+            setIsLoading(false);
+            setError(
+              intl.formatMessage({
+                id: "app.new-conversation.problem-occured-toast",
+              })
+            );
           }
         }
-        return filePayloadInput
-      });
-      dispatch(sendInitialGroupMessage(contacts, message, fileInputs)).then((res: any) => {
-        if (res) {
-          setIsLoading(false);
-          history.push(`/g/${res.groupResult.originalGroupEntryHash}`);
-        } else {
-          setIsLoading(false);
-          setError(
-            intl.formatMessage({
-              id: "app.new-conversation.problem-occured-toast",
-            })
-          );
-        }
-      });
+      );
     } else {
       setError(
         intl.formatMessage({ id: "app.new-conversation.no-contacts-toast" })

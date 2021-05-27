@@ -1,5 +1,5 @@
+import { serializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
-import { Uint8ArrayToBase64 } from "../../../utils/helpers";
 import { ThunkAction } from "../../types";
 import { convertFetchedResToGroupMessagesOutput } from "./helpers";
 import {
@@ -26,7 +26,7 @@ export const getNextBatchGroupMessages =
     dispatch<SetNextBatchGroupMessagesAction>({
       type: SET_NEXT_BATCH_GROUP_MESSAGES,
       groupMessagesOutput,
-      groupId: Uint8ArrayToBase64(groupMessageBatchFetchFilter.groupId),
+      groupId: serializeHash(groupMessageBatchFetchFilter.groupId),
     });
 
     return groupMessagesOutput;

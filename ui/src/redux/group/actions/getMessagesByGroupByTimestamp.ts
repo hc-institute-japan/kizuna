@@ -1,5 +1,5 @@
+import { serializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
-import { Uint8ArrayToBase64 } from "../../../utils/helpers";
 import { ThunkAction } from "../../types";
 import {
   GroupMessageByDateFetchFilter,
@@ -26,7 +26,7 @@ export const getMessagesByGroupByTimestamp =
     dispatch<SetMessagesByGroupByTimestampAction>({
       type: SET_MESSAGES_BY_GROUP_BY_TIMESTAMP,
       groupMessagesOutput,
-      groupId: Uint8ArrayToBase64(groupMessageByDateFetchFilter.groupId),
+      groupId: serializeHash(groupMessageByDateFetchFilter.groupId),
     });
 
     return groupMessagesOutput;

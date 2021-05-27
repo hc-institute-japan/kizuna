@@ -1,4 +1,16 @@
-// Common Types
+/* 
+  These are types that are commonly used across redux.
+  As much as possible, use the types here and do not make any type on your own
+  if it is not absolutely necessary.
+*/
+
+/* 
+  We are avoiding the usage of Buffer (as these are typed in the @holochain/conductor-api) in the ui
+  as it is cumbersome to translate data types among Buffer, Uint8Array, and string. 
+  TODO: This may be a temporary solution that may have better fix in the future
+*/
+export type HoloHash = Uint8Array;
+
 export type ProfileID = string;
 export type MessageID = string;
 export type FileBytesID = string;
