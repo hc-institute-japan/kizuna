@@ -7,17 +7,12 @@ import {
   IonList,
   IonPage,
 } from "@ionic/react";
-import {
-  pencil,
-  peopleCircleOutline,
-  personCircleOutline,
-} from "ionicons/icons";
+import { pencil } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import Conversation2, { MessageDetail } from "../../components/Conversation2";
 import Toolbar from "../../components/Toolbar";
-import { isTextPayload } from "../../redux/commons/types";
 import { GroupConversation, GroupMessage } from "../../redux/group/types";
 import { getAgentId } from "../../redux/profile/actions";
 import { RootState } from "../../redux/types";
@@ -29,9 +24,15 @@ import {
 } from "../../utils/helpers";
 import EmptyConversations from "./EmptyConversations";
 import { P2PMessageConversationState } from "../../redux/p2pmessages/types";
-import { FilePayload, TextPayload } from "../../redux/commons/types";
+import {
+  FilePayload,
+  TextPayload,
+  Message,
+  Conversation,
+  isTextPayload,
+} from "../../redux/commons/types";
 import styles from "./style.module.css";
-import { Message, Conversation } from "../../redux/commons/types";
+import { countUnread } from "../../redux/p2pmessages/actions";
 
 const Conversations: React.FC = () => {
   const history = useHistory();
@@ -76,56 +77,50 @@ const Conversations: React.FC = () => {
   /*
     Handle the display of Conversations
   */
-  const renderConversation = (
+  const constructConversations = async (
     groups: { [key: string]: GroupConversation },
     p2p: P2PMessageConversationState
   ) => {
-    let conversationsArray: any[] = [];
+    let conversationsArray: Conversation[] = [];
 
     /* code block for p2p logic */
-    if (p2p !== undefined) {
+    if (Object.keys(p2p.conversations).length > 0) {
       for (let key in p2p.conversations) {
-        // do not display people who are not in contacts list
-        // TODO: may change depending on design implementation for blocked contacts
-        if (contacts[key.slice(1)] === undefined) continue;
+        if (contacts[key] === undefined) continue;
+        /*
+          we are not displaying people who are not in contacts list right now; this will not be undefined atm
+          TODO: may change depending on design implementation for blocked contacts
+          */
+        let conversant = contacts[key].username;
 
-        let src = personCircleOutline;
-        let conversant = contacts[key.slice(1)].username;
-
-        let messages: Message[] = Object.values(
-          p2p.conversations[key].messages
-        ).map((p2pMessageID) => {
-          // convert p2pMessage to Message as input to Conversation component
-          let p2pMessage = p2p.messages[p2pMessageID];
-          let message: Message = {
-            id: p2pMessage.p2pMessageEntryHash,
-            sender: {
-              id: p2pMessage.author,
-              username: p2pMessage.author === myAgentId ? "You" : conversant,
-            },
-            message:
-              p2pMessage.payload.type === "TEXT"
-                ? (p2pMessage.payload as TextPayload).payload.payload
-                : (p2pMessage.payload as FilePayload).fileName,
-            timestamp: dateToTimestamp(p2pMessage.timestamp),
-          };
-          return message;
-        });
-
-        // sort messages according to time sent
-        messages.sort((x: Message, y: Message) =>
-          y.timestamp.valueOf() < x.timestamp.valueOf() ? 1 : -1
-        );
+        // accessing the first index for the latest message
+        // TODO: make sure that this is the latest
+        let latestMessageId = p2p.conversations[key].messages[0];
+        let latestMessage = p2p.messages[latestMessageId];
+        let message: Message = {
+          id: latestMessage.p2pMessageEntryHash,
+          sender: {
+            id: latestMessage.author,
+            username: latestMessage.author === myAgentId ? "You" : conversant,
+          },
+          payloadType: latestMessage.payload.type,
+          textPayload: isTextPayload(latestMessage.payload)
+            ? latestMessage.payload.payload.payload
+            : undefined,
+          fileName:
+            latestMessage.payload.type === "FILE"
+              ? latestMessage.payload.fileName
+              : undefined,
+          /* TODO: change to Date format */
+          timestamp: dateToTimestamp(latestMessage.timestamp),
+        };
 
         // create input to Conversation component
-        let conversation = {
-          groupId: key,
-          isGroup: false,
-          content: {
-            src: src,
-            name: conversant,
-            messages: messages,
-          },
+        let conversation: Conversation = {
+          id: key,
+          conversationName: conversant,
+          latestMessage: message,
+          badgeCount: await dispatch(countUnread(conversant)),
         };
         conversationsArray.push(conversation);
       }
@@ -135,8 +130,6 @@ const Conversations: React.FC = () => {
     /* code block for group logic */
     if (Object.keys(groups).length > 0) {
       Object.keys(groups).forEach((key: string) => {
-        // TODO: change to actual pic chosen by group creator
-        let src = peopleCircleOutline;
         let messages: (Message | undefined)[] = groups[key].messages
           ? groups[key].messages.map((messageId: string) => {
               let groupMessage = Object.keys(groupMessagesLocal).length
@@ -273,7 +266,7 @@ const Conversations: React.FC = () => {
         {Object.keys(groups).length > 0 ||
         Object.keys(p2pState.conversations).length > 0 ? (
           <IonList className={styles.conversation}>
-            {renderConversation(groups, p2pState).map(
+            {constructConversations(groups, p2pState).map(
               (conversation: Conversation) => (
                 <Conversation2
                   latestMessageDetail={}

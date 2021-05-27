@@ -105,7 +105,9 @@ export function isVideo(
 export interface Message {
   id: string;
   sender: Profile;
-  message: string;
+  payloadType: "TEXT" | "FILE";
+  /* undefined when payload type is FILE */
+  textPayload?: string;
   fileName?: string;
   /* TODO: tats needs to fix the timestamp type in GroupMessage so that this can be typed as Date  */
   timestamp: [number, number];
@@ -114,10 +116,11 @@ export interface Message {
 /* used in Conversations page */
 export interface Conversation {
   id: string;
-  name: string;
-  src: string;
+  conversationName: string;
+  // src: string;
   sender?: string;
-  messages: Message[];
+  latestMessage: Message;
+  badgeCount: number;
 }
 
 export type Conversations = Conversation[];
