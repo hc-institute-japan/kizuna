@@ -1,6 +1,4 @@
-import { IonLoading } from "@ionic/react";
 import React, { useEffect, useState } from "react";
-import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 // Components
 import Chat from "../../../components/Chat";
@@ -33,59 +31,48 @@ const MessageList: React.FC<Props> = ({
   groupId,
 }) => {
   const dispatch = useAppDispatch();
-  const intl = useIntl();
 
-  // LOCAL STATE
+  /* LOCAL STATE */
   const [messages, setMessages] = useState<any[]>([]);
-  const [myAgentId, setMyAgentId] = useState<string>("");
   const [oldestFetched, setOldestFetched] = useState<boolean>(false);
   const [oldestMessage, setOldestMessage] = useState<any>();
   const [newestMessage, setNewestMessage] = useState<GroupMessage>();
-  const [loading, setLoading] = useState<boolean>(false);
 
-  const allMessages = useSelector((state: RootState) => state.groups.messages);
-  const allMembers = useSelector((state: RootState) => state.groups.members);
+  const groups = useSelector((state: RootState) => state.groups);
   const profile = useSelector((state: RootState) => state.profile);
   const messagesData = useSelector((state: RootState) => {
-    let uniqueArray = messageIds.filter(function (item, pos, self) {
-      return self.indexOf(item) === pos;
+    const messages: any[] = messageIds.map((messageId) => {
+      /* retrieve the message content from redux */
+      let message: GroupMessage = state.groups.messages[messageId];
+      const authorProfile = groups.members[message.author];
+
+      let payload = message.payload;
+
+      if (!isTextPayload(payload)) {
+        payload = payload as FilePayload;
+
+        if (state.groups.groupFiles[payload.fileHash]) {
+          payload = {
+            ...payload,
+            fileHash: payload.fileHash,
+          };
+        } else {
+          dispatch(fetchFilesBytes([payload.fileHash]));
+        }
+      }
+      return {
+        ...message,
+        payload,
+        author: authorProfile
+          ? authorProfile
+          : // if profile was not found from allMembers, then the author is self
+            // assuming that allMembers have all the members of group at all times
+            {
+              username: profile.username!,
+              id: message.author,
+            },
+      };
     });
-    const messages: (any | undefined)[] = uniqueArray
-      ? uniqueArray.map((messageId) => {
-          let message: GroupMessage = state.groups.messages[messageId];
-          if (message) {
-            const authorProfile = allMembers[message.author];
-
-            let payload = message.payload;
-
-            if (!isTextPayload(payload)) {
-              payload = payload as FilePayload;
-
-              if (state.groups.groupFiles[payload.fileHash]) {
-                payload = {
-                  ...payload,
-                  fileHash: payload.fileHash,
-                };
-              } else {
-                dispatch(fetchFilesBytes([payload.fileHash]));
-              }
-            }
-            return {
-              ...message,
-              payload,
-              author: authorProfile
-                ? authorProfile
-                : // if profile was not found from allMembers, then the author is self
-                  // assuming that allMembers have all the members of group at all times
-                  {
-                    username: profile.username!,
-                    id: message.author,
-                  },
-            };
-          }
-          return null;
-        })
-      : [];
 
     // TODO: handle fetching of missing messages (most likely won't occur)
     if (messages.find((message) => message === null)) return null;
@@ -96,7 +83,6 @@ const MessageList: React.FC<Props> = ({
   });
 
   const handleOnScrollTop = (complete: any) => {
-    setLoading(true);
     if (messagesData?.length) {
       let lastMessage = messagesData![0];
       dispatch(
@@ -117,7 +103,8 @@ const MessageList: React.FC<Props> = ({
             res.groupMessagesContents;
           const fetchedMessages: (any | undefined)[] = [];
           Object.keys(groupMesssageContents).forEach((key: any) => {
-            const authorProfile = allMembers[groupMesssageContents[key].author];
+            const authorProfile =
+              groups.members[groupMesssageContents[key].author];
             fetchedMessages.push({
               ...groupMesssageContents[key],
               author: authorProfile
@@ -142,10 +129,8 @@ const MessageList: React.FC<Props> = ({
             ];
           setOldestMessage(newOldestMessage);
           setMessages(newMessages);
-          setLoading(false);
         } else {
           setOldestFetched(true);
-          setLoading(false);
         }
       });
     }
@@ -160,10 +145,11 @@ const MessageList: React.FC<Props> = ({
   }, [messageIds]);
 
   useEffect(() => {
-    let maybeThisGroupNewestMessageKey =
-      Object.keys(allMessages)[Object.keys(allMessages).length - 1];
+    let maybeThisGroupNewestMessageKey = Object.keys(groups.messages)[
+      Object.keys(groups.messages).length - 1
+    ];
     let maybeThisGroupNewestMessage =
-      allMessages[maybeThisGroupNewestMessageKey];
+      groups.messages[maybeThisGroupNewestMessageKey];
     if (maybeThisGroupNewestMessageKey) {
       if (
         maybeThisGroupNewestMessage.groupId === groupId &&
@@ -173,25 +159,7 @@ const MessageList: React.FC<Props> = ({
         setNewestMessage(maybeThisGroupNewestMessage);
       }
     }
-  }, [allMessages, groupId, newestMessage?.groupMessageId]);
-
-  useEffect(() => {
-    if (newestMessage) {
-      const authorProfile = allMembers[newestMessage.author];
-      messages.push({
-        ...newestMessage,
-        author: authorProfile
-          ? authorProfile
-          : // if profile was not found from allMembers, then the author is self
-            // assuming that allMembers have all the members of group at all times
-            {
-              username: profile.username!,
-              id: newestMessage.author,
-            },
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [newestMessage]);
+  }, [groupId, newestMessage?.groupMessageId]);
 
   const filesBytes = useSelector((state: RootState) => state.groups.groupFiles);
 
@@ -219,10 +187,6 @@ const MessageList: React.FC<Props> = ({
 
   return (
     <>
-      <IonLoading
-        isOpen={loading}
-        message={intl.formatMessage({ id: "app.group-chat.fetching" })}
-      />
       <Chat.ChatList
         disabled={oldestFetched}
         onScrollTop={(complete) => handleOnScrollTop(complete)}
@@ -230,14 +194,15 @@ const MessageList: React.FC<Props> = ({
         type="group"
       >
         {messages!.map((message, i) => {
-          if (message.author.id === myAgentId)
+          console.log(message);
+          if (message.author.id === profile.id)
             return (
               <Chat.Me
                 // key={message.groupMessageEntryHash}
                 onDownload={onDownload}
                 key={i}
                 author={message.author.username}
-                timestamp={new Date(message.timestamp[0] * 1000)}
+                timestamp={message.timestamp}
                 payload={message.payload}
                 readList={message.readList}
                 type="group"
@@ -251,7 +216,7 @@ const MessageList: React.FC<Props> = ({
               onDownload={onDownload}
               key={i}
               author={message.author.username}
-              timestamp={new Date(message.timestamp[0] * 1000)}
+              timestamp={message.timestamp}
               payload={message.payload}
               readList={message.readList}
               type="group"

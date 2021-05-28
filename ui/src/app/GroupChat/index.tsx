@@ -23,6 +23,7 @@ import { useHistory, useParams } from "react-router";
 import { ChatListMethods } from "../../components/Chat/types";
 import Typing from "../../components/Chat/Typing";
 import MessageInput from "../../components/MessageInput";
+import ChatBox from "./ChatBox";
 // Redux
 import { FilePayloadInput } from "../../redux/commons/types";
 import { getLatestGroupVersion } from "../../redux/group/actions/getLatestGroupVersion";
@@ -35,7 +36,6 @@ import {
 } from "../../redux/group/types";
 import { RootState } from "../../redux/types";
 import { useAppDispatch } from "../../utils/helpers";
-import MessageList from "./MessageList";
 import styles from "./style.module.css";
 
 interface GroupChatParams {
@@ -215,7 +215,7 @@ const GroupChat: React.FC = () => {
 
       <IonContent>
         {groupData ? (
-          <MessageList
+          <ChatBox
             groupId={groupInfo.originalGroupId}
             members={groupInfo!.members}
             messageIds={messages}
