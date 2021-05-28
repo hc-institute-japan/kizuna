@@ -61,7 +61,7 @@ const MessageList: React.FC<Props> = ({
             if (!isTextPayload(payload)) {
               payload = payload as FilePayload;
 
-              if (state.groups.groupFiles["u" + payload.fileHash]) {
+              if (state.groups.groupFiles[payload.fileHash]) {
                 payload = {
                   ...payload,
                   fileHash: payload.fileHash,
