@@ -94,7 +94,7 @@ const NewConversation: React.FC = () => {
         (res: { groupResult: GroupConversation; messageResults: any[] }) => {
           if (res) {
             setIsLoading(false);
-            history.push(`/g/${res.groupResult.originalGroupEntryHash}`);
+            history.push(`/g/${res.groupResult.originalGroupId}`);
           } else {
             setIsLoading(false);
             setError(

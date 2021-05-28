@@ -1,11 +1,11 @@
 import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
+import { AgentPubKey } from "@holochain/conductor-api";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
 import { deserializeAgentPubKey } from "../../../utils/helpers";
 import { ThunkAction } from "../../types";
 import {
   REMOVE_MEMBERS, // action type
   // IO
-  UpdateGroupMembersIO,
   UpdateGroupMembersData,
   RemoveGroupMembersAction, // action payload type
 } from "../types";
@@ -17,7 +17,7 @@ export const removeGroupMembers =
     _getState,
     { callZome }
   ): Promise<UpdateGroupMembersData> => {
-    let updateGroupMembersIO: UpdateGroupMembersIO = {
+    const input = {
       members: updateGroupMembersData.members.map((member: string) =>
         deserializeAgentPubKey(member)
       ),
@@ -27,14 +27,14 @@ export const removeGroupMembers =
     // TODO: error handling
     // TODO: input sanitation
     // make sure the members being removed are actual members of the group.
-    const removeMembersOutput: UpdateGroupMembersIO = await callZome({
+    const removeMembersOutput = await callZome({
       zomeName: ZOMES.GROUP,
       fnName: FUNCTIONS[ZOMES.GROUP].REMOVE_MEMBERS,
-      payload: updateGroupMembersIO,
+      payload: input,
     });
 
     let updateGroupMembersDataFromRes: UpdateGroupMembersData = {
-      members: removeMembersOutput.members.map((member) =>
+      members: removeMembersOutput.members.map((member: AgentPubKey) =>
         serializeHash(member)
       ),
       groupId: serializeHash(removeMembersOutput.groupId),

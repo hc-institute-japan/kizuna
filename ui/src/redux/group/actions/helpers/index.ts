@@ -2,7 +2,11 @@ import { serializeHash } from "@holochain-open-dev/core-types";
 import { AgentPubKey } from "@holochain/conductor-api";
 import { CombinedState } from "redux";
 import { FUNCTIONS, ZOMES } from "../../../../connection/types";
-import { deserializeAgentPubKey, objectMap } from "../../../../utils/helpers";
+import {
+  deserializeAgentPubKey,
+  objectMap,
+  timestampToDate,
+} from "../../../../utils/helpers";
 import {
   isOther,
   // type guards
@@ -36,15 +40,15 @@ export const convertFetchedResToGroupMessagesOutput = (
     fetchedRes.groupMessagesContents,
     (msg_content): GroupMessage => {
       return {
-        groupMessageEntryHash: serializeHash(
+        groupMessageId: serializeHash(
           msg_content.groupMessageElement.signedHeader.header.content.entry_hash
         ),
-        groupEntryHash: serializeHash(
-          msg_content.groupMessageElement.entry.groupHash
-        ),
+        groupId: serializeHash(msg_content.groupMessageElement.entry.groupHash),
         author: serializeHash(msg_content.groupMessageElement.entry.sender),
         payload: convertPayload(msg_content.groupMessageElement.entry.payload),
-        timestamp: msg_content.groupMessageElement.entry.created,
+        timestamp: timestampToDate(
+          msg_content.groupMessageElement.entry.created
+        ),
         replyTo: msg_content.groupMessageElement.entry.replyTo,
         readList: msg_content.readList,
       };

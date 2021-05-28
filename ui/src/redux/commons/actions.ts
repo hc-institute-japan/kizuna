@@ -1,5 +1,6 @@
 import { serializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../connection/types";
+import { timestampToDate } from "../../utils/helpers";
 import { SET_BLOCKED, SET_CONTACTS } from "../contacts/types";
 import { convertFetchedResToGroupMessagesOutput } from "../group/actions/helpers";
 import {
@@ -74,11 +75,11 @@ export const getLatestData =
     let groups: GroupConversation[] = latestData.groups.map(
       (group: any): GroupConversation => {
         return {
-          originalGroupEntryHash: serializeHash(group.groupId),
-          originalGroupHeaderHash: serializeHash(group.groupRevisionId),
+          originalGroupId: serializeHash(group.groupId),
+          originalGroupRevisionId: serializeHash(group.groupRevisionId),
           name: group.latestName,
           members: group.members.map((id: Buffer) => serializeHash(id)),
-          createdAt: group.created,
+          createdAt: timestampToDate(group.created),
           creator: serializeHash(group.creator),
           messages:
             groupMessagesOutput.messagesByGroup[serializeHash(group.groupId)],

@@ -1,4 +1,5 @@
 import { serializeHash } from "@holochain-open-dev/core-types";
+import { timestampToDate } from "../../../../utils/helpers";
 import { ThunkAction } from "../../../types";
 import { SetGroupReadMessage, SET_GROUP_READ_MESSAGE } from "../../types";
 
@@ -14,7 +15,7 @@ const groupMessageRead =
           serializeHash(messageId)
         ),
         reader: serializeHash(payload.reader),
-        timestamp: payload.timestamp,
+        timestamp: timestampToDate(payload.timestamp),
       },
     });
   };

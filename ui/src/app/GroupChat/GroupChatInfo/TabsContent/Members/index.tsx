@@ -1,7 +1,3 @@
-import { serializeHash } from "@holochain-open-dev/core-types";
-import { AgentPubKey } from "@holochain/conductor-api";
-import React, { useEffect, useState } from "react";
-import { useIntl } from "react-intl";
 import {
   IonIcon,
   IonItem,
@@ -14,20 +10,18 @@ import {
   personAddOutline,
   removeCircleOutline,
 } from "ionicons/icons";
-
+import React, { useEffect, useState } from "react";
+import { useIntl } from "react-intl";
+import { useSelector } from "react-redux";
+import { removeGroupMembers } from "../../../../../redux/group/actions/removeGroupMembers";
+import { GroupConversation } from "../../../../../redux/group/types";
 // Redux
 import { Profile } from "../../../../../redux/profile/types";
-import { useSelector } from "react-redux";
-import { getAgentId } from "../../../../../redux/profile/actions";
 import { RootState } from "../../../../../redux/types";
-import { GroupConversation } from "../../../../../redux/group/types";
-import { removeGroupMembers } from "../../../../../redux/group/actions/removeGroupMembers";
-
+import { useAppDispatch } from "../../../../../utils/helpers";
+import AddMemberModal from "./AddMemberModal";
 // Components
 import RemoveMemberToast from "./RemoveMemberToast";
-import AddMemberModal from "./AddMemberModal";
-
-import { useAppDispatch } from "../../../../../utils/helpers";
 import styles from "./style.module.css";
 
 interface Props {
@@ -40,7 +34,6 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
   const intl = useIntl();
 
   /* Local state */
-  const [myAgentId, setMyAgentId] = useState("");
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [toast, setToast] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
@@ -49,6 +42,7 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
 
   /* Selectors */
   const contacts = useSelector((state: RootState) => state.contacts.contacts);
+  const profile = useSelector((state: RootState) => state.profile);
   const groupMembers = useSelector((state: RootState) => state.groups.members);
   const groupData = useSelector(
     (state: RootState) => state.groups.conversations[groupId]
@@ -71,8 +65,8 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
 
     let input = {
       members: [memberProfile.id],
-      groupId: groupData.originalGroupEntryHash,
-      groupRevisionId: groupData.originalGroupHeaderHash,
+      groupId: groupData.originalGroupId,
+      groupRevisionId: groupData.originalGroupRevisionId,
     };
     dispatch(removeGroupMembers(input)).then((res: any) => {
       let newMembers = members.filter((x) => !res.members.includes(x.id));
@@ -82,12 +76,6 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
   };
 
   /* Use Effects */
-  useEffect(() => {
-    dispatch(getAgentId()).then((myAgentPubKey: AgentPubKey | null) => {
-      if (myAgentPubKey) setMyAgentId(serializeHash(myAgentPubKey));
-    });
-  }, [dispatch]);
-
   useEffect(() => {
     let membersProfile: Profile[] = [];
     let members = [...groupData.members, groupData.creator];
@@ -115,7 +103,7 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
   );
 
   const renderAddMemberButton = (groupData: GroupConversation) => {
-    return myAgentId === groupData.creator ? (
+    return profile.id === groupData.creator ? (
       <IonItem lines="none" button onClick={() => setIsOpen(true)}>
         <IonIcon className={styles.icon} icon={personAddOutline}></IonIcon>
         <IonLabel>
@@ -131,7 +119,7 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
       - check that the agent is a creator 
       - check also that the remove button will not appear to self
     */
-    return myAgentId === groupData.creator &&
+    return profile.id === groupData.creator &&
       member.id !== groupData.creator ? (
       <IonItem
         lines="none"
@@ -208,7 +196,7 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
         groupId={groupId}
         groupRevisionId={groupRevisionId}
         setLoading={setLoading}
-        myAgentId={myAgentId}
+        myAgentId={profile.id!}
       />
       <RemoveMemberToast
         toast={toast}

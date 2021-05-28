@@ -69,13 +69,15 @@ const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
         i
       );
 
+      console.log(child.props.timestamp);
+
       return (
         <Fragment key={i}>
           {showDate ? (
             <IonText className="ion-text-center">
               {child.props.timestamp.toDateString() ===
               new Date().toDateString()
-                ? intl.formatMessage({id: "components.chat.chat-list.today"})
+                ? intl.formatMessage({ id: "components.chat.chat-list.today" })
                 : intl.formatDate(child.props.timestamp, {
                     year: "numeric",
                     month: "numeric",
@@ -108,7 +110,10 @@ const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
   useImperativeHandle(ref, () => ({
     scrollToBottom: () => {
       /* TODO: come up with a better implementation than simply setting a timeout for scrollIntoView */
-      setTimeout(() => scroll.current?.scrollIntoView({ behavior: "smooth" }), 500)
+      setTimeout(
+        () => scroll.current?.scrollIntoView({ behavior: "smooth" }),
+        500
+      );
     },
   }));
 
@@ -121,7 +126,9 @@ const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
           ref={infiniteScroll}
           position="top"
           /* Adding a 1 second timeout just because messages are being fetched too freakin' fast locally :D */
-          onIonInfinite={(e) => setTimeout(() => onScrollTop(complete, e), 1000)}
+          onIonInfinite={(e) =>
+            setTimeout(() => onScrollTop(complete, e), 1000)
+          }
         >
           <IonInfiniteScrollContent loadingSpinner="crescent" />
         </IonInfiniteScroll>

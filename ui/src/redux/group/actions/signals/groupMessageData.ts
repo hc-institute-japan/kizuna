@@ -1,4 +1,5 @@
 import { serializeHash } from "@holochain-open-dev/core-types";
+import { timestampToDate } from "../../../../utils/helpers";
 import { isImage, isOther, isTextPayload } from "../../../commons/types";
 import { ThunkAction } from "../../../types";
 import {
@@ -32,11 +33,11 @@ const groupMessageData =
   async (dispatch) => {
     const { payload } = signalPayload;
     let groupMessage: GroupMessage = {
-      groupMessageEntryHash: serializeHash(payload.id),
-      groupEntryHash: serializeHash(payload.content.groupHash),
+      groupMessageId: serializeHash(payload.id),
+      groupId: serializeHash(payload.content.groupHash),
       author: serializeHash(payload.content.sender),
       payload: handleGroupMessagePayload(payload),
-      timestamp: payload.content.created,
+      timestamp: timestampToDate(payload.content.created),
       // TODO: work on this
       // replyTo: undefined,
       readList: {},

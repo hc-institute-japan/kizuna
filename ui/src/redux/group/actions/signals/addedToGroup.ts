@@ -1,7 +1,10 @@
 import { serializeHash } from "@holochain-open-dev/core-types";
 import { AgentPubKey } from "@holochain/conductor-api";
 import { FUNCTIONS, ZOMES } from "../../../../connection/types";
-import { deserializeAgentPubKey } from "../../../../utils/helpers";
+import {
+  deserializeAgentPubKey,
+  timestampToDate,
+} from "../../../../utils/helpers";
 import { Profile } from "../../../profile/types";
 import { ThunkAction } from "../../../types";
 import { AddGroupAction, ADD_GROUP, GroupConversation } from "../../types";
@@ -17,11 +20,11 @@ const addedToGroup =
     let myAgentIdBase64 = serializeHash(myAgentId!); // AgentPubKey should be non-nullable here
 
     const groupData: GroupConversation = {
-      originalGroupEntryHash: serializeHash(payload.groupId),
-      originalGroupHeaderHash: serializeHash(payload.groupRevisionId),
+      originalGroupId: serializeHash(payload.groupId),
+      originalGroupRevisionId: serializeHash(payload.groupRevisionId),
       name: payload.latestName,
       members: payload.members.map((member: Buffer) => serializeHash(member)),
-      createdAt: payload.created,
+      createdAt: timestampToDate(payload.created),
       creator: serializeHash(payload.creator),
       /* 
         Messages are empty at the creation of group

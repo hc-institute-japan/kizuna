@@ -10,6 +10,7 @@ import {
   AddGroupAction, // action payload type
 } from "../types";
 import { fetchUsernameOfMembers } from "./helpers";
+import { deserializeAgentPubKey } from "../../../utils/helpers";
 
 export const createGroup =
   (createGroupInput: CreateGroupInput): ThunkAction =>
@@ -21,17 +22,23 @@ export const createGroup =
     const state = getState();
     const myAgentId = await getAgentId();
 
+    const input = {
+      name: createGroupInput.name,
+      members: createGroupInput.members.map((member: string) =>
+        deserializeAgentPubKey(member)
+      ), // deserialize to AgentPubKey
+    };
     // TODO: error handling
     // TODO: input sanitation
     const createGroupRes = await callZome({
       zomeName: ZOMES.GROUP,
       fnName: FUNCTIONS[ZOMES.GROUP].CREATE_GROUP,
-      payload: createGroupInput,
+      payload: input,
     });
 
     let groupData: GroupConversation = {
-      originalGroupEntryHash: serializeHash(createGroupRes.groupId),
-      originalGroupHeaderHash: serializeHash(createGroupRes.groupRevisionId),
+      originalGroupId: serializeHash(createGroupRes.groupId),
+      originalGroupRevisionId: serializeHash(createGroupRes.groupRevisionId),
       name: createGroupRes.content.name,
       members: createGroupRes.content.members.map((member: Buffer) =>
         serializeHash(member)

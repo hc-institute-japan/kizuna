@@ -1,4 +1,3 @@
-import { AgentPubKey } from "@holochain/conductor-api";
 import {
   IonAvatar,
   IonButton,
@@ -20,29 +19,24 @@ import React, { useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router";
-
+// Components
+import { ChatListMethods } from "../../components/Chat/types";
+import Typing from "../../components/Chat/Typing";
+import MessageInput from "../../components/MessageInput";
 // Redux
 import { FilePayloadInput } from "../../redux/commons/types";
-import { sendGroupMessage } from "../../redux/group/actions/sendGroupMessage";
-import { indicateGroupTyping } from "../../redux/group/actions/indicateGroupTyping";
 import { getLatestGroupVersion } from "../../redux/group/actions/getLatestGroupVersion";
+import { indicateGroupTyping } from "../../redux/group/actions/indicateGroupTyping";
+import { sendGroupMessage } from "../../redux/group/actions/sendGroupMessage";
 import {
   GroupConversation,
   GroupMessage,
   GroupMessageInput,
 } from "../../redux/group/types";
-import { getAgentId } from "../../redux/profile/actions";
 import { RootState } from "../../redux/types";
-
-// Components
-import { ChatListMethods } from "../../components/Chat/types";
-import Typing from "../../components/Chat/Typing";
-import MessageInput from "../../components/MessageInput";
+import { useAppDispatch } from "../../utils/helpers";
 import MessageList from "./MessageList";
-
-import { deserializeAgentPubKey, useAppDispatch } from "../../utils/helpers";
 import styles from "./style.module.css";
-import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
 
 interface GroupChatParams {
   group: string;
@@ -56,7 +50,6 @@ const GroupChat: React.FC = () => {
   const chatList = useRef<ChatListMethods>(null);
 
   // local states
-  const [myAgentId, setMyAgentId] = useState<string>("");
   const [files, setFiles] = useState<object[]>([]);
   const [groupInfo, setGroupInfo] = useState<GroupConversation | undefined>();
   const [messages, setMessages] = useState<string[]>([]);
@@ -68,6 +61,7 @@ const GroupChat: React.FC = () => {
   const groupData = useSelector(
     (state: RootState) => state.groups.conversations[group]
   );
+  const myProfile = useSelector((state: RootState) => state.profile);
 
   const typing = useSelector((state: RootState) => state.groups.typing);
 
@@ -90,9 +84,9 @@ const GroupChat: React.FC = () => {
           },
         };
         let groupMessage: GroupMessageInput = {
-          groupHash: deserializeHash(groupInfo!.originalGroupEntryHash),
+          groupId: groupInfo!.originalGroupId,
           payloadInput: filePayloadInput,
-          sender: deserializeAgentPubKey(myAgentId),
+          sender: myProfile.id!,
           // TODO: handle replying to message here as well
           replyTo: undefined,
         };
@@ -101,12 +95,12 @@ const GroupChat: React.FC = () => {
     }
     if (message.length) {
       inputs.push({
-        groupHash: deserializeHash(groupInfo!.originalGroupEntryHash),
+        groupId: groupInfo!.originalGroupId,
         payloadInput: {
           type: "TEXT",
           payload: { payload: message },
         },
-        sender: deserializeAgentPubKey(myAgentId),
+        sender: myProfile.id!,
         // TODO: handle replying to message here as well
         replyTo: undefined,
       });
@@ -119,7 +113,7 @@ const GroupChat: React.FC = () => {
 
     Promise.all(messagePromises).then((sentMessages: GroupMessage[]) => {
       sentMessages.forEach((msg: GroupMessage, i) => {
-        setMessages([...messages!, msg.groupMessageEntryHash]);
+        setMessages([...messages!, msg.groupMessageId]);
       });
       setSendingLoading(false);
       chatList.current!.scrollToBottom();
@@ -129,33 +123,23 @@ const GroupChat: React.FC = () => {
   const handleOnBack = () => history.push({ pathname: `/home` });
 
   const handleOnChange = (message: string, groupInfo: GroupConversation) => {
-    dispatch(getAgentId()).then((myAgentId: AgentPubKey | null) => {
-      let myAgentIdBase64 = serializeHash(myAgentId!); // AgentPubKey should be non-nullable here
+    // Remove self from the recipient of typing signal
+    let members = [...groupInfo.members, groupInfo.creator].filter(
+      (member) => member !== myProfile.id
+    );
 
-      // Remove self from the recipient of typing signal
-      let members = [...groupInfo.members, groupInfo.creator]
-        .filter((member) => member !== myAgentIdBase64)
-        .map((member) => Buffer.from(deserializeHash(member).buffer));
-
-      dispatch(
-        indicateGroupTyping({
-          groupId: deserializeHash(groupInfo.originalGroupEntryHash),
-          indicatedBy: myAgentId!,
-          members,
-          isTyping: message.length !== 0 ? true : false,
-        })
-      );
-    });
+    dispatch(
+      indicateGroupTyping({
+        groupId: groupInfo.originalGroupId,
+        indicatedBy: myProfile.id!,
+        members,
+        isTyping: message.length !== 0 ? true : false,
+      })
+    );
     return setMessage(message);
   };
 
   /* UseEffects */
-  useEffect(() => {
-    dispatch(getAgentId()).then((myAgentPubKey: AgentPubKey | null) => {
-      if (myAgentPubKey) setMyAgentId(serializeHash(myAgentPubKey));
-    });
-  }, [dispatch]);
-
   useEffect(() => {
     if (groupData) {
       setGroupInfo(groupData);
@@ -220,7 +204,7 @@ const GroupChat: React.FC = () => {
             </IonTitle>
             <IonButton
               onClick={() =>
-                history.push(`/g/${groupInfo.originalGroupEntryHash}/info`)
+                history.push(`/g/${groupInfo.originalGroupId}/info`)
               }
             >
               <IonIcon slot="icon-only" icon={informationCircleOutline} />
@@ -232,7 +216,7 @@ const GroupChat: React.FC = () => {
       <IonContent>
         {groupData ? (
           <MessageList
-            groupId={groupInfo.originalGroupEntryHash}
+            groupId={groupInfo.originalGroupId}
             members={groupInfo!.members}
             messageIds={messages}
             chatList={chatList}
@@ -244,8 +228,8 @@ const GroupChat: React.FC = () => {
 
       <Typing
         profiles={
-          typing[groupInfo.originalGroupEntryHash]
-            ? typing[groupInfo.originalGroupEntryHash]
+          typing[groupInfo.originalGroupId]
+            ? typing[groupInfo.originalGroupId]
             : []
         }
       />

@@ -1,9 +1,14 @@
-import { AgentPubKey } from "@holochain/conductor-api";
-import React, { useEffect, useState } from "react";
 import { IonLoading } from "@ionic/react";
-import { useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
-
+import { useSelector } from "react-redux";
+// Components
+import Chat from "../../../components/Chat";
+import { ChatListMethods } from "../../../components/Chat/types";
+import { FilePayload } from "../../../redux/commons/types";
+import { getNextBatchGroupMessages } from "../../../redux/group/actions/getNextBatchGroupMessages";
+import { readGroupMessage } from "../../../redux/group/actions/readGroupMessage";
+import { fetchFilesBytes } from "../../../redux/group/actions/setFilesBytes";
 // Redux
 import {
   GroupMessage,
@@ -11,23 +16,8 @@ import {
   GroupMessagesContents,
   GroupMessagesOutput,
 } from "../../../redux/group/types";
-import { readGroupMessage } from "../../../redux/group/actions/readGroupMessage";
-import { getNextBatchGroupMessages } from "../../../redux/group/actions/getNextBatchGroupMessages";
-import { fetchFilesBytes } from "../../../redux/group/actions/setFilesBytes";
 import { RootState } from "../../../redux/types";
-import { FilePayload } from "../../../redux/commons/types";
-import { getAgentId } from "../../../redux/profile/actions";
-
-// Components
-import Chat from "../../../components/Chat";
-import { ChatListMethods } from "../../../components/Chat/types";
-
-import {
-  deserializeAgentPubKey,
-  isTextPayload,
-  useAppDispatch,
-} from "../../../utils/helpers";
-import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
+import { isTextPayload, useAppDispatch } from "../../../utils/helpers";
 
 interface Props {
   messageIds: string[];
@@ -55,7 +45,7 @@ const MessageList: React.FC<Props> = ({
 
   const allMessages = useSelector((state: RootState) => state.groups.messages);
   const allMembers = useSelector((state: RootState) => state.groups.members);
-  const username = useSelector((state: RootState) => state.profile.username);
+  const profile = useSelector((state: RootState) => state.profile);
   const messagesData = useSelector((state: RootState) => {
     let uniqueArray = messageIds.filter(function (item, pos, self) {
       return self.indexOf(item) === pos;
@@ -77,7 +67,7 @@ const MessageList: React.FC<Props> = ({
                   fileHash: payload.fileHash,
                 };
               } else {
-                dispatch(fetchFilesBytes([deserializeHash(payload.fileHash)]));
+                dispatch(fetchFilesBytes([payload.fileHash]));
               }
             }
             return {
@@ -88,7 +78,7 @@ const MessageList: React.FC<Props> = ({
                 : // if profile was not found from allMembers, then the author is self
                   // assuming that allMembers have all the members of group at all times
                   {
-                    username: username!,
+                    username: profile.username!,
                     id: message.author,
                   },
             };
@@ -111,11 +101,11 @@ const MessageList: React.FC<Props> = ({
       let lastMessage = messagesData![0];
       dispatch(
         getNextBatchGroupMessages({
-          groupId: deserializeHash(groupId),
+          groupId: groupId,
           // the entry hash of the last message in the last batch fetched
           lastFetched: oldestMessage
-            ? deserializeHash(oldestMessage.groupMessageEntryHash)
-            : deserializeHash(lastMessage.groupMessageEntryHash),
+            ? oldestMessage.groupMessageId
+            : lastMessage.groupMessageId,
           // 0 - seconds since epoch, 1 - nanoseconds. See Timestamp type in hdk doc for more info.
           lastMessageTimestamp: lastMessage.timestamp,
           batchSize: 10,
@@ -135,7 +125,7 @@ const MessageList: React.FC<Props> = ({
                 : // if profile was not found from allMembers, then the author is self
                   // assuming that allMembers have all the members of group at all times
                   {
-                    username: username!,
+                    username: profile.username!,
                     id: groupMesssageContents[key].author,
                   },
             });
@@ -176,14 +166,14 @@ const MessageList: React.FC<Props> = ({
       allMessages[maybeThisGroupNewestMessageKey];
     if (maybeThisGroupNewestMessageKey) {
       if (
-        maybeThisGroupNewestMessage.groupEntryHash === groupId &&
-        maybeThisGroupNewestMessage.groupMessageEntryHash !==
-          newestMessage?.groupMessageEntryHash
+        maybeThisGroupNewestMessage.groupId === groupId &&
+        maybeThisGroupNewestMessage.groupMessageId !==
+          newestMessage?.groupMessageId
       ) {
         setNewestMessage(maybeThisGroupNewestMessage);
       }
     }
-  }, [allMessages, groupId, newestMessage?.groupMessageEntryHash]);
+  }, [allMessages, groupId, newestMessage?.groupMessageId]);
 
   useEffect(() => {
     if (newestMessage) {
@@ -195,7 +185,7 @@ const MessageList: React.FC<Props> = ({
           : // if profile was not found from allMembers, then the author is self
             // assuming that allMembers have all the members of group at all times
             {
-              username: username!,
+              username: profile.username!,
               id: newestMessage.author,
             },
       });
@@ -214,18 +204,16 @@ const MessageList: React.FC<Props> = ({
       link.download = file.fileName;
       link.click();
     } else {
-      dispatch(fetchFilesBytes([deserializeHash(file.fileHash)])).then(
-        (res: any) => {
-          if (res) {
-            const fetchedFileBytes = res[`u${file.fileHash}`];
-            const blob = new Blob([fetchedFileBytes]); // change resultByte to bytes
-            const link = document.createElement("a");
-            link.href = window.URL.createObjectURL(blob);
-            link.download = file.fileName;
-            link.click();
-          }
+      dispatch(fetchFilesBytes([file.fileHash])).then((res: any) => {
+        if (res) {
+          const fetchedFileBytes = res[`u${file.fileHash}`];
+          const blob = new Blob([fetchedFileBytes]); // change resultByte to bytes
+          const link = document.createElement("a");
+          link.href = window.URL.createObjectURL(blob);
+          link.download = file.fileName;
+          link.click();
         }
-      );
+      });
     }
   };
 
@@ -269,33 +257,24 @@ const MessageList: React.FC<Props> = ({
               type="group"
               showName={true}
               onSeen={(complete) => {
-                dispatch(getAgentId()).then(
-                  (myAgentPubKey: AgentPubKey | null) => {
-                    setMyAgentId(serializeHash(myAgentPubKey!));
-                    let read: boolean = Object.keys(message.readList).includes(
-                      serializeHash(myAgentPubKey!)
-                    );
-
-                    if (!read) {
-                      let groupMessageReadData: GroupMessageReadData = {
-                        groupId: deserializeHash(groupId),
-                        messageIds: [
-                          deserializeHash(message.groupMessageEntryHash),
-                        ],
-                        reader: myAgentPubKey!,
-                        timestamp: message.timestamp,
-                        members: members.map((member: string) =>
-                          deserializeAgentPubKey(member)
-                        ),
-                      };
-                      dispatch(readGroupMessage(groupMessageReadData)).then(
-                        (res: any) => {
-                          complete();
-                        }
-                      );
-                    }
-                  }
+                let read: boolean = Object.keys(message.readList).includes(
+                  profile.id!
                 );
+
+                if (!read) {
+                  let groupMessageReadData: GroupMessageReadData = {
+                    groupId: groupId,
+                    messageIds: [message.groupMessageId],
+                    reader: profile.id!,
+                    timestamp: message.timestamp,
+                    members,
+                  };
+                  dispatch(readGroupMessage(groupMessageReadData)).then(
+                    (res: any) => {
+                      complete();
+                    }
+                  );
+                }
                 // TODO: This is only a temporary fix. The HashType should be changed to Agent in the hc side when ReadList is constrcuted
                 // to avoid doing something like this in UI.
               }}

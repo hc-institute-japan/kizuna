@@ -1,4 +1,3 @@
-import { deserializeHash } from "@holochain-open-dev/core-types";
 import {
   IonContent,
   IonGrid,
@@ -82,18 +81,13 @@ const Media: React.FC<Props> = ({ groupId }) => {
       [key: string]: GroupMessage[];
     } = indexedFileMessages;
     if (filteredMessages.length > 0) {
-      let monthNumber = new Date(
-        fileMessages[0].timestamp[0] * 1000
-      ).getMonth();
+      let monthNumber = fileMessages[0].timestamp.getMonth();
       let month = monthToString(monthNumber, intl)!;
       if (!indexedFiles[month]) {
         indexedFiles[month] = [];
       }
       fileMessages.forEach((fileMessage: GroupMessage) => {
-        const currMonth = monthToString(
-          new Date(fileMessage.timestamp[0] * 1000).getMonth(),
-          intl
-        );
+        const currMonth = monthToString(fileMessage.timestamp.getMonth(), intl);
         if (currMonth !== month) {
           month = currMonth!;
           indexedFiles[month] = [];
@@ -123,15 +117,13 @@ const Media: React.FC<Props> = ({ groupId }) => {
     let lastFile: GroupMessage = files[files.length - 1];
     dispatch(
       getNextBatchGroupMessages({
-        groupId: deserializeHash(groupId),
+        groupId: groupId,
         batchSize: 4,
         payloadType: { type: "MEDIA", payload: null },
         lastMessageTimestamp:
           lastFile !== undefined ? lastFile.timestamp : undefined,
         lastFetched:
-          lastFile !== undefined
-            ? Buffer.from(deserializeHash(lastFile.groupMessageEntryHash))
-            : undefined,
+          lastFile !== undefined ? lastFile.groupMessageId : undefined,
       })
     ).then((res: GroupMessagesOutput) => {
       if (Object.keys(res.groupMessagesContents).length !== 0) {
@@ -167,7 +159,7 @@ const Media: React.FC<Props> = ({ groupId }) => {
       setLoading(false);
     } else {
       let filter: GroupMessageBatchFetchFilter = {
-        groupId: deserializeHash(groupId),
+        groupId: groupId,
         batchSize: 20,
         payloadType: { type: "MEDIA", payload: null },
       };

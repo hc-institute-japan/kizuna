@@ -27,9 +27,7 @@ export const sendInitialGroupMessage =
     const groupResult: GroupConversation = await dispatch(
       createGroup({
         name: name.join(","),
-        members: members.map((member: Profile) =>
-          deserializeAgentPubKey(member.id)
-        ),
+        members: members.map((member: Profile) => member.id),
       })
     );
 
@@ -50,9 +48,9 @@ export const sendInitialGroupMessage =
         },
       };
       let groupMessage: GroupMessageInput = {
-        groupHash: deserializeHash(groupResult.originalGroupEntryHash),
+        groupId: groupResult.originalGroupId,
         payloadInput: filePayloadInput,
-        sender: deserializeAgentPubKey(groupResult.creator),
+        sender: groupResult.creator,
         // TODO: handle replying to message here as well
         replyTo: undefined,
       };
@@ -62,12 +60,12 @@ export const sendInitialGroupMessage =
     /* if there is a text payload, then include that in the input to the zome fn as well */
     if (message.length) {
       inputs.push({
-        groupHash: deserializeHash(groupResult.originalGroupEntryHash),
+        groupId: groupResult.originalGroupId,
         payloadInput: {
           type: "TEXT",
           payload: { payload: message },
         },
-        sender: deserializeAgentPubKey(groupResult.creator),
+        sender: groupResult.creator,
         // TODO: handle replying to message here as well
         replyTo: undefined,
       });

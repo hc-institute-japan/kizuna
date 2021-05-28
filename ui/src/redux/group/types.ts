@@ -1,12 +1,11 @@
-import { AgentPubKey } from "@holochain/conductor-api";
-import { HoloHash } from "../commons/types";
-import { Profile } from "../profile/types";
 import {
-  Payload,
-  TextPayload,
   FetchPayloadType,
   FilePayloadInput,
+  HoloHash,
+  Payload,
+  TextPayload,
 } from "../commons/types";
+import { Profile } from "../profile/types";
 
 export const ADD_GROUP = "ADD_GROUP";
 export const UPDATE_GROUP_NAME = "UPDATE_GROUP_NAME";
@@ -38,55 +37,43 @@ export interface FileMetadataInput {
 
 export interface CreateGroupInput {
   name: String;
-  members: AgentPubKey[];
-}
-
-export interface UpdateGroupMembersIO {
-  members: AgentPubKey[];
-  groupId: HoloHash;
-  groupRevisionId: HoloHash;
-}
-
-export interface UpdateGroupNameIO {
-  name: string;
-  groupId: HoloHash;
-  groupRevisionId: HoloHash;
+  members: string[]; // deserialize to AgentPubKey
 }
 
 export interface GroupMessageInput {
-  groupHash: HoloHash; // Group EntryHash
+  groupId: string; // deserialize to HoloHash
   payloadInput: PayloadInput;
-  sender: AgentPubKey;
-  replyTo?: HoloHash; // Group Message EntryHash
+  sender: string; // deserialize to AgentPubKey
+  replyTo?: string; // deserialize to AgentPubKey
 }
 
 export interface GroupMessageBatchFetchFilter {
-  groupId: HoloHash; // Group EntryHash
-  lastFetched?: HoloHash; // the entry hash of the last message in the last batch fetched
-  lastMessageTimestamp?: [number, number]; // 0 - seconds since epoch, 1 - nanoseconds. See Timestamp type in hdk doc for more info.
+  groupId: string; // deserialize to HoloHash
+  lastFetched?: string; // the entry hash of the last message in the last batch fetched. deserialize to HoloHash
+  lastMessageTimestamp?: Date; // converted to [number, number] for zome fn
   batchSize: number;
   payloadType: FetchPayloadType;
 }
 
 export interface GroupMessageByDateFetchFilter {
-  groupId: HoloHash; // Group EntryHash
-  date: [number, number];
+  groupId: string; // deserialize to HoloHash
+  date: Date;
   payloadType: FetchPayloadType;
 }
 
 export interface GroupTypingDetailData {
-  groupId: HoloHash; // Group EntryHash
-  indicatedBy: AgentPubKey;
-  members: AgentPubKey[];
+  groupId: string; // deserialize to HoloHash
+  indicatedBy: string; // deserialize to AgentPubKey
+  members: string[]; // deserialize to AgentPubKey
   isTyping: boolean;
 }
 
 export interface GroupMessageReadData {
-  groupId: HoloHash; // Group EntryHash
-  messageIds: HoloHash[]; // Group Message EntryHash
-  reader: AgentPubKey;
-  timestamp: [number, number];
-  members: AgentPubKey[];
+  groupId: string; // deserialize to Holohash
+  messageIds: string[]; // deserialize to Holohash
+  reader: string; // deserialize to AgentPubKey
+  timestamp: Date;
+  members: string[]; // deserialize to AgentPubKey
 }
 /* END OF INPUT DECLARATION */
 
@@ -100,15 +87,15 @@ export interface GroupMessageReadDetail {
   groupId: GroupIDB64;
   messageIds: GroupMessageIDB64[];
   reader: string;
-  timestamp: [number, number];
+  timestamp: Date;
 }
 
 export interface GroupMessage {
-  groupMessageEntryHash: GroupMessageIDB64;
-  groupEntryHash: GroupIDB64;
+  groupMessageId: GroupMessageIDB64;
+  groupId: GroupIDB64;
   author: string;
   payload: Payload; // subject to change
-  timestamp: [number, number];
+  timestamp: Date;
   replyTo?: GroupMessageIDB64;
   readList: {
     // key is AgentPubKey
@@ -152,8 +139,8 @@ export interface GroupMessagesContents {
 // }
 
 export interface GroupConversation {
-  originalGroupEntryHash: GroupIDB64;
-  originalGroupHeaderHash: GroupRevisionIDB64;
+  originalGroupId: GroupIDB64;
+  originalGroupRevisionId: GroupRevisionIDB64;
   // versions: GroupVersion[];
   name: string;
   members: string[];
