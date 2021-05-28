@@ -3,7 +3,6 @@ import { FUNCTIONS, ZOMES } from "../../../connection/types";
 import { ThunkAction } from "../../types";
 import {
   GroupConversation,
-  GroupMessageBatchFetchFilter,
   GroupMessagesOutput,
   SetLatestGroupVersionAction,
   SET_LATEST_GROUP_VERSION,
@@ -25,7 +24,7 @@ export const getLatestGroupVersion =
       },
     });
 
-    let groupMessageBatchFetchFilter: GroupMessageBatchFetchFilter = {
+    const input = {
       groupId: deserializeHash(groupId),
       batchSize: 10,
       payloadType: {
@@ -37,15 +36,15 @@ export const getLatestGroupVersion =
     const groupMessagesRes = await callZome({
       zomeName: ZOMES.GROUP,
       fnName: FUNCTIONS[ZOMES.GROUP].GET_NEXT_BATCH_GROUP_MESSAGES,
-      payload: groupMessageBatchFetchFilter,
+      payload: input,
     });
 
     let groupMessagesOutput: GroupMessagesOutput =
       convertFetchedResToGroupMessagesOutput(groupMessagesRes);
 
     let groupData: GroupConversation = {
-      originalGroupEntryHash: serializeHash(latestGroupVersionRes.groupId),
-      originalGroupHeaderHash: serializeHash(
+      originalGroupId: serializeHash(latestGroupVersionRes.groupId),
+      originalGroupRevisionId: serializeHash(
         latestGroupVersionRes.groupRevisionId
       ),
       name: latestGroupVersionRes.latestName,

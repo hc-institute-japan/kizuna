@@ -29,7 +29,6 @@ import EmptyFile from "./EmptyFile";
 
 import { monthToString, useAppDispatch } from "../../../../../utils/helpers";
 import styles from "./style.module.css";
-import { deserializeHash } from "@holochain-open-dev/core-types";
 
 interface Props {
   groupId: string;
@@ -79,18 +78,13 @@ const File: React.FC<Props> = ({ groupId }) => {
       [key: string]: GroupMessage[];
     } = indexedFileMessages;
     if (filteredMessages.length > 0) {
-      let monthNumber = new Date(
-        fileMessages[0].timestamp[0] * 1000
-      ).getMonth();
+      let monthNumber = fileMessages[0].timestamp.getMonth();
       let month = monthToString(monthNumber, intl)!;
       if (!indexedFiles[month]) {
         indexedFiles[month] = [];
       }
       fileMessages.forEach((fileMessage: GroupMessage) => {
-        const currMonth = monthToString(
-          new Date(fileMessage.timestamp[0] * 1000).getMonth(),
-          intl
-        );
+        const currMonth = monthToString(fileMessage.timestamp.getMonth(), intl);
         if (currMonth !== month) {
           month = currMonth!;
           indexedFiles[month] = [];
@@ -118,15 +112,13 @@ const File: React.FC<Props> = ({ groupId }) => {
     var lastFile: GroupMessage = files[files.length - 1];
     dispatch(
       getNextBatchGroupMessages({
-        groupId: deserializeHash(groupId),
+        groupId: groupId,
         batchSize: 4,
         payloadType: { type: "FILE", payload: null },
         lastMessageTimestamp:
           lastFile !== undefined ? lastFile.timestamp : undefined,
         lastFetched:
-          lastFile !== undefined
-            ? deserializeHash(lastFile.groupMessageEntryHash)
-            : undefined,
+          lastFile !== undefined ? lastFile.groupMessageId : undefined,
       })
     ).then((res: GroupMessagesOutput) => {
       if (Object.keys(res.groupMessagesContents).length !== 0) {
@@ -161,7 +153,7 @@ const File: React.FC<Props> = ({ groupId }) => {
       setLoading(false);
     } else {
       let filter: GroupMessageBatchFetchFilter = {
-        groupId: deserializeHash(groupId),
+        groupId: groupId,
         batchSize: 20,
         payloadType: { type: "FILE", payload: null },
       };

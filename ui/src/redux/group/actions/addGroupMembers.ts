@@ -4,12 +4,12 @@ import { deserializeAgentPubKey } from "../../../utils/helpers";
 import {
   ADD_MEMBERS, // action type
   // IO
-  UpdateGroupMembersIO,
   UpdateGroupMembersData,
   AddGroupMembersAction, // action payload type
 } from "../types";
 import { fetchUsernameOfMembers } from "./helpers";
 import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
+import { AgentPubKey } from "@holochain/conductor-api";
 
 export const addGroupMembers =
   (updateGroupMembersData: UpdateGroupMembersData): ThunkAction =>
@@ -20,7 +20,7 @@ export const addGroupMembers =
   ): Promise<UpdateGroupMembersData> => {
     const state = getState();
     const myAgentId = await getAgentId();
-    const updateGroupMembersIO: UpdateGroupMembersIO = {
+    const input = {
       members: updateGroupMembersData.members.map((member: string) =>
         deserializeAgentPubKey(member)
       ),
@@ -31,13 +31,13 @@ export const addGroupMembers =
     // TODO: error handling
     // TODO: input sanitation
     // Might be better to check whether there are any members duplicate in ui or hc.
-    const addMembersOutput: UpdateGroupMembersIO = await callZome({
+    const addMembersOutput = await callZome({
       zomeName: ZOMES.GROUP,
       fnName: FUNCTIONS[ZOMES.GROUP].ADD_MEMBERS,
-      payload: updateGroupMembersIO,
+      payload: input,
     });
 
-    let membersBase64 = addMembersOutput.members.map((member) =>
+    let membersBase64 = addMembersOutput.members.map((member: AgentPubKey) =>
       serializeHash(member)
     );
 

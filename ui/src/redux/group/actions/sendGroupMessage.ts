@@ -1,4 +1,4 @@
-import { serializeHash } from "@holochain-open-dev/core-types";
+import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
 import { ThunkAction } from "../../types";
 import {
@@ -31,10 +31,18 @@ export const sendGroupMessage =
       groupMessageData.payloadInput.payload = { payload: message.trim() };
     }
 
+    /* deserialize fields for zome fn */
+    const input = {
+      groupHash: deserializeHash(groupMessageData.groupId),
+      payloadInput: groupMessageData.payloadInput,
+      sender: groupMessageData.sender,
+      replyTo: groupMessageData.replyTo,
+    };
+
     const sendGroupMessageOutput = await callZome({
       zomeName: ZOMES.GROUP,
       fnName: FUNCTIONS[ZOMES.GROUP].SEND_MESSAGE,
-      payload: groupMessageData,
+      payload: input,
     });
 
     let payload: Payload;
@@ -84,8 +92,8 @@ export const sendGroupMessage =
 
     /* the final GroupMessage data type converted from the returned value of the Zome fn above */
     let groupMessageDataConverted: GroupMessage = {
-      groupMessageEntryHash: serializeHash(sendGroupMessageOutput.id),
-      groupEntryHash: serializeHash(sendGroupMessageOutput.content.groupHash),
+      groupMessageId: serializeHash(sendGroupMessageOutput.id),
+      groupId: serializeHash(sendGroupMessageOutput.content.groupHash),
       author: serializeHash(sendGroupMessageOutput.content.sender),
       payload,
       timestamp: sendGroupMessageOutput.content.created,

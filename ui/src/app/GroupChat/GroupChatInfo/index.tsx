@@ -1,4 +1,3 @@
-import { AgentPubKey } from "@holochain/conductor-api";
 import {
   IonButton,
   IonButtons,
@@ -15,12 +14,13 @@ import {
 } from "@ionic/react";
 import { arrowBackSharp } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router";
+import { getLatestGroupVersion } from "../../../redux/group/actions/getLatestGroupVersion";
 // Redux
 import { updateGroupName } from "../../../redux/group/actions/updateGroupName";
-import { getLatestGroupVersion } from "../../../redux/group/actions/getLatestGroupVersion";
 import { GroupConversation } from "../../../redux/group/types";
-import { getAgentId } from "../../../redux/profile/actions";
+import { RootState } from "../../../redux/types";
 import { useAppDispatch } from "../../../utils/helpers";
 import EndButtons from "./EndButtons";
 // Components
@@ -30,7 +30,6 @@ import File from "./TabsContent/Files/File";
 import Media from "./TabsContent/Media/Media";
 import Members from "./TabsContent/Members";
 import UpdateGroupName from "./UpdateGroupName";
-import { serializeHash } from "@holochain-open-dev/core-types";
 
 interface GroupChatParams {
   group: string;
@@ -45,6 +44,9 @@ const GroupChatInfo: React.FC = () => {
     initialSlide: 0,
     speed: 100,
   };
+
+  /* Selectors */
+  const myProfile = useSelector((state: RootState) => state.profile);
 
   /* Local state */
   const [editGroupName, setEditGroupName] = useState<boolean>(false);
@@ -109,8 +111,8 @@ const GroupChatInfo: React.FC = () => {
     dispatch(
       updateGroupName({
         name: newGroupName,
-        groupId: groupInfo!.originalGroupEntryHash,
-        groupRevisionId: groupInfo!.originalGroupHeaderHash,
+        groupId: groupInfo!.originalGroupId,
+        groupRevisionId: groupInfo!.originalGroupRevisionId,
       })
     ).then((res: any) => {
       setModalLoading(false);
@@ -125,10 +127,8 @@ const GroupChatInfo: React.FC = () => {
     dispatch(getLatestGroupVersion(group)).then(
       (groupRes: GroupConversation) => {
         setGroupInfo(groupRes);
-        dispatch(getAgentId()).then((myAgentId: AgentPubKey | null) => {
-          if (groupRes.creator !== serializeHash(myAgentId!)) setDisabled(true); // disable group name edit button if agent is not the creator
-          setLoading(false);
-        });
+        if (groupRes.creator !== myProfile.id) setDisabled(true); // disable group name edit button if agent is not the creator
+        setLoading(false);
       }
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -172,7 +172,7 @@ const GroupChatInfo: React.FC = () => {
           <IonSlide>
             <Members
               groupId={group}
-              groupRevisionId={groupInfo!.originalGroupHeaderHash}
+              groupRevisionId={groupInfo!.originalGroupRevisionId}
             />
           </IonSlide>
 

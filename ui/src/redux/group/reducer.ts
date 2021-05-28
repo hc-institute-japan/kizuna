@@ -34,7 +34,7 @@ const reducer = (
 ) => {
   switch (action.type) {
     case ADD_GROUP: {
-      let groupEntryHash: string = action.groupData.originalGroupEntryHash;
+      let groupEntryHash: string = action.groupData.originalGroupId;
       let newConversation: { [key: string]: GroupConversation } = {
         [groupEntryHash]: action.groupData,
       };
@@ -102,8 +102,8 @@ const reducer = (
     }
     case SET_GROUP_MESSAGE: {
       let groupMessage: GroupMessage = action.groupMessage;
-      let groupEntryHash: string = groupMessage.groupEntryHash;
-      let groupMessageEntryHash: string = groupMessage.groupMessageEntryHash;
+      let groupEntryHash: string = groupMessage.groupId;
+      let groupMessageEntryHash: string = groupMessage.groupMessageId;
       let groupConversation: GroupConversation =
         state.conversations[groupEntryHash];
 
@@ -114,7 +114,7 @@ const reducer = (
           Question: Is unshift() better?
         */
         groupConversation.messages = [
-          groupMessage.groupMessageEntryHash,
+          groupMessage.groupMessageId,
           ...groupConversation.messages,
         ];
       }
@@ -180,7 +180,7 @@ const reducer = (
 
       let conversations = state.conversations;
       groups.forEach((group: GroupConversation) => {
-        conversations[group.originalGroupEntryHash] = group;
+        conversations[group.originalGroupId] = group;
       });
 
       let messages = state.messages;
@@ -200,7 +200,7 @@ const reducer = (
       let groupConversation: GroupConversation = action.groupData;
       groupConversations = {
         ...groupConversations,
-        [groupConversation.originalGroupEntryHash]: groupConversation,
+        [groupConversation.originalGroupId]: groupConversation,
       };
 
       let messages = state.messages;
@@ -245,7 +245,7 @@ const reducer = (
         let groupMessage = messages[messageId];
         groupMessage.readList = {
           ...groupMessage.readList,
-          [reader]: new Date(timestamp[0] * 1000),
+          [reader]: timestamp,
         };
       });
 
