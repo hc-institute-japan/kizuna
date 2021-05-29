@@ -40,7 +40,7 @@ import {
   P2PMessageReceipt,
 } from "../../redux/p2pmessages/types";
 import { RootState } from "../../redux/types";
-import { dateToTimestamp, debounce, useAppDispatch } from "../../utils/helpers";
+import { debounce, useAppDispatch } from "../../utils/helpers";
 
 type Props = {
   location: RouteComponentProps<{}, {}, { state: Conversation }>;
@@ -183,7 +183,7 @@ const Chat: React.FC<Props> = ({ location }) => {
           conversant.id,
           5,
           "All",
-          dateToTimestamp(lastMessage.timestamp),
+          lastMessage.timestamp,
           lastMessage.p2pMessageEntryHash
         )
       ).then((res: P2PHashMap) => {
