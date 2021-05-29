@@ -12,13 +12,11 @@ import { useIntl } from "react-intl";
 import { FilePayload } from "../../../redux/commons/types";
 import { GroupMessage } from "../../../redux/group/types";
 import { P2PMessage } from "../../../redux/p2pmessages/types";
-import { Profile } from "../../../redux/profile/types";
 import { monthToString } from "../../../utils/helpers";
 import FileView from "../../Chat/File/FileView";
 import styles from "../style.module.css";
 
 interface Props {
-  conversant: Profile;
   orderedFileMessages: P2PMessage[] | GroupMessage[];
   onDownload(file: FilePayload): any;
   onScrollBottom(
