@@ -21,11 +21,7 @@ import {
 import { P2PMessage } from "../../../../redux/p2pmessages/types";
 import { Profile } from "../../../../redux/profile/types";
 import { RootState } from "../../../../redux/types";
-import {
-  dateToTimestamp,
-  monthToString,
-  useAppDispatch,
-} from "../../../../utils/helpers";
+import { monthToString, useAppDispatch } from "../../../../utils/helpers";
 import styles from "../style.module.css";
 
 interface Props {
@@ -83,9 +79,7 @@ const FileBox: React.FC<Props> = ({
         conversant.id,
         5,
         "File",
-        lastFile !== undefined
-          ? dateToTimestamp(lastFile.timestamp)
-          : undefined,
+        lastFile !== undefined ? lastFile.timestamp : undefined,
         lastFile !== undefined ? lastFile.p2pMessageEntryHash : undefined
       )
     ).then((res: any) => complete());
