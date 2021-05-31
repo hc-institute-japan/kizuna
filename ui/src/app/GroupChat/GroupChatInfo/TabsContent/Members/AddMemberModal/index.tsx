@@ -1,9 +1,20 @@
 import React, { useState } from "react";
-import { IonButton, IonButtons, IonContent, IonLabel, IonList, IonModal, IonToolbar } from "@ionic/react";
+import {
+  IonButton,
+  IonButtons,
+  IonContent,
+  IonLabel,
+  IonList,
+  IonModal,
+  IonToolbar,
+} from "@ionic/react";
 import { useIntl } from "react-intl";
 
 // redux
-import { Profile, ProfileListType } from "../../../../../../redux/profile/types";
+import {
+  Profile,
+  ProfileListType,
+} from "../../../../../../redux/profile/types";
 import { addGroupMembers } from "../../../../../../redux/group/actions/addGroupMembers";
 
 // components
@@ -28,7 +39,18 @@ interface Props {
   setMembers: (profiles: Profile[]) => void;
 }
 
-const AddMemberModal: React.FC<Props> = ({ isOpen, setIsOpen, onCancel, contacts, groupId, groupRevisionId, setLoading, myAgentId, members, setMembers }) => {
+const AddMemberModal: React.FC<Props> = ({
+  isOpen,
+  setIsOpen,
+  onCancel,
+  contacts,
+  groupId,
+  groupRevisionId,
+  setLoading,
+  myAgentId,
+  members,
+  setMembers,
+}) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const [filter, setFilter] = useState<string>("");
@@ -46,14 +68,18 @@ const AddMemberModal: React.FC<Props> = ({ isOpen, setIsOpen, onCancel, contacts
       setToast(contact.username);
       return false;
     }
-    if (members.map((profile: Profile) => {
-      return profile.id
-    }).includes(contact.id)) {
+    if (
+      members
+        .map((profile: Profile) => {
+          return profile.id;
+        })
+        .includes(contact.id)
+    ) {
       setToast(contact.username);
       return false;
     }
     setSelected([...selected, contact]);
-    return true
+    return true;
   };
 
   const onAdded = () => {
@@ -63,26 +89,34 @@ const AddMemberModal: React.FC<Props> = ({ isOpen, setIsOpen, onCancel, contacts
       members: selected.map((profile: any) => profile.id),
       groupId,
       groupRevisionId,
-    }
+    };
     dispatch(addGroupMembers(payload)).then((res: any) => {
       let newMembers: Profile[] = members.concat(selected);
       setMembers(newMembers);
-      setIsOpen(false);
       setLoading(false);
-    })
-  }
+    });
+  };
 
   return (
     <IonModal isOpen={isOpen}>
-      <AddMemberHeader onChange={(e) => setFilter(e.detail.value!)} onCancel={onCancel} />
-      {!contacts.length ? 
+      <AddMemberHeader
+        onChange={(e) => setFilter(e.detail.value!)}
+        onCancel={onCancel}
+      />
+      {!contacts.length ? (
         <IonContent>
-          {filter.length === 0 ? 
-          (
+          {filter.length === 0 ? (
             <IonList className={styles["contacts-list"]}>
               {Object.keys(indexedContacts).map((char) => {
                 const contacts = indexedContacts[char];
-                return <AddMemberIndex onCompletion={onCompletion} key={char} index={char} contacts={contacts} />
+                return (
+                  <AddMemberIndex
+                    onCompletion={onCompletion}
+                    key={char}
+                    index={char}
+                    contacts={contacts}
+                  />
+                );
               })}
             </IonList>
           ) : (
@@ -102,15 +136,20 @@ const AddMemberModal: React.FC<Props> = ({ isOpen, setIsOpen, onCancel, contacts
           )}
           <IonToolbar>
             <IonButtons slot="end">
-              <IonButton disabled={selected.length === 0} onClick={() => onAdded()}>
-                <IonLabel className={styles["add-label"]}>{intl.formatMessage({id: "app.group-chat.add-member"})}</IonLabel>
+              <IonButton
+                disabled={selected.length === 0}
+                onClick={() => onAdded()}
+              >
+                <IonLabel className={styles["add-label"]}>
+                  {intl.formatMessage({ id: "app.group-chat.add-member" })}
+                </IonLabel>
               </IonButton>
             </IonButtons>
           </IonToolbar>
-        </IonContent> 
-        : 
-        <EmptyContacts/>
-      }
+        </IonContent>
+      ) : (
+        <EmptyContacts />
+      )}
       <AddMemberToast toast={toast} onDismiss={() => setToast(null)} />
     </IonModal>
   );

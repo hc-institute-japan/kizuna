@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 // Components
 import Chat from "../../../components/Chat";
 import { ChatListMethods } from "../../../components/Chat/types";
-import { FilePayload } from "../../../redux/commons/types";
+import { FilePayload, Payload } from "../../../redux/commons/types";
 import { getNextBatchGroupMessages } from "../../../redux/group/actions/getNextBatchGroupMessages";
 import { readGroupMessage } from "../../../redux/group/actions/readGroupMessage";
 import { fetchFilesBytes } from "../../../redux/group/actions/setFilesBytes";
@@ -14,8 +14,22 @@ import {
   GroupMessagesContents,
   GroupMessagesOutput,
 } from "../../../redux/group/types";
+import { Profile } from "../../../redux/profile/types";
 import { RootState } from "../../../redux/types";
 import { isTextPayload, useAppDispatch } from "../../../utils/helpers";
+
+interface messageBundle {
+  groupMessageId: string;
+  groupId: string;
+  author: Profile;
+  payload: Payload; // subject to change
+  timestamp: Date;
+  replyTo?: string;
+  readList: {
+    // key is AgentPubKey
+    [key: string]: Date;
+  };
+}
 
 interface Props {
   messageIds: string[];
@@ -32,37 +46,26 @@ const MessageList: React.FC<Props> = ({
 }) => {
   const dispatch = useAppDispatch();
 
+  /* Selecotrs */
+  const filesBytes = useSelector((state: RootState) => state.groups.groupFiles);
+
   /* LOCAL STATE */
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<messageBundle[]>([]);
   const [oldestFetched, setOldestFetched] = useState<boolean>(false);
   const [oldestMessage, setOldestMessage] = useState<any>();
   const [newestMessage, setNewestMessage] = useState<GroupMessage>();
 
   const groups = useSelector((state: RootState) => state.groups);
   const profile = useSelector((state: RootState) => state.profile);
+
   const messagesData = useSelector((state: RootState) => {
-    const messages: any[] = messageIds.map((messageId) => {
+    const messages: messageBundle[] = messageIds.map((messageId) => {
       /* retrieve the message content from redux */
       let message: GroupMessage = state.groups.messages[messageId];
       const authorProfile = groups.members[message.author];
 
-      let payload = message.payload;
-
-      if (!isTextPayload(payload)) {
-        payload = payload as FilePayload;
-
-        if (state.groups.groupFiles[payload.fileHash]) {
-          payload = {
-            ...payload,
-            fileHash: payload.fileHash,
-          };
-        } else {
-          dispatch(fetchFilesBytes([payload.fileHash]));
-        }
-      }
       return {
         ...message,
-        payload,
         author: authorProfile
           ? authorProfile
           : // if profile was not found from allMembers, then the author is self
@@ -74,14 +77,13 @@ const MessageList: React.FC<Props> = ({
       };
     });
 
-    // TODO: handle fetching of missing messages (most likely won't occur)
-    if (messages.find((message) => message === null)) return null;
     messages.sort((x, y) => {
-      return x.timestamp.valueOf()[0] - y.timestamp.valueOf()[0];
+      return x.timestamp.getTime() - y.timestamp.getTime();
     });
     return messages;
   });
 
+  /* Handlers */
   const handleOnScrollTop = (complete: any) => {
     if (messagesData?.length) {
       let lastMessage = messagesData![0];
@@ -139,6 +141,47 @@ const MessageList: React.FC<Props> = ({
     return null;
   };
 
+  const handleOnDownload = (file: FilePayload) => {
+    const fileBytes = filesBytes[file.fileHash];
+    if (fileBytes) {
+      const blob = new Blob([fileBytes]); // change resultByte to bytes
+      const link = document.createElement("a");
+      link.href = window.URL.createObjectURL(blob);
+      link.download = file.fileName;
+      link.click();
+    } else {
+      dispatch(fetchFilesBytes([file.fileHash])).then((res: any) => {
+        if (res) {
+          const fetchedFileBytes = res[`u${file.fileHash}`];
+          const blob = new Blob([fetchedFileBytes]); // change resultByte to bytes
+          const link = document.createElement("a");
+          link.href = window.URL.createObjectURL(blob);
+          link.download = file.fileName;
+          link.click();
+        }
+      });
+    }
+  };
+
+  const handleOnSeen = (complete: () => any, message: any) => {
+    let read: boolean = Object.keys(message.readList).includes(profile.id!);
+
+    if (!read) {
+      let groupMessageReadData: GroupMessageReadData = {
+        groupId: groupId,
+        messageIds: [message.groupMessageId],
+        reader: profile.id!,
+        timestamp: message.timestamp,
+        members,
+      };
+      dispatch(readGroupMessage(groupMessageReadData)).then((res: any) => {
+        complete();
+      });
+    }
+  };
+
+  /* Effects */
+
   useEffect(() => {
     setMessages(messagesData!);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -161,30 +204,6 @@ const MessageList: React.FC<Props> = ({
     }
   }, [groupId, newestMessage?.groupMessageId]);
 
-  const filesBytes = useSelector((state: RootState) => state.groups.groupFiles);
-
-  const onDownload = (file: FilePayload) => {
-    const fileBytes = filesBytes[`u${file.fileHash}`];
-    if (fileBytes) {
-      const blob = new Blob([fileBytes]); // change resultByte to bytes
-      const link = document.createElement("a");
-      link.href = window.URL.createObjectURL(blob);
-      link.download = file.fileName;
-      link.click();
-    } else {
-      dispatch(fetchFilesBytes([file.fileHash])).then((res: any) => {
-        if (res) {
-          const fetchedFileBytes = res[`u${file.fileHash}`];
-          const blob = new Blob([fetchedFileBytes]); // change resultByte to bytes
-          const link = document.createElement("a");
-          link.href = window.URL.createObjectURL(blob);
-          link.download = file.fileName;
-          link.click();
-        }
-      });
-    }
-  };
-
   return (
     <>
       <Chat.ChatList
@@ -198,8 +217,7 @@ const MessageList: React.FC<Props> = ({
           if (message.author.id === profile.id)
             return (
               <Chat.Me
-                // key={message.groupMessageEntryHash}
-                onDownload={onDownload}
+                onDownload={handleOnDownload}
                 key={i}
                 author={message.author.username}
                 timestamp={message.timestamp}
@@ -212,8 +230,7 @@ const MessageList: React.FC<Props> = ({
             );
           return (
             <Chat.Others
-              // key={message.groupMessageEntryHash}
-              onDownload={onDownload}
+              onDownload={handleOnDownload}
               key={i}
               author={message.author.username}
               timestamp={message.timestamp}
@@ -221,28 +238,7 @@ const MessageList: React.FC<Props> = ({
               readList={message.readList}
               type="group"
               showName={true}
-              onSeen={(complete) => {
-                let read: boolean = Object.keys(message.readList).includes(
-                  profile.id!
-                );
-
-                if (!read) {
-                  let groupMessageReadData: GroupMessageReadData = {
-                    groupId: groupId,
-                    messageIds: [message.groupMessageId],
-                    reader: profile.id!,
-                    timestamp: message.timestamp,
-                    members,
-                  };
-                  dispatch(readGroupMessage(groupMessageReadData)).then(
-                    (res: any) => {
-                      complete();
-                    }
-                  );
-                }
-                // TODO: This is only a temporary fix. The HashType should be changed to Agent in the hc side when ReadList is constrcuted
-                // to avoid doing something like this in UI.
-              }}
+              onSeen={(complete) => handleOnSeen(complete, message)}
               showProfilePicture={true}
             />
           );
