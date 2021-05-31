@@ -93,6 +93,7 @@ const AddMemberModal: React.FC<Props> = ({
     dispatch(addGroupMembers(payload)).then((res: any) => {
       let newMembers: Profile[] = members.concat(selected);
       setMembers(newMembers);
+
       setLoading(false);
     });
   };
