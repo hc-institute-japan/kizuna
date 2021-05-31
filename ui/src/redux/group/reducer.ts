@@ -102,24 +102,24 @@ const reducer = (
     }
     case SET_GROUP_MESSAGE: {
       let groupMessage: GroupMessage = action.groupMessage;
-      let groupEntryHash: string = groupMessage.groupId;
-      let groupMessageEntryHash: string = groupMessage.groupMessageId;
-      let groupConversation: GroupConversation =
-        state.conversations[groupEntryHash];
+      let groupId: string = groupMessage.groupId;
+      let groupMessageId: string = groupMessage.groupMessageId;
 
-      if (groupConversation) {
-        /*
-          New messageId should always be prepend as the first element of array
-          for easy retrieval in the view.
-          Question: Is unshift() better?
-        */
-        groupConversation.messages = [
-          groupMessage.groupMessageId,
-          ...groupConversation.messages,
-        ];
-      }
+      let groupConversation = state.conversations[groupId];
+      // let prevGroupMessageIds = groupConversation.messages;
+
+      /*
+        New messageId should always be prepend as the first element of array
+        for easy retrieval in the view.
+        Question: Is unshift() better?
+      */
+      let messageIds = [
+        groupMessage.groupMessageId,
+        ...groupConversation.messages,
+      ];
+
       let newMessage: { [key: string]: GroupMessage } = {
-        [groupMessageEntryHash]: groupMessage,
+        [groupMessageId]: groupMessage,
       };
       let messages = state.messages;
       messages = {
@@ -137,9 +137,24 @@ const reducer = (
           ...groupFiles,
           ...newFile,
         };
-        return { ...state, messages, groupFiles };
+        return {
+          ...state,
+          conversations: {
+            ...state.conversations,
+            [groupId]: { ...groupConversation, messages: messageIds },
+          },
+          messages,
+          groupFiles,
+        };
       } else {
-        return { ...state, messages };
+        return {
+          ...state,
+          conversations: {
+            ...state.conversations,
+            [groupId]: { ...groupConversation, messages: messageIds },
+          },
+          messages,
+        };
       }
     }
     case SET_FILES_BYTES:
@@ -153,7 +168,7 @@ const reducer = (
       let groupConversation: GroupConversation =
         groupConversations[action.groupId];
 
-      groupConversation.messages = groupConversation.messages
+      let messageIds = groupConversation.messages
         ? Array.from(
             new Set(
               groupConversation.messages.concat(
@@ -172,7 +187,14 @@ const reducer = (
         ...messages,
         ...action.groupMessagesOutput.groupMessagesContents,
       };
-      return { ...state, messages, conversations: groupConversations };
+      return {
+        ...state,
+        messages,
+        conversations: {
+          ...groupConversations,
+          [action.groupId]: { ...groupConversation, messages: messageIds },
+        },
+      };
     }
     case SET_LATEST_GROUP_STATE: {
       let groups: GroupConversation[] = action.groups;

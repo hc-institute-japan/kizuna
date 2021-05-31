@@ -11,12 +11,11 @@ import { fetchFilesBytes } from "../../../redux/group/actions/setFilesBytes";
 import {
   GroupMessage,
   GroupMessageReadData,
-  GroupMessagesContents,
   GroupMessagesOutput,
 } from "../../../redux/group/types";
 import { Profile } from "../../../redux/profile/types";
 import { RootState } from "../../../redux/types";
-import { isTextPayload, useAppDispatch } from "../../../utils/helpers";
+import { useAppDispatch } from "../../../utils/helpers";
 
 interface messageBundle {
   groupMessageId: string;
@@ -129,7 +128,7 @@ const MessageList: React.FC<Props> = ({
     let messages: messageBundle[] = messageIds.map((messageId) => {
       /* retrieve the message content from redux */
       let message: GroupMessage = groups.messages[messageId];
-      const authorProfile = groups.members[message.author];
+      const authorProfile: Profile = groups.members[message.author];
 
       return {
         ...message,
@@ -159,7 +158,6 @@ const MessageList: React.FC<Props> = ({
         type="group"
       >
         {messages!.map((message, i) => {
-          console.log(message);
           if (message.author.id === profile.id)
             return (
               <Chat.Me
