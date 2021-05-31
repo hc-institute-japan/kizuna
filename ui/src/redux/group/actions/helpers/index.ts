@@ -1,17 +1,18 @@
+import { serializeHash } from "@holochain-open-dev/core-types";
 import { AgentPubKey } from "@holochain/conductor-api";
 import { CombinedState } from "redux";
 import { FUNCTIONS, ZOMES } from "../../../../connection/types";
 import {
-  base64ToUint8Array,
+  deserializeAgentPubKey,
   objectMap,
-  Uint8ArrayToBase64,
+  timestampToDate,
 } from "../../../../utils/helpers";
 import {
-  Payload,
-  TextPayload,
+  isOther,
   // type guards
   isTextPayload,
-  isOther,
+  Payload,
+  TextPayload,
 } from "../../../commons/types";
 import { ContactsState } from "../../../contacts/types";
 import { PreferenceState } from "../../../preference/types";
@@ -32,30 +33,26 @@ export const convertFetchedResToGroupMessagesOutput = (
   let messagesByGroup: MessagesByGroup = objectMap(
     fetchedRes.messagesByGroup,
     (message_ids: Uint8Array[]): string[] =>
-      message_ids.map((message_id) => Uint8ArrayToBase64(message_id)),
-    (group_id: string) => group_id.substring(1)
+      message_ids.map((message_id) => serializeHash(message_id))
   );
 
   let groupMessagesContents: GroupMessagesContents = objectMap(
     fetchedRes.groupMessagesContents,
     (msg_content): GroupMessage => {
       return {
-        groupMessageEntryHash: Uint8ArrayToBase64(
+        groupMessageId: serializeHash(
           msg_content.groupMessageElement.signedHeader.header.content.entry_hash
         ),
-        groupEntryHash: Uint8ArrayToBase64(
-          msg_content.groupMessageElement.entry.groupHash
-        ),
-        author: Uint8ArrayToBase64(
-          msg_content.groupMessageElement.entry.sender
-        ),
+        groupId: serializeHash(msg_content.groupMessageElement.entry.groupHash),
+        author: serializeHash(msg_content.groupMessageElement.entry.sender),
         payload: convertPayload(msg_content.groupMessageElement.entry.payload),
-        timestamp: msg_content.groupMessageElement.entry.created,
+        timestamp: timestampToDate(
+          msg_content.groupMessageElement.entry.created
+        ),
         replyTo: msg_content.groupMessageElement.entry.replyTo,
         readList: msg_content.readList,
       };
-    },
-    (group_id: string) => group_id.substring(1)
+    }
   );
 
   let groupMessagesOutput: GroupMessagesOutput = {
@@ -74,7 +71,7 @@ export const convertPayload = (payload: any | TextPayload): Payload => {
       fileName: payload.payload.metadata.fileName,
       fileSize: payload.payload.metadata.fileSize,
       fileType: payload.payload.metadata.fileType,
-      fileHash: Uint8ArrayToBase64(payload.payload.metadata.fileHash),
+      fileHash: serializeHash(payload.payload.metadata.fileHash),
     };
   } else {
     return {
@@ -82,7 +79,7 @@ export const convertPayload = (payload: any | TextPayload): Payload => {
       fileName: payload.payload.metadata.fileName,
       fileSize: payload.payload.metadata.fileSize,
       fileType: payload.payload.metadata.fileType,
-      fileHash: Uint8ArrayToBase64(payload.payload.metadata.fileHash),
+      fileHash: serializeHash(payload.payload.metadata.fileHash),
       thumbnail: payload.payload.fileType.payload.thumbnail,
     };
   }
@@ -99,13 +96,14 @@ export const fetchUsernameOfMembers = async (
   callZome: (config: CallZomeConfig) => Promise<any>,
   myAgentId: string
 ) => {
-  let contacts = state.contacts.contacts;
+  const contacts = state.contacts.contacts;
   // can assume that this is non-nullable since agent cannot call this
   // function without having a username.
-  let username = state.profile.username!;
-  let undefinedProfiles: AgentPubKey[] = [];
+  const username = state.profile.username!;
 
+  let undefinedProfiles: AgentPubKey[] = [];
   let membersUsernames: { [key: string]: Profile } = {};
+
   members.forEach((member) => {
     if (contacts[member]) {
       membersUsernames[member] = contacts[member];
@@ -115,7 +113,7 @@ export const fetchUsernameOfMembers = async (
         username,
       };
     } else {
-      undefinedProfiles.push(Buffer.from(base64ToUint8Array(member).buffer));
+      undefinedProfiles.push(deserializeAgentPubKey(member));
     }
   });
 
@@ -126,7 +124,7 @@ export const fetchUsernameOfMembers = async (
       payload: undefinedProfiles,
     });
     res.forEach((profile: any) => {
-      let base64 = Uint8ArrayToBase64(profile.agentId);
+      let base64 = serializeHash(profile.agentId);
       membersUsernames[base64] = { id: base64, username: profile.username };
     });
   }

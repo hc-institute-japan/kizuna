@@ -1,20 +1,34 @@
 import React, { useEffect, useRef, useState } from "react";
-import { IonContent, IonInfiniteScroll, IonInfiniteScrollContent, IonList, IonLoading } from "@ionic/react";
+import {
+  IonContent,
+  IonInfiniteScroll,
+  IonInfiniteScrollContent,
+  IonList,
+  IonLoading,
+} from "@ionic/react";
 import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 
 // Redux
-import { FilePayload, isTextPayload, Payload } from "../../../../../redux/commons/types";
+import {
+  FilePayload,
+  isTextPayload,
+  Payload,
+} from "../../../../../redux/commons/types";
 import { getNextBatchGroupMessages } from "../../../../../redux/group/actions/getNextBatchGroupMessages";
-import { GroupMessageBatchFetchFilter, GroupMessagesOutput, GroupMessage } from "../../../../../redux/group/types";
+import {
+  GroupMessageBatchFetchFilter,
+  GroupMessagesOutput,
+  GroupMessage,
+} from "../../../../../redux/group/types";
 import { RootState } from "../../../../../redux/types";
 
 // Components
 import FileIndex from "./FileIndex";
 import EmptyFile from "./EmptyFile";
 
-import { base64ToUint8Array, monthToString, useAppDispatch } from "../../../../../utils/helpers";
-import styles from "./style.module.css"
+import { monthToString, useAppDispatch } from "../../../../../utils/helpers";
+import styles from "./style.module.css";
 
 interface Props {
   groupId: string;
@@ -37,43 +51,40 @@ const File: React.FC<Props> = ({ groupId }) => {
   // USE SELECTORS
   const groupFileMessages: GroupMessage[] = useSelector((state: RootState) => {
     // eslint-disable-next-line array-callback-return
-    let groupMessages = state.groups.conversations[groupId].messages.map((key: string) => {
-      let messageContent: GroupMessage = state.groups.messages[key];
-      let payload: FilePayload | null = isTextPayload(messageContent.payload) ? null : (messageContent.payload.fileType === "OTHER") ? messageContent.payload : null;
-      if (payload) {
-        return messageContent;
-      }
-    }).flatMap(
-      (x: GroupMessage | undefined) => (x ? [x] : [])
-    );
-    return groupMessages
+    let groupMessages = state.groups.conversations[groupId].messages
+      .map((key: string) => {
+        let messageContent: GroupMessage = state.groups.messages[key];
+        let payload: FilePayload | null = isTextPayload(messageContent.payload)
+          ? null
+          : messageContent.payload.fileType === "OTHER"
+          ? messageContent.payload
+          : null;
+        if (payload) {
+          return messageContent;
+        }
+      })
+      .flatMap((x: GroupMessage | undefined) => (x ? [x] : []));
+    return groupMessages;
   });
 
-  const indexMedia: (
-    fileMessages: GroupMessage[]
-  ) => {
+  const indexMedia: (fileMessages: GroupMessage[]) => {
     [key: string]: GroupMessage[];
   } = (fileMessages) => {
-    let filteredMessages = fileMessages.filter(message => {
+    let filteredMessages = fileMessages.filter((message) => {
       const payload: Payload = message.payload;
-      return !isTextPayload(payload) && payload.fileType === "OTHER"
-    })
+      return !isTextPayload(payload) && payload.fileType === "OTHER";
+    });
     let indexedFiles: {
       [key: string]: GroupMessage[];
     } = indexedFileMessages;
     if (filteredMessages.length > 0) {
-      let monthNumber = new Date(
-        fileMessages[0].timestamp[0] * 1000
-      ).getMonth();
+      let monthNumber = fileMessages[0].timestamp.getMonth();
       let month = monthToString(monthNumber, intl)!;
       if (!indexedFiles[month]) {
         indexedFiles[month] = [];
       }
       fileMessages.forEach((fileMessage: GroupMessage) => {
-        const currMonth = monthToString(
-          new Date(fileMessage.timestamp[0] * 1000).getMonth(),
-          intl
-        );
+        const currMonth = monthToString(fileMessage.timestamp.getMonth(), intl);
         if (currMonth !== month) {
           month = currMonth!;
           indexedFiles[month] = [];
@@ -87,43 +98,50 @@ const File: React.FC<Props> = ({ groupId }) => {
     }
     Object.keys(indexedFiles).forEach((month: string) => {
       let uniqueMessages: GroupMessage[] = [...new Set(indexedFiles[month])];
-      indexedFiles[month] = uniqueMessages
-    })
+      indexedFiles[month] = uniqueMessages;
+    });
     return indexedFiles;
   };
 
-  const onScrollBottom = (complete: () => Promise<void>, files: GroupMessage[]) => {
+  const onScrollBottom = (
+    complete: () => Promise<void>,
+    files: GroupMessage[]
+  ) => {
     setFetchLoading(true);
     // var lastFile: P2PMessage = Object.values(files)[Object.entries(files).length - 1];
-    var lastFile: GroupMessage = files[files.length - 1]
+    var lastFile: GroupMessage = files[files.length - 1];
     dispatch(
       getNextBatchGroupMessages({
-        groupId: base64ToUint8Array(groupId),
+        groupId: groupId,
         batchSize: 4,
         payloadType: { type: "FILE", payload: null },
-        lastMessageTimestamp: lastFile !== undefined ? lastFile.timestamp : undefined,
-        lastFetched: lastFile !== undefined ? Buffer.from(base64ToUint8Array(lastFile.groupMessageEntryHash)) : undefined
+        lastMessageTimestamp:
+          lastFile !== undefined ? lastFile.timestamp : undefined,
+        lastFetched:
+          lastFile !== undefined ? lastFile.groupMessageId : undefined,
       })
     ).then((res: GroupMessagesOutput) => {
       if (Object.keys(res.groupMessagesContents).length !== 0) {
-        let newFiles = Object.keys(res.groupMessagesContents).map((key: string) => {
-          let message: GroupMessage = res.groupMessagesContents[key];
-          return message
-        });
-        setFileMessages([...fileMessages, ...newFiles])
+        let newFiles = Object.keys(res.groupMessagesContents).map(
+          (key: string) => {
+            let message: GroupMessage = res.groupMessagesContents[key];
+            return message;
+          }
+        );
+        setFileMessages([...fileMessages, ...newFiles]);
         const indexedMedia: {
           [key: string]: GroupMessage[];
         } = indexMedia(newFiles);
         setIndexedFileMessages(indexedMedia);
-        setFetchLoading(false)
+        setFetchLoading(false);
       } else {
         setOldestFetched(true);
         setFetchLoading(false);
       }
     });
     complete();
-    return
-  }
+    return;
+  };
 
   useEffect(() => {
     if (groupFileMessages.length >= 10) {
@@ -135,7 +153,7 @@ const File: React.FC<Props> = ({ groupId }) => {
       setLoading(false);
     } else {
       let filter: GroupMessageBatchFetchFilter = {
-        groupId: base64ToUint8Array(groupId),
+        groupId: groupId,
         batchSize: 20,
         payloadType: { type: "FILE", payload: null },
       };
@@ -151,12 +169,12 @@ const File: React.FC<Props> = ({ groupId }) => {
               return undefined;
             }
           });
-  
+
           let fileMessagesCleaned = maybeFileMessages.flatMap(
             (x: GroupMessage | undefined) => (x ? [x] : [])
           );
           setFileMessages([...fileMessages, ...fileMessagesCleaned]);
-  
+
           const indexedMedia: {
             [key: string]: GroupMessage[];
           } = indexMedia(fileMessagesCleaned);
@@ -169,7 +187,7 @@ const File: React.FC<Props> = ({ groupId }) => {
   }, []);
 
   return !loading ? (
-    (Object.keys(indexedFileMessages).length !== 0) ? (
+    Object.keys(indexedFileMessages).length !== 0 ? (
       <IonContent>
         <IonList className={styles.filelist}>
           {Object.keys(indexedFileMessages).map((month: string) => {
@@ -201,12 +219,19 @@ const File: React.FC<Props> = ({ groupId }) => {
             onIonInfinite={(e) => onScrollBottom(complete, fileMessages)}
           >
             <IonInfiniteScrollContent>
-              <IonLoading isOpen={fetchLoading} message={intl.formatMessage({id: "app.group-chat.files.fetching"})}/>
+              <IonLoading
+                isOpen={fetchLoading}
+                message={intl.formatMessage({
+                  id: "app.group-chat.files.fetching",
+                })}
+              />
             </IonInfiniteScrollContent>
           </IonInfiniteScroll>
         </IonList>
       </IonContent>
-    ) : <EmptyFile />
+    ) : (
+      <EmptyFile />
+    )
   ) : (
     <IonLoading isOpen={loading} />
   );
