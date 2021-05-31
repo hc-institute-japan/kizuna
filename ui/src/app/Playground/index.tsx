@@ -7,7 +7,6 @@ import Typing from "../../components/Chat/Typing";
 import MessageInput from "../../components/MessageInput";
 import { FilePayload, Payload } from "../../redux/commons/types";
 import { RootState } from "../../redux/types";
-import { Uint8ArrayToBase64 } from "../../utils/helpers";
 
 interface DataType {
   author: string;
@@ -303,7 +302,7 @@ const Playground = () => {
                 fileName: file.metadata.fileName,
                 fileType: file.metadata.fileType,
                 fileSize: file.metadata.fileSize,
-                fileHash: Uint8ArrayToBase64(file.fileBytes),
+                fileHash: file.fileBytes,
                 thumbnail: file.fileType!.thumbnail!,
               };
               return fileToAdd;

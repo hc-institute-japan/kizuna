@@ -1,4 +1,3 @@
-import { AgentPubKey } from "@holochain/conductor-api";
 import {
   IonContent,
   IonFab,
@@ -7,114 +6,98 @@ import {
   IonList,
   IonPage,
 } from "@ionic/react";
-import {
-  pencil,
-  peopleCircleOutline,
-  personCircleOutline,
-} from "ionicons/icons";
-import React, { useEffect, useState } from "react";
+import { pencil } from "ionicons/icons";
+import React from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import Conversation from "../../components/Conversation";
 import Toolbar from "../../components/Toolbar";
-import { isTextPayload } from "../../redux/commons/types";
-import { GroupConversation, GroupMessage } from "../../redux/group/types";
-import { fetchId } from "../../redux/profile/actions";
-import { RootState } from "../../redux/types";
 import {
-  Uint8ArrayToBase64,
-  useAppDispatch,
-  dateToTimestamp,
-} from "../../utils/helpers";
-import { Message } from "../../utils/types";
-import EmptyConversations from "./EmptyConversations";
+  Conversation as ConversationDetail,
+  isTextPayload,
+  Message,
+} from "../../redux/commons/types";
+import { getGroupConversationBadgeCount } from "../../redux/group/actions/getBadgeCount";
+import { GroupConversationsState } from "../../redux/group/types";
+import { countUnread } from "../../redux/p2pmessages/actions";
 import { P2PMessageConversationState } from "../../redux/p2pmessages/types";
-import { FilePayload, TextPayload } from "../../redux/commons/types";
+import { RootState } from "../../redux/types";
+import { useAppDispatch } from "../../utils/helpers";
+import EmptyConversations from "./EmptyConversations";
 import styles from "./style.module.css";
 
 const Conversations: React.FC = () => {
   const history = useHistory();
   const dispatch = useAppDispatch();
+
   const contacts = useSelector((state: RootState) => state.contacts.contacts);
-  const groupsData = useSelector(
-    (state: RootState) => state.groups.conversations
-  );
-  const groupMessages = useSelector(
-    (state: RootState) => state.groups.messages
-  );
-  const groupMembers = useSelector((state: RootState) => state.groups.members);
-  const myUsername = useSelector((state: RootState) => state.profile.username);
+  const myProfile = useSelector((state: RootState) => state.profile);
+  const groupsState = useSelector((state: RootState) => state.groups);
   const p2pState = useSelector((state: RootState) => state.p2pmessages);
-  const [myAgentId, setMyAgentId] = useState<string>("");
-  const [groups, setGroups] = useState<{
-    [key: string]: GroupConversation;
-  }>({});
 
-  const [groupMessagesLocal, setGroupMessagesLocal] = useState<{
-    [key: string]: GroupMessage;
-  }>({});
-
-  const handleOnClick = () => {
+  /* Handlers */
+  const handleOnCompose = () => {
     history.push({
       pathname: `/compose`,
       state: { contacts: { ...contacts } },
     });
   };
 
+  const handleOnClick = (conversation: ConversationDetail) =>
+    conversation.type === "group"
+      ? history.push(`/g/${conversation.id}`)
+      : history.push(`/u/${conversation.conversationName}`);
   /*
-    Handle the display of Conversations
+    Handle the construction of array of
+    conversation detail merged from P2P and Group conversations
   */
-  const renderConversation = (
-    groups: { [key: string]: GroupConversation },
-    p2p: P2PMessageConversationState
+  const constructConversations = (
+    groupsState: GroupConversationsState,
+    p2pState: P2PMessageConversationState
   ) => {
-    let conversationsArray: any[] = [];
+    let conversationsArray: ConversationDetail[] = [];
 
     /* code block for p2p logic */
-    if (p2p !== undefined) {
-      for (let key in p2p.conversations) {
-        // do not display people who are not in contacts list
-        // TODO: may change depending on design implementation for blocked contacts
-        if (contacts[key.slice(1)] === undefined) continue;
+    if (Object.keys(p2pState.conversations).length > 0) {
+      for (let key in p2pState.conversations) {
+        if (contacts[key] === undefined) continue;
+        /*
+          we are not displaying people who are not in contacts list right now; this will not be undefined atm
+          TODO: may change depending on design implementation for blocked contacts
+          */
+        let conversant = contacts[key];
 
-        let src = personCircleOutline;
-        let conversant = contacts[key.slice(1)].username;
-
-        let messages: Message[] = Object.values(
-          p2p.conversations[key].messages
-        ).map((p2pMessageID) => {
-          
-          // convert p2pMessage to Message as input to Conversation component
-          let p2pMessage = p2p.messages[p2pMessageID];
-          let message: Message = {
-            id: p2pMessage.p2pMessageEntryHash,
-            sender: {
-              id: p2pMessage.author,
-              username: p2pMessage.author === myAgentId ? "You" : conversant,
-            },
-            message:
-              p2pMessage.payload.type === "TEXT"
-                ? (p2pMessage.payload as TextPayload).payload.payload
-                : (p2pMessage.payload as FilePayload).fileName,
-            timestamp: dateToTimestamp(p2pMessage.timestamp),
-          };
-          return message;
-        });
-
-        // sort messages according to time sent
-        messages.sort((x: Message, y: Message) =>
-          y.timestamp.valueOf() < x.timestamp.valueOf() ? 1 : -1
-        );
+        // accessing the first index for the latest message
+        // TODO: make sure that this is the latest
+        let latestMessageId = p2pState.conversations[key].messages[0];
+        let latestMessage = p2pState.messages[latestMessageId];
+        let message: Message = {
+          id: latestMessage.p2pMessageEntryHash,
+          sender: {
+            id: latestMessage.author,
+            username:
+              latestMessage.author === myProfile.id
+                ? "You"
+                : conversant.username,
+          },
+          payloadType: latestMessage.payload.type,
+          textPayload: isTextPayload(latestMessage.payload)
+            ? latestMessage.payload.payload.payload
+            : undefined,
+          fileName: !isTextPayload(latestMessage.payload)
+            ? latestMessage.payload.fileName
+            : undefined,
+          /* TODO: change to Date format */
+          timestamp: latestMessage.timestamp,
+        };
 
         // create input to Conversation component
-        let conversation = {
-          groupId: key,
-          isGroup: false,
-          content: {
-            src: src,
-            name: conversant,
-            messages: messages,
-          },
+        let conversation: ConversationDetail = {
+          type: "p2p",
+          id: key,
+          conversationName: conversant.username,
+          latestMessage: message,
+          badgeCount: dispatch(countUnread(conversant.id)),
         };
         conversationsArray.push(conversation);
       }
@@ -122,138 +105,102 @@ const Conversations: React.FC = () => {
     /* end of code block for p2p logic */
 
     /* code block for group logic */
-    if (groups !== undefined) {
-      Object.keys(groups).forEach((key: string) => {
-        // TODO: change to actual pic chosen by group creator
-        let src = peopleCircleOutline;
-        let messages: (Message | undefined)[] = groups[key].messages
-          ? groups[key].messages.map((messageId: string) => {
-              let groupMessage = Object.keys(groupMessagesLocal).length
-                ? groupMessagesLocal[messageId]
-                : groupMessages[messageId];
+    if (Object.keys(groupsState.conversations).length > 0) {
+      const allGroupMessages = groupsState.messages;
+      const groupMembers = groupsState.members;
 
-              if (groupMessage) {
-                if (isTextPayload(groupMessage.payload)) {
-                  let message: Message = {
-                    id: groupMessage.groupMessageEntryHash,
-                    sender: groupMembers[groupMessage.author]
-                      ? {
-                          id: groupMembers[groupMessage.author].id,
-                          username: groupMembers[groupMessage.author].username,
-                        }
-                      : {
-                          id: myAgentId,
-                          username: myUsername!,
-                        },
-                    timestamp: groupMessage.timestamp,
-                    message: groupMessage.payload.payload.payload,
-                  };
-                  return message;
-                } else {
-                  let message: Message = {
-                    id: groupMessage.groupMessageEntryHash,
-                    sender: groupMembers[groupMessage.author]
-                      ? {
-                          id: groupMembers[groupMessage.author].id,
-                          username: groupMembers[groupMessage.author].username,
-                        }
-                      : {
-                          id: myAgentId,
-                          username: myUsername!,
-                        },
-                    timestamp: groupMessage.timestamp,
-                    message: "",
-                    fileName: groupMessage.payload.fileName,
-                  };
-                  return message;
+      /* 
+        Currently filtering freshly created group that has no message yet
+        TODO: discuss whether we should create group with an initial message already
+        to avoid this filter.
+      */
+      Object.keys(groupsState.conversations)
+        .filter(
+          (groupId: string) =>
+            groupsState.conversations[groupId].messages[0] !== undefined
+        )
+        .forEach((groupId: string) => {
+          /* 
+            TODO: Make sure that the index 0 is the latest message at all times
+            especially when messages are received via signal or fetched
+          */
+          let latestMessageId = groupsState.conversations[groupId].messages[0];
+          let latestMessage = allGroupMessages[latestMessageId];
+
+          let message: Message = {
+            id: latestMessage.groupMessageId,
+            sender: groupMembers[latestMessage.author]
+              ? {
+                  id: groupMembers[latestMessage.author].id,
+                  username: groupMembers[latestMessage.author].username,
                 }
-              }
-            })
-          : [];
-        let messagesCleaned = messages.flatMap((x: Message | undefined) =>
-          x ? [x] : []
-        );
-        messagesCleaned = messagesCleaned.sort((x: Message, y: Message) =>
-          y.timestamp.valueOf() < x.timestamp.valueOf() ? 1 : -1
-        );
-        let conversation = {
-          isGroup: true,
-          createdAt: groups[key].createdAt,
-          groupId: groups[key].originalGroupEntryHash,
-          content: { src, name: groups[key].name, messages: messagesCleaned },
-        };
+              : {
+                  id: myProfile.id!,
+                  username: myProfile.username!,
+                },
+            payloadType: latestMessage.payload.type,
+            /* TODO: change the data type of GroupMessage to Date to avoid this */
+            timestamp: latestMessage.timestamp,
+            textPayload: isTextPayload(latestMessage.payload)
+              ? latestMessage.payload.payload.payload
+              : undefined,
+            fileName: !isTextPayload(latestMessage.payload)
+              ? latestMessage.payload.fileName
+              : undefined,
+          };
 
-        if (
-          !conversationsArray.find(
-            (group: any) => group.id === conversation.groupId
-          )
-        ) {
+          let conversation: ConversationDetail = {
+            id: groupId,
+            type: "group",
+            conversationName: groupsState.conversations[groupId].name,
+            latestMessage: message,
+            badgeCount: dispatch(getGroupConversationBadgeCount(groupId)),
+          };
+
           conversationsArray.push(conversation);
-        }
-      });
+        });
     }
     /* end of code block for group logic */
 
     /* sort merged p2p and group conversations */
-    conversationsArray.sort((x: any, y: any) => {
-      let timestampX =
-        x.content.messages.length !== 0
-          ? x.content.messages[
-              x.content.messages.length - 1
-            ].timestamp.valueOf()
-          : x.createdAt.valueOf();
-                    
-      let timestampY =
-        y.content.messages.length !== 0
-          ? y.content.messages[
-              y.content.messages.length - 1
-            ].timestamp.valueOf()
-          : y.createdAt.valueOf();
-
+    conversationsArray.sort((x: ConversationDetail, y: ConversationDetail) => {
+      let timestampX = x.latestMessage.timestamp.valueOf();
+      let timestampY = y.latestMessage.timestamp.valueOf();
       return timestampX < timestampY ? 1 : -1;
     });
 
     return conversationsArray;
   };
 
-  useEffect(() => {
-    dispatch(fetchId()).then((res: AgentPubKey | null) => {
-      if (res) setMyAgentId(Uint8ArrayToBase64(res));
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  /* Rederer */
 
-  useEffect(() => {
-    setGroups(groupsData);
-  }, [groupsData]);
-
-  useEffect(() => {
-    setGroupMessagesLocal(groupMessages);
-  }, [groupMessages]);
+  /* Handle the display of conversations */
+  const renderAllConversation = (conversationsArray: ConversationDetail[]) => {
+    return Object.keys(conversationsArray).length > 0 ? (
+      <IonList className={styles.conversation}>
+        {conversationsArray.map((conversation: ConversationDetail) => (
+          <Conversation
+            key={conversation.id}
+            conversation={conversation}
+            myAgentId={myProfile.id!}
+            onClick={() => handleOnClick(conversation)}
+          />
+        ))}
+      </IonList>
+    ) : (
+      <EmptyConversations />
+    );
+  };
 
   return (
     <IonPage>
       <Toolbar noSearch onChange={() => {}} />
       <IonContent>
-        {Object.keys(groups).length > 0 || Object.keys(p2pState.conversations).length > 0 ? (
-            <IonList className={styles.conversation}>
-              {renderConversation(groups, p2pState).map((conversation: any) => (
-                <Conversation
-                  key={conversation.groupId}
-                  isGroup={conversation.isGroup}
-                  groupId={conversation.groupId}
-                  content={conversation.content}
-                  myAgentId={myAgentId}
-                />
-              ))}
-            </IonList>
-          ) : (
-          <EmptyConversations />
-        )}
+        {renderAllConversation(constructConversations(groupsState, p2pState))}
 
         <IonFab vertical="bottom" horizontal="end" slot="fixed">
           <IonFabButton>
-            <IonIcon icon={pencil} onClick={handleOnClick} />
+            <IonIcon icon={pencil} onClick={handleOnCompose} />
           </IonFabButton>
         </IonFab>
       </IonContent>

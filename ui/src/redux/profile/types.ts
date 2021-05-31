@@ -6,12 +6,14 @@ export interface Profile {
 }
 
 export interface ProfileState {
+  id: string | null;
   username: string | null;
 }
 
 interface SetUsernameAction {
   type: typeof SET_USERNAME;
   username: string;
+  id: string;
 }
 
 export type ProfileListType = {

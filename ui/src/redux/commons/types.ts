@@ -1,4 +1,19 @@
-// Common Types
+/* 
+  TODO: Discuss how to manage these types as it currently is being used in Redux and UI (dunno if that is problematic)
+  These are types that are commonly used across redux (and currently in the react components as well).
+  As much as possible, use the types here and do not make any type on your own
+  if it is not absolutely necessary.
+*/
+
+import { Profile } from "../profile/types";
+
+/* 
+  We are avoiding the usage of Buffer (as these are typed in the @holochain/conductor-api) in the ui
+  as it is cumbersome to translate data types among Buffer, Uint8Array, and string. 
+  TODO: This may be a temporary solution that may have better fix in the future
+*/
+export type HoloHash = Uint8Array;
+
 export type ProfileID = string;
 export type MessageID = string;
 export type FileBytesID = string;
@@ -81,3 +96,31 @@ export function isVideo(
     "VIDEO"
   );
 }
+
+/* 
+  Temporarily placing these types here which is being used in the UI
+*/
+
+export interface Message {
+  id: string;
+  sender: Profile;
+  payloadType: "TEXT" | "FILE";
+  /* undefined when payload type is FILE */
+  textPayload?: string;
+  fileName?: string;
+  /* TODO: tats needs to fix the timestamp type in GroupMessage so that this can be typed as Date  */
+  timestamp: Date;
+}
+
+/* used in Conversations page */
+export interface Conversation {
+  type: "p2p" | "group";
+  id: string;
+  conversationName: string;
+  // src: string;
+  sender?: string;
+  latestMessage: Message;
+  badgeCount: number;
+}
+
+export type Conversations = Conversation[];

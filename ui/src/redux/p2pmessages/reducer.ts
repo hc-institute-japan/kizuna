@@ -26,7 +26,7 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
       // copy state
       let stateToSet = state;
       let { conversations, messages, receipts } = action.state;
-
+      
       // iterate through conversations
       for (const [key, value] of Object.entries(conversations)) {
         let existing = state.conversations[key];

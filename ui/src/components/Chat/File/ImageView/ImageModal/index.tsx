@@ -40,13 +40,16 @@ const ImageModal: React.FC<Props> = ({ state, src, file, onDownload }) => {
     isOpen: false,
     event: undefined,
   });
-  const fileBytes = useSelector(
-    (state: RootState) => 
-      // state.groups.groupFiles[`u${file.fileHash}`]
-      {
-        let fileSet = Object.assign({}, state.groups.groupFiles, state.p2pmessages.files);
-        return fileSet[`u${file.fileHash}`];
-      }
+  const fileBytes = useSelector((state: RootState) =>
+    // state.groups.groupFiles[`u${file.fileHash}`]
+    {
+      let fileSet = Object.assign(
+        {},
+        state.groups.groupFiles,
+        state.p2pmessages.files
+      );
+      return fileSet[file.fileHash];
+    }
   );
 
   useEffect(() => {
@@ -106,9 +109,8 @@ const ImageModal: React.FC<Props> = ({ state, src, file, onDownload }) => {
         >
           <img
             style={{
-              [window.innerWidth > window.innerHeight
-                ? "height"
-                : "width"]: "100%",
+              [window.innerWidth > window.innerHeight ? "height" : "width"]:
+                "100%",
             }}
             alt="Message content"
             src={src}
@@ -130,8 +132,16 @@ const ImageModal: React.FC<Props> = ({ state, src, file, onDownload }) => {
           onDidDismiss={() => setPopover({ isOpen: false, event: undefined })}
         >
           <IonList>
-            <IonItem lines="none" button onClick={onDownload ? () => onDownload(file) : download}>
-              <IonLabel>{intl.formatMessage({id: "components.chat.media-modal-download"})}</IonLabel>
+            <IonItem
+              lines="none"
+              button
+              onClick={onDownload ? () => onDownload(file) : download}
+            >
+              <IonLabel>
+                {intl.formatMessage({
+                  id: "components.chat.media-modal-download",
+                })}
+              </IonLabel>
             </IonItem>
           </IonList>
         </IonPopover>

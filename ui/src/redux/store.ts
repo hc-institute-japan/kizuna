@@ -1,4 +1,5 @@
 import { AnyAction, applyMiddleware, createStore } from "redux";
+import logger from "redux-logger";
 import thunk, { ThunkMiddleware } from "redux-thunk";
 import { callZome, getAgentId } from "../connection/holochainClient";
 import rootReducer from "./reducers";
@@ -9,8 +10,8 @@ const modifiedThunk = thunk.withExtraArgument({ callZome, getAgentId });
 const store = createStore(
   rootReducer,
   applyMiddleware(
-    modifiedThunk as ThunkMiddleware<RootState, AnyAction>
-    // logger
+    modifiedThunk as ThunkMiddleware<RootState, AnyAction>,
+    logger
   )
 );
 

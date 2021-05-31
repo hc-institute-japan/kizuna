@@ -1,11 +1,10 @@
-import { AgentPubKey } from "@holochain/conductor-api";
-import { Profile } from "../profile/types";
 import {
-  Payload,
-  TextPayload,
   FetchPayloadType,
   FilePayloadInput,
+  Payload,
+  TextPayload,
 } from "../commons/types";
+import { Profile } from "../profile/types";
 
 export const ADD_GROUP = "ADD_GROUP";
 export const UPDATE_GROUP_NAME = "UPDATE_GROUP_NAME";
@@ -21,17 +20,14 @@ export const SET_FILES_BYTES = "SET_FILES_BYTES";
 export const SET_GROUP_TYPING_INDICATOR = "SET_GROUP_TYPING_INDICATOR";
 export const SET_GROUP_READ_MESSAGE = "SET_GROUP_READ_MESSAGE";
 
-// type declarations
-type GroupMessageID = string; // Group Message EntryHash in base64 string
-type GroupID = string; // Group's EntryHash in base64 string
-type GroupRevisionID = string; // Group's HeaderHash in base64 string
-type GroupEntryHash = Uint8Array; // Group's EntryHash
-type GroupHeaderHash = Uint8Array; // Group's HeaderHash
-type GroupMessageEntryHash = Uint8Array; // Group Message EntryHash
+/* TYPE DECLARATIONS */
+type GroupMessageIDB64 = string; // Group Message EntryHash in base64 string
+type GroupIDB64 = string; // Group's EntryHash in base64 string
+type GroupRevisionIDB64 = string; // Group's HeaderHash in base64 string
 type PayloadInput = TextPayload | FilePayloadInput;
-// end
+/* END OF TYPE DECLARATIONS */
 
-// input declaration
+/* INPUT DECLARATION */
 export interface FileMetadataInput {
   fileName: string;
   fileSize: number;
@@ -40,80 +36,66 @@ export interface FileMetadataInput {
 
 export interface CreateGroupInput {
   name: String;
-  members: AgentPubKey[];
-}
-
-export interface UpdateGroupMembersIO {
-  members: AgentPubKey[];
-  groupId: GroupEntryHash;
-  groupRevisionId: GroupHeaderHash;
-}
-
-export interface UpdateGroupNameIO {
-  name: string;
-  groupId: GroupEntryHash;
-  groupRevisionId: GroupHeaderHash;
+  members: string[]; // deserialize to AgentPubKey
 }
 
 export interface GroupMessageInput {
-  groupHash: GroupEntryHash;
+  groupId: string; // deserialize to HoloHash
   payloadInput: PayloadInput;
-  sender: AgentPubKey;
-  replyTo?: GroupMessageEntryHash;
+  sender: string; // deserialize to AgentPubKey
+  replyTo?: string; // deserialize to AgentPubKey
 }
 
 export interface GroupMessageBatchFetchFilter {
-  groupId: GroupEntryHash;
-  // the entry hash of the last message in the last batch fetched
-  lastFetched?: GroupMessageEntryHash;
-  // 0 - seconds since epoch, 1 - nanoseconds. See Timestamp type in hdk doc for more info.
-  lastMessageTimestamp?: [number, number];
+  groupId: string; // deserialize to HoloHash
+  lastFetched?: string; // the entry hash of the last message in the last batch fetched. deserialize to HoloHash
+  lastMessageTimestamp?: Date; // converted to [number, number] for zome fn
   batchSize: number;
   payloadType: FetchPayloadType;
 }
 
 export interface GroupMessageByDateFetchFilter {
-  groupId: GroupEntryHash;
-  date: [number, number];
+  groupId: string; // deserialize to HoloHash
+  date: Date;
   payloadType: FetchPayloadType;
 }
 
 export interface GroupTypingDetailData {
-  groupId: GroupEntryHash;
-  indicatedBy: AgentPubKey;
-  members: AgentPubKey[];
+  groupId: string; // deserialize to HoloHash
+  indicatedBy: string; // deserialize to AgentPubKey
+  members: string[]; // deserialize to AgentPubKey
   isTyping: boolean;
 }
 
 export interface GroupMessageReadData {
-  groupId: GroupEntryHash;
-  messageIds: GroupMessageEntryHash[];
-  reader: AgentPubKey;
-  timestamp: [number, number];
-  members: AgentPubKey[];
+  groupId: string; // deserialize to Holohash
+  messageIds: string[]; // deserialize to Holohash
+  reader: string; // deserialize to AgentPubKey
+  timestamp: Date;
+  members: string[]; // deserialize to AgentPubKey
 }
-// end
+/* END OF INPUT DECLARATION */
 
 export interface GroupTypingDetail {
-  groupId: GroupID;
+  groupId: GroupIDB64;
   indicatedBy: Profile;
   isTyping: boolean;
 }
 
 export interface GroupMessageReadDetail {
-  groupId: GroupID;
-  messageIds: GroupMessageID[];
+  groupId: GroupIDB64;
+  messageIds: GroupMessageIDB64[];
   reader: string;
-  timestamp: [number, number];
+  timestamp: Date;
 }
 
 export interface GroupMessage {
-  groupMessageEntryHash: GroupMessageID;
-  groupEntryHash: GroupID;
+  groupMessageId: GroupMessageIDB64;
+  groupId: GroupIDB64;
   author: string;
   payload: Payload; // subject to change
-  timestamp: [number, number];
-  replyTo?: GroupMessageID;
+  timestamp: Date;
+  replyTo?: GroupMessageIDB64;
   readList: {
     // key is AgentPubKey
     [key: string]: Date;
@@ -127,7 +109,7 @@ export interface GroupMessagesOutput {
 
 export interface MessagesByGroup {
   // key here is the base64 string of Group EntryHash
-  [key: string]: GroupMessageID[];
+  [key: string]: GroupMessageIDB64[];
 }
 
 export interface GroupMessagesContents {
@@ -136,16 +118,16 @@ export interface GroupMessagesContents {
 }
 
 // Unused right now
-export interface GroupMessageElement {
-  // any field from Element received from HC can be added here
-  // as needed
-  entry: GroupMessage;
-  // base64 string
-  groupMessageHeaderHash: string;
-  groupMessageEntryHash: string;
-  // agentPubKey(?)
-  signature: string;
-}
+// export interface GroupMessageElement {
+//   // any field from Element received from HC can be added here
+//   // as needed
+//   entry: GroupMessage;
+//   // base64 string
+//   groupMessageHeaderHash: string;
+//   groupMessageEntryHash: string;
+//   // agentPubKey(?)
+//   signature: string;
+// }
 
 // TODO: make sure this is fetched from holochain at some point
 // export interface GroupVersion {
@@ -156,8 +138,8 @@ export interface GroupMessageElement {
 // }
 
 export interface GroupConversation {
-  originalGroupEntryHash: GroupID;
-  originalGroupHeaderHash: GroupRevisionID;
+  originalGroupId: GroupIDB64;
+  originalGroupRevisionId: GroupRevisionIDB64;
   // versions: GroupVersion[];
   name: string;
   members: string[];
@@ -165,25 +147,23 @@ export interface GroupConversation {
   creator: string;
   // TODO: enable setting of avatar for a GroupConversation
   avatar?: string;
-  messages: GroupMessageID[];
+  messages: GroupMessageIDB64[];
 }
 
 export interface UpdateGroupMembersData {
   // base64 string
   members: string[];
-  groupId: GroupID;
-  groupRevisionId: GroupRevisionID;
+  groupId: GroupIDB64;
+  groupRevisionId: GroupRevisionIDB64;
 }
 
 export interface UpdateGroupNameData {
   name: string;
-  groupId: GroupID;
-  groupRevisionId: GroupRevisionID;
+  groupId: GroupIDB64;
+  groupRevisionId: GroupRevisionIDB64;
 }
 
-/*
- * Group Conversation interface
- */
+/* GROUP CONVERSATION INTERFACE */
 
 export interface GroupConversationsState {
   conversations: {

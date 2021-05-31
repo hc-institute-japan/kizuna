@@ -1,14 +1,17 @@
+import { deserializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
 import { ThunkAction } from "../../types";
 import { SET_FILES_BYTES } from "../types";
 
 export const fetchFilesBytes =
-  (fileHashes: Uint8Array[]): ThunkAction =>
+  (fileHashes: string[]): ThunkAction =>
   async (dispatch, getState, { callZome }) => {
+    /* deserialize id for zome fn */
+    const input = fileHashes.map((fileId: string) => deserializeHash(fileId));
     const res = await callZome({
       zomeName: ZOMES.GROUP,
       fnName: FUNCTIONS[ZOMES.GROUP].GET_FILES_BYTES,
-      payload: fileHashes,
+      payload: input,
     });
 
     if (res?.type !== "error") {
