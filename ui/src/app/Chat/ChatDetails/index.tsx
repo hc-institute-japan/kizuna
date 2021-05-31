@@ -169,17 +169,17 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
 
   const onScrollBottom = (
     complete: () => Promise<void>,
-    filesAndMedia: any[]
+    earliestMediaOrFile: any
   ) => {
-    let lastFile: P2PMessage = files[filesAndMedia.length - 1];
+    let earliest: P2PMessage = earliestMediaOrFile;
 
     dispatch(
       getNextBatchMessages(
         state.conversant.id,
         5,
         "File",
-        lastFile !== undefined ? lastFile.timestamp : undefined,
-        lastFile !== undefined ? lastFile.p2pMessageEntryHash : undefined
+        earliest !== undefined ? earliest.timestamp : undefined,
+        earliest !== undefined ? earliest.p2pMessageEntryHash : undefined
       )
     ).then((res: any) => complete());
 
@@ -218,8 +218,8 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
           <MediaBox
             orderedMediaMessages={orderedMedia}
             onDownload={(file: FilePayload) => onDownloadHandler(file)}
-            onScrollBottom={(complete, orderedMediaFiles) =>
-              onScrollBottom(complete, orderedMediaFiles)
+            onScrollBottom={(complete, earliestMedia) =>
+              onScrollBottom(complete, earliestMedia)
             }
           />
 
@@ -227,8 +227,8 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
           <FileBox
             orderedFileMessages={orderedFiles}
             onDownload={(file) => onDownloadHandler(file)}
-            onScrollBottom={(complete, orderedMediaFiles) =>
-              onScrollBottom(complete, orderedMediaFiles)
+            onScrollBottom={(complete, earliestFile) =>
+              onScrollBottom(complete, earliestFile)
             }
           />
         </IonSlides>
