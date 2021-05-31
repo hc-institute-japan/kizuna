@@ -71,7 +71,8 @@ pub fn collect_messages_info(
                 get_links(link.target.clone(), Some(LinkTag::new("read")))?.into_inner();
 
             for link in read_links {
-                read_list.insert(link.target.to_string(), link.timestamp);
+                let reader: AgentPubKey = link.target.into();
+                read_list.insert(reader.to_string(), link.timestamp);
             }
 
             match message_element.entry().to_app_option() {
