@@ -1,7 +1,6 @@
 import {
   FetchPayloadType,
   FilePayloadInput,
-  HoloHash,
   Payload,
   TextPayload,
 } from "../commons/types";

@@ -102,20 +102,6 @@ export const convertCamelToSnake = (arg: string) =>
 export const convertSnakeToCamel = (arg: string) =>
   arg.replace(/([-_]\w)/g, (g) => g[1].toUpperCase());
 
-export const Uint8ArrayToBase64 = (arr: Uint8Array): string =>
-  Buffer.from(arr)
-    .toString("base64")
-    .replaceAll(/\//g, "_")
-    .replaceAll(/\+/g, "-");
-
-export const base64ToUint8Array = (base64: string) =>
-  new Uint8Array(
-    Buffer.from(
-      base64.replaceAll("_", "/").replaceAll("-", "+"),
-      "base64"
-    ).buffer
-  );
-
 export const deserializeAgentPubKey = (agentPubKey: string) =>
   Buffer.from(deserializeHash(agentPubKey).buffer);
 

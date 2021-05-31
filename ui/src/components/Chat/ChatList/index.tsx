@@ -69,8 +69,6 @@ const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
         i
       );
 
-      console.log(child.props.timestamp);
-
       return (
         <Fragment key={i}>
           {showDate ? (
