@@ -174,21 +174,13 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
     let lastFile: P2PMessage = files[filesAndMedia.length - 1];
 
     dispatch(
-      getNextBatchMessages({
-        conversant: Buffer.from(base64ToUint8Array(state.conversant.id)),
-        batch_size: 5,
-        payload_type: "File",
-        last_fetched_timestamp:
-          lastFile !== undefined
-            ? dateToTimestamp(lastFile.timestamp)
-            : undefined,
-        last_fetched_message_id:
-          lastFile !== undefined
-            ? Buffer.from(
-                base64ToUint8Array(lastFile.p2pMessageEntryHash.slice(1))
-              )
-            : undefined,
-      })
+      getNextBatchMessages(
+        state.conversant.id,
+        5,
+        "File",
+        lastFile !== undefined ? lastFile.timestamp : undefined,
+        lastFile !== undefined ? lastFile.p2pMessageEntryHash : undefined
+      )
     ).then((res: any) => complete());
 
     return;
