@@ -16,12 +16,9 @@ import Settings from "../Settings";
 
 const Authenticated: React.FC = () => {
   const dispatch = useAppDispatch();
-  useEffect(
-    () => {
-      dispatch(getLatestData());
-    },
-    [dispatch]
-  );
+  useEffect(() => {
+    dispatch(getLatestData());
+  }, [dispatch]);
 
   return (
     <IonSplitPane contentId="main">
@@ -33,7 +30,7 @@ const Authenticated: React.FC = () => {
           <Route path="/u/:username" exact component={Chat} />
           <Route path="/settings" exact component={Settings} />
           <Route path="/g/:group" exact component={GroupChat} />
-          <Route path="/g/:group/info" component={GroupChatInfo}/>
+          <Route path="/g/:group/info" component={GroupChatInfo} />
           <Route path="/p/:username" exact component={Profile} />
           {/* <Route path="/test" exact component={GroupChat} /> */}
 

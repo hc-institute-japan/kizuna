@@ -1,5 +1,6 @@
 import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
+import { timestampToDate } from "../../../utils/helpers";
 import { ThunkAction } from "../../types";
 import {
   GroupConversation,
@@ -51,7 +52,7 @@ export const getLatestGroupVersion =
       members: latestGroupVersionRes.members.map((member: any) =>
         serializeHash(member)
       ),
-      createdAt: latestGroupVersionRes.created,
+      createdAt: timestampToDate(latestGroupVersionRes.created),
       creator: serializeHash(latestGroupVersionRes.creator),
       messages:
         groupMessagesOutput.messagesByGroup[

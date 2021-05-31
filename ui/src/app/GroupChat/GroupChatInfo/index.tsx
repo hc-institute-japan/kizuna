@@ -13,13 +13,11 @@ import {
   IonToolbar,
 } from "@ionic/react";
 import { arrowBackSharp } from "ionicons/icons";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router";
-import { getLatestGroupVersion } from "../../../redux/group/actions/getLatestGroupVersion";
 // Redux
 import { updateGroupName } from "../../../redux/group/actions/updateGroupName";
-import { GroupConversation } from "../../../redux/group/types";
 import { RootState } from "../../../redux/types";
 import { useAppDispatch } from "../../../utils/helpers";
 import EndButtons from "./EndButtons";
@@ -45,16 +43,15 @@ const GroupChatInfo: React.FC = () => {
     speed: 100,
   };
 
-  /* Selectors */
+  const groupData = useSelector(
+    (state: RootState) => state.groups.conversations[group]
+  );
   const myProfile = useSelector((state: RootState) => state.profile);
 
   /* Local state */
   const [editGroupName, setEditGroupName] = useState<boolean>(false);
-  const [disabled, setDisabled] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(false);
   const [modalLoading, setModalLoading] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [groupInfo, setGroupInfo] = useState<GroupConversation | undefined>();
   const [currentSegment, setCurrentSegment] = useState<string>("Info");
 
   /* Refs */
@@ -111,8 +108,8 @@ const GroupChatInfo: React.FC = () => {
     dispatch(
       updateGroupName({
         name: newGroupName,
-        groupId: groupInfo!.originalGroupId,
-        groupRevisionId: groupInfo!.originalGroupRevisionId,
+        groupId: groupData!.originalGroupId,
+        groupRevisionId: groupData!.originalGroupRevisionId,
       })
     ).then((res: any) => {
       setModalLoading(false);
@@ -120,21 +117,7 @@ const GroupChatInfo: React.FC = () => {
     });
   };
 
-  /*
-    This is to make sure that the latest state of the Group is being fetched.
-  */
-  useEffect(() => {
-    dispatch(getLatestGroupVersion(group)).then(
-      (groupRes: GroupConversation) => {
-        setGroupInfo(groupRes);
-        if (groupRes.creator !== myProfile.id) setDisabled(true); // disable group name edit button if agent is not the creator
-        setLoading(false);
-      }
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  return !loading && groupInfo ? (
+  return groupData ? (
     <IonPage>
       <IonHeader className={styles.header}>
         <IonToolbar>
@@ -149,11 +132,11 @@ const GroupChatInfo: React.FC = () => {
           <EndButtons
             onClickEdit={() => handleOnClickEdit()}
             onClickNotif={() => {}}
-            disabled={disabled}
+            disabled={groupData.creator !== myProfile.id ? true : false}
           />
         </IonToolbar>
 
-        <IonTitle className={styles.groupname}>{groupInfo!.name}</IonTitle>
+        <IonTitle className={styles.groupname}>{groupData!.name}</IonTitle>
 
         <SegmentTabs
           value={currentSegment}
@@ -172,7 +155,7 @@ const GroupChatInfo: React.FC = () => {
           <IonSlide>
             <Members
               groupId={group}
-              groupRevisionId={groupInfo!.originalGroupRevisionId}
+              groupRevisionId={groupData!.originalGroupRevisionId}
             />
           </IonSlide>
 
@@ -191,13 +174,13 @@ const GroupChatInfo: React.FC = () => {
           loading={modalLoading}
           isOpen={showModal}
           onCancel={() => setShowModal(false)}
-          groupData={groupInfo!}
+          groupData={groupData!}
           onSave={(newGroupName) => handleOnSave(newGroupName)}
         />
       </IonModal>
     </IonPage>
   ) : (
-    <IonLoading isOpen={loading} />
+    <IonLoading isOpen={true} />
   );
 };
 
