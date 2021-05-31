@@ -1,6 +1,7 @@
 import { ProfileActionTypes, ProfileState, SET_USERNAME } from "./types";
 
 const initialState: ProfileState = {
+  id: null,
   username: null,
 };
 
@@ -10,6 +11,7 @@ const reducer = (state = initialState, action: ProfileActionTypes) => {
       return {
         ...state,
         username: action.username,
+        id: action.id,
       };
 
     default:

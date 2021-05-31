@@ -16,11 +16,7 @@ import {
   getNextBatchMessages,
   getFileBytes,
 } from "../../../redux/p2pmessages/actions";
-import {
-  useAppDispatch,
-  base64ToUint8Array,
-  dateToTimestamp,
-} from "../../../utils/helpers";
+import { useAppDispatch } from "../../../utils/helpers";
 // import { useIntl } from "react-intl";
 
 import ContactHeader from "./ContactHeader";
@@ -59,14 +55,15 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
     when the page is initially opened
   */
   useEffect(() => {
-    let initialFetchFilter = {
-      conversant: Buffer.from(base64ToUint8Array(state.conversant.id)),
-      batch_size: 40,
-      payload_type: "File",
-      last_fetched_timestamp: undefined,
-      last_fetched_message_id: undefined,
-    };
-    dispatch(getNextBatchMessages(initialFetchFilter));
+    dispatch(
+      getNextBatchMessages(
+        state.conversant.id,
+        40,
+        "File",
+        undefined,
+        undefined
+      )
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -77,9 +74,9 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
   useEffect(() => {
     if (
       state.conversant !== undefined &&
-      conversations["u" + state.conversant.id] !== undefined
+      conversations[state.conversant.id] !== undefined
     ) {
-      conversations["u" + state.conversant.id].messages.forEach((messageID) => {
+      conversations[state.conversant.id].messages.forEach((messageID) => {
         let message = messages[messageID];
         if (message.payload.type === "FILE") {
           let type = message.payload.fileType;
@@ -155,11 +152,11 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
   */
   const onDownloadHandler = (file: FilePayload) => {
     console.log("Chat onDownloadHandler", file);
-    fetchedFiles["u" + file.fileHash] !== undefined
-      ? downloadFile(fetchedFiles["u" + file.fileHash], file.fileName)
-      : dispatch(getFileBytes([base64ToUint8Array(file.fileHash)])).then(
+    fetchedFiles[file.fileHash] !== undefined
+      ? downloadFile(fetchedFiles[file.fileHash], file.fileName)
+      : dispatch(getFileBytes([file.fileHash])).then(
           (res: { [key: string]: Uint8Array }) =>
-            downloadFile(res["u" + file.fileHash], file.fileName)
+            downloadFile(res[file.fileHash], file.fileName)
         );
   };
   const downloadFile = (fileBytes: Uint8Array, fileName: string) => {
