@@ -20,6 +20,7 @@ import {
   isImage,
 } from "../../commons/types";
 import { setFilesBytes } from "./setFilesBytes";
+import { timestampToDate } from "../../../utils/helpers";
 
 export const sendGroupMessage =
   (groupMessageData: GroupMessageInput): ThunkAction =>
@@ -96,7 +97,7 @@ export const sendGroupMessage =
       groupId: serializeHash(sendGroupMessageOutput.content.groupHash),
       author: serializeHash(sendGroupMessageOutput.content.sender),
       payload,
-      timestamp: sendGroupMessageOutput.content.created,
+      timestamp: timestampToDate(sendGroupMessageOutput.content.created),
       replyTo: !sendGroupMessageOutput.content.replyTo
         ? undefined
         : serializeHash(sendGroupMessageOutput.content.replyTo),

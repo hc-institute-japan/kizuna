@@ -1,17 +1,19 @@
+import { deserializeHash } from "@holochain-open-dev/core-types";
 import { IonGrid, IonIcon, IonLabel, IonRow, IonText } from "@ionic/react";
 import React from "react";
 import { documentOutline } from "ionicons/icons";
 import { FilePayload } from "../../../../../redux/commons/types";
-import { base64ToUint8Array, convertSizeToReadableSize } from "../../../../../utils/helpers";
+import { convertSizeToReadableSize } from "../../../../../utils/helpers";
 
 interface Props {
   file: FilePayload;
 }
 
+/* TODO: This will be replaced by the use of Component */
 const File: React.FC<Props> = ({ file }) => {
   const { fileName, fileSize } = file;
   const handleOnClick = () => {
-    const blob = new Blob([base64ToUint8Array(file.fileHash)]); // change resultByte to bytes
+    const blob = new Blob([deserializeHash(file.fileHash)]); // change resultByte to bytes
 
     const link = document.createElement("a");
     link.href = window.URL.createObjectURL(blob);
