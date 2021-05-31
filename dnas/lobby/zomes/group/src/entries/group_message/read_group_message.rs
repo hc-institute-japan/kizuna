@@ -20,6 +20,9 @@ pub fn read_group_message_handler(
         payload: SignalPayload::GroupMessageRead(group_message_read_data.clone()),
     };
 
-    remote_signal(ExternIO::encode(signal_detail)?, group_message_read_data.members.clone())?;
+    remote_signal(
+        ExternIO::encode(signal_detail)?,
+        group_message_read_data.members.clone(),
+    )?;
     Ok(group_message_read_data)
 }
