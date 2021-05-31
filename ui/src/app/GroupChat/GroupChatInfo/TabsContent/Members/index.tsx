@@ -12,19 +12,6 @@ import {
 } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
-import {
-  IonIcon,
-  IonItem,
-  IonItemGroup,
-  IonLabel,
-  IonLoading,
-} from "@ionic/react";
-import {
-  peopleOutline,
-  personAddOutline,
-  removeCircleOutline,
-} from "ionicons/icons";
-
 import { useSelector } from "react-redux";
 import { removeGroupMembers } from "../../../../../redux/group/actions/removeGroupMembers";
 import { GroupConversation } from "../../../../../redux/group/types";
@@ -194,9 +181,11 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
             {renderNoOfMembers()}
             {renderAddMemberButton(groupData)}
 
-        <IonItem lines="none" className={styles["member-title"]}>
-          <h3>{intl.formatMessage({ id: "app.group-chat.members-label" })}</h3>
-        </IonItem>
+            <IonItem lines="none" className={styles["member-title"]}>
+              <h3>
+                {intl.formatMessage({ id: "app.group-chat.members-label" })}
+              </h3>
+            </IonItem>
 
             {renderGroupMembers(members)}
           </IonItemGroup>
