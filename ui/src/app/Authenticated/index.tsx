@@ -18,7 +18,8 @@ const Authenticated: React.FC = () => {
   const dispatch = useAppDispatch();
   useEffect(() => {
     dispatch(getLatestData());
-  }, [dispatch]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <IonSplitPane contentId="main">

@@ -102,6 +102,19 @@ export interface GroupMessage {
   };
 }
 
+export interface groupMessageWithProfile {
+  groupMessageId: string;
+  groupId: string;
+  author: Profile;
+  payload: Payload; // subject to change
+  timestamp: Date;
+  replyTo?: string;
+  readList: {
+    // key is AgentPubKey
+    [key: string]: Date;
+  };
+}
+
 export interface GroupMessagesOutput {
   messagesByGroup: MessagesByGroup;
   groupMessagesContents: GroupMessagesContents;

@@ -50,8 +50,6 @@ const GroupChat: React.FC = () => {
 
   // local states
   const [files, setFiles] = useState<object[]>([]);
-  // const [groupData, setGroupData] = useState<GroupConversation | null>(null);
-  // const [messageIds, setMessageIds] = useState<string[]>([]);
   const [sendingLoading, setSendingLoading] = useState<boolean>(false);
   const [message, setMessage] = useState("");
 
@@ -178,7 +176,7 @@ const GroupChat: React.FC = () => {
       <IonContent>
         <ChatBox
           groupId={groupData.originalGroupId}
-          members={groupData!.members}
+          members={groupData.members}
           messageIds={groupData.messages}
           chatList={chatList}
         />
