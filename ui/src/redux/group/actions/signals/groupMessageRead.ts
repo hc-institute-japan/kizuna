@@ -1,4 +1,5 @@
-import { Uint8ArrayToBase64 } from "../../../../utils/helpers";
+import { serializeHash } from "@holochain-open-dev/core-types";
+import { timestampToDate } from "../../../../utils/helpers";
 import { ThunkAction } from "../../../types";
 import { SetGroupReadMessage, SET_GROUP_READ_MESSAGE } from "../../types";
 
@@ -9,12 +10,12 @@ const groupMessageRead =
     dispatch<SetGroupReadMessage>({
       type: SET_GROUP_READ_MESSAGE,
       GroupReadMessage: {
-        groupId: Uint8ArrayToBase64(payload.groupId),
+        groupId: serializeHash(payload.groupId),
         messageIds: payload.messageIds.map((messageId: Uint8Array) =>
-          Uint8ArrayToBase64(messageId)
+          serializeHash(messageId)
         ),
-        reader: Uint8ArrayToBase64(payload.reader),
-        timestamp: payload.timestamp,
+        reader: serializeHash(payload.reader),
+        timestamp: timestampToDate(payload.timestamp),
       },
     });
   };

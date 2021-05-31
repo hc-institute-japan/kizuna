@@ -1,12 +1,13 @@
-import { ThunkAction } from "../../types";
-import { base64ToUint8Array } from "../../../utils/helpers";
+import { deserializeHash } from "@holochain-open-dev/core-types";
+import { deserializeAgentPubKey } from "../../../utils/helpers";
+import { FilePayloadInput } from "../../commons/types";
 import { Profile } from "../../profile/types";
+import { ThunkAction } from "../../types";
 import {
   // IO
   GroupConversation,
   GroupMessageInput,
 } from "../types";
-import { FilePayloadInput } from "../../commons/types";
 import { createGroup } from "./createGroup";
 import { sendGroupMessage } from "./sendGroupMessage";
 
@@ -19,18 +20,20 @@ export const sendInitialGroupMessage =
   ): ThunkAction =>
   async (dispatch, getState) => {
     let name = members.map((member) => member.username);
+
+    /* Include yourself in the initial name of the Group */
     name.push(getState().profile.username!);
+
     const groupResult: GroupConversation = await dispatch(
       createGroup({
         name: name.join(","),
-        members: members.map((member) =>
-          Buffer.from(base64ToUint8Array(member.id).buffer)
-        ),
+        members: members.map((member: Profile) => member.id),
       })
     );
 
     let inputs: GroupMessageInput[] = [];
 
+    /* Work on each file that were uploaded and convert them to appropriate input to Zome fn */
     files.forEach((file: any) => {
       let filePayloadInput: FilePayloadInput = {
         type: "FILE",
@@ -45,24 +48,24 @@ export const sendInitialGroupMessage =
         },
       };
       let groupMessage: GroupMessageInput = {
-        groupHash: base64ToUint8Array(groupResult.originalGroupEntryHash),
+        groupId: groupResult.originalGroupId,
         payloadInput: filePayloadInput,
-        sender: Buffer.from(base64ToUint8Array(groupResult.creator).buffer),
+        sender: groupResult.creator,
         // TODO: handle replying to message here as well
         replyTo: undefined,
       };
       inputs.push(groupMessage);
     });
 
+    /* if there is a text payload, then include that in the input to the zome fn as well */
     if (message.length) {
-      message = message.trim();
       inputs.push({
-        groupHash: base64ToUint8Array(groupResult.originalGroupEntryHash),
+        groupId: groupResult.originalGroupId,
         payloadInput: {
           type: "TEXT",
           payload: { payload: message },
         },
-        sender: Buffer.from(base64ToUint8Array(groupResult.creator).buffer),
+        sender: groupResult.creator,
         // TODO: handle replying to message here as well
         replyTo: undefined,
       });

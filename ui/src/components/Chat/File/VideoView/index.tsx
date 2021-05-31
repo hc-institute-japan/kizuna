@@ -4,7 +4,7 @@ import { FilePayload } from "../../../../redux/commons/types";
 import { fetchFilesBytes } from "../../../../redux/group/actions/setFilesBytes";
 
 import { RootState } from "../../../../redux/types";
-import { base64ToUint8Array, useAppDispatch } from "../../../../utils/helpers";
+import { useAppDispatch } from "../../../../utils/helpers";
 import VideoPlayer from "../../../VideoPlayer";
 import styles from "./style.module.css";
 
@@ -20,7 +20,7 @@ const Video: React.FC<Props> = ({ file, onDownload }) => {
       state.groups.groupFiles,
       state.p2pmessages.files
     );
-    return fileSet[`u${file.fileHash}`];
+    return fileSet[file.fileHash];
     // return state.groups.groupFiles[`u${file.fileHash}`];
   });
   const dispatch = useAppDispatch();
@@ -44,14 +44,12 @@ const Video: React.FC<Props> = ({ file, onDownload }) => {
         thumbnail={URL.createObjectURL(
           new Blob([file.thumbnail as Uint8Array], { type: "image/jpeg" })
         )}
-        onPlayPauseErrorHandler={(setErrorState) => {
-          dispatch(fetchFilesBytes([base64ToUint8Array(file.fileHash)])).then(
-            (res: any) => {
-              if (res) {
-                setErrorState(false);
-              }
+        onPlayPauseErrorHandler={(setErrorState: any) => {
+          dispatch(fetchFilesBytes([file.fileHash])).then((res: any) => {
+            if (res) {
+              setErrorState(false);
             }
-          );
+          });
         }}
       />
     </div>

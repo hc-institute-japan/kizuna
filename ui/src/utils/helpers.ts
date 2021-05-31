@@ -1,12 +1,15 @@
 import { IntlShape } from "react-intl";
 import { useDispatch } from "react-redux";
 import { IndexedContacts } from "../redux/contacts/types";
-import { Payload, TextPayload } from "../redux/commons/types";
+import { Payload } from "../redux/commons/types";
 import { Profile } from "../redux/profile/types";
 import { ReduxDispatch } from "../redux/types";
+import { deserializeHash } from "@holochain-open-dev/core-types";
 
-// returns a new object with the values at each key mapped using mapFn(value)
-// optional keyFn if user wants to uniformly edit the keys as well
+/*
+  returns a new object with each value mapped using mapFn(value)
+  optional keyFn if user wants to uniformly edit the keys as well
+*/
 export const objectMap = (
   object: any,
   mapFn: (v: any) => any,
@@ -99,19 +102,8 @@ export const convertCamelToSnake = (arg: string) =>
 export const convertSnakeToCamel = (arg: string) =>
   arg.replace(/([-_]\w)/g, (g) => g[1].toUpperCase());
 
-export const Uint8ArrayToBase64 = (arr: Uint8Array): string =>
-  Buffer.from(arr)
-    .toString("base64")
-    .replaceAll(/\//g, "_")
-    .replaceAll(/\+/g, "-");
-
-export const base64ToUint8Array = (base64: string) =>
-  new Uint8Array(
-    Buffer.from(
-      base64.replaceAll("_", "/").replaceAll("-", "+"),
-      "base64"
-    ).buffer
-  );
+export const deserializeAgentPubKey = (agentPubKey: string) =>
+  Buffer.from(deserializeHash(agentPubKey).buffer);
 
 export const convertSizeToReadableSize = (size: number) =>
   (size / 1024 / 1024).toFixed(2) === "0.00"
