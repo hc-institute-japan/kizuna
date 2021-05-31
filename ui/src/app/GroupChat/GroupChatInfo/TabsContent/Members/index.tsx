@@ -173,18 +173,31 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
       );
     });
 
-  return !loading ? (
+  return (
     <>
-      <IonItemGroup className={styles["member-page"]}>
-        {renderNoOfMembers()}
-        {renderAddMemberButton(groupData)}
+      {!loading ? (
+        <>
+          <IonItemGroup className={styles["member-page"]}>
+            {renderNoOfMembers()}
+            {renderAddMemberButton(groupData)}
 
-        <IonItem lines="none" className={styles["member-title"]}>
-          <h3>{intl.formatMessage({ id: "app.group-chat.members-label" })}</h3>
-        </IonItem>
+            <IonItem lines="none" className={styles["member-title"]}>
+              <h3>
+                {intl.formatMessage({ id: "app.group-chat.members-label" })}
+              </h3>
+            </IonItem>
 
-        {renderGroupMembers(members)}
-      </IonItemGroup>
+            {renderGroupMembers(members)}
+          </IonItemGroup>
+          <RemoveMemberToast
+            toast={toast}
+            onDismiss={() => setToast(false)}
+            message={errMsg}
+          />
+        </>
+      ) : (
+        <IonLoading isOpen={loading} />
+      )}
 
       <AddMemberModal
         contacts={contacts}
@@ -198,14 +211,7 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
         setLoading={setLoading}
         myAgentId={profile.id!}
       />
-      <RemoveMemberToast
-        toast={toast}
-        onDismiss={() => setToast(false)}
-        message={errMsg}
-      />
     </>
-  ) : (
-    <IonLoading isOpen={loading} />
   );
 };
 
