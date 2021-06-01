@@ -13,12 +13,12 @@ import {
 import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
-import { removeGroupMembers } from "../../../../../redux/group/actions/removeGroupMembers";
-import { GroupConversation } from "../../../../../redux/group/types";
+import { removeGroupMembers } from "../../../../redux/group/actions/removeGroupMembers";
+import { GroupConversation } from "../../../../redux/group/types";
 // Redux
-import { Profile } from "../../../../../redux/profile/types";
-import { RootState } from "../../../../../redux/types";
-import { useAppDispatch } from "../../../../../utils/helpers";
+import { Profile } from "../../../../redux/profile/types";
+import { RootState } from "../../../../redux/types";
+import { useAppDispatch } from "../../../../utils/helpers";
 import AddMemberModal from "./AddMemberModal";
 // Components
 import RemoveMemberToast from "./RemoveMemberToast";
