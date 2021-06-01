@@ -39,6 +39,23 @@ export const convertFetchedResToGroupMessagesOutput = (
   let groupMessagesContents: GroupMessagesContents = objectMap(
     fetchedRes.groupMessagesContents,
     (msg_content): GroupMessage => {
+      let convertedReadList: {
+        [key: string]: Date;
+      } = objectMap(
+        msg_content.readList,
+        /* 
+          This is due to Timestamp in HC being a value in HashMap.
+          TODO: see if converting Timestamp data type in hc fixes this.
+        */
+        (timestamp: {
+          nanos_since_epoch: number;
+          secs_since_epoch: number;
+        }): Date =>
+          timestampToDate([
+            timestamp.secs_since_epoch,
+            timestamp.nanos_since_epoch,
+          ])
+      );
       return {
         groupMessageId: serializeHash(
           msg_content.groupMessageElement.signedHeader.header.content.entry_hash
@@ -50,7 +67,7 @@ export const convertFetchedResToGroupMessagesOutput = (
           msg_content.groupMessageElement.entry.created
         ),
         replyTo: msg_content.groupMessageElement.entry.replyTo,
-        readList: msg_content.readList,
+        readList: convertedReadList,
       };
     }
   );

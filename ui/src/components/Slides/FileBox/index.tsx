@@ -21,7 +21,7 @@ interface Props {
   onDownload(file: FilePayload): any;
   onScrollBottom(
     complete: () => Promise<void>,
-    files: P2PMessage[] | GroupMessage[]
+    earliestFile: P2PMessage | GroupMessage
   ): any;
 }
 
@@ -91,7 +91,12 @@ const FileBox: React.FC<Props> = ({
           <IonInfiniteScroll
             ref={infiniteFileScroll}
             position="bottom"
-            onIonInfinite={(e) => onScrollBottom(complete, orderedFileMessages)}
+            onIonInfinite={(e) =>
+              onScrollBottom(
+                complete,
+                orderedFileMessages[orderedFileMessages.length - 1]
+              )
+            }
           >
             <IonInfiniteScrollContent></IonInfiniteScrollContent>
           </IonInfiniteScroll>
