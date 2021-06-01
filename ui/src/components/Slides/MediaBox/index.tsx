@@ -9,12 +9,16 @@ import {
 } from "@ionic/react";
 import React, { useRef } from "react";
 import { useIntl } from "react-intl";
+import { useSelector } from "react-redux";
 import ImageView from "../../../components/Chat/File/ImageView/index";
-import VideoView from "../../../components/Chat/File/VideoView";
-import { FilePayload } from "../../../redux/commons/types";
+import { FilePayload, isP2PMessage } from "../../../redux/commons/types";
+import { fetchFilesBytes } from "../../../redux/group/actions/setFilesBytes";
 import { GroupMessage } from "../../../redux/group/types";
+import { getFileBytes } from "../../../redux/p2pmessages/actions";
 import { P2PMessage } from "../../../redux/p2pmessages/types";
-import { monthToString } from "../../../utils/helpers";
+import { RootState } from "../../../redux/types";
+import { monthToString, useAppDispatch } from "../../../utils/helpers";
+import VideoPlayer from "../../VideoPlayer";
 import styles from "../style.module.css";
 
 interface Props {
@@ -35,6 +39,22 @@ const FileBox: React.FC<Props> = ({
   onDownload,
   onScrollBottom,
 }) => {
+  const dispatch = useAppDispatch();
+  /* Selectors */
+  /* 
+    We are retrieving the store that contains 
+    the file bytes of all files both for p2p and group
+  */
+  const filesBytes = useSelector((state: RootState) => {
+    let fileSet = Object.assign(
+      {},
+      state.groups.groupFiles,
+      state.p2pmessages.files
+    );
+    return fileSet;
+    // return state.groups.groupFiles[`u${file.fileHash}`];
+  });
+
   /* i18n */
   const intl = useIntl();
 
@@ -60,9 +80,40 @@ const FileBox: React.FC<Props> = ({
   const renderPayload = (message: P2PMessage | GroupMessage) =>
     (message.payload as FilePayload).fileType === "VIDEO" ? (
       <div className={styles.mediadiv}>
-        <VideoView
-          file={message.payload as FilePayload}
-          onDownload={onDownload}
+        <VideoPlayer
+          download={() => onDownload(message.payload as FilePayload)}
+          src={URL.createObjectURL(
+            new Blob([filesBytes[(message.payload as FilePayload).fileHash]], {
+              type: "video/mp4",
+            })
+          )}
+          className={styles.video}
+          thumbnail={URL.createObjectURL(
+            new Blob(
+              [(message.payload as FilePayload).thumbnail as Uint8Array],
+              { type: "image/jpeg" }
+            )
+          )}
+          /* TODO: We should expose onPlayPauseErrorHandler as prop instead of directly handling it here. */
+          onPlayPauseErrorHandler={(setErrorState: any) => {
+            if (isP2PMessage(message)) {
+              dispatch(
+                getFileBytes([(message.payload as FilePayload).fileHash])
+              ).then((res: any) => {
+                if (res) {
+                  setErrorState(false);
+                }
+              });
+            } else {
+              dispatch(
+                fetchFilesBytes([(message.payload as FilePayload).fileHash])
+              ).then((res: any) => {
+                if (res) {
+                  setErrorState(false);
+                }
+              });
+            }
+          }}
         />
       </div>
     ) : (
@@ -81,17 +132,15 @@ const FileBox: React.FC<Props> = ({
 			see https://github.com/microsoft/TypeScript/issues/36390 for more info
     */
     (orderedMediaMessages as any[]).map(
-      (message: P2PMessage | GroupMessage) => {
+      (message: P2PMessage | GroupMessage, i) => {
         let month = message.timestamp.getMonth();
         // let year = file.timestamp.getFullYear();
         return (
-          <React.Fragment>
+          <React.Fragment key={i}>
             {renderMonth(month)}
             <IonCol size="3">
               <IonCard className={styles.mediacard}>
-                <IonCard className={styles.mediacard}>
-                  {renderPayload(message)}
-                </IonCard>
+                {renderPayload(message)}
               </IonCard>
             </IonCol>
           </React.Fragment>
