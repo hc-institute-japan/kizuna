@@ -1,8 +1,6 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { FilePayload } from "../../../../redux/commons/types";
-import { fetchFilesBytes } from "../../../../redux/group/actions/setFilesBytes";
-
 import { RootState } from "../../../../redux/types";
 import { useAppDispatch } from "../../../../utils/helpers";
 import VideoPlayer from "../../../VideoPlayer";
@@ -28,7 +26,6 @@ const Video: React.FC<Props> = ({
     return fileSet[file.fileHash];
     // return state.groups.groupFiles[`u${file.fileHash}`];
   });
-  const dispatch = useAppDispatch();
 
   const download = () => {
     if (fileBytes) {
