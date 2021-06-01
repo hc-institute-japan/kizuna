@@ -11,9 +11,14 @@ import styles from "./style.module.css";
 interface Props {
   file: FilePayload;
   onDownload?(file: FilePayload): any;
+  onPlayPauseErrorHandler?(setErrorState: (bool: boolean) => any): any;
 }
 
-const Video: React.FC<Props> = ({ file, onDownload }) => {
+const Video: React.FC<Props> = ({
+  file,
+  onDownload,
+  onPlayPauseErrorHandler,
+}) => {
   const fileBytes = useSelector((state: RootState) => {
     let fileSet = Object.assign(
       {},
@@ -44,13 +49,7 @@ const Video: React.FC<Props> = ({ file, onDownload }) => {
         thumbnail={URL.createObjectURL(
           new Blob([file.thumbnail as Uint8Array], { type: "image/jpeg" })
         )}
-        onPlayPauseErrorHandler={(setErrorState: any) => {
-          dispatch(fetchFilesBytes([file.fileHash])).then((res: any) => {
-            if (res) {
-              setErrorState(false);
-            }
-          });
-        }}
+        onPlayPauseErrorHandler={onPlayPauseErrorHandler}
       />
     </div>
   );
