@@ -11,11 +11,8 @@ import {
 import { useIntl } from "react-intl";
 
 // redux
-import {
-  Profile,
-  ProfileListType,
-} from "../../../../../../redux/profile/types";
-import { addGroupMembers } from "../../../../../../redux/group/actions/addGroupMembers";
+import { Profile, ProfileListType } from "../../../../../redux/profile/types";
+import { addGroupMembers } from "../../../../../redux/group/actions/addGroupMembers";
 
 // components
 import EmptyContacts from "../EmptyContacts";
@@ -23,7 +20,7 @@ import AddMemberToast from "./AddMemberToast";
 import AddMemberIndex from "./AddMemberIndex";
 import AddMemberHeader from "./AddMemberHeader";
 
-import { indexContacts, useAppDispatch } from "../../../../../../utils/helpers";
+import { indexContacts, useAppDispatch } from "../../../../../utils/helpers";
 import styles from "./style.module.css";
 
 interface Props {

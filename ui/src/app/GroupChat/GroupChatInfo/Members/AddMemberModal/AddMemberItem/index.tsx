@@ -1,9 +1,6 @@
-import {
-  IonItem,
-  IonLabel,
-} from "@ionic/react";
+import { IonItem, IonLabel } from "@ionic/react";
 import React, { useState } from "react";
-import { Profile } from "../../../../../../../redux/profile/types";
+import { Profile } from "../../../../../../redux/profile/types";
 
 interface Props {
   contact: Profile;
@@ -19,8 +16,14 @@ const AddMemberItem: React.FC<Props> = ({ contact, onCompletion }) => {
   };
 
   return (
-    <IonItem button onClick={handleOnClick} lines="none" color={selectedItem ? "primary" : ""} key={JSON.stringify(contact.id)} >
-        <IonLabel>{contact.username}</IonLabel>
+    <IonItem
+      button
+      onClick={handleOnClick}
+      lines="none"
+      color={selectedItem ? "primary" : ""}
+      key={JSON.stringify(contact.id)}
+    >
+      <IonLabel>{contact.username}</IonLabel>
     </IonItem>
   );
 };
