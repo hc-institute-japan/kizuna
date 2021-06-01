@@ -78,6 +78,7 @@ const Chat: React.FC<Props> = ({ location }) => {
   /* REFS */
   const scrollerRef = useRef<ChatListMethods>(null);
   const didMountRef = useRef(false);
+  const didMountRef2 = useRef(false);
 
   /* USE EFFECTS */
   /* 
@@ -90,7 +91,7 @@ const Chat: React.FC<Props> = ({ location }) => {
 
   useEffect(() => {
     scrollerRef.current!.scrollToBottom();
-  }, [conversant, fetchedFiles]);
+  }, [conversant]);
 
   /* 
     filters messages with conversant and
@@ -123,6 +124,7 @@ const Chat: React.FC<Props> = ({ location }) => {
       });
       setMessagesWithConversant(filteredMessages.reverse());
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversations, messages, receipts, conversant]);
 
   /* 
@@ -175,25 +177,30 @@ const Chat: React.FC<Props> = ({ location }) => {
     when reaching the beginning/top of the chat box
   */
   const handleOnScrollTop = (complete: any) => {
-    if (disableGetNextBatch === false) {
-      console.log("calling get next");
-      let lastMessage = messagesWithConversant[0].message;
-      dispatch(
-        getNextBatchMessages(
-          conversant.id,
-          5,
-          "All",
-          lastMessage.timestamp,
-          lastMessage.p2pMessageEntryHash
-        )
-      ).then((res: P2PHashMap) => {
-        // disable getNextBatch if return value is empty
-        if (Object.values(res)[0][conversant.id].length <= 0) {
-          setDisableGetNextBatch(true);
-        }
-        complete();
-      });
+    if (didMountRef2.current === true) {
+      if (disableGetNextBatch === false) {
+        console.log("calling get next");
+        let lastMessage = messagesWithConversant[0].message;
+        dispatch(
+          getNextBatchMessages(
+            conversant.id,
+            5,
+            "All",
+            lastMessage.timestamp,
+            lastMessage.p2pMessageEntryHash
+          )
+        ).then((res: P2PHashMap) => {
+          // disable getNextBatch if return value is empty
+          if (Object.values(res)[0][conversant.id].length <= 0) {
+            setDisableGetNextBatch(true);
+          }
+          complete();
+        });
+      }
+    } else {
+      didMountRef2.current = true;
     }
+    complete();
     return;
   };
 
@@ -245,7 +252,6 @@ const Chat: React.FC<Props> = ({ location }) => {
     receipt: P2PMessageReceipt;
   }) => {
     // assume that this will be called with messages in sorted order
-
     let key = messageBundle.message.p2pMessageEntryHash;
     let author = messageBundle.message.author;
     let timestamp = messageBundle.receipt.timestamp;
@@ -253,8 +259,6 @@ const Chat: React.FC<Props> = ({ location }) => {
     let readlist =
       messageBundle.receipt.status === "read" ? { key: timestamp } : undefined;
 
-    // get file bytes when rendering video messages
-    // TODO: will change to getting file bytes when played
     if (
       payload.type === "FILE" &&
       (payload as FilePayload).fileType === "VIDEO" &&

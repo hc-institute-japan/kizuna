@@ -145,7 +145,7 @@ dependencies = [
 [[package]]
 name = "file_types"
 version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/Kizuna?branch=develop#e270b5a8b80ff58d319a1754615b4df23f4e4511"
+source = "git+https://github.com/hc-institute-japan/Kizuna?branch=develop#d84ca27670d5382b97086205f47b32c20aa5fca0"
 dependencies = [
  "derive_more",
  "hdk",
@@ -347,9 +347,9 @@ checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
 name = "libc"
-version = "0.2.94"
+version = "0.2.95"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "18794a8ad5b29321f790b55d93dfba91e125cb1a9edbd4f8e3150acc771c1a5e"
+checksum = "789da6d93f1b866ffe175afc5322a4d76c038605a1c3319bb57b06967ca98a36"
 
 [[package]]
 name = "lock_api"
@@ -416,7 +416,7 @@ dependencies = [
 [[package]]
 name = "p2pmessage"
 version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=bump-hdk-0.0.100#faba1af2d66b81ea3367e9fc92560de35421c591"
+source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=bump-hdk-0.0.100#f1f392480ec8e3c9b4b8a161d525361ebcbdec44"
 dependencies = [
  "derive_more",
  "file_types 0.0.1 (git+https://github.com/hc-institute-japan/Kizuna?branch=develop)",
