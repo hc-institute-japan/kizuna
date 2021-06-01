@@ -1,4 +1,4 @@
-import { IonIcon, IonItem, IonLabel, IonText } from "@ionic/react";
+import { IonIcon, IonItem, IonText } from "@ionic/react";
 import {
   checkmarkDoneOutline,
   checkmarkOutline,
@@ -12,10 +12,9 @@ import {
   TextPayload,
 } from "../../../redux/commons/types";
 import File from "../File";
-import common from "../style.module.css";
+import { default as common, default as styles } from "../style.module.css";
 import Text from "../Text";
 import { ChatProps } from "../types";
-import styles from "../style.module.css";
 
 const Me: React.FC<ChatProps> = ({
   payload,

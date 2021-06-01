@@ -467,7 +467,7 @@ export const getFileBytes =
 
     let transformedFiles: { [key: string]: Uint8Array } = {};
     if (fetchedFiles?.type !== "error") {
-      Object.keys(fetchedFiles).map((key) => {
+      Object.keys(fetchedFiles).forEach((key) => {
         transformedFiles[key] = fetchedFiles[key];
       });
       console.log("actions transformed", transformedFiles);

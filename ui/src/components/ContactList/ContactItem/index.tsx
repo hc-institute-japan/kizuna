@@ -1,11 +1,4 @@
-import {
-  IonButton,
-  IonButtons,
-  IonIcon,
-  IonItem,
-  IonLabel,
-} from "@ionic/react";
-import { chatboxOutline } from "ionicons/icons";
+import { IonItem, IonLabel } from "@ionic/react";
 import React from "react";
 import { useHistory } from "react-router";
 import { Profile } from "../../../redux/profile/types";

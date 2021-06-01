@@ -1,23 +1,16 @@
-import {
-  IonInfiniteScroll,
-  IonInfiniteScrollContent,
-  IonItem,
-  IonText,
-} from "@ionic/react";
+import { IonItem, IonText } from "@ionic/react";
+import { personCircleOutline } from "ionicons/icons";
 import React from "react";
 import {
   FilePayload,
   isTextPayload,
   TextPayload,
 } from "../../../redux/commons/types";
-import common from "../style.module.css";
 import File from "../File";
-import { ChatProps } from "../types";
-import Text from "../Text";
-import { useIntl } from "react-intl";
-import { personCircleOutline } from "ionicons/icons";
-import styles from "../style.module.css";
 import MessageTimestamp from "../MessageTimestamp";
+import { default as common, default as styles } from "../style.module.css";
+import Text from "../Text";
+import { ChatProps } from "../types";
 
 const Others: React.FC<ChatProps> = ({
   id,
@@ -34,7 +27,6 @@ const Others: React.FC<ChatProps> = ({
 }) => {
   const isText = isTextPayload(payload);
   const isP2P = type === "p2p";
-  const intl = useIntl();
 
   return (
     <>

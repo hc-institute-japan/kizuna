@@ -1,7 +1,7 @@
 import { IonButton, IonPage, IonText } from "@ionic/react";
 import React, { useState } from "react";
 import { setLanguage } from "../../redux/language/actions";
-import { Languages, languages } from "../../redux/language/types";
+import { Languages } from "../../redux/language/types";
 import { useAppDispatch } from "../../utils/helpers";
 import styles from "./style.module.css";
 
