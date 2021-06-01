@@ -100,45 +100,75 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
               };
             } else if (type === "VIDEO") {
               const video = document.createElement("video");
-              const canvas = document.createElement("canvas");
-              video.src = URL.createObjectURL(
+              // const canvas = document.createElement("canvas");
+              const url = URL.createObjectURL(
                 new Blob([fileBytes], { type: "video/mp4" })
               );
+              const BASE_64 = ";base64,";
 
+              const timeUpdate = function () {
+                if (snapImage()) {
+                  video.removeEventListener("timeupdate", timeUpdate);
+                  video.pause();
+                }
+              };
               video.addEventListener("loadeddata", function () {
-                const BASE_64 = ";base64,";
+                if (snapImage()) {
+                  video.removeEventListener("timeupdate", timeUpdate);
+                }
+              });
+              const snapImage = function () {
+                const canvas = document.createElement("canvas");
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
-
                 canvas
                   .getContext("2d")
-                  ?.drawImage(video, 0, 0, video.videoWidth, video.videoHeight);
-                const dataURI = canvas.toDataURL("image/jpeg");
+                  ?.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-                const byteCharacters = window.atob(
-                  dataURI.split(BASE_64)[1].trim()
-                );
+                const image = canvas.toDataURL("image/jpeg");
 
-                const byteNumbers = new Array(byteCharacters.length);
-                for (let i = 0; i < byteCharacters.length; i++)
-                  byteNumbers[i] = byteCharacters.charCodeAt(i);
+                const success = image.length > 100000;
+                if (success) {
+                  const img = document.createElement("img");
 
-                const uArr = new Uint8Array(byteNumbers);
-                const final = {
-                  metadata: { fileName, fileType: type, fileSize },
-                  fileType: {
-                    type,
-                    payload: { thumbnail: uArr },
-                  },
-                  fileBytes,
-                };
+                  document.getElementsByTagName("div")[0].appendChild(img);
+                  URL.revokeObjectURL(url);
+                }
 
-                setFiles((currFiles) => {
-                  currFiles.push(final);
-                  return [...currFiles];
-                });
-              });
-              video.load();
+                const base64 = image.split(BASE_64)[1]?.trim();
+                if (base64) {
+                  const byteCharacters = window.atob(
+                    image.split(BASE_64)[1]?.trim()
+                  );
+
+                  const byteNumbers = new Array(byteCharacters.length);
+                  for (let i = 0; i < byteCharacters.length; i++)
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+
+                  const uArr = new Uint8Array(byteNumbers);
+
+                  // });
+                  const final = {
+                    metadata: { fileName, fileType: type, fileSize },
+                    fileType: {
+                      type,
+                      payload: { thumbnail: uArr },
+                    },
+                    fileBytes,
+                  };
+                  setFiles((currFiles) => {
+                    currFiles.push(final);
+                    return [...currFiles];
+                  });
+                }
+                return success;
+              };
+
+              video.src = url;
+              video.addEventListener("timeupdate", timeUpdate);
+              video.preload = "metadata";
+              video.muted = true;
+              video.play();
             } else {
               const final = {
                 metadata: { fileName, fileType: type, fileSize },
