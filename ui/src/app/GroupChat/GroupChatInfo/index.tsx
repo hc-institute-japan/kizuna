@@ -16,25 +16,22 @@ import { arrowBackSharp } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router";
+import FileBox from "../../../components/Slides/FileBox";
+import MediaBox from "../../../components/Slides/MediaBox";
+import { FetchPayloadType, FilePayload } from "../../../redux/commons/types";
+import { getNextBatchGroupMessages } from "../../../redux/group/actions/getNextBatchGroupMessages";
+import { fetchFilesBytes } from "../../../redux/group/actions/setFilesBytes";
 // Redux
 import { updateGroupName } from "../../../redux/group/actions/updateGroupName";
+import { GroupMessage } from "../../../redux/group/types";
 import { RootState } from "../../../redux/types";
 import { useAppDispatch } from "../../../utils/helpers";
 import EndButtons from "./EndButtons";
-import { FilePayload } from "../../../redux/commons/types";
 // Components
 import SegmentTabs from "./SegmentTabs";
 import styles from "./style.module.css";
-import File from "./TabsContent/Files/File";
-import Media from "./TabsContent/Media/Media";
-import Members from "./TabsContent/Members";
+import Members from "./Members";
 import UpdateGroupName from "./UpdateGroupName";
-
-import MediaBox from "../../../components/Slides/MediaBox";
-import FileBox from "../../../components/Slides/FileBox";
-import { GroupMessage } from "../../../redux/group/types";
-import { getNextBatchGroupMessages } from "../../../redux/group/actions/getNextBatchGroupMessages";
-import { fetchFilesBytes } from "../../../redux/group/actions/setFilesBytes";
 
 interface GroupChatParams {
   group: string;
@@ -72,45 +69,6 @@ const GroupChatInfo: React.FC = () => {
 
   /* Refs */
   const slideRef = useRef<HTMLIonSlidesElement>(null);
-
-  /* UseEffects */
-  // sort others
-  useEffect(() => {
-    if (conversations[group] !== undefined) {
-      conversations[group].messages.forEach((messageID) => {
-        let message = messages[messageID];
-        if (message.payload.type === "FILE") {
-          let type = message.payload.fileType;
-
-          // checks for and does not allow duplicates
-          // not clear when this happens
-          switch (type) {
-            case "IMAGE":
-              if (!media[message.groupMessageId]) {
-                media[message.groupMessageId] = true;
-                orderedMedia.push(message);
-              }
-              break;
-            case "VIDEO":
-              if (!media[message.groupMessageId]) {
-                media[message.groupMessageId] = true;
-                orderedMedia.push(message);
-              }
-              break;
-            case "OTHER":
-              if (!files[message.groupMessageId]) {
-                files[message.groupMessageId] = true;
-                orderedFiles.push(message);
-              }
-              break;
-            default:
-              break;
-          }
-        }
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [conversations, messages]);
 
   /* Handlers */
   const handleOnBack = () => {
@@ -191,104 +149,185 @@ const GroupChatInfo: React.FC = () => {
 
   const handleOnScrollBottom = (
     complete: () => Promise<void>,
-    earliestMediaOrFile: any
+    earliestMediaOrFile: any,
+    type: FetchPayloadType
   ) => {
     let earliest: GroupMessage = earliestMediaOrFile;
 
-    dispatch(
-      getNextBatchGroupMessages({
-        groupId: group,
-        lastFetched: earliest.groupMessageId,
-        lastMessageTimestamp: earliest.timestamp,
-        batchSize: 5,
-        payloadType: {
-          type: earliest.payload.type,
-          payload: null,
-        },
-      })
-    ).then((res: any) => complete());
-
+    if (earliest !== undefined) {
+      dispatch(
+        getNextBatchGroupMessages({
+          groupId: group,
+          lastFetched: earliest.groupMessageId,
+          lastMessageTimestamp: earliest.timestamp,
+          batchSize: 5,
+          payloadType: type,
+        })
+      ).then((res: any) => {
+        console.log("these are the next 5 files", res);
+        complete();
+      });
+    }
     return;
   };
 
-  return groupData ? (
-    <IonPage>
-      <IonHeader className={styles.header}>
-        <IonToolbar>
-          <IonButtons>
-            <IonButton
-              onClick={() => handleOnBack()}
-              className="ion-no-padding"
+  /* UseEffects */
+  // sort others
+  useEffect(() => {
+    if (conversations[group] !== undefined) {
+      conversations[group].messages.forEach((messageID) => {
+        let message = messages[messageID];
+        if (message.payload.type === "FILE") {
+          let type = message.payload.fileType;
+
+          // checks for and does not allow duplicates
+          // not clear when this happens
+          switch (type) {
+            case "IMAGE":
+              if (!media[message.groupMessageId]) {
+                media[message.groupMessageId] = true;
+                orderedMedia.push(message);
+              }
+              break;
+            case "VIDEO":
+              if (!media[message.groupMessageId]) {
+                media[message.groupMessageId] = true;
+                orderedMedia.push(message);
+              }
+              break;
+            case "OTHER":
+              if (!files[message.groupMessageId]) {
+                files[message.groupMessageId] = true;
+                orderedFiles.push(message);
+              }
+              break;
+            default:
+              break;
+          }
+        }
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversations, messages]);
+
+  /* fetch 40 media */
+  useEffect(() => {
+    dispatch(
+      getNextBatchGroupMessages({
+        groupId: group,
+        batchSize: 40,
+        payloadType: {
+          type: "MEDIA",
+          payload: null,
+        },
+      })
+    ).then((res: any) => console.log("this is the media fetched", res));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /* fetch 40 Files */
+  useEffect(() => {
+    dispatch(
+      getNextBatchGroupMessages({
+        groupId: group,
+        batchSize: 40,
+        payloadType: {
+          type: "FILE",
+          payload: null,
+        },
+      })
+    ).then((res: any) => console.log("this is the file fetched", res));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <>
+      {groupData ? (
+        <IonPage>
+          <IonHeader className={styles.header}>
+            <IonToolbar>
+              <IonButtons>
+                <IonButton
+                  onClick={() => handleOnBack()}
+                  className="ion-no-padding"
+                >
+                  <IonIcon slot="icon-only" icon={arrowBackSharp} />
+                </IonButton>
+              </IonButtons>
+              <EndButtons
+                onClickEdit={() => handleOnClickEdit()}
+                onClickNotif={() => {}}
+                disabled={groupData.creator !== myProfile.id ? true : false}
+              />
+            </IonToolbar>
+
+            <IonTitle className={styles.groupname}>{groupData!.name}</IonTitle>
+
+            <SegmentTabs
+              value={currentSegment}
+              onSegmentChange={handleOnSegmentChange}
+            />
+          </IonHeader>
+
+          <IonContent>
+            <IonSlides
+              ref={slideRef}
+              className="slides"
+              pager={false}
+              options={slideOpts}
+              onIonSlideDidChange={handleSlideChange}
             >
-              <IonIcon slot="icon-only" icon={arrowBackSharp} />
-            </IonButton>
-          </IonButtons>
-          <EndButtons
-            onClickEdit={() => handleOnClickEdit()}
-            onClickNotif={() => {}}
-            disabled={groupData.creator !== myProfile.id ? true : false}
-          />
-        </IonToolbar>
+              <IonSlide>
+                <Members
+                  groupId={group}
+                  groupRevisionId={groupData!.originalGroupRevisionId}
+                />
+              </IonSlide>
 
-        <IonTitle className={styles.groupname}>{groupData!.name}</IonTitle>
+              <IonSlide>
+                {/* <Media groupId={group} /> */}
+                <MediaBox
+                  orderedMediaMessages={orderedMedia}
+                  onDownload={(file: FilePayload) => handleOnDownload(file)}
+                  onScrollBottom={(complete, earliestMedia) =>
+                    handleOnScrollBottom(complete, earliestMedia, {
+                      type: "MEDIA",
+                      payload: null,
+                    })
+                  }
+                />
+              </IonSlide>
 
-        <SegmentTabs
-          value={currentSegment}
-          onSegmentChange={handleOnSegmentChange}
-        />
-      </IonHeader>
+              <IonSlide>
+                {/* <File groupId={group} /> */}
+                <FileBox
+                  orderedFileMessages={orderedFiles}
+                  onDownload={(file: FilePayload) => handleOnDownload(file)}
+                  onScrollBottom={(complete, earliestFile) =>
+                    handleOnScrollBottom(complete, earliestFile, {
+                      type: "FILE",
+                      payload: null,
+                    })
+                  }
+                />
+              </IonSlide>
+            </IonSlides>
+          </IonContent>
 
-      <IonContent>
-        <IonSlides
-          ref={slideRef}
-          className="slides"
-          pager={false}
-          options={slideOpts}
-          onIonSlideDidChange={handleSlideChange}
-        >
-          <IonSlide>
-            <Members
-              groupId={group}
-              groupRevisionId={groupData!.originalGroupRevisionId}
+          <IonModal isOpen={showModal} cssClass="my-custom-modal-css">
+            <UpdateGroupName
+              loading={modalLoading}
+              isOpen={showModal}
+              onCancel={() => setShowModal(false)}
+              groupData={groupData!}
+              onSave={(newGroupName) => handleOnSave(newGroupName)}
             />
-          </IonSlide>
-
-          <IonSlide>
-            {/* <Media groupId={group} /> */}
-            <MediaBox
-              orderedMediaMessages={orderedMedia}
-              onDownload={(file: FilePayload) => handleOnDownload(file)}
-              onScrollBottom={(complete, earliestMedia) =>
-                handleOnScrollBottom(complete, earliestMedia)
-              }
-            />
-          </IonSlide>
-
-          <IonSlide>
-            {/* <File groupId={group} /> */}
-            <FileBox
-              orderedFileMessages={orderedFiles}
-              onDownload={(file: FilePayload) => handleOnDownload(file)}
-              onScrollBottom={(complete, earliestFile) =>
-                handleOnScrollBottom(complete, earliestFile)
-              }
-            />
-          </IonSlide>
-        </IonSlides>
-      </IonContent>
-
-      <IonModal isOpen={showModal} cssClass="my-custom-modal-css">
-        <UpdateGroupName
-          loading={modalLoading}
-          isOpen={showModal}
-          onCancel={() => setShowModal(false)}
-          groupData={groupData!}
-          onSave={(newGroupName) => handleOnSave(newGroupName)}
-        />
-      </IonModal>
-    </IonPage>
-  ) : (
-    <IonLoading isOpen={true} />
+          </IonModal>
+        </IonPage>
+      ) : (
+        <IonLoading isOpen={true} />
+      )}
+    </>
   );
 };
 
