@@ -34,8 +34,9 @@ const groupTypingDetail =
   async (dispatch, getState, { getAgentId, callZome }) => {
     const { payload } = signalPayload;
     const state = getState();
-    let contacts = state.contacts.contacts;
-    let memberId = serializeHash(payload.indicatedBy);
+    const contacts = state.contacts.contacts;
+    const memberId = serializeHash(payload.indicatedBy);
+
     let indicatedBy: Profile = contacts[memberId]
       ? contacts[memberId]
       : await fetchProfile(payload.indicatedBy, callZome);

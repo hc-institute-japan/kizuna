@@ -15,7 +15,7 @@ import {
   informationCircleOutline,
   peopleCircleOutline,
 } from "ionicons/icons";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router";
@@ -33,7 +33,7 @@ import {
   GroupMessageInput,
 } from "../../redux/group/types";
 import { RootState } from "../../redux/types";
-import { useAppDispatch } from "../../utils/helpers";
+import { debounce, useAppDispatch } from "../../utils/helpers";
 import ChatBox from "./ChatBox";
 import styles from "./style.module.css";
 
@@ -48,10 +48,13 @@ const GroupChat: React.FC = () => {
   const { group } = useParams<GroupChatParams>();
   const chatList = useRef<ChatListMethods>(null);
 
-  // local states
+  /* local states */
   const [files, setFiles] = useState<object[]>([]);
   const [sendingLoading, setSendingLoading] = useState<boolean>(false);
   const [message, setMessage] = useState("");
+
+  /* Refs */
+  const didMountRef = useRef(false);
 
   /* Selectors */
   const groupData = useSelector(
@@ -136,6 +139,29 @@ const GroupChat: React.FC = () => {
     );
     return setMessage(message);
   };
+
+  /* Effects */
+  useEffect(() => {
+    if (didMountRef.current) {
+      let members = [...groupData.members, groupData.creator].filter(
+        (member) => member !== myProfile.id
+      );
+
+      debounce(
+        dispatch(
+          indicateGroupTyping({
+            groupId: groupData.originalGroupId,
+            indicatedBy: myProfile.id!,
+            members,
+            isTyping: true,
+          })
+        )
+      );
+    } else {
+      didMountRef.current = true;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [message]);
 
   return groupData ? (
     <IonPage>

@@ -24,9 +24,9 @@ export const getGroupConversationBadgeCount =
       filter each readList of a message and see if own AgentId is 
       present as key in the readList object.
     */
-    let badgeCount = readLists.filter(
-      (readList: { [key: string]: Date }) => readList[myAgentId!] !== undefined
-    ).length;
+    let badgeCount = readLists.filter((readList: { [key: string]: Date }) => {
+      return readList[myAgentId!] === undefined;
+    }).length;
 
     return badgeCount;
   };

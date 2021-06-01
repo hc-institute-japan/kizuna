@@ -13,7 +13,7 @@ import {
   IonToolbar,
 } from "@ionic/react";
 import { arrowBackSharp } from "ionicons/icons";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router";
 // Redux
@@ -21,6 +21,7 @@ import { updateGroupName } from "../../../redux/group/actions/updateGroupName";
 import { RootState } from "../../../redux/types";
 import { useAppDispatch } from "../../../utils/helpers";
 import EndButtons from "./EndButtons";
+import { FilePayload } from "../../../redux/commons/types";
 // Components
 import SegmentTabs from "./SegmentTabs";
 import styles from "./style.module.css";
@@ -28,6 +29,12 @@ import File from "./TabsContent/Files/File";
 import Media from "./TabsContent/Media/Media";
 import Members from "./TabsContent/Members";
 import UpdateGroupName from "./UpdateGroupName";
+
+import MediaBox from "../../../components/Slides/MediaBox";
+import FileBox from "../../../components/Slides/FileBox";
+import { GroupMessage } from "../../../redux/group/types";
+import { getNextBatchGroupMessages } from "../../../redux/group/actions/getNextBatchGroupMessages";
+import { fetchFilesBytes } from "../../../redux/group/actions/setFilesBytes";
 
 interface GroupChatParams {
   group: string;
@@ -47,6 +54,10 @@ const GroupChatInfo: React.FC = () => {
     (state: RootState) => state.groups.conversations[group]
   );
   const myProfile = useSelector((state: RootState) => state.profile);
+  const { conversations, messages } = useSelector(
+    (state: RootState) => state.groups
+  );
+  const others = useSelector((state: RootState) => state.groups.groupFiles);
 
   /* Local state */
   const [editGroupName, setEditGroupName] = useState<boolean>(false);
@@ -54,8 +65,52 @@ const GroupChatInfo: React.FC = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
   const [currentSegment, setCurrentSegment] = useState<string>("Info");
 
+  const [media] = useState<{ [key: string]: boolean }>({});
+  const [files] = useState<{ [key: string]: boolean }>({});
+  const [orderedMedia] = useState<GroupMessage[]>([]);
+  const [orderedFiles] = useState<GroupMessage[]>([]);
+
   /* Refs */
   const slideRef = useRef<HTMLIonSlidesElement>(null);
+
+  /* UseEffects */
+  // sort others
+  useEffect(() => {
+    if (conversations[group] !== undefined) {
+      conversations[group].messages.forEach((messageID) => {
+        let message = messages[messageID];
+        if (message.payload.type === "FILE") {
+          let type = message.payload.fileType;
+
+          // checks for and does not allow duplicates
+          // not clear when this happens
+          switch (type) {
+            case "IMAGE":
+              if (!media[message.groupMessageId]) {
+                media[message.groupMessageId] = true;
+                orderedMedia.push(message);
+              }
+              break;
+            case "VIDEO":
+              if (!media[message.groupMessageId]) {
+                media[message.groupMessageId] = true;
+                orderedMedia.push(message);
+              }
+              break;
+            case "OTHER":
+              if (!files[message.groupMessageId]) {
+                files[message.groupMessageId] = true;
+                orderedFiles.push(message);
+              }
+              break;
+            default:
+              break;
+          }
+        }
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversations, messages]);
 
   /* Handlers */
   const handleOnBack = () => {
@@ -117,6 +172,45 @@ const GroupChatInfo: React.FC = () => {
     });
   };
 
+  const handleOnDownload = (file: FilePayload) => {
+    console.log("Chat onDownloadHandler", file);
+    others[file.fileHash] !== undefined
+      ? downloadFile(others[file.fileHash], file.fileName)
+      : dispatch(fetchFilesBytes([file.fileHash])).then(
+          (res: { [key: string]: Uint8Array }) =>
+            downloadFile(res[file.fileHash], file.fileName)
+        );
+  };
+  const downloadFile = (fileBytes: Uint8Array, fileName: string) => {
+    const blob = new Blob([fileBytes]); // change resultByte to bytes
+    const link = document.createElement("a");
+    link.href = window.URL.createObjectURL(blob);
+    link.download = fileName;
+    link.click();
+  };
+
+  const handleOnScrollBottom = (
+    complete: () => Promise<void>,
+    earliestMediaOrFile: any
+  ) => {
+    let earliest: GroupMessage = earliestMediaOrFile;
+
+    dispatch(
+      getNextBatchGroupMessages({
+        groupId: group,
+        lastFetched: earliest.groupMessageId,
+        lastMessageTimestamp: earliest.timestamp,
+        batchSize: 5,
+        payloadType: {
+          type: earliest.payload.type,
+          payload: null,
+        },
+      })
+    ).then((res: any) => complete());
+
+    return;
+  };
+
   return groupData ? (
     <IonPage>
       <IonHeader className={styles.header}>
@@ -160,11 +254,25 @@ const GroupChatInfo: React.FC = () => {
           </IonSlide>
 
           <IonSlide>
-            <Media groupId={group} />
+            {/* <Media groupId={group} /> */}
+            <MediaBox
+              orderedMediaMessages={orderedMedia}
+              onDownload={(file: FilePayload) => handleOnDownload(file)}
+              onScrollBottom={(complete, earliestMedia) =>
+                handleOnScrollBottom(complete, earliestMedia)
+              }
+            />
           </IonSlide>
 
           <IonSlide>
-            <File groupId={group} />
+            {/* <File groupId={group} /> */}
+            <FileBox
+              orderedFileMessages={orderedFiles}
+              onDownload={(file: FilePayload) => handleOnDownload(file)}
+              onScrollBottom={(complete, earliestFile) =>
+                handleOnScrollBottom(complete, earliestFile)
+              }
+            />
           </IonSlide>
         </IonSlides>
       </IonContent>

@@ -1,3 +1,4 @@
+import { deserializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
 import { deserializeAgentPubKey } from "../../../utils/helpers";
 import { ThunkAction } from "../../types";
@@ -8,17 +9,35 @@ export const indicateGroupTyping =
   async (dispatch, getState, { callZome, getAgentId }) => {
     /* deserialize fields for zome fn */
     const input = {
-      groupId: groupTypingDetailData.groupId,
-      indicatedBy: groupTypingDetailData.indicatedBy,
+      groupId: deserializeHash(groupTypingDetailData.groupId),
+      indicatedBy: deserializeAgentPubKey(groupTypingDetailData.indicatedBy),
       members: groupTypingDetailData.members.map((member) =>
         deserializeAgentPubKey(member)
       ),
       isTyping: groupTypingDetailData.isTyping,
     };
+
     await callZome({
       zomeName: ZOMES.GROUP,
       fnName: FUNCTIONS[ZOMES.GROUP].INDICATE_GROUP_TYPING,
       payload: input,
     });
+
+    setTimeout(
+      () =>
+        callZome({
+          zomeName: ZOMES.GROUP,
+          fnName: FUNCTIONS[ZOMES.GROUP].INDICATE_GROUP_TYPING,
+          payload: {
+            groupId: deserializeHash(groupTypingDetailData.groupId),
+            indicatedBy: deserializeHash(groupTypingDetailData.indicatedBy),
+            members: groupTypingDetailData.members.map((member) =>
+              deserializeAgentPubKey(member)
+            ),
+            isTyping: false,
+          },
+        }),
+      5000
+    );
     return null;
   };
