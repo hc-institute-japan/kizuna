@@ -5,6 +5,8 @@
   if it is not absolutely necessary.
 */
 
+import { GroupMessage } from "../group/types";
+import { P2PMessage } from "../p2pmessages/types";
 import { Profile } from "../profile/types";
 
 /* 
@@ -95,6 +97,12 @@ export function isVideo(
     (payload as { type: "VIDEO"; payload: { thumbnail: Uint8Array } }).type ===
     "VIDEO"
   );
+}
+
+export function isP2PMessage(
+  message: P2PMessage | GroupMessage
+): message is P2PMessage {
+  return (message as P2PMessage).p2pMessageEntryHash !== undefined;
 }
 
 /* 

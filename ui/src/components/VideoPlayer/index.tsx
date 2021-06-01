@@ -74,7 +74,7 @@ const VideoPlayer: React.FC<Props> = ({
         />
       ) : null}
       <VideoPlayerModal
-        // download={download}
+        download={download}
         onPlayPauseErrorHandler={onPlayPauseErrorHandler}
         src={src}
         open={[isModalOpen, setIsModalOpen]}

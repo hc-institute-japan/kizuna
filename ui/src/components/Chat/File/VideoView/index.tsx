@@ -2,7 +2,6 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { FilePayload } from "../../../../redux/commons/types";
 import { RootState } from "../../../../redux/types";
-import { useAppDispatch } from "../../../../utils/helpers";
 import VideoPlayer from "../../../VideoPlayer";
 import styles from "./style.module.css";
 
