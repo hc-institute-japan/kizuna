@@ -37,6 +37,7 @@ const AddContactModal: React.FC<Props> = ({ isOpen, onCancel }) => {
         setUsers(filteredRes);
       }
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch]);
 
   let indexedContacts: IndexedContacts = indexContacts(

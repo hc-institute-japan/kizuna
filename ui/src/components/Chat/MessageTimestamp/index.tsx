@@ -1,5 +1,5 @@
 import { IonText } from "@ionic/react";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 
 interface Props {
@@ -30,6 +30,7 @@ const MessageTimestamp: React.FC<Props> = ({ timestamp, onSeen }) => {
       }
     }, options);
     if (ref.current) observerStorage.current?.observe(ref.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isComplete, ref.current]);
 
   const complete = () => {

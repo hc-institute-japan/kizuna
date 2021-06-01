@@ -1,5 +1,3 @@
-import { deserializeHash } from "@holochain-open-dev/core-types";
-import { deserializeAgentPubKey } from "../../../utils/helpers";
 import { FilePayloadInput } from "../../commons/types";
 import { Profile } from "../../profile/types";
 import { ThunkAction } from "../../types";

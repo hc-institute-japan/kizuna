@@ -1,4 +1,4 @@
-import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
+import { deserializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
 import { dateToTimestamp } from "../../../utils/helpers";
 import { ThunkAction } from "../../types";

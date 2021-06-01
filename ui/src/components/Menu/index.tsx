@@ -12,8 +12,6 @@ import {
   banOutline,
   cogOutline,
   logOutOutline,
-  peopleCircleOutline,
-  personCircle,
   personCircleOutline,
 } from "ionicons/icons";
 import React, { useRef } from "react";

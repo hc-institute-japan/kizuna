@@ -33,7 +33,7 @@ const Profile: React.FC = () => {
   const dispatch = useAppDispatch();
   const { username } = useParams<ParamsProps>();
   const [profile, setProfile] = useState<null | ProfileType>(null);
-  const [loading, setLoading] = useState(false);
+  // const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     _isMounted.current = true;
@@ -44,11 +44,11 @@ const Profile: React.FC = () => {
 
   useEffect(() => {
     if (location?.state?.contact === undefined) {
-      setLoading(true);
+      // setLoading(true);
       dispatch(fetchProfileFromUsername(username)).then(
         (profile: ProfileType) => {
           if (_isMounted.current) {
-            setLoading(false);
+            // setLoading(false);
             setProfile(profile);
           }
         }

@@ -131,7 +131,6 @@ const GroupChatInfo: React.FC = () => {
   };
 
   const handleOnDownload = (file: FilePayload) => {
-    console.log("Chat onDownloadHandler", file);
     others[file.fileHash] !== undefined
       ? downloadFile(others[file.fileHash], file.fileName)
       : dispatch(fetchFilesBytes([file.fileHash])).then(
@@ -164,7 +163,6 @@ const GroupChatInfo: React.FC = () => {
           payloadType: type,
         })
       ).then((res: any) => {
-        console.log("these are the next 5 files", res);
         complete();
       });
     }
@@ -221,7 +219,7 @@ const GroupChatInfo: React.FC = () => {
           payload: null,
         },
       })
-    ).then((res: any) => console.log("this is the media fetched", res));
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -236,7 +234,7 @@ const GroupChatInfo: React.FC = () => {
           payload: null,
         },
       })
-    ).then((res: any) => console.log("this is the file fetched", res));
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

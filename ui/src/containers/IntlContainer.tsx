@@ -1,10 +1,9 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { IntlProvider } from "react-intl";
 import { useSelector } from "react-redux";
 import LanguageSelector from "../app/LanguageSelector";
 import messages from "../lang";
 import { setLanguage } from "../redux/language/actions";
-import { languages } from "../redux/language/types";
 import { RootState } from "../redux/types";
 import { useAppDispatch } from "../utils/helpers";
 

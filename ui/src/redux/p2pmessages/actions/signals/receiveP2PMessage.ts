@@ -1,5 +1,4 @@
 import { serializeHash } from "@holochain-open-dev/core-types";
-import { FUNCTIONS, ZOMES } from "../../../../connection/types";
 import { timestampToDate } from "../../../../utils/helpers";
 import { ThunkAction } from "../../../types";
 import { APPEND_MESSAGE, P2PMessage, P2PMessageReceipt } from "../../types";
