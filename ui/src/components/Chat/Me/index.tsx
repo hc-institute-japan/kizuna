@@ -41,6 +41,7 @@ const Me: React.FC<ChatProps> = ({
           <Text message={payload as TextPayload} />
         ) : (
           <File
+            chatType={isP2P ? "p2p" : "group"}
             onDownload={onDownload}
             type="me"
             timestamp={timestamp}
