@@ -1,6 +1,7 @@
 import React from "react";
 import { FilePayload } from "../../../redux/commons/types";
 import { fetchFilesBytes } from "../../../redux/group/actions/setFilesBytes";
+import { getFileBytes } from "../../../redux/p2pmessages/actions";
 import { useAppDispatch } from "../../../utils/helpers";
 import FileView from "./FileView";
 import ImageView from "./ImageView";
@@ -10,10 +11,17 @@ interface Props {
   timestamp?: Date;
   file?: FilePayload;
   type: "others" | "me";
+  chatType: "p2p" | "group";
   onDownload?(file: FilePayload): any;
 }
 
-const File: React.FC<Props> = ({ timestamp, file, type, onDownload }) => {
+const File: React.FC<Props> = ({
+  timestamp,
+  file,
+  type,
+  onDownload,
+  chatType,
+}) => {
   const decoder = new TextDecoder("utf-8");
   const dispatch = useAppDispatch();
 
@@ -35,11 +43,19 @@ const File: React.FC<Props> = ({ timestamp, file, type, onDownload }) => {
             onDownload={onDownload}
             file={file}
             onPlayPauseErrorHandler={(setErrorState: any) => {
-              dispatch(fetchFilesBytes([file.fileHash])).then((res: any) => {
-                if (res) {
-                  setErrorState(false);
-                }
-              });
+              if (chatType === "p2p") {
+                dispatch(getFileBytes([file.fileHash])).then((res: any) => {
+                  if (res) {
+                    setErrorState(false);
+                  }
+                });
+              } else {
+                dispatch(fetchFilesBytes([file.fileHash])).then((res: any) => {
+                  if (res) {
+                    setErrorState(false);
+                  }
+                });
+              }
             }}
           />
         );
