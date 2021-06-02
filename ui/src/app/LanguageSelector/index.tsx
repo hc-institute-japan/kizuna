@@ -23,6 +23,7 @@ const LanguageSelector: React.FC = () => {
         <div className={styles["language-container"]}>
           {languages.map(({ language }, i) => (
             <IonText
+              key={language}
               className={`${styles.language}${
                 selected === i ? ` ${styles.selected}` : ""
               }`}

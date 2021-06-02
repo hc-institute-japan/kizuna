@@ -13,7 +13,6 @@ const Auth: React.FC = () => {
     dispatch(fetchMyUsername());
   }, [dispatch]);
 
-  // return <Playground />;
   /* TODO: Maybe better to load here while username is getting fetched */
   return username !== null ? <Authenticated /> : <Unauthenticated />;
 };

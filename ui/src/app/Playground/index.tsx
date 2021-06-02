@@ -1,12 +1,13 @@
 import { IonContent, IonHeader, IonPage, IonToolbar } from "@ionic/react";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { ChatList, Me, Others } from "../../components/Chat";
 import { ChatListMethods } from "../../components/Chat/types";
 import Typing from "../../components/Chat/Typing";
 import MessageInput from "../../components/MessageInput";
 import { FilePayload, Payload } from "../../redux/commons/types";
-import { RootState } from "../../redux/types";
+import { RootState, ThunkAction } from "../../redux/types";
+import { useAppDispatch } from "../../utils/helpers";
 
 interface DataType {
   author: string;
@@ -256,6 +257,18 @@ const Playground = () => {
   ]);
 
   const chatList = useRef<ChatListMethods>(null);
+
+  const dispatch = useAppDispatch();
+
+  // const testError =
+  //   (): ThunkAction =>
+  //   (dispatch, getState, { callError }) => {
+  //     callError("TOAST", { message: "hello" });
+  //   };
+
+  // useEffect(() => {
+  //   dispatch(testError());
+  // }, [dispatch]);
 
   return (
     <IonPage>

@@ -13,8 +13,6 @@ import { addGroupMembers } from "../../../../../redux/group/actions/addGroupMemb
 // redux
 import { Profile, ProfileListType } from "../../../../../redux/profile/types";
 import { indexContacts, useAppDispatch } from "../../../../../utils/helpers";
-// components
-import EmptyContacts from "../EmptyContacts";
 import AddMemberHeader from "./AddMemberHeader";
 import AddMemberIndex from "./AddMemberIndex";
 import AddMemberToast from "./AddMemberToast";

@@ -103,8 +103,6 @@ export const getLatestData =
       members,
     });
 
-    console.log(latestData);
-
     dispatch(getLatestMessages(21));
 
     return null;

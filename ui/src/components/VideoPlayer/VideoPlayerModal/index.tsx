@@ -10,6 +10,7 @@ import {
   IonModal,
   IonPage,
   IonPopover,
+  IonSpinner,
   IonToolbar,
 } from "@ionic/react";
 import {
@@ -155,9 +156,13 @@ const VideoPlayerModal: React.FC<Props> = ({
               style={{ opacity: isControlVisible ? 1 : 0 }}
               className={styles["modal-control"]}
             >
-              <div className={styles["play-pause"]} onClick={onPlayPause}>
-                <IonIcon icon={isPlaying ? pause : play} />
-              </div>
+              {isLoading ? (
+                <IonSpinner></IonSpinner>
+              ) : (
+                <div className={styles["play-pause"]} onClick={onPlayPause}>
+                  <IonIcon icon={isPlaying ? pause : play} />
+                </div>
+              )}
             </div>
           ) : null}
         </div>
