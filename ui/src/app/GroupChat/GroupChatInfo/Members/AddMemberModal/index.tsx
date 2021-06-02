@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import {
   IonButton,
   IonButtons,
@@ -8,19 +7,17 @@ import {
   IonModal,
   IonToolbar,
 } from "@ionic/react";
+import React, { useState } from "react";
 import { useIntl } from "react-intl";
-
+import { addGroupMembers } from "../../../../../redux/group/actions/addGroupMembers";
 // redux
 import { Profile, ProfileListType } from "../../../../../redux/profile/types";
-import { addGroupMembers } from "../../../../../redux/group/actions/addGroupMembers";
-
+import { indexContacts, useAppDispatch } from "../../../../../utils/helpers";
 // components
 import EmptyContacts from "../EmptyContacts";
-import AddMemberToast from "./AddMemberToast";
-import AddMemberIndex from "./AddMemberIndex";
 import AddMemberHeader from "./AddMemberHeader";
-
-import { indexContacts, useAppDispatch } from "../../../../../utils/helpers";
+import AddMemberIndex from "./AddMemberIndex";
+import AddMemberToast from "./AddMemberToast";
 import styles from "./style.module.css";
 
 interface Props {
@@ -54,17 +51,30 @@ const AddMemberModal: React.FC<Props> = ({
   const [toast, setToast] = useState<string | null>(null);
   const [selected, setSelected] = useState<Profile[]>([]);
 
+  /* Helpers */
+  const filterAddedMember = (contacts: ProfileListType) =>
+    Object.keys(contacts).filter(
+      (key: string) =>
+        members.map((member: Profile) => member.id).indexOf(key) === -1
+    );
+
   const indexedContacts = indexContacts(
-    Object.values(contacts).filter((contact) =>
-      contact.username.toLowerCase().includes(filter.toLowerCase())
-    )
+    filterAddedMember(contacts)
+      .map((key: string) => contacts[key])
+      .filter((contact) =>
+        contact.username.toLowerCase().includes(filter.toLowerCase())
+      )
   );
 
-  const onCompletion = (contact: Profile) => {
+  /* Handlers */
+
+  const handleOnCompletion = (contact: Profile) => {
+    /* you cannot add yourself */
     if (contact.id === myAgentId) {
       setToast(contact.username);
       return false;
     }
+    /* return toast if member is already added */
     if (
       members
         .map((profile: Profile) => {
@@ -79,7 +89,7 @@ const AddMemberModal: React.FC<Props> = ({
     return true;
   };
 
-  const onAdded = () => {
+  const handleOnAdd = () => {
     setLoading(true);
     let payload = {
       // base64 string
@@ -90,10 +100,24 @@ const AddMemberModal: React.FC<Props> = ({
     dispatch(addGroupMembers(payload)).then((res: any) => {
       let newMembers: Profile[] = members.concat(selected);
       setMembers(newMembers);
-
+      setSelected([]);
       setLoading(false);
     });
   };
+
+  /* Renders */
+  const renderContacts = () =>
+    Object.keys(indexedContacts).map((char) => {
+      const searchedContacts = indexedContacts[char];
+      return (
+        <AddMemberIndex
+          onCompletion={handleOnCompletion}
+          key={char}
+          index={char}
+          contacts={searchedContacts}
+        />
+      );
+    });
 
   return (
     <IonModal isOpen={isOpen}>
@@ -101,53 +125,21 @@ const AddMemberModal: React.FC<Props> = ({
         onChange={(e) => setFilter(e.detail.value!)}
         onCancel={onCancel}
       />
-      {!contacts.length ? (
-        <IonContent>
-          {filter.length === 0 ? (
-            <IonList className={styles["contacts-list"]}>
-              {Object.keys(indexedContacts).map((char) => {
-                const contacts = indexedContacts[char];
-                return (
-                  <AddMemberIndex
-                    onCompletion={onCompletion}
-                    key={char}
-                    index={char}
-                    contacts={contacts}
-                  />
-                );
-              })}
-            </IonList>
-          ) : (
-            <IonList className={styles["contacts-list"]}>
-              {Object.keys(indexedContacts).map((char) => {
-                const searchedContacts = indexedContacts[char];
-                return (
-                  <AddMemberIndex
-                    onCompletion={onCompletion}
-                    key={char}
-                    index={char}
-                    contacts={searchedContacts}
-                  />
-                );
-              })}
-            </IonList>
-          )}
-          <IonToolbar>
-            <IonButtons slot="end">
-              <IonButton
-                disabled={selected.length === 0}
-                onClick={() => onAdded()}
-              >
-                <IonLabel className={styles["add-label"]}>
-                  {intl.formatMessage({ id: "app.group-chat.add-member" })}
-                </IonLabel>
-              </IonButton>
-            </IonButtons>
-          </IonToolbar>
-        </IonContent>
-      ) : (
-        <EmptyContacts />
-      )}
+      <IonContent>
+        <IonList className={styles["contacts-list"]}>
+          {renderContacts()}
+        </IonList>
+        <IonToolbar>
+          <IonButtons slot="end">
+            <IonButton disabled={selected.length === 0} onClick={handleOnAdd}>
+              <IonLabel className={styles["add-label"]}>
+                {intl.formatMessage({ id: "app.group-chat.add-member" })}
+              </IonLabel>
+            </IonButton>
+          </IonButtons>
+        </IonToolbar>
+      </IonContent>
+      )
       <AddMemberToast toast={toast} onDismiss={() => setToast(null)} />
     </IonModal>
   );

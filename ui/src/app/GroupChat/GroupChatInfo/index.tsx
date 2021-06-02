@@ -44,7 +44,7 @@ const GroupChatInfo: React.FC = () => {
 
   const slideOpts = {
     initialSlide: 0,
-    speed: 100,
+    speed: 400,
   };
 
   const groupData = useSelector(
