@@ -11,7 +11,7 @@ import { RouteComponentProps } from "react-router";
 import { RootState } from "../../../redux/types";
 import { Profile } from "../../../redux/profile/types";
 import { FilePayload } from "../../../redux/commons/types";
-import { P2PMessage } from "../../../redux/p2pmessages/types";
+import { P2PHashMap, P2PMessage } from "../../../redux/p2pmessages/types";
 import {
   getNextBatchMessages,
   getFileBytes,
@@ -39,8 +39,9 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
   const fetchedFiles = useSelector(
     (state: RootState) => state.p2pmessages.files
   );
-  const [media] = useState<{ [key: string]: boolean }>({});
-  const [files] = useState<{ [key: string]: P2PMessage }>({});
+
+  const [disableGetNextBatch, setDisableGetNextBatch] =
+    useState<boolean>(false);
   const [orderedMedia] = useState<P2PMessage[]>([]);
   const [orderedFiles] = useState<P2PMessage[]>([]);
   const [currentSegment, setCurrentSegment] = useState<string>("Info");
@@ -59,7 +60,16 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
       getNextBatchMessages(
         state.conversant.id,
         40,
-        "File",
+        "Other",
+        undefined,
+        undefined
+      )
+    );
+    dispatch(
+      getNextBatchMessages(
+        state.conversant.id,
+        40,
+        "Media",
         undefined,
         undefined
       )
@@ -81,26 +91,15 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
         if (message.payload.type === "FILE") {
           let type = message.payload.fileType;
 
-          // checks for and does not allow duplicates
-          // not clear when this happens
           switch (type) {
             case "IMAGE":
-              if (!media[message.p2pMessageEntryHash]) {
-                media[message.p2pMessageEntryHash] = true;
-                orderedMedia.push(message);
-              }
+              orderedMedia.push(message);
               break;
             case "VIDEO":
-              if (!media[message.p2pMessageEntryHash]) {
-                media[message.p2pMessageEntryHash] = true;
-                orderedMedia.push(message);
-              }
+              orderedMedia.push(message);
               break;
             case "OTHER":
-              if (!files[message.p2pMessageEntryHash]) {
-                files[message.p2pMessageEntryHash] = message;
-                orderedFiles.push(message);
-              }
+              orderedFiles.push(message);
               break;
             default:
               break;
@@ -116,22 +115,9 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
     changes which slide is displayed
     when clicking on a segment
   */
-  const handleOnSegmentChange = (value: any) => {
-    let index;
-    switch (value) {
-      case "Info":
-        index = 0;
-        break;
-      case "Media":
-        index = 1;
-        break;
-      case "Files":
-        index = 2;
-        break;
-      default:
-        index = 0;
-    }
-    slideRef.current?.slideTo(index);
+  const handleSegmentChange = (value: any) => {
+    let array = ["Info", "Media", "Files"];
+    slideRef.current?.slideTo(array.indexOf(value));
   };
 
   /*
@@ -150,8 +136,7 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
     if not, dispatches an action to get the file from hc
     when clicking the file download button
   */
-  const onDownloadHandler = (file: FilePayload) => {
-    console.log("Chat onDownloadHandler", file);
+  const handleDownload = (file: FilePayload) => {
     fetchedFiles[file.fileHash] !== undefined
       ? downloadFile(fetchedFiles[file.fileHash], file.fileName)
       : dispatch(getFileBytes([file.fileHash])).then(
@@ -167,22 +152,31 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
     link.click();
   };
 
-  const onScrollBottom = (
+  const handleScrollToBottom = (
     complete: () => Promise<void>,
     earliestMediaOrFile: any
   ) => {
-    let earliest: P2PMessage = earliestMediaOrFile;
-
-    dispatch(
-      getNextBatchMessages(
-        state.conversant.id,
-        5,
-        "File",
-        earliest !== undefined ? earliest.timestamp : undefined,
-        earliest !== undefined ? earliest.p2pMessageEntryHash : undefined
-      )
-    ).then((res: any) => complete());
-
+    if (!disableGetNextBatch) {
+      let earliest: P2PMessage = earliestMediaOrFile;
+      dispatch(
+        getNextBatchMessages(
+          state.conversant.id,
+          10,
+          (earliest.payload as FilePayload).fileType === "IMAGE" ||
+            (earliest.payload as FilePayload).fileType === "VIDEO"
+            ? "Media"
+            : "Other",
+          earliest !== undefined ? earliest.timestamp : undefined,
+          earliest !== undefined ? earliest.p2pMessageEntryHash : undefined
+        )
+      ).then((res: P2PHashMap) => {
+        if (Object.values(res)[0][state.conversant.id].length <= 0) {
+          setDisableGetNextBatch(true);
+        }
+        complete();
+      });
+    }
+    complete();
     return;
   };
 
@@ -198,7 +192,7 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
         <ContactHeader username={state.conversant.username} />
         <SegmentTabs
           value={currentSegment}
-          onSegmentChange={handleOnSegmentChange}
+          onSegmentChange={handleSegmentChange}
         />
       </IonHeader>
 
@@ -217,18 +211,18 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
           {/* Media */}
           <MediaBox
             orderedMediaMessages={orderedMedia}
-            onDownload={(file: FilePayload) => onDownloadHandler(file)}
+            onDownload={(file: FilePayload) => handleDownload(file)}
             onScrollBottom={(complete, earliestMedia) =>
-              onScrollBottom(complete, earliestMedia)
+              handleScrollToBottom(complete, earliestMedia)
             }
           />
 
           {/* Files */}
           <FileBox
             orderedFileMessages={orderedFiles}
-            onDownload={(file) => onDownloadHandler(file)}
+            onDownload={(file) => handleDownload(file)}
             onScrollBottom={(complete, earliestFile) =>
-              onScrollBottom(complete, earliestFile)
+              handleScrollToBottom(complete, earliestFile)
             }
           />
         </IonSlides>

@@ -179,7 +179,6 @@ const Chat: React.FC<Props> = ({ location }) => {
   const handleOnScrollTop = (complete: any) => {
     if (didMountRef2.current === true) {
       if (disableGetNextBatch === false) {
-        console.log("calling get next");
         let lastMessage = messagesWithConversant[0].message;
         dispatch(
           getNextBatchMessages(
