@@ -28,6 +28,8 @@ export const addGroupMembers =
       groupRevisionId: deserializeHash(updateGroupMembersData.groupRevisionId),
     };
 
+    console.log("this is the input to the add member", updateGroupMembersData);
+
     // TODO: error handling
     // TODO: input sanitation
     // Might be better to check whether there are any members duplicate in ui or hc.
