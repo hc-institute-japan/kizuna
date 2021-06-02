@@ -183,7 +183,7 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
   // slider options
   const slideOpts = {
     initialSlide: 0,
-    speed: 100,
+    speed: 400,
   };
 
   return (
