@@ -3,14 +3,15 @@ import {
   AppSignalCb,
   AppWebsocket,
 } from "@holochain/conductor-api";
+import { store } from "../containers/ReduxContainer";
 import { handleSignal } from "../redux/signal/actions";
-import store from "../redux/store";
+
 import { CallZomeConfig } from "../redux/types";
 
 let client: null | AppWebsocket = null;
 
 let signalHandler: AppSignalCb = (signal) =>
-  store.dispatch(
+  store?.dispatch(
     handleSignal(signal.data.payload.name, signal.data.payload.payload)
   );
 
