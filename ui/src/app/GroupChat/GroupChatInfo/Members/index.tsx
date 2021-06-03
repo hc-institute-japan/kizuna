@@ -13,6 +13,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
+import { useError } from "../../../../containers/ErrorContainer/context";
 import { removeGroupMembers } from "../../../../redux/group/actions/removeGroupMembers";
 import { GroupConversation } from "../../../../redux/group/types";
 // Redux
@@ -20,8 +21,6 @@ import { Profile } from "../../../../redux/profile/types";
 import { RootState } from "../../../../redux/types";
 import { useAppDispatch } from "../../../../utils/helpers";
 import AddMemberModal from "./AddMemberModal";
-// Components
-import RemoveMemberToast from "./RemoveMemberToast";
 import styles from "./style.module.css";
 
 interface Props {
@@ -33,12 +32,12 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
 
+  const { displayError } = useError();
+
   /* Local state */
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [toast, setToast] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const [members, setMembers] = useState<Profile[]>([]);
-  const [errMsg, setErrMsg] = useState<string>("");
 
   /* Selectors */
   const contacts = useSelector((state: RootState) => state.contacts.contacts);
@@ -54,12 +53,11 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
     /* err if member is being removed when total member <= 2 */
     if (groupData.members.length <= 2) {
       setLoading(false);
-      setErrMsg(
-        intl.formatMessage({
+      displayError("TOAST", {
+        message: intl.formatMessage({
           id: "app.group-chat.minimum-member-required-reached",
-        })
-      );
-      setToast(true);
+        }),
+      });
       return null;
     }
 
@@ -189,11 +187,6 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
 
             {renderGroupMembers(members)}
           </IonItemGroup>
-          <RemoveMemberToast
-            toast={toast}
-            onDismiss={() => setToast(false)}
-            message={errMsg}
-          />
         </>
       ) : (
         <IonLoading isOpen={loading} />
