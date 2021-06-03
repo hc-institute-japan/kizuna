@@ -9,13 +9,13 @@ import {
 } from "@ionic/react";
 import React, { useState } from "react";
 import { useIntl } from "react-intl";
+import { useError } from "../../../../../containers/ErrorContainer/context";
 import { addGroupMembers } from "../../../../../redux/group/actions/addGroupMembers";
 // redux
 import { Profile, ProfileListType } from "../../../../../redux/profile/types";
 import { indexContacts, useAppDispatch } from "../../../../../utils/helpers";
 import AddMemberHeader from "./AddMemberHeader";
 import AddMemberIndex from "./AddMemberIndex";
-import AddMemberToast from "./AddMemberToast";
 import styles from "./style.module.css";
 
 interface Props {
@@ -45,8 +45,8 @@ const AddMemberModal: React.FC<Props> = ({
 }) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
+  const { displayError } = useError();
   const [filter, setFilter] = useState<string>("");
-  const [toast, setToast] = useState<string | null>(null);
   const [selected, setSelected] = useState<Profile[]>([]);
 
   /* Helpers */
@@ -67,12 +67,7 @@ const AddMemberModal: React.FC<Props> = ({
   /* Handlers */
 
   const handleOnCompletion = (contact: Profile) => {
-    /* you cannot add yourself */
-    if (contact.id === myAgentId) {
-      setToast(contact.username);
-      return false;
-    }
-    /* return toast if member is already added */
+    /* return error toast if member is already added */
     if (
       members
         .map((profile: Profile) => {
@@ -80,7 +75,12 @@ const AddMemberModal: React.FC<Props> = ({
         })
         .includes(contact.id)
     ) {
-      setToast(contact.username);
+      displayError("TOAST", {
+        message: intl.formatMessage(
+          { id: "app.group-chat.already-member" },
+          { name: contact.username }
+        ),
+      });
       return false;
     }
     setSelected([...selected, contact]);
@@ -138,7 +138,6 @@ const AddMemberModal: React.FC<Props> = ({
         </IonToolbar>
       </IonContent>
       )
-      <AddMemberToast toast={toast} onDismiss={() => setToast(null)} />
     </IonModal>
   );
 };
