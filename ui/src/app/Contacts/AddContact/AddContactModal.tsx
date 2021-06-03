@@ -1,6 +1,8 @@
 import { IonContent, IonList, IonModal } from "@ionic/react";
 import React, { useEffect, useState } from "react";
+import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
+import { useToast } from "../../../containers/ToastContainer/context";
 import { fetchAllUsernames } from "../../../redux/contacts/actions";
 import { IndexedContacts, SET_CONTACTS } from "../../../redux/contacts/types";
 import { Profile, ProfileListType } from "../../../redux/profile/types";
@@ -21,6 +23,7 @@ const AddContactModal: React.FC<Props> = ({ isOpen, onCancel }) => {
   const [filter, setFilter] = useState<string>("");
   const [users, setUsers] = useState<Profile[]>([]);
   const [toast, setToast] = useState<string | null>(null);
+  const { showToast } = useToast();
   const { contacts, username } = useSelector((state: RootState) => ({
     contacts: state.contacts.contacts,
     username: state.profile.username,
@@ -44,8 +47,16 @@ const AddContactModal: React.FC<Props> = ({ isOpen, onCancel }) => {
     users.filter((user) => user.username.includes(filter))
   );
 
+  const intl = useIntl();
   const onCompletion = (contact: Profile) => {
-    setToast(contact.username);
+    showToast({
+      message: intl.formatMessage(
+        { id: "app.contacts.add-message" },
+        { name: contact.username }
+      ),
+      color: "light",
+      duration: 1000,
+    });
     dispatch({
       type: SET_CONTACTS,
       contacts: { ...contacts },
@@ -77,7 +88,6 @@ const AddContactModal: React.FC<Props> = ({ isOpen, onCancel }) => {
             })}
           </IonList>
         )}
-        <AddContactToast toast={toast} onDismiss={() => setToast(null)} />
       </IonContent>
     </IonModal>
   );
