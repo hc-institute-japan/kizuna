@@ -11,12 +11,12 @@ const ReduxContainer: React.FC = ({ children }) => {
   const { displayError } = useError();
 
   useEffect(function () {
-    store = createStore({ callError: displayError });
+    store = createStore({ displayError });
     setIsStoreReady(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return isStoreReady ? (
+  return isStoreReady && store ? (
     <Provider store={store as Store}>{children}</Provider>
   ) : null;
 };
