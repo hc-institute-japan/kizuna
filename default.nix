@@ -1,20 +1,21 @@
 let 
   holonixPath = builtins.fetchTarball {
-    url = "https://github.com/holochain/holonix/archive/cdf1d199d5489ebc943b88e552507f1063e3e571.tar.gz";
-    sha256 = "1b5pdlxj91syg1qqf42f49sxlq9qd3qnz7ccgdncjvhdfyricagh";
+    url = "https://github.com/holochain/holonix/archive/3e94163765975f35f7d8ec509b33c3da52661bd1.tar.gz";
+    sha256 = "07sl281r29ygh54dxys1qpjvlvmnh7iv1ppf79fbki96dj9ip7d2";
   };
   holonix = import (holonixPath) {
     includeHolochainBinaries = true;
     holochainVersionId = "custom";
     
     holochainVersion = { 
-     rev = "d92678918b1b85f7ef40b866bdec0ea52cba77c4";  
-     sha256 = "1shjdsr822qmwbifpm8vs5p7g2gs0s74ipbqq30g223dgqxlq6wa";  
-     cargoSha256 = "19faydkxid1d2s0k4jks6y6plgchdhidcckacrcs841my6dvy131";
+     rev = "a6ac0439670ba367c723a80d3b8bc7c419aa5f6e";
+     sha256 = "16a9mjq8g40mp5120714ff5wpks74n3n39liswikqqf1sxabza9c";
+     cargoSha256 = "0sbr6ag5dyv7gdchpp5zjwzbsr1ggvxnmik21wm71gjd8hhwcdy6";
      bins = {
        holochain = "holochain";
        hc = "hc";
      };
     };
+    holochainOtherDepsNames = ["lair-keystore"];
   };
 in holonix.main
