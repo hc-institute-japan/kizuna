@@ -11,7 +11,6 @@ import { indexContacts, useAppDispatch } from "../../../utils/helpers";
 import styles from "../style.module.css";
 import AddContactHeader from "./AddContactHeader";
 import AddContactIndex from "./AddContactIndex";
-import AddContactToast from "./AddContactToast";
 
 interface Props {
   isOpen: boolean;
@@ -22,7 +21,6 @@ interface Props {
 const AddContactModal: React.FC<Props> = ({ isOpen, onCancel }) => {
   const [filter, setFilter] = useState<string>("");
   const [users, setUsers] = useState<Profile[]>([]);
-  const [toast, setToast] = useState<string | null>(null);
   const { showToast } = useToast();
   const { contacts, username } = useSelector((state: RootState) => ({
     contacts: state.contacts.contacts,
