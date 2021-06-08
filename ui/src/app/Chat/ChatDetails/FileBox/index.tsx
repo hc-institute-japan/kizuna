@@ -53,7 +53,7 @@ const FileBox: React.FC<Props> = ({
 
   /* REFS */
   const infiniteFileScroll = useRef<HTMLIonInfiniteScrollElement>(null);
-  const complete = () => infiniteFileScroll.current!.complete();
+  const complete: () => any = () => infiniteFileScroll.current?.complete();
 
   // determines the size of the grid columns
   // whole page width for others (looks like list)
