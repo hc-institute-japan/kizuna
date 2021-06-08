@@ -21,7 +21,6 @@ interface Props {
 const AddContactModal: React.FC<Props> = ({ isOpen, onCancel }) => {
   const [filter, setFilter] = useState<string>("");
   const [users, setUsers] = useState<Profile[]>([]);
-
   const { showToast } = useToast();
   const { contacts, username } = useSelector((state: RootState) => ({
     contacts: state.contacts.contacts,
