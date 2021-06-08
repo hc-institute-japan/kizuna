@@ -260,15 +260,15 @@ const Playground = () => {
 
   const dispatch = useAppDispatch();
 
-  // const testError =
-  //   (): ThunkAction =>
-  //   (dispatch, getState, { callError }) => {
-  //     callError("TOAST", { message: "hello" });
-  //   };
+  const testError =
+    (): ThunkAction =>
+    (dispatch, getState, { displayError }) => {
+      displayError("TOAST", { message: "hello" });
+    };
 
-  // useEffect(() => {
-  //   dispatch(testError());
-  // }, [dispatch]);
+  useEffect(() => {
+    dispatch(testError());
+  }, []);
 
   return (
     <IonPage>

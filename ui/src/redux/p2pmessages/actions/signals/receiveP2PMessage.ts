@@ -7,7 +7,7 @@ const receiveP2PMessage =
   (payload: any): ThunkAction =>
   async (dispatch, getState, { callZome }) => {
     let receivedMessage = payload.message;
-    console.log("signals", receivedMessage);
+    // console.log("signals", receivedMessage);
 
     const [messageTuple, receiptTuple] = receivedMessage;
     const [messageID, message] = messageTuple;

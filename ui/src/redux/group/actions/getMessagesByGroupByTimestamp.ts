@@ -26,7 +26,7 @@ export const getMessagesByGroupByTimestamp =
       payload: input,
     });
 
-    let groupMessagesOutput: GroupMessagesOutput =
+    const groupMessagesOutput: GroupMessagesOutput =
       convertFetchedResToGroupMessagesOutput(groupMessagesRes);
 
     dispatch<SetMessagesByGroupByTimestampAction>({

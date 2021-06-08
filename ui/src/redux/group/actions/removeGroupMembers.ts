@@ -33,7 +33,7 @@ export const removeGroupMembers =
       payload: input,
     });
 
-    let updateGroupMembersDataFromRes: UpdateGroupMembersData = {
+    const updateGroupMembersDataFromRes: UpdateGroupMembersData = {
       members: removeMembersOutput.members.map((member: AgentPubKey) =>
         serializeHash(member)
       ),

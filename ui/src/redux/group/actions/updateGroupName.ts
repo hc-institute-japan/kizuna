@@ -28,7 +28,7 @@ export const updateGroupName =
     });
 
     /* serializeHash returned value from zome fn */
-    let updateGroupNameDataFromRes: UpdateGroupNameData = {
+    const updateGroupNameDataFromRes: UpdateGroupNameData = {
       name: updateGroupNameOutput.name,
       groupId: serializeHash(updateGroupNameOutput.groupId),
       groupRevisionId: serializeHash(updateGroupNameOutput.groupRevisionId),

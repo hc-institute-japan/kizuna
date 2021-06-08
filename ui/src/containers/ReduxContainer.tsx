@@ -16,7 +16,7 @@ const ReduxContainer: React.FC = ({ children }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return isStoreReady && store ? (
+  return isStoreReady ? (
     <Provider store={store as Store}>{children}</Provider>
   ) : null;
 };

@@ -8,6 +8,7 @@ export const indicateGroupTyping =
   (groupTypingDetailData: GroupTypingDetailData): ThunkAction =>
   async (dispatch, getState, { callZome, getAgentId }) => {
     /* deserialize fields for zome fn */
+
     const input = {
       groupId: deserializeHash(groupTypingDetailData.groupId),
       indicatedBy: deserializeAgentPubKey(groupTypingDetailData.indicatedBy),
@@ -17,27 +18,27 @@ export const indicateGroupTyping =
       isTyping: groupTypingDetailData.isTyping,
     };
 
-    await callZome({
+    callZome({
       zomeName: ZOMES.GROUP,
       fnName: FUNCTIONS[ZOMES.GROUP].INDICATE_GROUP_TYPING,
       payload: input,
     });
 
-    setTimeout(
-      () =>
-        callZome({
-          zomeName: ZOMES.GROUP,
-          fnName: FUNCTIONS[ZOMES.GROUP].INDICATE_GROUP_TYPING,
-          payload: {
-            groupId: deserializeHash(groupTypingDetailData.groupId),
-            indicatedBy: deserializeHash(groupTypingDetailData.indicatedBy),
-            members: groupTypingDetailData.members.map((member) =>
-              deserializeAgentPubKey(member)
-            ),
-            isTyping: false,
-          },
-        }),
-      5000
-    );
+    // setTimeout(
+    //   () =>
+    //     callZome({
+    //       zomeName: ZOMES.GROUP,
+    //       fnName: FUNCTIONS[ZOMES.GROUP].INDICATE_GROUP_TYPING,
+    //       payload: {
+    //         groupId: deserializeHash(groupTypingDetailData.groupId),
+    //         indicatedBy: deserializeHash(groupTypingDetailData.indicatedBy),
+    //         members: groupTypingDetailData.members.map((member) =>
+    //           deserializeAgentPubKey(member)
+    //         ),
+    //         isTyping: false,
+    //       },
+    //     }),
+    //   5000
+    // );
     return null;
   };

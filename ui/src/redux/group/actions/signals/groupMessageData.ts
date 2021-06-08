@@ -32,7 +32,7 @@ const groupMessageData =
   (signalPayload: any): ThunkAction =>
   async (dispatch) => {
     const { payload } = signalPayload;
-    let groupMessage: GroupMessage = {
+    const groupMessage: GroupMessage = {
       groupMessageId: serializeHash(payload.id),
       groupId: serializeHash(payload.content.groupHash),
       author: serializeHash(payload.content.sender),

@@ -145,7 +145,7 @@ dependencies = [
 [[package]]
 name = "file_types"
 version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/Kizuna?branch=develop#d84ca27670d5382b97086205f47b32c20aa5fca0"
+source = "git+https://github.com/hc-institute-japan/Kizuna?branch=develop#aae6db14b9b620affbd3a9341c7081c8536798b4"
 dependencies = [
  "derive_more",
  "hdk",

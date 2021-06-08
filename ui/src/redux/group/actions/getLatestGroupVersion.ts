@@ -40,10 +40,10 @@ export const getLatestGroupVersion =
       payload: input,
     });
 
-    let groupMessagesOutput: GroupMessagesOutput =
+    const groupMessagesOutput: GroupMessagesOutput =
       convertFetchedResToGroupMessagesOutput(groupMessagesRes);
 
-    let groupData: GroupConversation = {
+    const groupData: GroupConversation = {
       originalGroupId: serializeHash(latestGroupVersionRes.groupId),
       originalGroupRevisionId: serializeHash(
         latestGroupVersionRes.groupRevisionId
@@ -60,7 +60,7 @@ export const getLatestGroupVersion =
         ],
     };
 
-    let membersUsernames = await fetchUsernameOfMembers(
+    const membersUsernames = await fetchUsernameOfMembers(
       getState(),
       groupData.members,
       callZome,

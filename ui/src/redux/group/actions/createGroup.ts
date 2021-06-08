@@ -36,7 +36,7 @@ export const createGroup =
       payload: input,
     });
 
-    let groupData: GroupConversation = {
+    const groupData: GroupConversation = {
       originalGroupId: serializeHash(createGroupRes.groupId),
       originalGroupRevisionId: serializeHash(createGroupRes.groupRevisionId),
       name: createGroupRes.content.name,
@@ -48,9 +48,9 @@ export const createGroup =
       messages: [],
     };
 
-    let groupMembers = [...groupData.members, groupData.creator];
+    const groupMembers = [...groupData.members, groupData.creator];
 
-    let membersProfile: {
+    const membersProfile: {
       [key: string]: Profile;
     } = await fetchUsernameOfMembers(
       state,

@@ -250,9 +250,10 @@ export interface SetLatestGroupVersionAction {
   };
 }
 
-export interface SetGroupTyingIndicator {
+export interface SetGroupTypingIndicator {
   type: typeof SET_GROUP_TYPING_INDICATOR;
-  GroupTyingIndicator: GroupTypingDetail;
+  groupTypingIndicator: GroupTypingDetail;
+  typing: { [key: string]: Profile[] };
 }
 
 export interface SetGroupReadMessage {
@@ -279,5 +280,5 @@ export type GroupConversationsActionTypes =
   | SetLatestGroupVersionAction
   | SetFilesBytes
   | SetLatestGroupVersionAction
-  | SetGroupTyingIndicator
+  | SetGroupTypingIndicator
   | SetGroupReadMessage;

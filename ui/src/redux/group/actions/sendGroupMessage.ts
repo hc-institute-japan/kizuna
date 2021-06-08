@@ -75,7 +75,7 @@ export const sendGroupMessage =
           dispatch(setFilesBytes({ ...fetchedFileBytes }));
         }
       }
-      let filePayload: FilePayload = {
+      const filePayload: FilePayload = {
         type: "FILE",
         fileName:
           sendGroupMessageOutput.content.payload.payload.metadata.fileName,
@@ -92,7 +92,7 @@ export const sendGroupMessage =
     }
 
     /* the final GroupMessage data type converted from the returned value of the Zome fn above */
-    let groupMessageDataConverted: GroupMessage = {
+    const groupMessageDataConverted: GroupMessage = {
       groupMessageId: serializeHash(sendGroupMessageOutput.id),
       groupId: serializeHash(sendGroupMessageOutput.content.groupHash),
       author: serializeHash(sendGroupMessageOutput.content.sender),

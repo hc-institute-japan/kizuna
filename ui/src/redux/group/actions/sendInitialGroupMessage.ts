@@ -17,7 +17,7 @@ export const sendInitialGroupMessage =
     files: FilePayloadInput[]
   ): ThunkAction =>
   async (dispatch, getState) => {
-    let name = members.map((member) => member.username);
+    const name = members.map((member) => member.username);
 
     /* Include yourself in the initial name of the Group */
     name.push(getState().profile.username!);
@@ -29,11 +29,11 @@ export const sendInitialGroupMessage =
       })
     );
 
-    let inputs: GroupMessageInput[] = [];
+    const inputs: GroupMessageInput[] = [];
 
     /* Work on each file that were uploaded and convert them to appropriate input to Zome fn */
     files.forEach((file: any) => {
-      let filePayloadInput: FilePayloadInput = {
+      const filePayloadInput: FilePayloadInput = {
         type: "FILE",
         payload: {
           metadata: {
@@ -45,7 +45,7 @@ export const sendInitialGroupMessage =
           fileBytes: file.payload.fileBytes,
         },
       };
-      let groupMessage: GroupMessageInput = {
+      const groupMessage: GroupMessageInput = {
         groupId: groupResult.originalGroupId,
         payloadInput: filePayloadInput,
         sender: groupResult.creator,
@@ -69,10 +69,10 @@ export const sendInitialGroupMessage =
       });
     }
 
-    let messageResults: any[] = [];
+    const messageResults: any[] = [];
     inputs.forEach(async (groupMessage: any) => {
       // TODO: error handling
-      let messageResult = await dispatch(sendGroupMessage(groupMessage));
+      const messageResult = await dispatch(sendGroupMessage(groupMessage));
       messageResults.push(messageResult);
     });
 

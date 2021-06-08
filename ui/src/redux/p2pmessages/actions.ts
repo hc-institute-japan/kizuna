@@ -145,7 +145,7 @@ export const setFiles =
     });
 
     if (fetchedFiles?.type !== "error") {
-      console.log("Actions SET_FILES dispatching to reducer", fetchedFiles);
+      // console.log("Actions SET_FILES dispatching to reducer", fetchedFiles);
       dispatch({
         type: SET_FILES,
         sate: fetchedFiles,
@@ -248,7 +248,7 @@ export const sendMessage =
     // send_message return value is not consistent with the structures of the get functions
     // TODO: standardize return values in HC
     if (sentMessage?.type !== "error") {
-      console.log("Action sent Message", sentMessage);
+      // console.log("Action sent Message", sentMessage);
       const [messageTuple, receiptTuple] = sentMessage;
       const [messageID, message] = messageTuple;
       const [receiptID, receipt] = receiptTuple!;
@@ -313,12 +313,12 @@ export const sendMessage =
         })
       );
 
-      console.log("actions successfully sent message");
+      // console.log("actions successfully sent message");
       return true;
     }
 
     // ERROR
-    console.log("actions failed to send message", sentMessage);
+    // console.log("actions failed to send message", sentMessage);
     return false;
   };
 
@@ -457,7 +457,7 @@ export const readMessage =
 export const getFileBytes =
   (inputHashes: HoloHashBase64[]): ThunkAction =>
   async (dispatch, _getState, { callZome }) => {
-    console.log("actions getting file bytes", inputHashes);
+    // console.log("actions getting file bytes", inputHashes);
     let hashes = inputHashes.map((hash) => deserializeHash(hash));
     const fetchedFiles = await callZome({
       zomeName: ZOMES.P2PMESSAGE,
@@ -470,7 +470,7 @@ export const getFileBytes =
       Object.keys(fetchedFiles).forEach((key) => {
         transformedFiles[key] = fetchedFiles[key];
       });
-      console.log("actions transformed", transformedFiles);
+      // console.log("actions transformed", transformedFiles);
       if (Object.entries(transformedFiles).length > 0) {
         dispatch({
           type: SET_FILES,
@@ -479,7 +479,7 @@ export const getFileBytes =
       }
       return transformedFiles;
     }
-    console.log("actiosn failed to get file bytes", fetchedFiles);
+    // console.log("actiosn failed to get file bytes", fetchedFiles);
     return false;
   };
 
@@ -518,7 +518,7 @@ export const isTyping =
 export const countUnread =
   (conversant: string): ThunkAction =>
   (dispatch, getState) => {
-    console.log("actions conversant", conversant);
+    // console.log("actions conversant", conversant);
     const { conversations, messages, receipts } = getState().p2pmessages;
     const conversation = conversations[conversant].messages;
     let unreadCounter = 0;
