@@ -60,7 +60,7 @@ const FileBox: React.FC<Props> = ({
 
   /* REFS */
   const infiniteFileScroll = useRef<HTMLIonInfiniteScrollElement>(null);
-  const complete = () => infiniteFileScroll.current!.complete();
+  const complete: () => any = () => infiniteFileScroll.current?.complete();
 
   // helper code for displaying date
   const decoder = new TextDecoder();

@@ -103,7 +103,7 @@ const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
     }
   }, [scroll]);
 
-  const complete = () => infiniteScroll.current!.complete();
+  const complete: () => any = () => infiniteScroll.current?.complete();
 
   useImperativeHandle(ref, () => ({
     scrollToBottom: () => {
