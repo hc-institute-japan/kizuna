@@ -215,13 +215,19 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
         <IonTextarea
           value={message}
           onKeyUp={(event) => {
-            if (
-              onSend &&
-              event.key === "Enter" &&
-              message.trim().length !== 0
-            ) {
-              onSend();
-              reset();
+            if (onSend && event.key === "Enter") {
+              if (message.trim().length !== 0 || files.length > 0) {
+                onSend();
+                reset();
+              }
+            }
+          }}
+          onKeyDown={(event) => {
+            if (event.key == "Enter" && !event.shiftKey) {
+              // prevent default behavior
+              event.preventDefault();
+              //alert("ok");
+              return false;
             }
           }}
           className={styles["textarea"]}
