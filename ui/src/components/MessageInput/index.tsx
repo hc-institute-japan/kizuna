@@ -215,7 +215,7 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
         <IonTextarea
           value={message}
           onKeyUp={(event) => {
-            if (onSend && event.key === "Enter") {
+            if (onSend && event.key === "Enter" && !event.shiftKey) {
               if (message.trim().length !== 0 || files.length > 0) {
                 onSend();
                 reset();
