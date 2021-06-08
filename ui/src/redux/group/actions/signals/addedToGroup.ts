@@ -13,11 +13,11 @@ const addedToGroup =
   (signalPayload: any): ThunkAction =>
   async (dispatch, getState, { callZome, getAgentId }) => {
     const { payload } = signalPayload;
-    const state = getState();
-    let contacts = state.contacts.contacts;
-    let username = state.profile.username!; // At this point, username is non-nullable
-    let myAgentId = await getAgentId();
-    let myAgentIdBase64 = serializeHash(myAgentId!); // AgentPubKey should be non-nullable here
+
+    const contacts = getState().contacts.contacts;
+    const username = getState().profile.username!; // At this point, username is non-nullable
+    const id = await getAgentId();
+    const myAgentId = serializeHash(id!); // AgentPubKey should be non-nullable here
 
     const groupData: GroupConversation = {
       originalGroupId: serializeHash(payload.groupId),
@@ -35,43 +35,46 @@ const addedToGroup =
       messages: [],
     };
 
-    let groupMembers = [...groupData.members, groupData.creator];
-
-    let nonAddedProfiles: AgentPubKey[] = [];
-    let membersProfile: { [key: string]: Profile } = {};
     /* 
-      Attempt to get the profile of group members from own contacts list.
-      If not found from contacts nor own AgentPubKey, then push it to
-      undefinedProfiles
+    Attempt to get the profile of group members from own contacts list.
+    If not found from contacts nor own AgentPubKey, then push it to
+    undefinedProfiles
     */
-    groupMembers.forEach((member: any) => {
-      let memberProfile: Profile | null = contacts[member]
-        ? contacts[member]
-        : member === myAgentIdBase64
-        ? {
-            id: myAgentIdBase64,
-            username,
-          }
-        : null;
-      if (memberProfile) {
-        membersProfile[member] = memberProfile;
-      } else {
-        nonAddedProfiles.push(deserializeAgentPubKey(member));
-      }
-    });
+    const groupMembers = [...groupData.members, groupData.creator];
+    const membersProfile: { [key: string]: Profile } = {};
+    const nonAddedProfiles: AgentPubKey[] = groupMembers.reduce(
+      (res, member: any) => {
+        const memberProfile: Profile | null = contacts[member]
+          ? contacts[member]
+          : member === myAgentId
+          ? {
+              id: myAgentId,
+              username,
+            }
+          : null;
+        if (memberProfile) {
+          membersProfile[member] = memberProfile;
+        } else {
+          const pubkey = deserializeAgentPubKey(member);
+          res.push(pubkey);
+        }
+        return res;
+      },
+      [] as AgentPubKey[]
+    );
 
     // get the profiles not in contacts from HC
     if (nonAddedProfiles?.length) {
-      let profiles = await callZome({
+      const profiles = await callZome({
         zomeName: ZOMES.USERNAME,
         fnName: FUNCTIONS[ZOMES.USERNAME].GET_USERNAMES,
         payload: nonAddedProfiles,
       });
-      profiles.forEach((profile: any) => {
-        let base64 = serializeHash(profile.agentId);
+      profiles.forEach(({ agentId, username }: any) => {
+        let base64 = serializeHash(agentId);
         membersProfile[base64] = {
           id: base64,
-          username: profile.username,
+          username,
         };
       });
     }

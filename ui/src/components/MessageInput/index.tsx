@@ -223,7 +223,7 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
             }
           }}
           onKeyDown={(event) => {
-            if (event.key == "Enter" && !event.shiftKey) {
+            if (event.key === "Enter" && !event.shiftKey) {
               // prevent default behavior
               event.preventDefault();
               //alert("ok");

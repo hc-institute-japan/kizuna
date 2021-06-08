@@ -33,7 +33,7 @@ import {
   GroupMessageInput,
 } from "../../redux/group/types";
 import { RootState } from "../../redux/types";
-import { debounce, useAppDispatch } from "../../utils/helpers";
+import { useAppDispatch } from "../../utils/helpers";
 import ChatBox from "./ChatBox";
 import styles from "./style.module.css";
 
@@ -123,6 +123,8 @@ const GroupChat: React.FC = () => {
 
   const handleOnBack = () => history.push({ pathname: `/home` });
 
+  const inputTimeout = useRef<NodeJS.Timeout>();
+
   const handleOnChange = (message: string, groupInfo: GroupConversation) => {
     // Remove self from the recipient of typing signal
     let members = [...groupInfo.members, groupInfo.creator].filter(
@@ -137,6 +139,22 @@ const GroupChat: React.FC = () => {
         isTyping: message.length !== 0 ? true : false,
       })
     );
+
+    if (inputTimeout.current) clearTimeout(inputTimeout.current);
+
+    inputTimeout.current = setTimeout(
+      () =>
+        dispatch(
+          indicateGroupTyping({
+            groupId: groupInfo.originalGroupId,
+            indicatedBy: myProfile.id!,
+            members,
+            isTyping: false,
+          })
+        ),
+      5000
+    );
+
     return setMessage(message);
   };
 
@@ -147,15 +165,13 @@ const GroupChat: React.FC = () => {
         (member) => member !== myProfile.id
       );
 
-      debounce(
-        dispatch(
-          indicateGroupTyping({
-            groupId: groupData.originalGroupId,
-            indicatedBy: myProfile.id!,
-            members,
-            isTyping: true,
-          })
-        )
+      dispatch(
+        indicateGroupTyping({
+          groupId: groupData.originalGroupId,
+          indicatedBy: myProfile.id!,
+          members,
+          isTyping: true,
+        })
       );
     } else {
       didMountRef.current = true;

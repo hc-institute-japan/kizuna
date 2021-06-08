@@ -1,24 +1,24 @@
-import {
-  ADD_GROUP,
-  UPDATE_GROUP_NAME,
-  REMOVE_MEMBERS,
-  ADD_MEMBERS,
-  SET_GROUP_MESSAGE,
-  SET_NEXT_BATCH_GROUP_MESSAGES,
-  SET_MESSAGES_BY_GROUP_BY_TIMESTAMP,
-  GroupConversationsActionTypes,
-  GroupConversation,
-  GroupConversationsState,
-  GroupMessage,
-  SET_LATEST_GROUP_STATE,
-  GroupMessagesOutput,
-  SET_LATEST_GROUP_VERSION,
-  SET_GROUP_TYPING_INDICATOR,
-  SET_GROUP_READ_MESSAGE,
-  SET_FILES_BYTES,
-} from "./types";
 import { isTextPayload } from "../commons/types";
 import { Profile } from "../profile/types";
+import {
+  ADD_GROUP,
+  ADD_MEMBERS,
+  GroupConversation,
+  GroupConversationsActionTypes,
+  GroupConversationsState,
+  GroupMessage,
+  GroupMessagesOutput,
+  REMOVE_MEMBERS,
+  SET_FILES_BYTES,
+  SET_GROUP_MESSAGE,
+  SET_GROUP_READ_MESSAGE,
+  SET_GROUP_TYPING_INDICATOR,
+  SET_LATEST_GROUP_STATE,
+  SET_LATEST_GROUP_VERSION,
+  SET_MESSAGES_BY_GROUP_BY_TIMESTAMP,
+  SET_NEXT_BATCH_GROUP_MESSAGES,
+  UPDATE_GROUP_NAME,
+} from "./types";
 
 const initialState: GroupConversationsState = {
   conversations: {},
@@ -239,21 +239,26 @@ const reducer = (
       return { ...state, conversations: groupConversations, members, messages };
     }
     case SET_GROUP_TYPING_INDICATOR: {
-      let typing = state.typing;
-      let groupTyping = typing[action.GroupTyingIndicator.groupId]
-        ? typing[action.GroupTyingIndicator.groupId]
+      let typing = action.typing;
+      let groupTyping = typing[action.groupTypingIndicator.groupId]
+        ? typing[action.groupTypingIndicator.groupId]
         : [];
-      let userNames = groupTyping.map((profile: Profile) => profile.id);
-      if (action.GroupTyingIndicator.isTyping) {
-        if (!userNames.includes(action.GroupTyingIndicator.indicatedBy.id)) {
-          groupTyping.push(action.GroupTyingIndicator.indicatedBy);
+      const userNames = groupTyping.map((profile: Profile) => profile.id);
+      if (action.groupTypingIndicator.isTyping) {
+        if (!userNames.includes(action.groupTypingIndicator.indicatedBy.id)) {
+          groupTyping.push(action.groupTypingIndicator.indicatedBy);
         }
       } else {
         groupTyping = groupTyping.filter((profile) => {
-          return profile.id !== action.GroupTyingIndicator.indicatedBy.id;
+          return profile.id !== action.groupTypingIndicator.indicatedBy.id;
         });
       }
-      typing = { ...typing, [action.GroupTyingIndicator.groupId]: groupTyping };
+
+      typing = {
+        ...typing,
+        [action.groupTypingIndicator.groupId]: groupTyping,
+      };
+
       return { ...state, typing };
     }
     case SET_GROUP_READ_MESSAGE: {

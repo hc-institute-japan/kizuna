@@ -45,7 +45,6 @@ const Typing: React.FC<Props> = ({ profiles, disabled }) => {
             },
             { user: profiles[0].username }
           )}
-          {animateDots()}
         </span>
       );
     const names = `${profiles
@@ -57,13 +56,14 @@ const Typing: React.FC<Props> = ({ profiles, disabled }) => {
     return (
       <span>
         {names}
-        {others(remaining)} are typing{animateDots()}
+        {others(remaining)} are typing
       </span>
     );
   };
-  return profiles.length ? (
+  return profiles.length > 0 ? (
     <div className={`${styles.typing} ion-padding-start`}>
       {displayNames(profiles)}
+      {animateDots()}
     </div>
   ) : null;
 };

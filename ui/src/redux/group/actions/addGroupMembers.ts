@@ -28,7 +28,7 @@ export const addGroupMembers =
       groupRevisionId: deserializeHash(updateGroupMembersData.groupRevisionId),
     };
 
-    console.log("this is the input to the add member", updateGroupMembersData);
+    // console.log("this is the input to the add member", updateGroupMembersData);
 
     // TODO: error handling
     // TODO: input sanitation
@@ -39,17 +39,17 @@ export const addGroupMembers =
       payload: input,
     });
 
-    let membersBase64 = addMembersOutput.members.map((member: AgentPubKey) =>
+    const membersBase64 = addMembersOutput.members.map((member: AgentPubKey) =>
       serializeHash(member)
     );
 
-    let updateGroupMembersDataFromRes: UpdateGroupMembersData = {
+    const updateGroupMembersDataFromRes: UpdateGroupMembersData = {
       members: membersBase64,
       groupId: serializeHash(addMembersOutput.groupId),
       groupRevisionId: serializeHash(addMembersOutput.groupRevisionId),
     };
 
-    let membersUsernames = await fetchUsernameOfMembers(
+    const membersUsernames = await fetchUsernameOfMembers(
       state,
       membersBase64,
       callZome,

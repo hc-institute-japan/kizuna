@@ -34,7 +34,7 @@ export const getNextBatchGroupMessages =
       payload: input,
     });
 
-    let groupMessagesOutput: GroupMessagesOutput =
+    const groupMessagesOutput: GroupMessagesOutput =
       convertFetchedResToGroupMessagesOutput(groupMessagesRes);
 
     dispatch<SetNextBatchGroupMessagesAction>({

@@ -4,7 +4,7 @@ import { Profile } from "../../../profile/types";
 import { CallZomeConfig, ThunkAction } from "../../../types";
 import {
   GroupTypingDetail,
-  SetGroupTyingIndicator,
+  SetGroupTypingIndicator,
   SET_GROUP_TYPING_INDICATOR,
 } from "../../types";
 
@@ -31,10 +31,10 @@ const fetchProfile = async (
 
 const groupTypingDetail =
   (signalPayload: any): ThunkAction =>
-  async (dispatch, getState, { getAgentId, callZome }) => {
+  async (dispatch, getState, { callZome }) => {
     const { payload } = signalPayload;
     const state = getState();
-    const contacts = state.contacts.contacts;
+    const { contacts } = state.contacts;
     const memberId = serializeHash(payload.indicatedBy);
 
     let indicatedBy: Profile = contacts[memberId]
@@ -45,9 +45,11 @@ const groupTypingDetail =
       indicatedBy: indicatedBy,
       isTyping: payload.isTyping,
     };
-    dispatch<SetGroupTyingIndicator>({
+
+    dispatch<SetGroupTypingIndicator>({
       type: SET_GROUP_TYPING_INDICATOR,
-      GroupTyingIndicator: GroupTypingDetail,
+      groupTypingIndicator: GroupTypingDetail,
+      typing: state.groups.typing,
     });
   };
 
