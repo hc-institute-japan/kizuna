@@ -1,8 +1,10 @@
-use hdk3::prelude::*;
+use hdk::prelude::*;
 mod entries;
 use entries::preference::{self, handlers};
 
 use preference::*;
+
+
 
 entry_defs![
     Preference::entry_def(),
@@ -11,14 +13,14 @@ entry_defs![
 ];
 
 pub fn error<T>(reason: &str) -> ExternResult<T> {
-    Err(HdkError::Wasm(WasmError::Zome(String::from(reason))))
+    Err(WasmError::Guest(String::from(reason)))
 }
 
 pub fn err<T>(code: &str, message: &str) -> ExternResult<T> {
-    Err(HdkError::Wasm(WasmError::Zome(format!(
+    Err(WasmError::Guest(format!(
         "{{\"code\": \"{}\", \"message\": \"{}\"}}",
         code, message
-    ))))
+    )))
 }
 
 #[hdk_extern]

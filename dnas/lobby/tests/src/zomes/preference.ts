@@ -1,3 +1,4 @@
+import { Orchestrator } from "@holochain/tryorama";
 import { Installables } from "../types";
 import { delay } from "../utils";
 
@@ -19,7 +20,10 @@ const call = async (
   return res;
 };
 
-const preference = (orchestrator, config, installables: Installables) => {
+
+let orchestrator = new Orchestrator();
+
+const preference = (config, installables: Installables) => {
   orchestrator.registerScenario(
     "Get and set global preference",
     async (s, t) => {
@@ -81,7 +85,6 @@ const preference = (orchestrator, config, installables: Installables) => {
 
       t.deepEqual(preference, createPreference(true, true));
 
-      // TATS: this test is failing with timeout.
       /**
        * Set receipt to true
        */
@@ -94,9 +97,11 @@ const preference = (orchestrator, config, installables: Installables) => {
     }
   );
 
-  orchestrator.registerScenario(
-    "Get and set per agent preference",
-    async (s, t) => {
+  orchestrator.run();
+
+  orchestrator = new Orchestrator();
+
+  orchestrator.registerScenario( "Get and set per agent preference", async (s, t) => {
       const [alice, bobby, clark, diego, ethan] = await s.players([
         config,
         config,
@@ -206,10 +211,11 @@ const preference = (orchestrator, config, installables: Installables) => {
       });
     }
   );
+  orchestrator.run();
 
-  orchestrator.registerScenario(
-    "Get and set per group preference",
-    async (s, t) => {
+  orchestrator = new Orchestrator();
+
+  orchestrator.registerScenario( "Get and set per group preference", async (s, t) => {
       const [alice] = await s.players([config]);
       const [alice_lobby_happ] = await alice.installAgentsHapps(
         installables.one
@@ -284,6 +290,8 @@ const preference = (orchestrator, config, installables: Installables) => {
       });
     }
   );
+  orchestrator.run();
+
 };
 
 export default preference;
