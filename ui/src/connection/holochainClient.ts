@@ -80,6 +80,19 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
     }
   } catch (e) {
     console.warn(e);
-    return e;
+    const { type = null, data = null } = { ...e };
+
+    if (type === "error") {
+      if (data?.type === "ribosome_error") {
+        const regex = /Guest\(\"([\s\S]*?)\"\)/;
+        const result = regex.exec(data.data);
+        throw {
+          type: "error",
+          message: result ? result[1] : "Something went wrong",
+        };
+      }
+    }
+
+    throw e;
   }
 };
