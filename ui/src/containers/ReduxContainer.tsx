@@ -11,8 +11,8 @@ const ReduxContainer: React.FC = ({ children }) => {
   const { displayError } = useError();
 
   useEffect(function () {
-    store = createStore({ displayError });
     setIsStoreReady(true);
+    store = createStore({ displayError });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
