@@ -4,8 +4,6 @@ use entries::preference::{self, handlers};
 
 use preference::*;
 
-
-
 entry_defs![
     Preference::entry_def(),
     PerAgentPreference::entry_def(),
@@ -16,11 +14,24 @@ pub fn error<T>(reason: &str) -> ExternResult<T> {
     Err(WasmError::Guest(String::from(reason)))
 }
 
-pub fn err<T>(code: &str, message: &str) -> ExternResult<T> {
-    Err(WasmError::Guest(format!(
-        "{{\"code\": \"{}\", \"message\": \"{}\"}}",
-        code, message
-    )))
+#[hdk_extern]
+fn init(_: ()) -> ExternResult<InitCallbackResult> {
+    create_entry(&Preference {
+        typing_indicator: true,
+        read_receipt: true,
+    })?;
+
+    create_entry(&PerAgentPreference {
+        typing_indicator: Vec::new(),
+        read_receipt: Vec::new(),
+    })?;
+
+    create_entry(&PerGroupPreference {
+        typing_indicator: Vec::new(),
+        read_receipt: Vec::new(),
+    })?;
+
+    Ok(InitCallbackResult::Pass)
 }
 
 #[hdk_extern]
