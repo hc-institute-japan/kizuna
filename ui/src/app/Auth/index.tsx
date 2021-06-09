@@ -1,6 +1,6 @@
-import { IonSpinner } from "@ionic/react";
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import Spinner from "../../components/Spinner";
 import { fetchMyUsername } from "../../redux/profile/actions";
 import { RootState } from "../../redux/types";
 import { useAppDispatch } from "../../utils/helpers";
@@ -20,7 +20,7 @@ const Auth: React.FC = () => {
 
   /* TODO: Maybe better to load here while username is getting fetched */
   return loading ? (
-    <IonSpinner />
+    <Spinner hidden={!loading} />
   ) : username !== null ? (
     <Authenticated />
   ) : (
