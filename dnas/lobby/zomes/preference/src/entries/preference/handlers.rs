@@ -2,65 +2,31 @@ use hdk::prelude::*;
 
 use super::*;
 
-#[hdk_extern]
-fn init(_: ()) -> ExternResult<InitCallbackResult> {
-    create_entry(&Preference {
-        typing_indicator: true,
-        read_receipt: true,
-    })?;
-
-    create_entry(&PerAgentPreference {
-        typing_indicator: Vec::new(),
-        read_receipt: Vec::new(),
-    })?;
-
-    create_entry(&PerGroupPreference {
-        typing_indicator: Vec::new(),
-        read_receipt: Vec::new(),
-    })?;
-
-    Ok(InitCallbackResult::Pass)
-}
-
-
-
-
-fn fetch_preference() -> ExternResult<(SignedHeaderHashed, Preference)> {
-    
-    let filter: QueryFilter = filter_for(QueryTarget::Preference,true)?;
+pub(crate) fn fetch_preference() -> ExternResult<(SignedHeaderHashed, Preference)> {
+    let filter: QueryFilter = filter_for(QueryTarget::Preference, true)?;
     let query_result = query(filter)?;
 
-    if query_result.get(0).is_some(){
+    if query_result.get(0).is_some() {
         //this unwrap is safe here, we check first the value on the condition above
         let element = query_result.get(0).unwrap();
 
         let element_entry: Option<Preference> = element.entry().to_app_option()?;
         let element_signed_header_hashed: SignedHeaderHashed = element.signed_header().to_owned();
 
-        match element_entry{
-
-            Some(preference_entry) =>{
-                return  Ok((element_signed_header_hashed, preference_entry));
-            },
-            None =>(),
+        match element_entry {
+            Some(preference_entry) => {
+                return Ok((element_signed_header_hashed, preference_entry));
+            }
+            None => (),
         }
     }
-    crate::err("104", "No entry found for global preference.")
-
-}
-
-pub(crate) fn get_preference() -> ExternResult<Preference> {
-
-    Ok(Preference {
-        ..fetch_preference()?.1
-    })
+    crate::error("no entry found for global preference")
 }
 
 fn create_preference(preference: Preference) -> ExternResult<Preference> {
-
     match create_entry(&preference) {
         Ok(_) => Ok(preference),
-        Err(_) => crate::err("100", "Problems were encountered during creation of entry"),
+        Err(_) => crate::error("problems were encountered during creation of entry"),
     }
 }
 
@@ -88,53 +54,44 @@ pub(crate) fn set_preference(preference_io: PreferenceIO) -> ExternResult<Prefer
                     _ => create_preference(preference),
                 }
             }
-            _ => crate::err("104", "No entry found for global preference."),
+            _ => crate::error("no entry found for global preference"),
         },
     }
 }
 
-
-
-
-fn fetch_per_agent_preference() -> ExternResult<(SignedHeaderHashed, PerAgentPreference)> {
-    
-    let filter: QueryFilter = filter_for(QueryTarget::AgentPreference,true)?;
+pub(crate) fn fetch_per_agent_preference() -> ExternResult<(SignedHeaderHashed, PerAgentPreference)>
+{
+    let filter: QueryFilter = filter_for(QueryTarget::AgentPreference, true)?;
     let query_result = query(filter)?;
 
-
-    if query_result.get(0).is_some(){
+    if query_result.get(0).is_some() {
         //this unwrap is safe here, we check first the value on the condition above
         let element = query_result.get(0).unwrap();
 
         let element_entry: Option<PerAgentPreference> = element.entry().to_app_option()?;
         let element_signed_header_hashed: SignedHeaderHashed = element.signed_header().to_owned();
 
-        match element_entry{
-
-            Some(per_agent_preference_entry) =>{
-                return  Ok((element_signed_header_hashed, per_agent_preference_entry));
-            },
-            None =>(),
+        match element_entry {
+            Some(per_agent_preference_entry) => {
+                return Ok((element_signed_header_hashed, per_agent_preference_entry));
+            }
+            None => (),
         }
     }
 
-    crate::err("104", "No entry found for global preference.")
-}
-
-pub(crate) fn get_per_agent_preference() -> ExternResult<PerAgentPreference> {
-    Ok(PerAgentPreference {
-        ..fetch_per_agent_preference()?.1
-    })
+    crate::error("no entry found for global preference.")
 }
 
 fn create_per_agent_preference(preference: PerAgentPreference) -> ExternResult<PerAgentPreference> {
     match create_entry(&preference) {
         Ok(_) => Ok(preference),
-        Err(_) => crate::err("100", "Problems were encountered during creation of entry"),
+        Err(_) => crate::error("problems were encountered during creation of entry"),
     }
 }
 
-pub(crate) fn set_per_agent_preference( per_agent_preference: PerAgentPreferenceIO) -> ExternResult<PerAgentPreference> {
+pub(crate) fn set_per_agent_preference(
+    per_agent_preference: PerAgentPreferenceIO,
+) -> ExternResult<PerAgentPreference> {
     match (
         per_agent_preference.clone().typing_indicator,
         per_agent_preference.clone().read_receipt,
@@ -163,53 +120,44 @@ pub(crate) fn set_per_agent_preference( per_agent_preference: PerAgentPreference
                     _ => create_per_agent_preference(preference),
                 }
             }
-            _ => crate::err("104", "No entry found for per agent preference."),
+            _ => crate::error("no entry found for per agent preference."),
         },
     }
 }
 
-
-
-
-fn fetch_per_group_preference() -> ExternResult<(SignedHeaderHashed, PerGroupPreference)> {
-
-    let filter: QueryFilter = filter_for(QueryTarget::GroupPreference,true)?;
+pub(crate) fn fetch_per_group_preference() -> ExternResult<(SignedHeaderHashed, PerGroupPreference)>
+{
+    let filter: QueryFilter = filter_for(QueryTarget::GroupPreference, true)?;
     let query_result = query(filter)?;
 
-    if query_result.get(0).is_some(){
+    if query_result.get(0).is_some() {
         //this unwrap is safe here, we check first the value on the condition above
         let element = query_result.get(0).unwrap();
 
         let element_entry: Option<PerGroupPreference> = element.entry().to_app_option()?;
         let element_signed_header_hashed: SignedHeaderHashed = element.signed_header().to_owned();
 
-        match element_entry{
-
-            Some(per_group_preference_entry) =>{
-                return  Ok((element_signed_header_hashed, per_group_preference_entry));
-            },
-            None =>(),
+        match element_entry {
+            Some(per_group_preference_entry) => {
+                return Ok((element_signed_header_hashed, per_group_preference_entry));
+            }
+            None => (),
         }
     }
 
-    crate::err("104", "No entry found for global preference.")
-
-}
-
-pub(crate) fn get_per_group_preference() -> ExternResult<PerGroupPreference> {
-    Ok(PerGroupPreference {
-        ..fetch_per_group_preference()?.1
-    })
+    crate::error("no entry found for global preference.")
 }
 
 fn create_per_group_preference(preference: PerGroupPreference) -> ExternResult<PerGroupPreference> {
     match create_entry(&preference) {
         Ok(_) => Ok(preference),
-        Err(_) => crate::err("100", "Problems were encountered during creation of entry"),
+        Err(_) => crate::error("problems were encountered during creation of entry"),
     }
 }
 
-pub(crate) fn set_per_group_preference( per_group_preference: PerGroupPreferenceIO ) -> ExternResult<PerGroupPreference> {
+pub(crate) fn set_per_group_preference(
+    per_group_preference: PerGroupPreferenceIO,
+) -> ExternResult<PerGroupPreference> {
     match (
         per_group_preference.clone().typing_indicator,
         per_group_preference.clone().read_receipt,
@@ -238,31 +186,28 @@ pub(crate) fn set_per_group_preference( per_group_preference: PerGroupPreference
                     _ => create_per_group_preference(preference),
                 }
             }
-            _ => crate::err("104", "No entry found for per group preference."),
+            _ => crate::error("no entry found for per group preference"),
         },
     }
 }
 
 //helper function
-fn filter_for(query_target:QueryTarget , include_entries: bool)->ExternResult<QueryFilter>{
+fn filter_for(query_target: QueryTarget, include_entries: bool) -> ExternResult<QueryFilter> {
+    let entry_index: u8;
 
-    let entry_index:u8;
-
-    match query_target{
-
-        QueryTarget::Preference => entry_index = 0, 
-        QueryTarget::AgentPreference=> entry_index = 1, 
-        QueryTarget::GroupPreference => entry_index = 2, 
+    match query_target {
+        QueryTarget::Preference => entry_index = 0,
+        QueryTarget::AgentPreference => entry_index = 1,
+        QueryTarget::GroupPreference => entry_index = 2,
     }
 
     let query_filter: QueryFilter = QueryFilter::new()
-    .entry_type(EntryType::App(AppEntryType::new(
-        EntryDefIndex::from(entry_index),
-        zome_info()?.zome_id,
-        EntryVisibility::Private,
-    )))
-    .include_entries(include_entries);
+        .entry_type(EntryType::App(AppEntryType::new(
+            EntryDefIndex::from(entry_index),
+            zome_info()?.zome_id,
+            EntryVisibility::Private,
+        )))
+        .include_entries(include_entries);
 
     Ok(query_filter)
 }
-
