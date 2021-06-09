@@ -21,19 +21,24 @@ export const setUsername =
 export const fetchMyUsername =
   (): ThunkAction =>
   async (dispatch, _getState, { callZome, getAgentId }) => {
-    const res = await callZome({
-      zomeName: ZOMES.USERNAME,
-      fnName: FUNCTIONS[ZOMES.USERNAME].GET_MY_USERNAME,
-    });
-    const myAgentId = await getAgentId();
-    /* assume that getAgentId() is non-nullable */
-    const myAgentIdB64 = serializeHash(myAgentId!);
-    if (res?.type !== "error") {
+    try {
+      const res = await callZome({
+        zomeName: ZOMES.USERNAME,
+        fnName: FUNCTIONS[ZOMES.USERNAME].GET_MY_USERNAME,
+      });
+      const myAgentId = await getAgentId();
+      /* assume that getAgentId() is non-nullable */
+      const myAgentIdB64 = serializeHash(myAgentId!);
       dispatch({
         type: SET_USERNAME,
         username: res.username,
         id: myAgentIdB64,
       });
+      return true;
+    } catch (e) {
+      if (e.message.includes("No username exists for this agent")) {
+        return false;
+      }
     }
   };
 
