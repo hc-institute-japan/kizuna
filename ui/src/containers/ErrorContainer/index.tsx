@@ -1,16 +1,21 @@
 import React from "react";
+import { useIntl } from "react-intl";
 import { useToast } from "../ToastContainer/context";
 import ErrorContext from "./context";
 import { CallError } from "./types";
 
 const ErrorContainer: React.FC = ({ children }) => {
   const { showToast } = useToast();
-  const displayError: CallError = (errorType, errorTypeProps) => {
+  const intl = useIntl();
+  const displayError: CallError = (errorType, errorTypeProps, messageIntl) => {
+    const { id, value } = { ...messageIntl };
     if (errorType === "TOAST") {
-      showToast({
-        color: "danger",
-        ...errorTypeProps,
-      });
+      if (id)
+        showToast({
+          color: "danger",
+          ...errorTypeProps,
+          message: intl.formatMessage({ id: id }, value),
+        });
     }
   };
 

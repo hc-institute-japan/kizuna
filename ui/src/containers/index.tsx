@@ -9,15 +9,15 @@ import ToastContainer from "./ToastContainer";
 
 const Container: React.FC = ({ children }) => (
   <IonicContainer>
-    <ToastContainer>
-      <ErrorContainer>
-        <RouterContainer>
-          <ReduxContainer>
-            <IntlContainer>{children}</IntlContainer>
-          </ReduxContainer>
-        </RouterContainer>
-      </ErrorContainer>
-    </ToastContainer>
+    <ReduxContainer>
+      <RouterContainer>
+        <IntlContainer>
+          <ToastContainer>
+            <ErrorContainer>{children}</ErrorContainer>
+          </ToastContainer>
+        </IntlContainer>
+      </RouterContainer>
+    </ReduxContainer>
   </IonicContainer>
 );
 
