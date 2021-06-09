@@ -1,0 +1,20 @@
+---
+manifest_version: "1"
+name: kizuna
+uuid: 00000000-0000-0000-0000-000000000000
+properties: ~
+zomes: 
+  - name: aggregator
+    bundled: ../../target/wasm32-unknown-unknown/release/aggregator.wasm
+  - name: contacts
+    bundled: ../../target/wasm32-unknown-unknown/release/contacts.wasm
+  - name: p2pmessage
+    bundled: ../../target/wasm32-unknown-unknown/release/p2pmessage.wasm
+  - name: preference
+    bundled: ../../target/wasm32-unknown-unknown/release/preference.wasm
+  # - name: request
+  #   bundled: ../../target/wasm32-unknown-unknown/release/request.wasm
+  - name: username
+    bundled: ../../target/wasm32-unknown-unknown/release/username.wasm  
+  - name : group
+    bundled: ../../target/wasm32-unknown-unknown/release/group.wasm 

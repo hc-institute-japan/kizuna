@@ -1,0 +1,15 @@
+[package]
+name = "file_types"
+version = "0.0.1"
+description = "types related to file used both for p2pmessage and group zomes."
+authors = ["Tatsuya Sato <tatsuya_sato@dlsu.edu.ph>"]
+edition = "2018"
+
+[lib]
+name = "file_types"
+crate-type = [ "cdylib", "rlib" ]
+
+[dependencies]
+derive_more = "0"
+serde = "1"
+hdk = "0.0.100"

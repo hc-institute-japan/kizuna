@@ -1,7 +1,7 @@
 [package]
 name = "group"
 version = "0.0.1"
-authors = [ "manuel_puentes" ]
+authors = [ "hcij" ]
 edition = "2018"
 
 [lib]
@@ -9,7 +9,7 @@ name = "group"
 crate-type = [ "cdylib", "rlib" ]
 
 [dependencies]
-derive_more = "0"
 serde = "1"
-
-hdk3 = "0"
+hdk = "0.0.100"
+derive_more = "0"
+file_types = { version = "0.0.1", path = "../../commons/file_types" }
