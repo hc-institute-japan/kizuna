@@ -390,7 +390,7 @@ export const getNextBatchMessages =
     }
 
     // ERROR
-    return false;
+    return nextBatchOfMessages;
   };
 
 // action to mark an array of messages as read (called in the onSeen callback)

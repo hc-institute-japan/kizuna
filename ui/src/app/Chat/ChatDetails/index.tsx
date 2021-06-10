@@ -44,6 +44,7 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
     useState<boolean>(false);
   const [orderedMedia] = useState<P2PMessage[]>([]);
   const [orderedFiles] = useState<P2PMessage[]>([]);
+  const [fileMessageHashes] = useState<{ [key: string]: boolean }>({});
   const [currentSegment, setCurrentSegment] = useState<string>("Info");
   const dispatch = useAppDispatch();
 
@@ -91,18 +92,23 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
         if (message.payload.type === "FILE") {
           let type = message.payload.fileType;
 
-          switch (type) {
-            case "IMAGE":
-              orderedMedia.push(message);
-              break;
-            case "VIDEO":
-              orderedMedia.push(message);
-              break;
-            case "OTHER":
-              orderedFiles.push(message);
-              break;
-            default:
-              break;
+          if (!fileMessageHashes[messageID]) {
+            switch (type) {
+              case "IMAGE":
+                orderedMedia.push(message);
+                fileMessageHashes[messageID] = true;
+                break;
+              case "VIDEO":
+                orderedMedia.push(message);
+                fileMessageHashes[messageID] = true;
+                break;
+              case "OTHER":
+                orderedFiles.push(message);
+                fileMessageHashes[messageID] = true;
+                break;
+              default:
+                break;
+            }
           }
         }
       });
@@ -158,23 +164,26 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
   ) => {
     if (!disableGetNextBatch) {
       let earliest: P2PMessage = earliestMediaOrFile;
-      dispatch(
-        getNextBatchMessages(
-          state.conversant.id,
-          10,
-          (earliest.payload as FilePayload).fileType === "IMAGE" ||
-            (earliest.payload as FilePayload).fileType === "VIDEO"
-            ? "Media"
-            : "Other",
-          earliest !== undefined ? earliest.timestamp : undefined,
-          earliest !== undefined ? earliest.p2pMessageEntryHash : undefined
-        )
-      ).then((res: P2PHashMap) => {
-        if (Object.values(res)[0][state.conversant.id].length <= 0) {
-          setDisableGetNextBatch(true);
-        }
-        complete();
-      });
+
+      if (earliest !== undefined) {
+        dispatch(
+          getNextBatchMessages(
+            state.conversant.id,
+            10,
+            (earliest.payload as FilePayload).fileType === "IMAGE" ||
+              (earliest.payload as FilePayload).fileType === "VIDEO"
+              ? "Media"
+              : "Other",
+            earliest !== undefined ? earliest.timestamp : undefined,
+            earliest !== undefined ? earliest.p2pMessageEntryHash : undefined
+          )
+        ).then((res: P2PHashMap) => {
+          if (Object.values(res)[0][state.conversant.id].length <= 0) {
+            setDisableGetNextBatch(true);
+          }
+          complete();
+        });
+      }
     }
     complete();
     return;
