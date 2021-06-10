@@ -1,10 +1,8 @@
 use hdk::prelude::*;
 mod entries;
-use entries::preference;
+use entries::preference::{self, handlers};
 
 use preference::*;
-
-
 
 entry_defs![
     Preference::entry_def(),
@@ -16,16 +14,31 @@ pub fn error<T>(reason: &str) -> ExternResult<T> {
     Err(WasmError::Guest(String::from(reason)))
 }
 
-pub fn err<T>(code: &str, message: &str) -> ExternResult<T> {
-    Err(WasmError::Guest(format!(
-        "{{\"code\": \"{}\", \"message\": \"{}\"}}",
-        code, message
-    )))
+#[hdk_extern]
+fn init(_: ()) -> ExternResult<InitCallbackResult> {
+    create_entry(&Preference {
+        typing_indicator: true,
+        read_receipt: true,
+    })?;
+
+    create_entry(&PerAgentPreference {
+        typing_indicator: Vec::new(),
+        read_receipt: Vec::new(),
+    })?;
+
+    create_entry(&PerGroupPreference {
+        typing_indicator: Vec::new(),
+        read_receipt: Vec::new(),
+    })?;
+
+    Ok(InitCallbackResult::Pass)
 }
 
 #[hdk_extern]
 fn get_preference(_: ()) -> ExternResult<Preference> {
-    handlers::get_preference()
+    Ok(Preference {
+        ..handlers::fetch_preference()?.1
+    })
 }
 
 #[hdk_extern]
@@ -40,7 +53,9 @@ fn set_per_agent_preference(preference: PerAgentPreferenceIO) -> ExternResult<Pe
 
 #[hdk_extern]
 fn get_per_agent_preference(_: ()) -> ExternResult<PerAgentPreference> {
-    handlers::get_per_agent_preference()
+    Ok(PerAgentPreference {
+        ..handlers::fetch_per_agent_preference()?.1
+    })
 }
 
 #[hdk_extern]
@@ -50,5 +65,7 @@ fn set_per_group_preference(preference: PerGroupPreferenceIO) -> ExternResult<Pe
 
 #[hdk_extern]
 fn get_per_group_preference(_: ()) -> ExternResult<PerGroupPreference> {
-    handlers::get_per_group_preference()
+    Ok(PerGroupPreference {
+        ..handlers::fetch_per_group_preference()?.1
+    })
 }
