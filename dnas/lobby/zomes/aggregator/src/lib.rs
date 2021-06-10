@@ -6,7 +6,7 @@ use crate::types::*;
 fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
     //AggregatedLatestData
 
-    let batch_size: BatchSize = BatchSize(10);
+    let batch_size: BatchSize = BatchSize(21);
     let mut agent_pub_keys: Vec<AgentPubKey> = Vec::new(); // agentPubKeys of members
 
     let blocked_contacts_call_response: ZomeCallResponse =
@@ -74,45 +74,45 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
     let latest_group_messages: GroupMessagesOutput =
         call_response_handler(latest_group_messages_call_response)?.decode()?;
 
-    let latest_p2p_messages_call_response: ZomeCallResponse = call(
-        None,
-        "p2pmessage".into(),
-        "get_latest_messages".into(),
-        None,
-        &batch_size,
-    )?;
-    let latest_p2p_messages: P2PMessageHashTables =
-        call_response_handler(latest_p2p_messages_call_response)?.decode()?;
+    // let latest_p2p_messages_call_response: ZomeCallResponse = call(
+    //     None,
+    //     "p2pmessage".into(),
+    //     "get_latest_messages".into(),
+    //     None,
+    //     &batch_size,
+    // )?;
+    // let latest_p2p_messages: P2PMessageHashTables =
+    //     call_response_handler(latest_p2p_messages_call_response)?.decode()?;
 
-    let global_preference_call_response: ZomeCallResponse = call(
-        None,
-        "preference".into(),
-        "get_preference".into(),
-        None,
-        &(),
-    )?;
-    let global_preference: Preference =
-        call_response_handler(global_preference_call_response)?.decode()?;
+    // let global_preference_call_response: ZomeCallResponse = call(
+    //     None,
+    //     "preference".into(),
+    //     "get_preference".into(),
+    //     None,
+    //     &(),
+    // )?;
+    // let global_preference: Preference =
+    //     call_response_handler(global_preference_call_response)?.decode()?;
 
-    let per_agent_preference_call_response: ZomeCallResponse = call(
-        None,
-        "preference".into(),
-        "get_per_agent_preference".into(),
-        None,
-        &(),
-    )?;
-    let per_agent_preference: PerAgentPreference =
-        call_response_handler(per_agent_preference_call_response)?.decode()?;
+    // let per_agent_preference_call_response: ZomeCallResponse = call(
+    //     None,
+    //     "preference".into(),
+    //     "get_per_agent_preference".into(),
+    //     None,
+    //     &(),
+    // )?;
+    // let per_agent_preference: PerAgentPreference =
+    //     call_response_handler(per_agent_preference_call_response)?.decode()?;
 
-    let per_group_preference_call_response: ZomeCallResponse = call(
-        None,
-        "preference".into(),
-        "get_per_group_preference".into(),
-        None,
-        &(),
-    )?;
-    let per_group_preference: PerGroupPreference =
-        call_response_handler(per_group_preference_call_response)?.decode()?;
+    // let per_group_preference_call_response: ZomeCallResponse = call(
+    //     None,
+    //     "preference".into(),
+    //     "get_per_group_preference".into(),
+    //     None,
+    //     &(),
+    // )?;
+    // let per_group_preference: PerGroupPreference =
+    //     call_response_handler(per_group_preference_call_response)?.decode()?;
 
     let aggregated_data: AggregatedLatestData = AggregatedLatestData {
         user_info,
@@ -121,10 +121,10 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
         groups,
         latest_group_messages,
         member_profiles,
-        latest_p2p_messages,
-        global_preference,
-        per_agent_preference,
-        per_group_preference,
+        // latest_p2p_messages,
+        // global_preference,
+        // per_agent_preference,
+        // per_group_preference,
     };
 
     Ok(aggregated_data)
@@ -137,12 +137,12 @@ fn call_response_handler(call_response: ZomeCallResponse) -> ExternResult<Extern
         }
         ZomeCallResponse::Unauthorized(_, _, function_name, _) => {
             return Err(WasmError::Guest(
-                String::from("Unauthorized Call to : ") + function_name.as_ref(),
+                String::from("unauthorized all to : ") + function_name.as_ref(),
             ));
         }
         ZomeCallResponse::NetworkError(error) => {
             return Err(WasmError::Guest(
-                String::from("Network Error : ") + error.as_ref(),
+                String::from("network error : ") + error.as_ref(),
             ));
         }
     }
