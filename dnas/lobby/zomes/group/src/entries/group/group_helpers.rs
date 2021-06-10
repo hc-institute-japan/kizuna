@@ -77,7 +77,7 @@ pub fn get_group_latest_version(group_id: EntryHash) -> ExternResult<GroupOutput
         } // match ends
     } // if let ends
 
-    return error("the given group_id does not exist");
+    return error("failed to get the given group id");
 }
 
 pub fn link_and_emit_added_to_group_signals(
