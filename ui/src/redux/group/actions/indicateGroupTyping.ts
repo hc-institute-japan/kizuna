@@ -24,21 +24,5 @@ export const indicateGroupTyping =
       payload: input,
     });
 
-    // setTimeout(
-    //   () =>
-    //     callZome({
-    //       zomeName: ZOMES.GROUP,
-    //       fnName: FUNCTIONS[ZOMES.GROUP].INDICATE_GROUP_TYPING,
-    //       payload: {
-    //         groupId: deserializeHash(groupTypingDetailData.groupId),
-    //         indicatedBy: deserializeHash(groupTypingDetailData.indicatedBy),
-    //         members: groupTypingDetailData.members.map((member) =>
-    //           deserializeAgentPubKey(member)
-    //         ),
-    //         isTyping: false,
-    //       },
-    //     }),
-    //   5000
-    // );
     return null;
   };

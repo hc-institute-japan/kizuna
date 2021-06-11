@@ -10,7 +10,7 @@ import {
 import React, { useState } from "react";
 import { useIntl } from "react-intl";
 import { useError } from "../../../../../containers/ErrorContainer/context";
-import { addGroupMembers } from "../../../../../redux/group/actions/addGroupMembers";
+import { addMembers } from "../../../../../redux/group/actions/addMembers";
 // redux
 import { Profile, ProfileListType } from "../../../../../redux/profile/types";
 import { indexContacts, useAppDispatch } from "../../../../../utils/helpers";
@@ -95,7 +95,7 @@ const AddMemberModal: React.FC<Props> = ({
       groupId,
       groupRevisionId,
     };
-    dispatch(addGroupMembers(payload)).then((res: any) => {
+    dispatch(addMembers(payload)).then((res: any) => {
       let newMembers: Profile[] = members.concat(selected);
       setMembers(newMembers);
       setSelected([]);

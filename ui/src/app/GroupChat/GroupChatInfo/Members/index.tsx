@@ -14,7 +14,7 @@ import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { useError } from "../../../../containers/ErrorContainer/context";
-import { removeGroupMembers } from "../../../../redux/group/actions/removeGroupMembers";
+import { removeMembers } from "../../../../redux/group/actions/removeMembers";
 import { GroupConversation } from "../../../../redux/group/types";
 // Redux
 import { Profile } from "../../../../redux/profile/types";
@@ -66,7 +66,7 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
       groupId: groupData.originalGroupId,
       groupRevisionId: groupData.originalGroupRevisionId,
     };
-    dispatch(removeGroupMembers(input)).then((res: any) => {
+    dispatch(removeMembers(input)).then((res: any) => {
       let newMembers = members.filter((x) => !res.members.includes(x.id));
       setMembers(newMembers);
       setLoading(false);

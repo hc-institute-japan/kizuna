@@ -17,7 +17,7 @@ export const createGroup =
   async (
     dispatch,
     getState,
-    { callZome, getAgentId }
+    { callZome, getAgentId, displayError }
   ): Promise<GroupConversation> => {
     const state = getState();
     const myAgentId = await getAgentId();
@@ -26,44 +26,47 @@ export const createGroup =
       name: createGroupInput.name,
       members: createGroupInput.members.map((member: string) =>
         deserializeAgentPubKey(member)
-      ), // deserialize to AgentPubKey
-    };
-    // TODO: error handling
-    // TODO: input sanitation
-    const createGroupRes = await callZome({
-      zomeName: ZOMES.GROUP,
-      fnName: FUNCTIONS[ZOMES.GROUP].CREATE_GROUP,
-      payload: input,
-    });
-
-    const groupData: GroupConversation = {
-      originalGroupId: serializeHash(createGroupRes.groupId),
-      originalGroupRevisionId: serializeHash(createGroupRes.groupRevisionId),
-      name: createGroupRes.content.name,
-      members: createGroupRes.content.members.map((member: Buffer) =>
-        serializeHash(member)
       ),
-      createdAt: createGroupRes.content.created,
-      creator: serializeHash(createGroupRes.content.creator),
-      messages: [],
     };
+    try {
+      const createGroupRes = await callZome({
+        zomeName: ZOMES.GROUP,
+        fnName: FUNCTIONS[ZOMES.GROUP].CREATE_GROUP,
+        payload: input,
+      });
 
-    const groupMembers = [...groupData.members, groupData.creator];
+      const groupData: GroupConversation = {
+        originalGroupId: serializeHash(createGroupRes.groupId),
+        originalGroupRevisionId: serializeHash(createGroupRes.groupRevisionId),
+        name: createGroupRes.content.name,
+        members: createGroupRes.content.members.map((member: Buffer) =>
+          serializeHash(member)
+        ),
+        createdAt: createGroupRes.content.created,
+        creator: serializeHash(createGroupRes.content.creator),
+        messages: [],
+      };
 
-    const membersProfile: {
-      [key: string]: Profile;
-    } = await fetchUsernameOfMembers(
-      state,
-      groupMembers,
-      callZome,
-      serializeHash(myAgentId!)
-    );
+      const groupMembers = [...groupData.members, groupData.creator];
 
-    dispatch<AddGroupAction>({
-      type: ADD_GROUP,
-      groupData,
-      membersProfile,
-    });
+      const membersProfile: {
+        [key: string]: Profile;
+      } = await fetchUsernameOfMembers(
+        state,
+        groupMembers,
+        callZome,
+        serializeHash(myAgentId!)
+      );
 
-    return groupData;
+      dispatch<AddGroupAction>({
+        type: ADD_GROUP,
+        groupData,
+        membersProfile,
+      });
+
+      return groupData;
+    } catch (e) {
+      /* We are throwing the error here and handle it in the caller sendInitialGroupMessage */
+      throw e;
+    }
   };
