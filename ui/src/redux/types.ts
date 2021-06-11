@@ -1,7 +1,7 @@
 import { AgentPubKey, CellId } from "@holochain/conductor-api";
 import { Action, AnyAction } from "redux";
 import { ThunkAction as Thunk, ThunkDispatch } from "redux-thunk";
-import { CallError } from "../containers/ErrorContainer/types";
+
 import rootReducer from "./reducers";
 
 export interface CallZomeConfig {
@@ -18,7 +18,6 @@ export interface CallZomeConfig {
 interface HolochainConfig {
   getAgentId: () => Promise<AgentPubKey | null>;
   callZome: (config: CallZomeConfig) => Promise<any>;
-  displayError: CallError;
 }
 
 export type ThunkAction = Thunk<

@@ -1,4 +1,5 @@
 import { FilePayloadInput } from "../../commons/types";
+import { pushError } from "../../error/actions";
 import { Profile } from "../../profile/types";
 import { ThunkAction } from "../../types";
 import {
@@ -16,7 +17,7 @@ export const sendInitialGroupMessage =
     message: string,
     files: FilePayloadInput[]
   ): ThunkAction =>
-  async (dispatch, getState, { displayError }) => {
+  async (dispatch, getState) => {
     const name = members.map((member) => member.username);
 
     /* Include yourself in the initial name of the Group */
@@ -83,14 +84,12 @@ export const sendInitialGroupMessage =
     } catch (e) {
       /* err from createGoup.ts */
       if (e.message.includes("cannot create group with blocked agents")) {
-        return displayError(
-          "TOAST",
-          {},
-          { id: "redux.err.group.create-group.1" }
+        return dispatch(
+          pushError("TOAST", {}, { id: "redux.err.group.create-group.1" })
         );
       } else {
         /* This error will be errors other than Guest from host/conductor (or holo-web-sdk) */
-        return displayError("TOAST", {}, { id: "redux.err.generic" });
+        return dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
       }
     }
   };

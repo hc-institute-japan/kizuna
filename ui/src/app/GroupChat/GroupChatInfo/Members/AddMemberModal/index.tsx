@@ -9,7 +9,8 @@ import {
 } from "@ionic/react";
 import React, { useState } from "react";
 import { useIntl } from "react-intl";
-import { useError } from "../../../../../containers/ErrorContainer/context";
+import { useToast } from "../../../../../containers/ToastContainer/context";
+
 import { addMembers } from "../../../../../redux/group/actions/addMembers";
 // redux
 import { Profile, ProfileListType } from "../../../../../redux/profile/types";
@@ -45,7 +46,7 @@ const AddMemberModal: React.FC<Props> = ({
 }) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
-  const { displayError } = useError();
+  const { showErrorToast } = useToast();
   const [filter, setFilter] = useState<string>("");
   const [selected, setSelected] = useState<Profile[]>([]);
 
@@ -75,7 +76,7 @@ const AddMemberModal: React.FC<Props> = ({
         })
         .includes(contact.id)
     ) {
-      displayError("TOAST", {
+      showErrorToast({
         message: intl.formatMessage(
           { id: "app.group-chat.already-member" },
           { name: contact.username }

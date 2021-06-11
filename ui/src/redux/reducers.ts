@@ -4,7 +4,8 @@ import groupReducer from "./group/reducer";
 import preferenceReducer from "./preference/reducer";
 import profileReducer from "./profile/reducer";
 import p2pmessagesReducer from "./p2pmessages/reducer";
-import languageReducer from './language/reducer'
+import languageReducer from "./language/reducer";
+import errorReducer from "./error/reducer";
 
 const rootReducer = combineReducers({
   profile: profileReducer,
@@ -12,7 +13,8 @@ const rootReducer = combineReducers({
   preference: preferenceReducer,
   groups: groupReducer,
   p2pmessages: p2pmessagesReducer,
-  language: languageReducer
+  language: languageReducer,
+  error: errorReducer,
 });
 
 export default rootReducer;

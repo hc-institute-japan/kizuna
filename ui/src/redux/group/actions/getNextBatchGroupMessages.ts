@@ -1,6 +1,7 @@
 import { deserializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
 import { dateToTimestamp } from "../../../utils/helpers";
+import { pushError } from "../../error/actions";
 import { ThunkAction } from "../../types";
 import {
   GroupMessageBatchFetchFilter,
@@ -12,11 +13,7 @@ import { convertFetchedResToGroupMessagesOutput } from "./helpers";
 
 export const getNextBatchGroupMessages =
   (groupMessageBatchFetchFilter: GroupMessageBatchFetchFilter): ThunkAction =>
-  async (
-    dispatch,
-    _getState,
-    { callZome, displayError }
-  ): Promise<GroupMessagesOutput> => {
+  async (dispatch, _getState, { callZome }): Promise<GroupMessagesOutput> => {
     /* deserialize fields for zome fn */
     const input = {
       groupId: deserializeHash(groupMessageBatchFetchFilter.groupId),
@@ -52,6 +49,6 @@ export const getNextBatchGroupMessages =
         No useful error is getting returned from
         the Guest/Host so we are simply returning a generic error here
       */
-      return displayError("TOAST", {}, { id: "redux.err.generic" });
+      return dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
     }
   };

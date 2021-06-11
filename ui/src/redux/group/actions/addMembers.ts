@@ -10,13 +10,14 @@ import {
 import { fetchUsernameOfMembers } from "./helpers";
 import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
 import { AgentPubKey } from "@holochain/conductor-api";
+import { pushError } from "../../error/actions";
 
 export const addMembers =
   (updateGroupMembersData: UpdateGroupMembersData): ThunkAction =>
   async (
     dispatch,
     getState,
-    { callZome, getAgentId, displayError }
+    { callZome, getAgentId }
   ): Promise<UpdateGroupMembersData> => {
     const state = getState();
     const myAgentId = await getAgentId();
@@ -66,28 +67,20 @@ export const addMembers =
     } catch (e) {
       switch (e.message) {
         case "members field is empty":
-          return displayError(
-            "TOAST",
-            {},
-            { id: "redux.err.group.add-members.1" }
+          return dispatch(
+            pushError("TOAST", {}, { id: "redux.err.group.add-members.1" })
           );
         case "cannot create group with blocked agents":
-          return displayError(
-            "TOAST",
-            {},
-            { id: "redux.err.group.add-members.2" }
+          return dispatch(
+            pushError("TOAST", {}, { id: "redux.err.group.add-members.2" })
           );
         case "failed to get the given group id":
-          return displayError(
-            "TOAST",
-            {},
-            { id: "redux.err.group.add-members.3" }
+          return dispatch(
+            pushError("TOAST", {}, { id: "redux.err.group.add-members.3" })
           );
         default:
-          return displayError(
-            "TOAST",
-            {},
-            { id: "redux.err.group.add-members.4" }
+          return dispatch(
+            pushError("TOAST", {}, { id: "redux.err.group.add-members.4" })
           );
       }
     }
