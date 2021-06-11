@@ -4,7 +4,7 @@ const initialState: ErrorState = {
   errors: [],
 };
 
-export default (state = initialState, action: ErrorActionType) => {
+const reducer = (state = initialState, action: ErrorActionType) => {
   switch (action.type) {
     case PUSH_ERROR:
       const curr = [...state.errors, action.error];
@@ -15,3 +15,5 @@ export default (state = initialState, action: ErrorActionType) => {
       return state;
   }
 };
+
+export default reducer;
