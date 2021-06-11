@@ -4,6 +4,7 @@ import { ToastContextType } from "./types";
 export const ToastContext = createContext<ToastContextType>({
   showToast: () => {},
   dismissToast: () => {},
+  showErrorToast: () => {},
 });
 
 export const useToast = () => {

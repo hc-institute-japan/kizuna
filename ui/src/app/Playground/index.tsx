@@ -260,11 +260,7 @@ const Playground = () => {
 
   const dispatch = useAppDispatch();
 
-  const testError =
-    (): ThunkAction =>
-    (dispatch, getState, { displayError }) => {
-      displayError("TOAST", { message: "hello" });
-    };
+  const testError = (): ThunkAction => (dispatch, getState) => {};
 
   useEffect(() => {
     dispatch(testError());

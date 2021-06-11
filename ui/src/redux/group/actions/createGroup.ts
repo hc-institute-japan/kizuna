@@ -17,7 +17,7 @@ export const createGroup =
   async (
     dispatch,
     getState,
-    { callZome, getAgentId, displayError }
+    { callZome, getAgentId }
   ): Promise<GroupConversation> => {
     const state = getState();
     const myAgentId = await getAgentId();

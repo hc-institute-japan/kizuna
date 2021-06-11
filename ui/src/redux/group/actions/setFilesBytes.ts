@@ -1,11 +1,12 @@
 import { deserializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
+import { pushError } from "../../error/actions";
 import { ThunkAction } from "../../types";
 import { SET_FILES_BYTES } from "../types";
 
 export const fetchFilesBytes =
   (fileHashes: string[]): ThunkAction =>
-  async (dispatch, getState, { callZome, displayError }) => {
+  async (dispatch, getState, { callZome }) => {
     /* deserialize id for zome fn */
     const input = fileHashes.map((fileId: string) => deserializeHash(fileId));
 
@@ -27,13 +28,11 @@ export const fetchFilesBytes =
       return res;
     } catch (e) {
       if (e.message.includes("The file bytes were not found")) {
-        return displayError(
-          "TOAST",
-          {},
-          { id: "redux.err.group.set-files-bytes.1" }
+        return dispatch(
+          pushError("TOAST", {}, { id: "redux.err.group.set-files-bytes.1" })
         );
       } else {
-        return displayError("TOAST", {}, { id: "redux.err.generic" });
+        return dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
       }
     }
   };

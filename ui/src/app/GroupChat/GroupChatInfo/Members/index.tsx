@@ -13,7 +13,8 @@ import {
 import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
-import { useError } from "../../../../containers/ErrorContainer/context";
+import { useToast } from "../../../../containers/ToastContainer/context";
+
 import { removeMembers } from "../../../../redux/group/actions/removeMembers";
 import { GroupConversation } from "../../../../redux/group/types";
 // Redux
@@ -32,7 +33,7 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
 
-  const { displayError } = useError();
+  const { showErrorToast } = useToast();
 
   /* Local state */
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -53,7 +54,7 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
     /* err if member is being removed when total member <= 2 */
     if (groupData.members.length <= 2) {
       setLoading(false);
-      displayError("TOAST", {
+      showErrorToast({
         message: intl.formatMessage({
           id: "app.group-chat.minimum-member-required-reached",
         }),
