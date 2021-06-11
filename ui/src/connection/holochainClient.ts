@@ -93,6 +93,10 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
           };
         }
         case "internal_error": {
+          /*
+            temporarily throwing a custom error for any internal_error
+            until we have a better grasp of how to handle each error separately.
+          */
           throw {
             type: "error",
             message:
