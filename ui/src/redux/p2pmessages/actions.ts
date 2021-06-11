@@ -499,20 +499,7 @@ export const isTyping =
       payload: payload,
     });
 
-    setTimeout(
-      () =>
-        callZome({
-          zomeName: ZOMES.P2PMESSAGE,
-          fnName: FUNCTIONS[ZOMES.P2PMESSAGE].TYPING,
-          payload: {
-            agent: agent,
-            isTyping: false,
-          },
-        }),
-      5000
-    );
-
-    return;
+    return null;
   };
 
 export const countUnread =
