@@ -30,16 +30,17 @@ const AddContactModal: React.FC<Props> = ({ isOpen, onCancel }) => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(fetchAllUsernames()).then((res: any) => {
-      if (res) {
-        const filteredRes = res.filter(
-          (user: Profile) => username !== user.username
-        );
-        setUsers(filteredRes);
-      }
-    });
+    if (isOpen)
+      dispatch(fetchAllUsernames()).then((res: any) => {
+        if (res) {
+          const filteredRes = res.filter(
+            (user: Profile) => username !== user.username
+          );
+          setUsers(filteredRes);
+        }
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch]);
+  }, [dispatch, isOpen]);
 
   let indexedContacts: IndexedContacts = indexContacts(
     users.filter((user) => user.username.includes(filter))

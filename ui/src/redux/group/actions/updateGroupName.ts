@@ -1,31 +1,26 @@
 import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
+import { pushError } from "../../error/actions";
 import { ThunkAction } from "../../types";
 import {
-  // action types
-  UPDATE_GROUP_NAME,
-  // IO
-  UpdateGroupNameData,
   // action payload types
   UpdateGroupNameAction,
+  // IO
+  UpdateGroupNameData,
+  // action types
+  UPDATE_GROUP_NAME,
 } from "../types";
 
 export const updateGroupName =
   (updateGroupNameData: UpdateGroupNameData): ThunkAction =>
-  async (
-    dispatch,
-    getState,
-    { callZome, displayError }
-  ): Promise<UpdateGroupNameData> => {
+  async (dispatch, getState, { callZome }): Promise<UpdateGroupNameData> => {
     const state = getState();
     const group = state.groups.conversations[updateGroupNameData.groupId];
 
     /* return err right away if the group name is the same as the old one */
     if (group.name === updateGroupNameData.name) {
-      return displayError(
-        "TOAST",
-        {},
-        { id: "redux.err.group.update-group-name.1" }
+      return dispatch(
+        pushError("TOAST", {}, { id: "redux.err.group.update-group-name.1" })
       );
     }
 
@@ -62,13 +57,11 @@ export const updateGroupName =
         as it is safe to assume that it is being handled above
       */
       if (e.message === "failed to get the given group id") {
-        return displayError(
-          "TOAST",
-          {},
-          { id: "redux.err.group.update-group-name.2" }
+        return dispatch(
+          pushError("TOAST", {}, { id: "redux.err.group.update-group-name.2" })
         );
       } else {
-        return displayError("TOAST", {}, { id: "redux.err.generic" });
+        return dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
       }
     }
   };

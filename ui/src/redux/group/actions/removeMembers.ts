@@ -2,12 +2,14 @@ import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
 import { AgentPubKey } from "@holochain/conductor-api";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
 import { deserializeAgentPubKey } from "../../../utils/helpers";
+import { pushError } from "../../error/actions";
 import { ThunkAction } from "../../types";
 import {
-  REMOVE_MEMBERS, // action type
+  RemoveMembersAction,
+  REMOVE_MEMBERS,
+
   // IO
   UpdateGroupMembersData,
-  RemoveMembersAction, // action payload type
 } from "../types";
 
 export const removeMembers =
@@ -15,7 +17,7 @@ export const removeMembers =
   async (
     dispatch,
     _getState,
-    { callZome, displayError }
+    { callZome }
   ): Promise<UpdateGroupMembersData> => {
     const input = {
       members: updateGroupMembersData.members.map((member: string) =>
@@ -49,19 +51,15 @@ export const removeMembers =
     } catch (e) {
       switch (e.message) {
         case "members field is empty":
-          return displayError(
-            "TOAST",
-            {},
-            { id: "redux.err.group.remove-members.1" }
+          return dispatch(
+            pushError("TOAST", {}, { id: "redux.err.group.remove-members.1" })
           );
         case "failed to get the given group id":
-          return displayError(
-            "TOAST",
-            {},
-            { id: "redux.err.group.remove-members.2" }
+          return dispatch(
+            pushError("TOAST", {}, { id: "redux.err.group.remove-members.2" })
           );
         default:
-          return displayError("TOAST", {}, { id: "redux.err.generic" });
+          return dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
       }
     }
   };
