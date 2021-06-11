@@ -1,5 +1,6 @@
-import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
+import { deserializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
+import { dateToTimestamp } from "../../../utils/helpers";
 import { ThunkAction } from "../../types";
 import {
   GroupMessageByDateFetchFilter,
@@ -9,13 +10,14 @@ import {
 } from "../types";
 import { convertFetchedResToGroupMessagesOutput } from "./helpers";
 
+// TODO: Implement this in the UI first.
 export const getMessagesByGroupByTimestamp =
   (groupMessageByDateFetchFilter: GroupMessageByDateFetchFilter): ThunkAction =>
   async (dispatch, _getState, { callZome }): Promise<GroupMessagesOutput> => {
     const input = {
       groupId: deserializeHash(groupMessageByDateFetchFilter.groupId),
-      date: groupMessageByDateFetchFilter.date,
-      payloadType: groupMessageByDateFetchFilter.date,
+      date: dateToTimestamp(groupMessageByDateFetchFilter.date),
+      payloadType: groupMessageByDateFetchFilter.payloadType,
     };
 
     // TODO: error handling

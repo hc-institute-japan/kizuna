@@ -197,7 +197,7 @@ export interface AddGroupAction {
   };
 }
 
-export interface AddGroupMembersAction {
+export interface AddMembersAction {
   type: typeof ADD_MEMBERS;
   updateGroupMembersData: UpdateGroupMembersData;
   membersUsernames: {
@@ -205,7 +205,7 @@ export interface AddGroupMembersAction {
   };
 }
 
-export interface RemoveGroupMembersAction {
+export interface RemoveMembersAction {
   type: typeof REMOVE_MEMBERS;
   updateGroupMembersData: UpdateGroupMembersData;
 }
@@ -270,8 +270,8 @@ export interface SetFilesBytes {
 
 export type GroupConversationsActionTypes =
   | AddGroupAction
-  | AddGroupMembersAction
-  | RemoveGroupMembersAction
+  | AddMembersAction
+  | RemoveMembersAction
   | UpdateGroupNameAction
   | SetGroupMessageAction
   | SetNextBatchGroupMessagesAction

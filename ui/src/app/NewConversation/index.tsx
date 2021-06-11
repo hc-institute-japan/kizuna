@@ -20,7 +20,12 @@ interface StateProps {
 }
 
 const NewConversation: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const intl = useIntl();
+  const history = useHistory();
   const location = useLocation<StateProps>();
+
+  /* Local States */
   const [contacts, setContacts] = useState<ProfileListType>({});
   const [selectedContacts, setSelectedContacts] = useState<ProfileListType>({});
   const [search, setSearch] = useState("");
@@ -29,14 +34,8 @@ const NewConversation: React.FC = () => {
   const [files, setFiles] = useState<object[]>([]);
   const [error, setError] = useState<string | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
-  const dispatch = useAppDispatch();
-  const intl = useIntl();
-  const history = useHistory();
 
-  useEffect(() => {
-    if (location.state !== undefined) setContacts(location.state.contacts);
-    return () => setContacts({});
-  }, [location.state]);
+  /* Handlers */
   const handleOnRemove = (contact: Profile) => {
     setSelectedContacts((currContacts) => {
       delete currContacts[contact.id];
@@ -47,13 +46,6 @@ const NewConversation: React.FC = () => {
       return { ...currContacts };
     });
   };
-
-  useEffect(() => {
-    setSearch("");
-  }, [contacts, selectedContacts]);
-  useEffect(() => {
-    setIsOpen(error !== undefined);
-  }, [error]);
 
   const handleOnSend = () => {
     const contacts = Object.values(selectedContacts);
@@ -111,6 +103,20 @@ const NewConversation: React.FC = () => {
       );
     }
   };
+
+  /* Effects */
+  useEffect(() => {
+    setSearch("");
+  }, [contacts, selectedContacts]);
+
+  useEffect(() => {
+    setIsOpen(error !== undefined);
+  }, [error]);
+
+  useEffect(() => {
+    if (location.state !== undefined) setContacts(location.state.contacts);
+    return () => setContacts({});
+  }, [location.state]);
 
   return (
     <ContactsContext.Provider

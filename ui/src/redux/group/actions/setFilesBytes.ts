@@ -5,16 +5,17 @@ import { SET_FILES_BYTES } from "../types";
 
 export const fetchFilesBytes =
   (fileHashes: string[]): ThunkAction =>
-  async (dispatch, getState, { callZome }) => {
+  async (dispatch, getState, { callZome, displayError }) => {
     /* deserialize id for zome fn */
     const input = fileHashes.map((fileId: string) => deserializeHash(fileId));
-    const res = await callZome({
-      zomeName: ZOMES.GROUP,
-      fnName: FUNCTIONS[ZOMES.GROUP].GET_FILES_BYTES,
-      payload: input,
-    });
 
-    if (res?.type !== "error") {
+    try {
+      const res = await callZome({
+        zomeName: ZOMES.GROUP,
+        fnName: FUNCTIONS[ZOMES.GROUP].GET_FILES_BYTES,
+        payload: input,
+      });
+
       const { groupFiles } = getState().groups;
 
       dispatch(
@@ -24,6 +25,16 @@ export const fetchFilesBytes =
         })
       );
       return res;
+    } catch (e) {
+      if (e.message.includes("The file bytes were not found")) {
+        return displayError(
+          "TOAST",
+          {},
+          { id: "redux.err.group.set-files-bytes.1" }
+        );
+      } else {
+        return displayError("TOAST", {}, { id: "redux.err.generic" });
+      }
     }
   };
 
