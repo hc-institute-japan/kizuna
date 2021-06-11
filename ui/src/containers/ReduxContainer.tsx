@@ -2,23 +2,12 @@ import React, { useEffect, useState } from "react";
 import { Provider } from "react-redux";
 import { Store } from "redux";
 import createStore from "../redux/store";
-import { useError } from "./ErrorContainer/context";
 
 export let store: Store | undefined;
+store = createStore();
 
 const ReduxContainer: React.FC = ({ children }) => {
-  const [isStoreReady, setIsStoreReady] = useState(false);
-  const { displayError } = useError();
-
-  useEffect(function () {
-    setIsStoreReady(true);
-    store = createStore({ displayError });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  return isStoreReady ? (
-    <Provider store={store as Store}>{children}</Provider>
-  ) : null;
+  return <Provider store={store as Store}>{children}</Provider>;
 };
 
 export default ReduxContainer;

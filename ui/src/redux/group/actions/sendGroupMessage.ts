@@ -21,14 +21,11 @@ import {
 } from "../../commons/types";
 import { setFilesBytes } from "./setFilesBytes";
 import { timestampToDate } from "../../../utils/helpers";
+import { pushError } from "../../error/actions";
 
 export const sendGroupMessage =
   (groupMessageData: GroupMessageInput): ThunkAction =>
-  async (
-    dispatch,
-    getState,
-    { callZome, displayError }
-  ): Promise<GroupMessage> => {
+  async (dispatch, getState, { callZome }): Promise<GroupMessage> => {
     if (isTextPayload(groupMessageData.payloadInput)) {
       let message = groupMessageData.payloadInput.payload.payload;
       /* input sanitization for text payload */
@@ -117,24 +114,26 @@ export const sendGroupMessage =
       return groupMessageDataConverted;
     } catch (e) {
       if (e.message.includes("failed to get the given group id")) {
-        return displayError(
-          "TOAST",
-          {},
-          {
-            id: "redux.err.group.send-group-message.1",
-            value: {
-              payload: isTextPayload(groupMessageData.payloadInput)
-                ? groupMessageData.payloadInput.payload
-                : groupMessageData.payloadInput.payload.metadata.fileName,
-            },
-          }
+        return dispatch(
+          pushError(
+            "TOAST",
+            {},
+            {
+              id: "redux.err.group.send-group-message.1",
+              value: {
+                payload: isTextPayload(groupMessageData.payloadInput)
+                  ? groupMessageData.payloadInput.payload
+                  : groupMessageData.payloadInput.payload.metadata.fileName,
+              },
+            }
+          )
         );
       } else {
         /* 
           This is the error other than what we defiend in Guest.
           See connection/holochainClient.ts callZome() for more info.
         */
-        return displayError("TOAST", {}, { id: "redux.err.generic" });
+        return dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
       }
     }
   };

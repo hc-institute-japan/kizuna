@@ -1,24 +1,25 @@
 import React from "react";
-import ErrorContainer from "./ErrorContainer";
-
+import ErrorHandler from "./ErrorHandlerContainer";
 import IntlContainer from "./IntlContainer";
 import IonicContainer from "./IonicContainer";
 import ReduxContainer from "./ReduxContainer";
 import RouterContainer from "./RouterContainer";
 import ToastContainer from "./ToastContainer";
 
-const Container: React.FC = ({ children }) => (
-  <IonicContainer>
-    <ReduxContainer>
+const Container: React.FC = ({ children }) => {
+  return (
+    <IonicContainer>
       <RouterContainer>
-        <IntlContainer>
-          <ToastContainer>
-            <ErrorContainer>{children}</ErrorContainer>
-          </ToastContainer>
-        </IntlContainer>
+        <ReduxContainer>
+          <IntlContainer>
+            <ToastContainer>
+              <ErrorHandler>{children}</ErrorHandler>
+            </ToastContainer>
+          </IntlContainer>
+        </ReduxContainer>
       </RouterContainer>
-    </ReduxContainer>
-  </IonicContainer>
-);
+    </IonicContainer>
+  );
+};
 
 export default Container;

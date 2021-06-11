@@ -21,8 +21,17 @@ const ToastContainer: React.FC = ({ children }) => {
     setIsShowing(false);
   };
 
+  useEffect(() => {
+    if (!shouldShow) setProps({});
+  }, [shouldShow]);
+
+  const showErrorToast = (props: ToastOptions) => {
+    setProps({ color: "danger", ...props });
+    setShouldShow(true);
+  };
+
   return (
-    <ToastContext.Provider value={{ showToast, dismissToast }}>
+    <ToastContext.Provider value={{ showToast, dismissToast, showErrorToast }}>
       <IonToast
         isOpen={isShowing}
         onDidDismiss={dismissToast}

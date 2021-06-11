@@ -1,6 +1,7 @@
 import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
 import { timestampToDate } from "../../../utils/helpers";
+import { pushError } from "../../error/actions";
 import { ThunkAction } from "../../types";
 import {
   GroupConversation,
@@ -15,7 +16,7 @@ import {
 
 export const getLatestGroupVersion =
   (groupId: string): ThunkAction =>
-  async (dispatch, getState, { callZome, getAgentId, displayError }) => {
+  async (dispatch, getState, { callZome, getAgentId }) => {
     const myAgentId = await getAgentId();
     try {
       const latestGroupVersionRes = await callZome({
@@ -78,13 +79,15 @@ export const getLatestGroupVersion =
       return groupData;
     } catch (e) {
       if (e.message.includes("failed to get the given group id")) {
-        return displayError(
-          "TOAST",
-          {},
-          { id: "redux.err.group.get-latest-group-version.1" }
+        return dispatch(
+          pushError(
+            "TOAST",
+            {},
+            { id: "redux.err.group.get-latest-group-version.1" }
+          )
         );
       } else {
-        return displayError("TOAST", {}, { id: "redux.err.generic" });
+        return dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
       }
     }
   };
