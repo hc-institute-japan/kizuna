@@ -136,16 +136,20 @@ const Chat: React.FC = () => {
     call typing indicator with false parameter with debounce of 500ms as well.
   */
   const handleOnChange = (message: string, conversant: Profile) => {
-    dispatch(isTyping(conversant.id, message.length !== 0 ? true : false));
+    if (didMountRef.current === true) {
+      dispatch(isTyping(conversant.id, message.length !== 0 ? true : false));
 
-    if (inputTimeout.current) clearTimeout(inputTimeout.current);
+      if (inputTimeout.current) clearTimeout(inputTimeout.current);
 
-    inputTimeout.current = setTimeout(
-      () => dispatch(isTyping(conversant.id, false)),
-      500
-    );
+      inputTimeout.current = setTimeout(
+        () => dispatch(isTyping(conversant.id, false)),
+        500
+      );
 
-    setMessage(message);
+      setMessage(message);
+    } else {
+      didMountRef.current = true;
+    }
   };
 
   /* 
