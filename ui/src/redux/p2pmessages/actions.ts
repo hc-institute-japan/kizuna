@@ -27,6 +27,8 @@ import {
   SET_MESSAGES,
 } from "./types";
 
+import { pushError, shiftError } from "../../redux/error/actions";
+
 /* HELPER FUNCTIONS */
 /* 
     transform HC data structures to UI/redux data structures
@@ -145,7 +147,6 @@ export const setFiles =
     });
 
     if (fetchedFiles?.type !== "error") {
-      // console.log("Actions SET_FILES dispatching to reducer", fetchedFiles);
       dispatch({
         type: SET_FILES,
         sate: fetchedFiles,
@@ -200,7 +201,6 @@ export const sendMessage =
     file?: any
   ): ThunkAction =>
   async (dispatch, _getState, { callZome }) => {
-    // construct the payload input structure (text or file)
     let payloadInput;
     if (type === "TEXT") {
       let textPayload: TextPayload = {
@@ -231,95 +231,93 @@ export const sendMessage =
 
     // construct the message input structure
     let input: MessageInput = {
-      // receiver: receiver,
       receiver: Buffer.from(deserializeHash(receiver)),
       payload: payloadInput,
       reply_to: replyTo,
     };
 
     // CALL ZOME
-    const sentMessage = await callZome({
-      zomeName: ZOMES.P2PMESSAGE,
-      fnName: FUNCTIONS[ZOMES.P2PMESSAGE].SEND_MESSAGE,
-      payload: input,
-    });
+    try {
+      const sentMessage = await callZome({
+        zomeName: ZOMES.P2PMESSAGE,
+        fnName: FUNCTIONS[ZOMES.P2PMESSAGE].SEND_MESSAGE,
+        payload: input,
+      });
 
-    // transform the return value of the send_message function (message and receipt)
-    // send_message return value is not consistent with the structures of the get functions
-    // TODO: standardize return values in HC
-    if (sentMessage?.type !== "error") {
-      // console.log("Action sent Message", sentMessage);
-      const [messageTuple, receiptTuple] = sentMessage;
-      const [messageID, message] = messageTuple;
-      const [receiptID, receipt] = receiptTuple!;
+      // transform the return value of the send_message function (message and receipt)
+      // send_message return value is not consistent with the structures of the get functions
+      // TODO: standardize return values in HC
+      if (sentMessage?.type !== "error") {
+        const [messageTuple, receiptTuple] = sentMessage;
+        const [messageID, message] = messageTuple;
+        const [receiptID, receipt] = receiptTuple!;
 
-      let messageHash = serializeHash(messageID);
-      let receiptHash = serializeHash(receiptID);
+        let messageHash = serializeHash(messageID);
+        let receiptHash = serializeHash(receiptID);
 
-      let payload;
-      switch (message.payload.type) {
-        case "TEXT":
-          payload = message.payload;
-          break;
-        case "FILE":
-          payload = {
-            type: "FILE",
-            fileName: message.payload.payload.metadata.fileName,
-            fileSize: message.payload.payload.metadata.fileSize,
-            fileType: message.payload.payload.fileType.type,
-            fileHash: serializeHash(message.payload.payload.metadata.fileHash),
-            thumbnail:
-              message.payload.payload.fileType.type !== "OTHER"
-                ? message.payload.payload.fileType.payload.thumbnail
-                : null,
-          };
-          break;
-        default:
-          break;
+        let payload;
+        switch (message.payload.type) {
+          case "TEXT":
+            payload = message.payload;
+            break;
+          case "FILE":
+            payload = {
+              type: "FILE",
+              fileName: message.payload.payload.metadata.fileName,
+              fileSize: message.payload.payload.metadata.fileSize,
+              fileType: message.payload.payload.fileType.type,
+              fileHash: serializeHash(
+                message.payload.payload.metadata.fileHash
+              ),
+              thumbnail:
+                message.payload.payload.fileType.type !== "OTHER"
+                  ? message.payload.payload.fileType.payload.thumbnail
+                  : null,
+            };
+            break;
+          default:
+            break;
+        }
+
+        let p2pMessage: P2PMessage = {
+          p2pMessageEntryHash: messageHash,
+          author: serializeHash(message.author),
+          receiver: serializeHash(message.receiver),
+          payload: payload,
+          timestamp: timestampToDate(message.timeSent),
+          replyTo: message.replyTo,
+          receipts: [receiptHash],
+        };
+
+        let messageEntryHash = serializeHash(receipt.id[0]);
+        let p2pReceipt: P2PMessageReceipt = {
+          p2pMessageReceiptEntryHash: serializeHash(receiptID),
+          p2pMessageEntryHashes: [messageEntryHash],
+          timestamp: timestampToDate(receipt.status.timestamp),
+          status: receipt.status.status,
+        };
+
+        let p2pFile =
+          type === "FILE"
+            ? {
+                fileHash: payload.fileHash,
+                fileBytes: file.fileBytes,
+              }
+            : undefined;
+
+        // DISPATCH TO REDUCER
+        dispatch(
+          appendMessage({
+            message: p2pMessage,
+            receipt: p2pReceipt,
+            file: p2pFile !== undefined ? p2pFile : undefined,
+          })
+        );
+        return true;
       }
-
-      let p2pMessage: P2PMessage = {
-        p2pMessageEntryHash: messageHash,
-        author: serializeHash(message.author),
-        receiver: serializeHash(message.receiver),
-        payload: payload,
-        timestamp: timestampToDate(message.timeSent),
-        replyTo: message.replyTo,
-        receipts: [receiptHash],
-      };
-
-      let messageEntryHash = serializeHash(receipt.id[0]);
-      let p2pReceipt: P2PMessageReceipt = {
-        p2pMessageReceiptEntryHash: serializeHash(receiptID),
-        p2pMessageEntryHashes: [messageEntryHash],
-        timestamp: timestampToDate(receipt.status.timestamp),
-        status: receipt.status.status,
-      };
-
-      let p2pFile =
-        type === "FILE"
-          ? {
-              fileHash: payload.fileHash,
-              fileBytes: file.fileBytes,
-            }
-          : undefined;
-
-      // DISPATCH TO REDUCER
-      dispatch(
-        appendMessage({
-          message: p2pMessage,
-          receipt: p2pReceipt,
-          file: p2pFile !== undefined ? p2pFile : undefined,
-        })
-      );
-
-      // console.log("actions successfully sent message");
-      return true;
+    } catch (e) {
+      dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
     }
-
-    // ERROR
-    // console.log("actions failed to send message", sentMessage);
-    return false;
   };
 
 /* GETTERS */
@@ -330,24 +328,26 @@ export const sendMessage =
 export const getLatestMessages =
   (size: number): ThunkAction =>
   async (dispatch, _getState, { callZome }) => {
-    // CALL ZOME
-    const batchSize: BatchSize = size;
-    const p2pLatestState = await callZome({
-      zomeName: ZOMES.P2PMESSAGE,
-      fnName: FUNCTIONS[ZOMES.P2PMESSAGE].GET_LATEST_MESSAGES,
-      payload: batchSize,
-    });
+    try {
+      // CALL ZOME
+      const batchSize: BatchSize = size;
+      const p2pLatestState = await callZome({
+        zomeName: ZOMES.P2PMESSAGE,
+        fnName: FUNCTIONS[ZOMES.P2PMESSAGE].GET_LATEST_MESSAGES,
+        payload: batchSize,
+      });
 
-    // DISPATCH TO REDUCER
-    if (p2pLatestState?.type !== "error") {
-      let toDispatch = transformZomeDataToUIData(p2pLatestState);
-      dispatch(setMessages(toDispatch));
+      // DISPATCH TO REDUCER
+      if (p2pLatestState?.type !== "error") {
+        let toDispatch = transformZomeDataToUIData(p2pLatestState);
+        dispatch(setMessages(toDispatch));
 
-      return toDispatch;
+        return toDispatch;
+      }
+    } catch (e) {
+      // ERROR
+      dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
     }
-
-    // ERROR
-    return false;
   };
 
 // action to get messages in batches (called while scrolling in chat boxes and media boxes)
@@ -371,26 +371,27 @@ export const getNextBatchMessages =
         ? Buffer.from(deserializeHash(last_fetched_message_id))
         : undefined,
     };
-    // CALL ZOME
-    const nextBatchOfMessages = await callZome({
-      zomeName: ZOMES.P2PMESSAGE,
-      fnName: FUNCTIONS[ZOMES.P2PMESSAGE].GET_NEXT_BATCH_MESSAGES,
-      payload: zome_input,
-    });
+    try {
+      // CALL ZOME
+      const nextBatchOfMessages = await callZome({
+        zomeName: ZOMES.P2PMESSAGE,
+        fnName: FUNCTIONS[ZOMES.P2PMESSAGE].GET_NEXT_BATCH_MESSAGES,
+        payload: zome_input,
+      });
 
-    // DISPATCH TO REDUCER
-    if (nextBatchOfMessages?.type !== "error") {
-      let toDispatch = transformZomeDataToUIData(nextBatchOfMessages);
-      if (Object.values(nextBatchOfMessages[1]).length > 0)
-        dispatch({
-          type: SET_MESSAGES,
-          state: toDispatch,
-        });
-      return nextBatchOfMessages;
+      // DISPATCH TO REDUCER
+      if (nextBatchOfMessages?.type !== "error") {
+        let toDispatch = transformZomeDataToUIData(nextBatchOfMessages);
+        if (Object.values(nextBatchOfMessages[1]).length > 0)
+          dispatch({
+            type: SET_MESSAGES,
+            state: toDispatch,
+          });
+        return nextBatchOfMessages;
+      }
+    } catch (e) {
+      dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
     }
-
-    // ERROR
-    return nextBatchOfMessages;
   };
 
 // action to mark an array of messages as read (called in the onSeen callback)
@@ -457,30 +458,30 @@ export const readMessage =
 export const getFileBytes =
   (inputHashes: HoloHashBase64[]): ThunkAction =>
   async (dispatch, _getState, { callZome }) => {
-    // console.log("actions getting file bytes", inputHashes);
     let hashes = inputHashes.map((hash) => deserializeHash(hash));
-    const fetchedFiles = await callZome({
-      zomeName: ZOMES.P2PMESSAGE,
-      fnName: FUNCTIONS[ZOMES.P2PMESSAGE].GET_FILE_BYTES,
-      payload: hashes,
-    });
-
-    let transformedFiles: { [key: string]: Uint8Array } = {};
-    if (fetchedFiles?.type !== "error") {
-      Object.keys(fetchedFiles).forEach((key) => {
-        transformedFiles[key] = fetchedFiles[key];
+    try {
+      const fetchedFiles = await callZome({
+        zomeName: ZOMES.P2PMESSAGE,
+        fnName: FUNCTIONS[ZOMES.P2PMESSAGE].GET_FILE_BYTES,
+        payload: hashes,
       });
-      // console.log("actions transformed", transformedFiles);
-      if (Object.entries(transformedFiles).length > 0) {
-        dispatch({
-          type: SET_FILES,
-          state: transformedFiles,
+
+      let transformedFiles: { [key: string]: Uint8Array } = {};
+      if (fetchedFiles?.type !== "error") {
+        Object.keys(fetchedFiles).forEach((key) => {
+          transformedFiles[key] = fetchedFiles[key];
         });
+        if (Object.entries(transformedFiles).length > 0) {
+          dispatch({
+            type: SET_FILES,
+            state: transformedFiles,
+          });
+        }
+        return transformedFiles;
       }
-      return transformedFiles;
+    } catch (e) {
+      dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
     }
-    // console.log("actiosn failed to get file bytes", fetchedFiles);
-    return false;
   };
 
 // action to call typing
@@ -505,7 +506,6 @@ export const isTyping =
 export const countUnread =
   (conversant: string): ThunkAction =>
   (dispatch, getState) => {
-    // console.log("actions conversant", conversant);
     const { conversations, messages, receipts } = getState().p2pmessages;
     const conversation = conversations[conversant].messages;
     let unreadCounter = 0;
