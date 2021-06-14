@@ -108,14 +108,10 @@ const GroupChat: React.FC = () => {
     }
 
     const messagePromises = inputs.map((groupMessage: any) =>
-      // TODO: error handling
       dispatch(sendGroupMessage(groupMessage))
     );
 
     Promise.all(messagePromises).then((sentMessages: GroupMessage[]) => {
-      // sentMessages.forEach((msg: GroupMessage, i) => {
-      //   setMessages([...messages!, msg.groupMessageId]);
-      // });
       setSendingLoading(false);
       chatList.current!.scrollToBottom();
     });

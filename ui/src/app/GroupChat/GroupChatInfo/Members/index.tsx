@@ -68,8 +68,10 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
       groupRevisionId: groupData.originalGroupRevisionId,
     };
     dispatch(removeMembers(input)).then((res: any) => {
-      let newMembers = members.filter((x) => !res.members.includes(x.id));
-      setMembers(newMembers);
+      if (res !== false) {
+        let newMembers = members.filter((x) => !res.members.includes(x.id));
+        setMembers(newMembers);
+      }
       setLoading(false);
     });
   };

@@ -70,7 +70,7 @@ const MessageList: React.FC<Props> = ({
           payloadType: { type: "ALL", payload: null },
         })
       ).then((res: GroupMessagesOutput) => {
-        if (Object.keys(res.groupMessagesContents).length <= 0) {
+        if (res && Object.keys(res.groupMessagesContents).length <= 0) {
           setOldestFetched(true);
         }
         complete();
@@ -81,6 +81,7 @@ const MessageList: React.FC<Props> = ({
 
   const handleOnDownload = (file: FilePayload) => {
     const fileBytes = filesBytes[file.fileHash];
+    console.log(fileBytes);
     if (fileBytes) {
       const blob = new Blob([fileBytes]); // change resultByte to bytes
       const link = document.createElement("a");
@@ -88,16 +89,18 @@ const MessageList: React.FC<Props> = ({
       link.download = file.fileName;
       link.click();
     } else {
-      dispatch(fetchFilesBytes([file.fileHash])).then((res: any) => {
-        if (res) {
-          const fetchedFileBytes = res[file.fileHash];
-          const blob = new Blob([fetchedFileBytes]); // change resultByte to bytes
-          const link = document.createElement("a");
-          link.href = window.URL.createObjectURL(blob);
-          link.download = file.fileName;
-          link.click();
+      dispatch(fetchFilesBytes([file.fileHash])).then(
+        (res: { [key: string]: Uint8Array }) => {
+          if (res && Object.keys(res).length > 0) {
+            const fetchedFileBytes = res[file.fileHash];
+            const blob = new Blob([fetchedFileBytes]); // change resultByte to bytes
+            const link = document.createElement("a");
+            link.href = window.URL.createObjectURL(blob);
+            link.download = file.fileName;
+            link.click();
+          }
         }
-      });
+      );
     }
   };
 
