@@ -12,6 +12,7 @@ import { useIntl } from "react-intl";
 import { useToast } from "../../../../../containers/ToastContainer/context";
 
 import { addMembers } from "../../../../../redux/group/actions/addMembers";
+import { UpdateGroupMembersData } from "../../../../../redux/group/types";
 // redux
 import { Profile, ProfileListType } from "../../../../../redux/profile/types";
 import { indexContacts, useAppDispatch } from "../../../../../utils/helpers";
@@ -21,26 +22,22 @@ import styles from "./style.module.css";
 
 interface Props {
   isOpen: boolean;
-  setIsOpen: (bool: any) => void;
   setLoading: (bool: any) => void;
   onCancel: () => void;
   contacts: ProfileListType;
   groupId: string;
   groupRevisionId: string;
-  myAgentId: string;
   members: Profile[];
   setMembers: (profiles: Profile[]) => void;
 }
 
 const AddMemberModal: React.FC<Props> = ({
   isOpen,
-  setIsOpen,
   onCancel,
   contacts,
   groupId,
   groupRevisionId,
   setLoading,
-  myAgentId,
   members,
   setMembers,
 }) => {
@@ -66,42 +63,29 @@ const AddMemberModal: React.FC<Props> = ({
   );
 
   /* Handlers */
-
-  const handleOnCompletion = (contact: Profile) => {
-    /* return error toast if member is already added */
-    if (
-      members
-        .map((profile: Profile) => {
-          return profile.id;
-        })
-        .includes(contact.id)
-    ) {
-      showErrorToast({
-        message: intl.formatMessage(
-          { id: "app.group-chat.already-member" },
-          { name: contact.username }
-        ),
-      });
-      return false;
-    }
+  const handleOnSelected = (contact: Profile) =>
     setSelected([...selected, contact]);
-    return true;
-  };
 
   const handleOnAdd = () => {
     setLoading(true);
     let payload = {
-      // base64 string
-      members: selected.map((profile: any) => profile.id),
+      members: selected.map((profile: any) => profile.id), // base64 string
       groupId,
       groupRevisionId,
     };
-    dispatch(addMembers(payload)).then((res: any) => {
-      let newMembers: Profile[] = members.concat(selected);
-      setMembers(newMembers);
-      setSelected([]);
-      setLoading(false);
-    });
+    dispatch(addMembers(payload)).then(
+      (res: UpdateGroupMembersData | boolean) => {
+        if (res !== false) {
+          let newMembers: Profile[] = members.concat(selected);
+          setMembers(newMembers);
+          setSelected([]);
+          setLoading(false);
+        } else {
+          setSelected([]);
+          setLoading(false);
+        }
+      }
+    );
   };
 
   /* Renders */
@@ -110,10 +94,11 @@ const AddMemberModal: React.FC<Props> = ({
       const searchedContacts = indexedContacts[char];
       return (
         <AddMemberIndex
-          onCompletion={handleOnCompletion}
+          onSelected={handleOnSelected}
           key={char}
           index={char}
           contacts={searchedContacts}
+          selected={selected}
         />
       );
     });

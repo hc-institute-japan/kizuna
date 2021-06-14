@@ -14,7 +14,6 @@
   "app.group-chat.add-member-contacts": "連絡先",
   "app.group-chat.add-members": "メンバー追加",
   "app.group-chat.admin-role": "管理者",
-  "app.group-chat.already-member": "{name}はすでにグループのメンバーです",
   "app.group-chat.fetching": "取得中...",
   "app.group-chat.files.fetching": "ファイル取得中...",
   "app.group-chat.files.no-files": "ファイルはこのチャットではまだ共有されていません",

@@ -1,34 +1,36 @@
 import { IonItemDivider, IonLabel } from "@ionic/react";
 import React from "react";
-import { IndexedContacts } from "../../../../../../redux/contacts/types";
 import { Profile } from "../../../../../../redux/profile/types";
 import AddContactItem from "../AddMemberItem";
 
 interface Props {
-  indexedContacts?: IndexedContacts;
   index: string;
   contacts: Profile[];
-  onCompletion(contact: Profile): boolean;
+  selected: Profile[];
+  onSelected(contact: Profile): void;
 }
 
 const AddMemberIndex: React.FC<Props> = ({
   index,
   contacts,
-  onCompletion,
-  indexedContacts,
+  onSelected,
+  selected,
 }) => {
   return (
     <React.Fragment key={index}>
       <IonItemDivider>
         <IonLabel>{index}</IonLabel>
       </IonItemDivider>
-      {contacts.map((contact) => (
-        <AddContactItem
-          key={JSON.stringify(contact.id)}
-          contact={contact}
-          onCompletion={onCompletion}
-        />
-      ))}
+      {contacts.map((contact) => {
+        return (
+          <AddContactItem
+            key={JSON.stringify(contact.id)}
+            onSelected={onSelected}
+            selected={selected.includes(contact) ? true : false}
+            contact={contact}
+          />
+        );
+      })}
     </React.Fragment>
   );
 };
