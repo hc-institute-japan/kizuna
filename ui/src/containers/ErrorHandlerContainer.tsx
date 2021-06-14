@@ -1,5 +1,5 @@
 import { ToastOptions } from "@ionic/core";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { shiftError } from "../redux/error/actions";
@@ -24,11 +24,11 @@ const ErrorHandler: React.FC = ({ children }) => {
             ),
           }
         : {};
-      console.log(intlMessage);
+
       showErrorToast({ ...(error.options as ToastOptions), ...intlMessage });
       dispatch(shiftError());
     }
-  }, [errors]);
+  }, [errors, dispatch, intl, showErrorToast]);
   return <>{children}</>;
 };
 

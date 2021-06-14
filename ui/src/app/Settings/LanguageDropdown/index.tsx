@@ -48,7 +48,7 @@ const LanguageDropdown: React.FC = () => {
           value={selected!.code}
         >
           {languages.map((language) => (
-            <IonSelectOption value={language.code}>
+            <IonSelectOption key={language.code} value={language.code}>
               {language.language}
             </IonSelectOption>
           ))}
