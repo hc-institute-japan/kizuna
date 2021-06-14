@@ -16,17 +16,12 @@ import {
 } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import {
-  RouteComponentProps,
-  useHistory,
-  useLocation,
-  useParams,
-} from "react-router";
+import { useHistory, useLocation, useParams } from "react-router";
 import { ChatList, Me, Others } from "../../components/Chat";
 import { ChatListMethods } from "../../components/Chat/types";
 import Typing from "../../components/Chat/Typing";
 import MessageInput from "../../components/MessageInput";
-import { Conversation, FilePayload } from "../../redux/commons/types";
+import { FilePayload } from "../../redux/commons/types";
 import {
   getFileBytes,
   getNextBatchMessages,
@@ -39,14 +34,11 @@ import {
   P2PMessage,
   P2PMessageReceipt,
 } from "../../redux/p2pmessages/types";
+import { Profile } from "../../redux/profile/types";
 import { RootState } from "../../redux/types";
-import { debounce, useAppDispatch } from "../../utils/helpers";
+import { useAppDispatch } from "../../utils/helpers";
 
-type Props = {
-  location: RouteComponentProps<{}, {}, { state: Conversation }>;
-};
-
-const Chat: React.FC<Props> = ({ location }) => {
+const Chat: React.FC = () => {
   /* STATES */
   const { username } = useParams<{ username: string }>();
   const [message, setMessage] = useState<string>("");
@@ -78,7 +70,7 @@ const Chat: React.FC<Props> = ({ location }) => {
   /* REFS */
   const scrollerRef = useRef<ChatListMethods>(null);
   const didMountRef = useRef(false);
-  const didMountRef2 = useRef(false);
+  const inputTimeout = useRef<NodeJS.Timeout>();
 
   /* USE EFFECTS */
   /* 
@@ -127,22 +119,6 @@ const Chat: React.FC<Props> = ({ location }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversations, messages, receipts, conversant]);
 
-  /* 
-    dispatches an action to notify hc that you are typing
-    which then emits a signal to the receiver
-    when the message state is changed during typing
-  */
-  useEffect(() => {
-    if (didMountRef.current) {
-      if (conversant) {
-        debounce(dispatch(isTyping(conversant.id, true)), 5000);
-      }
-    } else {
-      didMountRef.current = true;
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [message]);
-
   /* HANDLERS */
   /* 
     navigates to info, media, files page 
@@ -153,6 +129,27 @@ const Chat: React.FC<Props> = ({ location }) => {
       pathname: `${location2.pathname}/details`,
       state: { conversant: conversant },
     });
+  };
+
+  /*
+    dispatches an typing indicator when the user types.
+    call typing indicator with false parameter with debounce of 500ms as well.
+  */
+  const handleOnChange = (message: string, conversant: Profile) => {
+    if (didMountRef.current === true) {
+      dispatch(isTyping(conversant.id, message.length !== 0 ? true : false));
+
+      if (inputTimeout.current) clearTimeout(inputTimeout.current);
+
+      inputTimeout.current = setTimeout(
+        () => dispatch(isTyping(conversant.id, false)),
+        500
+      );
+
+      setMessage(message);
+    } else {
+      didMountRef.current = true;
+    }
   };
 
   /* 
@@ -177,7 +174,7 @@ const Chat: React.FC<Props> = ({ location }) => {
     when reaching the beginning/top of the chat box
   */
   const handleOnScrollTop = (complete: any) => {
-    if (didMountRef2.current === true) {
+    if (didMountRef.current === true) {
       if (disableGetNextBatch === false) {
         let lastMessage = messagesWithConversant[0].message;
         dispatch(
@@ -197,7 +194,7 @@ const Chat: React.FC<Props> = ({ location }) => {
         });
       }
     } else {
-      didMountRef2.current = true;
+      didMountRef.current = true;
     }
     complete();
     return;
@@ -334,7 +331,7 @@ const Chat: React.FC<Props> = ({ location }) => {
 
       <MessageInput
         onSend={handleOnSubmit}
-        onChange={(message) => setMessage(message)}
+        onChange={(message: string) => handleOnChange(message, conversant)}
         onFileSelect={(files) => setFiles(files)}
       />
     </IonPage>
