@@ -15,7 +15,7 @@ import {
   informationCircleOutline,
   peopleCircleOutline,
 } from "ionicons/icons";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router";
@@ -46,7 +46,6 @@ const GroupChat: React.FC = () => {
   const dispatch = useAppDispatch();
   const intl = useIntl();
   const { group } = useParams<GroupChatParams>();
-  const chatList = useRef<ChatListMethods>(null);
 
   /* local states */
   const [files, setFiles] = useState<object[]>([]);
@@ -54,7 +53,8 @@ const GroupChat: React.FC = () => {
   const [message, setMessage] = useState("");
 
   /* Refs */
-  const didMountRef = useRef(false);
+  const chatList = useRef<ChatListMethods>(null);
+  const inputTimeout = useRef<NodeJS.Timeout>();
 
   /* Selectors */
   const groupData = useSelector(
@@ -123,8 +123,10 @@ const GroupChat: React.FC = () => {
 
   const handleOnBack = () => history.push({ pathname: `/home` });
 
-  const inputTimeout = useRef<NodeJS.Timeout>();
-
+  /* 
+    handle change in message input. indicate typing as the user types 
+    but debounce with 500ms to indicate false in
+  */
   const handleOnChange = (message: string, groupInfo: GroupConversation) => {
     // Remove self from the recipient of typing signal
     let members = [...groupInfo.members, groupInfo.creator].filter(
@@ -152,32 +154,11 @@ const GroupChat: React.FC = () => {
             isTyping: false,
           })
         ),
-      5000
+      500
     );
 
     return setMessage(message);
   };
-
-  /* Effects */
-  useEffect(() => {
-    if (didMountRef.current) {
-      let members = [...groupData.members, groupData.creator].filter(
-        (member) => member !== myProfile.id
-      );
-
-      dispatch(
-        indicateGroupTyping({
-          groupId: groupData.originalGroupId,
-          indicatedBy: myProfile.id!,
-          members,
-          isTyping: true,
-        })
-      );
-    } else {
-      didMountRef.current = true;
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [message]);
 
   return groupData ? (
     <IonPage>
