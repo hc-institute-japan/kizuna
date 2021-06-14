@@ -1,10 +1,9 @@
-import { ErrorActionType, ErrorState, SHIFT_ERROR, PUSH_ERROR } from "./types";
+import { ErrorActionType, ErrorState, PUSH_ERROR, SHIFT_ERROR } from "./types";
 
 const initialState: ErrorState = {
   errors: [],
 };
-
-const reducer = (state = initialState, action: ErrorActionType) => {
+const errorReducer = (state = initialState, action: ErrorActionType) => {
   switch (action.type) {
     case PUSH_ERROR:
       const curr = [...state.errors, action.error];
@@ -16,4 +15,4 @@ const reducer = (state = initialState, action: ErrorActionType) => {
   }
 };
 
-export default reducer;
+export default errorReducer;
