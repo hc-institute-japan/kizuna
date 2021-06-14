@@ -5,7 +5,16 @@ import { ChatList, Me, Others } from "../../components/Chat";
 import { ChatListMethods } from "../../components/Chat/types";
 import Typing from "../../components/Chat/Typing";
 import MessageInput from "../../components/MessageInput";
+import { useToast } from "../../containers/ToastContainer/context";
+
 import { FilePayload, Payload } from "../../redux/commons/types";
+import {
+  addContact,
+  blockContact,
+  fetchAllUsernames,
+  unblockContact,
+} from "../../redux/contacts/actions";
+import { pushError } from "../../redux/error/actions";
 import { RootState, ThunkAction } from "../../redux/types";
 import { useAppDispatch } from "../../utils/helpers";
 
@@ -239,21 +248,6 @@ const Playground = () => {
         neil: new Date(),
       },
     },
-    // {
-    //   author: "neil",
-    //   timestamp: new Date(),
-    //   payload: {
-    //     type: "FILE",
-    //     payload: {
-    //       type: "FILE";
-    // fileName: string;
-    // fileSize: number;
-    // fileType: "IMAGE" | "VIDEO" | "OTHER";
-    // fileHash: FileBytesID;
-    // thumbnail?: Uint8Array;
-
-    //   },
-    // },
   ]);
 
   const chatList = useRef<ChatListMethods>(null);
@@ -264,6 +258,23 @@ const Playground = () => {
 
   useEffect(() => {
     dispatch(testError());
+    // dispatch(fetchAllUsernames()).then(({ id, username }: any) => {});
+    setTimeout(() => {
+      dispatch(
+        unblockContact({
+          id: "uhCAk63kHNGrgK99t9TDJrenQfsw2rJ_NYpPydf820gaWjtnESbXs",
+          username: "tats",
+        })
+      );
+    }, 2000);
+    setTimeout(() => {
+      dispatch(
+        blockContact({
+          id: "uhCAk63kHNGrgK99t9TDJrenQfsw2rJ_NYpPydf820gaWjtnESbXs",
+          username: "tats",
+        })
+      );
+    }, 4000);
   }, []);
 
   return (
@@ -286,19 +297,12 @@ const Playground = () => {
           { id: "xd", username: "pats" },
           { id: "xd", username: "eats" },
           { id: "xd", username: "xats" },
-
           { id: "xd", username: "wats" },
-
           { id: "xd", username: "qats" },
-
           { id: "xd", username: "bats" },
-
           { id: "xd", username: "pats" },
-
           { id: "xd", username: "lats" },
-
           { id: "xd", username: "fats" },
-
           { id: "xd", username: "dats" },
         ]}
       />

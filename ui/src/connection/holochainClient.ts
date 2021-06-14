@@ -81,11 +81,10 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
   } catch (e) {
     console.warn(e);
     const { type = null, data = null } = { ...e };
-
     if (type === "error") {
       switch (data?.type) {
         case "ribosome_error": {
-          const regex = /Guest\(\"([\s\S]*?)\"\)/;
+          const regex = /Guest\("([\s\S]*?)"\)/;
           const result = regex.exec(data.data);
           throw {
             type: "error",
@@ -103,6 +102,8 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
               "An internal error occured. This is likely a bug in holochain.",
           };
         }
+        default:
+          throw e;
       }
     }
 

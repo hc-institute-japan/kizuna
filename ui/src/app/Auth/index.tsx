@@ -20,12 +20,13 @@ const Auth: React.FC = () => {
 
   /* TODO: Maybe better to load here while username is getting fetched */
   return loading ? (
-    <Spinner hidden={!loading} />
+    <Spinner />
   ) : username !== null ? (
     <Authenticated />
   ) : (
     <Unauthenticated />
   );
+  // return <Playground />;
 };
 
 export default Auth;

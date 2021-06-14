@@ -24,12 +24,11 @@ const ErrorHandler: React.FC = ({ children }) => {
             ),
           }
         : {};
-      console.log(intlMessage);
+
       showErrorToast({ ...(error.options as ToastOptions), ...intlMessage });
       dispatch(shiftError());
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [errors]);
+  }, [errors, dispatch, intl, showErrorToast]);
   return <>{children}</>;
 };
 
