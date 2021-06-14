@@ -91,5 +91,19 @@
   "redux.err.group.send-group-message.1": "グループIDの取得に失敗したため、\"{payload}\"は送信されませんでした",
   "redux.err.group.set-files-bytes.1": "ファイル/メディアの取得に失敗しました",
   "redux.err.group.update-group-name.1": "おっと、同じ名前ではグループ名は更新できません",
-  "redux.err.group.update-group-name.2": "グループIDの取得に失敗したため、グループ名の更新に失敗しました"
-}
+  "redux.err.group.update-group-name.2": "グループIDの取得に失敗したため、グループ名の更新に失敗しました",
+  "redux.err.profile.set-username.1": "This username has already been taken.",
+  "redux.err.profile.set-username.2": "This user already has a username.",
+  "redux.err.profile.fetch-profile-from-username.1": "This username does not exist.",
+  "redux.err.contacts.add-contact.1": "{username} has already been added.",
+  "redux.err.contacts.add-contact.2": "{username} is blocked.",
+  "redux.err.contacts.block-contact.1": "{username} is already blocked.",
+  "redux.err.contacts.fetch-blocked.1": "Unable to fetch username of this user.",
+  "redux.err.contacts.fetch-blocked.2": "This user don't have a username.",
+  "redux.err.contacts.fetch-my-contacts.1": "Unable to fetch username of this user."
+
+
+
+
+
+} 
