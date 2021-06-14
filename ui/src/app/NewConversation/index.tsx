@@ -1,8 +1,9 @@
-import { IonContent, IonLoading, IonPage, IonToast } from "@ionic/react";
+import { IonContent, IonLoading, IonPage } from "@ionic/react";
 import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import { useHistory, useLocation } from "react-router";
 import MessageInput from "../../components/MessageInput";
+import { useToast } from "../../containers/ToastContainer/context";
 import { FilePayloadInput } from "../../redux/commons/types";
 import { sendInitialGroupMessage } from "../../redux/group/actions/sendInitialGroupMessage";
 import { GroupConversation } from "../../redux/group/types";
@@ -24,15 +25,14 @@ const NewConversation: React.FC = () => {
   const intl = useIntl();
   const history = useHistory();
   const location = useLocation<StateProps>();
+  const { showErrorToast } = useToast();
 
   /* Local States */
   const [contacts, setContacts] = useState<ProfileListType>({});
   const [selectedContacts, setSelectedContacts] = useState<ProfileListType>({});
   const [search, setSearch] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [files, setFiles] = useState<object[]>([]);
-  const [error, setError] = useState<string | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
 
   /* Handlers */
@@ -83,24 +83,21 @@ const NewConversation: React.FC = () => {
         return filePayloadInput;
       });
       dispatch(sendInitialGroupMessage(contacts, message, fileInputs)).then(
-        (res: { groupResult: GroupConversation; messageResults: any[] }) => {
-          if (res) {
-            setIsLoading(false);
+        (
+          res: { groupResult: GroupConversation; messageResults: any[] } | false
+        ) => {
+          setIsLoading(false);
+          if (res !== false) {
             history.push(`/g/${res.groupResult.originalGroupId}`);
-          } else {
-            setIsLoading(false);
-            setError(
-              intl.formatMessage({
-                id: "app.new-conversation.problem-occured-toast",
-              })
-            );
           }
         }
       );
     } else {
-      setError(
-        intl.formatMessage({ id: "app.new-conversation.no-contacts-toast" })
-      );
+      showErrorToast({
+        message: intl.formatMessage({
+          id: "app.new-conversation.no-contacts-toast",
+        }),
+      });
     }
   };
 
@@ -108,10 +105,6 @@ const NewConversation: React.FC = () => {
   useEffect(() => {
     setSearch("");
   }, [contacts, selectedContacts]);
-
-  useEffect(() => {
-    setIsOpen(error !== undefined);
-  }, [error]);
 
   useEffect(() => {
     if (location.state !== undefined) setContacts(location.state.contacts);
@@ -124,13 +117,6 @@ const NewConversation: React.FC = () => {
     >
       <IonPage>
         <IonLoading isOpen={isLoading} />
-        <IonToast
-          isOpen={isOpen}
-          onDidDismiss={() => setError(undefined)}
-          duration={1500}
-          message={error}
-          color="danger"
-        />
         <NewConversationHeader />
 
         <IonContent className={styles["list"]}>

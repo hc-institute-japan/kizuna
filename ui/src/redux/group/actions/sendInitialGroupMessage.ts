@@ -74,7 +74,10 @@ export const sendInitialGroupMessage =
       const messageResults: any[] = [];
       inputs.forEach(async (groupMessage: any) => {
         const messageResult = await dispatch(sendGroupMessage(groupMessage));
-        messageResults.push(messageResult);
+        /* We are ignoring any message that failed to send */
+        if (messageResult !== false) {
+          messageResults.push(messageResult);
+        }
       });
 
       return {
@@ -84,12 +87,13 @@ export const sendInitialGroupMessage =
     } catch (e) {
       /* err from createGoup.ts */
       if (e.message.includes("cannot create group with blocked agents")) {
-        return dispatch(
+        dispatch(
           pushError("TOAST", {}, { id: "redux.err.group.create-group.1" })
         );
       } else {
         /* This error will be errors other than Guest from host/conductor (or holo-web-sdk) */
-        return dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
+        dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
       }
     }
+    return false;
   };
