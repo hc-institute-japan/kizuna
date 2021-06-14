@@ -199,11 +199,9 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
         setMembers={setMembers}
         isOpen={isOpen}
         onCancel={() => setIsOpen(false)}
-        setIsOpen={setIsOpen}
         groupId={groupId}
         groupRevisionId={groupRevisionId}
         setLoading={setLoading}
-        myAgentId={profile.id!}
       />
     </>
   );

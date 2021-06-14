@@ -1,16 +1,17 @@
-import { FUNCTIONS, ZOMES } from "../../../connection/types";
-import { ThunkAction } from "../../types";
-import { deserializeAgentPubKey } from "../../../utils/helpers";
-import {
-  ADD_MEMBERS, // action type
-  // IO
-  UpdateGroupMembersData,
-  AddMembersAction, // action payload type
-} from "../types";
-import { fetchUsernameOfMembers } from "./helpers";
 import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
 import { AgentPubKey } from "@holochain/conductor-api";
+import { FUNCTIONS, ZOMES } from "../../../connection/types";
+import { deserializeAgentPubKey } from "../../../utils/helpers";
 import { pushError } from "../../error/actions";
+import { ThunkAction } from "../../types";
+import {
+  AddMembersAction,
+  ADD_MEMBERS,
+
+  // IO
+  UpdateGroupMembersData,
+} from "../types";
+import { fetchUsernameOfMembers } from "./helpers";
 
 export const addMembers =
   (updateGroupMembersData: UpdateGroupMembersData): ThunkAction =>
@@ -18,7 +19,7 @@ export const addMembers =
     dispatch,
     getState,
     { callZome, getAgentId }
-  ): Promise<UpdateGroupMembersData> => {
+  ): Promise<UpdateGroupMembersData | boolean> => {
     const state = getState();
     const myAgentId = await getAgentId();
     const input = {
@@ -67,21 +68,37 @@ export const addMembers =
     } catch (e) {
       switch (e.message) {
         case "members field is empty":
-          return dispatch(
-            pushError("TOAST", {}, { id: "redux.err.group.add-members.1" })
+          dispatch(
+            pushError(
+              "TOAST",
+              { duration: 2000 },
+              { id: "redux.err.group.add-members.1" }
+            )
           );
+          return false;
         case "cannot create group with blocked agents":
-          return dispatch(
-            pushError("TOAST", {}, { id: "redux.err.group.add-members.2" })
+          dispatch(
+            pushError(
+              "TOAST",
+              { duration: 1600 },
+              { id: "redux.err.group.add-members.2" }
+            )
           );
+          return false;
         case "failed to get the given group id":
-          return dispatch(
-            pushError("TOAST", {}, { id: "redux.err.group.add-members.3" })
+          dispatch(
+            pushError(
+              "TOAST",
+              { duration: 2000 },
+              { id: "redux.err.group.add-members.3" }
+            )
           );
+          return false;
         default:
-          return dispatch(
-            pushError("TOAST", {}, { id: "redux.err.group.add-members.4" })
+          dispatch(
+            pushError("TOAST", { duration: 1000 }, { id: "redux.err.generic" })
           );
+          return false;
       }
     }
   };
