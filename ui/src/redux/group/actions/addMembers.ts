@@ -69,35 +69,21 @@ export const addMembers =
       switch (e.message) {
         case "members field is empty":
           dispatch(
-            pushError(
-              "TOAST",
-              { duration: 2000 },
-              { id: "redux.err.group.add-members.1" }
-            )
+            pushError("TOAST", {}, { id: "redux.err.group.add-members.1" })
           );
           return false;
         case "cannot create group with blocked agents":
           dispatch(
-            pushError(
-              "TOAST",
-              { duration: 1600 },
-              { id: "redux.err.group.add-members.2" }
-            )
+            pushError("TOAST", {}, { id: "redux.err.group.add-members.2" })
           );
           return false;
         case "failed to get the given group id":
           dispatch(
-            pushError(
-              "TOAST",
-              { duration: 2000 },
-              { id: "redux.err.group.add-members.3" }
-            )
+            pushError("TOAST", {}, { id: "redux.err.group.add-members.3" })
           );
           return false;
         default:
-          dispatch(
-            pushError("TOAST", { duration: 1000 }, { id: "redux.err.generic" })
-          );
+          dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
           return false;
       }
     }

@@ -117,7 +117,7 @@ export const sendGroupMessage =
         dispatch(
           pushError(
             "TOAST",
-            { duration: 2000 },
+            {},
             {
               id: "redux.err.group.send-group-message.1",
               value: {
