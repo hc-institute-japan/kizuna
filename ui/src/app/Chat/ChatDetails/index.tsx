@@ -146,8 +146,11 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
     fetchedFiles[file.fileHash] !== undefined
       ? downloadFile(fetchedFiles[file.fileHash], file.fileName)
       : dispatch(getFileBytes([file.fileHash])).then(
-          (res: { [key: string]: Uint8Array }) =>
-            downloadFile(res[file.fileHash], file.fileName)
+          (res: { [key: string]: Uint8Array }) => {
+            if (res && Object.keys(res).length > 0) {
+              downloadFile(res[file.fileHash], file.fileName);
+            }
+          }
         );
   };
   const downloadFile = (fileBytes: Uint8Array, fileName: string) => {
