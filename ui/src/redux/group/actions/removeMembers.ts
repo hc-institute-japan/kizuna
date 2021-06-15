@@ -20,9 +20,10 @@ export const removeMembers =
     { callZome }
   ): Promise<UpdateGroupMembersData | false> => {
     const input = {
-      members: updateGroupMembersData.members.map((member: string) =>
-        deserializeAgentPubKey(member)
-      ),
+      // members: updateGroupMembersData.members.map((member: string) =>
+      //   deserializeAgentPubKey(member)
+      // ),
+      members: [],
       groupId: deserializeHash(updateGroupMembersData.groupId),
       groupRevisionId: deserializeHash(updateGroupMembersData.groupRevisionId),
     };
