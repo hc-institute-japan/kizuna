@@ -8,11 +8,14 @@ import React, {
 } from "react";
 
 interface Props {
+  // shows/hides date time item
   isVisible?: boolean;
+  // callback handler when selecting a date
   onChange?(date: Date): any;
 }
 
 export interface DatePickerMethods {
+  // opens the date time selector modal
   open(): any;
 }
 
