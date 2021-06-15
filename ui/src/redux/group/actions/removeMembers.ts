@@ -18,7 +18,7 @@ export const removeMembers =
     dispatch,
     _getState,
     { callZome }
-  ): Promise<UpdateGroupMembersData> => {
+  ): Promise<UpdateGroupMembersData | false> => {
     const input = {
       members: updateGroupMembersData.members.map((member: string) =>
         deserializeAgentPubKey(member)
@@ -51,15 +51,18 @@ export const removeMembers =
     } catch (e) {
       switch (e.message) {
         case "members field is empty":
-          return dispatch(
+          dispatch(
             pushError("TOAST", {}, { id: "redux.err.group.remove-members.1" })
           );
+          return false;
         case "failed to get the given group id":
-          return dispatch(
+          dispatch(
             pushError("TOAST", {}, { id: "redux.err.group.remove-members.2" })
           );
+          return false;
         default:
-          return dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
+          dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
+          return false;
       }
     }
   };

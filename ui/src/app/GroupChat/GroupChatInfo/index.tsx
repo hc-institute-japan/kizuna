@@ -58,14 +58,13 @@ const GroupChatInfo: React.FC = () => {
 
   /* Local state */
   const [editGroupName, setEditGroupName] = useState<boolean>(false);
-  const [modalLoading, setModalLoading] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [currentSegment, setCurrentSegment] = useState<string>("Info");
-
   const [media] = useState<{ [key: string]: boolean }>({});
   const [files] = useState<{ [key: string]: boolean }>({});
   const [orderedMedia] = useState<GroupMessage[]>([]);
   const [orderedFiles] = useState<GroupMessage[]>([]);
+  const [currentSegment, setCurrentSegment] = useState<string>("Info");
+  const [name, setName] = useState<string>("");
 
   /* Refs */
   const slideRef = useRef<HTMLIonSlidesElement>(null);
@@ -117,7 +116,6 @@ const GroupChatInfo: React.FC = () => {
     Handler for update of GroupName
   */
   const handleOnSave = (newGroupName: string) => {
-    setModalLoading(true);
     dispatch(
       updateGroupName({
         name: newGroupName,
@@ -125,8 +123,10 @@ const GroupChatInfo: React.FC = () => {
         groupRevisionId: groupData!.originalGroupRevisionId,
       })
     ).then((res: any) => {
-      setModalLoading(false);
-      setShowModal(false);
+      if (res) {
+        setName("");
+        setShowModal(false);
+      }
     });
   };
 
@@ -134,8 +134,11 @@ const GroupChatInfo: React.FC = () => {
     others[file.fileHash] !== undefined
       ? downloadFile(others[file.fileHash], file.fileName)
       : dispatch(fetchFilesBytes([file.fileHash])).then(
-          (res: { [key: string]: Uint8Array }) =>
-            downloadFile(res[file.fileHash], file.fileName)
+          (res: { [key: string]: Uint8Array }) => {
+            if (res && Object.keys(res).length > 0) {
+              downloadFile(res[file.fileHash], file.fileName);
+            }
+          }
         );
   };
   const downloadFile = (fileBytes: Uint8Array, fileName: string) => {
@@ -314,10 +317,9 @@ const GroupChatInfo: React.FC = () => {
 
           <IonModal isOpen={showModal} cssClass="my-custom-modal-css">
             <UpdateGroupName
-              loading={modalLoading}
-              isOpen={showModal}
+              setName={setName}
+              name={name}
               onCancel={() => setShowModal(false)}
-              groupData={groupData!}
               onSave={(newGroupName) => handleOnSave(newGroupName)}
             />
           </IonModal>
