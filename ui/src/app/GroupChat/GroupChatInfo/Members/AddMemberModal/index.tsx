@@ -9,8 +9,6 @@ import {
 } from "@ionic/react";
 import React, { useState } from "react";
 import { useIntl } from "react-intl";
-import { useToast } from "../../../../../containers/ToastContainer/context";
-
 import { addMembers } from "../../../../../redux/group/actions/addMembers";
 import { UpdateGroupMembersData } from "../../../../../redux/group/types";
 // redux
@@ -43,7 +41,7 @@ const AddMemberModal: React.FC<Props> = ({
 }) => {
   const intl = useIntl();
   const dispatch = useAppDispatch();
-  const { showErrorToast } = useToast();
+
   const [filter, setFilter] = useState<string>("");
   const [selected, setSelected] = useState<Profile[]>([]);
 
