@@ -1,6 +1,7 @@
 import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
 import { HoloHash } from "@holochain/conductor-api";
 import { FUNCTIONS, ZOMES } from "../../connection/types";
+import { pushError } from "../../redux/error/actions";
 import {
   P2PConversation,
   P2PMessage,
@@ -26,8 +27,6 @@ import {
   SET_FILES,
   SET_MESSAGES,
 } from "./types";
-
-import { pushError, shiftError } from "../../redux/error/actions";
 
 /* HELPER FUNCTIONS */
 /* 
