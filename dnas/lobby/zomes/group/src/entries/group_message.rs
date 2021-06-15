@@ -3,7 +3,6 @@ use hdk::prelude::*;
 use hdk::prelude::{element::SignedHeaderHashed, timestamp::Timestamp};
 use std::collections::hash_map::HashMap;
 
-pub mod get_all_messages;
 pub mod get_files_bytes;
 pub mod get_latest_messages_for_all_groups;
 pub mod get_messages_by_group_by_timestamp;
@@ -14,58 +13,9 @@ pub mod read_group_message;
 pub mod send_message;
 pub mod send_message_in_target_date;
 
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct BatchSize(pub u8);
+/* GROUP MESSAGE TYPE DEFINITION, GETTERS, SETTERS, ENTRY_DEF, UTILS ... */
 
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Hash, PartialEq, Eq, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct GroupMessageHash(pub EntryHash);
-
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Hash, PartialEq, Eq, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct GroupEntryHash(pub EntryHash);
-
-//this type was modfied the field Timestamp was changed for SystemTime
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct ReadList(pub HashMap<String, Timestamp>);
-
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct GroupMessageContent {
-    pub group_message_element: GroupMessageElement,
-    pub read_list: ReadList,
-}
-
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct MessagesByGroup(pub HashMap<String, Vec<GroupMessageHash>>);
-
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct GroupMessagesContents(pub HashMap<String, GroupMessageContent>);
-
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct GroupMessagesOutput {
-    messages_by_group: MessagesByGroup,
-    group_messages_contents: GroupMessagesContents,
-}
-
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct GroupMsgBatchFetchFilter {
-    pub group_id: EntryHash,
-    // the last message of the last batch
-    pub last_fetched: Option<EntryHash>,
-    pub last_message_timestamp: Option<Timestamp>,
-    // usize?
-    pub batch_size: u8,
-    pub payload_type: PayloadType,
-}
-
-// GROUP MESSAGE TYPE DEFINITION, GETTERS, SETTERS, ENTRY_DEF, UTILS ...
+/* GROUP MESSAGE ENTRY DEFS */
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct GroupMessage {
@@ -86,12 +36,17 @@ entry_def!(GroupMessage
         required_validation_type: RequiredValidationType::Element
     }
 );
+
 #[hdk_entry(id = "group_file_bytes", visibility = "public")]
 #[serde(rename_all = "camelCase")]
 pub struct GroupFileBytes(SerializedBytes);
-// END OF GROUP MESSAGE TYPE DEFINITION
+/* END OF GROUP MESSAGE TYPE DEFINITION */
 
-// START OF INPUTS TYPES DEFINITION
+/* START OF INPUTS TYPES DEFINITION */
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct BatchSize(pub u8);
+
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct GroupMessageInput {
@@ -103,12 +58,14 @@ pub struct GroupMessageInput {
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct GroupMessageInputWithDate {
-    group_hash: EntryHash,
-    payload: PayloadInput,
-    sender: AgentPubKey,
-    reply_to: Option<EntryHash>,
-    date: u64,
+pub struct GroupMsgBatchFetchFilter {
+    pub group_id: EntryHash,
+    // the last message of the last batch
+    pub last_fetched: Option<EntryHash>,
+    pub last_message_timestamp: Option<Timestamp>,
+    // usize?
+    pub batch_size: u8,
+    pub payload_type: PayloadType,
 }
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
@@ -139,19 +96,24 @@ pub struct GroupMessageReadData {
     pub timestamp: Timestamp,
     pub members: Vec<AgentPubKey>,
 }
-// END OF INPUTS TYPES DEFINITION
 
-// OUTPUTS TYPES DEFINITION
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct GroupMessageData {
-    // entry_hash of GroupMessage
-    pub id: EntryHash,
-    pub content: GroupMessage,
+pub struct GroupMessageInputWithDate {
+    group_hash: EntryHash,
+    payload: PayloadInput,
+    sender: AgentPubKey,
+    reply_to: Option<EntryHash>,
+    date: u64,
 }
+/* END OF INPUT TYPES DEFINITION */
 
-// This is needed since the entry field of Element will not be deserialized
-// automatically when it reaches the frontend.
+/* OUTPUT TYPES DEFINITION */
+
+/*
+This is needed since the entry field of Element will not be deserialized
+automatically when it reaches the frontend.
+*/
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct GroupMessageElement {
@@ -160,9 +122,43 @@ pub struct GroupMessageElement {
 }
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ReadList(pub HashMap<String, Timestamp>);
+
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct GroupMessageContent {
+    pub group_message_element: GroupMessageElement,
+    pub read_list: ReadList,
+}
+
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Hash, PartialEq, Eq, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct GroupMessageHash(pub EntryHash);
+
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct MessagesByGroup(pub HashMap<String, Vec<GroupMessageHash>>);
+
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct GroupMessagesContents(pub HashMap<String, GroupMessageContent>);
+
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct GroupMessagesOutput {
+    messages_by_group: MessagesByGroup,
+    group_messages_contents: GroupMessagesContents,
+}
+
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 pub struct FileBytes(pub HashMap<String, SerializedBytes>);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct GroupMessageDataWrapper(Vec<GroupMessageData>);
-// END OF OUTPUTS TYPES DEFINITION
+pub struct GroupMessageWithId {
+    // entry_hash of GroupMessage
+    pub id: EntryHash,
+    pub content: GroupMessage,
+}
+/* END OF OUTPUTS TYPES DEFINITION */

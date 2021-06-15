@@ -11,13 +11,13 @@ use crate::utils::timestamp_to_days;
 use crate::utils::to_timestamp;
 
 use super::{
-    GroupFileBytes, GroupMessage, GroupMessageData, GroupMessageInputWithDate, Payload,
+    GroupFileBytes, GroupMessage, GroupMessageInputWithDate, GroupMessageWithId, Payload,
     PayloadInput,
 };
 
 pub fn send_message_in_target_date_handler(
     message_input: GroupMessageInputWithDate,
-) -> ExternResult<GroupMessageData> {
+) -> ExternResult<GroupMessageWithId> {
     let payload_res = match message_input.clone().payload {
         PayloadInput::Text { payload } => Ok(Payload::Text { payload }),
         PayloadInput::File {
@@ -75,7 +75,7 @@ pub fn send_message_in_target_date_handler(
                     match get_group_latest_version(message.clone().group_hash) {
                         Ok(group) => {
                             let message_hash = hash_entry(&message.clone())?;
-                            let group_message_data = GroupMessageData {
+                            let group_message_data = GroupMessageWithId {
                                 id: message_hash,
                                 content: message,
                             };

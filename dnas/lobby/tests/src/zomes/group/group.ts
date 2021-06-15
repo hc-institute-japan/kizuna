@@ -32,7 +32,6 @@ function blockContacts(agentPubKeys) {
 // THE FUNCTION get_all_my_groups IS BEING IMPLICITLY TESTED BEACUSE IT'S USED IN ALMOST ALL THE TESTS
 
 export function createGroupTest(config, installables) {
-
   let orchestrator = new Orchestrator();
   orchestrator.registerScenario(
     "create group method test",
@@ -170,7 +169,6 @@ export function createGroupTest(config, installables) {
 }
 
 export function addAndRemoveMembersTest(config, installables) {
-
   let orchestrator = new Orchestrator();
 
   orchestrator.registerScenario(
@@ -223,7 +221,6 @@ export function addAndRemoveMembersTest(config, installables) {
       charlie.setSignalHandler((signal) => {
         signalHandler(signal, charlie_signal_listener);
       });
-
 
       await delay(1000);
 
@@ -375,17 +372,17 @@ export function addAndRemoveMembersTest(config, installables) {
         },
         "charlie's has received the signal payload from create_group"
       );
-      
+
       // 4 - CHECK IF THE GROUP MEMBERS KNOW THEY ARE MEMBERS OF THE GROUP AND IF THE GROUP LIST CONTAINS THE LATEST VERSION OF THE GROUP ENTRIES
-      let alice_group_list = (
-        await getMyGroupsList(alice_conductor)
-      ).map((group_output) => getGroupfromGroupOutput(group_output));
-      let bobby_group_list = (
-        await getMyGroupsList(bobby_conductor)
-      ).map((group_output) => getGroupfromGroupOutput(group_output));
-      let charlie_group_list = (
-        await getMyGroupsList(charlie_conductor)
-      ).map((group_output) => getGroupfromGroupOutput(group_output));
+      let alice_group_list = (await getMyGroupsList(alice_conductor)).map(
+        (group_output) => getGroupfromGroupOutput(group_output)
+      );
+      let bobby_group_list = (await getMyGroupsList(bobby_conductor)).map(
+        (group_output) => getGroupfromGroupOutput(group_output)
+      );
+      let charlie_group_list = (await getMyGroupsList(charlie_conductor)).map(
+        (group_output) => getGroupfromGroupOutput(group_output)
+      );
       await delay(1000);
 
       updated_group.created = original_group_content.created;
@@ -405,7 +402,6 @@ export function addAndRemoveMembersTest(config, installables) {
         [updated_group].length,
         "charlie group list match with the expected value"
       );
-
 
       // 5 - REMOVE GROUP MEMBERS FROM THE GROUP WE CREATED (the add members input and the remove members input have the same format UpdateMembersIo)
 
@@ -448,15 +444,15 @@ export function addAndRemoveMembersTest(config, installables) {
 
       // 7 - CHECK IF THE GROUP MEMBERS KNOW THEY ARE MEMBERS OF THE GROUP AND IF THE GROUP LIST CONTAINS THE LATEST VERSION OF THE GROUP ENTRIES
 
-      alice_group_list = (
-        await getMyGroupsList(alice_conductor)
-      ).map((group_output) => getGroupfromGroupOutput(group_output));
-      bobby_group_list = (
-        await getMyGroupsList(bobby_conductor)
-      ).map((group_output) => getGroupfromGroupOutput(group_output));
-      charlie_group_list = (
-        await getMyGroupsList(charlie_conductor)
-      ).map((group_output) => getGroupfromGroupOutput(group_output));
+      alice_group_list = (await getMyGroupsList(alice_conductor)).map(
+        (group_output) => getGroupfromGroupOutput(group_output)
+      );
+      bobby_group_list = (await getMyGroupsList(bobby_conductor)).map(
+        (group_output) => getGroupfromGroupOutput(group_output)
+      );
+      charlie_group_list = (await getMyGroupsList(charlie_conductor)).map(
+        (group_output) => getGroupfromGroupOutput(group_output)
+      );
       await delay(1000);
 
       t.deepEqual(
@@ -477,11 +473,10 @@ export function addAndRemoveMembersTest(config, installables) {
     }
   );
 
-    orchestrator.run();
+  orchestrator.run();
 }
 
 export function updateGroupNameTest(config, installables) {
-
   let orchestrator = new Orchestrator();
 
   orchestrator.registerScenario(
@@ -491,7 +486,9 @@ export function updateGroupNameTest(config, installables) {
 
       const [[alice_happ]] = await alice.installAgentsHapps(installables.one);
       const [[bobby_happ]] = await bobby.installAgentsHapps(installables.one);
-      const [[charlie_happ]] = await charlie.installAgentsHapps(installables.one);
+      const [[charlie_happ]] = await charlie.installAgentsHapps(
+        installables.one
+      );
 
       const alicePubKey = alice_happ.agent;
       const bobbyPubKey = bobby_happ.agent;
@@ -521,9 +518,11 @@ export function updateGroupNameTest(config, installables) {
         groupRevisionId,
       };
 
-      let update_result = await updateGroupName(update_group_name_io)(alice_conductor);
+      let update_result = await updateGroupName(update_group_name_io)(
+        alice_conductor
+      );
       await delay(1000);
-      
+
       // 2.1 - UPDATE GROUP NAME WITH THE SAME NAME: Err case
       // let update_group_name_io_same_name = {
       //   name: "New Group Name",
@@ -539,13 +538,14 @@ export function updateGroupNameTest(config, installables) {
 
       // 3- CHECK IF THE VALUES HAS CHANGED AND THE GROUP STATE ITS THE EXPECTED
 
-      let updated_group = await getLatestGroupVersion({ groupHash: update_group_name_io.groupId, })(alice_conductor);
+      let updated_group = await getLatestGroupVersion({
+        groupHash: update_group_name_io.groupId,
+      })(alice_conductor);
       updated_group.created = original_group_content.created;
-      await delay(1000);  
-      
+      await delay(1000);
+
       console.log("output");
       console.log(updated_group);
-      
 
       t.deepEqual(
         updated_group.name,
@@ -563,17 +563,17 @@ export function updateGroupNameTest(config, installables) {
         "the group members fields match with the expected value"
       );
 
-      // 4- CHECK IF THE GROUP MEMBERS KNOW THEY ARE MEMBERS OF THE GROUP AND IF THE GROUP LIST CONTAINS THE LATEST VERSION OF THE GROUP ENTRIES
+      // 4 - CHECK IF THE GROUP MEMBERS KNOW THEY ARE MEMBERS OF THE GROUP AND IF THE GROUP LIST CONTAINS THE LATEST VERSION OF THE GROUP ENTRIES
 
-      let alice_group_list = (
-        await getMyGroupsList(alice_conductor)
-      ).map((group_output) => getGroupfromGroupOutput(group_output));
-      let bobby_group_list = (
-        await getMyGroupsList(bobby_conductor)
-      ).map((group_output) => getGroupfromGroupOutput(group_output));
-      let charlie_group_list = (
-        await getMyGroupsList(charlie_conductor)
-      ).map((group_output) => getGroupfromGroupOutput(group_output));
+      let alice_group_list = (await getMyGroupsList(alice_conductor)).map(
+        (group_output) => getGroupfromGroupOutput(group_output)
+      );
+      let bobby_group_list = (await getMyGroupsList(bobby_conductor)).map(
+        (group_output) => getGroupfromGroupOutput(group_output)
+      );
+      let charlie_group_list = (await getMyGroupsList(charlie_conductor)).map(
+        (group_output) => getGroupfromGroupOutput(group_output)
+      );
       await delay(1000);
 
       t.deepEqual(
@@ -590,16 +590,14 @@ export function updateGroupNameTest(config, installables) {
         charlie_group_list.length,
         [updated_group].length,
         "charlie group list match with the expected value"
-      );    
-
+      );
     }
   );
 
   orchestrator.run();
 }
 
-export function validateCreateGroupTest( config, installables) {
-
+export function validateCreateGroupTest(config, installables) {
   let orchestrator = new Orchestrator();
 
   orchestrator.registerScenario(
@@ -732,7 +730,7 @@ export function validateCreateGroupTest( config, installables) {
     }
   );
 
-    orchestrator.run();
+  orchestrator.run();
 }
 
 // THIS TESTS CANNOT BE IMPLEMENTED YET, UNTILL HOLOCHAIN DO THE VALIDATION CALLBACKS
