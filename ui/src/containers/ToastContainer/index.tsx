@@ -49,8 +49,7 @@ const ToastContainer: React.FC = ({ children }) => {
           : [...(message as IonicSafeString).value].length * 100;
         setProps({ color: "danger", duration, ...props });
       }
-    }
-    setProps({ color: "danger", ...props });
+    } else setProps({ color: "danger", ...props });
     setShouldShow(true);
   };
 
