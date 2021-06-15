@@ -41,7 +41,16 @@ const ToastContainer: React.FC = ({ children }) => {
           : (message as IonicSafeString).value.split(" ").length * 160;
         setProps({ color: "danger", duration, ...props });
       }
-    } else setProps({ color: "danger", ...props });
+    } else if (language === "jp") {
+      const message = props?.message;
+      if (message) {
+        const duration = isString(message)
+          ? [...(message as string)].length * 100
+          : [...(message as IonicSafeString).value].length * 100;
+        setProps({ color: "danger", duration, ...props });
+      }
+    }
+    setProps({ color: "danger", ...props });
     setShouldShow(true);
   };
 
