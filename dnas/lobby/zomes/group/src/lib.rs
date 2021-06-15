@@ -15,7 +15,6 @@ use group::group_helpers;
 use group::remove_members::remove_members_handler;
 use group::update_group_name::update_group_name_handler;
 
-use group_message::get_all_messages::get_all_messages_handler;
 use group_message::get_files_bytes::get_files_bytes_handler;
 use group_message::get_latest_messages_for_all_groups::get_latest_messages_for_all_groups_handler;
 use group_message::get_messages_by_group_by_timestamp::get_messages_by_group_by_timestamp_handler;
@@ -31,9 +30,9 @@ use validation_rules::ValidationInput;
 use signals::{SignalDetails, SignalPayload};
 
 use group_message::{
-    BatchSize, FileBytes, GroupChatFilter, GroupFileBytes, GroupMessage, GroupMessageData,
-    GroupMessageDataWrapper, GroupMessageInput, GroupMessageInputWithDate, GroupMessageReadData,
-    GroupMessagesOutput, GroupMsgBatchFetchFilter, GroupTypingDetailData,
+    BatchSize, FileBytes, GroupChatFilter, GroupFileBytes, GroupMessage, GroupMessageInput,
+    GroupMessageInputWithDate, GroupMessageReadData, GroupMessageWithId, GroupMessagesOutput,
+    GroupMsgBatchFetchFilter, GroupTypingDetailData,
 };
 
 use group::{
@@ -73,9 +72,6 @@ pub fn init(_: ()) -> ExternResult<InitCallbackResult> {
 
 #[hdk_extern]
 fn recv_remote_signal(signal: ExternIO) -> ExternResult<()> {
-    // currently only emitting the received signal
-    // TODO: actually work with the received signal
-
     let signal_detail: SignalDetails = signal.decode()?;
     match signal_detail.payload {
         SignalPayload::AddedToGroup(_) => {
@@ -92,12 +88,6 @@ fn recv_remote_signal(signal: ExternIO) -> ExternResult<()> {
         }
     }
     Ok(())
-}
-
-//this is only exposed outside of WASM for testing purposes.
-#[hdk_extern]
-fn run_validation(validation_input: ValidationInput) -> ExternResult<ValidateCallbackResult> {
-    return run_validations_handler(validation_input);
 }
 
 #[hdk_extern]
@@ -132,16 +122,9 @@ fn get_group_latest_version(group_id: EntryHashWrapper) -> ExternResult<GroupOut
     return group_helpers::get_group_latest_version(group_id.group_hash);
 }
 
-//no tested methods
-
 #[hdk_extern]
-fn send_message(message_input: GroupMessageInput) -> ExternResult<GroupMessageData> {
+fn send_message(message_input: GroupMessageInput) -> ExternResult<GroupMessageWithId> {
     return send_message_handler(message_input);
-}
-
-#[hdk_extern]
-fn get_all_messages(group_id: EntryHash) -> ExternResult<GroupMessageDataWrapper> {
-    return get_all_messages_handler(group_id);
 }
 
 #[hdk_extern]
@@ -180,11 +163,18 @@ fn read_group_message(
     return read_group_message_handler(group_message_read_io);
 }
 
-// This function is only used for testing purposes
-// should be uncommented on production use
+/*
+These function are only used for testing purposes
+should be uncommented on production use
+*/
 #[hdk_extern]
 fn send_message_in_target_date(
     message_input: GroupMessageInputWithDate,
-) -> ExternResult<GroupMessageData> {
+) -> ExternResult<GroupMessageWithId> {
     return send_message_in_target_date_handler(message_input);
+}
+
+#[hdk_extern]
+fn run_validation(validation_input: ValidationInput) -> ExternResult<ValidateCallbackResult> {
+    return run_validations_handler(validation_input);
 }
