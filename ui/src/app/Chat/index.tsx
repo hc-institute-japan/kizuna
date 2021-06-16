@@ -158,14 +158,16 @@ const Chat: React.FC = () => {
     when clicking the send button  
   */
   const handleOnSubmit = () => {
-    files.forEach((file) => {
-      dispatch(sendMessage(conversant.id, message, "FILE", undefined, file));
-    });
-
     if (message !== "") {
       dispatch(sendMessage(conversant.id, message, "TEXT", undefined));
     }
 
+    files.forEach((file) =>
+      setTimeout(
+        dispatch(sendMessage(conversant.id, message, "FILE", undefined, file)),
+        3000
+      )
+    );
     scrollerRef.current!.scrollToBottom();
   };
 
