@@ -68,6 +68,20 @@ const GroupChat: React.FC = () => {
   /* handles sending of messages. */
   const handleOnSend = () => {
     let inputs: GroupMessageInput[] = [];
+    /* intentionally have the text at index 0 for performance purposes */
+    if (message.length) {
+      inputs.push({
+        groupId: groupData!.originalGroupId,
+        payloadInput: {
+          type: "TEXT",
+          payload: { payload: message },
+        },
+        sender: myProfile.id!,
+        // TODO: handle replying to message here as well
+        replyTo: undefined,
+      });
+    }
+
     if (files.length) {
       setSendingLoading(true);
       files.forEach((file: any) => {
@@ -92,18 +106,6 @@ const GroupChat: React.FC = () => {
           replyTo: undefined,
         };
         inputs.push(groupMessage);
-      });
-    }
-    if (message.length) {
-      inputs.push({
-        groupId: groupData!.originalGroupId,
-        payloadInput: {
-          type: "TEXT",
-          payload: { payload: message },
-        },
-        sender: myProfile.id!,
-        // TODO: handle replying to message here as well
-        replyTo: undefined,
       });
     }
 
