@@ -51,9 +51,9 @@
     "hc:charlie": "cd ../dnas/lobby && hc sandbox generate workdir/happ/ -r=8899 network --bootstrap https://bootstrap-staging.holo.host/ quic",
     "hc:david": "cd ../dnas/lobby && hc sandbox generate workdir/happ/ -r=8800 network --bootstrap https://bootstrap-staging.holo.host/ quic",
     "hc:emma": "cd ../dnas/lobby && hc sandbox generate workdir/happ/ -r=8811 network --bootstrap https://bootstrap-staging.holo.host/ quic",
-    "hc-rmt-prxy:alice": "cd ../dnas/lobby && hc sandbox generate workdir/happ/ -r=8888 network --bootstrap https://bootstrap-staging.holo.host/ quic -p=kitsune-proxy://vkgMh6eLHpgKssXRIHHku8OnKvzIXC4sdlL0tCk6YdU/kitsune-quic/h/3.112.128.40/p/33418/--",
-    "hc-rmt-prxy:bob": "cd ../dnas/lobby && hc sandbox generate workdir/happ/ -r=8889 network --bootstrap https://bootstrap-staging.holo.host/ quic -p=kitsune-proxy://vkgMh6eLHpgKssXRIHHku8OnKvzIXC4sdlL0tCk6YdU/kitsune-quic/h/3.112.128.40/p/33418/--",
-    "hc-rmt-prxy:charlie": "cd ../dnas/lobby && hc sandbox generate workdir/happ/ -r=8899 network --bootstrap https://bootstrap-staging.holo.host/ quic -p=kitsune-proxy://vkgMh6eLHpgKssXRIHHku8OnKvzIXC4sdlL0tCk6YdU/kitsune-quic/h/3.112.128.40/p/33418/--",
+    "hc-rmt-prxy:alice": "cd .. && RUST_LOG=info hc sandbox generate workdir-fixed/happ/ -r=8888 network --bootstrap https://bootstrap-staging.holo.host/ quic -p=kitsune-proxy://ArpvLPU7ZMabtIkUbXyORvksDaJYZx51UHIILEytkpU/kitsune-quic/h/13.230.17.133/p/37866/--",
+    "hc-rmt-prxy:bob": "cd .. && RUST_LOG=info hc sandbox generate workdir-fixed/happ/ -r=8889 network --bootstrap https://bootstrap-staging.holo.host/ quic -p=kitsune-proxy://ArpvLPU7ZMabtIkUbXyORvksDaJYZx51UHIILEytkpU/kitsune-quic/h/13.230.17.133/p/37866/--",
+    "hc-rmt-prxy:charlie": "cd ../dnas/lobby && RUST_LOG=info hc sandbox generate workdir/happ/ -r=8899 network --bootstrap https://bootstrap-staging.holo.host/ quic -p=kitsune-proxy://ArpvLPU7ZMabtIkUbXyORvksDaJYZx51UHIILEytkpU/kitsune-quic/h/13.230.17.133/p/37866/--",
     "ui:alice": "REACT_APP_DNA_INTERFACE_URL=ws://localhost:8888 ionic serve -p 8100",
     "ui:bob": "REACT_APP_DNA_INTERFACE_URL=ws://localhost:8889 ionic serve -p 8200",
     "ui:charlie": "REACT_APP_DNA_INTERFACE_URL=ws://localhost:8899 ionic serve -p 8300",
@@ -62,8 +62,8 @@
     "build-happ": "cd ../dnas/lobby && CARGO_TARGET_DIR=target cargo build --release --target wasm32-unknown-unknown && hc dna pack workdir/dna && hc app pack workdir/happ && rm -rf ~/tmp && mkdir ~/tmp && hc s clean",
     "demo": "concurrently \"npm run hc:alice\" \"npm run hc:bob\" \"npm run hc:charlie\" \"npm run ui:alice\" \"npm run ui:bob\" \"npm run ui:charlie\"",
     "demo-5": "concurrently \"npm run hc:alice\" \"npm run hc:bob\" \"npm run hc:charlie\" \"npm run hc:david\" \"npm run hc:emma\" \"npm run ui:alice\" \"npm run ui:bob\" \"npm run ui:charlie\" \"npm run ui:david\" \"npm run ui:emma\"",
-    "demo-rmt-prxy": "concurrently \"npm run hc-rmt-prxy:alice\" \"npm run hc-rmt-prxy:bob\" \"npm run hc-rmt-prxy:charlie\" \"npm run ui:alice\" \"npm run ui:bob\" \"npm run ui:charlie\"",
-    "demo-rmt-prxy-single": "concurrently \"cd .. && hc sandbox generate workdir-fixed/happ/ -r=8888 network --bootstrap https://bootstrap-staging.holo.host/ quic -p=kitsune-proxy://vkgMh6eLHpgKssXRIHHku8OnKvzIXC4sdlL0tCk6YdU/kitsune-quic/h/3.112.128.40/p/33418/--\" \"npm run ui:alice\"",
+    "demo-rmt-prxy-alice": "concurrently \"npm run hc-rmt-prxy:alice\" \"npm run ui:alice\"",
+    "demo-rmt-prxy-bob": "concurrently \"npm run hc-rmt-prxy:bob\" \"npm run ui:bob\"",
     "ios": "npx cap sync ios && npx cap copy ios && npx cap open ios"
   },
   "eslintConfig": {
