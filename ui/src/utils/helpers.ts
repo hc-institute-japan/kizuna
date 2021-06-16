@@ -105,7 +105,7 @@ export const deserializeAgentPubKey = (agentPubKey: string) =>
   Buffer.from(deserializeHash(agentPubKey).buffer);
 
 export const convertSizeToReadableSize = (size: number) =>
-  (size / 1024 / 1024).toFixed(2) === "0.00"
+  size / 1024 / 1024 >= 1
     ? `${(size / 1024 / 1024).toFixed(2)}mb`
     : `${(size / 1024).toFixed(2)}kb`;
 
