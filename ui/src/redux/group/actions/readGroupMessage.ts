@@ -17,10 +17,18 @@ export const readGroupMessage =
       timestamp: dateToTimestamp(groupMessageReadData.timestamp),
       members: groupMessageReadData.members,
     };
-    await callZome({
-      zomeName: ZOMES.GROUP,
-      fnName: FUNCTIONS[ZOMES.GROUP].READ_GROUP_MESSAGE,
-      payload: input,
-    });
+    try {
+      await callZome({
+        zomeName: ZOMES.GROUP,
+        fnName: FUNCTIONS[ZOMES.GROUP].READ_GROUP_MESSAGE,
+        payload: input,
+      });
+    } catch (e) {
+      /*
+      The error that could be returned here is of internal_error from create_link
+      but we ignore it since we don't have a workaround on this aotm.
+      See https://github.com/hc-institute-japan/kizuna/issues/54
+      */
+    }
     return null;
   };
