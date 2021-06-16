@@ -58,11 +58,7 @@ export const updateGroupName =
       */
       if (e.message === "failed to get the given group id") {
         return dispatch(
-          pushError(
-            "TOAST",
-            { duration: 2100 },
-            { id: "redux.err.group.update-group-name.2" }
-          )
+          pushError("TOAST", {}, { id: "redux.err.group.update-group-name.2" })
         );
       } else {
         return dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));

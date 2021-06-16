@@ -50,20 +50,35 @@ const NewConversation: React.FC = () => {
   const handleOnSend = () => {
     const contacts = Object.values(selectedContacts);
 
-    // P2PMessaging
     if (contacts.length === 1) {
-      setIsLoading(true);
-      files.forEach((file) => {
-        dispatch(sendMessage(contacts[0].id, message, "FILE", undefined, file));
-      });
-
       if (message !== "") {
+        setIsLoading(true);
         dispatch(sendMessage(contacts[0].id, message, "TEXT", undefined)).then(
-          setIsLoading(false)
+          (res: boolean) => {
+            if (files.length <= 0 && res === true) {
+              setIsLoading(false);
+              history.push(`/u/${contacts[0].username}`);
+            }
+          }
         );
       }
 
-      history.push(`/u/${contacts[0].username}`);
+      files.forEach((file) => {
+        setIsLoading(true);
+        setTimeout(
+          dispatch(
+            sendMessage(contacts[0].id, message, "FILE", undefined, file)
+          ).then((res: boolean) => {
+            setIsLoading(false);
+            if (res === true) history.push(`/u/${contacts[0].username}`);
+          }),
+          3000
+        );
+      });
+
+      // setIsLoading(false);
+
+      // if (sendRes1 || sendRes2) history.push(`/u/${contacts[0].username}`);
     } else if (contacts.length > 1) {
       /* create a Group and send the initial message */
       setIsLoading(true);
