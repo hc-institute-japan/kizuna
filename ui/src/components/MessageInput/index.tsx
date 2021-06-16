@@ -59,6 +59,21 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
     setFiles([]);
   };
 
+  const onKeyDown = (event: KeyboardEvent) => {
+    if (onSend && event.key === "Enter" && !event.shiftKey) {
+      if (message.trim().length !== 0 || files.length > 0) {
+        onSend();
+        reset();
+      }
+    }
+  };
+  useEffect(() => {
+    document.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [onSend, reset]);
   useEffect(() => {
     onFileSelectCallback();
   }, [files, onFileSelectCallback]);
@@ -214,14 +229,6 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
         </IonButtons>
         <IonTextarea
           value={message}
-          onKeyUp={(event) => {
-            if (onSend && event.key === "Enter" && !event.shiftKey) {
-              if (message.trim().length !== 0 || files.length > 0) {
-                onSend();
-                reset();
-              }
-            }
-          }}
           onKeyDown={(event) => {
             if (event.key === "Enter" && !event.shiftKey) {
               // prevent default behavior
