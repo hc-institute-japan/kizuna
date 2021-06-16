@@ -8,7 +8,7 @@ pub mod group_helpers;
 pub mod remove_members;
 pub mod update_group_name;
 
-// GROUP TYPE DEFINITION, GETTERS, SETTERS, ENTRY_DEF, UTILS ...
+/* GROUP TYPE DEFINITION, GETTERS, SETTERS, ENTRY_DEF, UTILS ... */
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Group {
@@ -53,9 +53,9 @@ entry_def!(Group
         required_validation_type: RequiredValidationType::Element
     }
 );
-//END OF GROUP TYPE DEFINITION
+/* END OF GROUP TYPE DEFINITION */
 
-// IO TYPES DEFINITION
+/* IO TYPE DEFINITION */
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateMembersIO {
@@ -71,18 +71,18 @@ pub struct UpdateGroupNameIO {
     group_id: EntryHash,
     group_revision_id: HeaderHash,
 }
-// END OF IO TYPES DEFINITION
+/* END OF IO TYPES DEFINITION */
 
-//INPUTS TYPES DEFINITION
+/* INPUT TYPES DEFINITION */
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateGroupInput {
     name: String,
     members: Vec<AgentPubKey>,
 }
-//END OF INPUTS TYPES DEFINITION
+/* END OF INPUT TYPES DEFINITION */
 
-//OUTPUTS TYPES DEFINITION
+/* OUTPUT TYPES DEFINITION */
 #[derive(Deserialize, Serialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateGroupOutput {
@@ -114,9 +114,9 @@ impl GroupOutput {
         }
     }
 }
-//END OF OUTPUTS TYPES DEFINITION
+/* END OF OUTPUT TYPES DEFINITION */
 
-//WRAPPERS TYPES DEFINITION
+/* WRAPPERS TYPES DEFINITION */
 #[derive(Deserialize, Serialize, SerializedBytes, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct BlockedWrapper(pub Vec<AgentPubKey>);
@@ -134,7 +134,7 @@ pub struct AgentPubKeysWrapper(Vec<AgentPubKey>);
 pub struct EntryHashWrapper {
     pub group_hash: EntryHash,
 }
-//END OF WRAPPERS TYPES DEFINITION
+/* END OF WRAPPERS TYPES DEFINITION */
 
 // //VALIDATION TYPES DEFINITION (this types are created just for testing purposes and can be removed in the future)
 // #[derive(Deserialize, Serialize, SerializedBytes, Debug)]

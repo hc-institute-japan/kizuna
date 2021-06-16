@@ -27,7 +27,10 @@ pub fn update_group_name_handler(
 
     let updated_group: Group = Group::new(new_group_name, created, creator, members);
 
-    // we always update the entry from the root_group_header_hash, the header hash for this entry is provided as arg (group_revision_id)
+    /*
+    we always update the entry from the root_group_header_hash,
+    the header hash for this entry is provided as arg (group_revision_id)
+    */
     // 3 - update_entry the Group with new name field using original HeaderHash
     update_entry(group_revision_id, &updated_group)?;
 
