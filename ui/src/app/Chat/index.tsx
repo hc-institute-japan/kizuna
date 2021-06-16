@@ -158,14 +158,16 @@ const Chat: React.FC = () => {
     when clicking the send button  
   */
   const handleOnSubmit = () => {
-    files.forEach((file) => {
-      dispatch(sendMessage(conversant.id, message, "FILE", undefined, file));
-    });
-
     if (message !== "") {
       dispatch(sendMessage(conversant.id, message, "TEXT", undefined));
     }
 
+    files.forEach((file) =>
+      setTimeout(
+        dispatch(sendMessage(conversant.id, message, "FILE", undefined, file)),
+        3000
+      )
+    );
     scrollerRef.current!.scrollToBottom();
   };
 
@@ -228,8 +230,11 @@ const Chat: React.FC = () => {
     fetchedFiles[file.fileHash] !== undefined
       ? downloadFile(fetchedFiles[file.fileHash], file.fileName)
       : dispatch(getFileBytes([file.fileHash])).then(
-          (res: { [key: string]: Uint8Array }) =>
-            downloadFile(res[file.fileHash], file.fileName)
+          (res: { [key: string]: Uint8Array }) => {
+            if (res && Object.keys(res).length > 0) {
+              downloadFile(res[file.fileHash], file.fileName);
+            }
+          }
         );
   };
   const downloadFile = (fileBytes: Uint8Array, fileName: string) => {
