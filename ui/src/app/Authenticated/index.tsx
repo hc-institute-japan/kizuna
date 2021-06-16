@@ -8,7 +8,6 @@ import Blocked from "../Blocked";
 import Chat from "../Chat";
 import ChatDetails from "../Chat/ChatDetails";
 import GroupChat from "../GroupChat";
-import GroupChatInfo from "../GroupChat/GroupChatInfo";
 import Home from "../Home";
 import NewConversation from "../NewConversation";
 import Profile from "../Profile";
@@ -28,16 +27,14 @@ const Authenticated: React.FC = () => {
         <Switch>
           <Route path="/home" render={() => <Home />} />
           <Route path="/compose" exact component={NewConversation} />
-          <Route path="/u/:username" exact component={Chat} />
           <Route path="/settings" exact component={Settings} />
-          <Route path="/g/:group" exact component={GroupChat} />
-          <Route path="/g/:group/info" component={GroupChatInfo} />
+          <Route path="/g/:group" component={GroupChat} />
+          <Route path="/u/:username" component={Chat} />
+
           <Route path="/p/:username" exact component={Profile} />
           {/* <Route path="/test" exact component={GroupChat} /> */}
 
           <Route path="/blocked" exact component={Blocked} />
-
-          <Route path="/u/:username/details" exact component={ChatDetails} />
 
           <Redirect from="/" to="/home" />
         </Switch>

@@ -81,7 +81,7 @@ const MessageList: React.FC<Props> = ({
 
   const handleOnDownload = (file: FilePayload) => {
     const fileBytes = filesBytes[file.fileHash];
-    console.log(fileBytes);
+
     if (fileBytes) {
       const blob = new Blob([fileBytes]); // change resultByte to bytes
       const link = document.createElement("a");
