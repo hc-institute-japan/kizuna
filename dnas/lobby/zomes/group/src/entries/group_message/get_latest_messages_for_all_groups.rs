@@ -6,16 +6,13 @@ use std::collections::hash_map::HashMap;
 use super::get_next_batch_group_messages::get_next_batch_group_messages_handler;
 
 use super::{
-    BatchSize,
-    MessagesByGroup,
-    GroupMessageHash,
-    GroupMessageContent,
-    GroupMessagesOutput,
-    GroupMessagesContents,
-    GroupMsgBatchFetchFilter
+    BatchSize, GroupMessageContent, GroupMessageHash, GroupMessagesContents, GroupMessagesOutput,
+    GroupMsgBatchFetchFilter, MessagesByGroup,
 };
 
-pub fn get_latest_messages_for_all_groups_handler( batch_size: BatchSize) -> ExternResult<GroupMessagesOutput> {
+pub fn get_latest_messages_for_all_groups_handler(
+    batch_size: BatchSize,
+) -> ExternResult<GroupMessagesOutput> {
     let batch_size: u8 = batch_size.0;
 
     // initialize MessagesByGroup
@@ -33,7 +30,7 @@ pub fn get_latest_messages_for_all_groups_handler( batch_size: BatchSize) -> Ext
             .map(|link_to_group| -> EntryHash { link_to_group.target })
             .collect();
 
-    //for each group in the list call fetch_next_batch_group_messages() with payload_type All last_fetched/last_message_timestamp as None
+    // for each group in the list call fetch_next_batch_group_messages() with payload_type All last_fetched/last_message_timestamp as None
 
     for group_id in linked_groups_to_the_agent.into_iter() {
         let batch_filter: GroupMsgBatchFetchFilter = GroupMsgBatchFetchFilter {
@@ -44,7 +41,8 @@ pub fn get_latest_messages_for_all_groups_handler( batch_size: BatchSize) -> Ext
             payload_type: PayloadType::All,
         };
 
-        let mut messages_output: GroupMessagesOutput = get_next_batch_group_messages_handler(batch_filter)?;
+        let mut messages_output: GroupMessagesOutput =
+            get_next_batch_group_messages_handler(batch_filter)?;
 
         // insert GroupMessagesContents and MessagesByGroup values from returned GroupMessagesOutput into the initialized MessagesByGroup and GroupMessagesContents
         for (key, value) in messages_output.messages_by_group.0.drain() {

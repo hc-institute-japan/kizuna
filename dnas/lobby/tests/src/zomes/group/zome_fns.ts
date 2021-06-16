@@ -1,7 +1,3 @@
-import { cond, filter } from "lodash";
-import { Base64 } from "js-base64";
-import blake from "blakejs";
-
 export function init(conductor) {
   conductor.call("group", "init");
 }
@@ -63,7 +59,6 @@ export function getMessagesByGroupByTimestamp(message_info) {
 }
 
 export function signalHandler(signal, signal_listener) {
-  
   /*
     //this is the incoming signal format
     signal = { 
