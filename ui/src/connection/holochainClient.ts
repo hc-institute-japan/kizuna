@@ -1,26 +1,112 @@
-import {AppApi, AppWebsocket} from '@holochain/conductor-api';
+import {
+  AgentPubKey,
+  AppSignalCb,
+  AppWebsocket,
+} from "@holochain/conductor-api";
+import { store } from "../containers/ReduxContainer";
+import { handleSignal } from "../redux/signal/actions";
 
-let client: AppApi;
+import { CallZomeConfig } from "../redux/types";
 
-const init = async () => {
+let client: null | AppWebsocket = null;
+
+let signalHandler: AppSignalCb = (signal) =>
+  store?.dispatch(
+    handleSignal(signal.data.payload.name, signal.data.payload.payload)
+  );
+
+const init: () => any = async () => {
   if (client) {
     return client;
   }
   try {
-    client = await AppWebsocket.connect('ws://localhost:8888');
+    client = await AppWebsocket.connect(
+      process.env.REACT_APP_DNA_INTERFACE_URL as string,
+      15000, // holochain's default timeout
+      signalHandler
+    );
   } catch (error) {
-    console.log(error);
+    console.error(error);
     throw error;
   }
 };
 
-export const callZome = async (config: any) => {
+let myAgentId: AgentPubKey | null;
+
+/* DO NOT USE THIS AS IT IS BUT INSTEAD USE THE getAgentId() ACTION FROM PROFILE INSTEAD */
+export const getAgentId: () => Promise<AgentPubKey | null> = async () => {
+  if (myAgentId) {
+    return myAgentId;
+  }
   await init();
-  const info = await client.appInfo({app_id: 'test-app'});
-  const response = await client.callZome({
-    ...config,
-    cell_id: info.cell_data[0][0],
-    provenance: info.cell_data[0][0][1],
-  });
-  return response;
+  try {
+    const info = await client?.appInfo({ installed_app_id: "test-app" });
+
+    if (info?.cell_data[0].cell_id[1]) {
+      myAgentId = info?.cell_data[0].cell_id[1];
+      return myAgentId;
+    }
+    return null;
+  } catch (e) {
+    console.warn(e);
+  }
+  return null;
+};
+
+export const callZome: (config: CallZomeConfig) => Promise<any> = async (
+  config
+) => {
+  await init();
+
+  const info = await client?.appInfo({ installed_app_id: "test-app" });
+  const {
+    cap = null,
+    cellId = info?.cell_data[0].cell_id,
+    zomeName,
+    fnName,
+    provenance = info?.cell_data[0].cell_id[1],
+    payload = null,
+  } = config;
+  try {
+    if (cellId && provenance) {
+      return await client?.callZome({
+        cap: cap,
+        cell_id: cellId,
+        zome_name: zomeName,
+        fn_name: fnName,
+        payload,
+        provenance,
+      });
+    }
+  } catch (e) {
+    console.warn(e);
+    const { type = null, data = null } = { ...e };
+    if (type === "error") {
+      switch (data?.type) {
+        case "ribosome_error": {
+          const regex = /Guest\("([\s\S]*?)"\)/;
+          const result = regex.exec(data.data);
+          throw {
+            type: "error",
+            message: result ? result[1] : "Something went wrong",
+          };
+        }
+        case "internal_error": {
+          /*
+            temporarily throwing a custom error for any internal_error
+            until we have a better grasp of how to handle each error separately.
+          */
+          throw {
+            type: "error",
+            message:
+              "An internal error occured. This is likely a bug in holochain.",
+          };
+        }
+        default:
+          throw e;
+      }
+    }
+
+    throw e;
+  }
 };

@@ -1,0 +1,5 @@
+.video {
+  width: 100% !important;
+  border-radius: 5px;
+  overflow: hidden;
+}
