@@ -87,8 +87,8 @@ pub struct CreateGroupInput {
 #[serde(rename_all = "camelCase")]
 pub struct CreateGroupOutput {
     pub content: Group,
-    pub group_id: EntryHash,
     pub group_revision_id: HeaderHash,
+    pub group_id: EntryHash,
 }
 #[derive(Deserialize, Serialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]

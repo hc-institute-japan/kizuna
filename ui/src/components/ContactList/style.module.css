@@ -1,0 +1,15 @@
+.contacts-list {
+  background: var(--ion-background-color) !important;
+}
+
+.contacts-list ion-item-divider {
+  border-bottom: 0px solid black;
+}
+
+.contacts-list > ion-item {
+  --background: var(--ion-background-color) !important;
+}
+.contacts-list > ion-item:hover {
+  --background: var(--ion-item-background) !important;
+  cursor: pointer;
+}

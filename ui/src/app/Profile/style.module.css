@@ -1,0 +1,49 @@
+.header {
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.header ion-toolbar {
+  --background: rgba(0, 0, 0, 0);
+}
+
+.profile-toolbar {
+  height: 30vh;
+
+  display: flex;
+  flex-direction: column;
+  --background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0),
+    rgba(0, 0, 0, 0.7)
+  ) !important;
+  justify-content: flex-end;
+}
+
+.content {
+  display: flex;
+
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+}
+
+.content p {
+  font-size: 2rem;
+  font-weight: lighter;
+}
+
+.content-icon {
+  padding-right: 1.5rem;
+  font-size: 2.5rem;
+}
+
+@media only screen and (max-width: 768px) {
+  .content {
+    flex-direction: column;
+  }
+  .content-icon {
+    font-size: 4rem;
+  }
+}

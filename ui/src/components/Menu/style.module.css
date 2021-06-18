@@ -1,0 +1,28 @@
+.menu ion-list {
+  background: var(--ion-background-color) !important;
+}
+
+.avatar {
+  filter: invert(0%);
+}
+
+.menu ion-item,
+.menu ion-item-group {
+  --background: var(--ion-background-color) !important;
+}
+
+.menu ion-item:hover,
+.menu ion-item-group:hover {
+  --background: var(--ion-item-background) !important;
+  cursor: pointer;
+}
+
+.avatar {
+  filter: invert(0%);
+}
+
+@media (prefers-color-scheme: dark) {
+  .avatar {
+    filter: invert(100%);
+  }
+}
