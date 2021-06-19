@@ -10,6 +10,7 @@ crate-type = [ "cdylib", "rlib" ]
 
 [dependencies]
 serde = "1"
-hdk = "0.0.100"
+hdk = "0.0.101-alpha.0"
+holo_hash = "0.0.2-alpha.1"
 derive_more = "0"
 file_types = { version = "0.0.1", path = "../../commons/file_types" }
