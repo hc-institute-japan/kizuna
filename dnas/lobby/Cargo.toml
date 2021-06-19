@@ -2,7 +2,8 @@
 members = [
     "zomes/group",
     # "zomes/request",
-    "zomes/username",
+    # "zomes/username",
+    "zomes/profiles",
     "zomes/contacts",
     "zomes/aggregator",
     "zomes/preference",
@@ -17,5 +18,5 @@ opt-level = "z"
 opt-level = "z"
 
 [patch.crates-io]
-#holo_hash = {git = "https://github.com/holochain/holochain", rev = "3675b58", package = "holo_hash"}
-
+hdk = {git = "https://github.com/holochain/holochain", rev = "24ceb63bdea374d1936b723e1966caf2e55ebfdc", package = "hdk"}
+holo_hash = {git = "https://github.com/holochain/holochain", rev = "24ceb63bdea374d1936b723e1966caf2e55ebfdc", package = "holo_hash"}

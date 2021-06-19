@@ -1,12 +1,11 @@
 [package]
-name = "file_types"
+name = "profiles"
 version = "0.0.1"
-description = "types related to file used both for p2pmessage and group zomes."
-authors = ["Tatsuya Sato <tatsuya_sato@dlsu.edu.ph>"]
+authors = [ "hcij" ]
 edition = "2018"
 
 [lib]
-name = "file_types"
+name = "profiles"
 crate-type = [ "cdylib", "rlib" ]
 
 [dependencies]
@@ -14,3 +13,4 @@ derive_more = "0"
 serde = "1"
 hdk = "0.0.101-alpha.0"
 holo_hash = "0.0.2-alpha.1"
+profiles = {git = "https://github.com/holochain-open-dev/profiles", package = "hc_zome_profiles"}
