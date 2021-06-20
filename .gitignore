@@ -3,3 +3,6 @@
 .DS_Store
 target/
 
+# rust cargo
+.cargo/
+
