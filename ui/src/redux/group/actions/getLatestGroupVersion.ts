@@ -14,7 +14,7 @@ import {
   fetchUsernameOfMembers,
 } from "./helpers";
 
-export const getLatestGroupVersion =
+const getLatestGroupVersion =
   (groupId: string): ThunkAction =>
   async (dispatch, getState, { callZome, getAgentId }) => {
     const myAgentId = await getAgentId();
@@ -91,3 +91,5 @@ export const getLatestGroupVersion =
       }
     }
   };
+
+export default getLatestGroupVersion;
