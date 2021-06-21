@@ -17,7 +17,7 @@ import {
   isTextPayload,
   Message,
 } from "../../redux/commons/types";
-import { getGroupConversationBadgeCount } from "../../redux/group/actions/getBadgeCount";
+import { getBadgeCount } from "../../redux/group/actions";
 import { GroupConversationsState } from "../../redux/group/types";
 import { countUnread } from "../../redux/p2pmessages/actions";
 import { P2PMessageConversationState } from "../../redux/p2pmessages/types";
@@ -154,7 +154,7 @@ const Conversations: React.FC = () => {
             type: "group",
             conversationName: groupsState.conversations[groupId].name,
             latestMessage: message,
-            badgeCount: dispatch(getGroupConversationBadgeCount(groupId)),
+            badgeCount: dispatch(getBadgeCount(groupId)),
           };
 
           conversationsArray.push(conversation);

@@ -13,7 +13,7 @@ import {
 } from "../types";
 import { fetchUsernameOfMembers } from "./helpers";
 
-export const addMembers =
+const addMembers =
   (updateGroupMembersData: UpdateGroupMembersData): ThunkAction =>
   async (
     dispatch,
@@ -88,3 +88,5 @@ export const addMembers =
       }
     }
   };
+
+export default addMembers;

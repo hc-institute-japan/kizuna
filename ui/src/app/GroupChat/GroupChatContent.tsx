@@ -25,8 +25,8 @@ import Typing from "../../components/Chat/Typing";
 import MessageInput from "../../components/MessageInput";
 // Redux
 import { FilePayloadInput } from "../../redux/commons/types";
-import { indicateGroupTyping } from "../../redux/group/actions/indicateGroupTyping";
-import { sendGroupMessage } from "../../redux/group/actions/sendGroupMessage";
+import { indicateGroupTyping } from "../../redux/group/actions";
+import { sendGroupMessage } from "../../redux/group/actions";
 import {
   GroupConversation,
   GroupMessage,
