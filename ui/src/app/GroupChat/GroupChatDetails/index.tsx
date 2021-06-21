@@ -19,10 +19,10 @@ import { useHistory, useParams } from "react-router";
 import FileBox from "../../../components/Slides/FileBox";
 import MediaBox from "../../../components/Slides/MediaBox";
 import { FetchPayloadType, FilePayload } from "../../../redux/commons/types";
-import { getNextBatchGroupMessages } from "../../../redux/group/actions/getNextBatchGroupMessages";
-import { fetchFilesBytes } from "../../../redux/group/actions/setFilesBytes";
+import { getNextBatchGroupMessages } from "../../../redux/group/actions";
+import { fetchFilesBytes } from "../../../redux/group/actions";
 // Redux
-import { updateGroupName } from "../../../redux/group/actions/updateGroupName";
+import { updateGroupName } from "../../../redux/group/actions";
 import { GroupMessage } from "../../../redux/group/types";
 import { RootState } from "../../../redux/types";
 import { useAppDispatch } from "../../../utils/helpers";

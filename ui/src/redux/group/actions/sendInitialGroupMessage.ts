@@ -7,10 +7,10 @@ import {
   GroupConversation,
   GroupMessageInput,
 } from "../types";
-import { createGroup } from "./createGroup";
-import { sendGroupMessage } from "./sendGroupMessage";
+import createGroup from "./createGroup";
+import sendGroupMessage from "./sendGroupMessage";
 
-export const sendInitialGroupMessage =
+const sendInitialGroupMessage =
   (
     members: Profile[],
     // need to handle files as well
@@ -97,3 +97,5 @@ export const sendInitialGroupMessage =
     }
     return false;
   };
+
+export default sendInitialGroupMessage;

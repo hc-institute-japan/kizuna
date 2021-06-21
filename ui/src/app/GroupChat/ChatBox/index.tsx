@@ -4,9 +4,9 @@ import { useSelector } from "react-redux";
 import Chat from "../../../components/Chat";
 import { ChatListMethods } from "../../../components/Chat/types";
 import { FilePayload, Payload } from "../../../redux/commons/types";
-import { getNextBatchGroupMessages } from "../../../redux/group/actions/getNextBatchGroupMessages";
-import { readGroupMessage } from "../../../redux/group/actions/readGroupMessage";
-import { fetchFilesBytes } from "../../../redux/group/actions/setFilesBytes";
+import { getNextBatchGroupMessages } from "../../../redux/group/actions";
+import { readGroupMessage } from "../../../redux/group/actions";
+import { fetchFilesBytes } from "../../../redux/group/actions";
 // Redux
 import {
   GroupMessage,
