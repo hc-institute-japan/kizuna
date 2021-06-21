@@ -12,7 +12,7 @@ import {
   UpdateGroupMembersData,
 } from "../types";
 
-export const removeMembers =
+const removeMembers =
   (updateGroupMembersData: UpdateGroupMembersData): ThunkAction =>
   async (
     dispatch,
@@ -20,10 +20,9 @@ export const removeMembers =
     { callZome }
   ): Promise<UpdateGroupMembersData | false> => {
     const input = {
-      // members: updateGroupMembersData.members.map((member: string) =>
-      //   deserializeAgentPubKey(member)
-      // ),
-      members: [],
+      members: updateGroupMembersData.members.map((member: string) =>
+        deserializeAgentPubKey(member)
+      ),
       groupId: deserializeHash(updateGroupMembersData.groupId),
       groupRevisionId: deserializeHash(updateGroupMembersData.groupRevisionId),
     };
@@ -67,3 +66,5 @@ export const removeMembers =
       }
     }
   };
+
+export default removeMembers;

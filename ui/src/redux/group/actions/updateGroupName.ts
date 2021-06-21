@@ -11,7 +11,7 @@ import {
   UPDATE_GROUP_NAME,
 } from "../types";
 
-export const updateGroupName =
+const updateGroupName =
   (updateGroupNameData: UpdateGroupNameData): ThunkAction =>
   async (dispatch, getState, { callZome }): Promise<UpdateGroupNameData> => {
     const state = getState();
@@ -65,3 +65,5 @@ export const updateGroupName =
       }
     }
   };
+
+export default updateGroupName;

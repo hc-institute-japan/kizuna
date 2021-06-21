@@ -5,7 +5,7 @@ import { useHistory, useLocation } from "react-router";
 import MessageInput from "../../components/MessageInput";
 import { useToast } from "../../containers/ToastContainer/context";
 import { FilePayloadInput } from "../../redux/commons/types";
-import { sendInitialGroupMessage } from "../../redux/group/actions/sendInitialGroupMessage";
+import { sendInitialGroupMessage } from "../../redux/group/actions";
 import { GroupConversation } from "../../redux/group/types";
 import { sendMessage } from "../../redux/p2pmessages/actions";
 import { Profile, ProfileListType } from "../../redux/profile/types";
