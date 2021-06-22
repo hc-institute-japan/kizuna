@@ -1,12 +1,12 @@
 use hdk::prelude::*;
 
-use super::{GroupFileBytes, GroupMessage, GroupMessageData, GroupMessageInput};
+use super::{GroupFileBytes, GroupMessage, GroupMessageInput, GroupMessageWithId};
 use crate::group_helpers::get_group_latest_version;
 use crate::signals::{SignalDetails, SignalName, SignalPayload};
 use crate::utils::*;
 use file_types::{FileMetadata, FileType, Payload, PayloadInput};
 
-pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<GroupMessageData> {
+pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<GroupMessageWithId> {
     let payload = match message_input.payload_input.clone() {
         PayloadInput::Text { payload } => Payload::Text { payload },
         PayloadInput::File {
@@ -65,7 +65,7 @@ pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<Gr
     let latest_group_version = get_group_latest_version(message.group_hash.clone())?;
 
     let message_hash = hash_entry(&message)?;
-    let group_message_data = GroupMessageData {
+    let group_message_data = GroupMessageWithId {
         id: message_hash,
         content: message,
     };

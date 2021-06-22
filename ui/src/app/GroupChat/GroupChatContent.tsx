@@ -28,8 +28,8 @@ import MessageInput, {
 } from "../../components/MessageInput";
 // Redux
 import { FilePayloadInput } from "../../redux/commons/types";
-import { indicateGroupTyping } from "../../redux/group/actions/indicateGroupTyping";
-import { sendGroupMessage } from "../../redux/group/actions/sendGroupMessage";
+import { indicateGroupTyping } from "../../redux/group/actions";
+import { sendGroupMessage } from "../../redux/group/actions";
 import {
   GroupConversation,
   GroupMessage,
@@ -71,6 +71,23 @@ const GroupChat: React.FC = () => {
   /* handles sending of messages. */
   const handleOnSend = () => {
     let inputs: GroupMessageInput[] = [];
+    /*
+      append text payload at index 0 and send it first
+      for performance purposes
+    */
+    if (message.length) {
+      inputs.push({
+        groupId: groupData!.originalGroupId,
+        payloadInput: {
+          type: "TEXT",
+          payload: { payload: message },
+        },
+        sender: myProfile.id!,
+        // TODO: handle replying to message here as well
+        replyTo: undefined,
+      });
+    }
+
     if (files.length) {
       setSendingLoading(true);
       files.forEach((file: any) => {
@@ -95,18 +112,6 @@ const GroupChat: React.FC = () => {
           replyTo: undefined,
         };
         inputs.push(groupMessage);
-      });
-    }
-    if (message.length) {
-      inputs.push({
-        groupId: groupData!.originalGroupId,
-        payloadInput: {
-          type: "TEXT",
-          payload: { payload: message },
-        },
-        sender: myProfile.id!,
-        // TODO: handle replying to message here as well
-        replyTo: undefined,
       });
     }
 

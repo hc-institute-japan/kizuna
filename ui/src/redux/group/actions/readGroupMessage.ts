@@ -4,7 +4,7 @@ import { dateToTimestamp } from "../../../utils/helpers";
 import { ThunkAction } from "../../types";
 import { GroupMessageReadData } from "../types";
 
-export const readGroupMessage =
+const readGroupMessage =
   (groupMessageReadData: GroupMessageReadData): ThunkAction =>
   async (dispatch, getState, { callZome, getAgentId }) => {
     /* deserialize fields for zome fn */
@@ -32,3 +32,5 @@ export const readGroupMessage =
     }
     return null;
   };
+
+export default readGroupMessage;

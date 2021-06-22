@@ -6,7 +6,10 @@ use crate::signals::{SignalDetails, SignalName, SignalPayload};
 use crate::utils::error;
 
 pub fn get_group_latest_version(group_id: EntryHash) -> ExternResult<GroupOutput> {
-    // 1 - we have to get details from the recived entry_hash as arg (group_id), based in the details we get back for this function we should have one or other behavior
+    /*
+    1 - we have to get details from the recived entry_hash as arg (group_id),
+    based in the details we get back for this function we should have one or other behavior
+    */
     if let Some(details) = get_details(group_id.clone(), GetOptions::latest())? {
         match details {
             Details::Entry(group_entry_details) => {
@@ -16,7 +19,11 @@ pub fn get_group_latest_version(group_id: EntryHash) -> ExternResult<GroupOutput
                     .map(|header_hashed| -> Header { header_hashed.header().to_owned() })
                     .collect();
 
-                // CASE # 1 : if updates field for this entry is empty it means this entry has never been updated, so we can return this group version because we can assure this is the latest group version for the given group_id.
+                /*
+                CASE # 1 : if updates field for this entry is empty it means
+                this entry has never been updated, so we can return this group version
+                because we can assure this is the latest group version for the given group_id.
+                */
                 if group_updates_headers.is_empty() {
                     if let Entry::App(group_entry_bytes) = group_entry_details.entry {
                         let group_sb: SerializedBytes = group_entry_bytes.into_sb();
@@ -37,7 +44,10 @@ pub fn get_group_latest_version(group_id: EntryHash) -> ExternResult<GroupOutput
                     }
                 }
 
-                // CASE # 2 : if the given entry has been updated we will loop through all the updates headers to get the most recent of them.
+                /*
+                CASE # 2 : if the given entry has been updated we will loop through
+                all the updates headers to get the most recent of them.
+                */
 
                 let group_root_header: Header = group_entry_details.headers[0].header().clone(); // here we storage the root header
                 let mut latest_group_header: Header = group_root_header;
@@ -48,7 +58,10 @@ pub fn get_group_latest_version(group_id: EntryHash) -> ExternResult<GroupOutput
                     }
                 }
 
-                // 3 - having the latest header from this entry, we can get the updated information from this group using "hdk3::get"
+                /*
+                3 - having the latest header from this entry, we can get the updated information
+                from this group using "hdk3::get"
+                */
                 if let Some(latest_group_entry_hash) = latest_group_header.entry_hash() {
                     if let Some(latest_group_element) =
                         get(latest_group_entry_hash.clone(), GetOptions::content())?

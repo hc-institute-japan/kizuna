@@ -12,7 +12,7 @@ import {
 import { fetchUsernameOfMembers } from "./helpers";
 import { deserializeAgentPubKey } from "../../../utils/helpers";
 
-export const createGroup =
+const createGroup =
   (createGroupInput: CreateGroupInput): ThunkAction =>
   async (
     dispatch,
@@ -70,3 +70,5 @@ export const createGroup =
       throw e;
     }
   };
+
+export default createGroup;
