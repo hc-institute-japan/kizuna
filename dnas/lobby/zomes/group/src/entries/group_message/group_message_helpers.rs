@@ -61,7 +61,7 @@ pub fn collect_messages_info(
         let link: Link = linked_messages.pop().unwrap();
 
         if let Some(message_element) = get(link.target.clone(), GetOptions::content())? {
-            // here i collect all the values to fill the group_message_content this values are:
+            // collect all the values to fill the group_message_content. these values are:
 
             // - the message entry_hash (aka the link target )
             // - the GroupMessageData (constructed from the element fetched from entry hash of the message )
@@ -122,10 +122,10 @@ pub fn filter_path_children_list(
                 .into_iter()
                 .position(|link| link.target.eq(&path_hash))
             {
-                // here we will split the path childrens to removed the newest paths from the olders (olders are those who we need to  keep checking)
+                // here we will split the path childrens to remove the newest paths from the olders (olders are those who we need to keep checking)
                 path_childrens.truncate(pivot_position);
             } else {
-                // this case shouldnt happen but i will handle it as an error (we can modified this in the future)
+                // this case shouldnt happen but we will handle it as an error (we can modified this in the future)
                 return error("cannot find this pivot into the childrens list ");
             }
         }

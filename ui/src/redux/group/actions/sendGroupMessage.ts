@@ -19,11 +19,11 @@ import {
   isOther,
   isImage,
 } from "../../commons/types";
-import { setFilesBytes } from "./setFilesBytes";
+import { setFilesBytes } from "../actions";
 import { timestampToDate } from "../../../utils/helpers";
 import { pushError } from "../../error/actions";
 
-export const sendGroupMessage =
+const sendGroupMessage =
   (groupMessageData: GroupMessageInput): ThunkAction =>
   async (dispatch, getState, { callZome }): Promise<GroupMessage | false> => {
     if (isTextPayload(groupMessageData.payloadInput)) {
@@ -138,3 +138,5 @@ export const sendGroupMessage =
     }
     return false;
   };
+
+export default sendGroupMessage;

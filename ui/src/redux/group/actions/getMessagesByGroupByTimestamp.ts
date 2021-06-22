@@ -11,7 +11,7 @@ import {
 import { convertFetchedResToGroupMessagesOutput } from "./helpers";
 
 // TODO: Implement this in the UI first.
-export const getMessagesByGroupByTimestamp =
+const getMessagesByGroupByTimestamp =
   (groupMessageByDateFetchFilter: GroupMessageByDateFetchFilter): ThunkAction =>
   async (dispatch, _getState, { callZome }): Promise<GroupMessagesOutput> => {
     const input = {
@@ -39,3 +39,5 @@ export const getMessagesByGroupByTimestamp =
 
     return groupMessagesOutput;
   };
+
+export default getMessagesByGroupByTimestamp;

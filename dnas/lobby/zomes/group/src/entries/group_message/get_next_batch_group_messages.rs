@@ -1,14 +1,16 @@
-use hdk::prelude::*;
 use crate::utils::*;
 use file_types::PayloadType;
+use hdk::prelude::*;
 use std::collections::hash_map::HashMap;
 
 use super::group_message_helpers::collect_messages_info;
 use super::group_message_helpers::filter_path_children_list;
 use super::group_message_helpers::get_linked_messages_from_path;
 
-use super::{GroupMessageContent, GroupMessageHash, GroupMessagesOutput, GroupMsgBatchFetchFilter, GroupMessagesContents, MessagesByGroup};
-
+use super::{
+    GroupMessageContent, GroupMessageHash, GroupMessagesContents, GroupMessagesOutput,
+    GroupMsgBatchFetchFilter, MessagesByGroup,
+};
 
 pub fn get_next_batch_group_messages_handler(
     filter: GroupMsgBatchFetchFilter,
@@ -52,7 +54,10 @@ pub fn get_next_batch_group_messages_handler(
                 )?;
             }
             Err(_) => {
-                // when this error can be generated? get the hash for a given entry should be safe
+                /*
+                getting of hash for a given entry
+                should be safe so this err may not happen at all
+                */
                 return error("Cannot get the path hash");
             }
         }
@@ -61,7 +66,7 @@ pub fn get_next_batch_group_messages_handler(
     // here we have to check if we already reach the batch size or not (if we dont reached yet the batch size we will repeat the proccess this time we will get all the pahs instead the especific one )
 
     if messages_hashes.len() < batch_size {
-        //generate the general group path (only the group_id)
+        // generate the general group path (only the group_id)
         let group_path: Path = path_from_str(&group_id.to_string());
 
         // get the list of childrens for this path
@@ -70,8 +75,7 @@ pub fn get_next_batch_group_messages_handler(
         // filter this childrens to removed the path we dont need to check
         filter_path_children_list(&mut path_childrens, pivot_path)?;
 
-        //itarate the childrens untill we reach the batch size or we run out of paths
-
+        // iterate the childrens until we reach the batch size or we run out of paths
         loop {
             if path_childrens.is_empty() || messages_hashes.len() >= batch_size {
                 break;

@@ -1,7 +1,7 @@
 import { ThunkAction } from "../../types";
 import { GroupConversation } from "../types";
 
-export const getGroupConversationBadgeCount =
+const getBadgeCount =
   (groupId: string): ThunkAction =>
   (_dispatch, getState) => {
     const state = getState();
@@ -30,3 +30,5 @@ export const getGroupConversationBadgeCount =
 
     return badgeCount;
   };
+
+export default getBadgeCount;
