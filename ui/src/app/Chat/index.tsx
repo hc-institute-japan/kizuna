@@ -1,6 +1,7 @@
 import React from "react";
 import { Route, Switch } from "react-router";
 import ChatContent from "./ChatContent";
+import ChatDetails from "./ChatDetails";
 const Chat: React.FC = () => {
   return (
     <Switch>
