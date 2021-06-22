@@ -12,7 +12,7 @@ export interface ChatListProps {
 }
 
 export interface ChatProps {
-  id?: string;
+  id: string;
   type?: "group" | "p2p";
   author: string;
   timestamp: Date;
@@ -24,6 +24,7 @@ export interface ChatProps {
   showName?: boolean;
   isSeen?: boolean;
   onSeen?(complete: () => any): any;
+  onReply?(message: { payload: Payload; author: string; id: string }): any;
   onDownload?(file: FilePayload): any;
 }
 

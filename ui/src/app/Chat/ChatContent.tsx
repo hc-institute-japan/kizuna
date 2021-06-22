@@ -270,6 +270,7 @@ const Chat: React.FC = () => {
 
     return conversant.id !== author ? (
       <Me
+        id={messageBundle.message.p2pMessageEntryHash}
         key={key}
         type="p2p"
         author={author}
@@ -282,6 +283,7 @@ const Chat: React.FC = () => {
       />
     ) : (
       <Others
+        id={messageBundle.message.p2pMessageEntryHash}
         key={key}
         type="p2p"
         author={author}

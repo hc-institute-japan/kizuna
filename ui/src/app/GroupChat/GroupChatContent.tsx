@@ -14,6 +14,7 @@ import {
   arrowBackSharp,
   informationCircleOutline,
   peopleCircleOutline,
+  search,
 } from "ionicons/icons";
 import React, { useRef, useState } from "react";
 import { useIntl } from "react-intl";
@@ -22,7 +23,9 @@ import { useHistory, useParams } from "react-router";
 // Components
 import { ChatListMethods } from "../../components/Chat/types";
 import Typing from "../../components/Chat/Typing";
-import MessageInput from "../../components/MessageInput";
+import MessageInput, {
+  MessageInputMethods,
+} from "../../components/MessageInput";
 // Redux
 import { FilePayloadInput } from "../../redux/commons/types";
 import { indicateGroupTyping } from "../../redux/group/actions/indicateGroupTyping";
@@ -156,6 +159,8 @@ const GroupChat: React.FC = () => {
     return setMessage(message);
   };
 
+  const messageInput = useRef<MessageInputMethods | null>(null);
+
   return groupData ? (
     <IonPage>
       <IonLoading
@@ -183,6 +188,13 @@ const GroupChat: React.FC = () => {
             </IonTitle>
             <IonButton
               onClick={() =>
+                history.push(`/g/${groupData.originalGroupId}/search`)
+              }
+            >
+              <IonIcon slot="icon-only" icon={search} />
+            </IonButton>
+            <IonButton
+              onClick={() =>
                 history.push(`/g/${groupData.originalGroupId}/details`)
               }
             >
@@ -194,6 +206,9 @@ const GroupChat: React.FC = () => {
 
       <IonContent>
         <ChatBox
+          onReply={(message) => {
+            if (messageInput.current) messageInput?.current?.reply(message);
+          }}
           groupId={groupData.originalGroupId}
           members={groupData.members}
           messageIds={groupData.messages}
@@ -209,6 +224,7 @@ const GroupChat: React.FC = () => {
         }
       />
       <MessageInput
+        ref={messageInput}
         onSend={handleOnSend}
         onChange={(message: string) => handleOnChange(message, groupData)}
         onFileSelect={(files) => setFiles(files)}

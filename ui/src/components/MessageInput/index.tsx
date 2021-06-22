@@ -7,17 +7,31 @@ import {
   IonToolbar,
 } from "@ionic/react";
 import { attachOutline } from "ionicons/icons";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  forwardRef,
+  ForwardRefRenderFunction,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import { useIntl } from "react-intl";
 import { useToast } from "../../containers/ToastContainer/context";
+import { Payload } from "../../redux/commons/types";
 import EndButtons from "./EndButtons";
 import FileView from "./FileView";
+import ReplyView from "./ReplyView";
 import styles from "./style.module.css";
 
 interface Props {
   onChange?: (message: string) => any;
   onSend?: () => any;
   onFileSelect?: (e: any[]) => any;
+}
+
+export interface MessageInputMethods {
+  reply: (message: { payload: Payload; author: string; id: string }) => any;
 }
 
 const determineFileType = (type: string): string => {
@@ -36,10 +50,14 @@ const determineFileType = (type: string): string => {
   }
 };
 
-const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
+const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
+  { onChange, onSend, onFileSelect },
+  ref
+) => {
   const [message, setMessage] = useState("");
   const handleOnChange = (e: CustomEvent) => setMessage(e.detail.value!);
   const intl = useIntl();
+  const [isReply, setIsReply] = useState(null);
   const file = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<any[]>([]);
   const handleOnFileClick = () => file?.current?.click();
@@ -49,12 +67,20 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [files]);
 
+  useImperativeHandle(ref, () => ({
+    reply: (message: any) => {
+      console.log(message);
+      setIsReply(message);
+    },
+  }));
+
   const onChangeCallback = useCallback(() => {
     if (onChange) onChange(message);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [message]);
 
   const reset = () => {
+    setIsReply(null);
     setMessage("");
     setFiles([]);
   };
@@ -212,6 +238,7 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
 
   return (
     <IonFooter>
+      {isReply ? <ReplyView messageState={[isReply, setIsReply]} /> : null}
       {files.length > 0 ? <FileView files={files} setFiles={setFiles} /> : null}
       <IonToolbar className={styles.toolbar}>
         <IonButtons slot="start">
@@ -247,7 +274,9 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
         <EndButtons
           files={files}
           onSend={() => {
-            if (onSend) onSend();
+            if (onSend) {
+              onSend();
+            }
             reset();
           }}
           message={message}
@@ -257,4 +286,4 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
   );
 };
 
-export default MessageInput;
+export default forwardRef(MessageInput);
