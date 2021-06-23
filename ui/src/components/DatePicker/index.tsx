@@ -2,6 +2,7 @@ import { IonDatetime } from "@ionic/react";
 import React, {
   forwardRef,
   ForwardRefRenderFunction,
+  useEffect,
   useImperativeHandle,
   useRef,
   useState,
@@ -23,10 +24,13 @@ const DatePicker: ForwardRefRenderFunction<DatePickerMethods, Props> = (
   { isVisible = true, onChange },
   ref
 ) => {
-  const [date, setDate] = useState<Date>(new Date());
+  const [date, setDate] = useState<Date>(
+    new Date(new Date().setDate(new Date().getDate() + 2))
+  );
+
   const dateRef = useRef<HTMLIonDatetimeElement>(null);
 
-  const dateToString = (): string => {
+  const dateToString = (date: Date): string => {
     const year = date.getUTCFullYear();
     const rawMonth = date.getMonth() + 1;
     const month = rawMonth < 10 ? `0${rawMonth}` : rawMonth;
@@ -59,8 +63,9 @@ const DatePicker: ForwardRefRenderFunction<DatePickerMethods, Props> = (
   return (
     <IonDatetime
       ref={dateRef}
-      value={dateToString()}
+      value={dateToString(date)}
       style={{ display: isVisible ? "block" : "none" }}
+      max={dateToString(new Date(new Date().setDate(new Date().getDate() + 1)))}
       onIonChange={(event) => {
         if (event.detail.value) {
           const newDate = stringToDate(event.detail.value);
