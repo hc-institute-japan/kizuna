@@ -1,0 +1,7 @@
+.search {
+  background: var(--ion-background-color);
+}
+
+.search > ion-item {
+  --background: var(--ion-background-color);
+}
