@@ -5,7 +5,7 @@ import {
   deserializeAgentPubKey,
   timestampToDate,
 } from "../../../../utils/helpers";
-import { Profile } from "../../../profile/types";
+import { AgentProfile, Profile } from "../../../profile/types";
 import { ThunkAction } from "../../../types";
 import { AddGroupAction, ADD_GROUP, GroupConversation } from "../../types";
 
@@ -64,17 +64,18 @@ const addedToGroup =
     );
 
     // get the profiles not in contacts from HC
+    // TODO: change for profiles module
     if (nonAddedProfiles?.length) {
       const profiles = await callZome({
-        zomeName: ZOMES.USERNAME,
-        fnName: FUNCTIONS[ZOMES.USERNAME].GET_USERNAMES,
+        zomeName: ZOMES.PROFILES,
+        fnName: FUNCTIONS[ZOMES.PROFILES].GET_AGENTS_PROFILES,
         payload: nonAddedProfiles,
       });
-      profiles.forEach(({ agentId, username }: any) => {
-        let base64 = serializeHash(agentId);
-        membersProfile[base64] = {
-          id: base64,
-          username,
+      profiles.forEach((agentProfile: AgentProfile) => {
+        const id = agentProfile.agent_pub_key;
+        membersProfile[id] = {
+          id,
+          username: agentProfile.profile.nickname,
         };
       });
     }

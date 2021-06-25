@@ -1,6 +1,6 @@
 import { serializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../../connection/types";
-import { Profile } from "../../../profile/types";
+import { AgentProfile, Profile } from "../../../profile/types";
 import { CallZomeConfig, ThunkAction } from "../../../types";
 import {
   GroupTypingDetail,
@@ -9,23 +9,18 @@ import {
 } from "../../types";
 
 const fetchProfile = async (
-  indicatedBy: any,
+  indicatedBy: string,
   callZome: (config: CallZomeConfig) => Promise<any>
 ) => {
-  /*
-    This is only plural because the ZomeFn returns a vector.
-    But in reality, only one profile (temporarily username) will be fetched given the arg.
-  */
-  let fetchedProfiles = await callZome({
-    zomeName: ZOMES.USERNAME,
-    fnName: FUNCTIONS[ZOMES.USERNAME].GET_USERNAMES,
-    payload: [indicatedBy],
+  let fetchedProfile: AgentProfile = await callZome({
+    zomeName: ZOMES.PROFILES,
+    fnName: FUNCTIONS[ZOMES.PROFILES].GET_AGENT_PROFILE,
+    payload: indicatedBy,
   });
-  let typerProfile = fetchedProfiles[0]; // safe to access index here because of above assumption
-  let base64 = serializeHash(typerProfile.agentId);
+  let id = fetchedProfile.agent_pub_key;
   return {
-    id: base64,
-    username: typerProfile.username,
+    id: id,
+    username: fetchedProfile.profile.nickname,
   };
 };
 
@@ -33,24 +28,40 @@ const groupTypingDetail =
   (signalPayload: any): ThunkAction =>
   async (dispatch, getState, { callZome }) => {
     const { payload } = signalPayload;
+    const groupIdB64 = serializeHash(payload.groupId);
     const state = getState();
+    const groupTyping = state.groups.typing[groupIdB64]
+      ? state.groups.typing[groupIdB64]
+      : [];
     const { contacts } = state.contacts;
     const memberId = serializeHash(payload.indicatedBy);
+    const currTypers = groupTyping.map((profile: Profile) => profile.id);
 
-    let indicatedBy: Profile = contacts[memberId]
-      ? contacts[memberId]
-      : await fetchProfile(payload.indicatedBy, callZome);
-    let GroupTypingDetail: GroupTypingDetail = {
-      groupId: serializeHash(payload.groupId),
-      indicatedBy: indicatedBy,
-      isTyping: payload.isTyping,
-    };
+    /*
+    only work with typing signal if needed be.
+    Do not work with signal if we already know that the
+    typer is typing and the signal is still an indication of typing
+    and vice versa.
+    */
+    if (
+      (payload.isTyping && !currTypers.includes(memberId)) ||
+      (!payload.isTyping && currTypers.includes(memberId))
+    ) {
+      let indicatedBy: Profile = contacts[memberId]
+        ? contacts[memberId]
+        : await fetchProfile(memberId, callZome);
+      let GroupTypingDetail: GroupTypingDetail = {
+        groupId: groupIdB64,
+        indicatedBy: indicatedBy,
+        isTyping: payload.isTyping,
+      };
 
-    dispatch<SetGroupTypingIndicator>({
-      type: SET_GROUP_TYPING_INDICATOR,
-      groupTypingIndicator: GroupTypingDetail,
-      typing: state.groups.typing,
-    });
+      dispatch<SetGroupTypingIndicator>({
+        type: SET_GROUP_TYPING_INDICATOR,
+        groupTypingIndicator: GroupTypingDetail,
+        typing: state.groups.typing,
+      });
+    }
   };
 
 export default groupTypingDetail;

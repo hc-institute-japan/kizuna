@@ -24,6 +24,7 @@ import SegmentTabs from "./SegmentTabs";
 
 import MediaBox from "../../../components/Slides/MediaBox";
 import FileBox from "../../../components/Slides/FileBox";
+import ProfileInfo from "../../../components/ProfileInfo";
 
 interface Props {
   location: RouteComponentProps<{}, {}, { conversant: Profile }>;
@@ -201,7 +202,7 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
   return (
     <IonPage>
       <IonHeader>
-        <ContactHeader username={state.conversant.username} />
+        <ContactHeader profile={state.conversant} />
         <SegmentTabs
           value={currentSegment}
           onSegmentChange={handleSegmentChange}
@@ -218,7 +219,12 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
         >
           {/* Contact Info */}
           {/* TODO: change to empty component for now */}
-          <IonSlide></IonSlide>
+          <IonSlide>
+            <ProfileInfo
+              nickname={state.conversant.username}
+              id={state.conversant.id}
+            />
+          </IonSlide>
 
           {/* Media */}
           <MediaBox

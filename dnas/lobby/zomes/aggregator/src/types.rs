@@ -1,25 +1,44 @@
 use file_types::Payload;
 use hdk::prelude::*;
 use hdk::prelude::{element::SignedHeaderHashed, timestamp::Timestamp};
-use std::collections::hash_map::HashMap;
+use holo_hash::AgentPubKeyB64;
+use std::collections::{hash_map::HashMap, BTreeMap};
 use std::time::SystemTime;
 
 // for contacts
 #[derive(Deserialize, Serialize, SerializedBytes, Debug)]
 pub struct AgentPubKeys(pub Vec<AgentPubKey>);
 
-// for username
-#[derive(Serialize, Deserialize, Debug, SerializedBytes)]
+// for profiles
+#[derive(Clone, Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct UsernameInfo {
-    username: String,
-    agent_id: AgentPubKey,
-    created_at: Timestamp,
-    entry_header_hash: HeaderHash,
+pub struct Profile {
+    pub nickname: String,
+    pub fields: BTreeMap<String, String>,
 }
 
-#[derive(Serialize, Deserialize, SerializedBytes, Debug)]
-pub struct UsernameList(pub Vec<UsernameInfo>);
+#[derive(Clone, Serialize, Deserialize, Debug)]
+pub struct AgentProfile {
+    pub agent_pub_key: AgentPubKeyB64,
+    pub profile: Profile,
+}
+
+#[derive(Clone, Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+// Is there a way not to do this ugly thing? :(
+pub struct AgentProfileCamel {
+    pub agent_pub_key: AgentPubKeyB64,
+    pub profile: Profile,
+}
+
+impl From<AgentProfile> for AgentProfileCamel {
+    fn from(profile: AgentProfile) -> Self {
+        AgentProfileCamel {
+            agent_pub_key: profile.agent_pub_key,
+            profile: profile.profile,
+        }
+    }
+}
 
 // for group
 #[derive(Deserialize, Serialize, SerializedBytes, Debug)]
@@ -150,14 +169,14 @@ pub struct PerGroupPreference {
 #[derive(Serialize, Deserialize, Debug, SerializedBytes)]
 #[serde(rename_all = "camelCase")]
 pub struct AggregatedLatestData {
-    pub user_info: UsernameInfo,
+    pub user_info: AgentProfileCamel,
     // for contacts
-    pub added_contacts: Vec<UsernameInfo>,
-    pub blocked_contacts: Vec<UsernameInfo>,
+    pub added_contacts: Vec<AgentProfileCamel>,
+    pub blocked_contacts: Vec<AgentProfileCamel>,
     // for group
     pub groups: MyGroupListWrapper,
     pub latest_group_messages: GroupMessagesOutput,
-    pub member_profiles: UsernameList,
+    pub member_profiles: Vec<AgentProfileCamel>,
     // for p2pmessage
     // pub latest_p2p_messages: P2PMessageHashTables,
     // for preference

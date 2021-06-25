@@ -5,6 +5,7 @@
   "dependencies": {
     "@capacitor/core": "2.4.5",
     "@capacitor/ios": "^2.4.5",
+    "@holo-host/identicon": "git+https://github.com/holo-host/identicon.git#types",
     "@holochain-open-dev/core-types": "git+https://github.com/holochain-open-dev/core-types.git#build",
     "@holochain/conductor-api": "^0.0.4",
     "@ionic-native/core": "^5.31.1",
@@ -61,6 +62,8 @@
     "ui:emma": "REACT_APP_DNA_INTERFACE_URL=ws://localhost:8811 ionic serve -p 8500",
     "build-happ": "cd ../dnas/lobby && CARGO_TARGET_DIR=target cargo build --release --target wasm32-unknown-unknown && hc dna pack workdir/dna && hc app pack workdir/happ && rm -rf ~/tmp && mkdir ~/tmp && hc s clean",
     "demo": "concurrently \"npm run hc:alice\" \"npm run hc:bob\" \"npm run hc:charlie\" \"npm run ui:alice\" \"npm run ui:bob\" \"npm run ui:charlie\"",
+    "demo-2": "concurrently \"npm run hc:alice\" \"npm run hc:bob\"  \"npm run ui:alice\" \"npm run ui:bob\"",
+    "demo-4": "concurrently \"npm run hc:alice\" \"npm run hc:bob\" \"npm run hc:charlie\" \"npm run hc:david\"  \"npm run ui:alice\" \"npm run ui:bob\" \"npm run ui:charlie\" \"npm run ui:david\"",
     "demo-5": "concurrently \"npm run hc:alice\" \"npm run hc:bob\" \"npm run hc:charlie\" \"npm run hc:david\" \"npm run hc:emma\" \"npm run ui:alice\" \"npm run ui:bob\" \"npm run ui:charlie\" \"npm run ui:david\" \"npm run ui:emma\"",
     "demo-rmt-prxy-alice": "concurrently \"npm run hc-rmt-prxy:alice\" \"npm run ui:alice\"",
     "demo-rmt-prxy-bob": "concurrently \"npm run hc-rmt-prxy:bob\" \"npm run ui:bob\"",

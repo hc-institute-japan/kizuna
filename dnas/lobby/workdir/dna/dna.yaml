@@ -14,7 +14,9 @@ zomes:
     bundled: ../../target/wasm32-unknown-unknown/release/preference.wasm
   # - name: request
   #   bundled: ../../target/wasm32-unknown-unknown/release/request.wasm
-  - name: username
-    bundled: ../../target/wasm32-unknown-unknown/release/username.wasm  
+  # - name: username
+  #   bundled: ../../target/wasm32-unknown-unknown/release/username.wasm  
   - name : group
     bundled: ../../target/wasm32-unknown-unknown/release/group.wasm 
+  - name : profiles
+    bundled: ../../target/wasm32-unknown-unknown/release/profiles.wasm 
