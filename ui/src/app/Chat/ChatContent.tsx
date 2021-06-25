@@ -17,6 +17,7 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory, useLocation, useParams } from "react-router";
+import AgentIdentifier from "../../components/AgentIdentifier";
 import { ChatList, Me, Others } from "../../components/Chat";
 import { ChatListMethods } from "../../components/Chat/types";
 import Typing from "../../components/Chat/Typing";
@@ -37,10 +38,11 @@ import {
 import { Profile } from "../../redux/profile/types";
 import { RootState } from "../../redux/types";
 import { useAppDispatch } from "../../utils/helpers";
+import styles from "./style.module.css";
 
 const Chat: React.FC = () => {
   /* STATES */
-  const { username } = useParams<{ username: string }>();
+  const { id } = useParams<{ id: string }>();
   const [message, setMessage] = useState<string>("");
   const [files, setFiles] = useState<any[]>([]);
   const [messagesWithConversant, setMessagesWithConversant] = useState<any[]>(
@@ -58,14 +60,15 @@ const Chat: React.FC = () => {
   const conversant = useSelector((state: RootState) => {
     let contacts = state.contacts.contacts;
     let conversant = Object.values(contacts).filter(
-      (contact) => contact.username === username
+      (contact) => contact.id === id
     );
     return conversant[0];
   });
 
   const dispatch = useAppDispatch();
   const history = useHistory();
-  const location2 = useLocation();
+  const { pathname, state }: { pathname: string; state: { username: string } } =
+    useLocation();
 
   /* REFS */
   const scrollerRef = useRef<ChatListMethods>(null);
@@ -79,7 +82,7 @@ const Chat: React.FC = () => {
     */
   useEffect(() => {
     scrollerRef.current!.scrollToBottom();
-  }, []);
+  });
 
   useEffect(() => {
     scrollerRef.current!.scrollToBottom();
@@ -121,20 +124,20 @@ const Chat: React.FC = () => {
 
   /* HANDLERS */
   /* 
-      navigates to info, media, files page 
-      when clicking the name of the conversant on the top toolbar 
-    */
+    navigates to info, media, files page 
+    when clicking the name of the conversant on the top toolbar 
+  */
   const handleOnClick = () => {
     history.push({
-      pathname: `${location2.pathname}/details`,
+      pathname: `${pathname}/details`,
       state: { conversant: conversant },
     });
   };
 
   /*
-      dispatches an typing indicator when the user types.
-      call typing indicator with false parameter with debounce of 500ms as well.
-    */
+    dispatches an typing indicator when the user types.
+    call typing indicator with false parameter with debounce of 500ms as well.
+  */
   const handleOnChange = (message: string, conversant: Profile) => {
     if (didMountRef.current === true) {
       dispatch(isTyping(conversant.id, message.length !== 0 ? true : false));
@@ -222,10 +225,10 @@ const Chat: React.FC = () => {
   };
 
   /* 
-      downloads a file when already in redux state
-      if not, dispatches an action to get the file from hc
-      when clicking the file download button
-    */
+    downloads a file when already in redux state
+    if not, dispatches an action to get the file from hc
+    when clicking the file download button
+  */
   const onDownloadHandler = (file: FilePayload) => {
     fetchedFiles[file.fileHash] !== undefined
       ? downloadFile(fetchedFiles[file.fileHash], file.fileName)
@@ -246,8 +249,8 @@ const Chat: React.FC = () => {
   };
 
   /* 
-      renders the appropriate chat bubble
-    */
+    renders the appropriate chat bubble
+  */
   const displayMessage = (messageBundle: {
     message: P2PMessage;
     receipt: P2PMessageReceipt;
@@ -309,9 +312,15 @@ const Chat: React.FC = () => {
               <IonIcon slot="icon-only" icon={arrowBackSharp} />
             </IonButton>
             <IonAvatar className="ion-padding">
-              <img src={personCircleOutline} alt={username} />
+              <img
+                className={styles["avatar"]}
+                src={personCircleOutline}
+                alt={state?.username}
+              />
             </IonAvatar>
-            <IonTitle className="item item-text-wrap">{username}</IonTitle>
+            <IonTitle className="item item-text-wrap">
+              <AgentIdentifier nickname={state?.username} id={id} />
+            </IonTitle>
             <IonButton onClick={handleOnClick}>
               <IonIcon slot="icon-only" icon={informationCircleOutline} />
             </IonButton>

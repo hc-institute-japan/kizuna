@@ -73,6 +73,7 @@ const MessageInput: React.FC<Props> = ({ onChange, onSend, onFileSelect }) => {
     return () => {
       document.removeEventListener("keydown", onKeyDown);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onSend, reset]);
   useEffect(() => {
     onFileSelectCallback();
