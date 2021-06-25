@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import Spinner from "../../components/Spinner";
-import { fetchMyUsername } from "../../redux/profile/actions";
+import { getMyProfile } from "../../redux/profile/actions";
 import { RootState } from "../../redux/types";
 import { useAppDispatch } from "../../utils/helpers";
 import Authenticated from "../Authenticated";
@@ -13,12 +13,11 @@ const Auth: React.FC = () => {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    dispatch(fetchMyUsername()).then((bool: boolean) => {
+    dispatch(getMyProfile()).then((bool: boolean) => {
       setLoading(false);
     });
   }, [dispatch]);
 
-  /* TODO: Maybe better to load here while username is getting fetched */
   return loading ? (
     <Spinner />
   ) : username !== null ? (

@@ -13,13 +13,13 @@ import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import { useHistory } from "react-router";
 import HomeInput from "../../components/Input/HomeInput";
-import { registerUsername } from "../../redux/profile/actions";
+import { createProfile } from "../../redux/profile/actions";
 import { useAppDispatch } from "../../utils/helpers";
 import { isUsernameFormatValid } from "../../utils/regex";
 import styles from "./style.module.css";
 
 const Register: React.FC = () => {
-  const [username, setUsername] = useState<string>("");
+  const [nickname, setNickname] = useState<string>("");
   const [isValid, setIsValid] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
@@ -29,7 +29,7 @@ const Register: React.FC = () => {
   const intl = useIntl();
 
   const handleOnChange = (e: CustomEvent) => {
-    setUsername(e.detail.value!);
+    setNickname(e.detail.value!);
     setError(
       isUsernameFormatValid(e.detail.value!)
         ? null
@@ -43,13 +43,13 @@ const Register: React.FC = () => {
     if (error) {
       setIsValid(false);
     } else {
-      if (username.length !== 0) setIsValid(true);
+      if (nickname.length >= 3) setIsValid(true);
     }
-  }, [error, username.length]);
+  }, [error, nickname.length]);
 
   const handleOnSubmit = () => {
     setLoading(true);
-    dispatch(registerUsername(username)).then((res: any) => {
+    dispatch(createProfile(nickname)).then((res: any) => {
       if (res) {
         history.push("/");
       } else {
@@ -82,7 +82,7 @@ const Register: React.FC = () => {
                 })}
               </IonLabel>
               <HomeInput
-                value={username}
+                value={nickname}
                 onIonChange={handleOnChange}
                 placeholder={intl.formatMessage({
                   id: "app.register.username-placeholder",
