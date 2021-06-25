@@ -16,6 +16,7 @@ interface SignalNameType {
 
 export const ZOMES: ZomeNameType = {
   USERNAME: "username",
+  PROFILES: "profiles",
   PREFERENCE: "preference",
   P2PMESSAGE: "p2pmessage",
   CONTACTS: "contacts",
@@ -43,6 +44,14 @@ export const FUNCTIONS: FunctionNameType = {
     GET_ALL_USERNAMES: "get_all_usernames",
     GET_AGENT_PUBKEY_FROM_USERNAME: "get_agent_pubkey_from_username",
     GET_MY_USERNAME: "get_my_username",
+  },
+  [ZOMES.PROFILES]: {
+    CREATE_PROFILE: "create_profile",
+    SEARCH_PROFILES: "search_profiles",
+    GET_AGENT_PROFILE: "get_agent_profile",
+    GET_AGENTS_PROFILES: "get_agents_profile",
+    GET_MY_PROFILE: "get_my_profile",
+    GET_ALL_PROFILES: "get_all_profiles",
   },
   [ZOMES.CONTACTS]: {
     ADD_CONTACTS: "add_contacts",
