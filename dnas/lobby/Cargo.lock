@@ -9,6 +9,7 @@ dependencies = [
  "derive_more",
  "file_types 0.0.1",
  "hdk",
+ "holo_hash",
  "serde",
 ]
 
@@ -201,7 +202,7 @@ checksum = "d7afe4a420e3fe79967a00898cc1f4db7c8a49a9333a29f8a4bd76a253d5cd04"
 [[package]]
 name = "hc_zome_profiles"
 version = "0.0.1"
-source = "git+https://github.com/holochain-open-dev/profiles?rev=2e37a8a#2e37a8ae09fdef734428c178c3678695756b3bde"
+source = "git+https://github.com/holochain-open-dev/profiles?rev=1092b87#1092b8749457cd2b31ca4e86e7caecfe1789fc5c"
 dependencies = [
  "derive_more",
  "hdk",
@@ -504,6 +505,7 @@ dependencies = [
  "derive_more",
  "hc_zome_profiles",
  "hdk",
+ "holo_hash",
  "serde",
 ]
 
@@ -846,6 +848,27 @@ name = "unicode-xid"
 version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8ccb82d61f80a663efe1f787a51b16b5a51e3314d6ac365b08639f52387b33f3"
+
+[[package]]
+name = "username"
+version = "0.0.1"
+dependencies = [
+ "derive_more",
+ "hdk",
+ "serde",
+ "username 0.0.1 (git+https://github.com/holochain-open-dev/username-zome?branch=bump-hdk-0.0.100)",
+]
+
+[[package]]
+name = "username"
+version = "0.0.1"
+source = "git+https://github.com/holochain-open-dev/username-zome?branch=bump-hdk-0.0.100#511165e0862f5756521ae33eca699653d5fdc40c"
+dependencies = [
+ "derive_more",
+ "hdk",
+ "serde",
+ "thiserror",
+]
 
 [[package]]
 name = "wasi"
