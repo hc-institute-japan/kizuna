@@ -46,7 +46,10 @@ const Conversations: React.FC = () => {
   const handleOnClick = (conversation: ConversationDetail) =>
     conversation.type === "group"
       ? history.push(`/g/${conversation.id}`)
-      : history.push(`/u/${conversation.conversationName}`);
+      : history.push({
+          pathname: `/u/${conversation.id}`,
+          state: { username: conversation.conversationName },
+        });
   /*
     Handle the construction of array of
     conversation detail merged from P2P and Group conversations

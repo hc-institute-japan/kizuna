@@ -3,11 +3,11 @@ import {
   IonButtons,
   IonIcon,
   IonItem,
-  IonLabel,
   IonSpinner,
 } from "@ionic/react";
 import { add } from "ionicons/icons";
 import React, { useState } from "react";
+import AgentIdentifier from "../../../components/AgentIdentifier";
 import { addContact } from "../../../redux/contacts/actions";
 import { Profile } from "../../../redux/profile/types";
 import { useAppDispatch } from "../../../utils/helpers";
@@ -31,7 +31,7 @@ const AddContactItem: React.FC<Props> = ({ contact, onCompletion }) => {
 
   return (
     <IonItem lines="none">
-      <IonLabel>{contact.username}</IonLabel>
+      <AgentIdentifier nickname={contact.username} id={contact.id} />
       <IonButtons slot="end">
         {isLoading ? (
           <IonSpinner />

@@ -5,10 +5,10 @@ import ChatDetails from "./ChatDetails";
 const Chat: React.FC = () => {
   return (
     <Switch>
-      <Route path="/u/:username" exact>
+      <Route path="/u/:id" exact>
         <ChatContent />
       </Route>
-      <Route path="/u/:username/details" exact component={ChatDetails} />
+      <Route path="/u/:id/details" exact component={ChatDetails} />
     </Switch>
   );
 };

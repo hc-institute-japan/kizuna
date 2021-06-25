@@ -99,6 +99,7 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
     return () => {
       document.removeEventListener("keydown", onKeyDown);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onSend, reset]);
   useEffect(() => {
     onFileSelectCallback();

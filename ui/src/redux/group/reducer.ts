@@ -243,9 +243,9 @@ const reducer = (
       let groupTyping = typing[action.groupTypingIndicator.groupId]
         ? typing[action.groupTypingIndicator.groupId]
         : [];
-      const userNames = groupTyping.map((profile: Profile) => profile.id);
+      const id = groupTyping.map((profile: Profile) => profile.id);
       if (action.groupTypingIndicator.isTyping) {
-        if (!userNames.includes(action.groupTypingIndicator.indicatedBy.id)) {
+        if (!id.includes(action.groupTypingIndicator.indicatedBy.id)) {
           groupTyping.push(action.groupTypingIndicator.indicatedBy);
         }
       } else {

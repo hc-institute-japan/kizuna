@@ -1,10 +1,10 @@
 import { IonContent, IonList, IonModal } from "@ionic/react";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { useToast } from "../../../containers/ToastContainer/context";
-import { fetchAllUsernames } from "../../../redux/contacts/actions";
 import { IndexedContacts, SET_CONTACTS } from "../../../redux/contacts/types";
+import { searchProfiles } from "../../../redux/profile/actions";
 import { Profile, ProfileListType } from "../../../redux/profile/types";
 import { RootState } from "../../../redux/types";
 import { indexContacts, useAppDispatch } from "../../../utils/helpers";
@@ -19,34 +19,38 @@ interface Props {
 }
 
 const AddContactModal: React.FC<Props> = ({ isOpen, onCancel }) => {
-  const [filter, setFilter] = useState<string>("");
-  const [users, setUsers] = useState<Profile[]>([]);
   const { showToast } = useToast();
-  const { contacts, username } = useSelector((state: RootState) => ({
-    contacts: state.contacts.contacts,
-    username: state.profile.username,
-  }));
+  const intl = useIntl();
+  const contacts = useSelector((state: RootState) => state.contacts.contacts);
+  const [users, setUsers] = useState<Profile[]>([]);
 
   const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    if (isOpen)
-      dispatch(fetchAllUsernames()).then((res: any) => {
-        if (res) {
-          const filteredRes = res.filter(
-            (user: Profile) => username !== user.username
-          );
-          setUsers(filteredRes);
-        }
+  const handleOnChange = (searchKey: string) => {
+    console.log("searching...");
+    if (searchKey.length >= 3) {
+      dispatch(searchProfiles(searchKey)).then((res: Profile[]) => {
+        if (res) setUsers(res);
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, isOpen]);
+    } else if (searchKey.length > 0 && searchKey.length < 3) {
+      /* add another 300ms to show warning toast */
+      setTimeout(
+        showToast({
+          color: "warning",
+          message: intl.formatMessage({
+            id: "app.contacts.search-nickname-warning",
+          }),
+        }),
+        300
+      );
+    } else {
+      /* clear search result when string is equal to 0 */
+      setUsers([]);
+    }
+  };
 
-  let indexedContacts: IndexedContacts = indexContacts(
-    users.filter((user) => user.username.includes(filter))
-  );
+  let indexedContacts: IndexedContacts = indexContacts(users);
 
-  const intl = useIntl();
   const onCompletion = (contact: Profile) => {
     showToast({
       message: intl.formatMessage(
@@ -68,25 +72,23 @@ const AddContactModal: React.FC<Props> = ({ isOpen, onCancel }) => {
   return (
     <IonModal isOpen={isOpen} onDidDismiss={onCancel}>
       <AddContactHeader
-        onChange={(e) => setFilter(e.detail.value!)}
+        onChange={(e) => handleOnChange(e.detail.value)}
         onCancel={onCancel}
       />
       <IonContent>
-        {filter.length === 0 ? null : (
-          <IonList className={styles["contacts-list"]}>
-            {Object.keys(indexedContacts).map((char) => {
-              const searchedContacts = indexedContacts[char];
-              return (
-                <AddContactIndex
-                  onCompletion={onCompletion}
-                  key={char}
-                  index={char}
-                  contacts={searchedContacts}
-                />
-              );
-            })}
-          </IonList>
-        )}
+        <IonList className={styles["contacts-list"]}>
+          {Object.keys(indexedContacts).map((char) => {
+            const searchedContacts = indexedContacts[char];
+            return (
+              <AddContactIndex
+                onCompletion={onCompletion}
+                key={char}
+                index={char}
+                contacts={searchedContacts}
+              />
+            );
+          })}
+        </IonList>
       </IonContent>
     </IonModal>
   );

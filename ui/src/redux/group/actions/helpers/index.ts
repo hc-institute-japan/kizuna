@@ -16,7 +16,7 @@ import {
 } from "../../../commons/types";
 import { ContactsState } from "../../../contacts/types";
 import { PreferenceState } from "../../../preference/types";
-import { Profile, ProfileState } from "../../../profile/types";
+import { AgentProfile, Profile, ProfileState } from "../../../profile/types";
 import { CallZomeConfig } from "../../../types";
 import {
   GroupConversationsState,
@@ -136,13 +136,13 @@ export const fetchUsernameOfMembers = async (
 
   if (undefinedProfiles?.length) {
     const res = await callZome({
-      zomeName: ZOMES.USERNAME,
-      fnName: FUNCTIONS[ZOMES.USERNAME].GET_USERNAMES,
+      zomeName: ZOMES.PROFILES,
+      fnName: FUNCTIONS[ZOMES.PROFILES].GET_AGENTS_PROFILES,
       payload: undefinedProfiles,
     });
-    res.forEach((profile: any) => {
-      let base64 = serializeHash(profile.agentId);
-      membersUsernames[base64] = { id: base64, username: profile.username };
+    res.forEach((agentProfile: AgentProfile) => {
+      let id = agentProfile.agent_pub_key;
+      membersUsernames[id] = { id, username: agentProfile.profile.nickname };
     });
   }
 

@@ -10,7 +10,7 @@ import {
   SET_LATEST_GROUP_STATE,
 } from "../group/types";
 import { getLatestMessages } from "../p2pmessages/actions";
-import { Profile, ProfileActionTypes, SET_USERNAME } from "../profile/types";
+import { Profile, ProfileActionTypes, SET_PROFILE } from "../profile/types";
 import { ThunkAction } from "../types";
 
 export const getLatestData =
@@ -28,25 +28,25 @@ export const getLatestData =
     const myAgentIdB64 = serializeHash(myAgentId!);
 
     dispatch<ProfileActionTypes>({
-      type: SET_USERNAME,
+      type: SET_PROFILE,
       id: myAgentIdB64,
-      username: latestData.userInfo.username,
+      nickname: latestData.userInfo.profile.nickname,
     });
 
     let contacts: { [key: string]: Profile } = {};
     let blocked: { [key: string]: Profile } = {};
-    latestData.addedContacts.forEach((profile: any) => {
-      const base64 = serializeHash(profile.agentId);
-      contacts[base64] = {
-        id: base64,
-        username: profile.username,
+    latestData.addedContacts.forEach((agentProfile: any) => {
+      const agentId = agentProfile.agentPubKey;
+      contacts[agentId] = {
+        id: agentId,
+        username: agentProfile.profile.nickname,
       };
     });
-    latestData.blockedContacts.forEach((profile: any) => {
-      const base64 = serializeHash(profile.agentId);
-      blocked[base64] = {
-        id: base64,
-        username: profile.username,
+    latestData.blockedContacts.forEach((agentProfile: any) => {
+      const agentId = agentProfile.agentPubKey;
+      blocked[agentId] = {
+        id: agentId,
+        username: agentProfile.profile.nickname,
       };
     });
 
@@ -88,10 +88,10 @@ export const getLatestData =
     );
 
     let members: Profile[] = latestData.memberProfiles.map(
-      (profile: any): Profile => {
+      (agentProfile: any): Profile => {
         return {
-          id: serializeHash(profile.agentId),
-          username: profile.username,
+          id: agentProfile.agentPubKey,
+          username: agentProfile.profile.nickname,
         };
       }
     );
