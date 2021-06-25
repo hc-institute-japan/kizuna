@@ -12,7 +12,7 @@ import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import ImageView from "../../../components/Chat/File/ImageView/index";
 import { FilePayload, isP2PMessage } from "../../../redux/commons/types";
-import { fetchFilesBytes } from "../../../redux/group/actions/setFilesBytes";
+import { fetchFilesBytes } from "../../../redux/group/actions";
 import { GroupMessage } from "../../../redux/group/types";
 import { getFileBytes } from "../../../redux/p2pmessages/actions";
 import { P2PMessage } from "../../../redux/p2pmessages/types";

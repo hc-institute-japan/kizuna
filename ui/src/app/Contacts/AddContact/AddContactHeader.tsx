@@ -13,6 +13,7 @@ const AddContactHeader: React.FC<Props> = ({ onChange, onCancel }) => (
         showCancelButton="always"
         onIonChange={onChange}
         onIonCancel={onCancel}
+        debounce={700}
       />
     </IonToolbar>
   </IonHeader>

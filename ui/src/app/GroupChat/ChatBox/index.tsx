@@ -4,12 +4,13 @@ import { useSelector } from "react-redux";
 import Chat from "../../../components/Chat";
 import { ChatListMethods } from "../../../components/Chat/types";
 import { FilePayload, Payload } from "../../../redux/commons/types";
-import { getNextBatchGroupMessages } from "../../../redux/group/actions/getNextBatchGroupMessages";
-import { readGroupMessage } from "../../../redux/group/actions/readGroupMessage";
-import { fetchFilesBytes } from "../../../redux/group/actions/setFilesBytes";
+import { getNextBatchGroupMessages } from "../../../redux/group/actions";
+import { readGroupMessage } from "../../../redux/group/actions";
+import { fetchFilesBytes } from "../../../redux/group/actions";
 // Redux
 import {
   GroupMessage,
+  GroupMessageBundle,
   GroupMessageReadData,
   GroupMessagesOutput,
 } from "../../../redux/group/types";
@@ -17,29 +18,18 @@ import { Profile } from "../../../redux/profile/types";
 import { RootState } from "../../../redux/types";
 import { useAppDispatch } from "../../../utils/helpers";
 
-interface messageBundle {
-  groupMessageId: string;
-  groupId: string;
-  author: Profile;
-  payload: Payload; // subject to change
-  timestamp: Date;
-  replyTo?: string;
-  readList: {
-    // key is AgentPubKey
-    [key: string]: Date;
-  };
-}
-
 interface Props {
   messageIds: string[];
   members: string[];
   groupId: string;
   // TODO: not really sure what type this is
+  onReply(message: { author: string; payload: Payload; id: string }): any;
   chatList: React.RefObject<ChatListMethods>;
 }
 const MessageList: React.FC<Props> = ({
   messageIds,
   members,
+  onReply,
   chatList,
   groupId,
 }) => {
@@ -49,7 +39,7 @@ const MessageList: React.FC<Props> = ({
   const filesBytes = useSelector((state: RootState) => state.groups.groupFiles);
 
   /* LOCAL STATE */
-  const [messages, setMessages] = useState<messageBundle[]>([]);
+  const [messages, setMessages] = useState<GroupMessageBundle[]>([]);
   const [oldestFetched, setOldestFetched] = useState<boolean>(false);
 
   const groups = useSelector((state: RootState) => state.groups);
@@ -128,7 +118,7 @@ const MessageList: React.FC<Props> = ({
       Retrieve the messgaes from redux store and modify
       the author field to Profile type.
     */
-    let messages: messageBundle[] = messageIds.map((messageId) => {
+    let messages: GroupMessageBundle[] = messageIds.map((messageId) => {
       /* retrieve the message content from redux */
       let message: GroupMessage = groups.messages[messageId];
       const authorProfile: Profile = groups.members[message.author];
@@ -164,6 +154,7 @@ const MessageList: React.FC<Props> = ({
           if (message.author.id === profile.id)
             return (
               <Chat.Me
+                id={message.groupMessageId}
                 onDownload={handleOnDownload}
                 key={i}
                 author={message.author.username}
@@ -173,10 +164,12 @@ const MessageList: React.FC<Props> = ({
                 type="group"
                 showName={true}
                 showProfilePicture={true}
+                onReply={(message) => onReply(message)}
               />
             );
           return (
             <Chat.Others
+              id={message.groupMessageId}
               onDownload={handleOnDownload}
               key={i}
               author={message.author.username}
@@ -186,6 +179,7 @@ const MessageList: React.FC<Props> = ({
               type="group"
               showName={true}
               onSeen={(complete) => handleOnSeen(complete, message)}
+              onReply={(message) => onReply(message)}
               showProfilePicture={true}
             />
           );

@@ -3,6 +3,7 @@ import { FUNCTIONS, ZOMES } from "../../../connection/types";
 import { pushError } from "../../error/actions";
 import { ThunkAction } from "../../types";
 
+/* CURRENTLY UNUSED */
 const fetchAllUsernames =
   (): ThunkAction =>
   async (dispatch, _getState, { callZome }) => {

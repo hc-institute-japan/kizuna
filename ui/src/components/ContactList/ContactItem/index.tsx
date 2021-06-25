@@ -1,7 +1,8 @@
-import { IonItem, IonLabel } from "@ionic/react";
+import { IonItem } from "@ionic/react";
 import React from "react";
 import { useHistory } from "react-router";
 import { Profile } from "../../../redux/profile/types";
+import AgentIdentifier from "../../AgentIdentifier";
 
 interface Props {
   contact: Profile;
@@ -17,7 +18,7 @@ const ContactItem: React.FC<Props> = ({ contact }) => {
 
   return (
     <IonItem onClick={handleOnClick} lines="none" key={JSON.stringify(contact)}>
-      <IonLabel>{contact.username}</IonLabel>
+      <AgentIdentifier nickname={contact.username} id={contact.id} />
       {/* <IonButtons slot="end">
         <IonButton>
           <IonIcon icon={chatboxOutline} />

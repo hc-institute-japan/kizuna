@@ -17,7 +17,7 @@ import {
   isTextPayload,
   Message,
 } from "../../redux/commons/types";
-import { getGroupConversationBadgeCount } from "../../redux/group/actions/getBadgeCount";
+import { getBadgeCount } from "../../redux/group/actions";
 import { GroupConversationsState } from "../../redux/group/types";
 import { countUnread } from "../../redux/p2pmessages/actions";
 import { P2PMessageConversationState } from "../../redux/p2pmessages/types";
@@ -46,7 +46,10 @@ const Conversations: React.FC = () => {
   const handleOnClick = (conversation: ConversationDetail) =>
     conversation.type === "group"
       ? history.push(`/g/${conversation.id}`)
-      : history.push(`/u/${conversation.conversationName}`);
+      : history.push({
+          pathname: `/u/${conversation.id}`,
+          state: { username: conversation.conversationName },
+        });
   /*
     Handle the construction of array of
     conversation detail merged from P2P and Group conversations
@@ -154,7 +157,7 @@ const Conversations: React.FC = () => {
             type: "group",
             conversationName: groupsState.conversations[groupId].name,
             latestMessage: message,
-            badgeCount: dispatch(getGroupConversationBadgeCount(groupId)),
+            badgeCount: dispatch(getBadgeCount(groupId)),
           };
 
           conversationsArray.push(conversation);

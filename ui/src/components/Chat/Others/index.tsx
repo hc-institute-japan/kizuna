@@ -1,11 +1,13 @@
 import { IonItem, IonText } from "@ionic/react";
 import { personCircleOutline } from "ionicons/icons";
-import React from "react";
+import React, { useState } from "react";
 import {
   FilePayload,
   isTextPayload,
   TextPayload,
 } from "../../../redux/commons/types";
+import { usePressHandlers } from "../../../utils/helpers";
+import ChatModal from "../ChatModal";
 import File from "../File";
 import MessageTimestamp from "../MessageTimestamp";
 import { default as common, default as styles } from "../style.module.css";
@@ -22,9 +24,15 @@ const Others: React.FC<ChatProps> = ({
   onSeen,
   showProfilePicture,
   showName,
+  onReply,
   isSeen = false,
   onDownload,
 }) => {
+  const onLongPress = () => setIsModalOpen(true);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const pressHandlers = usePressHandlers(onLongPress, () => {});
+
   const isText = isTextPayload(payload);
   const isP2P = type === "p2p";
 
@@ -36,7 +44,11 @@ const Others: React.FC<ChatProps> = ({
         </IonItem>
       ) : null}
 
-      <IonItem lines="none" className={`${common["others-container"]}`}>
+      <IonItem
+        lines="none"
+        className={`${common["others-container"]}`}
+        {...pressHandlers}
+      >
         {isP2P ? null : (
           <div className={common.picture} style={{ marginRight: "0.5rem" }}>
             {showProfilePicture ? (
@@ -68,6 +80,12 @@ const Others: React.FC<ChatProps> = ({
           <MessageTimestamp onSeen={onSeen} timestamp={timestamp} />
         </div>
       </IonItem>
+      <ChatModal
+        onReply={() => {
+          if (onReply) onReply({ author, payload, id });
+        }}
+        open={[isModalOpen, setIsModalOpen]}
+      ></ChatModal>
     </>
   );
 };
