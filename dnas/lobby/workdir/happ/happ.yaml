@@ -8,7 +8,7 @@ slots:
       strategy: create
       deferred: false
     dna:
-      bundled: "../dna/Kizuna.dna"
+      bundled: "../dna/kizuna.dna"
       properties: ~
       uuid: ~
       version: ~

@@ -11,7 +11,7 @@ import {
 } from "../types";
 import { convertFetchedResToGroupMessagesOutput } from "./helpers";
 
-export const getNextBatchGroupMessages =
+const getNextBatchGroupMessages =
   (groupMessageBatchFetchFilter: GroupMessageBatchFetchFilter): ThunkAction =>
   async (dispatch, _getState, { callZome }): Promise<GroupMessagesOutput> => {
     /* deserialize fields for zome fn */
@@ -52,3 +52,5 @@ export const getNextBatchGroupMessages =
       return dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
     }
   };
+
+export default getNextBatchGroupMessages;

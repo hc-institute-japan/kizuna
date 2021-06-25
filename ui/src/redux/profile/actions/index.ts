@@ -1,13 +1,7 @@
-import fetchMyUsername from "./fetchMyUsername";
-import fetchProfileFromUsername from "./fetchProfileFromUsername";
+import createProfile from "./createProfile";
 import getAgentId from "./getAgentId";
-import registerUsername from "./registerUsername";
-import setUsername from "./setUsername";
+import getMyProfile from "./getMyProfile";
+import searchProfiles from "./searchProfiles";
+import setProfile from "./setProfile";
 
-export {
-  fetchMyUsername,
-  fetchProfileFromUsername,
-  getAgentId,
-  registerUsername,
-  setUsername,
-};
+export { createProfile, getMyProfile, searchProfiles, getAgentId, setProfile };

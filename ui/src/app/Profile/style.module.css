@@ -4,13 +4,16 @@
   background-repeat: no-repeat;
 }
 
+.nickname {
+  font-size: x-large;
+}
+
 .header ion-toolbar {
   --background: rgba(0, 0, 0, 0);
 }
 
 .profile-toolbar {
   height: 30vh;
-
   display: flex;
   flex-direction: column;
   --background: linear-gradient(

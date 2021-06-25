@@ -15,7 +15,7 @@ import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { useToast } from "../../../../containers/ToastContainer/context";
 
-import { removeMembers } from "../../../../redux/group/actions/removeMembers";
+import { removeMembers } from "../../../../redux/group/actions";
 import { GroupConversation } from "../../../../redux/group/types";
 // Redux
 import { Profile } from "../../../../redux/profile/types";

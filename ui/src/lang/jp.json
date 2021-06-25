@@ -7,6 +7,7 @@
   "app.contacts.block": "連絡先をブロック",
   "app.contacts.empty-contact-list": "連絡先はまだありません",
   "app.contacts.remove": "連絡先から削除",
+  "app.contacts.search-nickname-warning": "検索は３文字以上で可能です",
   "app.contacts.unblock": "連絡先のブロックを解除",
   "app.conversations.empty-conversations": "まだ会話がないようです...",
   "app.group-chat.add-member": "追加",
@@ -65,10 +66,10 @@
   "app.profile.to-be-implemented": "工事中...",
   "app.profile.to-be-implemented-header": "おっと!",
   "app.register.error-existing-username": "このユーザー名はすでに登録されています",
-  "app.register.error-invalid-username": "ユーザー名は3文字以上で、1つの英字を含める必要があります",
-  "app.register.register": "アカウントを作成する",
-  "app.register.username-label": "ユーザー名",
-  "app.register.username-placeholder": "ユーザー名を入力してください...",
+  "app.register.error-invalid-username": "ニックネームは3英数字以上で、最低1英字を含める必要があります",
+  "app.register.register": "ニックネームを登録する",
+  "app.register.username-label": "ニックネーム",
+  "app.register.username-placeholder": "ニックネームを入力してください...",
   "app.settings.language-label": "言語",
   "app.settings.preference-label": "環境設定",
   "app.settings.read-receipt-label": "既読通知",
@@ -78,7 +79,16 @@
   "components.conversation.me-file-string": "あなたは{fileName}を送りました",
   "components.conversation.other-file-string": "{name}が{fileName}を送信しました",
   "components.message-input.over-size-limit": "{fileName}は15MBのファイル制限を超えています",
+  "components.profile-info.id": "ID",
+  "components.profile-info.identicon": "アイデンティコン",
+  "components.profile-info.nickname": "ニックネーム",
   "components.typing.is-typing": "{user}が入力しています",
+  "redux.err.contacts.add-contact.1": "{username}はすでに連絡先に追加されています",
+  "redux.err.contacts.add-contact.2": "{username}はブロックされています",
+  "redux.err.contacts.block-contact.1": "{username}はすでにブロックされています",
+  "redux.err.contacts.fetch-blocked.1": "このユーザーのユーザーネームの取得に失敗しました",
+  "redux.err.contacts.fetch-blocked.2": "このユーザーはユーザーネームがありません",
+  "redux.err.contacts.fetch-my-contacts.1": "このユーザーのユーザーネームの取得に失敗しました",
   "redux.err.generic": "エラーが発生しました",
   "redux.err.group.add-members.1": "おっと, 追加するメンバーを指定せずにメンバーを追加しようとしています",
   "redux.err.group.add-members.2": "おっと, ブロックされたユーザーはグループに追加できません",
@@ -91,18 +101,7 @@
   "redux.err.group.set-files-bytes.1": "ファイル/メディアの取得に失敗しました",
   "redux.err.group.update-group-name.1": "おっと、同じ名前ではグループ名は更新できません",
   "redux.err.group.update-group-name.2": "グループIDの取得に失敗したため、グループ名の更新に失敗しました",
-  "redux.err.profile.set-username.1": "このユーザーネームはすでに使用されています",
-  "redux.err.profile.set-username.2": "あなたはすでにユーザーネームをお持ちです",
   "redux.err.profile.fetch-profile-from-username.1": "このユーザーネームは存在しません",
-  "redux.err.contacts.add-contact.1": "{username}はすでに連絡先に追加されています",
-  "redux.err.contacts.add-contact.2": "{username}はブロックされています",
-  "redux.err.contacts.block-contact.1": "{username}はすでにブロックされています",
-  "redux.err.contacts.fetch-blocked.1": "このユーザーのユーザーネームの取得に失敗しました",
-  "redux.err.contacts.fetch-blocked.2": "このユーザーはユーザーネームがありません",
-  "redux.err.contacts.fetch-my-contacts.1": "このユーザーのユーザーネームの取得に失敗しました"
-
-
-
-
-
-} 
+  "redux.err.profile.set-username.1": "このユーザーネームはすでに使用されています",
+  "redux.err.profile.set-username.2": "あなたはすでにユーザーネームをお持ちです"
+}

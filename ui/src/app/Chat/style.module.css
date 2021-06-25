@@ -8,3 +8,9 @@
 .chat > ion-item {
   --background: var(--ion-background-color);
 }
+
+@media (prefers-color-scheme: dark) {
+  .avatar {
+    filter: invert(100%);
+  }
+}

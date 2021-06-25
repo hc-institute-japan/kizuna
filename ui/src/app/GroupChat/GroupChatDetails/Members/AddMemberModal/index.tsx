@@ -9,7 +9,7 @@ import {
 } from "@ionic/react";
 import React, { useState } from "react";
 import { useIntl } from "react-intl";
-import { addMembers } from "../../../../../redux/group/actions/addMembers";
+import { addMembers } from "../../../../../redux/group/actions";
 import { UpdateGroupMembersData } from "../../../../../redux/group/types";
 // redux
 import { Profile, ProfileListType } from "../../../../../redux/profile/types";

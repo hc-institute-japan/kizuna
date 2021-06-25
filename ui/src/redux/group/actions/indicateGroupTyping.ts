@@ -4,7 +4,7 @@ import { deserializeAgentPubKey } from "../../../utils/helpers";
 import { ThunkAction } from "../../types";
 import { GroupTypingDetailData } from "../types";
 
-export const indicateGroupTyping =
+const indicateGroupTyping =
   (groupTypingDetailData: GroupTypingDetailData): ThunkAction =>
   async (dispatch, getState, { callZome }) => {
     /* deserialize fields for zome fn */
@@ -26,3 +26,5 @@ export const indicateGroupTyping =
 
     return null;
   };
+
+export default indicateGroupTyping;
