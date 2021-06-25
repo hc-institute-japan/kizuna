@@ -4,9 +4,9 @@ use crate::types::*;
 
 #[hdk_extern]
 fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
-    //AggregatedLatestData
-
     let batch_size: BatchSize = BatchSize(21);
+
+    /* contacts */
     let mut agent_pub_keys: Vec<AgentPubKey> = Vec::new(); // agentPubKeys of members
 
     let blocked_contacts_call_response: ZomeCallResponse =
@@ -16,12 +16,12 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
 
     let blocked_profiles_call_response: ZomeCallResponse = call(
         None,
-        "username".into(),
-        "get_usernames".into(),
+        "profiles".into(),
+        "get_agents_profile".into(),
         None,
-        &blocked_contacts,
+        &blocked_contacts.0,
     )?;
-    let blocked_profiles: UsernameList =
+    let blocked_profiles: Vec<AgentProfile> =
         call_response_handler(blocked_profiles_call_response)?.decode()?;
 
     let added_contacts_call_response: ZomeCallResponse =
@@ -31,18 +31,27 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
 
     let added_profiles_call_response: ZomeCallResponse = call(
         None,
-        "username".into(),
-        "get_usernames".into(),
+        "profiles".into(),
+        "get_agents_profile".into(),
         None,
-        &added_contacts,
+        &added_contacts.0,
     )?;
-    let added_profiles: UsernameList =
+    let added_profiles: Vec<AgentProfile> =
         call_response_handler(added_profiles_call_response)?.decode()?;
 
+    /* profiles */
     let user_info_call_response: ZomeCallResponse =
-        call(None, "username".into(), "get_my_username".into(), None, &())?;
-    let user_info: UsernameInfo = call_response_handler(user_info_call_response)?.decode()?;
+        call(None, "profiles".into(), "get_my_profile".into(), None, &())?;
+    /*
+    There is a strong assumption here that profile will not be
+    variant None it is assumed that the agent already made a profile before making this call
+    from the frontend
+    */
+    let user_info: AgentProfile = call_response_handler(user_info_call_response)?
+        .decode::<Option<AgentProfile>>()?
+        .unwrap();
 
+    /* group */
     let groups_call_response: ZomeCallResponse =
         call(None, "group".into(), "get_all_my_groups".into(), None, &())?;
     let groups: MyGroupListWrapper = call_response_handler(groups_call_response)?.decode()?;
@@ -56,12 +65,12 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
 
     let member_profiles_call_response: ZomeCallResponse = call(
         None,
-        "username".into(),
-        "get_usernames".into(),
+        "profiles".into(),
+        "get_agents_profile".into(),
         None,
         &AgentPubKeys(agent_pub_keys),
     )?;
-    let member_profiles: UsernameList =
+    let member_profiles: Vec<AgentProfile> =
         call_response_handler(member_profiles_call_response)?.decode()?;
 
     let latest_group_messages_call_response: ZomeCallResponse = call(
@@ -71,9 +80,11 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
         None,
         &batch_size,
     )?;
+
     let latest_group_messages: GroupMessagesOutput =
         call_response_handler(latest_group_messages_call_response)?.decode()?;
 
+    /* p2pmessage */
     // let latest_p2p_messages_call_response: ZomeCallResponse = call(
     //     None,
     //     "p2pmessage".into(),
@@ -84,6 +95,7 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
     // let latest_p2p_messages: P2PMessageHashTables =
     //     call_response_handler(latest_p2p_messages_call_response)?.decode()?;
 
+    /* preference */
     // let global_preference_call_response: ZomeCallResponse = call(
     //     None,
     //     "preference".into(),
@@ -115,12 +127,12 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
     //     call_response_handler(per_group_preference_call_response)?.decode()?;
 
     let aggregated_data: AggregatedLatestData = AggregatedLatestData {
-        user_info,
-        added_contacts: added_profiles.0,
-        blocked_contacts: blocked_profiles.0,
+        user_info: AgentProfileCamel::from(user_info),
+        added_contacts: convert_to_camel(added_profiles),
+        blocked_contacts: convert_to_camel(blocked_profiles),
         groups,
         latest_group_messages,
-        member_profiles,
+        member_profiles: convert_to_camel(member_profiles),
         // latest_p2p_messages,
         // global_preference,
         // per_agent_preference,
@@ -146,4 +158,11 @@ fn call_response_handler(call_response: ZomeCallResponse) -> ExternResult<Extern
             ));
         }
     }
+}
+
+fn convert_to_camel(agent_profiles: Vec<AgentProfile>) -> Vec<AgentProfileCamel> {
+    agent_profiles
+        .into_iter()
+        .map(|p| AgentProfileCamel::from(p))
+        .collect()
 }
