@@ -181,7 +181,11 @@ const GroupChat: React.FC = () => {
             <IonAvatar className="ion-padding">
               {/* TODO: proper picture for default avatar if none is set */}
               {/* TODO: Display an actual avatar set by the group creator */}
-              <img src={peopleCircleOutline} alt={groupData!.name} />
+              <img
+                className={styles["avatar"]}
+                src={peopleCircleOutline}
+                alt={groupData!.name}
+              />
             </IonAvatar>
             <IonTitle className={styles["title"]}>
               <div className="item item-text-wrap">{groupData!.name}</div>

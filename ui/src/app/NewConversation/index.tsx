@@ -57,7 +57,10 @@ const NewConversation: React.FC = () => {
           (res: boolean) => {
             if (files.length <= 0 && res === true) {
               setIsLoading(false);
-              history.push(`/u/${contacts[0].username}`);
+              history.push({
+                pathname: `/u/${contacts[0].id}`,
+                state: { username: contacts[0].username },
+              });
             }
           }
         );
@@ -70,7 +73,7 @@ const NewConversation: React.FC = () => {
             sendMessage(contacts[0].id, message, "FILE", undefined, file)
           ).then((res: boolean) => {
             setIsLoading(false);
-            if (res === true) history.push(`/u/${contacts[0].username}`);
+            if (res === true) history.push(`/u/${contacts[0].id}`);
           }),
           3000
         );

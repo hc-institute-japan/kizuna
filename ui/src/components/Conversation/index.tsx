@@ -6,6 +6,7 @@ import {
   Conversation as ConversationDetail,
   Message,
 } from "../../redux/commons/types";
+import AgentIdentifier from "../AgentIdentifier";
 import styles from "./style.module.css";
 
 interface Props {
@@ -56,7 +57,15 @@ const Conversation: React.FC<Props> = ({
         />
       </IonAvatar>
       <IonLabel>
-        <h2>{conversation.conversationName}</h2>
+        {conversation.type === "group" ? (
+          <h2>{conversation.conversationName}</h2>
+        ) : (
+          <AgentIdentifier
+            nickname={conversation.conversationName}
+            id={conversation.id}
+            charToShow={10}
+          />
+        )}
         <h3>{conversation.latestMessage.sender.username}</h3>
         <p>
           {conversation.latestMessage.payloadType === "TEXT"

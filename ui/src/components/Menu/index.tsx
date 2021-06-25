@@ -1,5 +1,4 @@
 import {
-  IonAvatar,
   IonContent,
   IonIcon,
   IonItem,
@@ -8,18 +7,14 @@ import {
   IonList,
   IonMenu,
 } from "@ionic/react";
-import {
-  banOutline,
-  cogOutline,
-  logOutOutline,
-  personCircleOutline,
-} from "ionicons/icons";
+import { banOutline, cogOutline, logOutOutline } from "ionicons/icons";
 import React, { useRef } from "react";
 import { useIntl } from "react-intl";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { setUsername } from "../../redux/profile/actions";
+import { setProfile } from "../../redux/profile/actions";
 import { RootState } from "../../redux/types";
+import Identicon from "../Identicon";
 import styles from "./style.module.css";
 
 interface MenuItem {
@@ -30,7 +25,7 @@ interface MenuItem {
 
 const Menu: React.FC = () => {
   const history = useHistory();
-  const { username } = useSelector((state: RootState) => state.profile);
+  const { username, id } = useSelector((state: RootState) => state.profile);
   const dispatch = useDispatch();
   const intl = useIntl();
   const menu = useRef<any>(null);
@@ -52,7 +47,7 @@ const Menu: React.FC = () => {
     },
     {
       onClick: () => {
-        dispatch(setUsername(null));
+        dispatch(setProfile(null));
         history.push("/");
       },
       label: intl.formatMessage({ id: "app.menu.logout-label" }),
@@ -65,14 +60,16 @@ const Menu: React.FC = () => {
       <IonContent className={`${styles.menu} ion-padding-top`}>
         <IonList id="inbox-list" lines="none">
           <IonItemGroup className="ion-no-margin">
-            <IonAvatar className="ion-margin">
-              <img
-                className={styles.avatar}
-                alt="Your user"
-                src={personCircleOutline}
-              ></img>
-            </IonAvatar>
-
+            <span className={`${styles["container"]} ion-margin`}>
+              {/* <IonAvatar className="ion-margin-start">
+                <img
+                  className={styles.avatar}
+                  alt="Your user"
+                  src={personCircleOutline}
+                ></img>
+              </IonAvatar> */}
+              <Identicon hash={id!} size={50} />
+            </span>
             <IonItem lines="none">
               <IonLabel>{username}</IonLabel>
             </IonItem>
