@@ -7,7 +7,7 @@ const receiveP2PMessage =
   (payload: any): ThunkAction =>
   async (dispatch, getState, { callZome }) => {
     let receivedMessage = payload.message;
-    // console.log("signals", receivedMessage);
+    console.log("signals", receivedMessage);
 
     const [messageTuple, receiptTuple] = receivedMessage;
     const [messageID, message] = messageTuple;
@@ -35,9 +35,10 @@ const receiveP2PMessage =
         break;
     }
 
+    let contacts = getState().contacts.contacts;
     let p2pMessage: P2PMessage = {
       p2pMessageEntryHash: serializeHash(messageID),
-      author: serializeHash(message.author),
+      author: contacts[serializeHash(message.author)],
       receiver: serializeHash(message.receiver),
       payload: messagePayload,
       timestamp: timestampToDate(message.timeSent),
@@ -52,12 +53,13 @@ const receiveP2PMessage =
       status: receipt.status.status,
     };
 
+    console.log("signals", p2pMessage, p2pReceipt);
     dispatch({
       type: APPEND_MESSAGE,
       state: {
         message: p2pMessage,
         receipt: p2pReceipt,
-        key: p2pMessage.author,
+        key: p2pMessage.author.id,
       },
     });
   };

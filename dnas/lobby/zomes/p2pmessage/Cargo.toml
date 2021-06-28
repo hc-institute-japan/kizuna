@@ -12,4 +12,4 @@ crate-type = [ "cdylib", "rlib" ]
 derive_more = "0"
 serde = "1"
 hdk = "0.0.100"
-p2pmessage = {git = "https://github.com/hc-institute-japan/p2pmessage-zome", branch="bump-hdk-0.0.100", package = "p2pmessage"}
+p2pmessage = {git = "https://github.com/hc-institute-japan/p2pmessage-zome", branch="develop", package = "p2pmessage"}
