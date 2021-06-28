@@ -13,6 +13,7 @@ import {
   arrowBackSharp,
   informationCircleOutline,
   personCircleOutline,
+  search,
 } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
@@ -21,7 +22,9 @@ import AgentIdentifier from "../../components/AgentIdentifier";
 import { ChatList, Me, Others } from "../../components/Chat";
 import { ChatListMethods } from "../../components/Chat/types";
 import Typing from "../../components/Chat/Typing";
-import MessageInput from "../../components/MessageInput";
+import MessageInput, {
+  MessageInputMethods,
+} from "../../components/MessageInput";
 import { FilePayload } from "../../redux/commons/types";
 import {
   getFileBytes,
@@ -45,6 +48,7 @@ const Chat: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [message, setMessage] = useState<string>("");
   const [files, setFiles] = useState<any[]>([]);
+  const [replyTo, setReplyTo] = useState<string>("");
   const [messagesWithConversant, setMessagesWithConversant] = useState<any[]>(
     []
   );
@@ -74,6 +78,7 @@ const Chat: React.FC = () => {
   const scrollerRef = useRef<ChatListMethods>(null);
   const didMountRef = useRef(false);
   const inputTimeout = useRef<NodeJS.Timeout>();
+  const messageInputRef = useRef<MessageInputMethods | null>(null);
 
   /* USE EFFECTS */
   /* 
@@ -162,16 +167,34 @@ const Chat: React.FC = () => {
     */
   const handleOnSubmit = () => {
     if (message !== "") {
-      dispatch(sendMessage(conversant.id, message, "TEXT", undefined));
+      dispatch(
+        sendMessage(
+          conversant.id,
+          message,
+          "TEXT",
+          replyTo !== "" ? replyTo : undefined
+        )
+      );
     }
 
     files.forEach((file) =>
       setTimeout(
-        dispatch(sendMessage(conversant.id, message, "FILE", undefined, file)),
+        dispatch(
+          sendMessage(
+            conversant.id,
+            message,
+            "FILE",
+            replyTo !== "" ? replyTo : undefined,
+            file
+          )
+        ),
         3000
       )
     );
+
     scrollerRef.current!.scrollToBottom();
+
+    setReplyTo("");
   };
 
   /* 
@@ -271,25 +294,29 @@ const Chat: React.FC = () => {
       dispatch(getFileBytes([payload.fileHash]));
     }
 
-    return conversant.id !== author ? (
+    return conversant.id !== author.id ? (
       <Me
         id={messageBundle.message.p2pMessageEntryHash}
         key={key}
         type="p2p"
-        author={author}
+        author={author.username}
         timestamp={timestamp}
         payload={payload}
         readList={readlist ? readlist : {}}
         showProfilePicture={true}
         showName={true}
         onDownload={(file) => onDownloadHandler(file)}
+        onReply={(message) => {
+          if (messageInputRef.current) messageInputRef?.current?.reply(message);
+          setReplyTo(message.id);
+        }}
       />
     ) : (
       <Others
         id={messageBundle.message.p2pMessageEntryHash}
         key={key}
         type="p2p"
-        author={author}
+        author={author.username}
         timestamp={timestamp}
         payload={payload}
         readList={readlist ? readlist : {}}
@@ -297,6 +324,10 @@ const Chat: React.FC = () => {
         showName={true}
         onSeen={(complete) => onSeenHandler(messageBundle)}
         onDownload={(file) => onDownloadHandler(file)}
+        onReply={(message) => {
+          if (messageInputRef.current) messageInputRef?.current?.reply(message);
+          setReplyTo(message.id);
+        }}
       />
     );
   };
@@ -323,6 +354,11 @@ const Chat: React.FC = () => {
             <IonTitle className="item item-text-wrap">
               <AgentIdentifier nickname={state?.username} id={id} />
             </IonTitle>
+            <IonButton
+              onClick={() => history.push(`/u/${conversant.id}/search`)}
+            >
+              <IonIcon slot="icon-only" icon={search} />
+            </IonButton>
             <IonButton onClick={handleOnClick}>
               <IonIcon slot="icon-only" icon={informationCircleOutline} />
             </IonButton>
@@ -346,6 +382,7 @@ const Chat: React.FC = () => {
       <Typing profiles={Object.values(typing)}></Typing>
 
       <MessageInput
+        ref={messageInputRef}
         onSend={handleOnSubmit}
         onChange={(message: string) => handleOnChange(message, conversant)}
         onFileSelect={(files) => setFiles(files)}
