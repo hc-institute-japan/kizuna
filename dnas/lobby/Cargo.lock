@@ -202,7 +202,7 @@ checksum = "d7afe4a420e3fe79967a00898cc1f4db7c8a49a9333a29f8a4bd76a253d5cd04"
 [[package]]
 name = "hc_zome_profiles"
 version = "0.0.1"
-source = "git+https://github.com/holochain-open-dev/profiles?rev=1092b87#1092b8749457cd2b31ca4e86e7caecfe1789fc5c"
+source = "git+https://github.com/holochain-open-dev/profiles?rev=d8200230c13429603b750bb824e6476fed720ee9#d8200230c13429603b750bb824e6476fed720ee9"
 dependencies = [
  "derive_more",
  "hdk",
