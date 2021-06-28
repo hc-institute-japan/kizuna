@@ -82,17 +82,17 @@ const Chat: React.FC = () => {
     */
   useEffect(() => {
     scrollerRef.current!.scrollToBottom();
-  });
+  }, []);
 
   useEffect(() => {
     scrollerRef.current!.scrollToBottom();
   }, [conversant]);
 
   /* 
-      filters messages with conversant and
-      filters latest receipt/status
-      when redux state of p2pmessages changes
-    */
+    filters messages with conversant and
+    filters latest receipt/status
+    when redux state of p2pmessages changes
+  */
   useEffect(() => {
     if (
       conversant !== undefined &&
