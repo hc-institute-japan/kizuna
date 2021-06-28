@@ -7,8 +7,9 @@ use timestamp::Timestamp;
 use crate::utils::error;
 use crate::utils::timestamp_to_days;
 
+use super::GroupMessageData;
 use super::{
-    GroupChatFilter, GroupMessageContent, GroupMessageElement, GroupMessageHash,
+    GroupChatFilter, GroupMessage, GroupMessageContent, GroupMessageElement, GroupMessageHash,
     GroupMessagesContents, GroupMessagesOutput, MessagesByGroup, PayloadType, ReadList,
 };
 
@@ -61,12 +62,35 @@ pub fn get_messages_by_group_by_timestamp_handler(
                         };
                     }
 
-                    match element.entry().to_owned().to_app_option() {
+                    match element.entry().to_owned().to_app_option::<GroupMessage>() {
                         Ok(option) => match option {
                             Some(group_message) => {
+                                let mut reply_to: Option<GroupMessage> = None;
+                                if let Some(reply_to_hash) = group_message.reply_to.clone() {
+                                    if let Some(reply_to_element) =
+                                        get(reply_to_hash, GetOptions::latest())?
+                                    {
+                                        if let Ok(Some(reply_to_group_message)) = reply_to_element
+                                            .entry()
+                                            .to_owned()
+                                            .to_app_option::<GroupMessage>()
+                                        {
+                                            reply_to = Some(reply_to_group_message);
+                                        }
+                                    }
+                                }
+
+                                let group_message_data = GroupMessageData {
+                                    group_hash: group_message.group_hash.clone(),
+                                    sender: group_message.sender.clone(),
+                                    payload: group_message.payload.clone(),
+                                    created: group_message.created.clone(),
+                                    reply_to,
+                                };
+
                                 let group_message_element: GroupMessageElement =
                                     GroupMessageElement {
-                                        entry: group_message,
+                                        entry: group_message_data,
                                         signed_header: element.signed_header().to_owned(),
                                     };
 

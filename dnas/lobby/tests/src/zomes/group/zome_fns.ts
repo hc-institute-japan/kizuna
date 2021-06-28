@@ -44,12 +44,13 @@ export function readGroupMessage(group_message_read_io) {
 
 export async function sendMessage(
   conductor,
-  { groupId, sender, payloadInput }
+  { groupId, sender, payloadInput, replyTo = null }
 ) {
   return await conductor.call("group", "send_message", {
     groupHash: groupId,
     payloadInput,
     sender,
+    ...(replyTo ? { replyTo } : {}),
   });
 }
 
@@ -90,13 +91,14 @@ export function getNextBatchGroupMessage(filter_input) {
 
 export async function sendMessageWithDate(
   conductor,
-  { groupId, sender, payload, date = Date.now() }
+  { groupId, sender, payload, date = Date.now(), replyTo = undefined }
 ) {
   return await conductor.call("group", "send_message_in_target_date", {
     groupHash: groupId,
     payload,
     sender,
     date,
+    ...(replyTo ? { replyTo } : {}),
   });
 }
 
