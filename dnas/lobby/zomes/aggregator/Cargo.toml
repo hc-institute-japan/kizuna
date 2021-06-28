@@ -13,3 +13,4 @@ file_types = { version = "0.0.1", path = "../../commons/file_types" }
 derive_more = "0"
 serde = "1"
 hdk = "0.0.100"
+holo_hash = "0.0.2-alpha.1"

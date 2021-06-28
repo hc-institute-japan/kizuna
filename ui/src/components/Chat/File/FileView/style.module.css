@@ -1,0 +1,7 @@
+.file:hover {
+  cursor: pointer;
+}
+
+.file-name {
+  word-break: break-all;
+}

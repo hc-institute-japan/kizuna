@@ -1,0 +1,44 @@
+.video-player {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  background-color: black;
+}
+
+.video {
+  width: 100% !important;
+}
+
+.content {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: black;
+  box-sizing: border-box;
+  width: 100%;
+  overflow: hidden;
+}
+
+.modal-control {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+  transition: 0.5s;
+  background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75));
+}
+
+.slider-volume {
+  width: 100%;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.slider-volume input {
+  width: 100%;
+}

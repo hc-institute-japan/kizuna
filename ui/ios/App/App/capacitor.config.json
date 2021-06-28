@@ -1,0 +1,13 @@
+{
+  "appId": "kizuna.ui",
+  "appName": "ui",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "build",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  },
+  "cordova": {}
+}
