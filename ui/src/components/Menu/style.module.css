@@ -1,0 +1,36 @@
+.menu ion-list {
+  background: var(--ion-background-color) !important;
+}
+
+/* .avatar {
+  filter: invert(0%);
+  width: 50px;
+  height: 50px;
+} */
+
+.menu ion-item,
+.menu ion-item-group {
+  --background: var(--ion-background-color) !important;
+}
+
+.menu ion-item:hover,
+.menu ion-item-group:hover {
+  --background: var(--ion-item-background) !important;
+  cursor: pointer;
+}
+
+.container {
+  align-items: center;
+  display: flex;
+}
+
+@media (prefers-color-scheme: dark) {
+  .avatar {
+    filter: invert(100%);
+    width: 60px;
+    height: 60px;
+    margin-right: 16px !important;
+    max-height: 150%;
+    max-width: 150%;
+  }
+}

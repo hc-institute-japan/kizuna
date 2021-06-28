@@ -1,0 +1,7 @@
+.settings-list ion-list {
+  background: var(--ion-background-color) !important;
+}
+
+.settings-list ion-item {
+  --background: var(--ion-background-color);
+}

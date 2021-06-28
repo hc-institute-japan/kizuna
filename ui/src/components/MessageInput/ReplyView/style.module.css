@@ -1,0 +1,31 @@
+.reply {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+}
+
+.author {
+  color: rgb(var(--ion-color-primary-rgb));
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.text {
+  font-size: 0.8rem;
+  color: var(--ion-color-medium);
+}
+
+.thumbnail {
+  border-radius: 5px !important;
+  overflow: hidden;
+}

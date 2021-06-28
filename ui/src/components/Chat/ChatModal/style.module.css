@@ -1,0 +1,10 @@
+.modal {
+  --height: 10vh !important;
+  --width: 60%;
+  bottom: 0 !important;
+}
+
+.modal .modal-wrapper {
+  position: absolute !important;
+  bottom: 0 !important;
+}
