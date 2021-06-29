@@ -79,8 +79,19 @@ pub struct GroupMessage {
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
+pub struct GroupMessageData {
+    // EntryHash of first ver of Group
+    group_hash: EntryHash,
+    payload: Payload,
+    created: Timestamp,
+    sender: AgentPubKey,
+    reply_to: Option<GroupMessage>,
+}
+
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct GroupMessageElement {
-    pub entry: GroupMessage,
+    pub entry: GroupMessageData,
     pub signed_header: SignedHeaderHashed,
 }
 
