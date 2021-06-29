@@ -36,13 +36,27 @@ const receiveP2PMessage =
     }
 
     let contacts = getState().contacts.contacts;
+
+    let transformedReplyTo = undefined;
+    if (message.replyTo !== null) {
+      console.log(message.replyTo);
+      transformedReplyTo = {
+        p2pMessageEntryHash: serializeHash(message.replyTo.hash),
+        author: contacts[serializeHash(message.replyTo.author)],
+        receiver: serializeHash(message.replyTo.receiver),
+        payload: message.replyTo.payload,
+        timestamp: timestampToDate(message.replyTo.timeSent),
+        receipts: [],
+      };
+    }
+
     let p2pMessage: P2PMessage = {
       p2pMessageEntryHash: serializeHash(messageID),
       author: contacts[serializeHash(message.author)],
       receiver: serializeHash(message.receiver),
       payload: messagePayload,
       timestamp: timestampToDate(message.timeSent),
-      replyTo: message.replyTo,
+      replyTo: transformedReplyTo ? transformedReplyTo : undefined,
       receipts: [serializeHash(receiptID)],
     };
 
