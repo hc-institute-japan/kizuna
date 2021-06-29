@@ -77,9 +77,9 @@ const Conversations: React.FC = () => {
         let message: Message = {
           id: latestMessage.p2pMessageEntryHash,
           sender: {
-            id: latestMessage.author,
+            id: latestMessage.author.id,
             username:
-              latestMessage.author === myProfile.id
+              latestMessage.author.id === myProfile.id
                 ? "You"
                 : conversant.username,
           },

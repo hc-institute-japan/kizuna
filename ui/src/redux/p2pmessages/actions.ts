@@ -1,5 +1,4 @@
 import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
-import { HoloHash } from "@holochain/conductor-api";
 import { FUNCTIONS, ZOMES } from "../../connection/types";
 import { pushError } from "../../redux/error/actions";
 import {
@@ -16,6 +15,7 @@ import {
   TextPayload,
 } from "../commons/types";
 import { ThunkAction } from "../types";
+import { Profile } from "../profile/types";
 import {
   AgentPubKeyBase64,
   APPEND_MESSAGE,
@@ -33,7 +33,8 @@ import {
     transform HC data structures to UI/redux data structures
 */
 export const transformZomeDataToUIData = (
-  zomeResults: P2PMessageConversationState
+  zomeResults: P2PMessageConversationState,
+  contacts: { [key: string]: Profile }
 ) => {
   // destructure zome hashmap results
   let {
@@ -78,13 +79,28 @@ export const transformZomeDataToUIData = (
         break;
     }
 
-    let p2pMessage = {
+    let author = contacts[serializeHash(message.author)];
+
+    let transformedReplyTo = undefined;
+    if (message.replyTo !== null) {
+      transformedReplyTo = {
+        p2pMessageEntryHash: serializeHash(message.replyTo.hash),
+        author: contacts[serializeHash(message.replyTo.author)],
+        receiver: serializeHash(message.replyTo.receiver),
+        payload: message.replyTo.payload,
+        timestamp: timestampToDate(message.replyTo.timeSent),
+        replyTo: message.replyTo,
+        receipts: message.replyTo.receipts,
+      };
+    }
+
+    let p2pMessage: P2PMessage = {
       p2pMessageEntryHash: key,
-      author: serializeHash(message.author),
+      author: author,
       receiver: serializeHash(message.receiver),
       payload: payload,
       timestamp: timestampToDate(message.timeSent),
-      replyTo: message.replyTo,
+      replyTo: transformedReplyTo ? transformedReplyTo : undefined,
       receipts: receiptArray,
     };
 
@@ -192,14 +208,13 @@ export const appendReceipt =
 */
 export const sendMessage =
   (
-    // receiver: AgentPubKey,
     receiver: string,
     message: string,
     type: string,
-    replyTo?: HoloHash,
+    replyTo?: string,
     file?: any
   ): ThunkAction =>
-  async (dispatch, _getState, { callZome }) => {
+  async (dispatch, getState, { callZome }) => {
     let payloadInput;
     if (type === "TEXT") {
       let textPayload: TextPayload = {
@@ -232,7 +247,7 @@ export const sendMessage =
     let input: MessageInput = {
       receiver: Buffer.from(deserializeHash(receiver)),
       payload: payloadInput,
-      reply_to: replyTo,
+      reply_to: replyTo ? Buffer.from(deserializeHash(replyTo)) : undefined,
     };
 
     // CALL ZOME
@@ -243,9 +258,6 @@ export const sendMessage =
         payload: input,
       });
 
-      // transform the return value of the send_message function (message and receipt)
-      // send_message return value is not consistent with the structures of the get functions
-      // TODO: standardize return values in HC
       if (sentMessage?.type !== "error") {
         const [messageTuple, receiptTuple] = sentMessage;
         const [messageID, message] = messageTuple;
@@ -278,13 +290,31 @@ export const sendMessage =
             break;
         }
 
+        let contacts = getState().contacts.contacts;
+        let profile = getState().profile;
+        if (profile.id !== null && profile.username !== null)
+          contacts[profile.id] = { id: profile.id, username: profile.username };
+
+        let transformedReplyTo = undefined;
+        if (message.replyTo !== null) {
+          console.log(message.replyTo);
+          transformedReplyTo = {
+            p2pMessageEntryHash: serializeHash(message.replyTo.hash),
+            author: contacts[serializeHash(message.replyTo.author)],
+            receiver: serializeHash(message.replyTo.receiver),
+            payload: message.replyTo.payload,
+            timestamp: timestampToDate(message.replyTo.timeSent),
+            receipts: [],
+          };
+        }
+
         let p2pMessage: P2PMessage = {
           p2pMessageEntryHash: messageHash,
-          author: serializeHash(message.author),
+          author: contacts[serializeHash(message.author)],
           receiver: serializeHash(message.receiver),
           payload: payload,
           timestamp: timestampToDate(message.timeSent),
-          replyTo: message.replyTo,
+          replyTo: transformedReplyTo ? transformedReplyTo : undefined,
           receipts: [receiptHash],
         };
 
@@ -315,6 +345,7 @@ export const sendMessage =
         return true;
       }
     } catch (e) {
+      console.log(e);
       dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
     }
   };
@@ -326,7 +357,7 @@ export const sendMessage =
 */
 export const getLatestMessages =
   (size: number): ThunkAction =>
-  async (dispatch, _getState, { callZome }) => {
+  async (dispatch, getState, { callZome }) => {
     try {
       // CALL ZOME
       const batchSize: BatchSize = size;
@@ -336,15 +367,20 @@ export const getLatestMessages =
         payload: batchSize,
       });
 
+      console.log("actions zome return", p2pLatestState);
       // DISPATCH TO REDUCER
       if (p2pLatestState?.type !== "error") {
-        let toDispatch = transformZomeDataToUIData(p2pLatestState);
+        let contacts = getState().contacts.contacts;
+        let profile = getState().profile;
+        if (profile.id !== null && profile.username !== null)
+          contacts[profile.id] = { id: profile.id, username: profile.username };
+        let toDispatch = transformZomeDataToUIData(p2pLatestState, contacts);
         dispatch(setMessages(toDispatch));
-
+        console.log("actions", toDispatch);
         return toDispatch;
       }
     } catch (e) {
-      // ERROR
+      console.log("latest actions", e);
       dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
     }
   };
@@ -358,7 +394,7 @@ export const getNextBatchMessages =
     last_fetched_timestamp?: Date,
     last_fetched_message_id?: HoloHashBase64
   ): ThunkAction =>
-  async (dispatch, _getState, { callZome }) => {
+  async (dispatch, getState, { callZome }) => {
     let zome_input = {
       conversant: Buffer.from(deserializeHash(conversant)),
       batch_size: batch_size,
@@ -380,13 +416,49 @@ export const getNextBatchMessages =
 
       // DISPATCH TO REDUCER
       if (nextBatchOfMessages?.type !== "error") {
-        let toDispatch = transformZomeDataToUIData(nextBatchOfMessages);
+        let contacts = getState().contacts.contacts;
+        let profile = getState().profile;
+        if (profile.id !== null && profile.username !== null)
+          contacts[profile.id] = { id: profile.id, username: profile.username };
+        let toDispatch = transformZomeDataToUIData(
+          nextBatchOfMessages,
+          contacts
+        );
         if (Object.values(nextBatchOfMessages[1]).length > 0)
           dispatch({
             type: SET_MESSAGES,
             state: toDispatch,
           });
         return nextBatchOfMessages;
+      }
+    } catch (e) {
+      dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
+    }
+  };
+
+export const getMessagesByAgentByTimestamp =
+  (id: string, date: Date, payload_type: String): ThunkAction =>
+  async (dispatch, getState, { callZome }) => {
+    let zome_input = {
+      conversant: deserializeHash(id),
+      date: dateToTimestamp(date),
+      payload_type: payload_type,
+    };
+
+    try {
+      const messagesByDate = await callZome({
+        zomeName: ZOMES.P2PMESSAGE,
+        fnName: FUNCTIONS[ZOMES.P2PMESSAGE].GET_MESSAGES_BY_AGENT_BY_TIMESTAMP,
+        payload: zome_input,
+      });
+
+      if (messagesByDate?.type !== "error") {
+        let contacts = getState().contacts.contacts;
+        let profile = getState().profile;
+        if (profile.id !== null && profile.username !== null)
+          contacts[profile.id] = { id: profile.id, username: profile.username };
+        let transformed = transformZomeDataToUIData(messagesByDate, contacts);
+        return transformed;
       }
     } catch (e) {
       dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
@@ -411,7 +483,7 @@ export const readMessage =
     );
 
     // get the sender (sender = conversant since p2p)
-    let sender = Buffer.from(deserializeHash(messages[0].author));
+    let sender = Buffer.from(deserializeHash(messages[0].author.id));
 
     let input = {
       message_hashes: hashes,
@@ -523,7 +595,7 @@ export const countUnread =
         return 0;
       });
       let latestReceipt = filteredReceipts[0];
-      if (latestReceipt.status !== "read" && message.author === conversant)
+      if (latestReceipt.status !== "read" && message.author.id === conversant)
         unreadCounter = unreadCounter + 1;
     });
 
