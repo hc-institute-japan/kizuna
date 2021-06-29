@@ -4,7 +4,10 @@ use crate::utils::error;
 use file_types::PayloadType;
 use std::collections::hash_map::HashMap;
 
-use super::{GroupMessageContent, GroupMessageElement, GroupMessageHash, ReadList};
+use super::{
+    GroupMessage, GroupMessageContent, GroupMessageData, GroupMessageElement, GroupMessageHash,
+    ReadList,
+};
 
 pub fn get_linked_messages_from_path(
     path_hash: EntryHash,
@@ -75,11 +78,31 @@ pub fn collect_messages_info(
                 read_list.insert(reader.to_string(), link.timestamp);
             }
 
-            match message_element.entry().to_app_option() {
+            match message_element.entry().to_app_option::<GroupMessage>() {
                 Ok(option) => match option {
                     Some(group_message) => {
+                        let mut group_message_data = GroupMessageData {
+                            group_hash: group_message.group_hash.clone(),
+                            sender: group_message.sender.clone(),
+                            payload: group_message.payload.clone(),
+                            created: group_message.created.clone(),
+                            reply_to: None,
+                        };
+
+                        if let Some(reply_to_hash) = group_message.reply_to.clone() {
+                            if let Some(reply_to_element) =
+                                get(reply_to_hash.clone(), GetOptions::default())?
+                            {
+                                if let Ok(Some(reply_to_group_message)) =
+                                    reply_to_element.entry().to_app_option::<GroupMessage>()
+                                {
+                                    group_message_data.reply_to = Some(reply_to_group_message);
+                                }
+                            }
+                        }
+
                         let group_message_element: GroupMessageElement = GroupMessageElement {
-                            entry: group_message,
+                            entry: group_message_data,
                             signed_header: message_element.signed_header().to_owned(),
                         };
 
