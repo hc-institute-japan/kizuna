@@ -37,12 +37,7 @@ const Profile: React.FC = () => {
 
   return (
     <IonPage>
-      <IonHeader
-        style={{
-          backgroundImage: `url("https://instagram.fmnl3-2.fna.fbcdn.net/v/t51.2885-15/e35/p1080x1080/153183681_221786689635197_8533112046939022296_n.jpg?tp=1&_nc_ht=instagram.fmnl3-2.fna.fbcdn.net&_nc_cat=105&_nc_ohc=aiSb_B85lnsAX_ZSkr8&oh=485389a978d593f60ac1e88dd01d326a&oe=60649831")`,
-        }}
-        className={styles.header}
-      >
+      <IonHeader className={styles.header}>
         <IonToolbar>
           <IonButtons>
             <IonBackButton

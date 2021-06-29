@@ -16,7 +16,7 @@ import { ThunkAction } from "../types";
 
 export const getLatestData =
   (): ThunkAction =>
-  async (dispatch, _getState, { callZome, getAgentId }) => {
+  async (dispatch, getState, { callZome, getAgentId }) => {
     // TODO: error handling
     const latestData = await callZome({
       zomeName: ZOMES.AGGREGATOR,
@@ -103,7 +103,12 @@ export const getLatestData =
       members,
     });
 
-    const toDispatch = transformZomeDataToUIData(latestData.latestP2pMessages);
+    const contactsState = getState().contacts.contacts;
+
+    const toDispatch = transformZomeDataToUIData(
+      latestData.latestP2pMessages,
+      contactsState
+    );
     console.log(toDispatch);
     dispatch(setMessages(toDispatch));
 
