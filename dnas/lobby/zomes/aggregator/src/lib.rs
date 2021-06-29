@@ -44,7 +44,7 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
         call(None, "profiles".into(), "get_my_profile".into(), None, &())?;
     /*
     There is a strong assumption here that profile will not be
-    variant None it is assumed that the agent already made a profile before making this call
+    variant None since it is assumed that the agent already made a profile before making this call
     from the frontend
     */
     let user_info: AgentProfile = call_response_handler(user_info_call_response)?
@@ -85,46 +85,46 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
         call_response_handler(latest_group_messages_call_response)?.decode()?;
 
     /* p2pmessage */
-    // let latest_p2p_messages_call_response: ZomeCallResponse = call(
-    //     None,
-    //     "p2pmessage".into(),
-    //     "get_latest_messages".into(),
-    //     None,
-    //     &batch_size,
-    // )?;
-    // let latest_p2p_messages: P2PMessageHashTables =
-    //     call_response_handler(latest_p2p_messages_call_response)?.decode()?;
+    let latest_p2p_messages_call_response: ZomeCallResponse = call(
+        None,
+        "p2pmessage".into(),
+        "get_latest_messages".into(),
+        None,
+        &batch_size,
+    )?;
+    let latest_p2p_messages: P2PMessageHashTables =
+        call_response_handler(latest_p2p_messages_call_response)?.decode()?;
 
     /* preference */
-    // let global_preference_call_response: ZomeCallResponse = call(
-    //     None,
-    //     "preference".into(),
-    //     "get_preference".into(),
-    //     None,
-    //     &(),
-    // )?;
-    // let global_preference: Preference =
-    //     call_response_handler(global_preference_call_response)?.decode()?;
+    let global_preference_call_response: ZomeCallResponse = call(
+        None,
+        "preference".into(),
+        "get_preference".into(),
+        None,
+        &(),
+    )?;
+    let global_preference: Preference =
+        call_response_handler(global_preference_call_response)?.decode()?;
 
-    // let per_agent_preference_call_response: ZomeCallResponse = call(
-    //     None,
-    //     "preference".into(),
-    //     "get_per_agent_preference".into(),
-    //     None,
-    //     &(),
-    // )?;
-    // let per_agent_preference: PerAgentPreference =
-    //     call_response_handler(per_agent_preference_call_response)?.decode()?;
+    let per_agent_preference_call_response: ZomeCallResponse = call(
+        None,
+        "preference".into(),
+        "get_per_agent_preference".into(),
+        None,
+        &(),
+    )?;
+    let per_agent_preference: PerAgentPreference =
+        call_response_handler(per_agent_preference_call_response)?.decode()?;
 
-    // let per_group_preference_call_response: ZomeCallResponse = call(
-    //     None,
-    //     "preference".into(),
-    //     "get_per_group_preference".into(),
-    //     None,
-    //     &(),
-    // )?;
-    // let per_group_preference: PerGroupPreference =
-    //     call_response_handler(per_group_preference_call_response)?.decode()?;
+    let per_group_preference_call_response: ZomeCallResponse = call(
+        None,
+        "preference".into(),
+        "get_per_group_preference".into(),
+        None,
+        &(),
+    )?;
+    let per_group_preference: PerGroupPreference =
+        call_response_handler(per_group_preference_call_response)?.decode()?;
 
     let aggregated_data: AggregatedLatestData = AggregatedLatestData {
         user_info: AgentProfileCamel::from(user_info),
@@ -133,10 +133,10 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
         groups,
         latest_group_messages,
         member_profiles: convert_to_camel(member_profiles),
-        // latest_p2p_messages,
-        // global_preference,
-        // per_agent_preference,
-        // per_group_preference,
+        latest_p2p_messages,
+        global_preference,
+        per_agent_preference,
+        per_group_preference,
     };
 
     Ok(aggregated_data)

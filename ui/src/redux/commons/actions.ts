@@ -9,7 +9,8 @@ import {
   SetLatestGroupState,
   SET_LATEST_GROUP_STATE,
 } from "../group/types";
-import { getLatestMessages } from "../p2pmessages/actions";
+import { setMessages, transformZomeDataToUIData } from "../p2pmessages/actions";
+import { SET_PREFERENCE } from "../preference/types";
 import { Profile, ProfileActionTypes, SET_PROFILE } from "../profile/types";
 import { ThunkAction } from "../types";
 
@@ -17,7 +18,6 @@ export const getLatestData =
   (): ThunkAction =>
   async (dispatch, _getState, { callZome, getAgentId }) => {
     // TODO: error handling
-    // TODO: input sanitation
     const latestData = await callZome({
       zomeName: ZOMES.AGGREGATOR,
       fnName: FUNCTIONS[ZOMES.AGGREGATOR].RETRIEVE_LATEST_DATA,
@@ -61,13 +61,13 @@ export const getLatestData =
     });
 
     // TODO: store per agent and group prefenrece as well
-    // dispatch({
-    //   type: SET_PREFERENCE,
-    //   preference: {
-    //     readReceipt: latestData.globalPreference.readReceipt,
-    //     typingIndicator: latestData.globalPreference.typingIndicator,
-    //   },
-    // });
+    dispatch({
+      type: SET_PREFERENCE,
+      preference: {
+        readReceipt: latestData.globalPreference.readReceipt,
+        typingIndicator: latestData.globalPreference.typingIndicator,
+      },
+    });
 
     const groupMessagesOutput: GroupMessagesOutput =
       convertFetchedResToGroupMessagesOutput(latestData.latestGroupMessages);
@@ -103,7 +103,9 @@ export const getLatestData =
       members,
     });
 
-    dispatch(getLatestMessages(21));
+    const toDispatch = transformZomeDataToUIData(latestData.latestP2pMessages);
+    console.log(toDispatch);
+    dispatch(setMessages(toDispatch));
 
     return null;
   };
