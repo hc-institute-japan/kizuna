@@ -116,14 +116,25 @@ pub struct GroupMessagesOutput {
 }
 
 // for p2p chat
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, SerializedBytes, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct P2PMessage {
+pub struct P2PMessageReplyTo {
+    hash: EntryHash,
     author: AgentPubKey,
     receiver: AgentPubKey,
     payload: Payload,
     time_sent: Timestamp,
     reply_to: Option<EntryHash>,
+}
+
+#[derive(Serialize, Deserialize, Clone, SerializedBytes, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct P2PMessageData {
+    author: AgentPubKey,
+    receiver: AgentPubKey,
+    payload: Payload,
+    time_sent: Timestamp,
+    reply_to: Option<P2PMessageReplyTo>,
 }
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
@@ -144,7 +155,7 @@ pub enum Status {
 pub struct AgentMessages(HashMap<String, Vec<String>>);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Debug)]
-pub struct MessageBundle(P2PMessage, Vec<String>);
+pub struct MessageBundle(P2PMessageData, Vec<String>);
 #[derive(Serialize, Deserialize, SerializedBytes, Debug)]
 pub struct MessageContents(HashMap<String, MessageBundle>);
 
