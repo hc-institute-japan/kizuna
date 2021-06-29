@@ -22,6 +22,7 @@ import {
 import { setFilesBytes } from "../actions";
 import { timestampToDate } from "../../../utils/helpers";
 import { pushError } from "../../error/actions";
+import ReplyTo from "../../../components/Chat/Me/ReplyTo";
 
 const sendGroupMessage =
   (groupMessageData: GroupMessageInput): ThunkAction =>
@@ -93,6 +94,10 @@ const sendGroupMessage =
         };
         payload = filePayload;
       }
+      const message =
+        getState().groups.messages[
+          serializeHash(sendGroupMessageOutput.content.replyTo)
+        ];
 
       /* the final GroupMessage data type converted from the returned value of the Zome fn above */
       const groupMessageDataConverted: GroupMessage = {
@@ -101,7 +106,14 @@ const sendGroupMessage =
         author: serializeHash(sendGroupMessageOutput.content.sender),
         payload,
         timestamp: timestampToDate(sendGroupMessageOutput.content.created),
-        replyTo: sendGroupMessageOutput.content.replyTo,
+        replyTo: {
+          groupId: message.groupId,
+          author: message.author,
+          payload: message.payload,
+          timestamp: message.timestamp,
+          replyTo: undefined,
+          readList: {},
+        },
         readList: {},
       };
 

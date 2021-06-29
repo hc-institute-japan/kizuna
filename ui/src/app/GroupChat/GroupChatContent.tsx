@@ -25,6 +25,7 @@ import { ChatListMethods } from "../../components/Chat/types";
 import Typing from "../../components/Chat/Typing";
 import MessageInput, {
   MessageInputMethods,
+  MessageInputOnSendParams,
 } from "../../components/MessageInput";
 // Redux
 import { FilePayloadInput } from "../../redux/commons/types";
@@ -69,12 +70,14 @@ const GroupChat: React.FC = () => {
   /* Handlers */
 
   /* handles sending of messages. */
-  const handleOnSend = () => {
+  const handleOnSend = (opt?: MessageInputOnSendParams) => {
+    const { reply } = { ...opt };
     let inputs: GroupMessageInput[] = [];
     /*
       append text payload at index 0 and send it first
       for performance purposes
     */
+
     if (message.length) {
       inputs.push({
         groupId: groupData!.originalGroupId,
@@ -84,7 +87,7 @@ const GroupChat: React.FC = () => {
         },
         sender: myProfile.id!,
         // TODO: handle replying to message here as well
-        replyTo: undefined,
+        replyTo: reply,
       });
     }
 
@@ -109,7 +112,7 @@ const GroupChat: React.FC = () => {
           payloadInput: filePayloadInput,
           sender: myProfile.id!,
           // TODO: handle replying to message here as well
-          replyTo: undefined,
+          replyTo: reply,
         };
         inputs.push(groupMessage);
       });
