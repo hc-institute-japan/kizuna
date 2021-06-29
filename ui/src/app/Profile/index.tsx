@@ -15,7 +15,7 @@ import styles from "./style.module.css";
 
 interface LocationProps {
   prev: string;
-  contact: ProfileType;
+  profile: ProfileType;
 }
 
 const Profile: React.FC = () => {
@@ -32,8 +32,8 @@ const Profile: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    setProfile(state.contact);
-  }, [state?.contact]);
+    setProfile(state.profile);
+  }, [state?.profile]);
 
   return (
     <IonPage>
@@ -53,7 +53,7 @@ const Profile: React.FC = () => {
         </IonToolbar>
       </IonHeader>
 
-      <ProfileInfo id={state.contact.id} nickname={state.contact.username} />
+      <ProfileInfo id={state.profile.id} nickname={state.profile.username} />
     </IonPage>
   );
 };
