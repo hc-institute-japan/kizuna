@@ -288,7 +288,13 @@ const Chat: React.FC = () => {
     let payload = messageBundle.message.payload;
     let readlist =
       messageBundle.receipt.status === "read" ? { key: timestamp } : undefined;
-
+    let replyToData = messageBundle.message.replyTo
+      ? {
+          payload: messageBundle.message.replyTo.payload,
+          author: messageBundle.message.replyTo.author,
+          id: messageBundle.message.replyTo.p2pMessageEntryHash,
+        }
+      : null;
     if (
       payload.type === "FILE" &&
       (payload as FilePayload).fileType === "VIDEO" &&
@@ -309,6 +315,7 @@ const Chat: React.FC = () => {
         showProfilePicture={true}
         showName={true}
         onDownload={(file) => onDownloadHandler(file)}
+        replyTo={replyToData ? replyToData : undefined}
         onReply={(message) => {
           if (messageInputRef.current) messageInputRef?.current?.reply(message);
           setReplyTo(message.id);
@@ -327,6 +334,7 @@ const Chat: React.FC = () => {
         showName={true}
         onSeen={(complete) => onSeenHandler(messageBundle)}
         onDownload={(file) => onDownloadHandler(file)}
+        replyTo={replyToData ? replyToData : undefined}
         onReply={(message) => {
           if (messageInputRef.current) messageInputRef?.current?.reply(message);
           setReplyTo(message.id);
