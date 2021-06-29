@@ -64,9 +64,7 @@ const AddContactModal: React.FC<Props> = ({ isOpen, onCancel }) => {
       type: SET_CONTACTS,
       contacts: { ...contacts },
     });
-    setUsers((users) =>
-      users.filter((user) => user.username !== contact.username)
-    );
+    setUsers((users) => users.filter((user) => user.id !== contact.id));
   };
 
   return (
