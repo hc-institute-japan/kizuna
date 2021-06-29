@@ -24,9 +24,21 @@ import FileView from "./FileView";
 import ReplyView from "./ReplyView";
 import styles from "./style.module.css";
 
+export interface MessageInputOnSendParams {
+  message?: string;
+  files?: any[];
+  reply?: string;
+}
+
+export interface ReplyParams {
+  payload: Payload;
+  author: string;
+  id: string;
+}
+
 interface Props {
   onChange?: (message: string) => any;
-  onSend?: () => any;
+  onSend?: (opt?: MessageInputOnSendParams) => any;
   onFileSelect?: (e: any[]) => any;
 }
 
@@ -57,7 +69,7 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
   const [message, setMessage] = useState("");
   const handleOnChange = (e: CustomEvent) => setMessage(e.detail.value!);
   const intl = useIntl();
-  const [isReply, setIsReply] = useState(null);
+  const [isReply, setIsReply] = useState<ReplyParams | undefined>(undefined);
   const file = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<any[]>([]);
   const handleOnFileClick = () => file?.current?.click();
@@ -69,7 +81,6 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
 
   useImperativeHandle(ref, () => ({
     reply: (message: any) => {
-      console.log(message);
       setIsReply(message);
     },
   }));
@@ -80,7 +91,7 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
   }, [message]);
 
   const reset = () => {
-    setIsReply(null);
+    setIsReply(undefined);
     setMessage("");
     setFiles([]);
   };
@@ -88,7 +99,7 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
   const onKeyDown = (event: KeyboardEvent) => {
     if (onSend && event.key === "Enter" && !event.shiftKey) {
       if (message.trim().length !== 0 || files.length > 0) {
-        onSend();
+        onSend({ files, message, reply: isReply?.id });
         reset();
       }
     }
@@ -276,7 +287,7 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
           files={files}
           onSend={() => {
             if (onSend) {
-              onSend();
+              onSend({ files, message, reply: isReply?.id });
             }
             reset();
           }}

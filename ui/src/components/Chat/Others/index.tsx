@@ -13,6 +13,7 @@ import MessageTimestamp from "../MessageTimestamp";
 import { default as common, default as styles } from "../style.module.css";
 import Text from "../Text";
 import { ChatProps } from "../types";
+import ReplyTo from "./ReplyTo";
 
 const Others: React.FC<ChatProps> = ({
   id,
@@ -25,6 +26,7 @@ const Others: React.FC<ChatProps> = ({
   showProfilePicture,
   showName,
   onReply,
+  replyTo,
   isSeen = false,
   onDownload,
 }) => {
@@ -38,6 +40,8 @@ const Others: React.FC<ChatProps> = ({
 
   return (
     <>
+      {replyTo ? <ReplyTo message={replyTo}></ReplyTo> : null}
+
       {isP2P ? null : showName ? (
         <IonItem lines="none" className={`${common["author-name"]}`}>
           <IonText color="medium">{author}</IonText>

@@ -1,6 +1,5 @@
 import React from "react";
 import { Route, Switch } from "react-router";
-import Search from "../../components/Search";
 import GroupChatContent from "./GroupChatContent";
 import GroupChatDetails from "./GroupChatDetails";
 import GroupSearch from "./GroupSearch";

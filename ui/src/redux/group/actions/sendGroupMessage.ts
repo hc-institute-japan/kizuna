@@ -36,8 +36,10 @@ const sendGroupMessage =
     const input = {
       groupHash: deserializeHash(groupMessageData.groupId),
       payloadInput: groupMessageData.payloadInput,
-      sender: groupMessageData.sender,
-      replyTo: groupMessageData.replyTo,
+      sender: deserializeHash(groupMessageData.sender),
+      replyTo: groupMessageData.replyTo
+        ? deserializeHash(groupMessageData.replyTo)
+        : undefined,
     };
 
     try {
@@ -99,9 +101,7 @@ const sendGroupMessage =
         author: serializeHash(sendGroupMessageOutput.content.sender),
         payload,
         timestamp: timestampToDate(sendGroupMessageOutput.content.created),
-        replyTo: !sendGroupMessageOutput.content.replyTo
-          ? undefined
-          : serializeHash(sendGroupMessageOutput.content.replyTo),
+        replyTo: sendGroupMessageOutput.content.replyTo,
         readList: {},
       };
 

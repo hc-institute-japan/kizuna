@@ -1,0 +1,28 @@
+.reply-to {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding-bottom: 0.2rem;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.content p {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--ion-color-medium);
+}
+
+.content ion-label {
+  color: rgb(var(--ion-color-primary-rgb));
+  font-size: 0.8rem;
+}
+
+.thumbnail {
+  border-radius: 5px;
+  overflow: hidden;
+}

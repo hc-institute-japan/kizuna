@@ -26,13 +26,26 @@ type GroupIDB64 = string; // Group's EntryHash in base64 string
 type GroupRevisionIDB64 = string; // Group's HeaderHash in base64 string
 type PayloadInput = TextPayload | FilePayloadInput;
 /* END OF TYPE DECLARATIONS */
+
+export interface RepliedMessage {
+  groupId: GroupIDB64;
+  author: string;
+  payload: Payload; // subject to change
+  timestamp: Date;
+  replyTo?: GroupMessageIDB64;
+  readList: {
+    // key is AgentPubKey
+    [key: string]: Date;
+  };
+}
+
 export interface GroupMessageBundle {
   groupMessageId: string;
   groupId: string;
   author: Profile;
   payload: Payload; // subject to change
   timestamp: Date;
-  replyTo?: string;
+  replyTo?: RepliedMessage;
   readList: {
     // key is AgentPubKey
     [key: string]: Date;
@@ -107,7 +120,7 @@ export interface GroupMessage {
   author: string;
   payload: Payload; // subject to change
   timestamp: Date;
-  replyTo?: GroupMessageIDB64;
+  replyTo?: RepliedMessage;
   readList: {
     // key is AgentPubKey
     [key: string]: Date;
