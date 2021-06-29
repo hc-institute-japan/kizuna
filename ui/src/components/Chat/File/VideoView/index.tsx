@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
 import { FilePayload } from "../../../../redux/commons/types";
 import { RootState } from "../../../../redux/types";
@@ -36,8 +36,8 @@ const Video: React.FC<Props> = ({
     }
   };
 
-  return (
-    <div className={styles.video}>
+  const renderVideo = useMemo(
+    () => (
       <VideoPlayer
         download={onDownload ? () => onDownload(file) : download}
         src={URL.createObjectURL(new Blob([fileBytes], { type: "video/mp4" }))}
@@ -47,8 +47,11 @@ const Video: React.FC<Props> = ({
         )}
         onPlayPauseErrorHandler={onPlayPauseErrorHandler}
       />
-    </div>
+    ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [fileBytes]
   );
+  return <div className={styles.video}>{renderVideo}</div>;
 };
 
 export default Video;
