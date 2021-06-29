@@ -141,7 +141,7 @@ export const transformZomeDataToUIData = (
 */
 export const setMessages =
   (state: P2PMessageConversationState): ThunkAction =>
-  async (dispatch) => {
+  (dispatch) => {
     dispatch({
       type: SET_MESSAGES,
       state,
