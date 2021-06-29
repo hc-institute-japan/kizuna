@@ -128,7 +128,7 @@ pub struct P2PMessage {
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 pub struct P2PMessageReceipt {
-    id: EntryHash,
+    id: Vec<EntryHash>,
     status: Status,
 }
 
@@ -189,9 +189,9 @@ pub struct AggregatedLatestData {
     pub latest_group_messages: GroupMessagesOutput,
     pub member_profiles: Vec<AgentProfileCamel>,
     // for p2pmessage
-    // pub latest_p2p_messages: P2PMessageHashTables,
+    pub latest_p2p_messages: P2PMessageHashTables,
     // for preference
-    // pub global_preference: Preference,
-    // pub per_agent_preference: PerAgentPreference,
-    // pub per_group_preference: PerGroupPreference,
+    pub global_preference: Preference,
+    pub per_agent_preference: PerAgentPreference,
+    pub per_group_preference: PerGroupPreference,
 }

@@ -62,8 +62,8 @@ const Chat: React.FC = () => {
   );
   const typing = useSelector((state: RootState) => state.p2pmessages.typing);
   const conversant = useSelector((state: RootState) => {
-    let contacts = state.contacts.contacts;
-    let conversant = Object.values(contacts).filter(
+    const contacts = state.contacts.contacts;
+    const conversant = Object.values(contacts).filter(
       (contact) => contact.id === id
     );
     return conversant[0];
@@ -101,28 +101,32 @@ const Chat: React.FC = () => {
   useEffect(() => {
     if (
       conversant !== undefined &&
-      conversations[conversant.id] !== undefined
+      conversations[conversant.id] !== undefined &&
+      Object.keys(messages).length > 0
     ) {
-      let filteredMessages = Object.values(
-        conversations[conversant.id].messages
-      ).map((messageID) => {
-        let message = messages[messageID];
-        let receiptIDs = message.receipts;
-        let filteredReceipts = receiptIDs.map((id) => {
-          let receipt = receipts[id];
-          return receipt;
-        });
-        filteredReceipts.sort((a: any, b: any) => {
-          let receiptTimestampA = a.timestamp.getTime();
-          let receiptTimestampB = b.timestamp.getTime();
-          if (receiptTimestampA > receiptTimestampB) return -1;
-          if (receiptTimestampA < receiptTimestampB) return 1;
-          return 0;
-        });
-        let latestReceipt = filteredReceipts[0];
-        return { message: message, receipt: latestReceipt };
+      let filteredMessages = conversations[conversant.id].messages.map(
+        (messageID) => {
+          let message = messages[messageID]; // this is undefined
+          let receiptIDs = message.receipts;
+          let filteredReceipts = receiptIDs.map((id) => {
+            let receipt = receipts[id];
+            return receipt;
+          });
+          filteredReceipts.sort((a: any, b: any) => {
+            let receiptTimestampA = a.timestamp.getTime();
+            let receiptTimestampB = b.timestamp.getTime();
+            if (receiptTimestampA > receiptTimestampB) return -1;
+            if (receiptTimestampA < receiptTimestampB) return 1;
+            return 0;
+          });
+          let latestReceipt = filteredReceipts[0];
+          return { message: message, receipt: latestReceipt };
+        }
+      );
+      filteredMessages.sort((x, y) => {
+        return x.message.timestamp.getTime() - y.message.timestamp.getTime();
       });
-      setMessagesWithConversant(filteredMessages.reverse());
+      setMessagesWithConversant(filteredMessages);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversations, messages, receipts, conversant]);
@@ -224,7 +228,6 @@ const Chat: React.FC = () => {
     } else {
       didMountRef.current = true;
     }
-    complete();
     return;
   };
 
