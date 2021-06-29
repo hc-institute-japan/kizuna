@@ -104,12 +104,13 @@ export const getLatestData =
     });
 
     const contactsState = getState().contacts.contacts;
-
+    const profile = getState().profile;
+    if (profile.id !== null && profile.username !== null)
+      contacts[profile.id] = { id: profile.id, username: profile.username }; // include own profile in contacts
     const toDispatch = transformZomeDataToUIData(
       latestData.latestP2pMessages,
       contactsState
     );
-    console.log(toDispatch);
     dispatch(setMessages(toDispatch));
 
     return null;
