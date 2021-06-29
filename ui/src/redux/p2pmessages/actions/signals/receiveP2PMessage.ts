@@ -38,13 +38,36 @@ const receiveP2PMessage =
     let contacts = getState().contacts.contacts;
 
     let transformedReplyTo = undefined;
+    let replyToPayload = undefined;
     if (message.replyTo !== null) {
-      console.log(message.replyTo);
+      switch (message.replyTo.payload.type) {
+        case "TEXT":
+          replyToPayload = message.replyTo.payload;
+          break;
+        case "FILE":
+          replyToPayload = {
+            type: "FILE",
+            fileName: message.replyTo.payload.payload.metadata.fileName,
+            fileSize: message.replyTo.payload.payload.metadata.fileSize,
+            fileType: message.replyTo.payload.payload.fileType.type,
+            fileHash: serializeHash(
+              message.replyTo.payload.payload.metadata.fileHash
+            ),
+            thumbnail:
+              message.replyTo.payload.payload.fileType.type !== "OTHER"
+                ? message.replyTo.payload.payload.fileType.payload.thumbnail
+                : null,
+          };
+          break;
+        default:
+          break;
+      }
+
       transformedReplyTo = {
         p2pMessageEntryHash: serializeHash(message.replyTo.hash),
         author: contacts[serializeHash(message.replyTo.author)],
         receiver: serializeHash(message.replyTo.receiver),
-        payload: message.replyTo.payload,
+        payload: replyToPayload ? replyToPayload : message.replyTo.payload,
         timestamp: timestampToDate(message.replyTo.timeSent),
         receipts: [],
       };
@@ -67,7 +90,6 @@ const receiveP2PMessage =
       status: receipt.status.status,
     };
 
-    console.log("signals", p2pMessage, p2pReceipt);
     dispatch({
       type: APPEND_MESSAGE,
       state: {
