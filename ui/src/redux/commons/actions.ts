@@ -69,7 +69,7 @@ export const getLatestData =
     //   },
     // });
 
-    let groupMessagesOutput: GroupMessagesOutput =
+    const groupMessagesOutput: GroupMessagesOutput =
       convertFetchedResToGroupMessagesOutput(latestData.latestGroupMessages);
 
     let groups: GroupConversation[] = latestData.groups.map(

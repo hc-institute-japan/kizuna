@@ -31,7 +31,6 @@ const GroupSearch: React.FC = () => {
     <Search
       messages={messages}
       onDateSelect={(date) => {
-        console.log(date);
         dispatch(
           getMessagesByGroupByTimestamp({
             groupId: group,

@@ -1,5 +1,6 @@
 import { ReactElement } from "react";
 import { FilePayload, Payload } from "../../redux/commons/types";
+import { Profile } from "../../redux/profile/types";
 
 export interface ChatListProps {
   type?: "p2p" | "group";
@@ -23,6 +24,7 @@ export interface ChatProps {
   showProfilePicture?: boolean;
   showName?: boolean;
   isSeen?: boolean;
+  replyTo?: { payload: Payload; author: Profile; id: string };
   onSeen?(complete: () => any): any;
   onReply?(message: { payload: Payload; author: string; id: string }): any;
   onDownload?(file: FilePayload): any;

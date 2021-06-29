@@ -1,4 +1,4 @@
-import { IonContent, IonIcon, IonItem, IonText } from "@ionic/react";
+import { IonIcon, IonItem, IonText } from "@ionic/react";
 import {
   checkmarkDoneOutline,
   checkmarkOutline,
@@ -12,8 +12,9 @@ import {
   TextPayload,
 } from "../../../redux/commons/types";
 import { usePressHandlers } from "../../../utils/helpers";
-import File from "../File";
 import ChatModal from "../ChatModal";
+import File from "../File";
+import ReplyTo from "./ReplyTo";
 import { default as common, default as styles } from "../style.module.css";
 import Text from "../Text";
 import { ChatProps } from "../types";
@@ -23,6 +24,7 @@ const Me: React.FC<ChatProps> = ({
   payload,
   author,
   timestamp,
+  replyTo,
   onReply,
   type,
   showProfilePicture,
@@ -39,6 +41,7 @@ const Me: React.FC<ChatProps> = ({
 
   return (
     <>
+      {replyTo ? <ReplyTo message={replyTo}></ReplyTo> : null}
       <IonItem
         lines="none"
         className={`${common["me-container"]}`}
