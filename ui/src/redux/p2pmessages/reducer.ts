@@ -5,7 +5,7 @@ import {
   APPEND_MESSAGE,
   APPEND_RECEIPT,
   SET_FILES,
-  SET_TYPING
+  SET_TYPING,
 } from "./types";
 
 const initialState: P2PMessageConversationState = {
@@ -13,50 +13,52 @@ const initialState: P2PMessageConversationState = {
   messages: {},
   receipts: {},
   files: {},
-  typing: {}
+  typing: {},
 };
 
 // Hashes within the redux state are base64 strings with u prepended except for FileHash (except when used as key)
 const reducer = (state = initialState, action: P2PMessageActionType) => {
-
   switch (action.type) {
     case SET_MESSAGES:
       // console.log("Reducer setting messages");
 
       // copy state
-      let stateToSet = state;
+      let stateToSet = { ...state };
       let { conversations, messages, receipts } = action.state;
-      
+
       // iterate through conversations
       for (const [key, value] of Object.entries(conversations)) {
         let existing = state.conversations[key];
         // if conversation is not yet existing, create new
-        if (existing === undefined) stateToSet.conversations[key] = value
+        if (existing === undefined) stateToSet.conversations[key] = value;
         // else simply append messages to the array value
-        else stateToSet.conversations[key] = { messages: [...new Set(existing.messages.concat(value.messages))]}
-      };
-      
+        else
+          stateToSet.conversations[key] = {
+            messages: [...new Set(existing.messages.concat(value.messages))],
+          };
+      }
+
       // update copied state
       let stateSet: P2PMessageConversationState = {
         conversations: {
           ...state.conversations,
-          ...stateToSet.conversations
+          ...stateToSet.conversations,
         },
         messages: {
           ...state.messages,
-          ...messages
+          ...messages,
         },
         receipts: {
           ...state.receipts,
-          ...receipts
+          ...receipts,
         },
         files: {
           ...state.files,
         },
         typing: {
-          ...state.typing
-        }
-      }
+          ...state.typing,
+        },
+      };
 
       // console.log("Reducer finished setting messages", stateSet);
       return stateSet;
@@ -65,41 +67,52 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
       // console.log("Reducer appending message", action.state);
 
       // copy state
-      var stateToAppendMessage = state; 
+      var stateToAppendMessage = state;
 
       // destructure inputs
-      let key = action.state.key ? action.state.key : action.state.message.receiver;
+      let key = action.state.key
+        ? action.state.key
+        : action.state.message.receiver;
       let messageHash = action.state.message.p2pMessageEntryHash;
       let receiptHash = action.state.receipt.p2pMessageReceiptEntryHash;
 
       // if conversation is not yet existing, create new
-      if (stateToAppendMessage.conversations[key] === undefined) stateToAppendMessage.conversations[key]={messages: [messageHash]}
+      if (stateToAppendMessage.conversations[key] === undefined)
+        stateToAppendMessage.conversations[key] = { messages: [messageHash] };
       // else simply append messages to the array value
-      else stateToAppendMessage.conversations[key]={messages: [messageHash, ...stateToAppendMessage.conversations[key].messages]}
-      
+      else
+        stateToAppendMessage.conversations[key] = {
+          messages: [
+            messageHash,
+            ...stateToAppendMessage.conversations[key].messages,
+          ],
+        };
+
       // create a new file entry (allows duplicates)
-      if (action.state.file !== undefined) stateToAppendMessage.files[action.state.file.fileHash] = action.state.file.fileBytes;
+      if (action.state.file !== undefined)
+        stateToAppendMessage.files[action.state.file.fileHash] =
+          action.state.file.fileBytes;
 
       // update state
       stateToAppendMessage = {
         conversations: {
-          ...stateToAppendMessage.conversations
+          ...stateToAppendMessage.conversations,
         },
         messages: {
           ...stateToAppendMessage.messages,
-          [messageHash]: action.state.message
+          [messageHash]: action.state.message,
         },
         receipts: {
           ...stateToAppendMessage.receipts,
-          [receiptHash]: action.state.receipt
+          [receiptHash]: action.state.receipt,
         },
         files: {
           ...stateToAppendMessage.files,
         },
         typing: {
           ...stateToAppendMessage.typing,
-        }
-      }
+        },
+      };
 
       // console.log("Reducer finished appending message", stateToAppendMessage);
       return stateToAppendMessage;
@@ -117,29 +130,31 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
       // iterate over the hashes in a receipt (single receipt can correspond to multiple messages)
       action.state.p2pMessageEntryHashes.forEach((hash) => {
         if (stateToAppendReceipt.messages[hash] !== undefined) {
-          stateToAppendReceipt.messages[hash].receipts.push(receiptHashToAppend)
+          stateToAppendReceipt.messages[hash].receipts.push(
+            receiptHashToAppend
+          );
         }
-      })
+      });
 
       // update state
       stateToAppendReceipt = {
         conversations: {
-          ...stateToAppendReceipt.conversations
+          ...stateToAppendReceipt.conversations,
         },
         messages: {
-          ...stateToAppendReceipt.messages
+          ...stateToAppendReceipt.messages,
         },
         receipts: {
           ...stateToAppendReceipt.receipts,
-          [receiptHashToAppend]: receiptToAppend
+          [receiptHashToAppend]: receiptToAppend,
         },
         files: {
-          ...stateToAppendReceipt.files
+          ...stateToAppendReceipt.files,
         },
         typing: {
-          ...stateToAppendReceipt.typing
-        }
-      }     
+          ...stateToAppendReceipt.typing,
+        },
+      };
       // console.log("Reducer finished appending receipt", stateToAppendReceipt);
       return stateToAppendReceipt;
 
@@ -152,57 +167,58 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
       //update state
       stateToSetFiles = {
         conversations: {
-          ...stateToSetFiles.conversations
+          ...stateToSetFiles.conversations,
         },
         messages: {
-          ...stateToSetFiles.messages
+          ...stateToSetFiles.messages,
         },
         receipts: {
-          ...stateToSetFiles.receipts
+          ...stateToSetFiles.receipts,
         },
         files: {
           ...stateToSetFiles.files,
           ...action.state,
         },
         typing: {
-          ...stateToSetFiles.typing
-        }
-      }
-      console.log("reducer file set", stateToSetFiles)
-      return stateToSetFiles
-      
+          ...stateToSetFiles.typing,
+        },
+      };
+      console.log("reducer file set", stateToSetFiles);
+      return stateToSetFiles;
+
     case SET_TYPING:
       var stateToAppendTyping = state;
       let id = action.state.profile.id;
       let profile = {
         id: id,
-        username: action.state.profile.username
+        username: action.state.profile.username,
       };
       let status = action.state.isTyping;
 
-      if (stateToAppendTyping.typing[id] === undefined && status) stateToAppendTyping.typing[id] = profile
+      if (stateToAppendTyping.typing[id] === undefined && status)
+        stateToAppendTyping.typing[id] = profile;
       else {
-        if (!status) delete stateToAppendTyping.typing[id]
+        if (!status) delete stateToAppendTyping.typing[id];
       }
 
       stateToAppendTyping = {
         conversations: {
-          ...stateToAppendTyping.conversations
+          ...stateToAppendTyping.conversations,
         },
         messages: {
-          ...stateToAppendTyping.messages
+          ...stateToAppendTyping.messages,
         },
         receipts: {
-          ...stateToAppendTyping.receipts
+          ...stateToAppendTyping.receipts,
         },
         files: {
-          ...stateToAppendTyping.files
+          ...stateToAppendTyping.files,
         },
         typing: {
-          ...stateToAppendTyping.typing
-        }
-      }
-      return stateToAppendTyping
+          ...stateToAppendTyping.typing,
+        },
+      };
+      return stateToAppendTyping;
     default:
       return state;
   }
