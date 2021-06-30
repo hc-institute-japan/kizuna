@@ -120,7 +120,7 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
   }, [message, onChangeCallback]);
   const { showToast } = useToast();
 
-  const handleOnFileChange = () =>
+  const handleOnFileChange = () => {
     Array.from(file.current ? file.current.files! : new FileList()).forEach(
       (file) => {
         file.arrayBuffer().then((arrBuffer) => {
@@ -165,12 +165,8 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
                   video.pause();
                 }
               };
-              video.addEventListener("loadeddata", function () {
-                if (snapImage()) {
-                  video.removeEventListener("timeupdate", timeUpdate);
-                }
-              });
-              const snapImage = function () {
+
+              const snapImage = (): boolean => {
                 const canvas = document.createElement("canvas");
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
@@ -180,40 +176,42 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
 
                 const image = canvas.toDataURL("image/jpeg");
 
-                const success = image.length > 100000;
+                const success = image.length > 10;
                 if (success) {
                   const img = document.createElement("img");
 
                   document.getElementsByTagName("div")[0].appendChild(img);
                   URL.revokeObjectURL(url);
+
+                  const base64 = image.split(BASE_64)[1]?.trim();
+                  if (base64) {
+                    const byteCharacters = window.atob(
+                      image.split(BASE_64)[1]?.trim()
+                    );
+
+                    const byteNumbers = new Array(byteCharacters.length);
+                    for (let i = 0; i < byteCharacters.length; i++)
+                      byteNumbers[i] = byteCharacters.charCodeAt(i);
+
+                    const uArr = new Uint8Array(byteNumbers);
+
+                    // });
+                    const final = {
+                      metadata: { fileName, fileType: type, fileSize },
+                      fileType: {
+                        type,
+                        payload: { thumbnail: uArr },
+                      },
+                      fileBytes,
+                    };
+
+                    setFiles((currFiles) => {
+                      currFiles.push(final);
+                      return [...currFiles];
+                    });
+                  }
                 }
 
-                const base64 = image.split(BASE_64)[1]?.trim();
-                if (base64) {
-                  const byteCharacters = window.atob(
-                    image.split(BASE_64)[1]?.trim()
-                  );
-
-                  const byteNumbers = new Array(byteCharacters.length);
-                  for (let i = 0; i < byteCharacters.length; i++)
-                    byteNumbers[i] = byteCharacters.charCodeAt(i);
-
-                  const uArr = new Uint8Array(byteNumbers);
-
-                  // });
-                  const final = {
-                    metadata: { fileName, fileType: type, fileSize },
-                    fileType: {
-                      type,
-                      payload: { thumbnail: uArr },
-                    },
-                    fileBytes,
-                  };
-                  setFiles((currFiles) => {
-                    currFiles.push(final);
-                    return [...currFiles];
-                  });
-                }
                 return success;
               };
 
@@ -247,54 +245,54 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
         });
       }
     );
+  };
 
   return (
-    <IonFooter>
-      {isReply ? <ReplyView messageState={[isReply, setIsReply]} /> : null}
-      {files.length > 0 ? <FileView files={files} setFiles={setFiles} /> : null}
-      <IonToolbar className={styles.toolbar}>
-        <IonButtons slot="start">
-          {files.length > 0 ? null : (
-            <IonButton onClick={handleOnFileClick}>
-              <IonIcon color="medium" icon={attachOutline} />
-              <input
-                ref={file}
-                type="file"
-                hidden
-                onChange={handleOnFileChange}
-              />
-            </IonButton>
-          )}
-        </IonButtons>
-        <IonTextarea
-          value={message}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" && !event.shiftKey) {
-              // prevent default behavior
-              event.preventDefault();
-              //alert("ok");
-              return false;
-            }
-          }}
-          className={styles["textarea"]}
-          onIonChange={handleOnChange}
-          autoGrow={true}
-          placeholder={intl.formatMessage({
-            id: "app.new-conversation.message-placeholder",
-          })}
-        />
-        <EndButtons
-          files={files}
-          onSend={() => {
-            if (onSend) {
-              onSend({ files, message, reply: isReply?.id });
-            }
-            reset();
-          }}
-          message={message}
-        />
-      </IonToolbar>
-    </IonFooter>
+    <>
+      <IonFooter>
+        {isReply ? <ReplyView messageState={[isReply, setIsReply]} /> : null}
+        {files.length > 0 ? (
+          <FileView files={files} setFiles={setFiles} />
+        ) : null}
+        <IonToolbar className={styles.toolbar}>
+          <IonButtons slot="start">
+            {files.length > 0 ? null : (
+              <IonButton onClick={handleOnFileClick}>
+                <IonIcon color="medium" icon={attachOutline} />
+              </IonButton>
+            )}
+          </IonButtons>
+          <IonTextarea
+            value={message}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && !event.shiftKey) {
+                // prevent default behavior
+                event.preventDefault();
+                //alert("ok");
+                return false;
+              }
+            }}
+            className={styles["textarea"]}
+            onIonChange={handleOnChange}
+            autoGrow={true}
+            placeholder={intl.formatMessage({
+              id: "app.new-conversation.message-placeholder",
+            })}
+          />
+          <EndButtons
+            files={files}
+            onSend={() => {
+              if (onSend) {
+                onSend({ files, message, reply: isReply?.id });
+              }
+              reset();
+            }}
+            message={message}
+          />
+        </IonToolbar>
+      </IonFooter>
+      <input ref={file} type="file" hidden onChange={handleOnFileChange} />
+    </>
   );
 };
 
