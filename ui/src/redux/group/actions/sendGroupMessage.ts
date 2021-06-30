@@ -1,28 +1,27 @@
 import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
-import { ThunkAction } from "../../types";
+import { timestampToDate } from "../../../utils/helpers";
 import {
-  // action types
-  SET_GROUP_MESSAGE,
-  // IO
-  GroupMessageInput,
-  GroupMessage,
-  // action payload types
-  SetGroupMessageAction,
-} from "../types";
-import {
-  Payload,
   FilePayload,
   FileType,
+  isImage,
+  isOther,
   // type guards
   isTextPayload,
-  isOther,
-  isImage,
+  Payload,
 } from "../../commons/types";
-import { setFilesBytes } from "../actions";
-import { timestampToDate } from "../../../utils/helpers";
 import { pushError } from "../../error/actions";
-import ReplyTo from "../../../components/Chat/Me/ReplyTo";
+import { ThunkAction } from "../../types";
+import { setFilesBytes } from "../actions";
+import {
+  GroupMessage,
+  // IO
+  GroupMessageInput,
+  // action payload types
+  SetGroupMessageAction,
+  // action types
+  SET_GROUP_MESSAGE,
+} from "../types";
 
 const sendGroupMessage =
   (groupMessageData: GroupMessageInput): ThunkAction =>
