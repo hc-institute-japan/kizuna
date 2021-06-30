@@ -15,7 +15,7 @@ import styles from "./style.module.css";
 
 interface LocationProps {
   prev: string;
-  contact: ProfileType;
+  profile: ProfileType;
 }
 
 const Profile: React.FC = () => {
@@ -32,17 +32,12 @@ const Profile: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    setProfile(state.contact);
-  }, [state?.contact]);
+    setProfile(state.profile);
+  }, [state?.profile]);
 
   return (
     <IonPage>
-      <IonHeader
-        style={{
-          backgroundImage: `url("https://instagram.fmnl3-2.fna.fbcdn.net/v/t51.2885-15/e35/p1080x1080/153183681_221786689635197_8533112046939022296_n.jpg?tp=1&_nc_ht=instagram.fmnl3-2.fna.fbcdn.net&_nc_cat=105&_nc_ohc=aiSb_B85lnsAX_ZSkr8&oh=485389a978d593f60ac1e88dd01d326a&oe=60649831")`,
-        }}
-        className={styles.header}
-      >
+      <IonHeader className={styles.header}>
         <IonToolbar>
           <IonButtons>
             <IonBackButton
@@ -58,7 +53,7 @@ const Profile: React.FC = () => {
         </IonToolbar>
       </IonHeader>
 
-      <ProfileInfo id={state.contact.id} nickname={state.contact.username} />
+      <ProfileInfo id={state.profile.id} nickname={state.profile.username} />
     </IonPage>
   );
 };

@@ -36,10 +36,10 @@ export const convertFetchedResToGroupMessagesOutput = (
       message_ids.map((message_id) => serializeHash(message_id))
   );
 
-  let groupMessagesContents: GroupMessagesContents = objectMap(
+  const groupMessagesContents: GroupMessagesContents = objectMap(
     fetchedRes.groupMessagesContents,
     (msg_content): GroupMessage => {
-      let convertedReadList: {
+      const convertedReadList: {
         [key: string]: Date;
       } = objectMap(
         msg_content.readList,
@@ -56,6 +56,7 @@ export const convertFetchedResToGroupMessagesOutput = (
             timestamp.nanos_since_epoch,
           ])
       );
+
       return {
         groupMessageId: serializeHash(
           msg_content.groupMessageElement.signedHeader.header.content.entry_hash
@@ -66,7 +67,27 @@ export const convertFetchedResToGroupMessagesOutput = (
         timestamp: timestampToDate(
           msg_content.groupMessageElement.entry.created
         ),
-        replyTo: msg_content.groupMessageElement.entry.replyTo,
+        replyTo: msg_content.groupMessageElement.entry.replyTo
+          ? {
+              groupId: serializeHash(
+                msg_content.groupMessageElement.entry.replyTo.content.groupHash
+              ),
+              author: serializeHash(
+                msg_content.groupMessageElement.entry.replyTo.content.sender
+              ),
+              payload: convertPayload(
+                msg_content.groupMessageElement.entry.replyTo.content.payload
+              ),
+              timestamp: timestampToDate(
+                msg_content.groupMessageElement.entry.replyTo.content.created
+              ),
+
+              replyTo: msg_content.groupMessageElement.entry.replyTo
+                ? serializeHash(msg_content.groupMessageElement.entry.replyTo)
+                : undefined,
+              readList: {},
+            }
+          : undefined,
         readList: convertedReadList,
       };
     }

@@ -13,6 +13,7 @@ import {
   arrowBackSharp,
   informationCircleOutline,
   personCircleOutline,
+  search,
 } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
@@ -21,7 +22,9 @@ import AgentIdentifier from "../../components/AgentIdentifier";
 import { ChatList, Me, Others } from "../../components/Chat";
 import { ChatListMethods } from "../../components/Chat/types";
 import Typing from "../../components/Chat/Typing";
-import MessageInput from "../../components/MessageInput";
+import MessageInput, {
+  MessageInputMethods,
+} from "../../components/MessageInput";
 import { FilePayload } from "../../redux/commons/types";
 import {
   getFileBytes,
@@ -45,6 +48,7 @@ const Chat: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [message, setMessage] = useState<string>("");
   const [files, setFiles] = useState<any[]>([]);
+  const [replyTo, setReplyTo] = useState<string>("");
   const [messagesWithConversant, setMessagesWithConversant] = useState<any[]>(
     []
   );
@@ -56,10 +60,16 @@ const Chat: React.FC = () => {
   const fetchedFiles = useSelector(
     (state: RootState) => state.p2pmessages.files
   );
-  const typing = useSelector((state: RootState) => state.p2pmessages.typing);
+  const typing = useSelector((state: RootState) => {
+    const allTypingProfiles = state.p2pmessages.typing;
+    const typingProfile = Object.values(allTypingProfiles).filter(
+      (profile) => profile.id === id
+    );
+    return typingProfile;
+  });
   const conversant = useSelector((state: RootState) => {
-    let contacts = state.contacts.contacts;
-    let conversant = Object.values(contacts).filter(
+    const contacts = state.contacts.contacts;
+    const conversant = Object.values(contacts).filter(
       (contact) => contact.id === id
     );
     return conversant[0];
@@ -74,6 +84,7 @@ const Chat: React.FC = () => {
   const scrollerRef = useRef<ChatListMethods>(null);
   const didMountRef = useRef(false);
   const inputTimeout = useRef<NodeJS.Timeout>();
+  const messageInputRef = useRef<MessageInputMethods | null>(null);
 
   /* USE EFFECTS */
   /* 
@@ -82,42 +93,46 @@ const Chat: React.FC = () => {
     */
   useEffect(() => {
     scrollerRef.current!.scrollToBottom();
-  });
+  }, []);
 
   useEffect(() => {
     scrollerRef.current!.scrollToBottom();
   }, [conversant]);
 
   /* 
-      filters messages with conversant and
-      filters latest receipt/status
-      when redux state of p2pmessages changes
-    */
+    filters messages with conversant and
+    filters latest receipt/status
+    when redux state of p2pmessages changes
+  */
   useEffect(() => {
     if (
       conversant !== undefined &&
-      conversations[conversant.id] !== undefined
+      conversations[conversant.id] !== undefined &&
+      Object.keys(messages).length > 0
     ) {
-      let filteredMessages = Object.values(
-        conversations[conversant.id].messages
-      ).map((messageID) => {
-        let message = messages[messageID];
-        let receiptIDs = message.receipts;
-        let filteredReceipts = receiptIDs.map((id) => {
-          let receipt = receipts[id];
-          return receipt;
-        });
-        filteredReceipts.sort((a: any, b: any) => {
-          let receiptTimestampA = a.timestamp.getTime();
-          let receiptTimestampB = b.timestamp.getTime();
-          if (receiptTimestampA > receiptTimestampB) return -1;
-          if (receiptTimestampA < receiptTimestampB) return 1;
-          return 0;
-        });
-        let latestReceipt = filteredReceipts[0];
-        return { message: message, receipt: latestReceipt };
+      let filteredMessages = conversations[conversant.id].messages.map(
+        (messageID) => {
+          let message = messages[messageID]; // this is undefined
+          let receiptIDs = message.receipts;
+          let filteredReceipts = receiptIDs.map((id) => {
+            let receipt = receipts[id];
+            return receipt;
+          });
+          filteredReceipts.sort((a: any, b: any) => {
+            let receiptTimestampA = a.timestamp.getTime();
+            let receiptTimestampB = b.timestamp.getTime();
+            if (receiptTimestampA > receiptTimestampB) return -1;
+            if (receiptTimestampA < receiptTimestampB) return 1;
+            return 0;
+          });
+          let latestReceipt = filteredReceipts[0];
+          return { message: message, receipt: latestReceipt };
+        }
+      );
+      filteredMessages.sort((x, y) => {
+        return x.message.timestamp.getTime() - y.message.timestamp.getTime();
       });
-      setMessagesWithConversant(filteredMessages.reverse());
+      setMessagesWithConversant(filteredMessages);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversations, messages, receipts, conversant]);
@@ -162,16 +177,34 @@ const Chat: React.FC = () => {
     */
   const handleOnSubmit = () => {
     if (message !== "") {
-      dispatch(sendMessage(conversant.id, message, "TEXT", undefined));
+      dispatch(
+        sendMessage(
+          conversant.id,
+          message,
+          "TEXT",
+          replyTo !== "" ? replyTo : undefined
+        )
+      );
     }
 
     files.forEach((file) =>
       setTimeout(
-        dispatch(sendMessage(conversant.id, message, "FILE", undefined, file)),
+        dispatch(
+          sendMessage(
+            conversant.id,
+            message,
+            "FILE",
+            replyTo !== "" ? replyTo : undefined,
+            file
+          )
+        ),
         3000
       )
     );
+
     scrollerRef.current!.scrollToBottom();
+
+    setReplyTo("");
   };
 
   /* 
@@ -201,7 +234,7 @@ const Chat: React.FC = () => {
     } else {
       didMountRef.current = true;
     }
-    complete();
+    // complete();
     return;
   };
 
@@ -262,7 +295,13 @@ const Chat: React.FC = () => {
     let payload = messageBundle.message.payload;
     let readlist =
       messageBundle.receipt.status === "read" ? { key: timestamp } : undefined;
-
+    let replyToData = messageBundle.message.replyTo
+      ? {
+          payload: messageBundle.message.replyTo.payload,
+          author: messageBundle.message.replyTo.author,
+          id: messageBundle.message.replyTo.p2pMessageEntryHash,
+        }
+      : null;
     if (
       payload.type === "FILE" &&
       (payload as FilePayload).fileType === "VIDEO" &&
@@ -271,25 +310,30 @@ const Chat: React.FC = () => {
       dispatch(getFileBytes([payload.fileHash]));
     }
 
-    return conversant.id !== author ? (
+    return conversant.id !== author.id ? (
       <Me
         id={messageBundle.message.p2pMessageEntryHash}
         key={key}
         type="p2p"
-        author={author}
+        author={author.username}
         timestamp={timestamp}
         payload={payload}
         readList={readlist ? readlist : {}}
         showProfilePicture={true}
         showName={true}
         onDownload={(file) => onDownloadHandler(file)}
+        replyTo={replyToData ? replyToData : undefined}
+        onReply={(message) => {
+          if (messageInputRef.current) messageInputRef?.current?.reply(message);
+          setReplyTo(message.id);
+        }}
       />
     ) : (
       <Others
         id={messageBundle.message.p2pMessageEntryHash}
         key={key}
         type="p2p"
-        author={author}
+        author={author.username}
         timestamp={timestamp}
         payload={payload}
         readList={readlist ? readlist : {}}
@@ -297,6 +341,11 @@ const Chat: React.FC = () => {
         showName={true}
         onSeen={(complete) => onSeenHandler(messageBundle)}
         onDownload={(file) => onDownloadHandler(file)}
+        replyTo={replyToData ? replyToData : undefined}
+        onReply={(message) => {
+          if (messageInputRef.current) messageInputRef?.current?.reply(message);
+          setReplyTo(message.id);
+        }}
       />
     );
   };
@@ -323,6 +372,11 @@ const Chat: React.FC = () => {
             <IonTitle className="item item-text-wrap">
               <AgentIdentifier nickname={state?.username} id={id} />
             </IonTitle>
+            <IonButton
+              onClick={() => history.push(`/u/${conversant.id}/search`)}
+            >
+              <IonIcon slot="icon-only" icon={search} />
+            </IonButton>
             <IonButton onClick={handleOnClick}>
               <IonIcon slot="icon-only" icon={informationCircleOutline} />
             </IonButton>
@@ -346,6 +400,7 @@ const Chat: React.FC = () => {
       <Typing profiles={Object.values(typing)}></Typing>
 
       <MessageInput
+        ref={messageInputRef}
         onSend={handleOnSubmit}
         onChange={(message: string) => handleOnChange(message, conversant)}
         onFileSelect={(files) => setFiles(files)}

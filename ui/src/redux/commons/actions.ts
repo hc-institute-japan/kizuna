@@ -9,15 +9,15 @@ import {
   SetLatestGroupState,
   SET_LATEST_GROUP_STATE,
 } from "../group/types";
-import { getLatestMessages } from "../p2pmessages/actions";
+import { setMessages, transformZomeDataToUIData } from "../p2pmessages/actions";
+import { SET_PREFERENCE } from "../preference/types";
 import { Profile, ProfileActionTypes, SET_PROFILE } from "../profile/types";
 import { ThunkAction } from "../types";
 
 export const getLatestData =
   (): ThunkAction =>
-  async (dispatch, _getState, { callZome, getAgentId }) => {
+  async (dispatch, getState, { callZome, getAgentId }) => {
     // TODO: error handling
-    // TODO: input sanitation
     const latestData = await callZome({
       zomeName: ZOMES.AGGREGATOR,
       fnName: FUNCTIONS[ZOMES.AGGREGATOR].RETRIEVE_LATEST_DATA,
@@ -61,15 +61,15 @@ export const getLatestData =
     });
 
     // TODO: store per agent and group prefenrece as well
-    // dispatch({
-    //   type: SET_PREFERENCE,
-    //   preference: {
-    //     readReceipt: latestData.globalPreference.readReceipt,
-    //     typingIndicator: latestData.globalPreference.typingIndicator,
-    //   },
-    // });
+    dispatch({
+      type: SET_PREFERENCE,
+      preference: {
+        readReceipt: latestData.globalPreference.readReceipt,
+        typingIndicator: latestData.globalPreference.typingIndicator,
+      },
+    });
 
-    let groupMessagesOutput: GroupMessagesOutput =
+    const groupMessagesOutput: GroupMessagesOutput =
       convertFetchedResToGroupMessagesOutput(latestData.latestGroupMessages);
 
     let groups: GroupConversation[] = latestData.groups.map(
@@ -103,7 +103,15 @@ export const getLatestData =
       members,
     });
 
-    dispatch(getLatestMessages(21));
+    const contactsState = getState().contacts.contacts;
+    const profile = getState().profile;
+    if (profile.id !== null && profile.username !== null)
+      contacts[profile.id] = { id: profile.id, username: profile.username }; // include own profile in contacts
+    const toDispatch = transformZomeDataToUIData(
+      latestData.latestP2pMessages,
+      contactsState
+    );
+    dispatch(setMessages(toDispatch));
 
     return null;
   };

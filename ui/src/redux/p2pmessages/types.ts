@@ -28,11 +28,11 @@ export interface P2PConversation {
 
 export interface P2PMessage {
   p2pMessageEntryHash: MessageID;
-  author: ProfileID;
+  author: Profile;
   receiver: ProfileID;
   payload: Payload;
   timestamp: Date;
-  replyTo?: MessageID;
+  replyTo?: P2PMessage;
   receipts: P2PMessageReceiptID[];
 }
 
