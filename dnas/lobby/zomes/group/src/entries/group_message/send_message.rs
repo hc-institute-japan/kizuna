@@ -1,6 +1,8 @@
 use hdk::prelude::*;
 
-use super::{GroupFileBytes, GroupMessage, GroupMessageInput, GroupMessageWithId};
+use super::{
+    GroupFileBytes, GroupMessage, GroupMessageData, GroupMessageInput, GroupMessageWithId,
+};
 use crate::group_helpers::get_group_latest_version;
 use crate::signals::{SignalDetails, SignalName, SignalPayload};
 use crate::utils::*;
@@ -65,14 +67,26 @@ pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<Gr
     let latest_group_version = get_group_latest_version(message.group_hash.clone())?;
 
     let message_hash = hash_entry(&message)?;
-    let group_message_data = GroupMessageWithId {
+
+    let mut group_message_data: GroupMessageData = GroupMessageData {
+        group_hash: message.group_hash,
+        payload: message.payload,
+        created: message.created,
+        sender: message.sender,
+        reply_to: None,
+    };
+    if let Some(hash) = message_input.reply_to.clone() {
+        group_message_data.reply_to = Some(try_get_and_convert(hash)?);
+    }
+
+    let group_message_with_id = GroupMessageWithId {
         id: message_hash,
-        content: message,
+        content: group_message_data,
     };
 
     let signal = SignalDetails {
         name: SignalName::GROUP_MESSAGE_DATA.to_owned(),
-        payload: SignalPayload::GroupMessageData(group_message_data.clone()),
+        payload: SignalPayload::GroupMessageData(group_message_with_id.clone()),
     };
 
     remote_signal(
@@ -92,5 +106,5 @@ pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<Gr
         })
         .collect(),
     )?;
-    Ok(group_message_data)
+    Ok(group_message_with_id)
 }

@@ -5,14 +5,11 @@ use std::time::Duration;
 
 use crate::group::group_helpers::get_group_latest_version;
 use crate::signals::{SignalDetails, SignalName, SignalPayload};
-use crate::utils::error;
-use crate::utils::path_from_str;
-use crate::utils::timestamp_to_days;
-use crate::utils::to_timestamp;
+use crate::utils::*;
 
 use super::{
-    GroupFileBytes, GroupMessage, GroupMessageInputWithDate, GroupMessageWithId, Payload,
-    PayloadInput,
+    GroupFileBytes, GroupMessage, GroupMessageData, GroupMessageInputWithDate, GroupMessageWithId,
+    Payload, PayloadInput,
 };
 
 pub fn send_message_in_target_date_handler(
@@ -75,15 +72,28 @@ pub fn send_message_in_target_date_handler(
                     match get_group_latest_version(message.clone().group_hash) {
                         Ok(group) => {
                             let message_hash = hash_entry(&message.clone())?;
-                            let group_message_data = GroupMessageWithId {
+                            let mut replied_message: Option<GroupMessage> = None;
+                            if let Some(hash) = message_input.reply_to.clone() {
+                                replied_message = Some(try_get_and_convert(hash)?);
+                            }
+
+                            let group_message_data: GroupMessageData = GroupMessageData {
+                                group_hash: message.group_hash,
+                                payload: message.payload,
+                                created: message.created,
+                                sender: message.sender,
+                                reply_to: replied_message,
+                            };
+
+                            let group_message_with_id = GroupMessageWithId {
                                 id: message_hash,
-                                content: message,
+                                content: group_message_data,
                             };
 
                             let signal = SignalDetails {
                                 name: SignalName::GROUP_MESSAGE_DATA.to_owned(),
                                 payload: SignalPayload::GroupMessageData(
-                                    group_message_data.clone(),
+                                    group_message_with_id.clone(),
                                 ),
                             };
 
@@ -101,7 +111,7 @@ pub fn send_message_in_target_date_handler(
                                     })
                                     .collect(),
                             )?;
-                            Ok(group_message_data)
+                            Ok(group_message_with_id)
                         }
                         Err(_) => error("Cannot get group's latest version"),
                     }
