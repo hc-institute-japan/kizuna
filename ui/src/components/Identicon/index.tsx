@@ -11,14 +11,15 @@ interface Props {
 
 const Identicon: React.FC<Props> = ({ hash, size = 32 }) => {
   const didMount = useRef(false);
-  const canvas = document.getElementById("identicon") as HTMLCanvasElement;
+  // const canvas = document.getElementById(styles.icon) as HTMLCanvasElement;
+  const canvas = useRef<HTMLCanvasElement>(null);
   const opts = {
     hash: deserializeHash(hash),
     size,
   };
   useEffect(() => {
     if (didMount.current === true) {
-      renderIcon(opts, canvas);
+      if (canvas.current) renderIcon(opts, canvas.current);
     } else {
       didMount.current = true;
     }
@@ -26,6 +27,7 @@ const Identicon: React.FC<Props> = ({ hash, size = 32 }) => {
   return (
     <div>
       <canvas
+        ref={canvas}
         className={styles["icon"]}
         id="identicon"
         width="20"
