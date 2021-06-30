@@ -169,6 +169,6 @@ pub struct FileBytes(pub HashMap<String, SerializedBytes>);
 pub struct GroupMessageWithId {
     // entry_hash of GroupMessage
     pub id: EntryHash,
-    pub content: GroupMessage,
+    pub content: GroupMessageData,
 }
 /* END OF OUTPUTS TYPES DEFINITION */

@@ -1,6 +1,6 @@
 use hdk::prelude::*;
 
-use crate::utils::error;
+use crate::utils::{error, try_get_and_convert};
 use file_types::PayloadType;
 use std::collections::hash_map::HashMap;
 
@@ -90,15 +90,8 @@ pub fn collect_messages_info(
                         };
 
                         if let Some(reply_to_hash) = group_message.reply_to.clone() {
-                            if let Some(reply_to_element) =
-                                get(reply_to_hash.clone(), GetOptions::default())?
-                            {
-                                if let Ok(Some(reply_to_group_message)) =
-                                    reply_to_element.entry().to_app_option::<GroupMessage>()
-                                {
-                                    group_message_data.reply_to = Some(reply_to_group_message);
-                                }
-                            }
+                            let replied_message: GroupMessage = try_get_and_convert(reply_to_hash)?;
+                            group_message_data.reply_to = Some(replied_message);
                         }
 
                         let group_message_element: GroupMessageElement = GroupMessageElement {
