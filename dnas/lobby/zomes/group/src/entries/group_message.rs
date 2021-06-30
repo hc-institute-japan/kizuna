@@ -135,11 +135,12 @@ pub struct GroupMessageContent {
 #[derive(Serialize, Deserialize, SerializedBytes, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct GroupMessageData {
+    pub message_id: EntryHash,
     pub group_hash: EntryHash,
     pub payload: Payload,
     pub created: Timestamp,
     pub sender: AgentPubKey,
-    pub reply_to: Option<GroupMessage>,
+    pub reply_to: Option<GroupMessageWithId>,
 }
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Hash, PartialEq, Eq, Debug)]
