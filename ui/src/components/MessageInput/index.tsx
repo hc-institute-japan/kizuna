@@ -13,6 +13,7 @@ import React, {
   useCallback,
   useEffect,
   useImperativeHandle,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -246,6 +247,12 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
       }
     );
   };
+
+  const renderFileView = useMemo(
+    () =>
+      files.length > 0 ? <FileView files={files} setFiles={setFiles} /> : null,
+    [files]
+  );
 
   return (
     <>
