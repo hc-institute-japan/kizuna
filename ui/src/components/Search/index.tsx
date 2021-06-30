@@ -11,15 +11,10 @@ import {
   IonPage,
   IonToolbar,
 } from "@ionic/react";
-import {
-  arrowBack,
-  arrowBackCircleOutline,
-  arrowBackOutline,
-  calendar,
-} from "ionicons/icons";
+import { arrowBackOutline, calendar } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import { Payload } from "../../redux/commons/types";
+import { Payload, ReplyTo } from "../../redux/commons/types";
 import { Profile } from "../../redux/profile/types";
 import { RootState } from "../../redux/types";
 import { ChatList, Me, Others } from "../Chat";
@@ -47,6 +42,7 @@ const Search: React.FC<Props> = ({
         payload: Payload;
         timestamp: Date;
         readList: any;
+        replyTo?: ReplyTo;
       }[]
     | null
   >(null);
@@ -116,6 +112,7 @@ const Search: React.FC<Props> = ({
                         timestamp={msg.timestamp}
                         payload={msg.payload}
                         readList={msg.readList}
+                        replyTo={msg.replyTo}
                         type="group"
                         showName={true}
                         showProfilePicture={true}
@@ -130,6 +127,7 @@ const Search: React.FC<Props> = ({
                       timestamp={msg.timestamp}
                       payload={msg.payload}
                       readList={msg.readList}
+                      replyTo={msg.replyTo}
                       type="group"
                       showName={true}
                       showProfilePicture={true}

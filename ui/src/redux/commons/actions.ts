@@ -109,7 +109,7 @@ export const getLatestData =
       latestData.latestP2pMessages,
       contactsState
     );
-    console.log(toDispatch);
+
     dispatch(setMessages(toDispatch));
 
     return null;
