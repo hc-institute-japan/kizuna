@@ -93,10 +93,11 @@ const sendGroupMessage =
         };
         payload = filePayload;
       }
-      const message =
-        getState().groups.messages[
-          serializeHash(sendGroupMessageOutput.content.replyTo)
-        ];
+      const message = sendGroupMessageOutput.content.replyTo
+        ? getState().groups.messages[
+            serializeHash(sendGroupMessageOutput.content.replyTo)
+          ]
+        : null;
 
       /* the final GroupMessage data type converted from the returned value of the Zome fn above */
       const groupMessageDataConverted: GroupMessage = {
@@ -105,14 +106,20 @@ const sendGroupMessage =
         author: serializeHash(sendGroupMessageOutput.content.sender),
         payload,
         timestamp: timestampToDate(sendGroupMessageOutput.content.created),
-        replyTo: {
-          groupId: message.groupId,
-          author: message.author,
-          payload: message.payload,
-          timestamp: message.timestamp,
-          replyTo: undefined,
-          readList: {},
-        },
+        replyTo: message
+          ? {
+              groupId: message.groupId,
+              author: message.author,
+              payload: message.payload,
+              timestamp: message.timestamp,
+              /*
+                TODO: currently undefined but we will have to modify this once jumping
+                to replied message will be possible.
+              */
+              replyTo: undefined,
+              readList: {},
+            }
+          : undefined,
         readList: {},
       };
 

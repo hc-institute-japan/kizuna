@@ -4,13 +4,13 @@ use element::ElementEntry;
 use std::collections::HashMap;
 use timestamp::Timestamp;
 
-use crate::utils::error;
-use crate::utils::timestamp_to_days;
+use crate::utils::{error, timestamp_to_days, try_get_and_convert};
 
 use super::GroupMessageData;
 use super::{
     GroupChatFilter, GroupMessage, GroupMessageContent, GroupMessageElement, GroupMessageHash,
-    GroupMessagesContents, GroupMessagesOutput, MessagesByGroup, PayloadType, ReadList,
+    GroupMessageWithId, GroupMessagesContents, GroupMessagesOutput, MessagesByGroup, PayloadType,
+    ReadList,
 };
 
 pub fn get_messages_by_group_by_timestamp_handler(
@@ -42,12 +42,11 @@ pub fn get_messages_by_group_by_timestamp_handler(
 
             for i in 0..links.len() {
                 let message_link = links[i].clone();
+                let message_hash = message_link.target;
 
-                if let Some(element) = get(message_link.clone().target, GetOptions::content())? {
-                    let read_links = get_links(
-                        message_link.clone().target,
-                        Some(LinkTag::new("read".to_owned())),
-                    )?;
+                if let Some(element) = get(message_hash.clone(), GetOptions::content())? {
+                    let read_links =
+                        get_links(message_hash.clone(), Some(LinkTag::new("read".to_owned())))?;
                     let mut read_list: HashMap<String, Timestamp> = HashMap::new();
 
                     for j in 0..read_links.clone().into_inner().len() {
@@ -65,28 +64,23 @@ pub fn get_messages_by_group_by_timestamp_handler(
                     match element.entry().to_owned().to_app_option::<GroupMessage>() {
                         Ok(option) => match option {
                             Some(group_message) => {
-                                let mut reply_to: Option<GroupMessage> = None;
-                                if let Some(reply_to_hash) = group_message.reply_to.clone() {
-                                    if let Some(reply_to_element) =
-                                        get(reply_to_hash, GetOptions::latest())?
-                                    {
-                                        if let Ok(Some(reply_to_group_message)) = reply_to_element
-                                            .entry()
-                                            .to_owned()
-                                            .to_app_option::<GroupMessage>()
-                                        {
-                                            reply_to = Some(reply_to_group_message);
-                                        }
-                                    }
-                                }
-
-                                let group_message_data = GroupMessageData {
+                                let mut group_message_data = GroupMessageData {
+                                    message_id: message_hash.clone(),
                                     group_hash: group_message.group_hash.clone(),
                                     sender: group_message.sender.clone(),
                                     payload: group_message.payload.clone(),
                                     created: group_message.created.clone(),
-                                    reply_to,
+                                    reply_to: None,
                                 };
+
+                                if let Some(reply_to_hash) = group_message.reply_to.clone() {
+                                    let replied_message: GroupMessage =
+                                        try_get_and_convert(reply_to_hash.clone())?;
+                                    group_message_data.reply_to = Some(GroupMessageWithId {
+                                        id: reply_to_hash,
+                                        content: replied_message,
+                                    });
+                                }
 
                                 let group_message_element: GroupMessageElement =
                                     GroupMessageElement {
@@ -95,14 +89,14 @@ pub fn get_messages_by_group_by_timestamp_handler(
                                     };
 
                                 group_messages_content.insert(
-                                    message_link.clone().target.to_string(),
+                                    message_hash.clone().to_string(),
                                     GroupMessageContent {
                                         group_message_element,
                                         read_list: ReadList(read_list),
                                     },
                                 );
 
-                                messages_hashes.push(GroupMessageHash(message_link.clone().target));
+                                messages_hashes.push(GroupMessageHash(message_hash.clone()));
                             }
 
                             None => {}
