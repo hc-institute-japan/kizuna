@@ -2,7 +2,6 @@ import { IonDatetime } from "@ionic/react";
 import React, {
   forwardRef,
   ForwardRefRenderFunction,
-  useEffect,
   useImperativeHandle,
   useRef,
   useState,
