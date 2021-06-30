@@ -60,7 +60,13 @@ const Chat: React.FC = () => {
   const fetchedFiles = useSelector(
     (state: RootState) => state.p2pmessages.files
   );
-  const typing = useSelector((state: RootState) => state.p2pmessages.typing);
+  const typing = useSelector((state: RootState) => {
+    const allTypingProfiles = state.p2pmessages.typing;
+    const typingProfile = Object.values(allTypingProfiles).filter(
+      (profile) => profile.id === id
+    );
+    return typingProfile;
+  });
   const conversant = useSelector((state: RootState) => {
     const contacts = state.contacts.contacts;
     const conversant = Object.values(contacts).filter(
@@ -228,6 +234,7 @@ const Chat: React.FC = () => {
     } else {
       didMountRef.current = true;
     }
+    // complete();
     return;
   };
 
