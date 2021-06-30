@@ -35,6 +35,12 @@ export interface FilePayload {
   thumbnail?: Uint8Array;
 }
 
+export interface ReplyTo {
+  author: Profile;
+  id: string;
+  payload: Payload;
+}
+
 export type FileType =
   | { type: "IMAGE"; payload: { thumbnail: Uint8Array } }
   | { type: "VIDEO"; payload: { thumbnail: Uint8Array } }

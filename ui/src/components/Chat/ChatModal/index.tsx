@@ -1,8 +1,5 @@
-import { IonContent, IonItem, IonList, IonModal, IonLabel } from "@ionic/react";
+import { IonContent, IonItem, IonLabel, IonList, IonModal } from "@ionic/react";
 import React, { SetStateAction } from "react";
-import { Message } from "../../../redux/commons/types";
-import { GroupMessage } from "../../../redux/group/types";
-import { P2PMessage } from "../../../redux/p2pmessages/types";
 import styles from "./style.module.css";
 
 interface Props {

@@ -43,6 +43,9 @@ const MessageList: React.FC<Props> = ({
   const [oldestFetched, setOldestFetched] = useState<boolean>(false);
 
   const groups = useSelector((state: RootState) => state.groups);
+  const membersProfile = useSelector(
+    (state: RootState) => state.groups.members
+  );
   const profile = useSelector((state: RootState) => state.profile);
 
   /* Handlers */
@@ -118,9 +121,9 @@ const MessageList: React.FC<Props> = ({
       Retrieve the messgaes from redux store and modify
       the author field to Profile type.
     */
-    let messages: GroupMessageBundle[] = messageIds.map((messageId) => {
+    const messages: GroupMessageBundle[] = messageIds.map((messageId) => {
       /* retrieve the message content from redux */
-      let message: GroupMessage = groups.messages[messageId];
+      const message: GroupMessage = groups.messages[messageId];
       const authorProfile: Profile = groups.members[message.author];
 
       return {
@@ -161,6 +164,19 @@ const MessageList: React.FC<Props> = ({
                 timestamp={message.timestamp}
                 payload={message.payload}
                 readList={message.readList}
+                replyTo={
+                  message.replyTo
+                    ? {
+                        payload: message.replyTo!.payload,
+                        author: {
+                          id: membersProfile[message.replyTo!.author].id,
+                          username:
+                            membersProfile[message.replyTo!.author].username,
+                        },
+                        id: `${i}`,
+                      }
+                    : undefined
+                }
                 type="group"
                 showName={true}
                 showProfilePicture={true}
@@ -177,6 +193,19 @@ const MessageList: React.FC<Props> = ({
               payload={message.payload}
               readList={message.readList}
               type="group"
+              replyTo={
+                message.replyTo
+                  ? {
+                      payload: message.replyTo!.payload,
+                      author: {
+                        id: membersProfile[message.replyTo!.author].id,
+                        username:
+                          membersProfile[message.replyTo!.author].username,
+                      },
+                      id: `${i}`,
+                    }
+                  : undefined
+              }
               showName={true}
               onSeen={(complete) => handleOnSeen(complete, message)}
               onReply={(message) => onReply(message)}

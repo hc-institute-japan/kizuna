@@ -18,7 +18,7 @@ const searchProfiles =
       filter the contacts that are already added
       and remove yourself from the searched result
       */
-      console.log(res);
+
       const filteredMappedProfiles: Profile[] = res
         .filter(
           (res: AgentProfile) =>

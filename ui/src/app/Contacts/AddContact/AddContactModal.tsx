@@ -27,7 +27,6 @@ const AddContactModal: React.FC<Props> = ({ isOpen, onCancel }) => {
   const dispatch = useAppDispatch();
 
   const handleOnChange = (searchKey: string) => {
-    console.log("searching...");
     if (searchKey.length >= 3) {
       dispatch(searchProfiles(searchKey)).then((res: Profile[]) => {
         if (res) setUsers(res);
@@ -64,9 +63,7 @@ const AddContactModal: React.FC<Props> = ({ isOpen, onCancel }) => {
       type: SET_CONTACTS,
       contacts: { ...contacts },
     });
-    setUsers((users) =>
-      users.filter((user) => user.username !== contact.username)
-    );
+    setUsers((users) => users.filter((user) => user.id !== contact.id));
   };
 
   return (

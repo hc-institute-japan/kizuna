@@ -10,6 +10,7 @@ import { usePressHandlers } from "../../../utils/helpers";
 import ChatModal from "../ChatModal";
 import File from "../File";
 import MessageTimestamp from "../MessageTimestamp";
+import ReplyTo from "../ReplyTo";
 import { default as common, default as styles } from "../style.module.css";
 import Text from "../Text";
 import { ChatProps } from "../types";
@@ -25,6 +26,7 @@ const Others: React.FC<ChatProps> = ({
   showProfilePicture,
   showName,
   onReply,
+  replyTo,
   isSeen = false,
   onDownload,
 }) => {
@@ -66,6 +68,7 @@ const Others: React.FC<ChatProps> = ({
             common.bubble
           }`}
         >
+          {replyTo ? <ReplyTo message={replyTo}></ReplyTo> : null}
           {isText ? (
             <Text message={payload as TextPayload} />
           ) : (

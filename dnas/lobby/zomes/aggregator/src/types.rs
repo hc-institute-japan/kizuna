@@ -79,8 +79,27 @@ pub struct GroupMessage {
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
+pub struct GroupMessageWithId {
+    // entry_hash of GroupMessage
+    pub id: EntryHash,
+    pub content: GroupMessage,
+}
+
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct GroupMessageData {
+    // EntryHash of first ver of Group
+    group_hash: EntryHash,
+    payload: Payload,
+    created: Timestamp,
+    sender: AgentPubKey,
+    reply_to: Option<GroupMessageWithId>,
+}
+
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct GroupMessageElement {
-    pub entry: GroupMessage,
+    pub entry: GroupMessageData,
     pub signed_header: SignedHeaderHashed,
 }
 
@@ -105,9 +124,10 @@ pub struct GroupMessagesOutput {
 }
 
 // for p2p chat
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, SerializedBytes, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct P2PMessage {
+pub struct P2PMessageReplyTo {
+    hash: EntryHash,
     author: AgentPubKey,
     receiver: AgentPubKey,
     payload: Payload,
@@ -115,9 +135,19 @@ pub struct P2PMessage {
     reply_to: Option<EntryHash>,
 }
 
+#[derive(Serialize, Deserialize, Clone, SerializedBytes, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct P2PMessageData {
+    author: AgentPubKey,
+    receiver: AgentPubKey,
+    payload: Payload,
+    time_sent: Timestamp,
+    reply_to: Option<P2PMessageReplyTo>,
+}
+
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 pub struct P2PMessageReceipt {
-    id: EntryHash,
+    id: Vec<EntryHash>,
     status: Status,
 }
 
@@ -133,7 +163,7 @@ pub enum Status {
 pub struct AgentMessages(HashMap<String, Vec<String>>);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Debug)]
-pub struct MessageBundle(P2PMessage, Vec<String>);
+pub struct MessageBundle(P2PMessageData, Vec<String>);
 #[derive(Serialize, Deserialize, SerializedBytes, Debug)]
 pub struct MessageContents(HashMap<String, MessageBundle>);
 
@@ -178,9 +208,9 @@ pub struct AggregatedLatestData {
     pub latest_group_messages: GroupMessagesOutput,
     pub member_profiles: Vec<AgentProfileCamel>,
     // for p2pmessage
-    // pub latest_p2p_messages: P2PMessageHashTables,
+    pub latest_p2p_messages: P2PMessageHashTables,
     // for preference
-    // pub global_preference: Preference,
-    // pub per_agent_preference: PerAgentPreference,
-    // pub per_group_preference: PerGroupPreference,
+    pub global_preference: Preference,
+    pub per_agent_preference: PerAgentPreference,
+    pub per_group_preference: PerGroupPreference,
 }

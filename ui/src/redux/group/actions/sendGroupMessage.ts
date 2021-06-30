@@ -1,27 +1,27 @@
 import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
-import { ThunkAction } from "../../types";
+import { timestampToDate } from "../../../utils/helpers";
 import {
-  // action types
-  SET_GROUP_MESSAGE,
-  // IO
-  GroupMessageInput,
-  GroupMessage,
-  // action payload types
-  SetGroupMessageAction,
-} from "../types";
-import {
-  Payload,
   FilePayload,
   FileType,
+  isImage,
+  isOther,
   // type guards
   isTextPayload,
-  isOther,
-  isImage,
+  Payload,
 } from "../../commons/types";
-import { setFilesBytes } from "../actions";
-import { timestampToDate } from "../../../utils/helpers";
 import { pushError } from "../../error/actions";
+import { ThunkAction } from "../../types";
+import { setFilesBytes } from "../actions";
+import {
+  GroupMessage,
+  // IO
+  GroupMessageInput,
+  // action payload types
+  SetGroupMessageAction,
+  // action types
+  SET_GROUP_MESSAGE,
+} from "../types";
 
 const sendGroupMessage =
   (groupMessageData: GroupMessageInput): ThunkAction =>
@@ -36,8 +36,10 @@ const sendGroupMessage =
     const input = {
       groupHash: deserializeHash(groupMessageData.groupId),
       payloadInput: groupMessageData.payloadInput,
-      sender: groupMessageData.sender,
-      replyTo: groupMessageData.replyTo,
+      sender: deserializeHash(groupMessageData.sender),
+      replyTo: groupMessageData.replyTo
+        ? deserializeHash(groupMessageData.replyTo)
+        : undefined,
     };
 
     try {
@@ -91,6 +93,11 @@ const sendGroupMessage =
         };
         payload = filePayload;
       }
+      const message = sendGroupMessageOutput.content.replyTo
+        ? getState().groups.messages[
+            serializeHash(sendGroupMessageOutput.content.replyTo)
+          ]
+        : null;
 
       /* the final GroupMessage data type converted from the returned value of the Zome fn above */
       const groupMessageDataConverted: GroupMessage = {
@@ -99,9 +106,20 @@ const sendGroupMessage =
         author: serializeHash(sendGroupMessageOutput.content.sender),
         payload,
         timestamp: timestampToDate(sendGroupMessageOutput.content.created),
-        replyTo: !sendGroupMessageOutput.content.replyTo
-          ? undefined
-          : serializeHash(sendGroupMessageOutput.content.replyTo),
+        replyTo: message
+          ? {
+              groupId: message.groupId,
+              author: message.author,
+              payload: message.payload,
+              timestamp: message.timestamp,
+              /*
+                TODO: currently undefined but we will have to modify this once jumping
+                to replied message will be possible.
+              */
+              replyTo: undefined,
+              readList: {},
+            }
+          : undefined,
         readList: {},
       };
 

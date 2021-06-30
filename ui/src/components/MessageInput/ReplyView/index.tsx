@@ -40,7 +40,7 @@ const ReplyView: React.FC<Props> = ({ messageState }) => {
                 <IonThumbnail className={styles.thumbnail}>
                   <img
                     src={
-                      message.payload.fileType === "VIDEO"
+                      message.payload?.fileType === "VIDEO"
                         ? URL.createObjectURL(
                             new Blob([message.payload.thumbnail as Uint8Array])
                           )

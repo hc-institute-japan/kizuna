@@ -20,8 +20,7 @@ const fetchBlocked =
           fnName: FUNCTIONS[ZOMES.PROFILES].GET_AGENTS_PROFILES,
           payload: ids,
         });
-        console.log(ids);
-        console.log(profilesOutput);
+
         profilesOutput.forEach((agentProfile: AgentProfile) => {
           const id = agentProfile.agent_pub_key;
           blocked[id] = {

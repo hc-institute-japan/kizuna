@@ -11,6 +11,7 @@ import request from "./zomes/request";
 import contacts from "./zomes/contacts";
 import preference from "./zomes/preference";
 import group from "./zomes/group";
+import aggregator from "./zomes/aggregator";
 
 // QUIC
 const network = {
@@ -37,4 +38,5 @@ const installables: Installables = {
 group(config, installables);
 // contacts(config, installables);
 // preference(config, installables);
+// aggregator(config, installables);
 // request(config); // not passing

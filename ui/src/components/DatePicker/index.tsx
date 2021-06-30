@@ -57,7 +57,13 @@ const DatePicker: ForwardRefRenderFunction<DatePickerMethods, Props> = (
       day = rawMonth.substring(1);
     }
 
-    return new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+    const newDate = new Date(
+      parseInt(year),
+      parseInt(month) - 1,
+      parseInt(day)
+    );
+    newDate.setHours(12, 0, 0);
+    return newDate;
   };
 
   return (
@@ -65,7 +71,7 @@ const DatePicker: ForwardRefRenderFunction<DatePickerMethods, Props> = (
       ref={dateRef}
       value={dateToString(date)}
       style={{ display: isVisible ? "block" : "none" }}
-      max={dateToString(new Date(new Date().setDate(new Date().getDate() + 1)))}
+      max={dateToString(new Date(new Date().setDate(new Date().getDate())))}
       onIonChange={(event) => {
         if (event.detail.value) {
           const newDate = stringToDate(event.detail.value);

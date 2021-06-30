@@ -1,11 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router";
 import Search from "../../../components/Search";
 import { Payload } from "../../../redux/commons/types";
 import { getMessagesByGroupByTimestamp } from "../../../redux/group/actions";
 import fetchMembers from "../../../redux/group/actions/fetchMembers";
-import { fetchUsernameOfMembers } from "../../../redux/group/actions/helpers";
 import { GroupMessagesOutput } from "../../../redux/group/types";
 import { Profile } from "../../../redux/profile/types";
 import { RootState } from "../../../redux/types";
@@ -31,7 +30,6 @@ const GroupSearch: React.FC = () => {
     <Search
       messages={messages}
       onDateSelect={(date) => {
-        console.log(date);
         dispatch(
           getMessagesByGroupByTimestamp({
             groupId: group,
@@ -50,6 +48,7 @@ const GroupSearch: React.FC = () => {
               timestamp: content.timestamp,
               payload: content.payload,
               readList: content.readList,
+              replyTo: content.replyTo,
             };
           });
           dispatch(

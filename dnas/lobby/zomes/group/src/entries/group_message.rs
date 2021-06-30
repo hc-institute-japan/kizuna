@@ -117,7 +117,7 @@ automatically when it reaches the frontend.
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct GroupMessageElement {
-    pub entry: GroupMessage,
+    pub entry: GroupMessageData,
     pub signed_header: SignedHeaderHashed,
 }
 
@@ -130,6 +130,17 @@ pub struct ReadList(pub HashMap<String, Timestamp>);
 pub struct GroupMessageContent {
     pub group_message_element: GroupMessageElement,
     pub read_list: ReadList,
+}
+
+#[derive(Serialize, Deserialize, SerializedBytes, Debug, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct GroupMessageData {
+    pub message_id: EntryHash,
+    pub group_hash: EntryHash,
+    pub payload: Payload,
+    pub created: Timestamp,
+    pub sender: AgentPubKey,
+    pub reply_to: Option<GroupMessageWithId>,
 }
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Hash, PartialEq, Eq, Debug)]
