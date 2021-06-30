@@ -297,7 +297,6 @@ export const sendMessage =
 
         let transformedReplyTo = undefined;
         if (message.replyTo !== null) {
-          console.log(message.replyTo);
           transformedReplyTo = {
             p2pMessageEntryHash: serializeHash(message.replyTo.hash),
             author: contacts[serializeHash(message.replyTo.author)],
@@ -345,7 +344,6 @@ export const sendMessage =
         return true;
       }
     } catch (e) {
-      console.log(e);
       dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
     }
   };
@@ -367,7 +365,6 @@ export const getLatestMessages =
         payload: batchSize,
       });
 
-      console.log("actions zome return", p2pLatestState);
       // DISPATCH TO REDUCER
       if (p2pLatestState?.type !== "error") {
         let contacts = getState().contacts.contacts;
@@ -376,11 +373,10 @@ export const getLatestMessages =
           contacts[profile.id] = { id: profile.id, username: profile.username };
         let toDispatch = transformZomeDataToUIData(p2pLatestState, contacts);
         dispatch(setMessages(toDispatch));
-        console.log("actions", toDispatch);
+
         return toDispatch;
       }
     } catch (e) {
-      console.log("latest actions", e);
       dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
     }
   };

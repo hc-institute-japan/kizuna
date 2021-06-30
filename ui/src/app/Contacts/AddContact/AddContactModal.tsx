@@ -27,7 +27,6 @@ const AddContactModal: React.FC<Props> = ({ isOpen, onCancel }) => {
   const dispatch = useAppDispatch();
 
   const handleOnChange = (searchKey: string) => {
-    console.log("searching...");
     if (searchKey.length >= 3) {
       dispatch(searchProfiles(searchKey)).then((res: Profile[]) => {
         if (res) setUsers(res);

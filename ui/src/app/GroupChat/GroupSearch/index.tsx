@@ -48,6 +48,7 @@ const GroupSearch: React.FC = () => {
               timestamp: content.timestamp,
               payload: content.payload,
               readList: content.readList,
+              replyTo: content.replyTo,
             };
           });
           dispatch(
