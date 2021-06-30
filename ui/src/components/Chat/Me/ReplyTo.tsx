@@ -38,6 +38,7 @@ const ReplyTo: React.FC<Props> = ({ message }) => {
       ) : (
         <IonThumbnail className={styles.thumbnail}>
           <img
+            alt="replied message"
             src={
               (message?.payload as FilePayload)?.fileType === "VIDEO"
                 ? URL.createObjectURL(
