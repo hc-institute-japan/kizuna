@@ -135,11 +135,12 @@ pub struct GroupMessageContent {
 #[derive(Serialize, Deserialize, SerializedBytes, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct GroupMessageData {
+    pub message_id: EntryHash,
     pub group_hash: EntryHash,
     pub payload: Payload,
     pub created: Timestamp,
     pub sender: AgentPubKey,
-    pub reply_to: Option<GroupMessage>,
+    pub reply_to: Option<GroupMessageWithId>,
 }
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Hash, PartialEq, Eq, Debug)]
@@ -169,6 +170,6 @@ pub struct FileBytes(pub HashMap<String, SerializedBytes>);
 pub struct GroupMessageWithId {
     // entry_hash of GroupMessage
     pub id: EntryHash,
-    pub content: GroupMessageData,
+    pub content: GroupMessage,
 }
 /* END OF OUTPUTS TYPES DEFINITION */

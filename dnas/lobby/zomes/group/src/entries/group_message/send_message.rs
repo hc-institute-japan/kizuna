@@ -69,24 +69,29 @@ pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<Gr
     let message_hash = hash_entry(&message)?;
 
     let mut group_message_data: GroupMessageData = GroupMessageData {
-        group_hash: message.group_hash,
-        payload: message.payload,
-        created: message.created,
-        sender: message.sender,
+        message_id: message_hash.clone(),
+        group_hash: message.group_hash.clone(),
+        payload: message.payload.clone(),
+        created: message.created.clone(),
+        sender: message.sender.clone(),
         reply_to: None,
     };
     if let Some(hash) = message_input.reply_to.clone() {
-        group_message_data.reply_to = Some(try_get_and_convert(hash)?);
+        let replied_message: GroupMessage = try_get_and_convert(hash.clone())?;
+        group_message_data.reply_to = Some(GroupMessageWithId {
+            id: hash,
+            content: replied_message,
+        });
     }
 
     let group_message_with_id = GroupMessageWithId {
         id: message_hash,
-        content: group_message_data,
+        content: message,
     };
 
     let signal = SignalDetails {
         name: SignalName::GROUP_MESSAGE_DATA.to_owned(),
-        payload: SignalPayload::GroupMessageData(group_message_with_id.clone()),
+        payload: SignalPayload::GroupMessageData(group_message_data.clone()),
     };
 
     remote_signal(

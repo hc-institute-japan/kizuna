@@ -72,28 +72,32 @@ pub fn send_message_in_target_date_handler(
                     match get_group_latest_version(message.clone().group_hash) {
                         Ok(group) => {
                             let message_hash = hash_entry(&message.clone())?;
-                            let mut replied_message: Option<GroupMessage> = None;
-                            if let Some(hash) = message_input.reply_to.clone() {
-                                replied_message = Some(try_get_and_convert(hash)?);
-                            }
-
-                            let group_message_data: GroupMessageData = GroupMessageData {
-                                group_hash: message.group_hash,
-                                payload: message.payload,
-                                created: message.created,
-                                sender: message.sender,
-                                reply_to: replied_message,
+                            let mut group_message_data: GroupMessageData = GroupMessageData {
+                                message_id: message_hash.clone(),
+                                group_hash: message.group_hash.clone(),
+                                payload: message.payload.clone(),
+                                created: message.created.clone(),
+                                sender: message.sender.clone(),
+                                reply_to: None,
                             };
+                            if let Some(hash) = message_input.reply_to.clone() {
+                                let replied_message: GroupMessage =
+                                    try_get_and_convert(hash.clone())?;
+                                group_message_data.reply_to = Some(GroupMessageWithId {
+                                    id: hash,
+                                    content: replied_message,
+                                });
+                            }
 
                             let group_message_with_id = GroupMessageWithId {
                                 id: message_hash,
-                                content: group_message_data,
+                                content: message,
                             };
 
                             let signal = SignalDetails {
                                 name: SignalName::GROUP_MESSAGE_DATA.to_owned(),
                                 payload: SignalPayload::GroupMessageData(
-                                    group_message_with_id.clone(),
+                                    group_message_data.clone(),
                                 ),
                             };
 
