@@ -87,7 +87,13 @@ const Controls: React.FC<Props> = ({
       </div>
       <div className={styles["range-slider-expand"]}>
         <div className={styles["range-slider"]}>
-          <input type="range" value={duration * 100} min={0} max={100} />
+          <input
+            type="range"
+            onChange={() => {}}
+            value={duration * 100}
+            min={0}
+            max={100}
+          />
         </div>
         <div className={styles.expand}>
           <IonIcon onClick={handleOnDoubleClick} icon={expandOutline} />
