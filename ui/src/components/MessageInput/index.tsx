@@ -13,6 +13,7 @@ import React, {
   useCallback,
   useEffect,
   useImperativeHandle,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -248,10 +249,16 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
       }
     );
 
+  const renderFileView = useMemo(
+    () =>
+      files.length > 0 ? <FileView files={files} setFiles={setFiles} /> : null,
+    [files]
+  );
+
   return (
     <IonFooter>
       {isReply ? <ReplyView messageState={[isReply, setIsReply]} /> : null}
-      {files.length > 0 ? <FileView files={files} setFiles={setFiles} /> : null}
+      {renderFileView}
       <IonToolbar className={styles.toolbar}>
         <IonButtons slot="start">
           {files.length > 0 ? null : (
