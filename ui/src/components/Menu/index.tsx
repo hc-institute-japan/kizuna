@@ -13,6 +13,7 @@ import { useIntl } from "react-intl";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { setProfile } from "../../redux/profile/actions";
+import { Profile } from "../../redux/profile/types";
 import { RootState } from "../../redux/types";
 import Identicon from "../Identicon";
 import styles from "./style.module.css";
@@ -55,6 +56,14 @@ const Menu: React.FC = () => {
     },
   ];
 
+  const handleOnClick = () => {
+    menu?.current?.close();
+    history.push({
+      pathname: `/p/${username}`,
+      state: { profile: { username, id } as Profile },
+    });
+  };
+
   return (
     <IonMenu ref={menu} contentId="main" type="overlay">
       <IonContent className={`${styles.menu} ion-padding-top`}>
@@ -70,7 +79,7 @@ const Menu: React.FC = () => {
               </IonAvatar> */}
               <Identicon hash={id!} size={50} />
             </span>
-            <IonItem lines="none">
+            <IonItem onClick={handleOnClick} lines="none">
               <IonLabel>{username}</IonLabel>
             </IonItem>
           </IonItemGroup>

@@ -43,6 +43,9 @@ const MessageList: React.FC<Props> = ({
   const [oldestFetched, setOldestFetched] = useState<boolean>(false);
 
   const groups = useSelector((state: RootState) => state.groups);
+  const membersProfile = useSelector(
+    (state: RootState) => state.groups.members
+  );
   const profile = useSelector((state: RootState) => state.profile);
 
   /* Handlers */
@@ -166,8 +169,9 @@ const MessageList: React.FC<Props> = ({
                     ? {
                         payload: message.replyTo!.payload,
                         author: {
-                          id: message.replyTo!.author,
-                          username: message.replyTo!.author,
+                          id: membersProfile[message.replyTo!.author].id,
+                          username:
+                            membersProfile[message.replyTo!.author].username,
                         },
                         id: `${i}`,
                       }
@@ -194,8 +198,9 @@ const MessageList: React.FC<Props> = ({
                   ? {
                       payload: message.replyTo!.payload,
                       author: {
-                        id: message.replyTo!.author,
-                        username: message.replyTo!.author,
+                        id: membersProfile[message.replyTo!.author].id,
+                        username:
+                          membersProfile[message.replyTo!.author].username,
                       },
                       id: `${i}`,
                     }
