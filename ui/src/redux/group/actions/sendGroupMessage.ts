@@ -112,6 +112,10 @@ const sendGroupMessage =
               author: message.author,
               payload: message.payload,
               timestamp: message.timestamp,
+              /*
+                TODO: currently undefined but we will have to modify this once jumping
+                to replied message will be possible.
+              */
               replyTo: undefined,
               readList: {},
             }

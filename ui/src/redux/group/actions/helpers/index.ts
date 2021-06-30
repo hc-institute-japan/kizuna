@@ -70,16 +70,16 @@ export const convertFetchedResToGroupMessagesOutput = (
         replyTo: msg_content.groupMessageElement.entry.replyTo
           ? {
               groupId: serializeHash(
-                msg_content.groupMessageElement.entry.replyTo.groupHash
+                msg_content.groupMessageElement.entry.replyTo.content.groupHash
               ),
               author: serializeHash(
-                msg_content.groupMessageElement.entry.replyTo.sender
+                msg_content.groupMessageElement.entry.replyTo.content.sender
               ),
               payload: convertPayload(
-                msg_content.groupMessageElement.entry.replyTo.payload
+                msg_content.groupMessageElement.entry.replyTo.content.payload
               ),
               timestamp: timestampToDate(
-                msg_content.groupMessageElement.entry.created
+                msg_content.groupMessageElement.entry.replyTo.content.created
               ),
 
               replyTo: msg_content.groupMessageElement.entry.replyTo
