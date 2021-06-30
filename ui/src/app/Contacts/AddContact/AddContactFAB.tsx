@@ -7,8 +7,8 @@ interface Props {
 }
 
 const AddContactFAB: React.FC<Props> = ({ onClick }) => (
-  <IonFab onClick={onClick} vertical="bottom" horizontal="end" slot="fixed">
-    <IonFabButton>
+  <IonFab vertical="bottom" horizontal="end" slot="fixed">
+    <IonFabButton onClick={onClick}>
       <IonIcon icon={add} />
     </IonFabButton>
   </IonFab>
