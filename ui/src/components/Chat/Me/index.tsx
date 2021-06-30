@@ -14,7 +14,8 @@ import {
 import { usePressHandlers } from "../../../utils/helpers";
 import ChatModal from "../ChatModal";
 import File from "../File";
-import ReplyTo from "./ReplyTo";
+import ReplyTo from "../ReplyTo";
+
 import { default as common, default as styles } from "../style.module.css";
 import Text from "../Text";
 import { ChatProps } from "../types";
@@ -41,7 +42,6 @@ const Me: React.FC<ChatProps> = ({
 
   return (
     <>
-      {replyTo ? <ReplyTo message={replyTo}></ReplyTo> : null}
       <IonItem
         lines="none"
         className={`${common["me-container"]}`}
@@ -52,6 +52,7 @@ const Me: React.FC<ChatProps> = ({
             common.bubble
           }`}
         >
+          {replyTo ? <ReplyTo message={replyTo}></ReplyTo> : null}
           {isText ? (
             <Text message={payload as TextPayload} />
           ) : (

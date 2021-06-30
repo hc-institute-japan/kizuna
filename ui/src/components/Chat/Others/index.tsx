@@ -10,10 +10,10 @@ import { usePressHandlers } from "../../../utils/helpers";
 import ChatModal from "../ChatModal";
 import File from "../File";
 import MessageTimestamp from "../MessageTimestamp";
+import ReplyTo from "../ReplyTo";
 import { default as common, default as styles } from "../style.module.css";
 import Text from "../Text";
 import { ChatProps } from "../types";
-import ReplyTo from "./ReplyTo";
 
 const Others: React.FC<ChatProps> = ({
   id,
@@ -40,8 +40,6 @@ const Others: React.FC<ChatProps> = ({
 
   return (
     <>
-      {replyTo ? <ReplyTo message={replyTo}></ReplyTo> : null}
-
       {isP2P ? null : showName ? (
         <IonItem lines="none" className={`${common["author-name"]}`}>
           <IonText color="medium">{author}</IonText>
@@ -70,6 +68,7 @@ const Others: React.FC<ChatProps> = ({
             common.bubble
           }`}
         >
+          {replyTo ? <ReplyTo message={replyTo}></ReplyTo> : null}
           {isText ? (
             <Text message={payload as TextPayload} />
           ) : (

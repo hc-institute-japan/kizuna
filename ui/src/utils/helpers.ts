@@ -132,7 +132,7 @@ export const dateToTimestamp = (date: Date) => {
   return ret;
 };
 
-export const isTextPayload = (payload: Payload) => payload?.type === "TEXT";
+export const isTextPayload = (payload: Payload) => payload.type === "TEXT";
 
 export const usePressHandlers = (
   onLongPress: (event: MouseEvent) => any,
