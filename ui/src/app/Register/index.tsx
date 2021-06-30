@@ -20,7 +20,6 @@ import styles from "./style.module.css";
 
 const Register: React.FC = () => {
   const [nickname, setNickname] = useState<string>("");
-  const [isValid, setIsValid] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const dispatch = useAppDispatch();
@@ -31,7 +30,7 @@ const Register: React.FC = () => {
   const handleOnChange = (e: CustomEvent) => {
     setNickname(e.detail.value!);
     setError(
-      isUsernameFormatValid(e.detail.value!)
+      isUsernameFormatValid(e.detail.value!) && nickname.length >= 3
         ? null
         : intl.formatMessage({
             id: "app.register.error-invalid-username",
@@ -39,20 +38,10 @@ const Register: React.FC = () => {
     );
   };
 
-  useEffect(() => {
-    if (error) {
-      setIsValid(false);
-    } else {
-      if (nickname.length >= 3) setIsValid(true);
-    }
-  }, [error, nickname.length]);
-
   const handleOnSubmit = () => {
     setLoading(true);
     dispatch(createProfile(nickname)).then((res: any) => {
-      if (res) {
-        history.push("/");
-      } else {
+      if (!res) {
         setError(
           intl.formatMessage({
             id: "app.register.error-existing-username",
@@ -89,10 +78,10 @@ const Register: React.FC = () => {
                 })}
                 error={error}
                 debounce={600}
-              ></HomeInput>
+              />
             </div>
           </div>
-          <IonButton onClick={handleOnSubmit} disabled={!isValid}>
+          <IonButton onClick={handleOnSubmit} disabled={error ? true : false}>
             {intl.formatMessage({
               id: "app.register.register",
             })}
