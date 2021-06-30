@@ -202,8 +202,8 @@ const Conversations: React.FC = () => {
         {renderAllConversation(constructConversations(groupsState, p2pState))}
 
         <IonFab vertical="bottom" horizontal="end" slot="fixed">
-          <IonFabButton>
-            <IonIcon icon={pencil} onClick={handleOnCompose} />
+          <IonFabButton onClick={handleOnCompose}>
+            <IonIcon icon={pencil} />
           </IonFabButton>
         </IonFab>
       </IonContent>

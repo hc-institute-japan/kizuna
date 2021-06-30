@@ -60,7 +60,7 @@ const groupMessageData =
       /* assume no one read the message since it just arrived as signal to the recepient */
       readList: {},
     };
-    console.log(groupMessage);
+
     dispatch<SetGroupMessageAction>({
       type: SET_GROUP_MESSAGE,
       groupMessage,
