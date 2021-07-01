@@ -248,18 +248,12 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
     );
   };
 
-  const renderFileView = useMemo(
-    () =>
-      files.length > 0 ? <FileView files={files} setFiles={setFiles} /> : null,
-    [files]
-  );
-
   return (
     <>
       <IonFooter>
         {isReply ? <ReplyView messageState={[isReply, setIsReply]} /> : null}
         {files.length > 0 ? (
-          <FileView files={files} setFiles={setFiles} />
+          <FileView file={file.current} files={files} setFiles={setFiles} />
         ) : null}
         <IonToolbar className={styles.toolbar}>
           <IonButtons slot="start">
