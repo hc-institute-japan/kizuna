@@ -9,9 +9,8 @@ import {
   IonPage,
   IonToolbar,
 } from "@ionic/react";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useIntl } from "react-intl";
-import { useHistory } from "react-router";
 import HomeInput from "../../components/Input/HomeInput";
 import { createProfile } from "../../redux/profile/actions";
 import { useAppDispatch } from "../../utils/helpers";
@@ -23,14 +22,14 @@ const Register: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const dispatch = useAppDispatch();
-  const history = useHistory();
 
   const intl = useIntl();
 
   const handleOnChange = (e: CustomEvent) => {
     setNickname(e.detail.value!);
+
     setError(
-      isUsernameFormatValid(e.detail.value!) && nickname.length >= 3
+      isUsernameFormatValid(e.detail.value!) && e.detail!.value!.length >= 3
         ? null
         : intl.formatMessage({
             id: "app.register.error-invalid-username",
