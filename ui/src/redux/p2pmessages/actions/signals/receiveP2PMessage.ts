@@ -8,9 +8,19 @@ const receiveP2PMessage =
   async (dispatch, getState, { callZome }) => {
     let receivedMessage = payload.message;
 
+    let contacts = getState().contacts.contacts;
+    const profile = getState().profile;
+    if (profile.id !== null && profile.username !== null)
+      contacts[profile.id] = { id: profile.id, username: profile.username };
+
     const [messageTuple, receiptTuple] = receivedMessage;
     const [messageID, message] = messageTuple;
     const [receiptID, receipt] = receiptTuple!;
+
+    // sender not in contacts
+    if (!Object.keys(contacts).includes(serializeHash(message.author))) {
+      return;
+    }
 
     let messagePayload;
     switch (message.payload.type) {
@@ -33,8 +43,6 @@ const receiveP2PMessage =
       default:
         break;
     }
-
-    let contacts = getState().contacts.contacts;
 
     let transformedReplyTo = undefined;
     let replyToPayload = undefined;
