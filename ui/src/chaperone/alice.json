@@ -1,0 +1,11 @@
+{
+  "app_id": "test-app",
+  "log_level": true,
+  "connection": {
+    "secure": false,
+    "host": "localhost",
+    "port": 8888,
+    "path": "/"
+  },
+  "hcc_admin_port_for_agent_autodetection": 9000
+}

@@ -5,7 +5,10 @@
   "dependencies": {
     "@capacitor/core": "2.4.5",
     "@capacitor/ios": "^2.4.5",
+    "@holo-host/chaperone": "^7.1.2",
     "@holo-host/identicon": "git+https://github.com/holo-host/identicon.git#types",
+    "@holo-host/web-sdk": "^0.5.0",
+    "@holochain-open-dev/cell-client": "https://github.com/holochain-open-dev/cell-client#build",
     "@holochain-open-dev/core-types": "git+https://github.com/holochain-open-dev/core-types.git#build",
     "@holochain/conductor-api": "^0.0.4",
     "@ionic-native/core": "^5.31.1",
@@ -61,6 +64,7 @@
     "ui:david": "REACT_APP_DNA_INTERFACE_URL=ws://localhost:8800 ionic serve -p 8400",
     "ui:emma": "REACT_APP_DNA_INTERFACE_URL=ws://localhost:8811 ionic serve -p 8500",
     "build-happ": "cd ../dnas/lobby && CARGO_TARGET_DIR=target cargo build --release --target wasm32-unknown-unknown && hc dna pack workdir/dna && hc app pack workdir/happ && rm -rf ~/tmp && mkdir ~/tmp && hc s clean",
+    "demo-alice": "concurrently \"npm run hc:alice\" \"npm run ui:alice\"",
     "demo": "concurrently \"npm run hc:alice\" \"npm run hc:bob\" \"npm run hc:charlie\" \"npm run ui:alice\" \"npm run ui:bob\" \"npm run ui:charlie\"",
     "demo-2": "concurrently \"npm run hc:alice\" \"npm run hc:bob\"  \"npm run ui:alice\" \"npm run ui:bob\"",
     "demo-4": "concurrently \"npm run hc:alice\" \"npm run hc:bob\" \"npm run hc:charlie\" \"npm run hc:david\"  \"npm run ui:alice\" \"npm run ui:bob\" \"npm run ui:charlie\" \"npm run ui:david\"",
@@ -86,6 +90,7 @@
   },
   "devDependencies": {
     "@capacitor/cli": "2.4.5",
+    "@holo-host/comb": "^0.2.0",
     "@ionic/core": "^5.5.4",
     "@types/react": "^17.0.0",
     "@types/react-redux": "^7.1.15",
