@@ -55,7 +55,9 @@ const Search: React.FC<Props> = ({
 
   const profile = useSelector((state: RootState) => state.profile);
 
-  const handleSearchByDate = () => datePicker.current?.open();
+  const handleSearchByDate = () => {
+    datePicker.current?.open();
+  };
 
   const handleOnDownload = () => {};
 

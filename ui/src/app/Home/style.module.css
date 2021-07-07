@@ -1,3 +1,5 @@
 .home-tab-bar {
   --background: var(--ion-background-color);
+
+  --ion-color-primary: rgb(var(--ion-color-primary-rgb));
 }
