@@ -5,6 +5,15 @@
   flex-direction: column;
 }
 
+.title-container {
+  display: flex;
+}
+
+.title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .chat > ion-item {
   --background: var(--ion-background-color);
 }
