@@ -22,7 +22,7 @@ const Blocked = () => {
 
   const onClick = (profile: Profile) =>
     history.push({
-      pathname: `/p/${profile.username}`,
+      pathname: `/p/${profile.id}`,
       state: {
         prev: "/blocked",
       },

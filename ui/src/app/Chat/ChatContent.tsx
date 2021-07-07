@@ -5,6 +5,7 @@ import {
   IonContent,
   IonHeader,
   IonIcon,
+  IonItem,
   IonPage,
   IonTitle,
   IonToolbar,
@@ -282,6 +283,15 @@ const Chat: React.FC = () => {
     link.click();
   };
 
+  /*
+    handle the clicking of nickname
+  */
+  const handleOnProfileClick = () =>
+    history.push({
+      pathname: `/p/${id}`,
+      state: { profile: { username: state?.username, id } },
+    });
+
   /* 
     renders the appropriate chat bubble
   */
@@ -356,13 +366,15 @@ const Chat: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonButtons>
+          <IonButtons slot="start">
             <IonButton
               onClick={() => handleOnBack()}
               className="ion-no-padding"
             >
               <IonIcon slot="icon-only" icon={arrowBackSharp} />
             </IonButton>
+          </IonButtons>
+          <div className={styles["title-container"]}>
             <IonAvatar className="ion-padding">
               <img
                 className={styles["avatar"]}
@@ -370,9 +382,14 @@ const Chat: React.FC = () => {
                 alt={state?.username}
               />
             </IonAvatar>
-            <IonTitle className="item item-text-wrap">
+            <IonTitle
+              className={styles["title"]}
+              onClick={handleOnProfileClick}
+            >
               <AgentIdentifier nickname={state?.username} id={id} />
             </IonTitle>
+          </div>
+          <IonButtons slot="end">
             <IonButton
               onClick={() => history.push(`/u/${conversant.id}/search`)}
             >
