@@ -24,7 +24,7 @@ const DatePicker: ForwardRefRenderFunction<DatePickerMethods, Props> = (
   ref
 ) => {
   const [date, setDate] = useState<Date>(
-    new Date(new Date().setDate(new Date().getDate() + 2))
+    new Date(new Date().setDate(new Date().getDate() + 1))
   );
 
   const dateRef = useRef<HTMLIonDatetimeElement>(null);
@@ -32,8 +32,10 @@ const DatePicker: ForwardRefRenderFunction<DatePickerMethods, Props> = (
   const dateToString = (date: Date): string => {
     const year = date.getUTCFullYear();
     const rawMonth = date.getMonth() + 1;
+    const rawDate = date.getDate();
+
     const month = rawMonth < 10 ? `0${rawMonth}` : rawMonth;
-    const day = date.getDate();
+    const day = rawDate < 10 ? `0${rawDate}` : rawDate;
     return `${year}-${month}-${day}`;
   };
 
@@ -61,7 +63,8 @@ const DatePicker: ForwardRefRenderFunction<DatePickerMethods, Props> = (
       parseInt(month) - 1,
       parseInt(day)
     );
-    newDate.setHours(12, 0, 0);
+    newDate.setHours(0, 1, 1);
+
     return newDate;
   };
 

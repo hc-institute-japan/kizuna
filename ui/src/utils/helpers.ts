@@ -1,11 +1,11 @@
-import { IntlShape } from "react-intl";
-import { useDispatch } from "react-redux";
-import { IndexedContacts } from "../redux/contacts/types";
-import { Payload } from "../redux/commons/types";
-import { Profile } from "../redux/profile/types";
-import { ReduxDispatch } from "../redux/types";
 import { deserializeHash } from "@holochain-open-dev/core-types";
 import { useCallback, useRef, useState } from "react";
+import { IntlShape } from "react-intl";
+import { useDispatch } from "react-redux";
+import { Payload } from "../redux/commons/types";
+import { IndexedContacts } from "../redux/contacts/types";
+import { Profile } from "../redux/profile/types";
+import { ReduxDispatch } from "../redux/types";
 
 /*
   returns a new object with each value mapped using mapFn(value)
