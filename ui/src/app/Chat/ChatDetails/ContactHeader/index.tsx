@@ -27,7 +27,11 @@ const ContactHeader: React.FC<Props> = ({ profile }) => {
 
       <div className={styles.titlebar}>
         <p className={styles.title}>
-          <AgentIdentifier nickname={profile.username} id={profile.id} />
+          <AgentIdentifier
+            displayId={false}
+            nickname={profile.username}
+            id={profile.id}
+          />
         </p>
       </div>
     </div>

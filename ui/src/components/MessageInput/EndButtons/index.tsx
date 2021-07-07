@@ -1,5 +1,5 @@
 import { IonButton, IonButtons, IonIcon } from "@ionic/react";
-import { camera, mic, send } from "ionicons/icons";
+import { send } from "ionicons/icons";
 import React from "react";
 
 interface Props {
@@ -10,7 +10,7 @@ interface Props {
 
 const EndButtons: React.FC<Props> = ({ message, files, onSend }) => (
   <IonButtons slot="end">
-    {message.length > 0 ? null : (
+    {/* {message.length > 0 ? null : (
       <>
         <IonButton>
           <IonIcon color="medium" icon={camera} />
@@ -19,7 +19,7 @@ const EndButtons: React.FC<Props> = ({ message, files, onSend }) => (
           <IonIcon color="medium" icon={mic} />
         </IonButton>
       </>
-    )}
+    )} */}
     <IonButton
       type="submit"
       onClick={onSend}

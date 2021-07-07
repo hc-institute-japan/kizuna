@@ -1,5 +1,9 @@
 .title {
   overflow: hidden;
+  text-overflow: ellipsis;
+}
+.title-container {
+  display: flex;
 }
 
 @media (prefers-color-scheme: dark) {

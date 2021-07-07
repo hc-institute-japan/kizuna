@@ -179,13 +179,15 @@ const GroupChat: React.FC = () => {
       />
       <IonHeader>
         <IonToolbar>
-          <IonButtons>
+          <IonButtons slot="start">
             <IonButton
               onClick={() => handleOnBack()}
               className="ion-no-padding"
             >
               <IonIcon slot="icon-only" icon={arrowBackSharp} />
             </IonButton>
+          </IonButtons>
+          <div className={styles["title-container"]}>
             <IonAvatar className="ion-padding">
               {/* TODO: proper picture for default avatar if none is set */}
               {/* TODO: Display an actual avatar set by the group creator */}
@@ -195,9 +197,11 @@ const GroupChat: React.FC = () => {
                 alt={groupData!.name}
               />
             </IonAvatar>
-            <IonTitle className={styles["title"]}>
-              <div className="item item-text-wrap">{groupData!.name}</div>
-            </IonTitle>
+
+            <IonTitle className={styles["title"]}>{groupData!.name}</IonTitle>
+          </div>
+
+          <IonButtons slot="end">
             <IonButton
               onClick={() =>
                 history.push(`/g/${groupData.originalGroupId}/search`)
