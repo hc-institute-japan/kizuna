@@ -41,11 +41,11 @@ const Register: React.FC = () => {
     setLoading(true);
     dispatch(createProfile(nickname)).then((res: any) => {
       if (!res) {
-        setError(
-          intl.formatMessage({
-            id: "app.register.error-existing-username",
-          })
-        );
+        // setError(
+        //   intl.formatMessage({
+        //     id: "app.register.error-existing-username",
+        //   })
+        // );
         setLoading(false);
       }
     });
