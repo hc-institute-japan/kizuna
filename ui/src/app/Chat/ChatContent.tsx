@@ -83,6 +83,7 @@ const Chat: React.FC = () => {
   /* REFS */
   const scrollerRef = useRef<ChatListMethods>(null);
   const didMountRef = useRef(false);
+  const didMountRef2 = useRef(false);
   const inputTimeout = useRef<NodeJS.Timeout>();
   const messageInputRef = useRef<MessageInputMethods | null>(null);
 
@@ -212,7 +213,7 @@ const Chat: React.FC = () => {
       when reaching the beginning/top of the chat box
     */
   const handleOnScrollTop = (complete: any) => {
-    if (didMountRef.current === true) {
+    if (didMountRef2.current === true) {
       if (disableGetNextBatch === false) {
         let lastMessage = messagesWithConversant[0].message;
         dispatch(
@@ -232,9 +233,9 @@ const Chat: React.FC = () => {
         });
       }
     } else {
-      didMountRef.current = true;
+      didMountRef2.current = true;
     }
-    // complete();
+    complete();
     return;
   };
 
