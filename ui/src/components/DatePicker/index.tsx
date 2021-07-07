@@ -63,7 +63,6 @@ const DatePicker: ForwardRefRenderFunction<DatePickerMethods, Props> = (
       parseInt(month) - 1,
       parseInt(day)
     );
-    newDate.setHours(0, 1, 1);
 
     return newDate;
   };
