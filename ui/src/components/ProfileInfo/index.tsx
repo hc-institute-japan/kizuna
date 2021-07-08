@@ -1,4 +1,4 @@
-import { IonItem, IonItemGroup } from "@ionic/react";
+import { IonItem, IonItemGroup, IonText, IonTextarea } from "@ionic/react";
 import React from "react";
 import { useIntl } from "react-intl";
 import Identicon from "../Identicon";
@@ -31,7 +31,11 @@ const ProfileInfo: React.FC<Props> = ({ nickname, id }) => {
         </IonItem>
 
         <IonItem lines="none">
-          <p>{trimmedId}</p>
+          <IonTextarea
+            readonly
+            className="ion-no-padding"
+            value={trimmedId}
+          ></IonTextarea>
         </IonItem>
 
         <IonItem lines="none">
