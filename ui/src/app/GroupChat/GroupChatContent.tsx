@@ -66,6 +66,9 @@ const GroupChat: React.FC = () => {
   );
   const myProfile = useSelector((state: RootState) => state.profile);
   const typing = useSelector((state: RootState) => state.groups.typing);
+  const { readReceipt, typingIndicator } = useSelector(
+    (state: RootState) => state.preference
+  );
 
   /* Handlers */
 
@@ -94,7 +97,7 @@ const GroupChat: React.FC = () => {
     if (files.length) {
       setSendingLoading(true);
       files.forEach((file: any) => {
-        let filePayloadInput: FilePayloadInput = {
+        const filePayloadInput: FilePayloadInput = {
           type: "FILE",
           payload: {
             metadata: {
@@ -106,7 +109,7 @@ const GroupChat: React.FC = () => {
             fileBytes: file.fileBytes,
           },
         };
-        let groupMessage: GroupMessageInput = {
+        const groupMessage: GroupMessageInput = {
           /* groupData is non-nullable once the page renders */
           groupId: groupData!.originalGroupId,
           payloadInput: filePayloadInput,
@@ -135,35 +138,36 @@ const GroupChat: React.FC = () => {
       but debounce with 500ms to indicate false in
     */
   const handleOnChange = (message: string, groupInfo: GroupConversation) => {
-    // Remove self from the recipient of typing signal
-    let members = [...groupInfo.members, groupInfo.creator].filter(
-      (member) => member !== myProfile.id
-    );
+    if (typingIndicator) {
+      // Remove self from the recipient of typing signal
+      let members = [...groupInfo.members, groupInfo.creator].filter(
+        (member) => member !== myProfile.id
+      );
 
-    dispatch(
-      indicateGroupTyping({
-        groupId: groupInfo.originalGroupId,
-        indicatedBy: myProfile.id!,
-        members,
-        isTyping: message.length !== 0 ? true : false,
-      })
-    );
+      dispatch(
+        indicateGroupTyping({
+          groupId: groupInfo.originalGroupId,
+          indicatedBy: myProfile.id!,
+          members,
+          isTyping: message.length !== 0 ? true : false,
+        })
+      );
 
-    if (inputTimeout.current) clearTimeout(inputTimeout.current);
+      if (inputTimeout.current) clearTimeout(inputTimeout.current);
 
-    inputTimeout.current = setTimeout(
-      () =>
-        dispatch(
-          indicateGroupTyping({
-            groupId: groupInfo.originalGroupId,
-            indicatedBy: myProfile.id!,
-            members,
-            isTyping: false,
-          })
-        ),
-      500
-    );
-
+      inputTimeout.current = setTimeout(
+        () =>
+          dispatch(
+            indicateGroupTyping({
+              groupId: groupInfo.originalGroupId,
+              indicatedBy: myProfile.id!,
+              members,
+              isTyping: false,
+            })
+          ),
+        500
+      );
+    }
     return setMessage(message);
   };
 
@@ -229,6 +233,7 @@ const GroupChat: React.FC = () => {
           members={groupData.members}
           messageIds={groupData.messages}
           chatList={chatList}
+          readReceipt={readReceipt}
         />
       </IonContent>
 

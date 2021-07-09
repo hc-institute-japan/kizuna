@@ -2,6 +2,8 @@ import { IonIcon, IonItem, IonText } from "@ionic/react";
 import {
   checkmarkDoneOutline,
   checkmarkOutline,
+  checkmarkCircleOutline,
+  checkmarkDoneCircle,
   personCircleOutline,
 } from "ionicons/icons";
 import React, { useState } from "react";
@@ -68,8 +70,8 @@ const Me: React.FC<ChatProps> = ({
             <h6 className="ion-no-margin ion-text-end">
               {intl.formatTime(timestamp)}
               <IonIcon
-                size="s"
-                icon={isSeen ? checkmarkDoneOutline : checkmarkOutline}
+                size="medium"
+                icon={isSeen ? checkmarkDoneCircle : checkmarkCircleOutline}
               />
             </h6>
           </IonText>

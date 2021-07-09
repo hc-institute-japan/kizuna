@@ -22,6 +22,7 @@ interface Props {
   messageIds: string[];
   members: string[];
   groupId: string;
+  readReceipt: boolean;
   // TODO: not really sure what type this is
   onReply(message: { author: string; payload: Payload; id: string }): any;
   chatList: React.RefObject<ChatListMethods>;
@@ -32,6 +33,7 @@ const MessageList: React.FC<Props> = ({
   onReply,
   chatList,
   groupId,
+  readReceipt,
 }) => {
   const dispatch = useAppDispatch();
 
@@ -98,19 +100,21 @@ const MessageList: React.FC<Props> = ({
   };
 
   const handleOnSeen = (complete: () => any, message: any) => {
-    let read: boolean = Object.keys(message.readList).includes(profile.id!);
+    if (readReceipt) {
+      const read: boolean = Object.keys(message.readList).includes(profile.id!);
 
-    if (!read) {
-      let groupMessageReadData: GroupMessageReadData = {
-        groupId: groupId,
-        messageIds: [message.groupMessageId],
-        reader: profile.id!,
-        timestamp: message.timestamp,
-        members,
-      };
-      dispatch(readGroupMessage(groupMessageReadData)).then((res: any) => {
-        complete();
-      });
+      if (!read) {
+        const groupMessageReadData: GroupMessageReadData = {
+          groupId: groupId,
+          messageIds: [message.groupMessageId],
+          reader: profile.id!,
+          timestamp: message.timestamp,
+          members,
+        };
+        dispatch(readGroupMessage(groupMessageReadData)).then((res: any) => {
+          complete();
+        });
+      }
     }
   };
 
