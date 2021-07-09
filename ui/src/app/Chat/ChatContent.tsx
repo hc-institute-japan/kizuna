@@ -75,6 +75,9 @@ const Chat: React.FC = () => {
     );
     return conversant[0];
   });
+  const { readReceipt, typingIndicator } = useSelector(
+    (state: RootState) => state.preference
+  );
 
   const dispatch = useAppDispatch();
   const history = useHistory();
@@ -157,15 +160,16 @@ const Chat: React.FC = () => {
   */
   const handleOnChange = (message: string, conversant: Profile) => {
     if (didMountRef.current === true) {
-      dispatch(isTyping(conversant.id, message.length !== 0 ? true : false));
+      if (typingIndicator) {
+        dispatch(isTyping(conversant.id, message.length !== 0 ? true : false));
 
-      if (inputTimeout.current) clearTimeout(inputTimeout.current);
+        if (inputTimeout.current) clearTimeout(inputTimeout.current);
 
-      inputTimeout.current = setTimeout(
-        () => dispatch(isTyping(conversant.id, false)),
-        500
-      );
-
+        inputTimeout.current = setTimeout(
+          () => dispatch(isTyping(conversant.id, false)),
+          500
+        );
+      }
       setMessage(message);
     } else {
       didMountRef.current = true;
@@ -254,7 +258,7 @@ const Chat: React.FC = () => {
     message: P2PMessage;
     receipt: P2PMessageReceipt;
   }) => {
-    if (messageBundle.receipt.status !== "read") {
+    if (messageBundle.receipt.status !== "read" && readReceipt) {
       dispatch(readMessage([messageBundle.message]));
     }
   };

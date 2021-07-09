@@ -6,7 +6,7 @@ const searchProfiles =
   (nicknamePrefix: string): ThunkAction =>
   async (_dispatch, getState, { callZome }) => {
     const state = getState();
-    const contacts = state.contacts.contacts;
+    const contacts = { ...state.contacts.contacts };
     const id = state.profile.id;
     try {
       const res: AgentProfile[] = await callZome({

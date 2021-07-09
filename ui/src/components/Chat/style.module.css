@@ -94,6 +94,10 @@
   font-size: 0.7rem;
 }
 
+.me ion-icon {
+  padding-left: 1px;
+}
+
 .avatar {
   filter: invert(0%);
 }
