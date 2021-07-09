@@ -52,7 +52,7 @@ const ChatSearch: React.FC = () => {
                 let readlist =
                   latestReceipt.status === "read"
                     ? { key: latestReceipt.timestamp }
-                    : undefined;
+                    : {};
 
                 return {
                   id: message.p2pMessageEntryHash,
