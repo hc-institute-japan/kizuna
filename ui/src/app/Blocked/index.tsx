@@ -24,6 +24,7 @@ const Blocked = () => {
     history.push({
       pathname: `/p/${profile.id}`,
       state: {
+        profile,
         prev: "/blocked",
       },
     });
@@ -39,7 +40,7 @@ const Blocked = () => {
       </IonHeader>
       <IonContent>
         {blocked.map((block) => (
-          <IonItem key={block.username} onClick={() => onClick(block)}>
+          <IonItem button key={block.username} onClick={() => onClick(block)}>
             <IonLabel>{block.username}</IonLabel>
           </IonItem>
         ))}
