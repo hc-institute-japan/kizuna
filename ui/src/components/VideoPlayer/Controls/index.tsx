@@ -1,5 +1,5 @@
 import { IonIcon, IonSpinner } from "@ionic/react";
-import { expandOutline, pause, play } from "ionicons/icons";
+import { expandOutline, pause, play, download } from "ionicons/icons";
 import React, {
   RefObject,
   SetStateAction,
@@ -42,7 +42,7 @@ const Controls: React.FC<Props> = ({
     if (timeout.current) clearTimeout(timeout.current);
     timeout.current = setTimeout(function () {
       setVisible(false);
-    }, 3000);
+    }, 1000);
   };
 
   const handleOnMouseEnter = () => {
@@ -62,7 +62,9 @@ const Controls: React.FC<Props> = ({
   const onPlayPause = () => {
     if (!hasError) {
       if (!isPlaying) video.current?.play();
-      else video.current?.pause();
+      else {
+        video.current?.pause();
+      }
     } else {
       setIsLoading(true);
       if (onPlayPauseErrorHandler) onPlayPauseErrorHandler();
@@ -82,7 +84,17 @@ const Controls: React.FC<Props> = ({
         {isLoading ? (
           <IonSpinner />
         ) : (
-          <IonIcon icon={!isPlaying ? play : pause} />
+          <IonIcon
+            icon={
+              hasError // bytes are not loaded yet
+                ? isPlaying
+                  ? pause // will not happen
+                  : download
+                : isPlaying // bytes are loaded
+                ? pause
+                : play
+            }
+          />
         )}
       </div>
       <div className={styles["range-slider-expand"]}>

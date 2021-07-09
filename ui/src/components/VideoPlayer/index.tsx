@@ -51,7 +51,11 @@ const VideoPlayer: React.FC<Props> = ({
       <video
         className={styles.video}
         onTimeUpdate={() =>
-          setCurrentTime(video.current!.currentTime / video.current!.duration)
+          setCurrentTime(
+            !isNaN(video.current!.currentTime / video.current!.duration)
+              ? video.current!.currentTime / video.current!.duration
+              : 0
+          )
         }
         poster={thumbnail}
         onPlay={handleOnPlay}
@@ -63,16 +67,16 @@ const VideoPlayer: React.FC<Props> = ({
         src={src}
         onError={handleError}
       />
-      {video.current ? (
-        <Controls
-          isPlaying={isPlaying}
-          hasError={hasError}
-          onPlayPauseErrorHandler={errorHandler}
-          duration={currentTime}
-          video={video}
-          modal={[isModalOpen, setIsModalOpen]}
-        />
-      ) : null}
+      {/* {video.current ? ( */}
+      <Controls
+        isPlaying={isPlaying}
+        hasError={hasError}
+        onPlayPauseErrorHandler={errorHandler}
+        duration={currentTime}
+        video={video}
+        modal={[isModalOpen, setIsModalOpen]}
+      />
+      {/* ) : null} */}
       <VideoPlayerModal
         download={download}
         onPlayPauseErrorHandler={onPlayPauseErrorHandler}
