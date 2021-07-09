@@ -3,3 +3,9 @@ ion-modal.fullscreen {
   --height: 100%;
   --border-radius: 0;
 }
+
+ion-text,
+p,
+ion-label {
+  word-break: break-all;
+}

@@ -7,11 +7,7 @@ interface Props {
 }
 
 const Text: React.FC<Props> = ({ message }) => {
-  return (
-    <IonText>
-      <p className="ion-no-margin">{message.payload.payload}</p>
-    </IonText>
-  );
+  return <IonText>{message.payload.payload}</IonText>;
 };
 
 export default Text;
