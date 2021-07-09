@@ -31,11 +31,7 @@ const ProfileInfo: React.FC<Props> = ({ nickname, id }) => {
         </IonItem>
 
         <IonItem lines="none">
-          <IonTextarea
-            readonly
-            className="ion-no-padding"
-            value={trimmedId}
-          ></IonTextarea>
+          <IonText>{trimmedId}</IonText>
         </IonItem>
 
         <IonItem lines="none">
