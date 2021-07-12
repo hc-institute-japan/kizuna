@@ -238,7 +238,8 @@ export const sendMessage =
     replyTo?: string,
     file?: any
   ): ThunkAction =>
-  async (dispatch, getState, { callZome }) => {
+  async (dispatch, getState, { callZome, retry }) => {
+    console.log("actions send message");
     let payloadInput;
     if (type === "TEXT") {
       let textPayload: TextPayload = {
@@ -392,6 +393,12 @@ export const sendMessage =
         return true;
       }
     } catch (e) {
+      console.log("actions send error", e);
+      await retry({
+        zomeName: ZOMES.P2PMESSAGE,
+        fnName: FUNCTIONS[ZOMES.P2PMESSAGE].SEND_MESSAGE,
+        payload: input,
+      });
       dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
     }
   };
@@ -513,6 +520,7 @@ export const getMessagesByAgentByTimestamp =
 export const readMessage =
   (messages: P2PMessage[]): ThunkAction =>
   async (dispatch, _getState, { callZome }) => {
+    console.log("actions read message");
     // CONSTRUCT ZOME INPUT
     // construct the timestamp
     let now = Date.now();
