@@ -37,7 +37,6 @@ const Conversations: React.FC = () => {
 
   /* Handlers */
   const handleOnCompose = () => {
-    console.log(contacts);
     history.push({
       pathname: `/compose`,
       state: { contacts: { ...contacts } },
