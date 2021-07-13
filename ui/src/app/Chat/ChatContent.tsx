@@ -5,7 +5,6 @@ import {
   IonContent,
   IonHeader,
   IonIcon,
-  IonItem,
   IonPage,
   IonTitle,
   IonToolbar,

@@ -1,7 +1,5 @@
 import { IonIcon, IonItem, IonText } from "@ionic/react";
 import {
-  checkmarkDoneOutline,
-  checkmarkOutline,
   checkmarkCircleOutline,
   checkmarkDoneCircle,
   personCircleOutline,
@@ -17,7 +15,6 @@ import { usePressHandlers } from "../../../utils/helpers";
 import ChatModal from "../ChatModal";
 import File from "../File";
 import ReplyTo from "../ReplyTo";
-
 import { default as common, default as styles } from "../style.module.css";
 import Text from "../Text";
 import { ChatProps } from "../types";

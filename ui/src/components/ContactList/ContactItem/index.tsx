@@ -12,7 +12,7 @@ const ContactItem: React.FC<Props> = ({ contact }) => {
   const history = useHistory();
   const handleOnClick = () =>
     history.push({
-      pathname: `/p/${contact.username}`,
+      pathname: `/p/${contact.id}`,
       state: { profile: contact },
     });
 
