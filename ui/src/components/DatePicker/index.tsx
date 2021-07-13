@@ -55,7 +55,7 @@ const DatePicker: ForwardRefRenderFunction<DatePickerMethods, Props> = (
     }
 
     if (rawDay.charAt(0) === "0") {
-      day = rawMonth.substring(1);
+      day = rawDay.substring(1);
     }
 
     const newDate = new Date(
@@ -63,6 +63,8 @@ const DatePicker: ForwardRefRenderFunction<DatePickerMethods, Props> = (
       parseInt(month) - 1,
       parseInt(day)
     );
+
+    console.log(newDate);
 
     return newDate;
   };
