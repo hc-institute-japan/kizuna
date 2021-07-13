@@ -35,7 +35,8 @@ const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
     let showName = false;
     let showDate = i === 0;
 
-    const hasRead = Object.values(arrChildren[i].props.readList).length !== 0;
+    const hasRead =
+      Object.values(arrChildren[i]?.props?.readList)?.length !== 0;
 
     if (i === 0) showProfilePicture = true;
 
