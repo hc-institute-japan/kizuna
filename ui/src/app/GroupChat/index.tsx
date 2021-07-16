@@ -2,6 +2,7 @@ import React from "react";
 import { Route, Switch } from "react-router";
 import GroupChatContent from "./GroupChatContent";
 import GroupChatDetails from "./GroupChatDetails";
+import GroupPinnedMessages from "./GroupPinnedMessages";
 import GroupSearch from "./GroupSearch";
 
 const GroupChat: React.FC = () => {
@@ -14,8 +15,10 @@ const GroupChat: React.FC = () => {
         <GroupChatDetails />
       </Route>
       <Route path="/g/:group/search">
-        {/* <Search prevHref="/" type="group" /> */}
         <GroupSearch />
+      </Route>
+      <Route path="/g/:group/pinned">
+        <GroupPinnedMessages />
       </Route>
     </Switch>
   );

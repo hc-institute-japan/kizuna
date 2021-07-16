@@ -25,9 +25,22 @@ import FileView from "./FileView";
 import ReplyView from "./ReplyView";
 import styles from "./style.module.css";
 
+export interface FileContent {
+  metadata: {
+    fileName: string;
+    fileType: "VIDEO" | "IMAGE" | "OTHER";
+    fileSize: number;
+  };
+  fileType: {
+    type: "VIDEO" | "IMAGE" | "OTHER";
+    payload?: { thumbnail: Uint8Array };
+  };
+  fileBytes: Uint8Array;
+}
+
 export interface MessageInputOnSendParams {
   message?: string;
-  files?: any[];
+  files?: FileContent[];
   reply?: string;
 }
 
@@ -40,14 +53,14 @@ export interface ReplyParams {
 interface Props {
   onChange?: (message: string) => any;
   onSend?: (opt?: MessageInputOnSendParams) => any;
-  onFileSelect?: (e: any[]) => any;
+  onFileSelect?: (e: FileContent[]) => any;
 }
 
 export interface MessageInputMethods {
   reply: (message: { payload: Payload; author: string; id: string }) => any;
 }
 
-const determineFileType = (type: string): string => {
+const determineFileType = (type: string): "VIDEO" | "IMAGE" | "OTHER" => {
   // too lazy to do all
   // url: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
 
@@ -72,7 +85,7 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
   const intl = useIntl();
   const [isReply, setIsReply] = useState<ReplyParams | undefined>(undefined);
   const file = useRef<HTMLInputElement>(null);
-  const [files, setFiles] = useState<any[]>([]);
+  const [files, setFiles] = useState<FileContent[]>([]);
   const handleOnFileClick = () => file?.current?.click();
 
   const onFileSelectCallback = useCallback(() => {
@@ -224,7 +237,7 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
             } else {
               const final = {
                 metadata: { fileName, fileType: type, fileSize },
-                fileType: { type, payload: null },
+                fileType: { type },
                 fileBytes,
               };
               setFiles((currFiles) => {

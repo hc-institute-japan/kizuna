@@ -1,25 +1,8 @@
-import {
-  IonAvatar,
-  IonButton,
-  IonButtons,
-  IonContent,
-  IonHeader,
-  IonIcon,
-  IonLoading,
-  IonPage,
-  IonTitle,
-  IonToolbar,
-} from "@ionic/react";
-import {
-  arrowBackSharp,
-  informationCircleOutline,
-  peopleCircleOutline,
-  search,
-} from "ionicons/icons";
+import { IonContent, IonLoading, IonPage } from "@ionic/react";
 import React, { useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
-import { useHistory, useParams } from "react-router";
+import { useParams } from "react-router";
 // Components
 import { ChatListMethods } from "../../components/Chat/types";
 import Typing from "../../components/Chat/Typing";
@@ -29,8 +12,10 @@ import MessageInput, {
 } from "../../components/MessageInput";
 // Redux
 import { FilePayloadInput } from "../../redux/commons/types";
-import { indicateGroupTyping } from "../../redux/group/actions";
-import { sendGroupMessage } from "../../redux/group/actions";
+import {
+  indicateGroupTyping,
+  sendGroupMessage,
+} from "../../redux/group/actions";
 import {
   GroupConversation,
   GroupMessage,
@@ -39,14 +24,13 @@ import {
 import { RootState } from "../../redux/types";
 import { useAppDispatch } from "../../utils/helpers";
 import ChatBox from "./ChatBox";
-import styles from "./style.module.css";
+import GroupChatHeader from "./GroupChatHeader";
 
 interface GroupChatParams {
   group: string;
 }
 
 const GroupChat: React.FC = () => {
-  const history = useHistory();
   const dispatch = useAppDispatch();
   const intl = useIntl();
   const { group } = useParams<GroupChatParams>();
@@ -131,8 +115,6 @@ const GroupChat: React.FC = () => {
     });
   };
 
-  const handleOnBack = () => history.push({ pathname: `/home` });
-
   /* 
       handle change in message input. indicate typing as the user types 
       but debounce with 500ms to indicate false in
@@ -181,48 +163,7 @@ const GroupChat: React.FC = () => {
           id: "app.group-chat.sending",
         })}
       />
-      <IonHeader>
-        <IonToolbar>
-          <IonButtons slot="start">
-            <IonButton
-              onClick={() => handleOnBack()}
-              className="ion-no-padding"
-            >
-              <IonIcon slot="icon-only" icon={arrowBackSharp} />
-            </IonButton>
-          </IonButtons>
-          <div className={styles["title-container"]}>
-            <IonAvatar className="ion-padding">
-              {/* TODO: proper picture for default avatar if none is set */}
-              {/* TODO: Display an actual avatar set by the group creator */}
-              <img
-                className={styles["avatar"]}
-                src={peopleCircleOutline}
-                alt={groupData!.name}
-              />
-            </IonAvatar>
-
-            <IonTitle className={styles["title"]}>{groupData!.name}</IonTitle>
-          </div>
-
-          <IonButtons slot="end">
-            <IonButton
-              onClick={() =>
-                history.push(`/g/${groupData.originalGroupId}/search`)
-              }
-            >
-              <IonIcon slot="icon-only" icon={search} />
-            </IonButton>
-            <IonButton
-              onClick={() =>
-                history.push(`/g/${groupData.originalGroupId}/details`)
-              }
-            >
-              <IonIcon slot="icon-only" icon={informationCircleOutline} />
-            </IonButton>
-          </IonButtons>
-        </IonToolbar>
-      </IonHeader>
+      <GroupChatHeader groupData={groupData} />
 
       <IonContent>
         <ChatBox
