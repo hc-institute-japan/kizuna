@@ -1,9 +1,10 @@
 import { IonButton, IonButtons, IonIcon } from "@ionic/react";
 import { send } from "ionicons/icons";
 import React from "react";
+import { FileContent } from "..";
 
 interface Props {
-  files: File[];
+  files: FileContent[];
   message: string;
   onSend?(): any;
 }
