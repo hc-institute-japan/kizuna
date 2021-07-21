@@ -1,3 +1,4 @@
+import { HolochainClient, HoloClient } from "@holochain-open-dev/cell-client";
 import {
   AgentPubKey,
   AppSignalCb,
@@ -5,27 +6,99 @@ import {
 } from "@holochain/conductor-api";
 import { store } from "../containers/ReduxContainer";
 import { handleSignal } from "../redux/signal/actions";
-
 import { CallZomeConfig } from "../redux/types";
+// @ts-ignore
+global.COMB = undefined;
+// @ts-ignore
+const { Connection } = require("@holo-host/web-sdk");
+// @ts-ignore
+window.COMB = require("@holo-host/comb").COMB;
 
-let client: null | AppWebsocket = null;
+let client: null | HolochainClient | HoloClient = null;
 
 let signalHandler: AppSignalCb = (signal) =>
   store?.dispatch(
     handleSignal(signal.data.payload.name, signal.data.payload.payload)
   );
 
+const createClient = async (
+  env: string
+): Promise<HoloClient | HolochainClient | null> => {
+  switch (env) {
+    case "HCC": {
+      const branding = {
+        app_name: "kizuna_test",
+      };
+
+      const connection = new Connection(
+        `http://localhost:${process.env.REACT_APP_CHAPERONE_PORT}`,
+        // "http://localhost:24273",
+        signalHandler,
+        branding
+      );
+
+      await connection.ready();
+
+      await connection.signIn();
+
+      const appInfo = await connection.appInfo(process.env.REACT_APP_APP_ID);
+
+      const cellData = appInfo.cell_data[0];
+
+      return new HoloClient(connection, cellData, branding);
+    }
+    case "HC": {
+      const appWs = await AppWebsocket.connect(
+        process.env.REACT_APP_DNA_INTERFACE_URL as string,
+        15000, // holochain's default timeout
+        signalHandler
+      );
+
+      const appInfo = await appWs.appInfo({
+        installed_app_id: "test-app",
+      });
+
+      const cellData = appInfo.cell_data[0];
+
+      return new HolochainClient(appWs, cellData);
+    }
+    default: {
+      return null;
+    }
+  }
+};
+
 const init: () => any = async () => {
   if (client) {
     return client;
   }
   try {
-    client = await AppWebsocket.connect(
-      process.env.REACT_APP_DNA_INTERFACE_URL as string,
-      15000, // holochain's default timeout
-      signalHandler
-    );
+    client = await createClient(process.env.REACT_APP_ENV as string);
+    return client;
+
+    // const branding = {
+    //   app_name: "kizuna_test",
+    // };
+
+    // const connection = new Connection(
+    //   "http://localhost:24273",
+    //   signalHandler,
+    //   branding
+    // );
+
+    // await connection.ready();
+
+    // await connection.signIn();
+
+    // const appInfo = await connection.appInfo(
+    //   "uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL"
+    // );
+
+    // const cellData = appInfo.cell_data[0];
+
+    // client = new HoloClient(connection, cellData, branding);
   } catch (error) {
+    Object.values(error).forEach((e) => console.error(e));
     console.error(error);
     throw error;
   }
@@ -40,11 +113,10 @@ export const getAgentId: () => Promise<AgentPubKey | null> = async () => {
   }
   await init();
   try {
-    const info = await client?.appInfo({ installed_app_id: "test-app" });
+    const info = await client?.cellId[1];
 
-    if (info?.cell_data[0].cell_id[1]) {
-      myAgentId = info?.cell_data[0].cell_id[1];
-      return myAgentId;
+    if (info) {
+      return info;
     }
     return null;
   } catch (e) {
@@ -58,26 +130,15 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
 ) => {
   await init();
 
-  const info = await client?.appInfo({ installed_app_id: "test-app" });
   const {
-    cap = null,
-    cellId = info?.cell_data[0].cell_id,
+    // cellId = info?.cell_data[0].cell_id,
     zomeName,
     fnName,
-    provenance = info?.cell_data[0].cell_id[1],
+    // provenance = info?.cell_data[0].cell_id[1],
     payload = null,
   } = config;
   try {
-    if (cellId && provenance) {
-      return await client?.callZome({
-        cap: cap,
-        cell_id: cellId,
-        zome_name: zomeName,
-        fn_name: fnName,
-        payload,
-        provenance,
-      });
-    }
+    return await client?.callZome(zomeName, fnName, payload);
   } catch (e) {
     console.warn(e);
     const { type = null, data = null } = { ...e };

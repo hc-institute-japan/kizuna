@@ -1,3 +1,4 @@
+import { isPlatform } from "@ionic/core";
 import { IonIcon, IonSpinner } from "@ionic/react";
 import { expandOutline, pause, play, download } from "ionicons/icons";
 import React, {
@@ -26,7 +27,7 @@ const Controls: React.FC<Props> = ({
   hasError,
   onPlayPauseErrorHandler,
 }) => {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(isPlatform("mobile"));
   const [isOpen, setIsOpen] = modal;
   const timeout = useRef<NodeJS.Timeout>();
   const [isLoading, setIsLoading] = useState(false);
@@ -80,7 +81,11 @@ const Controls: React.FC<Props> = ({
       className={styles.controls}
       style={{ opacity: visible ? 1 : 0 }}
     >
-      <div className={styles["play-pause"]} onClick={onPlayPause}>
+      <div
+        className={styles["play-pause"]}
+        onClick={onPlayPause}
+        onTouchEnd={onPlayPause}
+      >
         {isLoading ? (
           <IonSpinner />
         ) : (
@@ -108,7 +113,11 @@ const Controls: React.FC<Props> = ({
           />
         </div>
         <div className={styles.expand}>
-          <IonIcon onClick={handleOnDoubleClick} icon={expandOutline} />
+          <IonIcon
+            onClick={handleOnDoubleClick}
+            onTouchEnd={handleOnDoubleClick}
+            icon={expandOutline}
+          />
         </div>
       </div>
     </div>

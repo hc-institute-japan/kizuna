@@ -584,7 +584,7 @@ export const readMessage =
 export const getFileBytes =
   (inputHashes: HoloHashBase64[]): ThunkAction =>
   async (dispatch, _getState, { callZome }) => {
-    let hashes = inputHashes.map((hash) => deserializeHash(hash));
+    const hashes = inputHashes.map((hash) => deserializeHash(hash));
     try {
       const fetchedFiles = await callZome({
         zomeName: ZOMES.P2PMESSAGE,
