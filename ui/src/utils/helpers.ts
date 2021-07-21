@@ -57,6 +57,34 @@ export const monthToString = (month: number, intl: IntlShape) => {
   }
 };
 
+export const dateToString = (date: Date): string => {
+  const year = date.getUTCFullYear();
+  const rawMonth = date.getMonth() + 1;
+  const rawDate = date.getDate();
+
+  const month = rawMonth < 10 ? `0${rawMonth}` : rawMonth;
+  const day = rawDate < 10 ? `0${rawDate}` : rawDate;
+  return `${year}-${month}-${day}`;
+};
+
+export const stringToDate = (stringDate: string): Date => {
+  const [year, rawMonth, rawDay] = stringDate.split("-");
+  let month = rawMonth,
+    day = rawDay;
+
+  if (rawMonth.charAt(0) === "0") {
+    month = rawMonth.substring(1);
+  }
+
+  if (rawDay.charAt(0) === "0") {
+    day = rawDay.substring(1);
+  }
+
+  const newDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+
+  return newDate;
+};
+
 export const indexContacts: (contacts: Profile[]) => IndexedContacts = (
   contacts
 ) => {
