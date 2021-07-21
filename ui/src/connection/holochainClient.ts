@@ -10,7 +10,7 @@ import { CallZomeConfig } from "../redux/types";
 // @ts-ignore
 global.COMB = undefined;
 // @ts-ignore
-// const { Connection } = require("@holo-host/web-sdk");
+const { Connection } = require("@holo-host/web-sdk");
 // @ts-ignore
 window.COMB = require("@holo-host/comb").COMB;
 
@@ -21,28 +21,65 @@ let signalHandler: AppSignalCb = (signal) =>
     handleSignal(signal.data.payload.name, signal.data.payload.payload)
   );
 
+const createClient = async (
+  env: string
+): Promise<HoloClient | HolochainClient | null> => {
+  switch (env) {
+    case "HCC": {
+      const branding = {
+        app_name: "kizuna_test",
+      };
+
+      const connection = new Connection(
+        `http://localhost:${process.env.REACT_APP_CHAPERONE_PORT}`,
+        // "http://localhost:24273",
+        signalHandler,
+        branding
+      );
+
+      await connection.ready();
+
+      await connection.signIn();
+
+      const appInfo = await connection.appInfo(process.env.REACT_APP_APP_ID);
+
+      const cellData = appInfo.cell_data[0];
+
+      return new HoloClient(connection, cellData, branding);
+    }
+    case "HC": {
+      const appWs = await AppWebsocket.connect(
+        process.env.REACT_APP_DNA_INTERFACE_URL as string,
+        15000, // holochain's default timeout
+        signalHandler
+      );
+
+      const appInfo = await appWs.appInfo({
+        installed_app_id: "test-app",
+      });
+
+      const cellData = appInfo.cell_data[0];
+
+      return new HolochainClient(appWs, cellData);
+    }
+    default: {
+      return null;
+    }
+  }
+};
+
 const init: () => any = async () => {
   if (client) {
     return client;
   }
   try {
-    const appWs = await AppWebsocket.connect(
-      process.env.REACT_APP_DNA_INTERFACE_URL as string,
-      15000, // holochain's default timeout
-      signalHandler
-    );
-
-    const appInfo = await appWs.appInfo({
-      installed_app_id: "test-app",
-    });
-
-    const cellData = appInfo.cell_data[0];
-
-    client = new HolochainClient(appWs, cellData);
+    client = await createClient(process.env.REACT_APP_ENV as string);
+    return client;
 
     // const branding = {
-    //   app_name: "uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL",
+    //   app_name: "kizuna_test",
     // };
+
     // const connection = new Connection(
     //   "http://localhost:24273",
     //   signalHandler,
@@ -52,15 +89,14 @@ const init: () => any = async () => {
     // await connection.ready();
 
     // await connection.signIn();
-    // const appInfo = await connection.appInfo({
-    //   installed_app_id: "uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL",
-    // });
+
+    // const appInfo = await connection.appInfo(
+    //   "uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL"
+    // );
 
     // const cellData = appInfo.cell_data[0];
 
     // client = new HoloClient(connection, cellData, branding);
-
-    return client;
   } catch (error) {
     Object.values(error).forEach((e) => console.error(e));
     console.error(error);
