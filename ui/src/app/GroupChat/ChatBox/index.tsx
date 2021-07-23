@@ -44,7 +44,9 @@ const MessageList: React.FC<Props> = ({
   const [messages, setMessages] = useState<GroupMessageBundle[]>([]);
   const [oldestFetched, setOldestFetched] = useState<boolean>(false);
 
-  const groups = useSelector((state: RootState) => state.groups);
+  const { messages: stateMessages, members: stateMembers } = useSelector(
+    (state: RootState) => state.groups
+  );
   const membersProfile = useSelector(
     (state: RootState) => state.groups.members
   );
@@ -127,8 +129,8 @@ const MessageList: React.FC<Props> = ({
     */
     const messages: GroupMessageBundle[] = messageIds.map((messageId) => {
       /* retrieve the message content from redux */
-      const message: GroupMessage = groups.messages[messageId];
-      const authorProfile: Profile = groups.members[message.author];
+      const message: GroupMessage = stateMessages[messageId];
+      const authorProfile: Profile = stateMembers[message.author];
 
       return {
         ...message,
@@ -147,7 +149,7 @@ const MessageList: React.FC<Props> = ({
     });
     setMessages(messages);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messageIds]);
+  }, [messageIds, stateMessages]);
 
   return (
     <>

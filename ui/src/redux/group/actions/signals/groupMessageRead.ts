@@ -1,13 +1,18 @@
 import { serializeHash } from "@holochain-open-dev/core-types";
 import { timestampToDate } from "../../../../utils/helpers";
 import { ThunkAction } from "../../../types";
-import { SetGroupReadMessage, SET_GROUP_READ_MESSAGE } from "../../types";
+import {
+  GroupMessage,
+  SetGroupReadMessage,
+  SET_GROUP_READ_MESSAGE,
+} from "../../types";
 
 const groupMessageRead =
   (signalPayload: any): ThunkAction =>
   async (dispatch, getState) => {
     const { payload } = signalPayload;
     const state = getState();
+
     /* 
     There is a case where the read signal comes first from another agent
     before the groupMessage has arrived (whether through signal or with getters).
@@ -19,14 +24,26 @@ const groupMessageRead =
     const messagesArrived = payload.messageIds
       .map((messageId: Uint8Array) => serializeHash(messageId))
       .filter((messageId: string) => state.groups.messages[messageId]);
+
+    const reader = serializeHash(payload.reader);
+
+    const timestamp = timestampToDate(payload.timestamp);
+
+    const messages: { [key: string]: GroupMessage } = {
+      ...getState().groups.messages,
+    };
+
+    messagesArrived.forEach((messageId: string) => {
+      messages[messageId].readList = {
+        ...messages[messageId].readList,
+        [reader]: timestamp,
+      };
+    });
+   
+
     dispatch<SetGroupReadMessage>({
       type: SET_GROUP_READ_MESSAGE,
-      GroupReadMessage: {
-        groupId: serializeHash(payload.groupId),
-        messageIds: messagesArrived,
-        reader: serializeHash(payload.reader),
-        timestamp: timestampToDate(payload.timestamp),
-      },
+      messages,
     });
   };
 

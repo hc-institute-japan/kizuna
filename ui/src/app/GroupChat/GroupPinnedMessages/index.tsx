@@ -50,7 +50,7 @@ const GroupPinnedMessages: React.FC = () => {
       <IonContent>
         <PinnedMessages
           onMessageClick={(message) => {
-            console.log(message);
+
           }}
           messages={data}
         />

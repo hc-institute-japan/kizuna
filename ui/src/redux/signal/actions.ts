@@ -10,30 +10,30 @@ import receiveP2PReceipt from "../p2pmessages/actions/signals/receiveP2PReceipt"
 import typingP2P from "../p2pmessages/actions/signals/typingP2P";
 import { RootState } from "../types";
 
-export const handleSignal = (type: string, payload: any): any => async (
-  dispatch: ThunkDispatch<RootState, any, AnyAction>
-) => {
-  switch (type) {
-    case SIGNALS[ZOMES.GROUP].ADDED_TO_GROUP:
-      dispatch(addedToGroup(payload));
-      break;
-    case SIGNALS[ZOMES.GROUP].GROUP_MESSAGE_DATA:
-      dispatch(groupMessageData(payload));
-      break;
-    case SIGNALS[ZOMES.GROUP].GROUP_TYPING_DETAIL:
-      dispatch(groupTypingDetail(payload));
-      break;
-    case SIGNALS[ZOMES.GROUP].GROUP_MESSAGE_READ:
-      dispatch(groupMessageRead(payload));
-      break;
-    case SIGNALS[ZOMES.P2PMESSAGE].RECEIVE_P2P_MESSAGE:
-      dispatch(receiveP2PMessage(payload));
-      break;
-    case SIGNALS[ZOMES.P2PMESSAGE].RECEIVE_P2P_RECEIPT:
-      dispatch(receiveP2PReceipt(payload));
-      break;
-    case SIGNALS[ZOMES.P2PMESSAGE].TYPING_P2P:
-      dispatch(typingP2P(payload));
-      break;
-  }
-};
+export const handleSignal =
+  (type: string, payload: any): any =>
+  async (dispatch: ThunkDispatch<RootState, any, AnyAction>) => {
+    switch (type) {
+      case SIGNALS[ZOMES.GROUP].ADDED_TO_GROUP:
+        dispatch(addedToGroup(payload));
+        break;
+      case SIGNALS[ZOMES.GROUP].GROUP_MESSAGE_DATA:
+        dispatch(groupMessageData(payload));
+        break;
+      case SIGNALS[ZOMES.GROUP].GROUP_TYPING_DETAIL:
+        dispatch(groupTypingDetail(payload));
+        break;
+      case SIGNALS[ZOMES.GROUP].GROUP_MESSAGE_READ:
+        dispatch(groupMessageRead(payload));
+        break;
+      case SIGNALS[ZOMES.P2PMESSAGE].RECEIVE_P2P_MESSAGE:
+        dispatch(receiveP2PMessage(payload));
+        break;
+      case SIGNALS[ZOMES.P2PMESSAGE].RECEIVE_P2P_RECEIPT:
+        dispatch(receiveP2PReceipt(payload));
+        break;
+      case SIGNALS[ZOMES.P2PMESSAGE].TYPING_P2P:
+        dispatch(typingP2P(payload));
+        break;
+    }
+  };
