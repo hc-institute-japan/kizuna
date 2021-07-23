@@ -48,6 +48,7 @@ const GroupChat: React.FC = () => {
   const groupData = useSelector(
     (state: RootState) => state.groups.conversations[group]
   );
+
   const myProfile = useSelector((state: RootState) => state.profile);
   const typing = useSelector((state: RootState) => state.groups.typing);
   const { readReceipt, typingIndicator } = useSelector(
@@ -171,7 +172,7 @@ const GroupChat: React.FC = () => {
             if (messageInput.current) messageInput?.current?.reply(message);
           }}
           groupId={groupData.originalGroupId}
-          members={groupData.members}
+          members={[...groupData.members, groupData.creator]}
           messageIds={groupData.messages}
           chatList={chatList}
           readReceipt={readReceipt}

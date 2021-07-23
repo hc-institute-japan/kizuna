@@ -262,21 +262,7 @@ const reducer = (
       return { ...state, typing };
     }
     case SET_GROUP_READ_MESSAGE: {
-      let reader = action.GroupReadMessage.reader;
-      let messageIds = action.GroupReadMessage.messageIds;
-      let timestamp = action.GroupReadMessage.timestamp;
-
-      let messages = state.messages;
-
-      messageIds.forEach((messageId: string) => {
-        let groupMessage = messages[messageId];
-        groupMessage.readList = {
-          ...groupMessage.readList,
-          [reader]: timestamp,
-        };
-      });
-
-      return { ...state, messages };
+      return { ...state, messages: { ...action.messages } };
     }
     default:
       return state;
