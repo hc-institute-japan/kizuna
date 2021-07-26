@@ -13,6 +13,7 @@ import React, {
   useCallback,
   useEffect,
   useImperativeHandle,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -24,9 +25,22 @@ import FileView from "./FileView";
 import ReplyView from "./ReplyView";
 import styles from "./style.module.css";
 
+export interface FileContent {
+  metadata: {
+    fileName: string;
+    fileType: "VIDEO" | "IMAGE" | "OTHER";
+    fileSize: number;
+  };
+  fileType: {
+    type: "VIDEO" | "IMAGE" | "OTHER";
+    payload?: { thumbnail: Uint8Array };
+  };
+  fileBytes: Uint8Array;
+}
+
 export interface MessageInputOnSendParams {
   message?: string;
-  files?: any[];
+  files?: FileContent[];
   reply?: string;
 }
 
@@ -39,14 +53,14 @@ export interface ReplyParams {
 interface Props {
   onChange?: (message: string) => any;
   onSend?: (opt?: MessageInputOnSendParams) => any;
-  onFileSelect?: (e: any[]) => any;
+  onFileSelect?: (e: FileContent[]) => any;
 }
 
 export interface MessageInputMethods {
   reply: (message: { payload: Payload; author: string; id: string }) => any;
 }
 
-const determineFileType = (type: string): string => {
+const determineFileType = (type: string): "VIDEO" | "IMAGE" | "OTHER" => {
   // too lazy to do all
   // url: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types
 
@@ -71,7 +85,7 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
   const intl = useIntl();
   const [isReply, setIsReply] = useState<ReplyParams | undefined>(undefined);
   const file = useRef<HTMLInputElement>(null);
-  const [files, setFiles] = useState<any[]>([]);
+  const [files, setFiles] = useState<FileContent[]>([]);
   const handleOnFileClick = () => file?.current?.click();
 
   const onFileSelectCallback = useCallback(() => {
@@ -120,7 +134,7 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
   }, [message, onChangeCallback]);
   const { showToast } = useToast();
 
-  const handleOnFileChange = () =>
+  const handleOnFileChange = () => {
     Array.from(file.current ? file.current.files! : new FileList()).forEach(
       (file) => {
         file.arrayBuffer().then((arrBuffer) => {
@@ -165,12 +179,8 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
                   video.pause();
                 }
               };
-              video.addEventListener("loadeddata", function () {
-                if (snapImage()) {
-                  video.removeEventListener("timeupdate", timeUpdate);
-                }
-              });
-              const snapImage = function () {
+
+              const snapImage = (): boolean => {
                 const canvas = document.createElement("canvas");
                 canvas.width = video.videoWidth;
                 canvas.height = video.videoHeight;
@@ -180,40 +190,42 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
 
                 const image = canvas.toDataURL("image/jpeg");
 
-                const success = image.length > 100000;
+                const success = image.length > 10;
                 if (success) {
                   const img = document.createElement("img");
 
                   document.getElementsByTagName("div")[0].appendChild(img);
                   URL.revokeObjectURL(url);
+
+                  const base64 = image.split(BASE_64)[1]?.trim();
+                  if (base64) {
+                    const byteCharacters = window.atob(
+                      image.split(BASE_64)[1]?.trim()
+                    );
+
+                    const byteNumbers = new Array(byteCharacters.length);
+                    for (let i = 0; i < byteCharacters.length; i++)
+                      byteNumbers[i] = byteCharacters.charCodeAt(i);
+
+                    const uArr = new Uint8Array(byteNumbers);
+
+                    // });
+                    const final = {
+                      metadata: { fileName, fileType: type, fileSize },
+                      fileType: {
+                        type,
+                        payload: { thumbnail: uArr },
+                      },
+                      fileBytes,
+                    };
+
+                    setFiles((currFiles) => {
+                      currFiles.push(final);
+                      return [...currFiles];
+                    });
+                  }
                 }
 
-                const base64 = image.split(BASE_64)[1]?.trim();
-                if (base64) {
-                  const byteCharacters = window.atob(
-                    image.split(BASE_64)[1]?.trim()
-                  );
-
-                  const byteNumbers = new Array(byteCharacters.length);
-                  for (let i = 0; i < byteCharacters.length; i++)
-                    byteNumbers[i] = byteCharacters.charCodeAt(i);
-
-                  const uArr = new Uint8Array(byteNumbers);
-
-                  // });
-                  const final = {
-                    metadata: { fileName, fileType: type, fileSize },
-                    fileType: {
-                      type,
-                      payload: { thumbnail: uArr },
-                    },
-                    fileBytes,
-                  };
-                  setFiles((currFiles) => {
-                    currFiles.push(final);
-                    return [...currFiles];
-                  });
-                }
                 return success;
               };
 
@@ -225,7 +237,7 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
             } else {
               const final = {
                 metadata: { fileName, fileType: type, fileSize },
-                fileType: { type, payload: null },
+                fileType: { type },
                 fileBytes,
               };
               setFiles((currFiles) => {
@@ -247,54 +259,60 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
         });
       }
     );
+  };
+
+  const renderFileView = useMemo(
+    () =>
+      files.length > 0 ? (
+        <FileView file={file.current} files={files} setFiles={setFiles} />
+      ) : null,
+    [files]
+  );
 
   return (
-    <IonFooter>
-      {isReply ? <ReplyView messageState={[isReply, setIsReply]} /> : null}
-      {files.length > 0 ? <FileView files={files} setFiles={setFiles} /> : null}
-      <IonToolbar className={styles.toolbar}>
-        <IonButtons slot="start">
-          {files.length > 0 ? null : (
-            <IonButton onClick={handleOnFileClick}>
-              <IonIcon color="medium" icon={attachOutline} />
-              <input
-                ref={file}
-                type="file"
-                hidden
-                onChange={handleOnFileChange}
-              />
-            </IonButton>
-          )}
-        </IonButtons>
-        <IonTextarea
-          value={message}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" && !event.shiftKey) {
-              // prevent default behavior
-              event.preventDefault();
-              //alert("ok");
-              return false;
-            }
-          }}
-          className={styles["textarea"]}
-          onIonChange={handleOnChange}
-          autoGrow={true}
-          placeholder={intl.formatMessage({
-            id: "app.new-conversation.message-placeholder",
-          })}
-        />
-        <EndButtons
-          files={files}
-          onSend={() => {
-            if (onSend) {
-              onSend({ files, message, reply: isReply?.id });
-            }
-            reset();
-          }}
-          message={message}
-        />
-      </IonToolbar>
-    </IonFooter>
+    <>
+      <IonFooter>
+        {isReply ? <ReplyView messageState={[isReply, setIsReply]} /> : null}
+        {renderFileView}
+        <IonToolbar className={styles.toolbar}>
+          <IonButtons slot="start">
+            {files.length > 0 ? null : (
+              <IonButton onClick={handleOnFileClick}>
+                <IonIcon color="medium" icon={attachOutline} />
+              </IonButton>
+            )}
+          </IonButtons>
+          <IonTextarea
+            value={message}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" && !event.shiftKey) {
+                // prevent default behavior
+                event.preventDefault();
+                //alert("ok");
+                return false;
+              }
+            }}
+            className={styles["textarea"]}
+            onIonChange={handleOnChange}
+            autoGrow={true}
+            placeholder={intl.formatMessage({
+              id: "app.new-conversation.message-placeholder",
+            })}
+          />
+          <EndButtons
+            files={files}
+            onSend={() => {
+              if (onSend) {
+                onSend({ files, message, reply: isReply?.id });
+              }
+              reset();
+            }}
+            message={message}
+          />
+        </IonToolbar>
+      </IonFooter>
+      <input ref={file} type="file" hidden onChange={handleOnFileChange} />
+    </>
   );
 };
 

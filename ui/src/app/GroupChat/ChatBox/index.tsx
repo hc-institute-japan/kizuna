@@ -22,6 +22,7 @@ interface Props {
   messageIds: string[];
   members: string[];
   groupId: string;
+  readReceipt: boolean;
   // TODO: not really sure what type this is
   onReply(message: { author: string; payload: Payload; id: string }): any;
   chatList: React.RefObject<ChatListMethods>;
@@ -32,6 +33,7 @@ const MessageList: React.FC<Props> = ({
   onReply,
   chatList,
   groupId,
+  readReceipt,
 }) => {
   const dispatch = useAppDispatch();
 
@@ -42,7 +44,9 @@ const MessageList: React.FC<Props> = ({
   const [messages, setMessages] = useState<GroupMessageBundle[]>([]);
   const [oldestFetched, setOldestFetched] = useState<boolean>(false);
 
-  const groups = useSelector((state: RootState) => state.groups);
+  const { messages: stateMessages, members: stateMembers } = useSelector(
+    (state: RootState) => state.groups
+  );
   const membersProfile = useSelector(
     (state: RootState) => state.groups.members
   );
@@ -98,19 +102,21 @@ const MessageList: React.FC<Props> = ({
   };
 
   const handleOnSeen = (complete: () => any, message: any) => {
-    let read: boolean = Object.keys(message.readList).includes(profile.id!);
+    if (readReceipt) {
+      const read: boolean = Object.keys(message.readList).includes(profile.id!);
 
-    if (!read) {
-      let groupMessageReadData: GroupMessageReadData = {
-        groupId: groupId,
-        messageIds: [message.groupMessageId],
-        reader: profile.id!,
-        timestamp: message.timestamp,
-        members,
-      };
-      dispatch(readGroupMessage(groupMessageReadData)).then((res: any) => {
-        complete();
-      });
+      if (!read) {
+        const groupMessageReadData: GroupMessageReadData = {
+          groupId: groupId,
+          messageIds: [message.groupMessageId],
+          reader: profile.id!,
+          timestamp: message.timestamp,
+          members,
+        };
+        dispatch(readGroupMessage(groupMessageReadData)).then((res: any) => {
+          complete();
+        });
+      }
     }
   };
 
@@ -123,8 +129,8 @@ const MessageList: React.FC<Props> = ({
     */
     const messages: GroupMessageBundle[] = messageIds.map((messageId) => {
       /* retrieve the message content from redux */
-      const message: GroupMessage = groups.messages[messageId];
-      const authorProfile: Profile = groups.members[message.author];
+      const message: GroupMessage = stateMessages[messageId];
+      const authorProfile: Profile = stateMembers[message.author];
 
       return {
         ...message,
@@ -143,7 +149,7 @@ const MessageList: React.FC<Props> = ({
     });
     setMessages(messages);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messageIds]);
+  }, [messageIds, stateMessages]);
 
   return (
     <>

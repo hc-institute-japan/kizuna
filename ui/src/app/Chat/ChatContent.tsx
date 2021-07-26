@@ -74,6 +74,9 @@ const Chat: React.FC = () => {
     );
     return conversant[0];
   });
+  const { readReceipt, typingIndicator } = useSelector(
+    (state: RootState) => state.preference
+  );
 
   const dispatch = useAppDispatch();
   const history = useHistory();
@@ -83,6 +86,7 @@ const Chat: React.FC = () => {
   /* REFS */
   const scrollerRef = useRef<ChatListMethods>(null);
   const didMountRef = useRef(false);
+  const didMountRef2 = useRef(false);
   const inputTimeout = useRef<NodeJS.Timeout>();
   const messageInputRef = useRef<MessageInputMethods | null>(null);
 
@@ -155,15 +159,16 @@ const Chat: React.FC = () => {
   */
   const handleOnChange = (message: string, conversant: Profile) => {
     if (didMountRef.current === true) {
-      dispatch(isTyping(conversant.id, message.length !== 0 ? true : false));
+      if (typingIndicator) {
+        dispatch(isTyping(conversant.id, message.length !== 0 ? true : false));
 
-      if (inputTimeout.current) clearTimeout(inputTimeout.current);
+        if (inputTimeout.current) clearTimeout(inputTimeout.current);
 
-      inputTimeout.current = setTimeout(
-        () => dispatch(isTyping(conversant.id, false)),
-        500
-      );
-
+        inputTimeout.current = setTimeout(
+          () => dispatch(isTyping(conversant.id, false)),
+          500
+        );
+      }
       setMessage(message);
     } else {
       didMountRef.current = true;
@@ -212,7 +217,7 @@ const Chat: React.FC = () => {
       when reaching the beginning/top of the chat box
     */
   const handleOnScrollTop = (complete: any) => {
-    if (didMountRef.current === true) {
+    if (didMountRef2.current === true) {
       if (disableGetNextBatch === false) {
         let lastMessage = messagesWithConversant[0].message;
         dispatch(
@@ -232,9 +237,9 @@ const Chat: React.FC = () => {
         });
       }
     } else {
-      didMountRef.current = true;
+      didMountRef2.current = true;
     }
-    // complete();
+    complete();
     return;
   };
 
@@ -252,7 +257,7 @@ const Chat: React.FC = () => {
     message: P2PMessage;
     receipt: P2PMessageReceipt;
   }) => {
-    if (messageBundle.receipt.status !== "read") {
+    if (messageBundle.receipt.status !== "read" && readReceipt) {
       dispatch(readMessage([messageBundle.message]));
     }
   };
@@ -280,6 +285,15 @@ const Chat: React.FC = () => {
     link.download = fileName;
     link.click();
   };
+
+  /*
+    handle the clicking of nickname
+  */
+  const handleOnProfileClick = () =>
+    history.push({
+      pathname: `/p/${id}`,
+      state: { profile: { username: state?.username, id } },
+    });
 
   /* 
     renders the appropriate chat bubble
@@ -355,13 +369,15 @@ const Chat: React.FC = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonButtons>
+          <IonButtons slot="start">
             <IonButton
               onClick={() => handleOnBack()}
               className="ion-no-padding"
             >
               <IonIcon slot="icon-only" icon={arrowBackSharp} />
             </IonButton>
+          </IonButtons>
+          <div className={styles["title-container"]}>
             <IonAvatar className="ion-padding">
               <img
                 className={styles["avatar"]}
@@ -369,9 +385,14 @@ const Chat: React.FC = () => {
                 alt={state?.username}
               />
             </IonAvatar>
-            <IonTitle className="item item-text-wrap">
+            <IonTitle
+              className={styles["title"]}
+              onClick={handleOnProfileClick}
+            >
               <AgentIdentifier nickname={state?.username} id={id} />
             </IonTitle>
+          </div>
+          <IonButtons slot="end">
             <IonButton
               onClick={() => history.push(`/u/${conversant.id}/search`)}
             >

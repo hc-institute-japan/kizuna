@@ -112,12 +112,19 @@ const VideoPlayerModal: React.FC<Props> = ({
         <IonHeader>
           <IonToolbar ref={header} className={styles.toolbar}>
             <IonButtons>
-              <IonButton onClick={() => setIsOpen(false)}>
+              <IonButton
+                onTouchEnd={() => setIsOpen(false)}
+                onClick={() => setIsOpen(false)}
+              >
                 <IonIcon icon={arrowBack} />
               </IonButton>
             </IonButtons>
             <IonButtons slot="end">
               <IonButton
+                onTouchEnd={(e: any) => {
+                  e.persist();
+                  setPopover({ isOpen: true, event: e });
+                }}
                 onClick={(e: any) => {
                   e.persist();
                   setPopover({ isOpen: true, event: e });

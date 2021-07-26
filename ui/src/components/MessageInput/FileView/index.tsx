@@ -6,9 +6,11 @@ import styles from "./style.module.css";
 interface Props {
   files: any[];
   setFiles: Dispatch<SetStateAction<any[]>>;
+  file: HTMLInputElement | null;
 }
-const FileView: React.FC<Props> = ({ files, setFiles }) => {
+const FileView: React.FC<Props> = ({ file, files, setFiles }) => {
   const handleClose = (index: number) => {
+    (file as HTMLInputElement).value = "";
     setFiles((currFiles) => {
       currFiles.splice(index, 1);
       return [...currFiles];

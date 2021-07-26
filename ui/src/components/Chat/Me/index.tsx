@@ -1,7 +1,7 @@
 import { IonIcon, IonItem, IonText } from "@ionic/react";
 import {
-  checkmarkDoneOutline,
-  checkmarkOutline,
+  checkmarkCircleOutline,
+  checkmarkDoneCircle,
   personCircleOutline,
 } from "ionicons/icons";
 import React, { useState } from "react";
@@ -15,7 +15,6 @@ import { usePressHandlers } from "../../../utils/helpers";
 import ChatModal from "../ChatModal";
 import File from "../File";
 import ReplyTo from "../ReplyTo";
-
 import { default as common, default as styles } from "../style.module.css";
 import Text from "../Text";
 import { ChatProps } from "../types";
@@ -68,8 +67,8 @@ const Me: React.FC<ChatProps> = ({
             <h6 className="ion-no-margin ion-text-end">
               {intl.formatTime(timestamp)}
               <IonIcon
-                size="s"
-                icon={isSeen ? checkmarkDoneOutline : checkmarkOutline}
+                size="medium"
+                icon={isSeen ? checkmarkDoneCircle : checkmarkCircleOutline}
               />
             </h6>
           </IonText>

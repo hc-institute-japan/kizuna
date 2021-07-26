@@ -39,6 +39,7 @@ const ReplyView: React.FC<Props> = ({ messageState }) => {
               <div className={`${styles.row} ion-padding-start`}>
                 <IonThumbnail className={styles.thumbnail}>
                   <img
+                    alt="Thumbnail"
                     src={
                       message.payload?.fileType === "VIDEO"
                         ? URL.createObjectURL(
