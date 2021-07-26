@@ -9,7 +9,6 @@ import { handleSignal } from "../redux/signal/actions";
 import { CallZomeConfig } from "../redux/types";
 // @ts-ignore
 global.COMB = undefined;
-// @ts-ignore
 const { Connection } = require("@holo-host/web-sdk");
 // @ts-ignore
 window.COMB = require("@holo-host/comb").COMB;
@@ -27,7 +26,8 @@ const createClient = async (
   switch (env) {
     case "HCC": {
       const branding = {
-        app_name: "kizuna_test",
+        logo_url: "assets/icon/kizuna_logo.png",
+        app_name: "Kizuna Messaging App",
       };
 
       const connection = new Connection(

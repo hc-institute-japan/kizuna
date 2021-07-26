@@ -14,10 +14,7 @@ const Landing: React.FC = () => (
   <IonPage>
     <IonContent fullscreen>
       <div className={styles.landing}>
-      <IonImg 
-        src="assets/icon/kizuna_tab_logo.png"
-        className={styles.logo}
-        />
+        <IonImg src="assets/icon/kizuna_logo.png" className={styles.logo} />
         <div className={styles.actions}>
           <IonButton href="/login" className="ion-margin-bottom">
             <FormattedMessage id="app.landing.login" />
