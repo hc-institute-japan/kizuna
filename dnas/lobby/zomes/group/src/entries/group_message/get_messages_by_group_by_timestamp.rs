@@ -74,8 +74,10 @@ pub fn get_messages_by_group_by_timestamp_handler(
                                 };
 
                                 if let Some(reply_to_hash) = group_message.reply_to.clone() {
-                                    let replied_message: GroupMessage =
-                                        try_get_and_convert(reply_to_hash.clone())?;
+                                    let replied_message: GroupMessage = try_get_and_convert(
+                                        reply_to_hash.clone(),
+                                        GetOptions::content(),
+                                    )?;
                                     group_message_data.reply_to = Some(GroupMessageWithId {
                                         id: reply_to_hash,
                                         content: replied_message,

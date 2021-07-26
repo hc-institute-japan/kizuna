@@ -8,21 +8,23 @@ mod validation_rules;
 use entries::group::{self, GroupOutput};
 use entries::group_message;
 
-use group::add_members::add_members_handler;
-use group::create_group::create_group_handler;
-use group::get_all_my_groups::get_all_my_groups_handler;
-use group::group_helpers;
-use group::remove_members::remove_members_handler;
-use group::update_group_name::update_group_name_handler;
+use group::{
+    add_members::add_members_handler, create_group::create_group_handler,
+    get_all_my_groups::get_all_my_groups_handler, group_helpers,
+    remove_members::remove_members_handler, update_group_name::update_group_name_handler,
+};
 
-use group_message::get_files_bytes::get_files_bytes_handler;
-use group_message::get_latest_messages_for_all_groups::get_latest_messages_for_all_groups_handler;
-use group_message::get_messages_by_group_by_timestamp::get_messages_by_group_by_timestamp_handler;
-use group_message::get_next_batch_group_messages::get_next_batch_group_messages_handler;
-use group_message::indicate_group_typing::indicate_group_typing_handler;
-use group_message::read_group_message::read_group_message_handler;
-use group_message::send_message::send_message_handler;
-use group_message::send_message_in_target_date::send_message_in_target_date_handler;
+use group_message::{
+    get_files_bytes::get_files_bytes_handler,
+    get_latest_messages_for_all_groups::get_latest_messages_for_all_groups_handler,
+    get_messages_by_group_by_timestamp::get_messages_by_group_by_timestamp_handler,
+    get_next_batch_group_messages::get_next_batch_group_messages_handler,
+    get_pinned_messages::get_pinned_messages_handler,
+    indicate_group_typing::indicate_group_typing_handler, pin_message::pin_message_handler,
+    read_group_message::read_group_message_handler, send_message::send_message_handler,
+    send_message_in_target_date::send_message_in_target_date_handler,
+    unpin_message::unpin_message_handler,
+};
 
 use validation_rules::run_validations::run_validations_handler;
 use validation_rules::ValidationInput;
@@ -30,9 +32,9 @@ use validation_rules::ValidationInput;
 use signals::{SignalDetails, SignalPayload};
 
 use group_message::{
-    BatchSize, FileBytes, GroupChatFilter, GroupFileBytes, GroupMessage, GroupMessageInput,
-    GroupMessageInputWithDate, GroupMessageReadData, GroupMessageWithId, GroupMessagesOutput,
-    GroupMsgBatchFetchFilter, GroupTypingDetailData,
+    BatchSize, FileBytes, GroupChatFilter, GroupFileBytes, GroupHash, GroupMessage,
+    GroupMessageInput, GroupMessageInputWithDate, GroupMessageReadData, GroupMessageWithId,
+    GroupMessagesOutput, GroupMsgBatchFetchFilter, GroupTypingDetailData, PinContents, PinDetail,
 };
 
 use group::{
@@ -90,6 +92,7 @@ fn recv_remote_signal(signal: ExternIO) -> ExternResult<()> {
     Ok(())
 }
 
+// Group CRUD
 #[hdk_extern]
 fn create_group(create_group_input: CreateGroupInput) -> ExternResult<CreateGroupOutput> {
     return create_group_handler(create_group_input);
@@ -122,6 +125,7 @@ fn get_group_latest_version(group_id: EntryHashWrapper) -> ExternResult<GroupOut
     return group_helpers::get_group_latest_version(group_id.group_hash);
 }
 
+// Group Message CRUD
 #[hdk_extern]
 fn send_message(message_input: GroupMessageInput) -> ExternResult<GroupMessageWithId> {
     return send_message_handler(message_input);
@@ -140,11 +144,6 @@ fn get_latest_messages_for_all_groups(batch_size: BatchSize) -> ExternResult<Gro
 }
 
 #[hdk_extern]
-fn indicate_group_typing(group_typing_detail_data: GroupTypingDetailData) -> ExternResult<()> {
-    return indicate_group_typing_handler(group_typing_detail_data);
-}
-
-#[hdk_extern]
 fn get_messages_by_group_by_timestamp(
     group_chat_filter: GroupChatFilter,
 ) -> ExternResult<GroupMessagesOutput> {
@@ -157,10 +156,30 @@ fn get_files_bytes(file_hashes: Vec<EntryHash>) -> ExternResult<FileBytes> {
 }
 
 #[hdk_extern]
+fn pin_message(pin_detail: PinDetail) -> ExternResult<()> {
+    return pin_message_handler(pin_detail);
+}
+
+#[hdk_extern]
+fn unpin_message(pin_detail: PinDetail) -> ExternResult<()> {
+    return unpin_message_handler(pin_detail);
+}
+
+#[hdk_extern]
+fn get_pinned_messages(group_hash: GroupHash) -> ExternResult<PinContents> {
+    return get_pinned_messages_handler(group_hash);
+}
+
+#[hdk_extern]
 fn read_group_message(
     group_message_read_io: GroupMessageReadData,
 ) -> ExternResult<GroupMessageReadData> {
     return read_group_message_handler(group_message_read_io);
+}
+
+#[hdk_extern]
+fn indicate_group_typing(group_typing_detail_data: GroupTypingDetailData) -> ExternResult<()> {
+    return indicate_group_typing_handler(group_typing_detail_data);
 }
 
 /*

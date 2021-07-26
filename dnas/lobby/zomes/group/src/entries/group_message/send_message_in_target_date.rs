@@ -82,7 +82,7 @@ pub fn send_message_in_target_date_handler(
                             };
                             if let Some(hash) = message_input.reply_to.clone() {
                                 let replied_message: GroupMessage =
-                                    try_get_and_convert(hash.clone())?;
+                                    try_get_and_convert(hash.clone(), GetOptions::content())?;
                                 group_message_data.reply_to = Some(GroupMessageWithId {
                                     id: hash,
                                     content: replied_message,
