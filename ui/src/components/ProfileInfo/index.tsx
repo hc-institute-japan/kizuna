@@ -1,4 +1,4 @@
-import { IonItem, IonItemGroup } from "@ionic/react";
+import { IonItem, IonItemGroup, IonText } from "@ionic/react";
 import React from "react";
 import { useIntl } from "react-intl";
 import Identicon from "../Identicon";
@@ -31,7 +31,7 @@ const ProfileInfo: React.FC<Props> = ({ nickname, id }) => {
         </IonItem>
 
         <IonItem lines="none">
-          <p>{trimmedId}</p>
+          <IonText>{trimmedId}</IonText>
         </IonItem>
 
         <IonItem lines="none">

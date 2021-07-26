@@ -6,7 +6,7 @@ import { GroupMessageReadData } from "../types";
 
 const readGroupMessage =
   (groupMessageReadData: GroupMessageReadData): ThunkAction =>
-  async (dispatch, getState, { callZome, getAgentId }) => {
+  async (dispatch, getState, { callZome }) => {
     /* deserialize fields for zome fn */
     const input = {
       groupId: deserializeHash(groupMessageReadData.groupId),

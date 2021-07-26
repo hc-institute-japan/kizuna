@@ -2,6 +2,33 @@
   display: flex !important;
   flex-direction: column !important;
   background: transparent;
+  flex: 1;
+  min-height: 100%;
+}
+
+.chat:before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+
+  display: block;
+
+  background-image: url("chat-app-background.jpeg");
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 100%;
+  height: 100%;
+
+  -webkit-filter: blur(5px);
+  -moz-filter: blur(5px);
+  -o-filter: blur(5px);
+  -ms-filter: blur(5px);
+  filter: blur(5px);
 }
 
 .chat ion-item {

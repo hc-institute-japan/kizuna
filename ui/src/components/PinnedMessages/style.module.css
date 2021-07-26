@@ -1,0 +1,46 @@
+.content-container {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+}
+
+.header .author {
+  color: rgb(var(--ion-color-primary-rgb));
+}
+
+.header .date {
+  font-size: 0.65rem;
+}
+
+.header .date {
+  font-size: 0.65rem;
+}
+
+.thumbnail {
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.video {
+  border-radius: 5px;
+}
+
+.other {
+  display: flex;
+  align-items: center;
+  border-radius: 5px;
+  border: 1px solid var(--ion-color-light);
+}
+
+.file-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.file-size {
+  color: var(--ion-color-medium);
+}

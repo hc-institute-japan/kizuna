@@ -22,14 +22,19 @@ const AddContactModal: React.FC<Props> = ({ isOpen, onCancel }) => {
   const { showToast } = useToast();
   const intl = useIntl();
   const contacts = useSelector((state: RootState) => state.contacts.contacts);
-  const [users, setUsers] = useState<Profile[]>([]);
+  const [profiles, setProfiles] = useState<Profile[]>([]);
 
   const dispatch = useAppDispatch();
 
   const handleOnChange = (searchKey: string) => {
     if (searchKey.length >= 3) {
-      dispatch(searchProfiles(searchKey)).then((res: Profile[]) => {
-        if (res) setUsers(res);
+      dispatch(searchProfiles(searchKey)).then((profiles: Profile[]) => {
+        if (profiles) {
+          const filteredProfiles = profiles.filter((profile: Profile) =>
+            profile.username.includes(searchKey)
+          );
+          setProfiles(filteredProfiles);
+        }
       });
     } else if (searchKey.length > 0 && searchKey.length < 3) {
       /* add another 300ms to show warning toast */
@@ -44,11 +49,11 @@ const AddContactModal: React.FC<Props> = ({ isOpen, onCancel }) => {
       );
     } else {
       /* clear search result when string is equal to 0 */
-      setUsers([]);
+      setProfiles([]);
     }
   };
 
-  let indexedContacts: IndexedContacts = indexContacts(users);
+  let indexedContacts: IndexedContacts = indexContacts(profiles);
 
   const onCompletion = (contact: Profile) => {
     showToast({
@@ -63,7 +68,9 @@ const AddContactModal: React.FC<Props> = ({ isOpen, onCancel }) => {
       type: SET_CONTACTS,
       contacts: { ...contacts },
     });
-    setUsers((users) => users.filter((user) => user.id !== contact.id));
+    setProfiles((profiles) =>
+      profiles.filter((profile) => profile.id !== contact.id)
+    );
   };
 
   return (

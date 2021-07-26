@@ -183,7 +183,7 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
           ...stateToSetFiles.typing,
         },
       };
-      console.log("reducer file set", stateToSetFiles);
+      // console.log("reducer file set", stateToSetFiles);
       return stateToSetFiles;
 
     case SET_TYPING:

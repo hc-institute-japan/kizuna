@@ -1,5 +1,6 @@
+import { isPlatform } from "@ionic/core";
 import { IonIcon, IonSpinner } from "@ionic/react";
-import { expandOutline, pause, play } from "ionicons/icons";
+import { expandOutline, pause, play, download } from "ionicons/icons";
 import React, {
   RefObject,
   SetStateAction,
@@ -26,7 +27,7 @@ const Controls: React.FC<Props> = ({
   hasError,
   onPlayPauseErrorHandler,
 }) => {
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(isPlatform("mobile"));
   const [isOpen, setIsOpen] = modal;
   const timeout = useRef<NodeJS.Timeout>();
   const [isLoading, setIsLoading] = useState(false);
@@ -42,7 +43,7 @@ const Controls: React.FC<Props> = ({
     if (timeout.current) clearTimeout(timeout.current);
     timeout.current = setTimeout(function () {
       setVisible(false);
-    }, 3000);
+    }, 1000);
   };
 
   const handleOnMouseEnter = () => {
@@ -62,7 +63,9 @@ const Controls: React.FC<Props> = ({
   const onPlayPause = () => {
     if (!hasError) {
       if (!isPlaying) video.current?.play();
-      else video.current?.pause();
+      else {
+        video.current?.pause();
+      }
     } else {
       setIsLoading(true);
       if (onPlayPauseErrorHandler) onPlayPauseErrorHandler();
@@ -78,19 +81,43 @@ const Controls: React.FC<Props> = ({
       className={styles.controls}
       style={{ opacity: visible ? 1 : 0 }}
     >
-      <div className={styles["play-pause"]} onClick={onPlayPause}>
+      <div
+        className={styles["play-pause"]}
+        onClick={onPlayPause}
+        onTouchEnd={onPlayPause}
+      >
         {isLoading ? (
           <IonSpinner />
         ) : (
-          <IonIcon icon={!isPlaying ? play : pause} />
+          <IonIcon
+            icon={
+              hasError // bytes are not loaded yet
+                ? isPlaying
+                  ? pause // will not happen
+                  : download
+                : isPlaying // bytes are loaded
+                ? pause
+                : play
+            }
+          />
         )}
       </div>
       <div className={styles["range-slider-expand"]}>
         <div className={styles["range-slider"]}>
-          <input type="range" value={duration * 100} min={0} max={100} />
+          <input
+            type="range"
+            onChange={() => {}}
+            value={duration * 100}
+            min={0}
+            max={100}
+          />
         </div>
         <div className={styles.expand}>
-          <IonIcon onClick={handleOnDoubleClick} icon={expandOutline} />
+          <IonIcon
+            onClick={handleOnDoubleClick}
+            onTouchEnd={handleOnDoubleClick}
+            icon={expandOutline}
+          />
         </div>
       </div>
     </div>

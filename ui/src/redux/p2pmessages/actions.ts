@@ -314,10 +314,12 @@ export const sendMessage =
             break;
         }
 
-        let contacts = getState().contacts.contacts;
-        let profile = getState().profile;
-        if (profile.id !== null && profile.username !== null)
-          contacts[profile.id] = { id: profile.id, username: profile.username };
+        const contactsState = { ...getState().contacts.contacts };
+        const profile = { ...getState().profile };
+        const profileList = {
+          ...contactsState,
+          [profile.id!]: { id: profile.id!, username: profile.username! },
+        };
 
         let transformedReplyTo = undefined;
         let replyToPayload = undefined;
@@ -347,7 +349,7 @@ export const sendMessage =
 
           transformedReplyTo = {
             p2pMessageEntryHash: serializeHash(message.replyTo.hash),
-            author: contacts[serializeHash(message.replyTo.author)],
+            author: profileList[serializeHash(message.replyTo.author)],
             receiver: serializeHash(message.replyTo.receiver),
             payload: replyToPayload ? replyToPayload : message.replyTo.payload,
             timestamp: timestampToDate(message.replyTo.timeSent),
@@ -357,7 +359,7 @@ export const sendMessage =
 
         let p2pMessage: P2PMessage = {
           p2pMessageEntryHash: messageHash,
-          author: contacts[serializeHash(message.author)],
+          author: profileList[serializeHash(message.author)],
           receiver: serializeHash(message.receiver),
           payload: payload,
           timestamp: timestampToDate(message.timeSent),
@@ -415,11 +417,13 @@ export const getLatestMessages =
 
       // DISPATCH TO REDUCER
       if (p2pLatestState?.type !== "error") {
-        let contacts = getState().contacts.contacts;
-        let profile = getState().profile;
-        if (profile.id !== null && profile.username !== null)
-          contacts[profile.id] = { id: profile.id, username: profile.username };
-        let toDispatch = transformZomeDataToUIData(p2pLatestState, contacts);
+        const contactsState = { ...getState().contacts.contacts };
+        const profile = { ...getState().profile };
+        const profileList = {
+          ...contactsState,
+          [profile.id!]: { id: profile.id!, username: profile.username! },
+        };
+        let toDispatch = transformZomeDataToUIData(p2pLatestState, profileList);
         dispatch(setMessages(toDispatch));
 
         return toDispatch;
@@ -460,13 +464,15 @@ export const getNextBatchMessages =
 
       // DISPATCH TO REDUCER
       if (nextBatchOfMessages?.type !== "error") {
-        let contacts = getState().contacts.contacts;
-        let profile = getState().profile;
-        if (profile.id !== null && profile.username !== null)
-          contacts[profile.id] = { id: profile.id, username: profile.username };
+        const contactsState = { ...getState().contacts.contacts };
+        const profile = { ...getState().profile };
+        const profileList = {
+          ...contactsState,
+          [profile.id!]: { id: profile.id!, username: profile.username! },
+        };
         let toDispatch = transformZomeDataToUIData(
           nextBatchOfMessages,
-          contacts
+          profileList
         );
         if (Object.values(nextBatchOfMessages[1]).length > 0)
           dispatch({
@@ -497,11 +503,16 @@ export const getMessagesByAgentByTimestamp =
       });
 
       if (messagesByDate?.type !== "error") {
-        let contacts = getState().contacts.contacts;
-        let profile = getState().profile;
-        if (profile.id !== null && profile.username !== null)
-          contacts[profile.id] = { id: profile.id, username: profile.username };
-        let transformed = transformZomeDataToUIData(messagesByDate, contacts);
+        const contactsState = { ...getState().contacts.contacts };
+        const profile = { ...getState().profile };
+        const profileList = {
+          ...contactsState,
+          [profile.id!]: { id: profile.id!, username: profile.username! },
+        };
+        let transformed = transformZomeDataToUIData(
+          messagesByDate,
+          profileList
+        );
         return transformed;
       }
     } catch (e) {
@@ -573,7 +584,7 @@ export const readMessage =
 export const getFileBytes =
   (inputHashes: HoloHashBase64[]): ThunkAction =>
   async (dispatch, _getState, { callZome }) => {
-    let hashes = inputHashes.map((hash) => deserializeHash(hash));
+    const hashes = inputHashes.map((hash) => deserializeHash(hash));
     try {
       const fetchedFiles = await callZome({
         zomeName: ZOMES.P2PMESSAGE,

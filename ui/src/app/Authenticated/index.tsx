@@ -30,7 +30,7 @@ const Authenticated: React.FC = () => {
           <Route path="/g/:group" component={GroupChat} />
           <Route path="/u/:id" component={Chat} />
 
-          <Route path="/p/:username" exact component={Profile} />
+          <Route path="/p/:id" exact component={Profile} />
           {/* <Route path="/test" exact component={GroupChat} /> */}
 
           <Route path="/blocked" exact component={Blocked} />

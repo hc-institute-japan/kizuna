@@ -1,0 +1,13 @@
+{
+  "app_id": "uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL",
+  "log_level": true,
+  "connection": {
+    "secure": false,
+    "host": "localhost",
+    "port": 8889,
+    "path": "/"
+  },
+  "port": 24274,
+  "mode": 2,
+  "hcc_admin_port": 9001
+}

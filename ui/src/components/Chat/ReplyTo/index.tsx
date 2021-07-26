@@ -1,6 +1,6 @@
 import { IonIcon, IonLabel, IonThumbnail } from "@ionic/react";
-import { arrowRedo, arrowUndo, documentOutline } from "ionicons/icons";
-import React, { useRef, useState } from "react";
+import { documentOutline } from "ionicons/icons";
+import React from "react";
 import {
   FilePayload,
   Payload,
@@ -32,6 +32,7 @@ const ReplyTo: React.FC<Props> = ({ message }) => {
       ) : (
         <IonThumbnail className={`${styles.thumbnail} ion-margin-end`}>
           <img
+            alt="Thumbnail"
             src={
               (message?.payload as FilePayload)?.fileType === "VIDEO"
                 ? URL.createObjectURL(

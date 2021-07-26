@@ -9,9 +9,8 @@ import {
   IonPage,
   IonToolbar,
 } from "@ionic/react";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useIntl } from "react-intl";
-import { useHistory } from "react-router";
 import HomeInput from "../../components/Input/HomeInput";
 import { createProfile } from "../../redux/profile/actions";
 import { useAppDispatch } from "../../utils/helpers";
@@ -20,18 +19,17 @@ import styles from "./style.module.css";
 
 const Register: React.FC = () => {
   const [nickname, setNickname] = useState<string>("");
-  const [isValid, setIsValid] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const dispatch = useAppDispatch();
-  const history = useHistory();
 
   const intl = useIntl();
 
   const handleOnChange = (e: CustomEvent) => {
     setNickname(e.detail.value!);
+
     setError(
-      isUsernameFormatValid(e.detail.value!)
+      isUsernameFormatValid(e.detail.value!) && e.detail!.value!.length >= 3
         ? null
         : intl.formatMessage({
             id: "app.register.error-invalid-username",
@@ -39,25 +37,15 @@ const Register: React.FC = () => {
     );
   };
 
-  useEffect(() => {
-    if (error) {
-      setIsValid(false);
-    } else {
-      if (nickname.length >= 3) setIsValid(true);
-    }
-  }, [error, nickname.length]);
-
   const handleOnSubmit = () => {
     setLoading(true);
     dispatch(createProfile(nickname)).then((res: any) => {
-      if (res) {
-        history.push("/");
-      } else {
-        setError(
-          intl.formatMessage({
-            id: "app.register.error-existing-username",
-          })
-        );
+      if (!res) {
+        // setError(
+        //   intl.formatMessage({
+        //     id: "app.register.error-existing-username",
+        //   })
+        // );
         setLoading(false);
       }
     });
@@ -89,10 +77,10 @@ const Register: React.FC = () => {
                 })}
                 error={error}
                 debounce={600}
-              ></HomeInput>
+              />
             </div>
           </div>
-          <IonButton onClick={handleOnSubmit} disabled={!isValid}>
+          <IonButton onClick={handleOnSubmit} disabled={error ? true : false}>
             {intl.formatMessage({
               id: "app.register.register",
             })}

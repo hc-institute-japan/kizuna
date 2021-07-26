@@ -283,7 +283,7 @@ export interface SetGroupTypingIndicator {
 
 export interface SetGroupReadMessage {
   type: typeof SET_GROUP_READ_MESSAGE;
-  GroupReadMessage: GroupMessageReadDetail;
+  messages: { [key: string]: GroupMessage };
 }
 
 export interface SetFilesBytes {
