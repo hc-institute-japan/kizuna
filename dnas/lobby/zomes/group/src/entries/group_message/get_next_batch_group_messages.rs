@@ -4,7 +4,7 @@ use hdk::prelude::*;
 use std::collections::hash_map::HashMap;
 
 use super::group_message_helpers::collect_messages_info;
-use super::group_message_helpers::filter_path_children_list;
+use super::group_message_helpers::filter_path_children;
 use super::group_message_helpers::get_linked_messages_from_path;
 
 use super::{
@@ -73,7 +73,7 @@ pub fn get_next_batch_group_messages_handler(
         let mut path_childrens: Vec<Link> = group_path.children()?.into_inner();
 
         // filter this childrens to removed the path we dont need to check
-        filter_path_children_list(&mut path_childrens, pivot_path)?;
+        filter_path_children(&mut path_childrens, pivot_path)?;
 
         // iterate the childrens until we reach the batch size or we run out of paths
         loop {

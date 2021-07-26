@@ -63,8 +63,25 @@ pub fn call_response_handler(call_response: ZomeCallResponse) -> ExternResult<Ex
     }
 }
 
-pub fn try_get_and_convert<T: TryFrom<SerializedBytes>>(entry_hash: EntryHash) -> ExternResult<T> {
-    match get(entry_hash.clone(), GetOptions::default())? {
+// slight modification of try_get_and_convert to retrieve the header together with the entry
+pub fn try_get_and_convert_with_header<T: TryFrom<SerializedBytes>>(
+    entry_hash: EntryHash,
+    option: GetOptions,
+) -> ExternResult<(SignedHeaderHashed, T)> {
+    match get(entry_hash.clone(), option)? {
+        Some(element) => Ok((
+            element.signed_header().to_owned(),
+            try_from_element(element)?,
+        )),
+        None => error("Entry not found"),
+    }
+}
+
+pub fn try_get_and_convert<T: TryFrom<SerializedBytes>>(
+    entry_hash: EntryHash,
+    option: GetOptions,
+) -> ExternResult<T> {
+    match get(entry_hash.clone(), option)? {
         Some(element) => try_from_element(element),
         None => error("Entry not found"),
     }

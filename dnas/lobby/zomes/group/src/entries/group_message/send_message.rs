@@ -77,7 +77,8 @@ pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<Gr
         reply_to: None,
     };
     if let Some(hash) = message_input.reply_to.clone() {
-        let replied_message: GroupMessage = try_get_and_convert(hash.clone())?;
+        let replied_message: GroupMessage =
+            try_get_and_convert(hash.clone(), GetOptions::content())?;
         group_message_data.reply_to = Some(GroupMessageWithId {
             id: hash,
             content: replied_message,
