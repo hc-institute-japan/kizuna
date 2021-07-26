@@ -27,6 +27,8 @@ pub fn read_group_message_handler(
         we wait here until the entry can be retrieved even before the create_link() is executed.
         https://forum.holochain.org/t/problem-that-may-occur-when-creating-a-link-between-two-entries-when-the-said-entries-are-literally-just-created-in-the-dht/6316/3
         TODO: use https://docs.rs/hdk/0.0.100/hdk/time/fn.sleep.html to lessen burden.
+        TODO: refactor the flow of creating a link from an EntryHash received from the signal as
+        the receiver of signal has no guarantee that the sender of signal succefully created the entry
         */
         let mut message_entry: Option<Element> = None;
         while let None = message_entry {
