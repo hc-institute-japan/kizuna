@@ -7,11 +7,14 @@ pub mod get_files_bytes;
 pub mod get_latest_messages_for_all_groups;
 pub mod get_messages_by_group_by_timestamp;
 pub mod get_next_batch_group_messages;
+pub mod get_pinned_messages;
 pub mod group_message_helpers;
 pub mod indicate_group_typing;
+pub mod pin_message;
 pub mod read_group_message;
 pub mod send_message;
 pub mod send_message_in_target_date;
+pub mod unpin_message;
 
 /* GROUP MESSAGE TYPE DEFINITION, GETTERS, SETTERS, ENTRY_DEF, UTILS ... */
 
@@ -106,6 +109,13 @@ pub struct GroupMessageInputWithDate {
     reply_to: Option<EntryHash>,
     date: u64,
 }
+
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct PinDetail {
+    group_hash: EntryHash,
+    group_message_hash: EntryHash,
+}
 /* END OF INPUT TYPES DEFINITION */
 
 /* OUTPUT TYPES DEFINITION */
@@ -143,9 +153,13 @@ pub struct GroupMessageData {
     pub reply_to: Option<GroupMessageWithId>,
 }
 
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Hash, PartialEq, Eq, Debug)]
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct GroupMessageHash(pub EntryHash);
+
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct GroupHash(pub EntryHash);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -172,4 +186,7 @@ pub struct GroupMessageWithId {
     pub id: EntryHash,
     pub content: GroupMessage,
 }
+
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+pub struct PinContents(HashMap<String, GroupMessageElement>);
 /* END OF OUTPUTS TYPES DEFINITION */
