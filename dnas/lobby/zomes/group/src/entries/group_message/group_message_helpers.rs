@@ -67,7 +67,7 @@ pub fn collect_messages_info(
         if let Some(message_element) = get(message_hash.clone(), GetOptions::content())? {
             // collect all the values to fill the group_message_content. these values are:
 
-            // - the message entry_hash (aka the link target )
+            // - the message entry_hash (aka the link target)
             // - the GroupMessageData (constructed from the element fetched from entry hash of the message )
             // - the read_list for that message ( got it from the links related to the message with the tag "read" )
 
@@ -93,7 +93,7 @@ pub fn collect_messages_info(
 
                         if let Some(reply_to_hash) = group_message.reply_to.clone() {
                             let replied_message: GroupMessage =
-                                try_get_and_convert(reply_to_hash.clone())?;
+                                try_get_and_convert(reply_to_hash.clone(), GetOptions::content())?;
                             group_message_data.reply_to = Some(GroupMessageWithId {
                                 id: reply_to_hash,
                                 content: replied_message,
@@ -128,7 +128,7 @@ pub fn collect_messages_info(
     Ok(())
 }
 
-pub fn filter_path_children_list(
+pub fn filter_path_children(
     path_childrens: &mut Vec<Link>,
     pivot_path: Option<EntryHash>,
 ) -> ExternResult<()> {
