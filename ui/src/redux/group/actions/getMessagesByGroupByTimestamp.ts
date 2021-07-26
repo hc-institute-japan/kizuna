@@ -1,6 +1,6 @@
 import { deserializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
-import { dateToTimestamp } from "../../../utils/helpers";
+import { dateToTimestampOffset } from "../../../utils/helpers";
 import { ThunkAction } from "../../types";
 import {
   GroupMessageByDateFetchFilter,
@@ -16,7 +16,7 @@ const getMessagesByGroupByTimestamp =
   async (dispatch, _getState, { callZome }): Promise<GroupMessagesOutput> => {
     const input = {
       groupId: deserializeHash(groupMessageByDateFetchFilter.groupId),
-      date: dateToTimestamp(groupMessageByDateFetchFilter.date),
+      date: dateToTimestampOffset(groupMessageByDateFetchFilter.date),
       payloadType: groupMessageByDateFetchFilter.payloadType,
     };
 
