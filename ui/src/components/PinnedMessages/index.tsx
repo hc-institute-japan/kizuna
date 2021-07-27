@@ -11,7 +11,7 @@ import { documentOutline } from "ionicons/icons";
 import React from "react";
 import { FilePayload, Payload, TextPayload } from "../../redux/commons/types";
 import { fetchFilesBytes } from "../../redux/group/actions";
-import { getFileBytes } from "../../redux/p2pmessages/actions";
+import { getFileBytes } from "../../redux/p2pmessages/actions/getFileBytes";
 import {
   convertSizeToReadableSize,
   isTextPayload,
