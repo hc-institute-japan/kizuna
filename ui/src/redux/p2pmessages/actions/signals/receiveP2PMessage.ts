@@ -75,7 +75,7 @@ const receiveP2PMessage =
       transformedReplyTo = {
         p2pMessageEntryHash: serializeHash(message.replyTo.hash),
         author: profileList[serializeHash(message.replyTo.author)],
-        receiver: serializeHash(message.replyTo.receiver),
+        receiver: profileList[serializeHash(message.replyTo.receiver)],
         payload: replyToPayload ? replyToPayload : message.replyTo.payload,
         timestamp: timestampToDate(message.replyTo.timeSent),
         receipts: [],
@@ -85,7 +85,7 @@ const receiveP2PMessage =
     let p2pMessage: P2PMessage = {
       p2pMessageEntryHash: serializeHash(messageID),
       author: profileList[serializeHash(message.author)],
-      receiver: serializeHash(message.receiver),
+      receiver: profileList[serializeHash(message.receiver)],
       payload: messagePayload,
       timestamp: timestampToDate(message.timeSent),
       replyTo: transformedReplyTo ? transformedReplyTo : undefined,

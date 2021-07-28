@@ -12,10 +12,8 @@ import { RootState } from "../../../redux/types";
 import { Profile } from "../../../redux/profile/types";
 import { FilePayload } from "../../../redux/commons/types";
 import { P2PHashMap, P2PMessage } from "../../../redux/p2pmessages/types";
-import {
-  getNextBatchMessages,
-  getFileBytes,
-} from "../../../redux/p2pmessages/actions";
+import { getNextBatchMessages } from "../../../redux/p2pmessages/actions/getNextBatchMessages";
+import { getFileBytes } from "../../../redux/p2pmessages/actions/getFileBytes";
 import { useAppDispatch } from "../../../utils/helpers";
 // import { useIntl } from "react-intl";
 

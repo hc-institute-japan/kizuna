@@ -14,33 +14,41 @@ import {
   informationCircleOutline,
   personCircleOutline,
   search,
+  pinOutline,
 } from "ionicons/icons";
+// react imports
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory, useLocation, useParams } from "react-router";
+import { RootState } from "../../redux/types";
+// component imports
 import AgentIdentifier from "../../components/AgentIdentifier";
 import { ChatList, Me, Others } from "../../components/Chat";
 import { ChatListMethods } from "../../components/Chat/types";
 import Typing from "../../components/Chat/Typing";
-import MessageInput, {
-  MessageInputMethods,
-} from "../../components/MessageInput";
-import { FilePayload } from "../../redux/commons/types";
-import {
-  getFileBytes,
-  getNextBatchMessages,
-  isTyping,
-  readMessage,
-  sendMessage,
-} from "../../redux/p2pmessages/actions";
+// type imports
 import {
   P2PHashMap,
   P2PMessage,
   P2PMessageReceipt,
 } from "../../redux/p2pmessages/types";
+import MessageInput, {
+  MessageInputMethods,
+} from "../../components/MessageInput";
+import { FilePayload } from "../../redux/commons/types";
 import { Profile } from "../../redux/profile/types";
-import { RootState } from "../../redux/types";
-import { useAppDispatch } from "../../utils/helpers";
+// action imports
+import { sendMessage } from "../../redux/p2pmessages/actions/sendMessage";
+import { readMessage } from "../../redux/p2pmessages/actions/readMessage";
+import { isTyping } from "../../redux/p2pmessages/actions/isTyping";
+import { pinMessage } from "../../redux/p2pmessages/actions/pinMessage";
+import { getFileBytes } from "../../redux/p2pmessages/actions/getFileBytes";
+import { getNextBatchMessages } from "../../redux/p2pmessages/actions/getNextBatchMessages";
+import { getNextMessages } from "../../redux/p2pmessages/actions/getNextMessages";
+import { getAdjacentMessages } from "../../redux/p2pmessages/actions/getAdjacentMessages";
+import { sendMessageWithTimestamp } from "../../redux/p2pmessages/actions/sendMessageWithTimestamp";
+// helper imports
+import { timestampToDate, useAppDispatch } from "../../utils/helpers";
 import styles from "./style.module.css";
 
 const Chat: React.FC = () => {
@@ -136,6 +144,42 @@ const Chat: React.FC = () => {
       filteredMessages.sort((x, y) => {
         return x.message.timestamp.getTime() - y.message.timestamp.getTime();
       });
+
+      dispatch(
+        getNextMessages(
+          conversant.id,
+          5,
+          "All",
+          Object.values(filteredMessages)[0].message.timestamp,
+          Object.values(filteredMessages)[0].message.p2pMessageEntryHash
+        )
+      ).then((res: P2PHashMap) => {
+        // disable getNextBatch if return value is empty
+        console.log("chatcontent next messages", res);
+      });
+
+      if (filteredMessages.length >= 5) {
+        console.log(
+          "chatcontent middle message",
+          filteredMessages[Math.floor(filteredMessages.length / 2)]
+        );
+        dispatch(
+          getAdjacentMessages(
+            conversant.id,
+            5,
+            "All",
+            Object.values(filteredMessages)[
+              Math.floor(filteredMessages.length / 2)
+            ].message.timestamp,
+            Object.values(filteredMessages)[
+              Math.floor(filteredMessages.length / 2)
+            ].message.p2pMessageEntryHash
+          )
+        ).then((res: P2PHashMap) =>
+          console.log("chatcontent adjacent messages", res)
+        );
+      }
+
       setMessagesWithConversant(filteredMessages);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -146,9 +190,24 @@ const Chat: React.FC = () => {
     navigates to info, media, files page 
     when clicking the name of the conversant on the top toolbar 
   */
-  const handleOnClick = () => {
+
+  const handleOnOpenSearch = () => {
+    history.push({
+      pathname: `${pathname}/search`,
+      state: { conversant: conversant },
+    });
+  };
+
+  const handleOnOpenDetails = () => {
     history.push({
       pathname: `${pathname}/details`,
+      state: { conversant: conversant },
+    });
+  };
+
+  const handleOnOpenPinned = () => {
+    history.push({
+      pathname: `${pathname}/pinned`,
       state: { conversant: conversant },
     });
   };
@@ -190,6 +249,21 @@ const Chat: React.FC = () => {
           replyTo !== "" ? replyTo : undefined
         )
       );
+      // .then(
+      //   setTimeout(() => {
+      //     let time = new Date().getTime() - 1000 * 60 * 60 * 24 * 22;
+      //     console.log("with timestamp", time, new Date(time));
+      //     dispatch(
+      //       sendMessageWithTimestamp(
+      //         conversant.id,
+      //         message + "2 day ago",
+      //         "TEXT",
+      //         new Date(time),
+      //         undefined
+      //       )
+      //     );
+      //   })
+      // );
     }
 
     files.forEach((file) =>
@@ -284,6 +358,10 @@ const Chat: React.FC = () => {
     link.href = window.URL.createObjectURL(blob);
     link.download = fileName;
     link.click();
+  };
+
+  const onPinHandler = (message: P2PMessage) => {
+    dispatch(pinMessage([message]));
   };
 
   /*
@@ -393,13 +471,14 @@ const Chat: React.FC = () => {
             </IonTitle>
           </div>
           <IonButtons slot="end">
-            <IonButton
-              onClick={() => history.push(`/u/${conversant.id}/search`)}
-            >
+            <IonButton onClick={handleOnOpenSearch}>
               <IonIcon slot="icon-only" icon={search} />
             </IonButton>
-            <IonButton onClick={handleOnClick}>
+            <IonButton onClick={handleOnOpenDetails}>
               <IonIcon slot="icon-only" icon={informationCircleOutline} />
+            </IonButton>
+            <IonButton onClick={handleOnOpenPinned}>
+              <IonIcon slot="icon-only" icon={pinOutline} />
             </IonButton>
           </IonButtons>
         </IonToolbar>

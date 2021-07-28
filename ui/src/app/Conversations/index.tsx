@@ -19,7 +19,7 @@ import {
 } from "../../redux/commons/types";
 import { getBadgeCount } from "../../redux/group/actions";
 import { GroupConversationsState } from "../../redux/group/types";
-import { countUnread } from "../../redux/p2pmessages/actions";
+import { countUnread } from "../../redux/p2pmessages/actions/countUnread";
 import { P2PMessageConversationState } from "../../redux/p2pmessages/types";
 import { RootState } from "../../redux/types";
 import { useAppDispatch } from "../../utils/helpers";

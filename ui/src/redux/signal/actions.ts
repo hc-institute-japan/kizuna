@@ -7,6 +7,7 @@ import groupMessageRead from "../group/actions/signals/groupMessageRead";
 import groupTypingDetail from "../group/actions/signals/groupTypingDetail";
 import receiveP2PMessage from "../p2pmessages/actions/signals/receiveP2PMessage";
 import receiveP2PReceipt from "../p2pmessages/actions/signals/receiveP2PReceipt";
+import receiveP2PPin from "../p2pmessages/actions/signals/receiveP2PPin";
 import typingP2P from "../p2pmessages/actions/signals/typingP2P";
 import { RootState } from "../types";
 
@@ -35,5 +36,7 @@ export const handleSignal =
       case SIGNALS[ZOMES.P2PMESSAGE].TYPING_P2P:
         dispatch(typingP2P(payload));
         break;
+      case SIGNALS[ZOMES.P2PMESSAGE].SYNC_P2P_PINS:
+        dispatch(receiveP2PPin(payload));
     }
   };
