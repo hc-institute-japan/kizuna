@@ -9,7 +9,8 @@ import {
   SetLatestGroupState,
   SET_LATEST_GROUP_STATE,
 } from "../group/types";
-import { setMessages, transformZomeDataToUIData } from "../p2pmessages/actions";
+import { setMessages } from "../p2pmessages/actions/setMessages";
+import { transformZomeDataToUIData } from "../p2pmessages/actions/helpers/transformZomeDateToUIData";
 import { SET_PREFERENCE } from "../preference/types";
 import { Profile, ProfileActionTypes, SET_PROFILE } from "../profile/types";
 import { ThunkAction } from "../types";

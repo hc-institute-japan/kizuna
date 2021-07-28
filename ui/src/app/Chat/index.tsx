@@ -3,6 +3,7 @@ import { Route, Switch } from "react-router";
 import ChatContent from "./ChatContent";
 import ChatDetails from "./ChatDetails";
 import ChatSearch from "./ChatSearch";
+import ChatPinnedMessages from "./ChatPinnedMessages";
 
 const Chat: React.FC = () => {
   return (
@@ -12,6 +13,7 @@ const Chat: React.FC = () => {
       </Route>
       <Route path="/u/:id/details" exact component={ChatDetails} />
       <Route path="/u/:id/search" exact component={ChatSearch} />
+      <Route path="/u/:id/pinned" exact component={ChatPinnedMessages} />
     </Switch>
   );
 };
