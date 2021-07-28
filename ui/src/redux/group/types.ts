@@ -11,9 +11,7 @@ export const UPDATE_GROUP_NAME = "UPDATE_GROUP_NAME";
 export const REMOVE_MEMBERS = "REMOVE_MEMBERS";
 export const ADD_MEMBERS = "ADD_MEMBERS";
 export const SET_GROUP_MESSAGE = "SET_GROUP_MESSAGE";
-export const SET_NEXT_BATCH_GROUP_MESSAGES = "SET_NEXT_BATCH_GROUP_MESSAGES";
-export const SET_MESSAGES_BY_GROUP_BY_TIMESTAMP =
-  "SET_MESSAGES_BY_GROUP_BY_TIMESTAMP";
+export const SET_GROUP_MESSAGES = "SET_GROUP_MESSAGES";
 export const SET_LATEST_GROUP_STATE = "SET_LATEST_GROUP_STATE";
 export const SET_LATEST_GROUP_VERSION = "SET_LATEST_GROUP_VERSION";
 export const SET_FILES_BYTES = "SET_FILES_BYTES";
@@ -77,6 +75,14 @@ export interface GroupMessageBatchFetchFilter {
   lastMessageTimestamp?: Date; // converted to [number, number] for zome fn
   batchSize: number;
   payloadType: FetchPayloadType;
+}
+
+export interface GroupMessagAdjacentFetchFilter {
+  groupId: string;
+  adjacentMessage: string; // Message id of the message being adjacent
+  messageTimestamp: Date;
+  // This batch size goes for both previou and later messages of adjacent message
+  batchSize: number;
 }
 
 export interface GroupMessageByDateFetchFilter {
@@ -246,16 +252,10 @@ export interface SetGroupMessageAction {
   fileBytes?: Uint8Array;
 }
 
-export interface SetNextBatchGroupMessagesAction {
-  type: typeof SET_NEXT_BATCH_GROUP_MESSAGES;
+export interface SetGroupMessagesAction {
+  type: typeof SET_GROUP_MESSAGES;
   groupMessagesOutput: GroupMessagesOutput;
   // for ease of retrieving groupID
-  groupId: string;
-}
-
-export interface SetMessagesByGroupByTimestampAction {
-  type: typeof SET_MESSAGES_BY_GROUP_BY_TIMESTAMP;
-  groupMessagesOutput: GroupMessagesOutput;
   groupId: string;
 }
 
@@ -299,8 +299,7 @@ export type GroupConversationsActionTypes =
   | RemoveMembersAction
   | UpdateGroupNameAction
   | SetGroupMessageAction
-  | SetNextBatchGroupMessagesAction
-  | SetMessagesByGroupByTimestampAction
+  | SetGroupMessagesAction
   | SetLatestGroupState
   | SetLatestGroupVersionAction
   | SetFilesBytes

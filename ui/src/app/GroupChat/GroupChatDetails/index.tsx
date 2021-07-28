@@ -19,7 +19,7 @@ import { useHistory, useParams } from "react-router";
 import FileBox from "../../../components/Slides/FileBox";
 import MediaBox from "../../../components/Slides/MediaBox";
 import { FetchPayloadType, FilePayload } from "../../../redux/commons/types";
-import { getNextBatchGroupMessages } from "../../../redux/group/actions";
+import { getPreviousGroupMessages } from "../../../redux/group/actions";
 import { fetchFilesBytes } from "../../../redux/group/actions";
 // Redux
 import { updateGroupName } from "../../../redux/group/actions";
@@ -158,7 +158,7 @@ const GroupChatDetails: React.FC = () => {
 
     if (earliest !== undefined) {
       dispatch(
-        getNextBatchGroupMessages({
+        getPreviousGroupMessages({
           groupId: group,
           lastFetched: earliest.groupMessageId,
           lastMessageTimestamp: earliest.timestamp,
@@ -214,7 +214,7 @@ const GroupChatDetails: React.FC = () => {
   /* fetch 40 media */
   useEffect(() => {
     dispatch(
-      getNextBatchGroupMessages({
+      getPreviousGroupMessages({
         groupId: group,
         batchSize: 40,
         payloadType: {
@@ -229,7 +229,7 @@ const GroupChatDetails: React.FC = () => {
   /* fetch 40 Files */
   useEffect(() => {
     dispatch(
-      getNextBatchGroupMessages({
+      getPreviousGroupMessages({
         groupId: group,
         batchSize: 40,
         payloadType: {
