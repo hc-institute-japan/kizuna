@@ -7,7 +7,7 @@ import { useToast } from "../../containers/ToastContainer/context";
 import { FilePayloadInput } from "../../redux/commons/types";
 import { sendInitialGroupMessage } from "../../redux/group/actions";
 import { GroupConversation } from "../../redux/group/types";
-import { sendMessage } from "../../redux/p2pmessages/actions";
+import { sendMessage } from "../../redux/p2pmessages/actions/sendMessage";
 import { Profile, ProfileListType } from "../../redux/profile/types";
 import { useAppDispatch } from "../../utils/helpers";
 import ContactList from "./ContactList";

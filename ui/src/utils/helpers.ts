@@ -80,7 +80,9 @@ export const stringToDate = (stringDate: string): Date => {
     day = rawDay.substring(1);
   }
 
-  const newDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day));
+  const newDate = new Date(
+    Date.UTC(parseInt(year), parseInt(month) - 1, parseInt(day))
+  );
 
   return newDate;
 };
@@ -148,23 +150,12 @@ export const searchContacts: SearchContacts = (contacts, username) =>
 
 export const timestampToDate = (timestamp: number[]) => {
   const { 0: seconds, 1: nanoseconds } = timestamp;
-  const date = new Date(seconds * 1000 + nanoseconds * 10 ** -6);
+  const date = new Date(seconds * 1000 + nanoseconds * 1e-6);
   return date;
 };
 
 export const dateToTimestamp = (date: Date) => {
   const milliseconds = date.getTime();
-  const seconds = (milliseconds / 1000) >> 0;
-  const nanoseconds = (milliseconds % 1000) * 10 ** 6;
-  const ret: [number, number] = [seconds, nanoseconds];
-  return ret;
-};
-
-export const dateToTimestampOffset = (date: Date) => {
-  const localMilliseconds = date.getTime();
-  const offset = date.getTimezoneOffset() * 60000;
-  const newDate = new Date(localMilliseconds - offset);
-  const milliseconds = newDate.getTime();
   const seconds = (milliseconds / 1000) >> 0;
   const nanoseconds = (milliseconds % 1000) * 10 ** 6;
   const ret: [number, number] = [seconds, nanoseconds];
