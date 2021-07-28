@@ -33,6 +33,7 @@ export const SIGNALS: SignalNameType = {
   [ZOMES.P2PMESSAGE]: {
     RECEIVE_P2P_MESSAGE: "RECEIVE_P2P_MESSAGE",
     RECEIVE_P2P_RECEIPT: "RECEIVE_P2P_RECEIPT",
+    SYNC_P2P_PINS: "SYNC_P2P_PINS",
     TYPING_P2P: "TYPING_P2P",
   },
 };
@@ -90,6 +91,7 @@ export const FUNCTIONS: FunctionNameType = {
   },
   [ZOMES.P2PMESSAGE]: {
     SEND_MESSAGE: "send_message",
+    SEND_MESSAGE_WITH_TIMESTAMP: "send_message_with_timestamp",
     GET_LATEST_MESSAGES: "get_latest_messages",
     GET_MESSAGES_BY_AGENT_BY_TIMESTAMP: "get_messages_by_agent_by_timestamp",
     GET_NEXT_BATCH_MESSAGES: "get_next_batch_messages",
@@ -97,5 +99,9 @@ export const FUNCTIONS: FunctionNameType = {
     READ_MESSAGE: "read_message",
     GET_FILE_BYTES: "get_file_bytes",
     TYPING: "typing",
+    PIN_MESSAGE: "pin_message",
+    GET_PINNED_MESSAGES: "get_pinned_messages",
+    GET_NEXT_MESSAGES: "get_next_messages",
+    GET_ADJACENT_MESSAGES: "get_adjacent_messages",
   },
 };

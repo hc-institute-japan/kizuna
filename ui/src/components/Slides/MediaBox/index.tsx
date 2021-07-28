@@ -14,7 +14,7 @@ import ImageView from "../../../components/Chat/File/ImageView/index";
 import { FilePayload, isP2PMessage } from "../../../redux/commons/types";
 import { fetchFilesBytes } from "../../../redux/group/actions";
 import { GroupMessage } from "../../../redux/group/types";
-import { getFileBytes } from "../../../redux/p2pmessages/actions";
+import { getFileBytes } from "../../../redux/p2pmessages/actions/getFileBytes";
 import { P2PMessage } from "../../../redux/p2pmessages/types";
 import { RootState } from "../../../redux/types";
 import { monthToString, useAppDispatch } from "../../../utils/helpers";

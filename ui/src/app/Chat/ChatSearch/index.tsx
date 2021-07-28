@@ -3,7 +3,7 @@ import { useParams } from "react-router";
 import Search from "../../../components/Search";
 import { Payload } from "../../../redux/commons/types";
 
-import { getMessagesByAgentByTimestamp } from "../../../redux/p2pmessages/actions";
+import { getMessagesByAgentByTimestamp } from "../../../redux/p2pmessages/actions/getMessagesByAgentByTimestamp";
 import {
   P2PMessage,
   P2PMessageConversationState,

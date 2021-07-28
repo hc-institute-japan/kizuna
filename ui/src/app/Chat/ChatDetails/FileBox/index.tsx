@@ -14,10 +14,8 @@ import FileView from "../../../../components/Chat/File/FileView";
 import ImageView from "../../../../components/Chat/File/ImageView/index";
 import VideoView from "../../../../components/Chat/File/VideoView";
 import { FilePayload } from "../../../../redux/commons/types";
-import {
-  getFileBytes,
-  getNextBatchMessages,
-} from "../../../../redux/p2pmessages/actions";
+import { getFileBytes } from "../../../../redux/p2pmessages/actions/getFileBytes";
+import { getNextBatchMessages } from "../../../../redux/p2pmessages/actions/getNextBatchMessages";
 import { P2PMessage } from "../../../../redux/p2pmessages/types";
 import { Profile } from "../../../../redux/profile/types";
 import { RootState } from "../../../../redux/types";

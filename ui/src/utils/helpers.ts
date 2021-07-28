@@ -162,17 +162,6 @@ export const dateToTimestamp = (date: Date) => {
   return ret;
 };
 
-export const dateToTimestampOffset = (date: Date) => {
-  // const localMilliseconds = date.getTime();
-  // const offset = date.getTimezoneOffset() * 60000;
-  // const newDate = new Date(localMilliseconds - offset);
-  const milliseconds = date.getTime();
-  const seconds = (milliseconds / 1000) >> 0;
-  const nanoseconds = (milliseconds % 1000) * 10 ** 6;
-  const ret: [number, number] = [seconds, nanoseconds];
-  return ret;
-};
-
 export const isTextPayload = (payload: Payload) => payload.type === "TEXT";
 
 export const usePressHandlers = (
