@@ -3,11 +3,13 @@ use hdk::prelude::*;
 use hdk::prelude::{element::SignedHeaderHashed, timestamp::Timestamp};
 use std::collections::hash_map::HashMap;
 
+pub mod get_adjacent_group_messages;
 pub mod get_files_bytes;
 pub mod get_latest_messages_for_all_groups;
 pub mod get_messages_by_group_by_timestamp;
-pub mod get_next_batch_group_messages;
 pub mod get_pinned_messages;
+pub mod get_previous_group_messages;
+pub mod get_subsequent_group_messages;
 pub mod group_message_helpers;
 pub mod indicate_group_typing;
 pub mod pin_message;
@@ -69,6 +71,17 @@ pub struct GroupMsgBatchFetchFilter {
     // usize?
     pub batch_size: u8,
     pub payload_type: PayloadType,
+}
+
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct GroupMsgAdjacentFetchFilter {
+    group_id: EntryHash,
+    // the message EntryHash that has previous and later adjacent messages
+    adjacent_message: EntryHash,
+    message_timestamp: Timestamp,
+    // This batch size goes for both previou and later messages of adjacent message
+    batch_size: u8,
 }
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
