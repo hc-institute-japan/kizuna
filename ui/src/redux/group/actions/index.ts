@@ -3,7 +3,9 @@ import createGroup from "./createGroup";
 import getBadgeCount from "./getBadgeCount";
 import getLatestGroupVersion from "./getLatestGroupVersion";
 import getMessagesByGroupByTimestamp from "./getMessagesByGroupByTimestamp";
-import getNextBatchGroupMessages from "./getNextBatchGroupMessages";
+import getPreviousGroupMessages from "./getPreviousGroupMessages";
+import getSubsequentGroupMessages from "./getSubsequentGroupMessages";
+import getAdjacentGroupMessages from "./getAdjacentGroupMessages";
 import indicateGroupTyping from "./indicateGroupTyping";
 import readGroupMessage from "./readGroupMessage";
 import removeMembers from "./removeMembers";
@@ -18,7 +20,9 @@ export {
   getBadgeCount,
   getLatestGroupVersion,
   getMessagesByGroupByTimestamp,
-  getNextBatchGroupMessages,
+  getAdjacentGroupMessages,
+  getPreviousGroupMessages,
+  getSubsequentGroupMessages,
   indicateGroupTyping,
   readGroupMessage,
   removeMembers,

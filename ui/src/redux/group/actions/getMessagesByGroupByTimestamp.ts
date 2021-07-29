@@ -5,8 +5,8 @@ import { ThunkAction } from "../../types";
 import {
   GroupMessageByDateFetchFilter,
   GroupMessagesOutput,
-  SetMessagesByGroupByTimestampAction,
-  SET_MESSAGES_BY_GROUP_BY_TIMESTAMP,
+  SetGroupMessagesAction,
+  SET_GROUP_MESSAGES,
 } from "../types";
 import { convertFetchedResToGroupMessagesOutput } from "./helpers";
 
@@ -31,8 +31,8 @@ const getMessagesByGroupByTimestamp =
     const groupMessagesOutput: GroupMessagesOutput =
       convertFetchedResToGroupMessagesOutput(groupMessagesRes);
 
-    dispatch<SetMessagesByGroupByTimestampAction>({
-      type: SET_MESSAGES_BY_GROUP_BY_TIMESTAMP,
+    dispatch<SetGroupMessagesAction>({
+      type: SET_GROUP_MESSAGES,
       groupMessagesOutput,
       groupId: groupMessageByDateFetchFilter.groupId,
     });
