@@ -222,62 +222,79 @@ export interface GroupConversationsState {
 
 export interface AddGroupAction {
   type: typeof ADD_GROUP;
-  groupData: GroupConversation;
-  membersProfile: {
+  conversations: {
+    [key: string]: GroupConversation;
+  };
+  members: {
     [key: string]: Profile;
   };
 }
 
 export interface AddMembersAction {
   type: typeof ADD_MEMBERS;
-  updateGroupMembersData: UpdateGroupMembersData;
-  membersUsernames: {
+  conversations: {
+    [key: string]: GroupConversation;
+  };
+  members: {
     [key: string]: Profile;
   };
 }
 
 export interface RemoveMembersAction {
   type: typeof REMOVE_MEMBERS;
-  updateGroupMembersData: UpdateGroupMembersData;
+  conversations: {
+    [key: string]: GroupConversation;
+  };
+  members: {
+    [key: string]: Profile;
+  };
 }
 
 export interface UpdateGroupNameAction {
   type: typeof UPDATE_GROUP_NAME;
-  updateGroupNameData: UpdateGroupNameData;
+  conversations: {
+    [key: string]: GroupConversation;
+  };
 }
 
 export interface SetGroupMessageAction {
   type: typeof SET_GROUP_MESSAGE;
-  groupMessage: GroupMessage;
-  fileBytes?: Uint8Array;
+  conversations: {
+    [key: string]: GroupConversation;
+  };
+  messages: {
+    [key: string]: GroupMessage;
+  };
+  groupFiles: {
+    [key: string]: Uint8Array;
+  };
 }
 
 export interface SetGroupMessagesAction {
   type: typeof SET_GROUP_MESSAGES;
-  groupMessagesOutput: GroupMessagesOutput;
-  // for ease of retrieving groupID
-  groupId: string;
+  conversations: {
+    [key: string]: GroupConversation;
+  };
+  messages: {
+    [key: string]: GroupMessage;
+  };
 }
 
 export interface SetLatestGroupState {
   type: typeof SET_LATEST_GROUP_STATE;
-  groups: GroupConversation[];
-  groupMessagesOutput: GroupMessagesOutput;
-  members: Profile[];
-}
-
-export interface SetLatestGroupVersionAction {
-  type: typeof SET_LATEST_GROUP_VERSION;
-  groupData: GroupConversation;
-  groupMessagesOutput: GroupMessagesOutput;
-  membersUsernames: {
+  messages: {
+    [key: string]: GroupMessage;
+  };
+  conversations: {
+    [key: string]: GroupConversation;
+  };
+  members: {
     [key: string]: Profile;
   };
 }
 
 export interface SetGroupTypingIndicator {
   type: typeof SET_GROUP_TYPING_INDICATOR;
-  groupTypingIndicator: GroupTypingDetail;
   typing: { [key: string]: Profile[] };
 }
 
@@ -301,8 +318,6 @@ export type GroupConversationsActionTypes =
   | SetGroupMessageAction
   | SetGroupMessagesAction
   | SetLatestGroupState
-  | SetLatestGroupVersionAction
   | SetFilesBytes
-  | SetLatestGroupVersionAction
   | SetGroupTypingIndicator
   | SetGroupReadMessage;

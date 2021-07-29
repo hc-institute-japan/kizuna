@@ -4,6 +4,7 @@ import { dateToTimestamp } from "../../../utils/helpers";
 import { pushError } from "../../error/actions";
 import { ThunkAction } from "../../types";
 import {
+  GroupConversation,
   GroupMessageBatchFetchFilter,
   GroupMessagesOutput,
   SetGroupMessagesAction,
@@ -12,19 +13,20 @@ import {
 import { convertFetchedResToGroupMessagesOutput } from "./helpers";
 
 const getSubsequentGroupMessages =
-  (groupMessageBatchFetchFilter: GroupMessageBatchFetchFilter): ThunkAction =>
-  async (dispatch, _getState, { callZome }): Promise<GroupMessagesOutput> => {
+  (filter: GroupMessageBatchFetchFilter): ThunkAction =>
+  async (dispatch, getState, { callZome }): Promise<GroupMessagesOutput> => {
+    const state = getState();
     /* deserialize fields for zome fn */
     const input = {
-      groupId: deserializeHash(groupMessageBatchFetchFilter.groupId),
-      lastFetched: groupMessageBatchFetchFilter.lastFetched
-        ? deserializeHash(groupMessageBatchFetchFilter.lastFetched)
+      groupId: deserializeHash(filter.groupId),
+      lastFetched: filter.lastFetched
+        ? deserializeHash(filter.lastFetched)
         : undefined,
-      lastMessageTimestamp: groupMessageBatchFetchFilter.lastMessageTimestamp
-        ? dateToTimestamp(groupMessageBatchFetchFilter.lastMessageTimestamp)
+      lastMessageTimestamp: filter.lastMessageTimestamp
+        ? dateToTimestamp(filter.lastMessageTimestamp)
         : undefined,
-      batchSize: groupMessageBatchFetchFilter.batchSize,
-      payloadType: groupMessageBatchFetchFilter.payloadType,
+      batchSize: filter.batchSize,
+      payloadType: filter.payloadType,
     };
 
     try {
@@ -37,10 +39,41 @@ const getSubsequentGroupMessages =
       const groupMessagesOutput: GroupMessagesOutput =
         convertFetchedResToGroupMessagesOutput(groupMessagesRes);
 
+      let groupConversations = state.groups.conversations;
+      const groupConversation: GroupConversation =
+        groupConversations[filter.groupId];
+
+      const messageIds = groupConversation.messages
+        ? Array.from(
+            new Set(
+              groupConversation.messages.concat(
+                groupMessagesOutput.messagesByGroup[filter.groupId]
+              )
+            )
+          )
+        : groupConversations[filter.groupId].messages;
+
+      groupConversations = {
+        ...groupConversations,
+        [filter.groupId]: groupConversation,
+      };
+      let messages = state.groups.messages;
+      messages = {
+        ...messages,
+        ...groupMessagesOutput.groupMessagesContents,
+      };
+
+      const conversations: {
+        [key: string]: GroupConversation;
+      } = {
+        ...groupConversations,
+        [filter.groupId]: { ...groupConversation, messages: messageIds },
+      };
+
       dispatch<SetGroupMessagesAction>({
         type: SET_GROUP_MESSAGES,
-        groupMessagesOutput,
-        groupId: groupMessageBatchFetchFilter.groupId,
+        conversations,
+        messages,
       });
 
       return groupMessagesOutput;
