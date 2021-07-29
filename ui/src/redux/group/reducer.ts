@@ -15,8 +15,7 @@ import {
   SET_GROUP_TYPING_INDICATOR,
   SET_LATEST_GROUP_STATE,
   SET_LATEST_GROUP_VERSION,
-  SET_MESSAGES_BY_GROUP_BY_TIMESTAMP,
-  SET_NEXT_BATCH_GROUP_MESSAGES,
+  SET_GROUP_MESSAGES,
   UPDATE_GROUP_NAME,
 } from "./types";
 
@@ -162,8 +161,7 @@ const reducer = (
         ...state,
         groupFiles: action.filesBytes,
       };
-    case SET_NEXT_BATCH_GROUP_MESSAGES: // fallthrough since its the same process with the next case
-    case SET_MESSAGES_BY_GROUP_BY_TIMESTAMP: {
+    case SET_GROUP_MESSAGES: {
       let groupConversations = state.conversations;
       let groupConversation: GroupConversation =
         groupConversations[action.groupId];

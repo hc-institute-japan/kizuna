@@ -6,12 +6,12 @@ import { ThunkAction } from "../../types";
 import {
   GroupMessageBatchFetchFilter,
   GroupMessagesOutput,
-  SetNextBatchGroupMessagesAction,
-  SET_NEXT_BATCH_GROUP_MESSAGES,
+  SetGroupMessagesAction,
+  SET_GROUP_MESSAGES,
 } from "../types";
 import { convertFetchedResToGroupMessagesOutput } from "./helpers";
 
-const getNextBatchGroupMessages =
+const getSubsequentGroupMessages =
   (groupMessageBatchFetchFilter: GroupMessageBatchFetchFilter): ThunkAction =>
   async (dispatch, _getState, { callZome }): Promise<GroupMessagesOutput> => {
     /* deserialize fields for zome fn */
@@ -30,15 +30,15 @@ const getNextBatchGroupMessages =
     try {
       const groupMessagesRes = await callZome({
         zomeName: ZOMES.GROUP,
-        fnName: FUNCTIONS[ZOMES.GROUP].GET_NEXT_BATCH_GROUP_MESSAGES,
+        fnName: FUNCTIONS[ZOMES.GROUP].GET_SUBSEQUENT_GROUP_MESSAGES,
         payload: input,
       });
 
       const groupMessagesOutput: GroupMessagesOutput =
         convertFetchedResToGroupMessagesOutput(groupMessagesRes);
 
-      dispatch<SetNextBatchGroupMessagesAction>({
-        type: SET_NEXT_BATCH_GROUP_MESSAGES,
+      dispatch<SetGroupMessagesAction>({
+        type: SET_GROUP_MESSAGES,
         groupMessagesOutput,
         groupId: groupMessageBatchFetchFilter.groupId,
       });
@@ -53,4 +53,4 @@ const getNextBatchGroupMessages =
     }
   };
 
-export default getNextBatchGroupMessages;
+export default getSubsequentGroupMessages;

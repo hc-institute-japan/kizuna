@@ -37,8 +37,8 @@ pub(crate) fn path_from_str(str: &str) -> Path {
     path
 }
 
-pub(crate) fn timestamp_to_days(seconds: Timestamp) -> i64 {
-    seconds.0 / (SECONDS * MINUTES * HOURS)
+pub(crate) fn timestamp_to_days(timestamp: Timestamp) -> i64 {
+    timestamp.0 / (SECONDS * MINUTES * HOURS)
 }
 
 pub fn error<T>(reason: &str) -> ExternResult<T> {
