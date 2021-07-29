@@ -4,6 +4,7 @@ import { dateToTimestamp } from "../../../utils/helpers";
 import { pushError } from "../../error/actions";
 import { ThunkAction } from "../../types";
 import {
+  GroupConversation,
   GroupMessagAdjacentFetchFilter,
   GroupMessagesOutput,
   SetGroupMessagesAction,
@@ -13,7 +14,8 @@ import { convertFetchedResToGroupMessagesOutput } from "./helpers";
 
 const getAdjacentGroupMessages =
   (filter: GroupMessagAdjacentFetchFilter): ThunkAction =>
-  async (dispatch, _getState, { callZome }): Promise<GroupMessagesOutput> => {
+  async (dispatch, getState, { callZome }): Promise<GroupMessagesOutput> => {
+    const state = getState();
     /* deserialize fields for zome fn */
     const input = {
       groupId: deserializeHash(filter.groupId),
@@ -32,10 +34,41 @@ const getAdjacentGroupMessages =
       const groupMessagesOutput: GroupMessagesOutput =
         convertFetchedResToGroupMessagesOutput(groupMessagesRes);
 
+      let groupConversations = state.groups.conversations;
+      const groupConversation: GroupConversation =
+        groupConversations[filter.groupId];
+
+      const messageIds = groupConversation.messages
+        ? Array.from(
+            new Set(
+              groupConversation.messages.concat(
+                groupMessagesOutput.messagesByGroup[filter.groupId]
+              )
+            )
+          )
+        : groupConversations[filter.groupId].messages;
+
+      groupConversations = {
+        ...groupConversations,
+        [filter.groupId]: groupConversation,
+      };
+      let messages = state.groups.messages;
+      messages = {
+        ...messages,
+        ...groupMessagesOutput.groupMessagesContents,
+      };
+
+      const conversations: {
+        [key: string]: GroupConversation;
+      } = {
+        ...groupConversations,
+        [filter.groupId]: { ...groupConversation, messages: messageIds },
+      };
+
       dispatch<SetGroupMessagesAction>({
         type: SET_GROUP_MESSAGES,
-        groupMessagesOutput,
-        groupId: filter.groupId,
+        conversations,
+        messages,
       });
 
       return groupMessagesOutput;

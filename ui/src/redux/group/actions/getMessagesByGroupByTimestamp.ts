@@ -3,6 +3,7 @@ import { FUNCTIONS, ZOMES } from "../../../connection/types";
 import { dateToTimestamp } from "../../../utils/helpers";
 import { ThunkAction } from "../../types";
 import {
+  GroupConversation,
   GroupMessageByDateFetchFilter,
   GroupMessagesOutput,
   SetGroupMessagesAction,
@@ -12,12 +13,13 @@ import { convertFetchedResToGroupMessagesOutput } from "./helpers";
 
 // TODO: Implement this in the UI first.
 const getMessagesByGroupByTimestamp =
-  (groupMessageByDateFetchFilter: GroupMessageByDateFetchFilter): ThunkAction =>
-  async (dispatch, _getState, { callZome }): Promise<GroupMessagesOutput> => {
+  (filter: GroupMessageByDateFetchFilter): ThunkAction =>
+  async (dispatch, getState, { callZome }): Promise<GroupMessagesOutput> => {
+    const state = getState();
     const input = {
-      groupId: deserializeHash(groupMessageByDateFetchFilter.groupId),
-      date: dateToTimestamp(groupMessageByDateFetchFilter.date),
-      payloadType: groupMessageByDateFetchFilter.payloadType,
+      groupId: deserializeHash(filter.groupId),
+      date: dateToTimestamp(filter.date),
+      payloadType: filter.payloadType,
     };
 
     // TODO: error handling
@@ -31,10 +33,41 @@ const getMessagesByGroupByTimestamp =
     const groupMessagesOutput: GroupMessagesOutput =
       convertFetchedResToGroupMessagesOutput(groupMessagesRes);
 
+    let groupConversations = state.groups.conversations;
+    const groupConversation: GroupConversation =
+      groupConversations[filter.groupId];
+
+    const messageIds = groupConversation.messages
+      ? Array.from(
+          new Set(
+            groupConversation.messages.concat(
+              groupMessagesOutput.messagesByGroup[filter.groupId]
+            )
+          )
+        )
+      : groupConversations[filter.groupId].messages;
+
+    groupConversations = {
+      ...groupConversations,
+      [filter.groupId]: groupConversation,
+    };
+    let messages = state.groups.messages;
+    messages = {
+      ...messages,
+      ...groupMessagesOutput.groupMessagesContents,
+    };
+
+    const conversations: {
+      [key: string]: GroupConversation;
+    } = {
+      ...groupConversations,
+      [filter.groupId]: { ...groupConversation, messages: messageIds },
+    };
+
     dispatch<SetGroupMessagesAction>({
       type: SET_GROUP_MESSAGES,
-      groupMessagesOutput,
-      groupId: groupMessageByDateFetchFilter.groupId,
+      conversations,
+      messages,
     });
 
     return groupMessagesOutput;

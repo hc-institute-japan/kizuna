@@ -58,10 +58,25 @@ const createGroup =
         serializeHash(myAgentId!)
       );
 
+      let groupEntryHash: string = groupData.originalGroupId;
+      let newConversation: { [key: string]: GroupConversation } = {
+        [groupEntryHash]: groupData,
+      };
+      let conversations = state.groups.conversations;
+      conversations = {
+        ...conversations,
+        ...newConversation,
+      };
+      let members = state.groups.members;
+      members = {
+        ...members,
+        ...membersProfile,
+      };
+
       dispatch<AddGroupAction>({
         type: ADD_GROUP,
-        groupData,
-        membersProfile,
+        conversations,
+        members,
       });
 
       return groupData;

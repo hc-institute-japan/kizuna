@@ -7,6 +7,7 @@ import { ThunkAction } from "../../types";
 import {
   AddMembersAction,
   ADD_MEMBERS,
+  GroupConversation,
 
   // IO
   UpdateGroupMembersData,
@@ -58,10 +59,27 @@ const addMembers =
         serializeHash(myAgentId!)
       );
 
+      let groupEntryHash: string = updateGroupMembersDataFromRes.groupId;
+      let groupConversation: GroupConversation =
+        state.groups.conversations[groupEntryHash];
+      groupConversation.members = groupConversation.members.concat(
+        updateGroupMembersDataFromRes.members
+      );
+      let conversations = state.groups.conversations;
+      conversations = {
+        ...conversations,
+        [groupEntryHash]: groupConversation,
+      };
+      let members = state.groups.members;
+      members = {
+        ...members,
+        ...membersUsernames,
+      };
+
       dispatch<AddMembersAction>({
         type: ADD_MEMBERS,
-        updateGroupMembersData: updateGroupMembersDataFromRes,
-        membersUsernames,
+        conversations,
+        members,
       });
 
       return updateGroupMembersData;

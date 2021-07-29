@@ -5,6 +5,7 @@ import { deserializeAgentPubKey } from "../../../utils/helpers";
 import { pushError } from "../../error/actions";
 import { ThunkAction } from "../../types";
 import {
+  GroupConversation,
   RemoveMembersAction,
   REMOVE_MEMBERS,
 
@@ -16,7 +17,7 @@ const removeMembers =
   (updateGroupMembersData: UpdateGroupMembersData): ThunkAction =>
   async (
     dispatch,
-    _getState,
+    getState,
     { callZome }
   ): Promise<UpdateGroupMembersData | false> => {
     const input = {
@@ -26,6 +27,8 @@ const removeMembers =
       groupId: deserializeHash(updateGroupMembersData.groupId),
       groupRevisionId: deserializeHash(updateGroupMembersData.groupRevisionId),
     };
+
+    const state = getState();
 
     try {
       const removeMembersOutput = await callZome({
@@ -42,9 +45,27 @@ const removeMembers =
         groupRevisionId: serializeHash(removeMembersOutput.groupRevisionId),
       };
 
+      const groupEntryHash: string = updateGroupMembersDataFromRes.groupId;
+      const removedMembers: string[] = updateGroupMembersDataFromRes.members;
+      const groupConversation: GroupConversation =
+        state.groups.conversations[groupEntryHash];
+      groupConversation.members = groupConversation.members.filter(
+        (x) => !removedMembers.includes(x)
+      );
+      let conversations = state.groups.conversations;
+      conversations = {
+        ...conversations,
+        [groupEntryHash]: groupConversation,
+      };
+      let members = state.groups.members;
+      removedMembers.forEach((memberId: any) => {
+        delete members[memberId];
+      });
+
       dispatch<RemoveMembersAction>({
         type: REMOVE_MEMBERS,
-        updateGroupMembersData: updateGroupMembersDataFromRes,
+        conversations,
+        members,
       });
 
       return updateGroupMembersData;

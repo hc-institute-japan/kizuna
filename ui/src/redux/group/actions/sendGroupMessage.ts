@@ -14,6 +14,7 @@ import { pushError } from "../../error/actions";
 import { ThunkAction } from "../../types";
 import { setFilesBytes } from "../actions";
 import {
+  GroupConversation,
   GroupMessage,
   // IO
   GroupMessageInput,
@@ -41,6 +42,8 @@ const sendGroupMessage =
         ? deserializeHash(groupMessageData.replyTo)
         : undefined,
     };
+
+    const state = getState();
 
     try {
       const sendGroupMessageOutput = await callZome({
@@ -123,10 +126,47 @@ const sendGroupMessage =
         readList: {},
       };
 
+      const groupId: string = groupMessageDataConverted.groupId;
+      const groupMessageId: string = groupMessageDataConverted.groupMessageId;
+      const groupConversation = state.groups.conversations[groupId];
+
+      const messageIds = [
+        groupMessageDataConverted.groupMessageId,
+        ...groupConversation.messages,
+      ];
+      const newMessage: { [key: string]: GroupMessage } = {
+        [groupMessageId]: groupMessageDataConverted,
+      };
+      let messages = state.groups.messages;
+      messages = {
+        ...messages,
+        ...newMessage,
+      };
+
+      let groupFiles = state.groups.groupFiles;
+      if (!isTextPayload(groupMessageDataConverted.payload)) {
+        // work with file payload
+        const newFile: { [key: string]: Uint8Array } = {
+          [groupMessageDataConverted.payload.fileHash]: fileBytes!,
+        };
+        groupFiles = {
+          ...groupFiles,
+          ...newFile,
+        };
+      }
+
+      const conversations: {
+        [key: string]: GroupConversation;
+      } = {
+        ...state.groups.conversations,
+        [groupId]: { ...groupConversation, messages: messageIds },
+      };
+
       dispatch<SetGroupMessageAction>({
         type: SET_GROUP_MESSAGE,
-        groupMessage: groupMessageDataConverted,
-        fileBytes,
+        conversations,
+        messages,
+        groupFiles,
       });
 
       return groupMessageDataConverted;

@@ -3,6 +3,7 @@ import { FUNCTIONS, ZOMES } from "../../../connection/types";
 import { pushError } from "../../error/actions";
 import { ThunkAction } from "../../types";
 import {
+  GroupConversation,
   // action payload types
   UpdateGroupNameAction,
   // IO
@@ -45,9 +46,19 @@ const updateGroupName =
         groupRevisionId: serializeHash(updateGroupNameOutput.groupRevisionId),
       };
 
+      const groupEntryHash: string = updateGroupNameDataFromRes.groupId;
+      const groupConversation: GroupConversation =
+        state.groups.conversations[groupEntryHash];
+      groupConversation.name = updateGroupNameDataFromRes.name;
+      let conversations = state.groups.conversations;
+      conversations = {
+        ...conversations,
+        [groupEntryHash]: groupConversation,
+      };
+
       dispatch<UpdateGroupNameAction>({
         type: UPDATE_GROUP_NAME,
-        updateGroupNameData: updateGroupNameDataFromRes,
+        conversations,
       });
 
       return updateGroupNameData;
