@@ -42,6 +42,7 @@ export interface MessageInputOnSendParams {
   message?: string;
   files?: FileContent[];
   reply?: string;
+  setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export interface ReplyParams {
@@ -84,6 +85,7 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
   const handleOnChange = (e: CustomEvent) => setMessage(e.detail.value!);
   const intl = useIntl();
   const [isReply, setIsReply] = useState<ReplyParams | undefined>(undefined);
+  const [loading, setLoading] = useState<boolean>(false);
   const file = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<FileContent[]>([]);
   const handleOnFileClick = () => file?.current?.click();
@@ -113,7 +115,12 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
   const onKeyDown = (event: KeyboardEvent) => {
     if (onSend && event.key === "Enter" && !event.shiftKey) {
       if (message.trim().length !== 0 || files.length > 0) {
-        onSend({ files, message, reply: isReply?.id });
+        onSend({
+          files,
+          message,
+          reply: isReply?.id,
+          setIsLoading: setLoading,
+        });
         reset();
       }
     }
@@ -303,11 +310,17 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
             files={files}
             onSend={() => {
               if (onSend) {
-                onSend({ files, message, reply: isReply?.id });
+                onSend({
+                  files,
+                  message,
+                  reply: isReply?.id,
+                  setIsLoading: setLoading,
+                });
               }
               reset();
             }}
             message={message}
+            loading={loading}
           />
         </IonToolbar>
       </IonFooter>

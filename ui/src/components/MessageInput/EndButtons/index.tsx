@@ -2,14 +2,16 @@ import { IonButton, IonButtons, IonIcon } from "@ionic/react";
 import { send } from "ionicons/icons";
 import React from "react";
 import { FileContent } from "..";
+import Spinner from "../../Spinner";
 
 interface Props {
   files: FileContent[];
   message: string;
   onSend?(): any;
+  loading: boolean;
 }
 
-const EndButtons: React.FC<Props> = ({ message, files, onSend }) => (
+const EndButtons: React.FC<Props> = ({ message, files, onSend, loading }) => (
   <IonButtons slot="end">
     {/* {message.length > 0 ? null : (
       <>
@@ -26,7 +28,7 @@ const EndButtons: React.FC<Props> = ({ message, files, onSend }) => (
       onClick={onSend}
       disabled={message.length === 0 && files.length === 0}
     >
-      <IonIcon color="medium" icon={send} />
+      {loading ? <Spinner /> : <IonIcon color="medium" icon={send} />}
     </IonButton>
   </IonButtons>
 );
