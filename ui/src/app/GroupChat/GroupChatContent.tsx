@@ -37,7 +37,6 @@ const GroupChat: React.FC = () => {
 
   /* local states */
   const [files, setFiles] = useState<object[]>([]);
-  const [sendingLoading, setSendingLoading] = useState<boolean>(false);
   const [message, setMessage] = useState("");
 
   /* Refs */
@@ -59,13 +58,13 @@ const GroupChat: React.FC = () => {
 
   /* handles sending of messages. */
   const handleOnSend = (opt?: MessageInputOnSendParams) => {
-    const { reply } = { ...opt };
+    const { reply, setIsLoading } = { ...opt };
     let inputs: GroupMessageInput[] = [];
+    setIsLoading!(true);
     /*
       append text payload at index 0 and send it first
       for performance purposes
     */
-
     if (message.length) {
       inputs.push({
         groupId: groupData!.originalGroupId,
@@ -80,7 +79,6 @@ const GroupChat: React.FC = () => {
     }
 
     if (files.length) {
-      setSendingLoading(true);
       files.forEach((file: any) => {
         const filePayloadInput: FilePayloadInput = {
           type: "FILE",
@@ -106,12 +104,12 @@ const GroupChat: React.FC = () => {
       });
     }
 
-    const messagePromises = inputs.map((groupMessage: any) =>
+    const messagePromises = inputs.map((groupMessage: GroupMessageInput) =>
       dispatch(sendGroupMessage(groupMessage))
     );
 
     Promise.all(messagePromises).then((sentMessages: GroupMessage[]) => {
-      setSendingLoading(false);
+      setIsLoading!(false);
       chatList.current!.scrollToBottom();
     });
   };
@@ -158,12 +156,6 @@ const GroupChat: React.FC = () => {
 
   return groupData ? (
     <IonPage>
-      <IonLoading
-        isOpen={sendingLoading}
-        message={intl.formatMessage({
-          id: "app.group-chat.sending",
-        })}
-      />
       <GroupChatHeader groupData={groupData} />
 
       <IonContent>
