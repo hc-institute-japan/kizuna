@@ -103,34 +103,38 @@ const PinnedMessages: React.FC<Props> = ({
 
   return (
     <IonList>
-      {messages.map((message, i) => {
-        const isText = isTextPayload(message.payload);
-        return (
-          <IonItem
-            key={i}
-            button
-            onClick={() => {
-              if (onMessageClick) onMessageClick(message);
-            }}
-          >
-            <div className={styles["content-container"]}>
-              <div className={styles.header}>
-                <IonLabel className={styles.author}>{message.author}</IonLabel>
-                <IonNote className={`${styles.date} ion-padding-start`}>
-                  {message.date.toDateString()}
-                </IonNote>
+      {messages
+        .sort((a, b) => (a.date > b.date ? -1 : 1))
+        .map((message, i) => {
+          const isText = isTextPayload(message.payload);
+          return (
+            <IonItem
+              key={i}
+              button
+              onClick={() => {
+                if (onMessageClick) onMessageClick(message);
+              }}
+            >
+              <div className={styles["content-container"]}>
+                <div className={styles.header}>
+                  <IonLabel className={styles.author}>
+                    {message.author}
+                  </IonLabel>
+                  <IonNote className={`${styles.date} ion-padding-start`}>
+                    {message.date.toDateString()}
+                  </IonNote>
+                </div>
+                {isText ? (
+                  <IonText>
+                    {(message.payload as TextPayload).payload.payload}
+                  </IonText>
+                ) : (
+                  displayFile(message.payload as FilePayload)
+                )}
               </div>
-              {isText ? (
-                <IonText>
-                  {(message.payload as TextPayload).payload.payload}
-                </IonText>
-              ) : (
-                displayFile(message.payload as FilePayload)
-              )}
-            </div>
-          </IonItem>
-        );
-      })}
+            </IonItem>
+          );
+        })}
     </IonList>
   );
 };
