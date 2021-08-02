@@ -26,6 +26,8 @@ const Me: React.FC<ChatProps> = ({
   timestamp,
   replyTo,
   onReply,
+  onPinMessage,
+  isPinned,
   type,
   showProfilePicture,
   isSeen = false,
@@ -86,6 +88,8 @@ const Me: React.FC<ChatProps> = ({
         )}
       </IonItem>
       <ChatModal
+        isPinned={isPinned}
+        onPin={onPinMessage as () => any}
         onReply={() => {
           if (onReply) onReply({ author, payload, id });
         }}

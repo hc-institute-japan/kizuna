@@ -269,7 +269,7 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
               pinMessageConversant
             ].pinned.includes(key)
           ) {
-            console.log("red push 1");
+            // console.log("red push 1");
             stateToSetPinned.conversations[pinMessageConversant].pinned.push(
               key
             );
@@ -293,7 +293,7 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
                 pinMessageConversant
               ].pinned.includes(key)
             ) {
-              console.log("red push 2");
+              // console.log("red push 2");
               stateToSetPinned.conversations[pinMessageConversant].pinned.push(
                 key
               );
@@ -311,7 +311,7 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
                 pinMessageConversant
               ].pinned.includes(key)
             ) {
-              console.log("red push 3");
+              // console.log("red push 3");
               stateToSetPinned.conversations[pinMessageConversant].pinned.push(
                 key
               );
@@ -352,15 +352,16 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
         } else continue;
       }
 
-      return stateToAppendPin;
+      return { ...stateToAppendPin };
 
     case UNPIN_MESSAGE:
-      let stateToRemovePin = state;
+      const stateToRemovePin = state;
       const unpinConversant = action.state.conversant;
 
-      for (const [key, value] of Object.entries(action.state.messages)) {
+      Object.keys(action.state.messages).forEach((key) => {
         const existing =
           stateToRemovePin.conversations[unpinConversant] !== undefined;
+
         if (existing) {
           if (
             stateToRemovePin.conversations[unpinConversant].pinned === undefined
@@ -379,13 +380,14 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
                 1
               );
           }
-          if (!stateToRemovePin.pinned[key] === undefined) {
+          console.log(stateToRemovePin.pinned[key], key);
+          if (stateToRemovePin.pinned[key]) {
             delete stateToRemovePin.pinned[key];
-          } else continue;
+          }
         }
-      }
+      });
 
-      return stateToRemovePin;
+      return { ...stateToRemovePin };
 
     default:
       return state;
