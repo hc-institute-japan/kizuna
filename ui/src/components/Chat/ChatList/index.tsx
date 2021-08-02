@@ -18,13 +18,15 @@ import styles from "./style.module.css";
 import { ChatListMethods, ChatListProps } from "../types";
 
 const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
-  { children, type = "p2p", onScrollTop, disabled },
+  { children, type = "p2p", onScrollTop, disabled, onScrollBottom },
   ref: Ref<ChatListMethods>
 ) => {
   const arrChildren = React.Children.toArray(children);
   const intl = useIntl();
   const scroll = useRef<HTMLDivElement | null>(null);
   const infiniteScroll = useRef<HTMLIonInfiniteScrollElement>(null);
+  const infiniteScrollBottom = useRef<HTMLIonInfiniteScrollElement>(null);
+
   const assess = (
     child: React.ReactElement,
     arrChildren: React.ReactElement[],
@@ -105,6 +107,8 @@ const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
   }, [scroll]);
 
   const complete: () => any = () => infiniteScroll.current?.complete();
+  const completeBottom: () => any = () =>
+    infiniteScrollBottom.current?.complete();
 
   useImperativeHandle(ref, () => ({
     scrollToBottom: () => {
@@ -135,6 +139,20 @@ const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
 
       {elements}
       <div ref={scroll} />
+      {onScrollBottom ? (
+        <IonInfiniteScroll
+          disabled={disabled ? true : false}
+          threshold="0px"
+          ref={infiniteScrollBottom}
+          position="top"
+          /* Adding a 1 second timeout just because messages are being fetched too freakin' fast locally :D */
+          onIonInfinite={(e) =>
+            setTimeout(() => onScrollBottom(completeBottom, e), 1000)
+          }
+        >
+          <IonInfiniteScrollContent loadingSpinner="crescent" />
+        </IonInfiniteScroll>
+      ) : null}
     </IonList>
   );
 };

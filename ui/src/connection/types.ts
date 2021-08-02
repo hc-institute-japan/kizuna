@@ -85,6 +85,9 @@ export const FUNCTIONS: FunctionNameType = {
     INDICATE_GROUP_TYPING: "indicate_group_typing",
     READ_GROUP_MESSAGE: "read_group_message",
     GET_FILES_BYTES: "get_files_bytes",
+    PIN_MESSAGE: "pin_message",
+    UNPIN_MESSAGE: "unpin_message",
+    FETCH_PINNED_MESSAGES: "get_pinned_messages",
   },
   [ZOMES.AGGREGATOR]: {
     RETRIEVE_LATEST_DATA: "retrieve_latest_data",

@@ -1,55 +1,33 @@
-import {
-  IonAvatar,
-  IonButton,
-  IonButtons,
-  IonContent,
-  IonHeader,
-  IonIcon,
-  IonPage,
-  IonTitle,
-  IonToolbar,
-} from "@ionic/react";
-import {
-  arrowBackSharp,
-  informationCircleOutline,
-  personCircleOutline,
-  search,
-  pinOutline,
-} from "ionicons/icons";
-// react imports
+import { IonContent, IonPage } from "@ionic/react";
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useHistory, useLocation, useParams } from "react-router";
-import { RootState } from "../../redux/types";
-// component imports
-import AgentIdentifier from "../../components/AgentIdentifier";
 import { ChatList, Me, Others } from "../../components/Chat";
 import { ChatListMethods } from "../../components/Chat/types";
 import Typing from "../../components/Chat/Typing";
+import MessageInput, {
+  MessageInputMethods,
+} from "../../components/MessageInput";
+import { FilePayload } from "../../redux/commons/types";
+import { getAdjacentMessages } from "../../redux/p2pmessages/actions/getAdjacentMessages";
+import { getFileBytes } from "../../redux/p2pmessages/actions/getFileBytes";
+import { getNextBatchMessages } from "../../redux/p2pmessages/actions/getNextBatchMessages";
+import { getNextMessages } from "../../redux/p2pmessages/actions/getNextMessages";
+import { getPinnedMessages } from "../../redux/p2pmessages/actions/getPinnedMessages";
+import { isTyping } from "../../redux/p2pmessages/actions/isTyping";
 // type imports
+import { pinMessage } from "../../redux/p2pmessages/actions/pinMessage";
+import { readMessage } from "../../redux/p2pmessages/actions/readMessage";
+import { sendMessage } from "../../redux/p2pmessages/actions/sendMessage";
 import {
   P2PHashMap,
   P2PMessage,
   P2PMessageReceipt,
 } from "../../redux/p2pmessages/types";
-import MessageInput, {
-  MessageInputMethods,
-} from "../../components/MessageInput";
-import { FilePayload } from "../../redux/commons/types";
 import { Profile } from "../../redux/profile/types";
-// action imports
-import { sendMessage } from "../../redux/p2pmessages/actions/sendMessage";
-import { readMessage } from "../../redux/p2pmessages/actions/readMessage";
-import { isTyping } from "../../redux/p2pmessages/actions/isTyping";
-import { pinMessage } from "../../redux/p2pmessages/actions/pinMessage";
-import { getFileBytes } from "../../redux/p2pmessages/actions/getFileBytes";
-import { getNextBatchMessages } from "../../redux/p2pmessages/actions/getNextBatchMessages";
-import { getNextMessages } from "../../redux/p2pmessages/actions/getNextMessages";
-import { getAdjacentMessages } from "../../redux/p2pmessages/actions/getAdjacentMessages";
-import { sendMessageWithTimestamp } from "../../redux/p2pmessages/actions/sendMessageWithTimestamp";
-// helper imports
-import { timestampToDate, useAppDispatch } from "../../utils/helpers";
-import styles from "./style.module.css";
+import { RootState } from "../../redux/types";
+import { useAppDispatch } from "../../utils/helpers";
+import ChatHeader from "./ChatHeader";
 
 const Chat: React.FC = () => {
   /* STATES */
@@ -68,6 +46,12 @@ const Chat: React.FC = () => {
   const fetchedFiles = useSelector(
     (state: RootState) => state.p2pmessages.files
   );
+  const pinned = useSelector((state: RootState) => state.p2pmessages.pinned);
+
+  useEffect(() => {
+    dispatch(getPinnedMessages(id));
+  }, []);
+
   const typing = useSelector((state: RootState) => {
     const allTypingProfiles = state.p2pmessages.typing;
     const typingProfile = Object.values(allTypingProfiles).filter(
@@ -155,14 +139,14 @@ const Chat: React.FC = () => {
         )
       ).then((res: P2PHashMap) => {
         // disable getNextBatch if return value is empty
-        console.log("chatcontent next messages", res);
+        // console.log("chatcontent next messages", res);
       });
 
       if (filteredMessages.length >= 5) {
-        console.log(
-          "chatcontent middle message",
-          filteredMessages[Math.floor(filteredMessages.length / 2)]
-        );
+        // console.log(
+        //   "chatcontent middle message",
+        //   filteredMessages[Math.floor(filteredMessages.length / 2)]
+        // );
         dispatch(
           getAdjacentMessages(
             conversant.id,
@@ -175,9 +159,7 @@ const Chat: React.FC = () => {
               Math.floor(filteredMessages.length / 2)
             ].message.p2pMessageEntryHash
           )
-        ).then((res: P2PHashMap) =>
-          console.log("chatcontent adjacent messages", res)
-        );
+        ).then((res: P2PHashMap) => {});
       }
 
       setMessagesWithConversant(filteredMessages);
@@ -320,7 +302,6 @@ const Chat: React.FC = () => {
   /*
       Handle back button
     */
-  const handleOnBack = () => history.push({ pathname: `/home` });
 
   /* 
       dispatches an action to hc to mark a message as read 
@@ -367,11 +348,6 @@ const Chat: React.FC = () => {
   /*
     handle the clicking of nickname
   */
-  const handleOnProfileClick = () =>
-    history.push({
-      pathname: `/p/${id}`,
-      state: { profile: { username: state?.username, id } },
-    });
 
   /* 
     renders the appropriate chat bubble
@@ -419,6 +395,12 @@ const Chat: React.FC = () => {
           if (messageInputRef.current) messageInputRef?.current?.reply(message);
           setReplyTo(message.id);
         }}
+        onPinMessage={() => {
+          dispatch(pinMessage([messageBundle.message]));
+        }}
+        isPinned={
+          pinned[messageBundle.message.p2pMessageEntryHash] ? true : false
+        }
       />
     ) : (
       <Others
@@ -430,6 +412,7 @@ const Chat: React.FC = () => {
         payload={payload}
         readList={readlist ? readlist : {}}
         showProfilePicture={true}
+        onPinMessage={() => dispatch(pinMessage([messageBundle.message]))}
         showName={true}
         onSeen={(complete) => onSeenHandler(messageBundle)}
         onDownload={(file) => onDownloadHandler(file)}
@@ -438,6 +421,9 @@ const Chat: React.FC = () => {
           if (messageInputRef.current) messageInputRef?.current?.reply(message);
           setReplyTo(message.id);
         }}
+        isPinned={
+          pinned[messageBundle.message.p2pMessageEntryHash] ? true : false
+        }
       />
     );
   };
@@ -445,49 +431,22 @@ const Chat: React.FC = () => {
   /* RENDER */
   return (
     <IonPage>
-      <IonHeader>
-        <IonToolbar>
-          <IonButtons slot="start">
-            <IonButton
-              onClick={() => handleOnBack()}
-              className="ion-no-padding"
-            >
-              <IonIcon slot="icon-only" icon={arrowBackSharp} />
-            </IonButton>
-          </IonButtons>
-          <div className={styles["title-container"]}>
-            <IonAvatar className="ion-padding">
-              <img
-                className={styles["avatar"]}
-                src={personCircleOutline}
-                alt={state?.username}
-              />
-            </IonAvatar>
-            <IonTitle
-              className={styles["title"]}
-              onClick={handleOnProfileClick}
-            >
-              <AgentIdentifier nickname={state?.username} id={id} />
-            </IonTitle>
-          </div>
-          <IonButtons slot="end">
-            <IonButton onClick={handleOnOpenSearch}>
-              <IonIcon slot="icon-only" icon={search} />
-            </IonButton>
-            <IonButton onClick={handleOnOpenDetails}>
-              <IonIcon slot="icon-only" icon={informationCircleOutline} />
-            </IonButton>
-            <IonButton onClick={handleOnOpenPinned}>
-              <IonIcon slot="icon-only" icon={pinOutline} />
-            </IonButton>
-          </IonButtons>
-        </IonToolbar>
-      </IonHeader>
-
+      <ChatHeader
+        id={id}
+        pathname={pathname}
+        conversant={conversant}
+        username={state?.username}
+      />
       <IonContent>
         <ChatList
           type="p2p"
           onScrollTop={(complete) => handleOnScrollTop(complete)}
+          onScrollBottom={(complete) => {
+            setTimeout(() => {
+              console.log("xd");
+              complete();
+            }, 2000);
+          }}
           ref={scrollerRef}
           disabled={disableGetNextBatch}
         >

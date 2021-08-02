@@ -176,7 +176,7 @@ const GroupChatDetails: React.FC = () => {
   // sort others
   useEffect(() => {
     if (conversations[group] !== undefined) {
-      conversations[group].messages.forEach((messageID) => {
+      conversations[group].messages.forEach((messageID: string) => {
         let message = messages[messageID];
         if (message.payload.type === "FILE") {
           let type = message.payload.fileType;

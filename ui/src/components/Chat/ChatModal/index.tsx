@@ -5,9 +5,11 @@ import styles from "./style.module.css";
 interface Props {
   open: [boolean, React.Dispatch<SetStateAction<boolean>>];
   onReply: () => any;
+  onPin: () => any;
+  isPinned: boolean;
 }
 
-const ChatModal: React.FC<Props> = ({ open, onReply }) => {
+const ChatModal: React.FC<Props> = ({ open, onReply, onPin, isPinned }) => {
   const [isOpen, setIsOpen] = open;
   return (
     <IonModal
@@ -28,6 +30,16 @@ const ChatModal: React.FC<Props> = ({ open, onReply }) => {
             }}
           >
             <IonLabel>Reply</IonLabel>
+          </IonItem>
+          <IonItem
+            button
+            lines="none"
+            onClick={() => {
+              onPin();
+              setIsOpen(false);
+            }}
+          >
+            <IonLabel>{isPinned ? "Unpin" : "Pin"}</IonLabel>
           </IonItem>
         </IonList>
       </IonContent>
