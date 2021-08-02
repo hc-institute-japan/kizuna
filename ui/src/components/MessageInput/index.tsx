@@ -110,6 +110,7 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
     setIsReply(undefined);
     setMessage("");
     setFiles([]);
+    if (file.current) file.current!.value = "";
   };
 
   const onKeyDown = (event: KeyboardEvent) => {
