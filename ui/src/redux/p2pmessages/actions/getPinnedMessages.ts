@@ -9,11 +9,10 @@ import { transformZomeDataToUIData } from "./helpers/transformZomeDateToUIData";
 export const getPinnedMessages =
   (conversant: AgentPubKeyBase64): ThunkAction =>
   async (dispatch, getState, { callZome }) => {
-    console.log("getting pinned messages", conversant);
-    let zome_input = {
+    const zome_input = {
       conversant: Buffer.from(deserializeHash(conversant)),
     };
-    console.log("zome input", zome_input);
+
     try {
       // CALL ZOME
       const pinnedMessages = await callZome({
@@ -21,6 +20,8 @@ export const getPinnedMessages =
         fnName: FUNCTIONS[ZOMES.P2PMESSAGE].GET_PINNED_MESSAGES,
         payload: Buffer.from(deserializeHash(conversant)),
       });
+
+      // console.log(pinnedMessages);
 
       // DISPATCH TO REDUCER
       if (pinnedMessages?.type !== "error") {
@@ -31,8 +32,11 @@ export const getPinnedMessages =
           ...contactsState,
           [profile.id!]: { id: profile.id!, username: profile.username! },
         };
-        let toDispatch = transformZomeDataToUIData(pinnedMessages, profileList);
-        console.log("todispatch", toDispatch);
+        const toDispatch = transformZomeDataToUIData(
+          pinnedMessages,
+          profileList
+        );
+        // console.log("todispatch", toDispatch);
 
         dispatch({
           type: SET_PINNED,

@@ -4,12 +4,17 @@ import {
   GroupConversationsActionTypes,
   GroupConversationsState,
   REMOVE_MEMBERS,
+  SET_CONVERSATIONS,
   SET_FILES_BYTES,
   SET_GROUP_MESSAGE,
   SET_GROUP_MESSAGES,
   SET_GROUP_READ_MESSAGE,
   SET_GROUP_TYPING_INDICATOR,
   SET_LATEST_GROUP_STATE,
+  SET_LATEST_GROUP_VERSION,
+  SET_MESSAGES_BY_GROUP_BY_TIMESTAMP,
+  SET_NEXT_BATCH_GROUP_MESSAGES,
+  SET_PINNED_MESSAGES,
   UPDATE_GROUP_NAME,
 } from "./types";
 
@@ -19,6 +24,7 @@ const initialState: GroupConversationsState = {
   groupFiles: {},
   members: {},
   typing: {},
+  pinnedMessages: {},
 };
 
 const reducer = (
@@ -83,6 +89,21 @@ const reducer = (
     }
     case SET_GROUP_READ_MESSAGE: {
       return { ...state, messages: { ...action.messages } };
+    }
+    case SET_PINNED_MESSAGES: {
+      const { conversations, pinnedMessages } = action;
+      return {
+        ...state,
+        conversations,
+        pinnedMessages,
+      };
+    }
+    case SET_CONVERSATIONS: {
+      const { conversations } = action;
+      return {
+        ...state,
+        conversations,
+      };
     }
     default:
       return state;
