@@ -7,6 +7,8 @@ import { FilePayload, Payload } from "../../../redux/commons/types";
 import { getNextBatchGroupMessages } from "../../../redux/group/actions";
 import { readGroupMessage } from "../../../redux/group/actions";
 import { fetchFilesBytes } from "../../../redux/group/actions";
+import { pinMessage } from "../../../redux/group/actions/pinMessage";
+import { unpinMessage } from "../../../redux/group/actions/unpinMessage";
 // Redux
 import {
   GroupMessage,
@@ -44,9 +46,11 @@ const MessageList: React.FC<Props> = ({
   const [messages, setMessages] = useState<GroupMessageBundle[]>([]);
   const [oldestFetched, setOldestFetched] = useState<boolean>(false);
 
-  const { messages: stateMessages, members: stateMembers } = useSelector(
-    (state: RootState) => state.groups
-  );
+  const {
+    messages: stateMessages,
+    members: stateMembers,
+    pinnedMessages,
+  } = useSelector((state: RootState) => state.groups);
   const membersProfile = useSelector(
     (state: RootState) => state.groups.members
   );
@@ -167,9 +171,15 @@ const MessageList: React.FC<Props> = ({
                 onDownload={handleOnDownload}
                 key={i}
                 author={message.author.username}
+                isPinned={pinnedMessages[message.groupMessageId] ? true : false}
                 timestamp={message.timestamp}
                 payload={message.payload}
                 readList={message.readList}
+                onPinMessage={() => {
+                  if (pinnedMessages[message.groupMessageId])
+                    dispatch(unpinMessage(groupId, message.groupMessageId));
+                  else dispatch(pinMessage(groupId, message.groupMessageId));
+                }}
                 replyTo={
                   message.replyTo
                     ? {
@@ -194,6 +204,12 @@ const MessageList: React.FC<Props> = ({
               id={message.groupMessageId}
               onDownload={handleOnDownload}
               key={i}
+              isPinned={pinnedMessages[message.groupMessageId] ? true : false}
+              onPinMessage={() => {
+                if (pinnedMessages[message.groupMessageId])
+                  dispatch(unpinMessage(groupId, message.groupMessageId));
+                else dispatch(pinMessage(groupId, message.groupMessageId));
+              }}
               author={message.author.username}
               timestamp={message.timestamp}
               payload={message.payload}

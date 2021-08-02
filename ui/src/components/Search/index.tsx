@@ -116,6 +116,7 @@ const Search: React.FC<Props> = ({
                         readList={msg.readList}
                         replyTo={msg.replyTo}
                         type="group"
+                        isPinned={false}
                         showName={true}
                         showProfilePicture={true}
                       />
@@ -127,6 +128,7 @@ const Search: React.FC<Props> = ({
                       key={i}
                       author={msg.author.username}
                       timestamp={msg.timestamp}
+                      isPinned={false}
                       payload={msg.payload}
                       readList={msg.readList}
                       replyTo={msg.replyTo}

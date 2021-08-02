@@ -43,10 +43,7 @@ const PinnedMessages: React.FC<Props> = ({
       case "OTHER":
         return (
           <div className={`${styles["other"]} ion-padding`}>
-            <IonIcon
-              className="ion-margin-end"
-              icon={documentOutline}
-            ></IonIcon>
+            <IonIcon className="ion-margin-end" icon={documentOutline} />
             <div className={styles["file-details"]}>
               <IonText className={styles["file-name"]}>
                 {payload.fileName}
@@ -77,6 +74,7 @@ const PinnedMessages: React.FC<Props> = ({
             )}
             onPlayPauseErrorHandler={(setErrorState: any) => {
               if (type === "p2p") {
+                console.log(payload);
                 dispatch(getFileBytes([payload.fileHash])).then((res: any) => {
                   if (res) {
                     setErrorState(false);

@@ -42,6 +42,14 @@ const getLatestGroupVersion =
         payload: input,
       });
 
+      const groupPinnedMessages = await callZome({
+        zomeName: ZOMES.GROUP,
+        fnName: FUNCTIONS[ZOMES.GROUP].FETCH_PINNED_MESSAGES,
+        payload: groupId,
+      });
+
+      console.log(groupPinnedMessages);
+
       const groupMessagesOutput: GroupMessagesOutput =
         convertFetchedResToGroupMessagesOutput(groupMessagesRes);
 

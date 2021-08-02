@@ -15,17 +15,10 @@ import { Payload } from "../../../redux/commons/types";
 import { P2PMessage } from "../../../redux/p2pmessages/types";
 import { getPinnedMessages } from "../../../redux/p2pmessages/actions/getPinnedMessages";
 import { useAppDispatch } from "../../../utils/helpers";
+import PinnedMessage from "../../../components/PinnedMessage";
 
 const ChatPinnedMessage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [messages, setMessages] = useState<{
-    [key: string]: {
-      id: string;
-      author: string;
-      payload: Payload;
-      date: Date;
-    };
-  }>({});
 
   const dispatch = useAppDispatch();
 
@@ -33,42 +26,67 @@ const ChatPinnedMessage: React.FC = () => {
     dispatch(getPinnedMessages(id));
   }, []);
 
-  const pinnedIDs = useSelector((state: RootState) =>
-    state.p2pmessages.conversations[id]
-      ? state.p2pmessages.conversations[id].pinned
-        ? state.p2pmessages.conversations[id].pinned
-        : []
-      : []
-  );
-
-  const allPinned: P2PMessage[] = useSelector((state: RootState) => {
-    const allPinned: { [key: string]: P2PMessage } = state.p2pmessages.pinned;
-    const filteredPinned = Object.values(allPinned).filter((message) =>
-      pinnedIDs.includes(message.p2pMessageEntryHash)
-    );
-    return filteredPinned;
-  });
-
-  useEffect(() => {
-    allPinned.map((message: P2PMessage) => {
-      if (pinnedIDs.includes(message.p2pMessageEntryHash)) {
-        console.log("chappinned push to state");
-        if (messages[message.p2pMessageEntryHash] === undefined) {
-          messages[message.p2pMessageEntryHash] = {
-            id: message.p2pMessageEntryHash,
-            author: message.author.username,
-            payload: message.payload,
-            date: message.timestamp,
-          };
+  const messages: any[] = useSelector(
+    (state: RootState) => {
+      const conversation = state.p2pmessages.conversations[id];
+      if (conversation) {
+        if (
+          conversation.pinned &&
+          !(
+            conversation.pinned.filter((id) => !state.p2pmessages.pinned)
+              .length > 0
+          )
+        ) {
+          return conversation.pinned.map((id) => {
+            const pinnedMessage = state.p2pmessages.pinned[id];
+            console.log(pinnedMessage);
+            return {
+              id: pinnedMessage.p2pMessageEntryHash,
+              payload: pinnedMessage.payload,
+              author: pinnedMessage.author.username,
+              date: pinnedMessage.timestamp,
+            };
+          });
+        } else {
+          dispatch(getPinnedMessages(id));
         }
-        // messages.push({
-
-        // });
       }
-    });
-    console.log("chatpinned messageIDs allPinned", pinnedIDs, allPinned);
-    console.log("chatpinned", messages);
-  }, [allPinned]);
+      return [];
+    }
+    // state.p2pmessages.conversations[id]
+    //   ? state.p2pmessages.conversations[id].pinned
+    //     ? state.p2pmessages.conversations[id].pinned
+    //     : []
+    //   : []
+  );
+  console.log(messages);
+
+  // const allPinned: P2PMessage[] = useSelector((state: RootState) => {
+  //   const allPinned: { [key: string]: P2PMessage } = state.p2pmessages.pinned;
+  //   const filteredPinned = Object.values(allPinned).filter((message) =>
+  //     pinnedIDs.includes(message.p2pMessageEntryHash)
+  //   );
+  //   return filteredPinned;
+  // });
+
+  // useEffect(() => {
+  //   allPinned.map((message: P2PMessage) => {
+  //     if (pinnedIDs.includes(message.p2pMessageEntryHash)) {
+  //       if (messages[message.p2pMessageEntryHash] === undefined) {
+  //         setMessages((currMessages) => ({
+  //           [message.p2pMessageEntryHash]: {
+  //             id: message.p2pMessageEntryHash,
+  //             author: message.author.username,
+  //             payload: message.payload,
+  //             date: message.timestamp,
+  //           },
+  //         }));
+  //       }
+  //     }
+  //   });
+  //   // console.log("chatpinned messageIDs allPinned", pinnedIDs, allPinned);
+  //   // console.log("chatpinned", messages);
+  // }, [allPinned]);
 
   return (
     <IonPage>

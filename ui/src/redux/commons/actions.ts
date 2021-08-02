@@ -73,28 +73,24 @@ export const getLatestData =
     const groupMessagesOutput: GroupMessagesOutput =
       convertFetchedResToGroupMessagesOutput(latestData.latestGroupMessages);
 
-    let groups: GroupConversation[] = latestData.groups.map(
-      (group: any): GroupConversation => {
-        return {
-          originalGroupId: serializeHash(group.groupId),
-          originalGroupRevisionId: serializeHash(group.groupRevisionId),
-          name: group.latestName,
-          members: group.members.map((id: Buffer) => serializeHash(id)),
-          createdAt: timestampToDate(group.created),
-          creator: serializeHash(group.creator),
-          messages:
-            groupMessagesOutput.messagesByGroup[serializeHash(group.groupId)],
-        };
-      }
+    const groups: GroupConversation[] = latestData.groups.map(
+      (group: any): GroupConversation => ({
+        originalGroupId: serializeHash(group.groupId),
+        originalGroupRevisionId: serializeHash(group.groupRevisionId),
+        name: group.latestName,
+        members: group.members.map((id: Buffer) => serializeHash(id)),
+        createdAt: timestampToDate(group.created),
+        creator: serializeHash(group.creator),
+        messages:
+          groupMessagesOutput.messagesByGroup[serializeHash(group.groupId)],
+      })
     );
 
     let members: Profile[] = latestData.memberProfiles.map(
-      (agentProfile: any): Profile => {
-        return {
-          id: agentProfile.agentPubKey,
-          username: agentProfile.profile.nickname,
-        };
-      }
+      (agentProfile: any): Profile => ({
+        id: agentProfile.agentPubKey,
+        username: agentProfile.profile.nickname,
+      })
     );
 
     dispatch<SetLatestGroupState>({
