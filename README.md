@@ -1,5 +1,5 @@
 # Kizuna
 
-<!-- [![hc-institute-japan](https://circleci.com/gh/hc-institute-japan/Kizuna.svg?style=svg)](https://circleci.com/gh/hc-institute-japan/Kizuna) -->
+![workflow](https://github.com/hc-institute-japan/kizuna/actions/workflows/main.yml/badge.svg)
 
 A distributed, peer-to-peer, non-profit messaging application (getting 😆) built on holochain.
