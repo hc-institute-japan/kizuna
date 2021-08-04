@@ -1,5 +1,5 @@
 import { IonContent, IonLoading, IonPage } from "@ionic/react";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router";
@@ -10,12 +10,14 @@ import MessageInput, {
   MessageInputMethods,
   MessageInputOnSendParams,
 } from "../../components/MessageInput";
+import PinnedMessage from "../../components/PinnedMessage";
 // Redux
 import { FilePayloadInput } from "../../redux/commons/types";
 import {
   indicateGroupTyping,
   sendGroupMessage,
 } from "../../redux/group/actions";
+import { fetchPinnedMessages } from "../../redux/group/actions/fetchPinnedMessages";
 import {
   GroupConversation,
   GroupMessage,
@@ -53,6 +55,14 @@ const GroupChat: React.FC = () => {
   const { readReceipt, typingIndicator } = useSelector(
     (state: RootState) => state.preference
   );
+
+  /**
+   * Hooks
+   */
+
+  useEffect(() => {
+    if (groupData) dispatch(fetchPinnedMessages(groupData?.originalGroupId));
+  }, [groupData, dispatch]);
 
   /* Handlers */
 
@@ -152,13 +162,15 @@ const GroupChat: React.FC = () => {
     return setMessage(message);
   };
 
+  // const pinnedMessages = groupData.pinnedMessages?.map(pinnedMessage=>)
+
   const messageInput = useRef<MessageInputMethods | null>(null);
 
   return groupData ? (
     <IonPage>
       <GroupChatHeader groupData={groupData} />
-
       <IonContent>
+        {/* <PinnedMessage></PinnedMessage> */}
         <ChatBox
           onReply={(message) => {
             if (messageInput.current) messageInput?.current?.reply(message);

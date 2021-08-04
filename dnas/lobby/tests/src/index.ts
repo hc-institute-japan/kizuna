@@ -21,7 +21,7 @@ const network = {
 };
 
 const config = Config.gen({ network });
-const kizuna = path.join(__dirname, "../../workdir/dna/Kizuna.dna");
+const kizuna = path.join(__dirname, "../../workdir/dna/kizuna.dna");
 
 const installAgent: InstallAgentsHapps = [[[kizuna]]];
 
@@ -36,7 +36,7 @@ const installables: Installables = {
 };
 
 group(config, installables);
-// contacts(config, installables);
-// preference(config, installables);
-// aggregator(config, installables);
+contacts(config, installables);
+preference(config, installables);
+aggregator(config, installables);
 // request(config); // not passing

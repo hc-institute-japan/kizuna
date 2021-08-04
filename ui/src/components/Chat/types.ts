@@ -10,6 +10,10 @@ export interface ChatListProps {
     complete: () => Promise<void>,
     event: CustomEvent<void>
   ) => any;
+  onScrollBottom?: (
+    complete: () => Promise<void>,
+    event: CustomEvent<void>
+  ) => any;
 }
 
 export interface ChatProps {
@@ -28,6 +32,8 @@ export interface ChatProps {
   onSeen?(complete: () => any): any;
   onReply?(message: { payload: Payload; author: string; id: string }): any;
   onDownload?(file: FilePayload): any;
+  onPinMessage?(): any;
+  isPinned: boolean;
 }
 
 export interface ChatListMethods {

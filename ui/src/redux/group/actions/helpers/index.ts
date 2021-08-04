@@ -1,6 +1,5 @@
 import { serializeHash } from "@holochain-open-dev/core-types";
 import { AgentPubKey } from "@holochain/conductor-api";
-import { CombinedState } from "redux";
 import { FUNCTIONS, ZOMES } from "../../../../connection/types";
 import {
   deserializeAgentPubKey,
@@ -14,12 +13,9 @@ import {
   Payload,
   TextPayload,
 } from "../../../commons/types";
-import { ContactsState } from "../../../contacts/types";
-import { PreferenceState } from "../../../preference/types";
-import { AgentProfile, Profile, ProfileState } from "../../../profile/types";
-import { CallZomeConfig } from "../../../types";
+import { AgentProfile, Profile } from "../../../profile/types";
+import { CallZomeConfig, RootState } from "../../../types";
 import {
-  GroupConversationsState,
   GroupMessage,
   GroupMessagesContents,
   GroupMessagesOutput,
@@ -124,12 +120,7 @@ export const convertPayload = (payload: any | TextPayload): Payload => {
 };
 
 export const fetchUsernameOfMembers = async (
-  state: CombinedState<{
-    profile: ProfileState;
-    contacts: ContactsState;
-    preference: PreferenceState;
-    groups: GroupConversationsState;
-  }>,
+  state: RootState,
   members: string[],
   callZome: (config: CallZomeConfig) => Promise<any>,
   myAgentId: string
