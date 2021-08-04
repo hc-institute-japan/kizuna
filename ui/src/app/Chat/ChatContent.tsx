@@ -446,7 +446,6 @@ const Chat: React.FC = () => {
           onScrollTop={(complete) => handleOnScrollTop(complete)}
           onScrollBottom={(complete) => {
             setTimeout(() => {
-              console.log("xd");
               complete();
             }, 2000);
           }}
