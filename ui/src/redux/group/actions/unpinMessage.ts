@@ -32,7 +32,7 @@ export const unpinMessage =
           ...getState().groups.conversations,
           [groupId]: conversation,
         },
-        pinnedMessages,
+        pinnedMessages: { ...pinnedMessages },
       });
     } catch (e) {
       return dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));

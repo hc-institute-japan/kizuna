@@ -74,7 +74,6 @@ const PinnedMessages: React.FC<Props> = ({
             )}
             onPlayPauseErrorHandler={(setErrorState: any) => {
               if (type === "p2p") {
-                console.log(payload);
                 dispatch(getFileBytes([payload.fileHash])).then((res: any) => {
                   if (res) {
                     setErrorState(false);
