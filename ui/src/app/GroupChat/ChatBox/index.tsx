@@ -4,7 +4,7 @@ import { useSelector } from "react-redux";
 import Chat from "../../../components/Chat";
 import { ChatListMethods } from "../../../components/Chat/types";
 import { FilePayload, Payload } from "../../../redux/commons/types";
-import { getNextBatchGroupMessages } from "../../../redux/group/actions";
+import { getPreviousGroupMessages } from "../../../redux/group/actions";
 import { readGroupMessage } from "../../../redux/group/actions";
 import { fetchFilesBytes } from "../../../redux/group/actions";
 import { pinMessage } from "../../../redux/group/actions/pinMessage";
@@ -61,7 +61,7 @@ const MessageList: React.FC<Props> = ({
     if (!oldestFetched) {
       let lastMessage = messages[0];
       dispatch(
-        getNextBatchGroupMessages({
+        getPreviousGroupMessages({
           groupId: groupId,
           // the entry hash of the last message in the last batch fetched
           lastFetched: lastMessage.groupMessageId,

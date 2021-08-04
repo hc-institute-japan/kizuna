@@ -56,10 +56,29 @@ const groupTypingDetail =
         isTyping: payload.isTyping,
       };
 
+      let typing = state.groups.typing;
+      let groupTyping = typing[GroupTypingDetail.groupId]
+        ? typing[GroupTypingDetail.groupId]
+        : [];
+      const id = groupTyping.map((profile: Profile) => profile.id);
+      if (GroupTypingDetail.isTyping) {
+        if (!id.includes(GroupTypingDetail.indicatedBy.id)) {
+          groupTyping.push(GroupTypingDetail.indicatedBy);
+        }
+      } else {
+        groupTyping = groupTyping.filter((profile) => {
+          return profile.id !== GroupTypingDetail.indicatedBy.id;
+        });
+      }
+
+      typing = {
+        ...typing,
+        [GroupTypingDetail.groupId]: groupTyping,
+      };
+
       dispatch<SetGroupTypingIndicator>({
         type: SET_GROUP_TYPING_INDICATOR,
-        groupTypingIndicator: GroupTypingDetail,
-        typing: state.groups.typing,
+        typing,
       });
     }
   };

@@ -14,8 +14,9 @@ const addedToGroup =
   async (dispatch, getState, { callZome, getAgentId }) => {
     const { payload } = signalPayload;
 
-    const contacts = getState().contacts.contacts;
-    const username = getState().profile.username!; // At this point, username is non-nullable
+    const state = getState();
+    const contacts = state.contacts.contacts;
+    const username = state.profile.username!; // At this point, username is non-nullable
     const id = await getAgentId();
     const myAgentId = serializeHash(id!); // AgentPubKey should be non-nullable here
 
@@ -79,10 +80,25 @@ const addedToGroup =
         };
       });
     }
+
+    let groupEntryHash: string = groupData.originalGroupId;
+    let newConversation: { [key: string]: GroupConversation } = {
+      [groupEntryHash]: groupData,
+    };
+    let conversations = state.groups.conversations;
+    conversations = {
+      ...conversations,
+      ...newConversation,
+    };
+    let members = state.groups.members;
+    members = {
+      ...members,
+      ...membersProfile,
+    };
     dispatch<AddGroupAction>({
       type: ADD_GROUP,
-      groupData,
-      membersProfile,
+      conversations,
+      members,
     });
   };
 

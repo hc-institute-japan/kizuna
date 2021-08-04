@@ -6,8 +6,8 @@ import { ThunkAction } from "../../types";
 import {
   GroupConversation,
   GroupMessagesOutput,
-  SetLatestGroupVersionAction,
-  SET_LATEST_GROUP_VERSION,
+  SetLatestGroupState,
+  SET_LATEST_GROUP_STATE,
 } from "../types";
 import {
   convertFetchedResToGroupMessagesOutput,
@@ -18,6 +18,7 @@ const getLatestGroupVersion =
   (groupId: string): ThunkAction =>
   async (dispatch, getState, { callZome, getAgentId }) => {
     const myAgentId = await getAgentId();
+    const state = getState();
     try {
       const latestGroupVersionRes = await callZome({
         zomeName: ZOMES.GROUP,
@@ -77,11 +78,28 @@ const getLatestGroupVersion =
         serializeHash(myAgentId!)
       );
 
-      dispatch<SetLatestGroupVersionAction>({
-        type: SET_LATEST_GROUP_VERSION,
-        groupData,
-        groupMessagesOutput,
-        membersUsernames,
+      let conversations = state.groups.conversations;
+      conversations = {
+        ...conversations,
+        [groupData.originalGroupId]: groupData,
+      };
+
+      let messages = state.groups.messages;
+      messages = {
+        ...messages,
+        ...groupMessagesOutput.groupMessagesContents,
+      };
+
+      let members = state.groups.members;
+      Object.keys(membersUsernames).forEach((key: string) => {
+        members[key] = membersUsernames[key];
+      });
+
+      dispatch<SetLatestGroupState>({
+        type: SET_LATEST_GROUP_STATE,
+        conversations,
+        messages,
+        members,
       });
 
       return groupData;

@@ -7,6 +7,7 @@ import { ChatListMethods } from "../../components/Chat/types";
 import Typing from "../../components/Chat/Typing";
 import MessageInput, {
   MessageInputMethods,
+  MessageInputOnSendParams,
 } from "../../components/MessageInput";
 import { FilePayload } from "../../redux/commons/types";
 import { getAdjacentMessages } from "../../redux/p2pmessages/actions/getAdjacentMessages";
@@ -221,7 +222,9 @@ const Chat: React.FC = () => {
       together with any file attached
       when clicking the send button  
     */
-  const handleOnSubmit = () => {
+  const handleOnSubmit = (opt?: MessageInputOnSendParams) => {
+    let { setIsLoading } = { ...opt };
+    setIsLoading!(true);
     if (message !== "") {
       dispatch(
         sendMessage(
@@ -230,7 +233,7 @@ const Chat: React.FC = () => {
           "TEXT",
           replyTo !== "" ? replyTo : undefined
         )
-      );
+      ).then((res: any) => (files.length ? null : setIsLoading!(false)));
       // .then(
       //   setTimeout(() => {
       //     let time = new Date().getTime() - 1000 * 60 * 60 * 24 * 22;
@@ -258,7 +261,7 @@ const Chat: React.FC = () => {
             replyTo !== "" ? replyTo : undefined,
             file
           )
-        ),
+        ).then((res: any) => setIsLoading!(false)),
         3000
       )
     );

@@ -2,7 +2,7 @@
 name = "file_types"
 version = "0.0.1"
 description = "types related to file used both for p2pmessage and group zomes."
-authors = ["Tatsuya Sato <tatsuya_sato@dlsu.edu.ph>"]
+authors = ["Tatsuya Sato <tatsuya_sato@yumeville.com>"]
 edition = "2018"
 
 [lib]
@@ -12,4 +12,4 @@ crate-type = [ "cdylib", "rlib" ]
 [dependencies]
 derive_more = "0"
 serde = "1"
-hdk = "0.0.100"
+hdk = {git = "https://github.com/holochain/holochain", rev = "363af6d8af8d18e4616f6aa56ad4d1f0fabaafb7", package = "hdk", version = "0.0.101-alpha.0"}

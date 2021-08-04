@@ -1,6 +1,6 @@
 extern crate profiles;
+use hdk::prelude::holo_hash::AgentPubKeyB64;
 use hdk::prelude::*;
-use holo_hash::AgentPubKeyB64;
 use profiles::*;
 
 #[hdk_extern]
