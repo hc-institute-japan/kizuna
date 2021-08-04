@@ -31,7 +31,6 @@ export default (config, installables) => {
         null
       );
 
-      console.log(aggreageted_result, "This is the aggregated result");
       t.ok(aggreageted_result);
     }
   );
