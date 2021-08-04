@@ -24,5 +24,5 @@ jobs:
     - name: test-holochain
       run: |
         cd $GITHUB_WORKSPACE
-        nix-shell . --run dnas/lobby && "tests && npm install"
-        nix-shell . --run dnas/lobby && "tests && npm test" 
+        nix-shell . --run dnas/lobby && npm install"
+        nix-shell . --run dnas/lobby && npm run test" 
