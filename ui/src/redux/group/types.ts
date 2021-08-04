@@ -11,9 +11,7 @@ export const UPDATE_GROUP_NAME = "UPDATE_GROUP_NAME";
 export const REMOVE_MEMBERS = "REMOVE_MEMBERS";
 export const ADD_MEMBERS = "ADD_MEMBERS";
 export const SET_GROUP_MESSAGE = "SET_GROUP_MESSAGE";
-export const SET_NEXT_BATCH_GROUP_MESSAGES = "SET_NEXT_BATCH_GROUP_MESSAGES";
-export const SET_MESSAGES_BY_GROUP_BY_TIMESTAMP =
-  "SET_MESSAGES_BY_GROUP_BY_TIMESTAMP";
+export const SET_GROUP_MESSAGES = "SET_GROUP_MESSAGES";
 export const SET_LATEST_GROUP_STATE = "SET_LATEST_GROUP_STATE";
 export const SET_LATEST_GROUP_VERSION = "SET_LATEST_GROUP_VERSION";
 export const SET_FILES_BYTES = "SET_FILES_BYTES";
@@ -79,6 +77,14 @@ export interface GroupMessageBatchFetchFilter {
   lastMessageTimestamp?: Date; // converted to [number, number] for zome fn
   batchSize: number;
   payloadType: FetchPayloadType;
+}
+
+export interface GroupMessagAdjacentFetchFilter {
+  groupId: string;
+  adjacentMessage: string; // Message id of the message being adjacent
+  messageTimestamp: Date;
+  // This batch size goes for both previou and later messages of adjacent message
+  batchSize: number;
 }
 
 export interface GroupMessageByDateFetchFilter {
@@ -222,8 +228,10 @@ export interface GroupConversationsState {
 
 export interface AddGroupAction {
   type: typeof ADD_GROUP;
-  groupData: GroupConversation;
-  membersProfile: {
+  conversations: {
+    [key: string]: GroupConversation;
+  };
+  members: {
     [key: string]: Profile;
   };
 }
@@ -240,60 +248,69 @@ export interface SetPinnedMessages {
 
 export interface AddMembersAction {
   type: typeof ADD_MEMBERS;
-  updateGroupMembersData: UpdateGroupMembersData;
-  membersUsernames: {
+  conversations: {
+    [key: string]: GroupConversation;
+  };
+  members: {
     [key: string]: Profile;
   };
 }
 
 export interface RemoveMembersAction {
   type: typeof REMOVE_MEMBERS;
-  updateGroupMembersData: UpdateGroupMembersData;
+  conversations: {
+    [key: string]: GroupConversation;
+  };
+  members: {
+    [key: string]: Profile;
+  };
 }
 
 export interface UpdateGroupNameAction {
   type: typeof UPDATE_GROUP_NAME;
-  updateGroupNameData: UpdateGroupNameData;
+  conversations: {
+    [key: string]: GroupConversation;
+  };
 }
 
 export interface SetGroupMessageAction {
   type: typeof SET_GROUP_MESSAGE;
-  groupMessage: GroupMessage;
-  fileBytes?: Uint8Array;
+  conversations: {
+    [key: string]: GroupConversation;
+  };
+  messages: {
+    [key: string]: GroupMessage;
+  };
+  groupFiles: {
+    [key: string]: Uint8Array;
+  };
 }
 
-export interface SetNextBatchGroupMessagesAction {
-  type: typeof SET_NEXT_BATCH_GROUP_MESSAGES;
-  groupMessagesOutput: GroupMessagesOutput;
-  // for ease of retrieving groupID
-  groupId: string;
-}
-
-export interface SetMessagesByGroupByTimestampAction {
-  type: typeof SET_MESSAGES_BY_GROUP_BY_TIMESTAMP;
-  groupMessagesOutput: GroupMessagesOutput;
-  groupId: string;
+export interface SetGroupMessagesAction {
+  type: typeof SET_GROUP_MESSAGES;
+  conversations: {
+    [key: string]: GroupConversation;
+  };
+  messages: {
+    [key: string]: GroupMessage;
+  };
 }
 
 export interface SetLatestGroupState {
   type: typeof SET_LATEST_GROUP_STATE;
-  groups: GroupConversation[];
-  groupMessagesOutput: GroupMessagesOutput;
-  members: Profile[];
-}
-
-export interface SetLatestGroupVersionAction {
-  type: typeof SET_LATEST_GROUP_VERSION;
-  groupData: GroupConversation;
-  groupMessagesOutput: GroupMessagesOutput;
-  membersUsernames: {
+  messages: {
+    [key: string]: GroupMessage;
+  };
+  conversations: {
+    [key: string]: GroupConversation;
+  };
+  members: {
     [key: string]: Profile;
   };
 }
 
 export interface SetGroupTypingIndicator {
   type: typeof SET_GROUP_TYPING_INDICATOR;
-  groupTypingIndicator: GroupTypingDetail;
   typing: { [key: string]: Profile[] };
 }
 
@@ -322,12 +339,9 @@ export type GroupConversationsActionTypes =
   | RemoveMembersAction
   | UpdateGroupNameAction
   | SetGroupMessageAction
-  | SetNextBatchGroupMessagesAction
-  | SetMessagesByGroupByTimestampAction
+  | SetGroupMessagesAction
   | SetLatestGroupState
-  | SetLatestGroupVersionAction
   | SetFilesBytes
-  | SetLatestGroupVersionAction
   | SetGroupTypingIndicator
   | SetGroupReadMessage
   | SetPinnedMessages

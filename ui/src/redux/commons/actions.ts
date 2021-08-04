@@ -86,17 +86,38 @@ export const getLatestData =
       })
     );
 
-    let members: Profile[] = latestData.memberProfiles.map(
-      (agentProfile: any): Profile => ({
-        id: agentProfile.agentPubKey,
-        username: agentProfile.profile.nickname,
-      })
+    const groupMembers: Profile[] = latestData.memberProfiles.map(
+      (agentProfile: any): Profile => {
+        return {
+          id: agentProfile.agentPubKey,
+          username: agentProfile.profile.nickname,
+        };
+      }
     );
+
+    // let groups: GroupConversation[] = groups;
+    // let groupMessagesOutput: GroupMessagesOutput = action.groupMessagesOutput;
+
+    let conversations = getState().groups.conversations;
+    groups.forEach((group: GroupConversation) => {
+      conversations[group.originalGroupId] = group;
+    });
+
+    let messages = getState().groups.messages;
+    messages = {
+      ...messages,
+      ...groupMessagesOutput.groupMessagesContents,
+    };
+
+    let members = getState().groups.members;
+    groupMembers.forEach((member: Profile) => {
+      members[member.id] = member;
+    });
 
     dispatch<SetLatestGroupState>({
       type: SET_LATEST_GROUP_STATE,
-      groups,
-      groupMessagesOutput,
+      messages,
+      conversations,
       members,
     });
 

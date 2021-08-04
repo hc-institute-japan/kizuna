@@ -10,6 +10,7 @@ import {
 } from "../../../commons/types";
 import { ThunkAction } from "../../../types";
 import {
+  GroupConversation,
   GroupMessage,
   SetGroupMessageAction,
   SET_GROUP_MESSAGE,
@@ -35,8 +36,9 @@ const handleGroupMessagePayload = (payload: any) =>
 
 const groupMessageData =
   (signalPayload: any): ThunkAction =>
-  async (dispatch) => {
+  async (dispatch, getState) => {
     const { payload } = signalPayload;
+    const state = getState();
     const groupMessage: GroupMessage = {
       groupMessageId: serializeHash(payload.messageId),
       groupId: serializeHash(payload.groupHash),
@@ -61,9 +63,36 @@ const groupMessageData =
       readList: {},
     };
 
+    const groupId: string = groupMessage.groupId;
+    const groupMessageId: string = groupMessage.groupMessageId;
+    const groupConversation = state.groups.conversations[groupId];
+
+    const messageIds = [
+      groupMessage.groupMessageId,
+      ...groupConversation.messages,
+    ];
+
+    const newMessage: { [key: string]: GroupMessage } = {
+      [groupMessageId]: groupMessage,
+    };
+    let messages = state.groups.messages;
+    messages = {
+      ...messages,
+      ...newMessage,
+    };
+    const groupFiles = state.groups.groupFiles;
+    const conversations: {
+      [key: string]: GroupConversation;
+    } = {
+      ...state.groups.conversations,
+      [groupId]: { ...groupConversation, messages: messageIds },
+    };
+
     dispatch<SetGroupMessageAction>({
       type: SET_GROUP_MESSAGE,
-      groupMessage,
+      conversations,
+      messages,
+      groupFiles,
     });
   };
 

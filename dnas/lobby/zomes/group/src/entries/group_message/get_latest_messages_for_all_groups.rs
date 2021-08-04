@@ -3,7 +3,7 @@ use hdk::prelude::*;
 use file_types::PayloadType;
 use std::collections::hash_map::HashMap;
 
-use super::get_next_batch_group_messages::get_next_batch_group_messages_handler;
+use super::get_previous_group_messages::get_previous_group_messages_handler;
 
 use super::{
     BatchSize, GroupMessageContent, GroupMessageHash, GroupMessagesContents, GroupMessagesOutput,
@@ -42,7 +42,7 @@ pub fn get_latest_messages_for_all_groups_handler(
         };
 
         let mut messages_output: GroupMessagesOutput =
-            get_next_batch_group_messages_handler(batch_filter)?;
+            get_previous_group_messages_handler(batch_filter)?;
 
         // insert GroupMessagesContents and MessagesByGroup values from returned GroupMessagesOutput into the initialized MessagesByGroup and GroupMessagesContents
         for (key, value) in messages_output.messages_by_group.0.drain() {

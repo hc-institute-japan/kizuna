@@ -1,3 +1,5 @@
+use std::collections::BTreeSet;
+
 use hdk::prelude::*;
 
 mod entries;
@@ -15,11 +17,13 @@ use group::{
 };
 
 use group_message::{
+    get_adjacent_group_messages::get_adjacent_group_messages_handler,
     get_files_bytes::get_files_bytes_handler,
     get_latest_messages_for_all_groups::get_latest_messages_for_all_groups_handler,
     get_messages_by_group_by_timestamp::get_messages_by_group_by_timestamp_handler,
-    get_next_batch_group_messages::get_next_batch_group_messages_handler,
     get_pinned_messages::get_pinned_messages_handler,
+    get_previous_group_messages::get_previous_group_messages_handler,
+    get_subsequent_group_messages::get_subsequent_group_messages_handler,
     indicate_group_typing::indicate_group_typing_handler, pin_message::pin_message_handler,
     read_group_message::read_group_message_handler, send_message::send_message_handler,
     send_message_in_target_date::send_message_in_target_date_handler,
@@ -34,7 +38,8 @@ use signals::{SignalDetails, SignalPayload};
 use group_message::{
     BatchSize, FileBytes, GroupChatFilter, GroupFileBytes, GroupHash, GroupMessage,
     GroupMessageInput, GroupMessageInputWithDate, GroupMessageReadData, GroupMessageWithId,
-    GroupMessagesOutput, GroupMsgBatchFetchFilter, GroupTypingDetailData, PinContents, PinDetail,
+    GroupMessagesOutput, GroupMsgAdjacentFetchFilter, GroupMsgBatchFetchFilter,
+    GroupTypingDetailData, PinContents, PinDetail,
 };
 
 use group::{
@@ -52,7 +57,7 @@ entry_defs![
 // this is only exposed outside of WASM for testing purposes.
 #[hdk_extern]
 pub fn init(_: ()) -> ExternResult<InitCallbackResult> {
-    let mut fuctions = HashSet::new();
+    let mut fuctions = BTreeSet::new();
 
     // TODO: name may be changed to better suit the context of cap grant.s
     let tag: String = "group_zome_cap_grant".into();
@@ -132,10 +137,24 @@ fn send_message(message_input: GroupMessageInput) -> ExternResult<GroupMessageWi
 }
 
 #[hdk_extern]
-fn get_next_batch_group_messages(
+fn get_previous_group_messages(
     filter: GroupMsgBatchFetchFilter,
 ) -> ExternResult<GroupMessagesOutput> {
-    return get_next_batch_group_messages_handler(filter);
+    return get_previous_group_messages_handler(filter);
+}
+
+#[hdk_extern]
+fn get_subsequent_group_messages(
+    filter: GroupMsgBatchFetchFilter,
+) -> ExternResult<GroupMessagesOutput> {
+    return get_subsequent_group_messages_handler(filter);
+}
+
+#[hdk_extern]
+fn get_adjacent_group_messages(
+    filter: GroupMsgAdjacentFetchFilter,
+) -> ExternResult<GroupMessagesOutput> {
+    return get_adjacent_group_messages_handler(filter);
 }
 
 #[hdk_extern]

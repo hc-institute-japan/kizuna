@@ -9,10 +9,16 @@ use super::{
     GroupMessageWithId, ReadList,
 };
 
+pub enum Direction {
+    Previous,
+    Subsequent,
+}
+
 pub fn get_linked_messages_from_path(
     path_hash: EntryHash,
     payload_type: PayloadType,
     last_fetched: Option<EntryHash>,
+    direction: Option<Direction>,
 ) -> ExternResult<Vec<Link>> {
     // this method return the messages linked to the path, if the args given have a last_fetched then this method will filter the linked messages and will remove those links newest than the last_fecthed
 
@@ -36,12 +42,25 @@ pub fn get_linked_messages_from_path(
     linked_messages.sort_by_key(|link| link.timestamp);
 
     if let Some(last_fetched_entry_hash) = last_fetched {
-        if let Some(pivot) = linked_messages
+        if let Some(pivot_index) = linked_messages
             .clone()
             .into_iter()
             .position(|link| link.target.eq(&last_fetched_entry_hash))
         {
-            linked_messages.truncate(pivot);
+            if let Some(direction) = direction {
+                match direction {
+                    Direction::Previous => {
+                        // remove the links that have newer timestamps than the pivot
+                        linked_messages.truncate(pivot_index);
+                    }
+                    Direction::Subsequent => {
+                        let split_index = pivot_index + 1;
+                        // get the links that have older timestamps than the pivot
+                        let subsequent_links: Vec<Link> = linked_messages.split_off(split_index);
+                        linked_messages = subsequent_links
+                    }
+                }
+            }
         }
     }
 
@@ -53,15 +72,16 @@ pub fn collect_messages_info(
     batch_size: usize,
     messages_hashes: &mut Vec<GroupMessageHash>,
     group_messages_contents: &mut HashMap<String, GroupMessageContent>,
+    direction: Direction,
 ) -> ExternResult<()> {
     let mut read_list: HashMap<String, Timestamp> = HashMap::new();
 
-    loop {
-        if linked_messages.is_empty() || messages_hashes.len() >= batch_size {
-            break;
+    while !linked_messages.is_empty() && messages_hashes.len() < batch_size {
+        let link: Link;
+        match direction {
+            Direction::Previous => link = linked_messages.pop().unwrap(),
+            Direction::Subsequent => link = linked_messages.remove(0),
         }
-
-        let link: Link = linked_messages.pop().unwrap();
         let message_hash = link.target;
 
         if let Some(message_element) = get(message_hash.clone(), GetOptions::content())? {
@@ -129,29 +149,36 @@ pub fn collect_messages_info(
 }
 
 pub fn filter_path_children(
-    path_childrens: &mut Vec<Link>,
+    children_paths: &mut Vec<Link>,
     pivot_path: Option<EntryHash>,
+    direction: Direction,
 ) -> ExternResult<()> {
     //->Vec<Link>
 
     // the pivot path only be a Some(_) if we already collect messages in one path before this called happens in other words if we received the fields last_fecthed and last_message_timestamp as Some(_)
-    path_childrens.sort_by_key(|link| link.timestamp);
+    children_paths.sort_by_key(|link| link.timestamp);
 
-    match pivot_path {
-        Some(path_hash) => {
-            if let Some(pivot_position) = path_childrens
-                .clone()
-                .into_iter()
-                .position(|link| link.target.eq(&path_hash))
-            {
-                // here we will split the path childrens to remove the newest paths from the olders (olders are those who we need to keep checking)
-                path_childrens.truncate(pivot_position);
-            } else {
-                // this case shouldnt happen but we will handle it as an error (we can modified this in the future)
-                return error("cannot find this pivot into the childrens list ");
+    if let Some(path_hash) = pivot_path {
+        if let Some(pivot_index) = children_paths
+            .clone()
+            .into_iter()
+            .position(|link| link.target.eq(&path_hash))
+        {
+            match direction {
+                Direction::Previous => {
+                    // remove the paths that have newer timestamps than the pivot
+                    children_paths.truncate(pivot_index);
+                }
+                Direction::Subsequent => {
+                    let split_index = pivot_index + 1;
+                    let subsequent_paths: Vec<Link> = children_paths.split_off(split_index);
+                    *children_paths = subsequent_paths
+                }
             }
+        } else {
+            // this case shouldnt happen but we will handle it as an error (we can modified this in the future)
+            return error("cannot find this pivot into the childrens list ");
         }
-        None => (),
     }
 
     Ok(())
