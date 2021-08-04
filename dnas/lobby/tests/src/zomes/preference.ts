@@ -20,7 +20,6 @@ const call = async (
   return res;
 };
 
-
 let orchestrator = new Orchestrator();
 
 const preference = (config, installables: Installables) => {
@@ -37,16 +36,12 @@ const preference = (config, installables: Installables) => {
       // const [alice_dna, alice_pubkey] = alice_conductor.cellId;
       let preference = null;
 
-      /**
-       * Both typing and receipt are set to true by default
-       */
+      // Both typing and receipt are set to true by default
 
       preference = await call(alice_conductor, "preference", "get_preference");
       t.deepEqual(preference, createPreference(true, true));
 
-      /**
-       * Set both typing and receipt to false
-       */
+      // Set both typing and receipt to false
       preference = await call(alice_conductor, "preference", "set_preference", {
         typingIndicator: false,
         readReceipt: false,
@@ -54,9 +49,7 @@ const preference = (config, installables: Installables) => {
 
       t.deepEqual(preference, createPreference(false, false));
 
-      /**
-       * Set both typing to false and receipt to true
-       */
+      // Set both typing to false and receipt to true
       preference = await call(alice_conductor, "preference", "set_preference", {
         typingIndicator: false,
         readReceipt: true,
@@ -101,7 +94,9 @@ const preference = (config, installables: Installables) => {
 
   orchestrator = new Orchestrator();
 
-  orchestrator.registerScenario( "Get and set per agent preference", async (s, t) => {
+  orchestrator.registerScenario(
+    "Get and set per agent preference",
+    async (s, t) => {
       const [alice, bobby, clark, diego, ethan] = await s.players([
         config,
         config,
@@ -215,7 +210,9 @@ const preference = (config, installables: Installables) => {
 
   orchestrator = new Orchestrator();
 
-  orchestrator.registerScenario( "Get and set per group preference", async (s, t) => {
+  orchestrator.registerScenario(
+    "Get and set per group preference",
+    async (s, t) => {
       const [alice] = await s.players([config]);
       const [alice_lobby_happ] = await alice.installAgentsHapps(
         installables.one
@@ -291,7 +288,6 @@ const preference = (config, installables: Installables) => {
     }
   );
   orchestrator.run();
-
 };
 
 export default preference;

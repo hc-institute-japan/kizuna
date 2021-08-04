@@ -1,9 +1,8 @@
 use hdk::prelude::*;
 
-use crate::group::{
-    Group
-};
+use crate::group::Group;
 
+// TODO: implement unit test
 pub fn validate_create_group_handler(data: ValidateData) -> ExternResult<ValidateCallbackResult> {
     //data = { element = { signed_header, entry } , validation_package <Option> }
     // 1- create is valid if creator pubkey matches the signature
