@@ -39,7 +39,7 @@ const ChatPinnedMessage: React.FC = () => {
         ) {
           return conversation.pinned.map((id) => {
             const pinnedMessage = state.p2pmessages.pinned[id];
-            console.log(pinnedMessage);
+
             return {
               id: pinnedMessage.p2pMessageEntryHash,
               payload: pinnedMessage.payload,
@@ -59,7 +59,6 @@ const ChatPinnedMessage: React.FC = () => {
     //     : []
     //   : []
   );
-  console.log(messages);
 
   // const allPinned: P2PMessage[] = useSelector((state: RootState) => {
   //   const allPinned: { [key: string]: P2PMessage } = state.p2pmessages.pinned;
