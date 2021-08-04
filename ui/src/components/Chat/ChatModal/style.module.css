@@ -1,5 +1,5 @@
 .modal {
-  --height: 10vh !important;
+  /* --height: !important; */
   --width: 60%;
   bottom: 0 !important;
 }

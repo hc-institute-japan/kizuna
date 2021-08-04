@@ -17,6 +17,8 @@ export const SET_LATEST_GROUP_VERSION = "SET_LATEST_GROUP_VERSION";
 export const SET_FILES_BYTES = "SET_FILES_BYTES";
 export const SET_GROUP_TYPING_INDICATOR = "SET_GROUP_TYPING_INDICATOR";
 export const SET_GROUP_READ_MESSAGE = "SET_GROUP_READ_MESSAGE";
+export const SET_PINNED_MESSAGES = "SET_PINNNED_MESSAGES";
+export const SET_CONVERSATIONS = "SET_CONVERSATIONS";
 
 /* TYPE DECLARATIONS */
 type GroupMessageIDB64 = string; // Group Message EntryHash in base64 string
@@ -179,6 +181,7 @@ export interface GroupConversation {
   // TODO: enable setting of avatar for a GroupConversation
   avatar?: string;
   messages: GroupMessageIDB64[];
+  pinnedMessages?: GroupMessageIDB64[];
 }
 
 export interface UpdateGroupMembersData {
@@ -218,6 +221,9 @@ export interface GroupConversationsState {
     // TODO: finish this
     [key: string]: Profile[];
   };
+  pinnedMessages: {
+    [key: string]: GroupMessage;
+  };
 }
 
 export interface AddGroupAction {
@@ -227,6 +233,16 @@ export interface AddGroupAction {
   };
   members: {
     [key: string]: Profile;
+  };
+}
+
+export interface SetPinnedMessages {
+  type: typeof SET_PINNED_MESSAGES;
+  pinnedMessages: {
+    [key: string]: GroupMessage;
+  };
+  conversations: {
+    [key: string]: GroupConversation;
   };
 }
 
@@ -310,6 +326,13 @@ export interface SetFilesBytes {
   };
 }
 
+export interface SetConversations {
+  type: typeof SET_CONVERSATIONS;
+  conversations: {
+    [key: string]: GroupConversation;
+  };
+}
+
 export type GroupConversationsActionTypes =
   | AddGroupAction
   | AddMembersAction
@@ -320,4 +343,6 @@ export type GroupConversationsActionTypes =
   | SetLatestGroupState
   | SetFilesBytes
   | SetGroupTypingIndicator
-  | SetGroupReadMessage;
+  | SetGroupReadMessage
+  | SetPinnedMessages
+  | SetConversations;
