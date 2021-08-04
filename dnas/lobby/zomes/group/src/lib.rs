@@ -1,3 +1,5 @@
+use std::collections::BTreeSet;
+
 use hdk::prelude::*;
 
 mod entries;
@@ -55,7 +57,7 @@ entry_defs![
 // this is only exposed outside of WASM for testing purposes.
 #[hdk_extern]
 pub fn init(_: ()) -> ExternResult<InitCallbackResult> {
-    let mut fuctions = HashSet::new();
+    let mut fuctions = BTreeSet::new();
 
     // TODO: name may be changed to better suit the context of cap grant.s
     let tag: String = "group_zome_cap_grant".into();

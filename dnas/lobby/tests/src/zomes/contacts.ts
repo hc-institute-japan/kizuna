@@ -1,7 +1,4 @@
 import { Orchestrator } from "@holochain/tryorama";
-import { remove } from "lodash";
-
-const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
 function addContacts(agentPubKeys) {
   return (conductor) =>
@@ -46,13 +43,10 @@ function inBlocked(agentPubKey) {
 let orchestrator = new Orchestrator();
 
 export default (config, installables) => {
-
   orchestrator.registerScenario("add a contact", async (s, t) => {
     const [conductor] = await s.players([config]);
-    const [
-      [alice_lobby_happ],
-      [bobby_lobby_happ],
-    ] = await conductor.installAgentsHapps(installables.two);
+    const [[alice_lobby_happ], [bobby_lobby_happ]] =
+      await conductor.installAgentsHapps(installables.two);
     const [alice_conductor] = alice_lobby_happ.cells;
     const [bobby_conductor] = bobby_lobby_happ.cells;
 
@@ -94,14 +88,12 @@ export default (config, installables) => {
 
   orchestrator.run();
 
-  orchestrator = new Orchestrator(); 
+  orchestrator = new Orchestrator();
 
   orchestrator.registerScenario("remove a contact", async (s, t) => {
     const [conductor] = await s.players([config]);
-    const [
-      [alice_lobby_happ],
-      [bobby_lobby_happ],
-    ] = await conductor.installAgentsHapps(installables.two);
+    const [[alice_lobby_happ], [bobby_lobby_happ]] =
+      await conductor.installAgentsHapps(installables.two);
     const [alice_conductor] = alice_lobby_happ.cells;
     const [bobby_conductor] = bobby_lobby_happ.cells;
 
@@ -135,11 +127,8 @@ export default (config, installables) => {
 
   orchestrator.registerScenario("list added", async (s, t) => {
     const [conductor] = await s.players([config]);
-    const [
-      [alice_lobby_happ],
-      [bobby_lobby_happ],
-      [clark_lobby_happ],
-    ] = await conductor.installAgentsHapps(installables.three);
+    const [[alice_lobby_happ], [bobby_lobby_happ], [clark_lobby_happ]] =
+      await conductor.installAgentsHapps(installables.three);
     const [alice_conductor] = alice_lobby_happ.cells;
     const [bobby_conductor] = bobby_lobby_happ.cells;
     const [clark_conductor] = clark_lobby_happ.cells;
@@ -182,11 +171,8 @@ export default (config, installables) => {
 
   orchestrator.registerScenario("block contact", async (s, t) => {
     const [conductor] = await s.players([config]);
-    const [
-      [alice_lobby_happ],
-      [bobby_lobby_happ],
-      [clark_lobby_happ],
-    ] = await conductor.installAgentsHapps(installables.three);
+    const [[alice_lobby_happ], [bobby_lobby_happ], [clark_lobby_happ]] =
+      await conductor.installAgentsHapps(installables.three);
     const [alice_conductor] = alice_lobby_happ.cells;
     const [bobby_conductor] = bobby_lobby_happ.cells;
     const [clark_conductor] = clark_lobby_happ.cells;
@@ -237,11 +223,8 @@ export default (config, installables) => {
 
   orchestrator.registerScenario("unblock contact", async (s, t) => {
     const [conductor] = await s.players([config]);
-    const [
-      [alice_lobby_happ],
-      [bobby_lobby_happ],
-      [clark_lobby_happ],
-    ] = await conductor.installAgentsHapps(installables.three);
+    const [[alice_lobby_happ], [bobby_lobby_happ], [clark_lobby_happ]] =
+      await conductor.installAgentsHapps(installables.three);
     const [alice_conductor] = alice_lobby_happ.cells;
     const [bobby_conductor] = bobby_lobby_happ.cells;
     const [clark_conductor] = clark_lobby_happ.cells;
@@ -281,11 +264,8 @@ export default (config, installables) => {
 
   orchestrator.registerScenario("list blocked", async (s, t) => {
     const [conductor] = await s.players([config]);
-    const [
-      [alice_lobby_happ],
-      [bobby_lobby_happ],
-      [clark_lobby_happ],
-    ] = await conductor.installAgentsHapps(installables.three);
+    const [[alice_lobby_happ], [bobby_lobby_happ], [clark_lobby_happ]] =
+      await conductor.installAgentsHapps(installables.three);
     const [alice_conductor] = alice_lobby_happ.cells;
     const [bobby_conductor] = bobby_lobby_happ.cells;
     const [clark_conductor] = clark_lobby_happ.cells;
@@ -317,18 +297,15 @@ export default (config, installables) => {
     t.deepEqual(list_blocked_2.length, 0);
     t.deepEqual(list_blocked_3.length, 1);
     t.deepEqual(list_blocked_4.length, 2);
-});
-orchestrator.run();
+  });
+  orchestrator.run();
 
-orchestrator = new Orchestrator();
+  orchestrator = new Orchestrator();
 
   orchestrator.registerScenario("check in blocked list", async (s, t) => {
     const [conductor] = await s.players([config]);
-    const [
-      [alice_lobby_happ],
-      [bobby_lobby_happ],
-      [clark_lobby_happ],
-    ] = await conductor.installAgentsHapps(installables.three);
+    const [[alice_lobby_happ], [bobby_lobby_happ], [clark_lobby_happ]] =
+      await conductor.installAgentsHapps(installables.three);
     const [alice_conductor] = alice_lobby_happ.cells;
     const [bobby_conductor] = bobby_lobby_happ.cells;
     const [clark_conductor] = clark_lobby_happ.cells;
