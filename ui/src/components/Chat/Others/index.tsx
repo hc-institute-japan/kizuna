@@ -26,6 +26,8 @@ const Others: React.FC<ChatProps> = ({
   showProfilePicture,
   showName,
   onReply,
+  isPinned,
+  onPinMessage,
   replyTo,
   isSeen = false,
   onDownload,
@@ -84,6 +86,8 @@ const Others: React.FC<ChatProps> = ({
         </div>
       </IonItem>
       <ChatModal
+        onPin={onPinMessage as () => any}
+        isPinned={isPinned}
         onReply={() => {
           if (onReply) onReply({ author, payload, id });
         }}

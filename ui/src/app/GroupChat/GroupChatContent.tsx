@@ -1,5 +1,5 @@
 import { IonContent, IonLoading, IonPage } from "@ionic/react";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router";
@@ -10,12 +10,14 @@ import MessageInput, {
   MessageInputMethods,
   MessageInputOnSendParams,
 } from "../../components/MessageInput";
+import PinnedMessage from "../../components/PinnedMessage";
 // Redux
 import { FilePayloadInput } from "../../redux/commons/types";
 import {
   indicateGroupTyping,
   sendGroupMessage,
 } from "../../redux/group/actions";
+import { fetchPinnedMessages } from "../../redux/group/actions/fetchPinnedMessages";
 import {
   GroupConversation,
   GroupMessage,
@@ -37,7 +39,6 @@ const GroupChat: React.FC = () => {
 
   /* local states */
   const [files, setFiles] = useState<object[]>([]);
-  const [sendingLoading, setSendingLoading] = useState<boolean>(false);
   const [message, setMessage] = useState("");
 
   /* Refs */
@@ -55,17 +56,25 @@ const GroupChat: React.FC = () => {
     (state: RootState) => state.preference
   );
 
+  /**
+   * Hooks
+   */
+
+  useEffect(() => {
+    if (groupData) dispatch(fetchPinnedMessages(groupData?.originalGroupId));
+  }, [groupData, dispatch]);
+
   /* Handlers */
 
   /* handles sending of messages. */
   const handleOnSend = (opt?: MessageInputOnSendParams) => {
-    const { reply } = { ...opt };
+    const { reply, setIsLoading } = { ...opt };
     let inputs: GroupMessageInput[] = [];
+    setIsLoading!(true);
     /*
       append text payload at index 0 and send it first
       for performance purposes
     */
-
     if (message.length) {
       inputs.push({
         groupId: groupData!.originalGroupId,
@@ -80,7 +89,6 @@ const GroupChat: React.FC = () => {
     }
 
     if (files.length) {
-      setSendingLoading(true);
       files.forEach((file: any) => {
         const filePayloadInput: FilePayloadInput = {
           type: "FILE",
@@ -106,12 +114,12 @@ const GroupChat: React.FC = () => {
       });
     }
 
-    const messagePromises = inputs.map((groupMessage: any) =>
+    const messagePromises = inputs.map((groupMessage: GroupMessageInput) =>
       dispatch(sendGroupMessage(groupMessage))
     );
 
     Promise.all(messagePromises).then((sentMessages: GroupMessage[]) => {
-      setSendingLoading(false);
+      setIsLoading!(false);
       chatList.current!.scrollToBottom();
     });
   };
@@ -154,19 +162,15 @@ const GroupChat: React.FC = () => {
     return setMessage(message);
   };
 
+  // const pinnedMessages = groupData.pinnedMessages?.map(pinnedMessage=>)
+
   const messageInput = useRef<MessageInputMethods | null>(null);
 
   return groupData ? (
     <IonPage>
-      <IonLoading
-        isOpen={sendingLoading}
-        message={intl.formatMessage({
-          id: "app.group-chat.sending",
-        })}
-      />
       <GroupChatHeader groupData={groupData} />
-
       <IonContent>
+        {/* <PinnedMessage></PinnedMessage> */}
         <ChatBox
           onReply={(message) => {
             if (messageInput.current) messageInput?.current?.reply(message);

@@ -43,6 +43,14 @@ const getLatestGroupVersion =
         payload: input,
       });
 
+      const groupPinnedMessages = await callZome({
+        zomeName: ZOMES.GROUP,
+        fnName: FUNCTIONS[ZOMES.GROUP].FETCH_PINNED_MESSAGES,
+        payload: groupId,
+      });
+
+      console.log(groupPinnedMessages);
+
       const groupMessagesOutput: GroupMessagesOutput =
         convertFetchedResToGroupMessagesOutput(groupMessagesRes);
 
@@ -96,7 +104,7 @@ const getLatestGroupVersion =
 
       return groupData;
     } catch (e) {
-      if (e.message.includes("failed to get the given group id")) {
+      if (e?.message?.includes("failed to get the given group id")) {
         return dispatch(
           pushError(
             "TOAST",

@@ -9,7 +9,13 @@ import {
 } from "../commons/types";
 import { Profile } from "../profile/types";
 
-/* ENTRIES */
+export interface Read {
+  timestamp: [number, number];
+}
+export interface Delivered {
+  timestamp: [number, number];
+}
+
 export interface P2PMessage {
   p2pMessageEntryHash: MessageID;
   author: Profile;
