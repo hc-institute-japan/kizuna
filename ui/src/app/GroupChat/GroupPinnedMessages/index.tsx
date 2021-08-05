@@ -23,37 +23,6 @@ const GroupPinnedMessages: React.FC = () => {
     { id: string; author: string; payload: Payload; date: Date }[] | null
   >(null);
 
-  // useSelector((state: RootState) => {
-  //   // if (state.groups.conversations[group]) {
-  //   //   const pinnedMessages = state.groups.conversations[group].pinnedMessages
-  //   //     ? state.groups.conversations[group].pinnedMessages!.map(
-  //   //         (pinnedMessageId) => {
-  //   //           const pinnedMessage =
-  //   //             state.groups.pinnedMessages[pinnedMessageId];
-
-  //   //           return {
-  //   //             id: pinnedMessageId,
-  //   //             payload: pinnedMessage.payload,
-  //   //             author: pinnedMessage.author,
-  //   //             date: pinnedMessage.timestamp,
-  //   //           };
-  //   //         }
-  //   //       )
-  //   //     : [];
-
-  //   //   if (pinnedMessages) {
-  //   //   }
-
-  //   //   return [];
-  //   // }
-
-  //   return null;
-  // });
-
-  // useEffect(() => {
-  //   if (!data) dispatch(fetchPinnedMessages(group));
-  // }, [data]);
-
   const { conversation, pinnedMesssages } = useSelector((state: RootState) => ({
     conversation: state.groups.conversations[group],
     pinnedMesssages: state.groups.conversations[group]?.pinnedMessages,

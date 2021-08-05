@@ -380,7 +380,7 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
                 1
               );
           }
-          console.log(stateToRemovePin.pinned[key], key);
+
           if (stateToRemovePin.pinned[key]) {
             delete stateToRemovePin.pinned[key];
           }

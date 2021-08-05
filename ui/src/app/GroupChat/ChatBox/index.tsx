@@ -155,6 +155,14 @@ const MessageList: React.FC<Props> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messageIds, stateMessages]);
 
+  // console.log(
+  //   messages
+  //     .filter((message) => message.payload.type === "FILE")
+  //     .map((message) => ({
+  //       name: (message.payload as FilePayload).fileName,
+  //       bytes: message.payload as FilePayload,
+  //     }))
+  // );
   return (
     <>
       <Chat.ChatList
