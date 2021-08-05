@@ -9,9 +9,11 @@ import {
 } from "@ionic/react";
 import { documentOutline } from "ionicons/icons";
 import React from "react";
+import { useSelector } from "react-redux";
 import { FilePayload, Payload, TextPayload } from "../../redux/commons/types";
 import { fetchFilesBytes } from "../../redux/group/actions";
 import { getFileBytes } from "../../redux/p2pmessages/actions/getFileBytes";
+import { RootState } from "../../redux/types";
 import {
   convertSizeToReadableSize,
   isTextPayload,
@@ -38,6 +40,10 @@ const PinnedMessages: React.FC<Props> = ({
 }) => {
   const decoder = new TextDecoder();
   const dispatch = useAppDispatch();
+  const fileBytes = useSelector((state: RootState) => {
+    return Object.assign({}, state.groups.groupFiles, state.p2pmessages.files);
+  });
+
   const displayFile = (payload: FilePayload) => {
     switch (payload.fileType) {
       case "OTHER":
@@ -64,6 +70,7 @@ const PinnedMessages: React.FC<Props> = ({
         );
 
       case "VIDEO": {
+        const blobFileBytes = fileBytes[payload.fileHash];
         return (
           <VideoPlayer
             className={styles.video}
@@ -73,6 +80,7 @@ const PinnedMessages: React.FC<Props> = ({
               })
             )}
             onPlayPauseErrorHandler={(setErrorState: any) => {
+              console.log(payload.fileHash);
               if (type === "p2p") {
                 dispatch(getFileBytes([payload.fileHash])).then((res: any) => {
                   if (res) {
@@ -90,7 +98,7 @@ const PinnedMessages: React.FC<Props> = ({
               }
             }}
             src={URL.createObjectURL(
-              new Blob([payload.fileHash], {
+              new Blob([blobFileBytes], {
                 type: "video/mp4",
               })
             )}
@@ -100,6 +108,7 @@ const PinnedMessages: React.FC<Props> = ({
     }
   };
 
+  console.log("hello");
   return (
     <IonList>
       {messages

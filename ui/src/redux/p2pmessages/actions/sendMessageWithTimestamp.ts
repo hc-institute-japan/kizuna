@@ -70,7 +70,7 @@ export const sendMessageWithTimestamp =
       });
 
       if (sentMessage?.type !== "error") {
-        console.log("send with timestamp, sentMessage");
+        // console.log("send with timestamp, sentMessage");
         const [messageTuple, receiptTuple] = sentMessage;
         const [messageID, message] = messageTuple;
         const [receiptID, receipt] = receiptTuple!;

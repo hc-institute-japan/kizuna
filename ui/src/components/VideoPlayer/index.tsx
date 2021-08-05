@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Controls from "./Controls";
 import styles from "./style.module.css";
 import VideoPlayerModal from "./VideoPlayerModal";
@@ -46,7 +46,10 @@ const VideoPlayer: React.FC<Props> = ({
     <div
       ref={container}
       className={style.join(" ")}
-      onDoubleClick={() => setIsModalOpen(true)}
+      onDoubleClick={() => {
+        setIsPlaying(false);
+        setIsModalOpen(true);
+      }}
     >
       <video
         className={styles.video}

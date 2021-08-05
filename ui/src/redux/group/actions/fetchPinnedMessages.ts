@@ -1,4 +1,4 @@
-import { serializeHash } from "@holochain-open-dev/core-types";
+import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
 import { timestampToDate } from "../../../utils/helpers";
 import { isTextPayload, Payload } from "../../commons/types";
@@ -44,7 +44,9 @@ export const fetchPinnedMessages =
               : {
                   type: "FILE",
                   fileType: rawResult.payload.payload.fileType.type,
-                  fileHash: rawResult.payload.payload.metadata.fileHash,
+                  fileHash: serializeHash(
+                    rawResult.payload.payload.metadata.fileHash
+                  ),
                   fileName: rawResult.payload.payload.metadata.fileName,
                   fileSize: rawResult.payload.payload.metadata.fileSize,
                   thumbnail:
