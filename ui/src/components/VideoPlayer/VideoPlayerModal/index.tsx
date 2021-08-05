@@ -113,8 +113,14 @@ const VideoPlayerModal: React.FC<Props> = ({
           <IonToolbar ref={header} className={styles.toolbar}>
             <IonButtons>
               <IonButton
-                onTouchEnd={() => setIsOpen(false)}
-                onClick={() => setIsOpen(false)}
+                onTouchEnd={() => {
+                  setIsPlaying(false);
+                  setIsOpen(false);
+                }}
+                onClick={() => {
+                  setIsPlaying(false);
+                  setIsOpen(false);
+                }}
               >
                 <IonIcon icon={arrowBack} />
               </IonButton>
