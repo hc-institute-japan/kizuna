@@ -157,7 +157,7 @@ export const timestampToDate = (timestamp: number[]) => {
 export const dateToTimestamp = (date: Date) => {
   const milliseconds = date.getTime();
   const seconds = (milliseconds / 1000) >> 0;
-  const nanoseconds = (milliseconds % 1000) * 10 ** 6;
+  const nanoseconds = (milliseconds % 1000) * 1e6;
   const ret: [number, number] = [seconds, nanoseconds];
   return ret;
 };

@@ -95,9 +95,6 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
         stateToAppendMessage.conversations[key] = {
           messages: [messageHash],
           pinned: [],
-          // pinned: stateToAppendMessage.conversations[key].pinned
-          //   ? [...stateToAppendMessage.conversations[key].pinned]
-          //   : [],
         };
       // else simply append messages to the array value
       else

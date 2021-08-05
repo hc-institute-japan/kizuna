@@ -109,6 +109,24 @@ export interface P2PConversation {
   pinned: MessageID[];
 }
 
+export interface P2PMessageRaw {
+  author: Uint8Array;
+  receiver: Uint8Array;
+  payload: Payload;
+  timeSent: [number, number];
+  replyTo: Uint8Array;
+}
+
+export interface P2PReceiptRaw {
+  id: Uint8Array[];
+  status: P2PMessageStatus;
+}
+
+export interface P2PMessageAndReceiptRaw {
+  message: P2PMessageRaw;
+  receipt: P2PReceiptRaw;
+}
+
 export interface PinContents {
   id: string;
   pin: P2PMessagePin;

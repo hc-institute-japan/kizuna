@@ -7,7 +7,9 @@ import { useToast } from "../../containers/ToastContainer/context";
 import { FilePayloadInput } from "../../redux/commons/types";
 import { sendInitialGroupMessage } from "../../redux/group/actions";
 import { GroupConversation } from "../../redux/group/types";
-import { sendMessage } from "../../redux/p2pmessages/actions/sendMessage";
+import { saveMessage } from "../../redux/p2pmessages/actions/saveMessage";
+import { sendMessage2 } from "../../redux/p2pmessages/actions/sendMessage2";
+import { receiveReceipt } from "../../redux/p2pmessages/actions/receiveReceipt";
 import { Profile, ProfileListType } from "../../redux/profile/types";
 import { useAppDispatch } from "../../utils/helpers";
 import ContactList from "./ContactList";
@@ -49,20 +51,26 @@ const NewConversation: React.FC = () => {
 
   const handleOnSend = () => {
     const contacts = Object.values(selectedContacts);
+    const receiverID = contacts[0].id;
 
     if (contacts.length === 1) {
       if (message !== "") {
         setIsLoading(true);
-        dispatch(sendMessage(contacts[0].id, message, "TEXT", undefined)).then(
-          (res: boolean) => {
-            if (files.length <= 0 && res === true) {
-              setIsLoading(false);
-              history.push({
-                pathname: `/u/${contacts[0].id}`,
-                state: { username: contacts[0].username },
-              });
-            }
-          }
+        dispatch(saveMessage(receiverID, message, "TEXT", undefined)).then(
+          (rawTimestamp: [number, number]) =>
+            dispatch(
+              sendMessage2(receiverID, message, "TEXT", rawTimestamp, undefined)
+            ).then((receipt: any) =>
+              dispatch(receiveReceipt(receipt)).then((res: boolean) => {
+                if (files.length <= 0 && res === true) {
+                  setIsLoading(false);
+                  history.push({
+                    pathname: `/u/${contacts[0].id}`,
+                    state: { username: contacts[0].username },
+                  });
+                }
+              })
+            )
         );
       }
 
@@ -70,18 +78,29 @@ const NewConversation: React.FC = () => {
         setIsLoading(true);
         setTimeout(
           dispatch(
-            sendMessage(contacts[0].id, message, "FILE", undefined, file)
-          ).then((res: boolean) => {
-            setIsLoading(false);
-            if (res === true) history.push(`/u/${contacts[0].id}`);
-          }),
+            saveMessage(receiverID, message, "FILE", undefined, file)
+          ).then((rawTimestamp: [number, number]) =>
+            dispatch(
+              sendMessage2(
+                receiverID,
+                message,
+                "FILE",
+                rawTimestamp,
+                undefined,
+                file
+              )
+            )
+              .then((receipt: any) => dispatch(receiveReceipt(receipt)))
+              .then((res: boolean) => {
+                setIsLoading(false);
+                if (res === true) history.push(`/u/${contacts[0].id}`);
+              })
+          ),
           3000
         );
       });
 
       // setIsLoading(false);
-
-      // if (sendRes1 || sendRes2) history.push(`/u/${contacts[0].username}`);
     } else if (contacts.length > 1) {
       /* create a Group and send the initial message */
       setIsLoading(true);

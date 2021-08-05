@@ -6,6 +6,7 @@ import { APPEND_RECEIPT } from "../../types";
 const receiveP2PReceipt =
   (payload: any): ThunkAction =>
   async (dispatch, getState, { callZome }) => {
+    console.log("receive receipt signal");
     let receiptHash = Object.keys(payload.receipt)[0];
 
     let messageIDs: string[] = [];

@@ -5,30 +5,36 @@ import { useHistory, useLocation, useParams } from "react-router";
 import { ChatList, Me, Others } from "../../components/Chat";
 import { ChatListMethods } from "../../components/Chat/types";
 import Typing from "../../components/Chat/Typing";
-import MessageInput, {
-  MessageInputMethods,
-  MessageInputOnSendParams,
-} from "../../components/MessageInput";
-import { FilePayload } from "../../redux/commons/types";
-import { getAdjacentMessages } from "../../redux/p2pmessages/actions/getAdjacentMessages";
-import { getFileBytes } from "../../redux/p2pmessages/actions/getFileBytes";
-import { getNextBatchMessages } from "../../redux/p2pmessages/actions/getNextBatchMessages";
-import { getNextMessages } from "../../redux/p2pmessages/actions/getNextMessages";
-import { getPinnedMessages } from "../../redux/p2pmessages/actions/getPinnedMessages";
-import { isTyping } from "../../redux/p2pmessages/actions/isTyping";
 // type imports
-import { pinMessage } from "../../redux/p2pmessages/actions/pinMessage";
-import { readMessage } from "../../redux/p2pmessages/actions/readMessage";
-import { sendMessage } from "../../redux/p2pmessages/actions/sendMessage";
 import {
   P2PHashMap,
   P2PMessage,
   P2PMessageReceipt,
+  P2PReceiptRaw,
 } from "../../redux/p2pmessages/types";
-import { Profile } from "../../redux/profile/types";
+import MessageInput, {
+  MessageInputMethods,
+  MessageInputOnSendParams,
+} from "../../components/MessageInput";
 import { RootState } from "../../redux/types";
-import { useAppDispatch } from "../../utils/helpers";
+import { FilePayload } from "../../redux/commons/types";
+import { Profile } from "../../redux/profile/types";
+// action imports
+import { readMessage } from "../../redux/p2pmessages/actions/readMessage";
+import { isTyping } from "../../redux/p2pmessages/actions/isTyping";
+import { pinMessage } from "../../redux/p2pmessages/actions/pinMessage";
+import { getFileBytes } from "../../redux/p2pmessages/actions/getFileBytes";
+import { getNextBatchMessages } from "../../redux/p2pmessages/actions/getNextBatchMessages";
+import { saveMessage } from "../../redux/p2pmessages/actions/saveMessage";
+import { sendMessage2 } from "../../redux/p2pmessages/actions/sendMessage2";
+import { getMessagesFromStore } from "../../redux/p2pmessages/actions/getMessagesFromStore";
+import { receiveReceipt } from "../../redux/p2pmessages/actions/receiveReceipt";
+import { getPinnedMessages } from "../../redux/p2pmessages/actions/getPinnedMessages";
 import ChatHeader from "./ChatHeader";
+
+// helper imports
+import { useAppDispatch } from "../../utils/helpers";
+import styles from "./style.module.css";
 
 const Chat: React.FC = () => {
   /* STATES */
@@ -107,63 +113,9 @@ const Chat: React.FC = () => {
       conversations[conversant.id] !== undefined &&
       Object.keys(messages).length > 0
     ) {
-      let filteredMessages = conversations[conversant.id].messages.map(
-        (messageID) => {
-          let message = messages[messageID]; // this is undefined
-          let receiptIDs = message.receipts;
-          let filteredReceipts = receiptIDs.map((id) => {
-            let receipt = receipts[id];
-            return receipt;
-          });
-          filteredReceipts.sort((a: any, b: any) => {
-            let receiptTimestampA = a.timestamp.getTime();
-            let receiptTimestampB = b.timestamp.getTime();
-            if (receiptTimestampA > receiptTimestampB) return -1;
-            if (receiptTimestampA < receiptTimestampB) return 1;
-            return 0;
-          });
-          let latestReceipt = filteredReceipts[0];
-          return { message: message, receipt: latestReceipt };
-        }
+      dispatch(getMessagesFromStore(conversant.id)).then(
+        (filteredMessages: any) => setMessagesWithConversant(filteredMessages)
       );
-      filteredMessages.sort((x, y) => {
-        return x.message.timestamp.getTime() - y.message.timestamp.getTime();
-      });
-
-      dispatch(
-        getNextMessages(
-          conversant.id,
-          5,
-          "All",
-          Object.values(filteredMessages)[0].message.timestamp,
-          Object.values(filteredMessages)[0].message.p2pMessageEntryHash
-        )
-      ).then((res: P2PHashMap) => {
-        // disable getNextBatch if return value is empty
-        // console.log("chatcontent next messages", res);
-      });
-
-      if (filteredMessages.length >= 5) {
-        // console.log(
-        //   "chatcontent middle message",
-        //   filteredMessages[Math.floor(filteredMessages.length / 2)]
-        // );
-        dispatch(
-          getAdjacentMessages(
-            conversant.id,
-            5,
-            "All",
-            Object.values(filteredMessages)[
-              Math.floor(filteredMessages.length / 2)
-            ].message.timestamp,
-            Object.values(filteredMessages)[
-              Math.floor(filteredMessages.length / 2)
-            ].message.p2pMessageEntryHash
-          )
-        ).then((res: P2PHashMap) => {});
-      }
-
-      setMessagesWithConversant(filteredMessages);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversations, messages, receipts, conversant]);
@@ -227,41 +179,50 @@ const Chat: React.FC = () => {
     setIsLoading!(true);
     if (message !== "") {
       dispatch(
-        sendMessage(
+        saveMessage(
           conversant.id,
           message,
           "TEXT",
           replyTo !== "" ? replyTo : undefined
         )
-      ).then((res: any) => (files.length ? null : setIsLoading!(false)));
-      // .then(
-      //   setTimeout(() => {
-      //     let time = new Date().getTime() - 1000 * 60 * 60 * 24 * 22;
-      //     console.log("with timestamp", time, new Date(time));
-      //     dispatch(
-      //       sendMessageWithTimestamp(
-      //         conversant.id,
-      //         message + "2 day ago",
-      //         "TEXT",
-      //         new Date(time),
-      //         undefined
-      //       )
-      //     );
-      //   })
-      // );
+      ).then((timestamp: [number, number]) => {
+        dispatch(
+          sendMessage2(
+            conversant.id,
+            message,
+            "TEXT",
+            timestamp,
+            replyTo !== "" ? replyTo : undefined
+          )
+        ).then((receipt: P2PReceiptRaw) => {
+          console.log("chatcontent receipt", receipt);
+          dispatch(receiveReceipt(receipt));
+        });
+      });
     }
 
     files.forEach((file) =>
       setTimeout(
         dispatch(
-          sendMessage(
+          saveMessage(
             conversant.id,
             message,
             "FILE",
             replyTo !== "" ? replyTo : undefined,
             file
           )
-        ).then((res: any) => setIsLoading!(false)),
+        ).then((res: any) =>
+          dispatch(
+            sendMessage2(
+              conversant.id,
+              message,
+              "FILE",
+              res,
+              replyTo !== "" ? replyTo : undefined,
+              file
+            )
+          ).then((receipt: any) => dispatch(receiveReceipt(receipt)))
+        ),
         3000
       )
     );

@@ -108,5 +108,8 @@ export const FUNCTIONS: FunctionNameType = {
     GET_PINNED_MESSAGES: "get_pinned_messages",
     GET_NEXT_MESSAGES: "get_next_messages",
     GET_ADJACENT_MESSAGES: "get_adjacent_messages",
+    SAVE_MESSAGE: "save_message",
+    SEND_MESSAGE_2: "send_message_2",
+    RECEIVE_DELIVERED_RECEIPT: "receive_receipt",
   },
 };

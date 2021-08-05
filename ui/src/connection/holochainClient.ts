@@ -146,6 +146,7 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
       console.warn(fnName);
       switch (data?.type) {
         case "ribosome_error": {
+          console.log("ribosome", e);
           const regex = /Guest\("([\s\S]*?)"\)/;
           const result = regex.exec(data.data);
           throw {
