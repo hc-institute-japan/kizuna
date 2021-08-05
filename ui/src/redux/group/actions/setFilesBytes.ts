@@ -25,6 +25,7 @@ export const fetchFilesBytes =
           ...res,
         })
       );
+      // console.log(res);
       return res;
     } catch (e) {
       if (e.message.includes("The file bytes were not found")) {
