@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import Controls from "./Controls";
 import styles from "./style.module.css";
 import VideoPlayerModal from "./VideoPlayerModal";

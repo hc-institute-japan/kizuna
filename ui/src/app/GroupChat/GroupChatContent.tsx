@@ -10,7 +10,6 @@ import MessageInput, {
   MessageInputMethods,
   MessageInputOnSendParams,
 } from "../../components/MessageInput";
-import PinnedMessage from "../../components/PinnedMessage";
 // Redux
 import { FilePayloadInput } from "../../redux/commons/types";
 import {

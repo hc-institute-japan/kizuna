@@ -13,7 +13,6 @@ import {
 } from "@ionic/react";
 import {
   arrowBackSharp,
-  ellipsisVerticalCircleOutline,
   ellipsisVerticalOutline,
   informationCircleOutline,
   personCircleOutline,
@@ -84,14 +83,14 @@ const ChatMenuItems: React.FC<ChatMenuItemsProps> = ({
     </IonList>
   );
 };
-{
-  /* <IonButton onClick={() => history.push(`/u/${conversant.id}/search`)}>
-            <IonIcon slot="icon-only" icon={search} />
-          </IonButton>
-          <IonButton onClick={handleOnClick}>
-            <IonIcon slot="icon-only" icon={informationCircleOutline} />
-          </IonButton> */
-}
+// {
+//   <IonButton onClick={() => history.push(`/u/${conversant.id}/search`)}>
+//             <IonIcon slot="icon-only" icon={search} />
+//           </IonButton>
+//           <IonButton onClick={handleOnClick}>
+//             <IonIcon slot="icon-only" icon={informationCircleOutline} />
+//           </IonButton>
+// }
 
 const ChatHeader: React.FC<Props> = ({
   id,
