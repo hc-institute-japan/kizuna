@@ -1,7 +1,7 @@
-import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
+import { serializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
 import { timestampToDate } from "../../../utils/helpers";
-import { isTextPayload, Payload } from "../../commons/types";
+import { Payload } from "../../commons/types";
 import { pushError } from "../../error/actions";
 import { ThunkAction } from "../../types";
 import { GroupMessage, SetPinnedMessages, SET_PINNED_MESSAGES } from "../types";

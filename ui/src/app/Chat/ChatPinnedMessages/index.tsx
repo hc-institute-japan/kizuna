@@ -6,16 +6,13 @@ import {
   IonPage,
   IonToolbar,
 } from "@ionic/react";
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "../../../redux/types";
 import { useParams } from "react-router";
 import PinnedMessages from "../../../components/PinnedMessages";
-import { Payload } from "../../../redux/commons/types";
-import { P2PMessage } from "../../../redux/p2pmessages/types";
 import { getPinnedMessages } from "../../../redux/p2pmessages/actions/getPinnedMessages";
+import { RootState } from "../../../redux/types";
 import { useAppDispatch } from "../../../utils/helpers";
-import PinnedMessage from "../../../components/PinnedMessage";
 
 const ChatPinnedMessage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
