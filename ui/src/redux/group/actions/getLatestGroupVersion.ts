@@ -39,7 +39,7 @@ const getLatestGroupVersion =
 
       const groupMessagesRes = await callZome({
         zomeName: ZOMES.GROUP,
-        fnName: FUNCTIONS[ZOMES.GROUP].GET_NEXT_BATCH_GROUP_MESSAGES,
+        fnName: FUNCTIONS[ZOMES.GROUP].GET_PREVIOUS_GROUP_MESSAGES,
         payload: input,
       });
 
