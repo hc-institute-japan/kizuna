@@ -39,7 +39,7 @@ const getLatestGroupVersion =
 
       const groupMessagesRes = await callZome({
         zomeName: ZOMES.GROUP,
-        fnName: FUNCTIONS[ZOMES.GROUP].GET_NEXT_BATCH_GROUP_MESSAGES,
+        fnName: FUNCTIONS[ZOMES.GROUP].GET_SUBSEQUENT_GROUP_MESSAGES,
         payload: input,
       });
 
@@ -48,8 +48,6 @@ const getLatestGroupVersion =
         fnName: FUNCTIONS[ZOMES.GROUP].FETCH_PINNED_MESSAGES,
         payload: groupId,
       });
-
-      console.log(groupPinnedMessages);
 
       const groupMessagesOutput: GroupMessagesOutput =
         convertFetchedResToGroupMessagesOutput(groupMessagesRes);
@@ -69,6 +67,9 @@ const getLatestGroupVersion =
           groupMessagesOutput.messagesByGroup[
             serializeHash(latestGroupVersionRes.groupId)
           ],
+        pinnedMessages: Object.values(groupPinnedMessages).map((message: any) =>
+          serializeHash(message.entry.messageId)
+        ),
       };
 
       const membersUsernames = await fetchUsernameOfMembers(
