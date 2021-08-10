@@ -4,7 +4,10 @@ import { useSelector } from "react-redux";
 import Chat from "../../../components/Chat";
 import { ChatListMethods } from "../../../components/Chat/types";
 import { FilePayload, Payload } from "../../../redux/commons/types";
-import { getPreviousGroupMessages } from "../../../redux/group/actions";
+import {
+  getMessagesWithProfile,
+  getPreviousGroupMessages,
+} from "../../../redux/group/actions";
 import { readGroupMessage } from "../../../redux/group/actions";
 import { fetchFilesBytes } from "../../../redux/group/actions";
 import { pinMessage } from "../../../redux/group/actions/pinMessage";
@@ -127,42 +130,11 @@ const MessageList: React.FC<Props> = ({
   /* Effects */
 
   useEffect(() => {
-    /* 
-      Retrieve the messgaes from redux store and modify
-      the author field to Profile type.
-    */
-    const messages: GroupMessageBundle[] = messageIds.map((messageId) => {
-      /* retrieve the message content from redux */
-      const message: GroupMessage = stateMessages[messageId];
-      const authorProfile: Profile = stateMembers[message.author];
-
-      return {
-        ...message,
-        author: authorProfile
-          ? authorProfile
-          : // if profile was not found from allMembers, then the author is self
-            // assuming that allMembers have all the members of group at all times
-            {
-              username: profile.username!,
-              id: message.author,
-            },
-      };
-    });
-    messages.sort((x, y) => {
-      return x.timestamp.getTime() - y.timestamp.getTime();
-    });
+    const messages = dispatch(getMessagesWithProfile(messageIds));
     setMessages(messages);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messageIds, stateMessages]);
 
-  // console.log(
-  //   messages
-  //     .filter((message) => message.payload.type === "FILE")
-  //     .map((message) => ({
-  //       name: (message.payload as FilePayload).fileName,
-  //       bytes: message.payload as FilePayload,
-  //     }))
-  // );
   return (
     <>
       <Chat.ChatList
