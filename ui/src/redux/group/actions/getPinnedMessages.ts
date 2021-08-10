@@ -48,8 +48,7 @@ export const getPinnedMessages =
         // fetch messages here
         // dispatch()
       } else dispatch(fetchPinnedMessages(groupId));
-    } else {
-      dispatch(getLatestGroupVersion(groupId));
-    }
+    } else dispatch(getLatestGroupVersion(groupId));
+
     return null;
   };

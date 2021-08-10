@@ -15,17 +15,17 @@ export const pinMessage =
           groupMessageHash: groupMessageId,
         },
       });
-      const { conversation, pinnedMessages, message } = {
+      const { conversations, pinnedMessages, message } = {
         ...{
-          conversation: getState().groups.conversations[groupId],
           pinnedMessages: getState().groups.pinnedMessages,
           message: getState().groups.messages[groupMessageId],
+          conversations: getState().groups.conversations,
         },
       };
-      if (!message.replyTo) delete message["replyTo"];
 
+      const conversation = conversations[groupId];
+      // if (!message.replyTo) delete message["replyTo"];
       pinnedMessages[groupMessageId] = message;
-
       if (conversation.pinnedMessages)
         conversation.pinnedMessages!.push(groupMessageId);
       else conversation.pinnedMessages = [groupMessageId];
@@ -33,7 +33,7 @@ export const pinMessage =
       dispatch<SetPinnedMessages>({
         type: SET_PINNED_MESSAGES,
         conversations: {
-          ...getState().groups.conversations,
+          ...conversations,
           [groupId]: conversation,
         },
         pinnedMessages: {
