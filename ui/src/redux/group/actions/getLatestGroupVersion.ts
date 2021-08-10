@@ -49,8 +49,6 @@ const getLatestGroupVersion =
         payload: groupId,
       });
 
-      console.log(groupPinnedMessages);
-
       const groupMessagesOutput: GroupMessagesOutput =
         convertFetchedResToGroupMessagesOutput(groupMessagesRes);
 
@@ -69,6 +67,9 @@ const getLatestGroupVersion =
           groupMessagesOutput.messagesByGroup[
             serializeHash(latestGroupVersionRes.groupId)
           ],
+        pinnedMessages: Object.values(groupPinnedMessages).map((message: any) =>
+          serializeHash(message.entry.messageId)
+        ),
       };
 
       const membersUsernames = await fetchUsernameOfMembers(

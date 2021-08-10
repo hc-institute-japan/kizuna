@@ -89,8 +89,12 @@ const reducer = (
     }
     case SET_PINNED_MESSAGES: {
       const { conversations, pinnedMessages } = { ...action };
-      // console.log(conversations, state.messages);
-      return { ...state, conversations, pinnedMessages };
+
+      return {
+        ...state,
+        conversations,
+        pinnedMessages,
+      };
     }
     case SET_CONVERSATIONS: {
       const { conversations } = action;

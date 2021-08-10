@@ -80,7 +80,6 @@ const PinnedMessages: React.FC<Props> = ({
               })
             )}
             onPlayPauseErrorHandler={(setErrorState: any) => {
-              console.log(payload.fileHash);
               if (type === "p2p") {
                 dispatch(getFileBytes([payload.fileHash])).then((res: any) => {
                   if (res) {
@@ -108,7 +107,6 @@ const PinnedMessages: React.FC<Props> = ({
     }
   };
 
-  console.log("hello");
   return (
     <IonList>
       {messages

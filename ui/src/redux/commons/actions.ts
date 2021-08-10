@@ -83,6 +83,7 @@ export const getLatestData =
         creator: serializeHash(group.creator),
         messages:
           groupMessagesOutput.messagesByGroup[serializeHash(group.groupId)],
+        pinnedMessages: [],
       })
     );
 
