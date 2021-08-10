@@ -15,8 +15,13 @@ export const unpinMessage =
           groupMessageHash: groupMessageId,
         },
       });
-      const conversation = getState().groups.conversations[groupId];
-      const pinnedMessages = getState().groups.pinnedMessages;
+      const { conversations, pinnedMessages } = {
+        ...{
+          conversations: getState().groups.conversations,
+          pinnedMessages: getState().groups.pinnedMessages,
+        },
+      };
+      const conversation = conversations[groupId];
 
       delete pinnedMessages[groupMessageId];
 
@@ -29,10 +34,10 @@ export const unpinMessage =
       dispatch<SetPinnedMessages>({
         type: SET_PINNED_MESSAGES,
         conversations: {
-          ...getState().groups.conversations,
+          ...conversations,
           [groupId]: conversation,
         },
-        pinnedMessages: { ...pinnedMessages },
+        pinnedMessages,
       });
     } catch (e) {
       return dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));

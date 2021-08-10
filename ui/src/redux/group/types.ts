@@ -181,7 +181,7 @@ export interface GroupConversation {
   // TODO: enable setting of avatar for a GroupConversation
   avatar?: string;
   messages: GroupMessageIDB64[];
-  pinnedMessages?: GroupMessageIDB64[];
+  pinnedMessages: GroupMessageIDB64[];
 }
 
 export interface UpdateGroupMembersData {

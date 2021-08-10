@@ -1,4 +1,5 @@
 import React from "react";
+import { IonRouterOutlet } from "@ionic/react";
 import { Route, Switch } from "react-router";
 import GroupChatContent from "./GroupChatContent";
 import GroupChatDetails from "./GroupChatDetails";
@@ -14,10 +15,10 @@ const GroupChat: React.FC = () => {
       <Route path="/g/:group/details" exact>
         <GroupChatDetails />
       </Route>
-      <Route path="/g/:group/search">
+      <Route path="/g/:group/search" exact>
         <GroupSearch />
       </Route>
-      <Route path="/g/:group/pinned">
+      <Route path="/g/:group/pinned" exact>
         <GroupPinnedMessages />
       </Route>
     </Switch>

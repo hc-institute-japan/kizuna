@@ -34,6 +34,7 @@ const addedToGroup =
         arrives with signal
       */
       messages: [],
+      pinnedMessages: [],
     };
 
     /* 

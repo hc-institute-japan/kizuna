@@ -1,10 +1,8 @@
 import { serializeHash } from "@holochain-open-dev/core-types";
-import { FilePayload } from "../../commons/types";
 import { ThunkAction } from "../../types";
 import { fetchPinnedMessages } from "./fetchPinnedMessages";
 import getLatestGroupVersion from "./getLatestGroupVersion";
 import { fetchUsernameOfMembers } from "./helpers";
-import { fetchFilesBytes } from "./setFilesBytes";
 
 export const getPinnedMessages =
   (groupId: string): ThunkAction =>
@@ -50,8 +48,7 @@ export const getPinnedMessages =
         // fetch messages here
         // dispatch()
       } else dispatch(fetchPinnedMessages(groupId));
-    } else {
-      dispatch(getLatestGroupVersion(groupId));
-    }
+    } else dispatch(getLatestGroupVersion(groupId));
+
     return null;
   };

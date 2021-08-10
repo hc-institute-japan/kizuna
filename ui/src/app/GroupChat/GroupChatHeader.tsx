@@ -43,9 +43,10 @@ const GroupChatMenuList: React.FC<MenuListProps> = ({
     <IonList>
       <IonItem
         button
+        href={`/g/${groupData.originalGroupId}/details`}
         onClick={() => {
           onHide();
-          history.push(`/g/${groupData.originalGroupId}/details`);
+          // history.push(`/g/${groupData.originalGroupId}/details`);
         }}
       >
         <IonIcon slot="start" icon={informationCircleOutline}></IonIcon>
@@ -53,9 +54,9 @@ const GroupChatMenuList: React.FC<MenuListProps> = ({
       </IonItem>
 
       <IonItem
+        href={`/g/${groupData.originalGroupId}/search`}
         onClick={() => {
           onHide();
-          history.push(`/g/${groupData.originalGroupId}/search`);
         }}
         button
       >
@@ -64,9 +65,9 @@ const GroupChatMenuList: React.FC<MenuListProps> = ({
       </IonItem>
 
       <IonItem
+        href={`/g/${groupData.originalGroupId}/pinned`}
         onClick={() => {
           onHide();
-          history.push(`/g/${groupData.originalGroupId}/pinned`);
         }}
         button
       >
@@ -90,7 +91,8 @@ const GroupChatHeader: React.FC<Props> = ({ groupData }) => {
       <IonToolbar>
         <IonButtons slot="start">
           <IonButton
-            onClick={() => history.push({ pathname: `/home` })}
+            href="/home"
+            // onClick={() => history.push({ pathname: `/home` })}
             className="ion-no-padding"
           >
             <IonIcon slot="icon-only" icon={arrowBackSharp} />
