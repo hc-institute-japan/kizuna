@@ -10,6 +10,7 @@ import MessageInput, {
   MessageInputOnSendParams,
 } from "../../components/MessageInput";
 import { FilePayload } from "../../redux/commons/types";
+import { fetchMyContacts } from "../../redux/contacts/actions";
 import { getAdjacentMessages } from "../../redux/p2pmessages/actions/getAdjacentMessages";
 import { getFileBytes } from "../../redux/p2pmessages/actions/getFileBytes";
 import { getNextBatchMessages } from "../../redux/p2pmessages/actions/getNextBatchMessages";
@@ -76,6 +77,14 @@ const Chat: React.FC = () => {
   const { pathname, state }: { pathname: string; state: { username: string } } =
     useLocation();
 
+  const username = useSelector((rootState: RootState) => {
+    if (state?.username) return state?.username;
+    if (rootState.contacts?.contacts[id]?.username)
+      return rootState.contacts?.contacts[id]?.username;
+
+    fetchMyContacts();
+    return "";
+  });
   /* REFS */
   const scrollerRef = useRef<ChatListMethods>(null);
   const didMountRef = useRef(false);
@@ -438,7 +447,7 @@ const Chat: React.FC = () => {
         id={id}
         pathname={pathname}
         conversant={conversant}
-        username={state?.username}
+        username={username}
       />
       <IonContent>
         <ChatList
