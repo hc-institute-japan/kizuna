@@ -62,9 +62,9 @@ const ChatMenuItems: React.FC<ChatMenuItemsProps> = ({
       </IonItem>
       <IonItem
         button
+        href={`/u/${conversant.id}/search`}
         onClick={() => {
           onHide();
-          history.push(`/u/${conversant.id}/search`);
         }}
       >
         <IonIcon slot="start" icon={search} />
@@ -72,9 +72,9 @@ const ChatMenuItems: React.FC<ChatMenuItemsProps> = ({
       </IonItem>
       <IonItem
         button
+        href={`/u/${conversant.id}/pinned`}
         onClick={() => {
           onHide();
-          history.push(`/u/${conversant.id}/pinned`);
         }}
       >
         <IonIcon slot="start" icon={pin} />

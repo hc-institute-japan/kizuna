@@ -80,13 +80,13 @@ const PinnedMessages: React.FC<Props> = ({
               })
             )}
             onPlayPauseErrorHandler={(setErrorState: any) => {
-              if (type === "p2p") {
+              if (type === "p2p")
                 dispatch(getFileBytes([payload.fileHash])).then((res: any) => {
                   if (res) {
                     setErrorState(false);
                   }
                 });
-              } else {
+              else
                 dispatch(fetchFilesBytes([payload.fileHash])).then(
                   (res: any) => {
                     if (res) {
@@ -94,13 +94,21 @@ const PinnedMessages: React.FC<Props> = ({
                     }
                   }
                 );
-              }
             }}
             src={URL.createObjectURL(
               new Blob([blobFileBytes], {
                 type: "video/mp4",
               })
             )}
+            download={() => {
+              if (blobFileBytes) {
+                const blob = new Blob([blobFileBytes]); // change resultByte to bytes
+                const link = document.createElement("a");
+                link.href = window.URL.createObjectURL(blob);
+                link.download = payload.fileName;
+                link.click();
+              }
+            }}
           />
         );
       }
