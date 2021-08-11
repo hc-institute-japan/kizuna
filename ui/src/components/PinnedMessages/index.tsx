@@ -80,13 +80,13 @@ const PinnedMessages: React.FC<Props> = ({
               })
             )}
             onPlayPauseErrorHandler={(setErrorState: any) => {
-              if (type === "p2p") {
+              if (type === "p2p")
                 dispatch(getFileBytes([payload.fileHash])).then((res: any) => {
                   if (res) {
                     setErrorState(false);
                   }
                 });
-              } else {
+              else
                 dispatch(fetchFilesBytes([payload.fileHash])).then(
                   (res: any) => {
                     if (res) {
@@ -94,7 +94,6 @@ const PinnedMessages: React.FC<Props> = ({
                     }
                   }
                 );
-              }
             }}
             src={URL.createObjectURL(
               new Blob([blobFileBytes], {
