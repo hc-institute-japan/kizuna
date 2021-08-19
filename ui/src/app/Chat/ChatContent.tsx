@@ -11,12 +11,11 @@ import MessageInput, {
 } from "../../components/MessageInput";
 import { FilePayload } from "../../redux/commons/types";
 import { fetchMyContacts } from "../../redux/contacts/actions";
-import { getAdjacentMessages } from "../../redux/p2pmessages/actions/getAdjacentMessages";
 import { getFileBytes } from "../../redux/p2pmessages/actions/getFileBytes";
 import { getNextBatchMessages } from "../../redux/p2pmessages/actions/getNextBatchMessages";
-import { getNextMessages } from "../../redux/p2pmessages/actions/getNextMessages";
 import { getPinnedMessages } from "../../redux/p2pmessages/actions/getPinnedMessages";
 import { isTyping } from "../../redux/p2pmessages/actions/isTyping";
+import { getP2PState } from "../../redux/p2pmessages/actions/helpers/getP2PState";
 // type imports
 import { pinMessage } from "../../redux/p2pmessages/actions/pinMessage";
 import { readMessage } from "../../redux/p2pmessages/actions/readMessage";
@@ -73,7 +72,7 @@ const Chat: React.FC = () => {
   );
 
   const dispatch = useAppDispatch();
-  const history = useHistory();
+  // const history = useHistory();
   const { pathname, state }: { pathname: string; state: { username: string } } =
     useLocation();
 
@@ -111,68 +110,10 @@ const Chat: React.FC = () => {
     when redux state of p2pmessages changes
   */
   useEffect(() => {
-    if (
-      conversant !== undefined &&
-      conversations[conversant.id] !== undefined &&
-      Object.keys(messages).length > 0
-    ) {
-      let filteredMessages = conversations[conversant.id].messages.map(
-        (messageID) => {
-          let message = messages[messageID]; // this is undefined
-          let receiptIDs = message.receipts;
-          let filteredReceipts = receiptIDs.map((id) => {
-            let receipt = receipts[id];
-            return receipt;
-          });
-          filteredReceipts.sort((a: any, b: any) => {
-            let receiptTimestampA = a.timestamp.getTime();
-            let receiptTimestampB = b.timestamp.getTime();
-            if (receiptTimestampA > receiptTimestampB) return -1;
-            if (receiptTimestampA < receiptTimestampB) return 1;
-            return 0;
-          });
-          let latestReceipt = filteredReceipts[0];
-          return { message: message, receipt: latestReceipt };
-        }
+    if (conversant !== undefined) {
+      dispatch(getP2PState(conversant)).then((res: any) =>
+        setMessagesWithConversant(res)
       );
-      filteredMessages.sort((x, y) => {
-        return x.message.timestamp.getTime() - y.message.timestamp.getTime();
-      });
-
-      dispatch(
-        getNextMessages(
-          conversant.id,
-          5,
-          "All",
-          Object.values(filteredMessages)[0].message.timestamp,
-          Object.values(filteredMessages)[0].message.p2pMessageEntryHash
-        )
-      ).then((res: P2PHashMap) => {
-        // disable getNextBatch if return value is empty
-        // console.log("chatcontent next messages", res);
-      });
-
-      if (filteredMessages.length >= 5) {
-        // console.log(
-        //   "chatcontent middle message",
-        //   filteredMessages[Math.floor(filteredMessages.length / 2)]
-        // );
-        dispatch(
-          getAdjacentMessages(
-            conversant.id,
-            5,
-            "All",
-            Object.values(filteredMessages)[
-              Math.floor(filteredMessages.length / 2)
-            ].message.timestamp,
-            Object.values(filteredMessages)[
-              Math.floor(filteredMessages.length / 2)
-            ].message.p2pMessageEntryHash
-          )
-        ).then((res: P2PHashMap) => {});
-      }
-
-      setMessagesWithConversant(filteredMessages);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversations, messages, receipts, conversant]);
@@ -182,27 +123,6 @@ const Chat: React.FC = () => {
     navigates to info, media, files page 
     when clicking the name of the conversant on the top toolbar 
   */
-
-  const handleOnOpenSearch = () => {
-    history.push({
-      pathname: `${pathname}/search`,
-      state: { conversant: conversant },
-    });
-  };
-
-  const handleOnOpenDetails = () => {
-    history.push({
-      pathname: `${pathname}/details`,
-      state: { conversant: conversant },
-    });
-  };
-
-  const handleOnOpenPinned = () => {
-    history.push({
-      pathname: `${pathname}/pinned`,
-      state: { conversant: conversant },
-    });
-  };
 
   /*
     dispatches an typing indicator when the user types.
@@ -243,21 +163,6 @@ const Chat: React.FC = () => {
           replyTo !== "" ? replyTo : undefined
         )
       ).then((res: any) => (files.length ? null : setIsLoading!(false)));
-      // .then(
-      //   setTimeout(() => {
-      //     let time = new Date().getTime() - 1000 * 60 * 60 * 24 * 22;
-      //     console.log("with timestamp", time, new Date(time));
-      //     dispatch(
-      //       sendMessageWithTimestamp(
-      //         conversant.id,
-      //         message + "2 day ago",
-      //         "TEXT",
-      //         new Date(time),
-      //         undefined
-      //       )
-      //     );
-      //   })
-      // );
     }
 
     files.forEach((file) =>
@@ -352,11 +257,6 @@ const Chat: React.FC = () => {
     link.download = fileName;
     link.click();
   };
-
-  const onPinHandler = (message: P2PMessage) => {
-    dispatch(pinMessage([message]));
-  };
-
   /*
     handle the clicking of nickname
   */

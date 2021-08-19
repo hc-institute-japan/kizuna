@@ -153,7 +153,7 @@ pub struct P2PMessageReceipt {
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(tag = "status", rename_all = "camelCase")]
 pub enum Status {
-    Sent,
+    Sent { timestamp: Timestamp },
     Delivered { timestamp: Timestamp },
     Read { timestamp: Timestamp },
 }
