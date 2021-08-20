@@ -119,13 +119,8 @@ const Chat: React.FC = () => {
   }, [conversations, messages, receipts, conversant]);
 
   /* HANDLERS */
-  /* 
-    navigates to info, media, files page 
-    when clicking the name of the conversant on the top toolbar 
-  */
-
   /*
-    dispatches an typing indicator when the user types.
+    dispatches a typing indicator when the user types.
     call typing indicator with false parameter with debounce of 500ms as well.
   */
   const handleOnChange = (message: string, conversant: Profile) => {
@@ -162,23 +157,25 @@ const Chat: React.FC = () => {
           "TEXT",
           replyTo !== "" ? replyTo : undefined
         )
-      ).then((res: any) => (files.length ? null : setIsLoading!(false)));
+      ).then((res: any) =>
+        files.length
+          ? files.forEach((file) =>
+              setTimeout(
+                dispatch(
+                  sendMessage(
+                    conversant.id,
+                    message,
+                    "FILE",
+                    replyTo !== "" ? replyTo : undefined,
+                    file
+                  )
+                ).then((res: any) => setIsLoading!(false)),
+                3000
+              )
+            )
+          : setIsLoading!(false)
+      );
     }
-
-    files.forEach((file) =>
-      setTimeout(
-        dispatch(
-          sendMessage(
-            conversant.id,
-            message,
-            "FILE",
-            replyTo !== "" ? replyTo : undefined,
-            file
-          )
-        ).then((res: any) => setIsLoading!(false)),
-        3000
-      )
-    );
 
     scrollerRef.current!.scrollToBottom();
 
@@ -216,15 +213,12 @@ const Chat: React.FC = () => {
     return;
   };
 
-  /*
-      Handle back button
-    */
-
   /* 
       dispatches an action to hc to mark a message as read 
       which emits a signal to the sender
       when the chat bubble comes into view
     */
+  // NOTE: removed for now with the implementaation of remote_signal in HC
   const onSeenHandler = (messageBundle: {
     message: P2PMessage;
     receipt: P2PMessageReceipt;
@@ -326,7 +320,7 @@ const Chat: React.FC = () => {
         showProfilePicture={true}
         onPinMessage={() => dispatch(pinMessage([messageBundle.message]))}
         showName={true}
-        onSeen={(complete) => onSeenHandler(messageBundle)}
+        // onSeen={(complete) => onSeenHandler(messageBundle)}
         onDownload={(file) => onDownloadHandler(file)}
         replyTo={replyToData ? replyToData : undefined}
         onReply={(message) => {
