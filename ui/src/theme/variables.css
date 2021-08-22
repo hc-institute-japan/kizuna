@@ -4,8 +4,8 @@ http://ionicframework.com/docs/theming/ */
 /** Ionic CSS Variables **/
 :root {
   /** primary **/
-  --ion-color-primary: #F5C31A;
-  --ion-color-primary-rgb: 150, 135, 18;
+  --ion-color-primary: linear-gradient(to right, #DF5A23 , #F5C31A);
+  --ion-color-primary-rgb: 249, 135, 18;
   --ion-color-primary-contrast: #fff;
   --ion-color-primary-contrast-rgb: 0, 0, 0;
   --ion-color-primary-shade: #F5C31A;

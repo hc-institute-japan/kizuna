@@ -50,7 +50,7 @@
   "app.home.contacts-tab-bar": "Contacts",
   "app.home.messaging-tab-bar": "Messaging",
   "app.landing.login": "Start Messaging",
-  "app.landing.register": "Don't have an account?",
+  "app.landing.register": "Register Nickname",
   "app.login.login": "Login",
   "app.login.username-label": "Username",
   "app.login.username-placeholder": "Please enter your username...",

@@ -16,13 +16,16 @@ const Landing: React.FC = () => (
       <div className={styles.landing}>
         <IonImg src="assets/icon/kizuna_logo.png" className={styles.logo} />
         <div className={styles.actions}>
-          <IonButton href="/login" className="ion-margin-bottom">
+          {/* <IonButton href="/login" className="ion-margin-bottom">
             <FormattedMessage id="app.landing.login" />
-          </IonButton>
+          </IonButton> */}
           <IonRouterLink href="/register">
-            <IonText className={styles["register-label"]}>
+            {/* <IonText className={styles["register-label"]}>
               <FormattedMessage id="app.landing.register" />
-            </IonText>
+            </IonText> */}
+            <IonButton href="/register" className="ion-margin-bottom">
+              <FormattedMessage id="app.landing.register" />
+            </IonButton>
           </IonRouterLink>
         </div>
       </div>
