@@ -5,7 +5,7 @@ http://ionicframework.com/docs/theming/ */
 :root {
   /** primary **/
   --ion-color-primary: linear-gradient(to right, #DF5A23 , #F5C31A);
-  --ion-color-primary-rgb: 249, 135, 18;
+  --ion-color-primary-rgb: 223, 90, 35;
   --ion-color-primary-contrast: #fff;
   --ion-color-primary-contrast-rgb: 0, 0, 0;
   --ion-color-primary-shade: #F5C31A;
@@ -84,7 +84,7 @@ http://ionicframework.com/docs/theming/ */
 
   body {
     --ion-color-primary: linear-gradient(to right, #DF5A23 , #F5C31A);
-    --ion-color-primary-rgb: 249, 135, 18;
+    --ion-color-primary-rgb: 223, 90, 35;
     --ion-color-primary-contrast: #fff;
     --ion-color-primary-contrast-rgb: #DF5A23;
     --ion-color-primary-shade: linear-gradient(to right, #DF5A23 , #F5C31A);
