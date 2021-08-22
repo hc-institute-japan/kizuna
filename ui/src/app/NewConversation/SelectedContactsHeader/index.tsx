@@ -28,10 +28,8 @@ const SelectedContactsHeader: React.FC<Props> = ({
         {intl.formatMessage({ id: "app.new-conversation.to" })}:
       </IonLabel>
       {Object.values(contacts).map((contact) => (
-        <IonChip color="primary" key={JSON.stringify(contact)}>
-          <IonLabel>
-            {contact.username}
-          </IonLabel>
+        <IonChip key={JSON.stringify(contact)}>
+          <IonLabel>{contact.username}</IonLabel>
           <IonIcon icon={close} onClick={() => onCloseButtonPress(contact)} />
         </IonChip>
       ))}
