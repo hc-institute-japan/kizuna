@@ -9,7 +9,9 @@ import receiveP2PMessage from "../p2pmessages/actions/signals/receiveP2PMessage"
 import receiveP2PReceipt from "../p2pmessages/actions/signals/receiveP2PReceipt";
 import receiveP2PPin from "../p2pmessages/actions/signals/receiveP2PPin";
 import typingP2P from "../p2pmessages/actions/signals/typingP2P";
+import retryCommitReceipt from "../p2pmessages/actions/signals/retryCommitReceipt";
 import { RootState } from "../types";
+import retryReceiveMessage from "../p2pmessages/actions/signals/retryReceiveMessage";
 
 export const handleSignal =
   (type: string, payload: any): any =>
@@ -38,5 +40,17 @@ export const handleSignal =
         break;
       case SIGNALS[ZOMES.P2PMESSAGE].SYNC_P2P_PINS:
         dispatch(receiveP2PPin(payload));
+        break;
+      case SIGNALS[ZOMES.P2PMESSAGE].P2P_RETRY_RECEIVE_MESSAGE:
+        console.log("ui signal received to retry receive message");
+        dispatch(retryReceiveMessage(payload));
+        break;
+      case SIGNALS[ZOMES.P2PMESSAGE].P2P_RETRY_DELIVERED_RECEIPT:
+        console.log("ui signal received to retry delivered receipt");
+        dispatch(retryCommitReceipt(payload));
+        break;
+      case SIGNALS[ZOMES.P2PMESSAGE].P2P_RETRY_READ_RECEIPT:
+        console.log("ui signal received to retry read receipt");
+        dispatch(retryCommitReceipt(payload));
     }
   };

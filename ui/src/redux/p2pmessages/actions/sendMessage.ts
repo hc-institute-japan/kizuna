@@ -23,7 +23,7 @@ export const sendMessage =
     replyTo?: string,
     file?: any
   ): ThunkAction =>
-  async (dispatch, getState, { callZome }) => {
+  async (dispatch, getState, { callZome, retry }) => {
     let payloadInput;
     if (type === "TEXT") {
       let textPayload: TextPayload = {
@@ -179,6 +179,11 @@ export const sendMessage =
         return true;
       }
     } catch (e) {
+      await retry({
+        zomeName: ZOMES.P2PMESSAGE,
+        fnName: FUNCTIONS[ZOMES.P2PMESSAGE].SEND_MESSAGE,
+        payload: input,
+      });
       dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
     }
   };

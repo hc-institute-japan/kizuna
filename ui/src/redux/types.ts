@@ -18,6 +18,7 @@ export interface CallZomeConfig {
 interface HolochainConfig {
   getAgentId: () => Promise<AgentPubKey | null>;
   callZome: (config: CallZomeConfig) => Promise<any>;
+  retry: (config: CallZomeConfig) => Promise<any>;
 }
 
 export type ThunkAction = Thunk<
