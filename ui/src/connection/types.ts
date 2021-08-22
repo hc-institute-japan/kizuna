@@ -35,6 +35,9 @@ export const SIGNALS: SignalNameType = {
     RECEIVE_P2P_RECEIPT: "RECEIVE_P2P_RECEIPT",
     SYNC_P2P_PINS: "SYNC_P2P_PINS",
     TYPING_P2P: "TYPING_P2P",
+    P2P_RETRY_RECEIVE_MESSAGE: "P2P_RETRY_RECEIVE_MESSAGE",
+    P2P_RETRY_DELIVERED_RECEIPT: "P2P_RETRY_DELIVERED_RECEIPT",
+    P2P_RETRY_READ_RECEIPT: "P2P_RETRY_READ_RECEIPT",
   },
 };
 
@@ -108,5 +111,7 @@ export const FUNCTIONS: FunctionNameType = {
     GET_PINNED_MESSAGES: "get_pinned_messages",
     GET_NEXT_MESSAGES: "get_next_messages",
     GET_ADJACENT_MESSAGES: "get_adjacent_messages",
+    RETRY_COMMIT_MESSAGE: "receive_message",
+    RETRY_COMMIT_RECEIPT: "receive_receipt",
   },
 };

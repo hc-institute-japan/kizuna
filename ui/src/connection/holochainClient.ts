@@ -125,6 +125,81 @@ export const getAgentId: () => Promise<AgentPubKey | null> = async () => {
   return null;
 };
 
+const backOff = (count: number) => {
+  let waitTime = (2 ** count + Math.random()) * 1000;
+  console.log("Retrying after ", waitTime);
+  return new Promise((resolve) => setTimeout(resolve, waitTime));
+};
+
+export const retry: (config: CallZomeConfig) => Promise<any> = async (
+  config
+) => {
+  console.log("entering backoff");
+  await init();
+
+  const { zomeName, fnName, payload = null } = config;
+
+  const max_retries = 5;
+  let retryCount = 0;
+  let callFailed = true;
+
+  while (callFailed && retryCount < max_retries) {
+    try {
+      return await client?.callZome(zomeName, fnName, payload);
+    } catch (e) {
+      console.warn(e);
+      const { type = null, data = null } = { ...e };
+      if (type === "error") {
+        console.warn(fnName);
+        switch (data?.type) {
+          case "ribosome_error":
+            console.log("ribsosome error", e);
+
+            const networkRegex = /Network error/;
+            const networkMatch = networkRegex.exec(data.data);
+
+            if (networkMatch !== null) {
+              await backOff(retryCount);
+              retryCount += 1;
+            } else {
+              callFailed = false;
+              const regex = /Guest\("([\s\S]*?)"\)/;
+              const result = regex.exec(data.data);
+              throw {
+                type: "error",
+                function: fnName,
+                message: result ? result[1] : "Something went wrong",
+              };
+            }
+            break;
+          case "internal_error":
+            console.log("internal error", e);
+            if (retryCount > max_retries) {
+              throw {
+                type: "error",
+                function: fnName,
+                message:
+                  "An internal error occured. This is likely a bug in holochain.",
+              };
+            } else {
+              await backOff(retryCount);
+              retryCount += 1;
+            }
+            break;
+          default:
+            console.log("default error", e);
+            if (retryCount > max_retries) {
+              throw e;
+            } else {
+              await backOff(retryCount);
+              retryCount += 1;
+            }
+        }
+      }
+    }
+  }
+};
+
 export const callZome: (config: CallZomeConfig) => Promise<any> = async (
   config
 ) => {

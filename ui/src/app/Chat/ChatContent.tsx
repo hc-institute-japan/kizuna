@@ -320,7 +320,7 @@ const Chat: React.FC = () => {
         showProfilePicture={true}
         onPinMessage={() => dispatch(pinMessage([messageBundle.message]))}
         showName={true}
-        // onSeen={(complete) => onSeenHandler(messageBundle)}
+        onSeen={(complete) => onSeenHandler(messageBundle)}
         onDownload={(file) => onDownloadHandler(file)}
         replyTo={replyToData ? replyToData : undefined}
         onReply={(message) => {
