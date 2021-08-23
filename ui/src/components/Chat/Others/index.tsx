@@ -72,7 +72,7 @@ const Others: React.FC<ChatProps> = ({
         >
           {replyTo ? <ReplyTo message={replyTo}></ReplyTo> : null}
           {isText ? (
-            <Text message={payload as TextPayload} />
+            <Text type="others" message={payload as TextPayload} />
           ) : (
             <File
               chatType={isP2P ? "p2p" : "group"}

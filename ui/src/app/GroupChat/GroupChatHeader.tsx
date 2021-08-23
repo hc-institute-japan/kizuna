@@ -20,6 +20,7 @@ import {
   search,
 } from "ionicons/icons";
 import React from "react";
+import { IntlShape, useIntl } from "react-intl";
 import { useHistory } from "react-router";
 import { GroupConversation } from "../../redux/group/types";
 import styles from "./style.module.css";
@@ -32,12 +33,14 @@ interface MenuListProps {
   onHide(): void;
   groupData: GroupConversation;
   history: any;
+  intl: IntlShape;
 }
 
 const GroupChatMenuList: React.FC<MenuListProps> = ({
   groupData,
   history,
   onHide,
+  intl,
 }) => {
   return (
     <IonList>
@@ -50,7 +53,9 @@ const GroupChatMenuList: React.FC<MenuListProps> = ({
         }}
       >
         <IonIcon slot="start" icon={informationCircleOutline}></IonIcon>
-        <IonLabel>Details</IonLabel>
+        <IonLabel>
+          {intl.formatMessage({ id: "app.group-chat.header-details" })}
+        </IonLabel>
       </IonItem>
 
       <IonItem
@@ -61,7 +66,9 @@ const GroupChatMenuList: React.FC<MenuListProps> = ({
         button
       >
         <IonIcon slot="start" icon={search}></IonIcon>
-        <IonLabel>Search</IonLabel>
+        <IonLabel>
+          {intl.formatMessage({ id: "app.group-chat.header-search" })}
+        </IonLabel>
       </IonItem>
 
       <IonItem
@@ -72,7 +79,9 @@ const GroupChatMenuList: React.FC<MenuListProps> = ({
         button
       >
         <IonIcon slot="start" icon={pinOutline}></IonIcon>
-        <IonLabel>Pinned Messages</IonLabel>
+        <IonLabel>
+          {intl.formatMessage({ id: "app.group-chat.header-pinned-message" })}
+        </IonLabel>
       </IonItem>
     </IonList>
   );
@@ -80,11 +89,13 @@ const GroupChatMenuList: React.FC<MenuListProps> = ({
 
 const GroupChatHeader: React.FC<Props> = ({ groupData }) => {
   const history = useHistory();
+  const intl = useIntl();
 
   const [present, dismiss] = useIonPopover(GroupChatMenuList, {
     onHide: () => dismiss(),
     groupData,
     history,
+    intl,
   });
   return (
     <IonHeader>

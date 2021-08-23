@@ -35,6 +35,7 @@ const getPreviousGroupMessages =
         fnName: FUNCTIONS[ZOMES.GROUP].GET_PREVIOUS_GROUP_MESSAGES,
         payload: input,
       });
+      console.log("groupmsgres", groupMessagesRes);
 
       const groupMessagesOutput: GroupMessagesOutput =
         convertFetchedResToGroupMessagesOutput(groupMessagesRes);
@@ -43,38 +44,40 @@ const getPreviousGroupMessages =
       const groupConversation: GroupConversation =
         groupConversations[filter.groupId];
 
-      const messageIds = groupConversation.messages
-        ? Array.from(
-            new Set(
-              groupConversation.messages.concat(
-                groupMessagesOutput.messagesByGroup[filter.groupId]
+      if (groupConversation) {
+        const messageIds = groupConversation.messages
+          ? Array.from(
+              new Set(
+                groupConversation.messages.concat(
+                  groupMessagesOutput.messagesByGroup[filter.groupId]
+                )
               )
             )
-          )
-        : groupConversations[filter.groupId].messages;
+          : groupMessagesOutput.messagesByGroup[filter.groupId];
 
-      groupConversations = {
-        ...groupConversations,
-        [filter.groupId]: groupConversation,
-      };
-      let messages = state.groups.messages;
-      messages = {
-        ...messages,
-        ...groupMessagesOutput.groupMessagesContents,
-      };
+        groupConversations = {
+          ...groupConversations,
+          [filter.groupId]: groupConversation,
+        };
+        let messages = state.groups.messages;
+        messages = {
+          ...messages,
+          ...groupMessagesOutput.groupMessagesContents,
+        };
 
-      const conversations: {
-        [key: string]: GroupConversation;
-      } = {
-        ...groupConversations,
-        [filter.groupId]: { ...groupConversation, messages: messageIds },
-      };
+        const conversations: {
+          [key: string]: GroupConversation;
+        } = {
+          ...groupConversations,
+          [filter.groupId]: { ...groupConversation, messages: messageIds },
+        };
 
-      dispatch<SetGroupMessagesAction>({
-        type: SET_GROUP_MESSAGES,
-        conversations,
-        messages,
-      });
+        dispatch<SetGroupMessagesAction>({
+          type: SET_GROUP_MESSAGES,
+          conversations,
+          messages,
+        });
+      }
 
       return groupMessagesOutput;
     } catch (e) {
@@ -82,6 +85,7 @@ const getPreviousGroupMessages =
         No useful error is getting returned from
         the Guest/Host so we are simply returning a generic error here
       */
+      console.log("is this the error?", e);
       return dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
     }
   };

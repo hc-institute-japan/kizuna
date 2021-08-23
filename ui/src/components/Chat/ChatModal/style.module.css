@@ -1,10 +1,15 @@
 .modal {
-  /* --height: !important; */
-  --width: 60%;
+  --height: 75% !important;
+  --width: 75%;
   bottom: 0 !important;
+  --border-radius: 10px;
 }
 
 .modal .modal-wrapper {
   position: absolute !important;
   bottom: 0 !important;
+}
+
+.icon { 
+  color: var(--ion-color-dark)
 }
