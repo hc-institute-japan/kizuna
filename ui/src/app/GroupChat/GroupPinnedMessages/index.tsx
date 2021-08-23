@@ -4,9 +4,11 @@ import {
   IonContent,
   IonHeader,
   IonPage,
+  IonTitle,
   IonToolbar,
 } from "@ionic/react";
 import React, { useEffect, useState } from "react";
+import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router";
 import PinnedMessages from "../../../components/PinnedMessages";
@@ -17,6 +19,7 @@ import { useAppDispatch } from "../../../utils/helpers";
 
 const GroupPinnedMessages: React.FC = () => {
   const { group } = useParams<{ group: string }>();
+  const intl = useIntl();
   const dispatch = useAppDispatch();
 
   const [data, setData] = useState<
@@ -38,6 +41,11 @@ const GroupPinnedMessages: React.FC = () => {
         <IonToolbar>
           <IonButtons>
             <IonBackButton defaultHref={`/g/${group}`}></IonBackButton>
+            <IonTitle>
+              {intl.formatMessage({
+                id: "app.group-chat.pinned-message-title",
+              })}
+            </IonTitle>
           </IonButtons>
         </IonToolbar>
       </IonHeader>
