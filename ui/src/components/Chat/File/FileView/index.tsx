@@ -10,9 +10,10 @@ import styles from "./style.module.css";
 interface Props {
   file: FilePayload;
   onDownload?(file: FilePayload): any;
+  darken?: boolean;
 }
 
-const File: React.FC<Props> = ({ file, onDownload }) => {
+const File: React.FC<Props> = ({ file, onDownload, darken = false }) => {
   const { fileName, fileSize } = file;
   const fileBytes = useSelector((state: RootState) =>
     // state.groups.groupFiles[`u${file.fileHash}`]
@@ -46,7 +47,11 @@ const File: React.FC<Props> = ({ file, onDownload }) => {
         className={`ion-align-items-center ${styles.file}`}
       >
         <div className="ion-padding-end">
-          <IonIcon size="small" icon={documentOutline}></IonIcon>
+          <IonIcon
+            className={styles[darken ? "file-icon-dark" : "file-icon-light"]}
+            size="small"
+            icon={documentOutline}
+          ></IonIcon>
         </div>
         <div className="ion-align-items-center">
           <IonRow>

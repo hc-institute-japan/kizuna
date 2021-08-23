@@ -4,9 +4,11 @@ import {
   IonContent,
   IonHeader,
   IonPage,
+  IonTitle,
   IonToolbar,
 } from "@ionic/react";
 import React, { useEffect } from "react";
+import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router";
 import PinnedMessages from "../../../components/PinnedMessages";
@@ -16,6 +18,7 @@ import { useAppDispatch } from "../../../utils/helpers";
 
 const ChatPinnedMessage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
+  const intl = useIntl();
 
   const dispatch = useAppDispatch();
 
@@ -90,6 +93,11 @@ const ChatPinnedMessage: React.FC = () => {
         <IonToolbar>
           <IonButtons>
             <IonBackButton defaultHref={`/u/${id}`}></IonBackButton>
+            <IonTitle>
+              {intl.formatMessage({
+                id: "app.chat.pinned-message-title",
+              })}
+            </IonTitle>
           </IonButtons>
         </IonToolbar>
       </IonHeader>

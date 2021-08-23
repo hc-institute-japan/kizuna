@@ -72,6 +72,7 @@ const FileBox: React.FC<Props> = ({
                 <FileView
                   file={message.payload as FilePayload}
                   onDownload={onDownload}
+                  darken={true}
                 />
               </IonCard>
             </IonCol>
