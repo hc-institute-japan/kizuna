@@ -5,3 +5,11 @@
 .file-name {
   word-break: break-all;
 }
+
+.file-icon-dark {
+  color: var(--ion-color-medium);
+}
+
+.file-icon-light {
+  color: var(--ion-color-primary-contrast);
+}

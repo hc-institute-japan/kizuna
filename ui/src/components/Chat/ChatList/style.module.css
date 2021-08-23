@@ -16,8 +16,6 @@
   z-index: -1;
 
   display: block;
-
-  background-image: url("chat-app-background.jpeg");
   background-attachment: fixed;
   background-repeat: no-repeat;
   background-size: cover;

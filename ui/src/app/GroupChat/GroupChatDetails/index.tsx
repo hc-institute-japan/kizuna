@@ -178,7 +178,7 @@ const GroupChatDetails: React.FC = () => {
     if (conversations[group] !== undefined) {
       conversations[group].messages.forEach((messageID: string) => {
         let message = messages[messageID];
-        if (message.payload.type === "FILE") {
+        if (message && message.payload.type === "FILE") {
           let type = message.payload.fileType;
 
           // checks for and does not allow duplicates

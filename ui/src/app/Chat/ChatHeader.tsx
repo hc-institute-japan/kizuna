@@ -20,6 +20,7 @@ import {
   search,
 } from "ionicons/icons";
 import React from "react";
+import { IntlShape, useIntl } from "react-intl";
 import { useHistory } from "react-router";
 import AgentIdentifier from "../../components/AgentIdentifier";
 import { Profile } from "../../redux/profile/types";
@@ -37,6 +38,7 @@ interface ChatMenuItemsProps {
   conversant: Profile;
   pathname: string;
   onHide(): any;
+  intl: IntlShape;
 }
 
 const ChatMenuItems: React.FC<ChatMenuItemsProps> = ({
@@ -44,6 +46,7 @@ const ChatMenuItems: React.FC<ChatMenuItemsProps> = ({
   conversant,
   onHide,
   pathname,
+  intl,
 }) => {
   return (
     <IonList>
@@ -58,7 +61,9 @@ const ChatMenuItems: React.FC<ChatMenuItemsProps> = ({
         }}
       >
         <IonIcon slot="start" icon={informationCircleOutline} />
-        <IonLabel>Details</IonLabel>
+        <IonLabel>
+          {intl.formatMessage({ id: "app.chat.header-details" })}
+        </IonLabel>
       </IonItem>
       <IonItem
         button
@@ -68,7 +73,9 @@ const ChatMenuItems: React.FC<ChatMenuItemsProps> = ({
         }}
       >
         <IonIcon slot="start" icon={search} />
-        <IonLabel>Search</IonLabel>
+        <IonLabel>
+          {intl.formatMessage({ id: "app.chat.header-search" })}
+        </IonLabel>
       </IonItem>
       <IonItem
         button
@@ -78,7 +85,9 @@ const ChatMenuItems: React.FC<ChatMenuItemsProps> = ({
         }}
       >
         <IonIcon slot="start" icon={pin} />
-        <IonLabel>Pinned Messages</IonLabel>
+        <IonLabel>
+          {intl.formatMessage({ id: "app.chat.header-pinned-messages" })}
+        </IonLabel>
       </IonItem>
     </IonList>
   );
@@ -99,11 +108,13 @@ const ChatHeader: React.FC<Props> = ({
   conversant,
 }) => {
   const history = useHistory();
+  const intl = useIntl();
   const [present, dismiss] = useIonPopover(ChatMenuItems, {
     onHide: () => dismiss(),
     history,
     conversant,
     pathname,
+    intl,
   });
   const handleOnBack = () => history.push({ pathname: `/home` });
 

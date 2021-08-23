@@ -1,5 +1,17 @@
-import { IonContent, IonItem, IonLabel, IonList, IonModal } from "@ionic/react";
+import {
+  IonBackButton,
+  IonButton,
+  IonButtons,
+  IonContent,
+  IonIcon,
+  IonItem,
+  IonLabel,
+  IonList,
+  IonModal,
+} from "@ionic/react";
+import { arrowUndoOutline, pinOutline } from "ionicons/icons";
 import React, { SetStateAction } from "react";
+import { useIntl } from "react-intl";
 import styles from "./style.module.css";
 
 interface Props {
@@ -10,6 +22,7 @@ interface Props {
 }
 
 const ChatModal: React.FC<Props> = ({ open, onReply, onPin, isPinned }) => {
+  const intl = useIntl();
   const [isOpen, setIsOpen] = open;
   return (
     <IonModal
@@ -19,7 +32,7 @@ const ChatModal: React.FC<Props> = ({ open, onReply, onPin, isPinned }) => {
         setIsOpen(false);
       }}
     >
-      <IonContent>
+      <IonContent className={styles["content"]}>
         <IonList>
           <IonItem
             button
@@ -29,7 +42,10 @@ const ChatModal: React.FC<Props> = ({ open, onReply, onPin, isPinned }) => {
               setIsOpen(false);
             }}
           >
-            <IonLabel>Reply</IonLabel>
+            <IonLabel>
+              {intl.formatMessage({ id: "components.chat.chat-modal-reply" })}
+            </IonLabel>
+            <IonIcon icon={arrowUndoOutline} className={styles["icon"]} />
           </IonItem>
           <IonItem
             button
@@ -39,7 +55,12 @@ const ChatModal: React.FC<Props> = ({ open, onReply, onPin, isPinned }) => {
               setIsOpen(false);
             }}
           >
-            <IonLabel>{isPinned ? "Unpin" : "Pin"}</IonLabel>
+            <IonLabel>
+              {isPinned
+                ? intl.formatMessage({ id: "components.chat.chat-modal-unpin" })
+                : intl.formatMessage({ id: "components.chat.chat-modal-pin" })}
+            </IonLabel>
+            <IonIcon icon={pinOutline} className={styles["icon"]} />
           </IonItem>
         </IonList>
       </IonContent>

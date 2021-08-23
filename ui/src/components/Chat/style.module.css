@@ -89,6 +89,11 @@
   font-size: 1rem;
 }
 
+.me span {
+  color: var(--ion-color-primary-contrast);
+  font-size: 1rem;
+}
+
 .me h6 {
   color: var(--ion-color-primary-contrast);
   font-size: 0.7rem;
