@@ -51,6 +51,6 @@ export const handleSignal =
         break;
       case SIGNALS[ZOMES.P2PMESSAGE].P2P_RETRY_READ_RECEIPT:
         console.log("ui signal received to retry read receipt");
-        dispatch(retryCommitReceipt(payload));
+      // dispatch(retryCommitReceipt(payload));
     }
   };

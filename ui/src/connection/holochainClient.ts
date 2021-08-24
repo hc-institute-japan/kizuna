@@ -15,10 +15,12 @@ window.COMB = require("@holo-host/comb").COMB;
 
 let client: null | HolochainClient | HoloClient = null;
 
-let signalHandler: AppSignalCb = (signal) =>
+let signalHandler: AppSignalCb = (signal) => {
+  // console.log("client signal", signal);
   store?.dispatch(
     handleSignal(signal.data.payload.name, signal.data.payload.payload)
   );
+};
 
 const createClient = async (
   env: string
@@ -144,7 +146,9 @@ export const retry: (config: CallZomeConfig) => Promise<any> = async (
   let callFailed = true;
 
   while (callFailed && retryCount < max_retries) {
+    console.log("retry attempt #", retryCount + 1);
     try {
+      console.log("retry count", retryCount);
       return await client?.callZome(zomeName, fnName, payload);
     } catch (e) {
       console.warn(e);
