@@ -1,6 +1,7 @@
-import { IonItem, IonText } from "@ionic/react";
+import { IonItem, IonText, useIonPopover } from "@ionic/react";
 import { personCircleOutline } from "ionicons/icons";
 import React, { useState } from "react";
+import { useIntl } from "react-intl";
 import {
   FilePayload,
   isTextPayload,
@@ -8,6 +9,7 @@ import {
 } from "../../../redux/commons/types";
 import { usePressHandlers } from "../../../utils/helpers";
 import ChatModal from "../ChatModal";
+import ChatPopover from "../ChatPopover";
 import File from "../File";
 import MessageTimestamp from "../MessageTimestamp";
 import ReplyTo from "../ReplyTo";
@@ -32,9 +34,22 @@ const Others: React.FC<ChatProps> = ({
   isSeen = false,
   onDownload,
 }) => {
-  const onLongPress = () => setIsModalOpen(true);
+  const intl = useIntl();
+
+  const [show, dismiss] = useIonPopover(ChatPopover, {
+    onHide: () => dismiss(),
+    onPin: onPinMessage,
+    onReply: () => {
+      if (onReply) onReply({ author, payload, id });
+    },
+    isPinned,
+    intl,
+  });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const onLongPress = (e: any) => {
+    show({ event: e.nativeEvent });
+  };
   const pressHandlers = usePressHandlers(onLongPress, () => {});
 
   const isText = isTextPayload(payload);
@@ -85,14 +100,14 @@ const Others: React.FC<ChatProps> = ({
           <MessageTimestamp onSeen={onSeen} timestamp={timestamp} />
         </div>
       </IonItem>
-      <ChatModal
+      {/* <ChatModal
         onPin={onPinMessage as () => any}
         isPinned={isPinned}
         onReply={() => {
           if (onReply) onReply({ author, payload, id });
         }}
         open={[isModalOpen, setIsModalOpen]}
-      ></ChatModal>
+      ></ChatModal> */}
     </>
   );
 };

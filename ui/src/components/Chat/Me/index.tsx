@@ -1,4 +1,4 @@
-import { IonIcon, IonItem, IonText } from "@ionic/react";
+import { IonIcon, IonItem, IonText, useIonPopover } from "@ionic/react";
 import {
   checkmarkCircleOutline,
   checkmarkDoneCircle,
@@ -13,6 +13,7 @@ import {
 } from "../../../redux/commons/types";
 import { usePressHandlers } from "../../../utils/helpers";
 import ChatModal from "../ChatModal";
+import ChatPopover from "../ChatPopover";
 import File from "../File";
 import ReplyTo from "../ReplyTo";
 import { default as common, default as styles } from "../style.module.css";
@@ -33,13 +34,26 @@ const Me: React.FC<ChatProps> = ({
   isSeen = false,
   onDownload,
 }) => {
-  const onLongPress = () => setIsModalOpen(true);
+  const intl = useIntl();
+
+  const onLongPress = (e: any) =>
+    show({
+      event: e.nativeEvent,
+    });
+  const [show, dismiss] = useIonPopover(ChatPopover, {
+    onHide: () => dismiss(),
+    onPin: onPinMessage,
+    onReply: () => {
+      if (onReply) onReply({ author, payload, id });
+    },
+    isPinned,
+    intl,
+  });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const pressHandlers = usePressHandlers(onLongPress, () => {});
   const isText = isTextPayload(payload);
   const isP2P = type === "p2p";
-  const intl = useIntl();
 
   return (
     <>
@@ -87,14 +101,14 @@ const Me: React.FC<ChatProps> = ({
           </div>
         )}
       </IonItem>
-      <ChatModal
+      {/* <ChatModal
         isPinned={isPinned}
         onPin={onPinMessage as () => any}
         onReply={() => {
           if (onReply) onReply({ author, payload, id });
         }}
         open={[isModalOpen, setIsModalOpen]}
-      ></ChatModal>
+      ></ChatModal> */}
     </>
   );
 };

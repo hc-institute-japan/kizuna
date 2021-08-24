@@ -181,6 +181,7 @@ export const usePressHandlers = (
         });
         target.current = event.target;
       }
+      event.persist();
       timeout.current = setTimeout(() => {
         onLongPress(event);
         setLongPressTriggered(true);
