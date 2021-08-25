@@ -1,6 +1,6 @@
 import { IonItem, IonText, useIonPopover } from "@ionic/react";
 import { personCircleOutline } from "ionicons/icons";
-import React, { useState } from "react";
+import React from "react";
 import { useIntl } from "react-intl";
 import {
   FilePayload,
@@ -8,7 +8,6 @@ import {
   TextPayload,
 } from "../../../redux/commons/types";
 import { usePressHandlers } from "../../../utils/helpers";
-import ChatModal from "../ChatModal";
 import ChatPopover from "../ChatPopover";
 import File from "../File";
 import MessageTimestamp from "../MessageTimestamp";
@@ -46,7 +45,7 @@ const Others: React.FC<ChatProps> = ({
     intl,
   });
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // const [isModalOpen, setIsModalOpen] = useState(false);
   const onLongPress = (e: any) => {
     show({ event: e.nativeEvent });
   };

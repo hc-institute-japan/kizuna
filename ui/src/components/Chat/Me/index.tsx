@@ -4,7 +4,7 @@ import {
   checkmarkDoneCircle,
   personCircleOutline,
 } from "ionicons/icons";
-import React, { useState } from "react";
+import React from "react";
 import { useIntl } from "react-intl";
 import {
   FilePayload,
@@ -12,7 +12,6 @@ import {
   TextPayload,
 } from "../../../redux/commons/types";
 import { usePressHandlers } from "../../../utils/helpers";
-import ChatModal from "../ChatModal";
 import ChatPopover from "../ChatPopover";
 import File from "../File";
 import ReplyTo from "../ReplyTo";
@@ -37,10 +36,10 @@ const Me: React.FC<ChatProps> = ({
   const intl = useIntl();
 
   const onLongPress = (e: any) =>
-    show({
+    present({
       event: e.nativeEvent,
     });
-  const [show, dismiss] = useIonPopover(ChatPopover, {
+  const [present, dismiss] = useIonPopover(ChatPopover, {
     onHide: () => dismiss(),
     onPin: onPinMessage,
     onReply: () => {
@@ -50,7 +49,7 @@ const Me: React.FC<ChatProps> = ({
     intl,
   });
 
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // const [isModalOpen, setIsModalOpen] = useState(false);
   const pressHandlers = usePressHandlers(onLongPress, () => {});
   const isText = isTextPayload(payload);
   const isP2P = type === "p2p";
