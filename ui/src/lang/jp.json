@@ -83,7 +83,7 @@
   "app.settings.read-receipt-label": "既読通知",
   "app.settings.typing-indicator-label": "入力中通知",
   "components.chat.chat-list.today": "今日",
-  "components.chat.chat-modal-pin": "メッセージをピン留めする",
+  "components.chat.chat-modal-pin": "メッセージをピン留め",
   "components.chat.chat-modal-reply": "返信",
   "components.chat.chat-modal-unpin": "メッセージのピン留めを解除",
   "components.chat.media-modal-download": "ダウンロード",
