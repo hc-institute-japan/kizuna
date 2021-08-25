@@ -1,6 +1,14 @@
 import { Orchestrator } from "@holochain/tryorama";
 import { Installables } from "../types";
 import { delay } from "../utils";
+import {
+  installAgents,
+  MEM_PROOF1,
+  MEM_PROOF2,
+  MEM_PROOF3,
+  MEM_PROOF4,
+  MEM_PROOF5,
+} from "../install";
 
 const createPreference = (typingIndicator, readReceipt) => ({
   typingIndicator: typingIndicator,
@@ -22,18 +30,19 @@ const call = async (
 
 let orchestrator = new Orchestrator();
 
-const preference = (config, installables: Installables) => {
+const preference = (config) => {
   orchestrator.registerScenario(
     "Get and set global preference",
     async (s, t) => {
-      const [alice] = await s.players([config]);
-      await alice.startup({});
-      const [alice_lobby_happ] = await alice.installAgentsHapps(
-        installables.one
+      const [conductor] = await s.players([config]);
+      const [alice_lobby_happ] = await installAgents(
+        conductor,
+        ["alice"],
+        [MEM_PROOF1]
       );
-      const alice_conductor = alice_lobby_happ[0].cells[0];
+      const [alice_conductor] = alice_lobby_happ.cells;
 
-      // const [alice_dna, alice_pubkey] = alice_conductor.cellId;
+      await delay();
       let preference = null;
 
       // Both typing and receipt are set to true by default
@@ -57,9 +66,7 @@ const preference = (config, installables: Installables) => {
 
       t.deepEqual(preference, createPreference(false, true));
 
-      /**
-       * Set both typing to true and receipt to false
-       */
+      // Set both typing to true and receipt to false
 
       preference = await call(alice_conductor, "preference", "set_preference", {
         typingIndicator: true,
@@ -68,9 +75,7 @@ const preference = (config, installables: Installables) => {
 
       t.deepEqual(preference, createPreference(true, false));
 
-      /**
-       * Set typing to false
-       */
+      // Set typing to false
 
       preference = await call(alice_conductor, "preference", "set_preference", {
         readReceipt: true,
@@ -78,9 +83,7 @@ const preference = (config, installables: Installables) => {
 
       t.deepEqual(preference, createPreference(true, true));
 
-      /**
-       * Set receipt to true
-       */
+      // Set receipt to true
 
       preference = await call(alice_conductor, "preference", "set_preference", {
         typingIndicator: false,
@@ -97,45 +100,41 @@ const preference = (config, installables: Installables) => {
   orchestrator.registerScenario(
     "Get and set per agent preference",
     async (s, t) => {
-      const [alice, bobby, clark, diego, ethan] = await s.players([
-        config,
-        config,
-        config,
-        config,
-        config,
-      ]);
-      await alice.startup({});
-      await bobby.startup({});
-      await clark.startup({});
-      await diego.startup({});
-      await ethan.startup({});
-      const [alice_lobby_happ] = await alice.installAgentsHapps(
-        installables.one
+      const [conductor] = await s.players([config]);
+      const [alice_lobby_happ] = await installAgents(
+        conductor,
+        ["alice"],
+        [MEM_PROOF1]
       );
-      const [bobby_lobby_happ] = await bobby.installAgentsHapps(
-        installables.one
+      const [bobby_lobby_happ] = await installAgents(
+        conductor,
+        ["bobby"],
+        [MEM_PROOF2]
       );
-      const [clark_lobby_happ] = await clark.installAgentsHapps(
-        installables.one
+      const [clark_lobby_happ] = await installAgents(
+        conductor,
+        ["clark"],
+        [MEM_PROOF3]
       );
-      const [diego_lobby_happ] = await diego.installAgentsHapps(
-        installables.one
+      const [diego_lobby_happ] = await installAgents(
+        conductor,
+        ["diego"],
+        [MEM_PROOF4]
       );
-      const [ethan_lobby_happ] = await ethan.installAgentsHapps(
-        installables.one
+      const [ethan_lobby_happ] = await installAgents(
+        conductor,
+        ["ethan"],
+        [MEM_PROOF5]
       );
 
-      const alice_conductor = alice_lobby_happ[0].cells[0];
-      const bobby_conductor = bobby_lobby_happ[0].cells[0];
-      const clark_conductor = clark_lobby_happ[0].cells[0];
-      const diego_conductor = diego_lobby_happ[0].cells[0];
-      const ethan_conductor = ethan_lobby_happ[0].cells[0];
+      const [alice_conductor] = alice_lobby_happ.cells;
 
-      const [alice_dna, alice_pubkey] = alice_conductor.cellId;
-      const [bobby_dna, bobby_pubkey] = bobby_conductor.cellId;
-      const [charlie_dna, clark_pubkey] = clark_conductor.cellId;
-      const [diego_dna, diego_pubkey] = diego_conductor.cellId;
-      const [ethan_dna, ethan_pubkey] = ethan_conductor.cellId;
+      const bobby_pubkey = bobby_lobby_happ.agent;
+      const clark_pubkey = clark_lobby_happ.agent;
+      const diego_pubkey = diego_lobby_happ.agent;
+      const ethan_pubkey = ethan_lobby_happ.agent;
+
+      await delay();
 
       let preference = null;
 
@@ -213,11 +212,16 @@ const preference = (config, installables: Installables) => {
   orchestrator.registerScenario(
     "Get and set per group preference",
     async (s, t) => {
-      const [alice] = await s.players([config]);
-      const [alice_lobby_happ] = await alice.installAgentsHapps(
-        installables.one
+      const [alice, bobby, charlie] = await s.players([config, config, config]);
+      const [alice_lobby_happ] = await installAgents(
+        alice,
+        ["alice"],
+        [MEM_PROOF1]
       );
-      const alice_conductor = alice_lobby_happ[0].cells[0];
+
+      const [alice_conductor] = alice_lobby_happ.cells;
+
+      await delay();
 
       let preference = null;
 

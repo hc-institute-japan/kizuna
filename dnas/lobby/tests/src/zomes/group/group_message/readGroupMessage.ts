@@ -7,30 +7,42 @@ import {
   readGroupMessage,
   sendMessage,
 } from "../zome_fns";
+import {
+  installAgents,
+  MEM_PROOF1,
+  MEM_PROOF2,
+  MEM_PROOF3,
+} from "../../../install";
 
-export function readGroupMessageTest(config, installables) {
+export function readGroupMessageTest(config) {
   let orchestrator = new Orchestrator();
 
   orchestrator.registerScenario(
     "test read group message",
     async (s: ScenarioApi, t) => {
       const [alice, bobby, charlie] = await s.players([config, config, config]);
-
-      const [[alice_happ]] = await alice.installAgentsHapps(installables.one);
-      const [[bobby_happ]] = await bobby.installAgentsHapps(installables.one);
-      const [[charlie_happ]] = await charlie.installAgentsHapps(
-        installables.one
+      const [alice_lobby_happ] = await installAgents(
+        alice,
+        ["alice"],
+        [MEM_PROOF1]
       );
+      const [bobby_lobby_happ] = await installAgents(
+        bobby,
+        ["bobby"],
+        [MEM_PROOF2]
+      );
+      const [charlie_lobby_happ] = await installAgents(
+        charlie,
+        ["charlie"],
+        [MEM_PROOF3]
+      );
+      const [alice_conductor] = alice_lobby_happ.cells;
+      const [bobby_conductor] = bobby_lobby_happ.cells;
+      const [charlie_conductor] = charlie_lobby_happ.cells;
 
-      // await s.shareAllNodes([alice, bobby, charlie]);
-
-      const alicePubKey = alice_happ.agent;
-      const bobbyPubKey = bobby_happ.agent;
-      const charliePubKey = charlie_happ.agent;
-
-      const alice_conductor = alice_happ.cells[0];
-      const bobby_conductor = bobby_happ.cells[0];
-      const charlie_conductor = charlie_happ.cells[0];
+      const alicePubKey = alice_lobby_happ.agent;
+      const bobbyPubKey = bobby_lobby_happ.agent;
+      const charliePubKey = charlie_lobby_happ.agent;
 
       let alice_signal_listener = {
         counter: 0,

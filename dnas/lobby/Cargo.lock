@@ -281,6 +281,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ab5ef0d4909ef3724cc8cce6ccc8572c5c817592e9285f5464f8e86f8bd3726e"
 
 [[package]]
+name = "hc_joining_code"
+version = "0.0.1-alpha.1"
+source = "git+https://github.com/holochain/elemental-chat?rev=c4842945880338512b110d31e80f979ba0f03f02#c4842945880338512b110d31e80f979ba0f03f02"
+dependencies = [
+ "derive_more",
+ "hdk",
+ "serde",
+]
+
+[[package]]
 name = "hc_zome_profiles"
 version = "0.0.1"
 source = "git+https://github.com/tatssato/profiles?rev=cf442446f6b8b7f7112d6d6f5563cd59518ab83c#cf442446f6b8b7f7112d6d6f5563cd59518ab83c"
@@ -446,6 +456,14 @@ name = "itoa"
 version = "0.4.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dd25036021b0de88a0aff6b850051563c6516d0bf53f8638938edbb9de732736"
+
+[[package]]
+name = "joining_code"
+version = "0.0.1"
+dependencies = [
+ "hc_joining_code",
+ "hdk",
+]
 
 [[package]]
 name = "lazy_static"

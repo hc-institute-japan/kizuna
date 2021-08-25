@@ -8,8 +8,14 @@ import {
   unpinMessage,
   getPinnnedMessages,
 } from "../zome_fns";
+import {
+  installAgents,
+  MEM_PROOF1,
+  MEM_PROOF2,
+  MEM_PROOF3,
+} from "../../../install";
 
-export function pinMessageTest(config, installables) {
+export function pinMessageTest(config) {
   let orchestrator = new Orchestrator();
 
   orchestrator.registerScenario(
@@ -20,19 +26,27 @@ export function pinMessageTest(config, installables) {
         pin_message, unpin_message, get_pinned_messages
       */
       const [alice, bobby, charlie] = await s.players([config, config, config]);
-
-      const [[alice_happ]] = await alice.installAgentsHapps(installables.one);
-      const [[bobby_happ]] = await bobby.installAgentsHapps(installables.one);
-      const [[charlie_happ]] = await charlie.installAgentsHapps(
-        installables.one
+      const [alice_lobby_happ] = await installAgents(
+        alice,
+        ["alice"],
+        [MEM_PROOF1]
       );
+      const [bobby_lobby_happ] = await installAgents(
+        bobby,
+        ["bobby"],
+        [MEM_PROOF2]
+      );
+      const [charlie_lobby_happ] = await installAgents(
+        charlie,
+        ["charlie"],
+        [MEM_PROOF3]
+      );
+      const [alice_conductor] = alice_lobby_happ.cells;
+      const [bobby_conductor] = bobby_lobby_happ.cells;
 
-      const alicePubKey = alice_happ.agent;
-      const bobbyPubKey = bobby_happ.agent;
-      const charliePubKey = charlie_happ.agent;
-
-      const alice_conductor = alice_happ.cells[0];
-      const bobby_conductor = bobby_happ.cells[0];
+      const alicePubKey = alice_lobby_happ.agent;
+      const bobbyPubKey = bobby_lobby_happ.agent;
+      const charliePubKey = charlie_lobby_happ.agent;
 
       await delay(2000);
 

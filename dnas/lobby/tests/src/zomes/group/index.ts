@@ -24,22 +24,22 @@ import { getLatestMessagesForAllGroupsTest } from "./group_message/getLatestMess
 import { groupTypingIndicatorTest } from "./group_message/typingIndicator";
 import { readGroupMessageTest } from "./group_message/readGroupMessage";
 
-export default (config, installables) => {
+export default (config) => {
   // Group CRUD and validation related tests.
-  createGroupTest(config, installables);
-  addAndRemoveMembersTest(config, installables);
-  updateGroupNameTest(config, installables);
-  validateCreateGroupTest(config, installables);
+  addAndRemoveMembersTest(config);
+  createGroupTest(config);
+  updateGroupNameTest(config);
+  validateCreateGroupTest(config);
 
   // GroupMessage related tests
-  sendMessageTest(config, installables);
-  pinMessageTest(config, installables);
-  sendMessageswithFilesTest(config, installables);
-  sendLargeSetOfFilesTest(config, installables);
-  getPreviousGroupMessagesTest(config, installables);
-  getMessagesByGroupByTimestampTest(config, installables);
-  getLatestMessagesForAllGroupsTest(config, installables);
-  fetchFilesForAParticularDateTest(config, installables);
-  groupTypingIndicatorTest(config, installables);
-  readGroupMessageTest(config, installables);
+  sendMessageTest(config);
+  pinMessageTest(config);
+  sendMessageswithFilesTest(config);
+  sendLargeSetOfFilesTest(config);
+  getPreviousGroupMessagesTest(config);
+  getMessagesByGroupByTimestampTest(config);
+  getLatestMessagesForAllGroupsTest(config);
+  fetchFilesForAParticularDateTest(config);
+  groupTypingIndicatorTest(config);
+  readGroupMessageTest(config);
 };
