@@ -177,6 +177,21 @@ const Chat: React.FC = () => {
       );
     }
 
+    if (message === "" && files.length) {
+      files.forEach((file) =>
+        dispatch(
+          sendMessage(
+            conversant.id,
+            message,
+            "FILE",
+            replyTo !== "" ? replyTo : undefined,
+            file
+          )
+        )
+      );
+      setIsLoading!(false);
+    }
+
     scrollerRef.current!.scrollToBottom();
 
     setReplyTo("");
@@ -187,29 +202,29 @@ const Chat: React.FC = () => {
       when reaching the beginning/top of the chat box
     */
   const handleOnScrollTop = (complete: any) => {
-    if (didMountRef2.current === true) {
-      if (disableGetNextBatch === false) {
-        let lastMessage = messagesWithConversant[0].message;
-        dispatch(
-          getNextBatchMessages(
-            conversant.id,
-            5,
-            "All",
-            lastMessage.timestamp,
-            lastMessage.p2pMessageEntryHash
-          )
-        ).then((res: P2PHashMap) => {
-          // disable getNextBatch if return value is empty
-          if (Object.values(res)[0][conversant.id].length <= 0) {
-            setDisableGetNextBatch(true);
-          }
-          complete();
-        });
-      }
-    } else {
-      didMountRef2.current = true;
+    // if (didMountRef2.current === true) {
+    if (disableGetNextBatch === false) {
+      let lastMessage = messagesWithConversant[0].message;
+      dispatch(
+        getNextBatchMessages(
+          conversant.id,
+          5,
+          "All",
+          lastMessage.timestamp,
+          lastMessage.p2pMessageEntryHash
+        )
+      ).then((res: P2PHashMap) => {
+        // disable getNextBatch if return value is empty
+        if (Object.values(res)[0][conversant.id].length <= 0) {
+          setDisableGetNextBatch(true);
+        }
+        complete();
+      });
     }
-    complete();
+    // } else {
+    // didMountRef2.current = true;
+    // }
+    // complete();
     return;
   };
 
