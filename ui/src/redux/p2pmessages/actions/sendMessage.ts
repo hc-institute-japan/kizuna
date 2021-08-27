@@ -179,11 +179,11 @@ export const sendMessage =
         return true;
       }
     } catch (e) {
-      await retry({
-        zomeName: ZOMES.P2PMESSAGE,
-        fnName: FUNCTIONS[ZOMES.P2PMESSAGE].SEND_MESSAGE,
-        payload: input,
-      });
+      // await retry({
+      //   zomeName: ZOMES.P2PMESSAGE,
+      //   fnName: FUNCTIONS[ZOMES.P2PMESSAGE].SEND_MESSAGE,
+      //   payload: input,
+      // });
       dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
     }
   };
