@@ -38,5 +38,6 @@ export const handleSignal =
         break;
       case SIGNALS[ZOMES.P2PMESSAGE].SYNC_P2P_PINS:
         dispatch(receiveP2PPin(payload));
+        break;
     }
   };
