@@ -9,10 +9,6 @@ import { transformZomeDataToUIData } from "./helpers/transformZomeDateToUIData";
 export const getPinnedMessages =
   (conversant: AgentPubKeyBase64): ThunkAction =>
   async (dispatch, getState, { callZome }) => {
-    const zome_input = {
-      conversant: Buffer.from(deserializeHash(conversant)),
-    };
-
     try {
       // CALL ZOME
       const pinnedMessages = await callZome({
@@ -21,11 +17,8 @@ export const getPinnedMessages =
         payload: Buffer.from(deserializeHash(conversant)),
       });
 
-      // console.log(pinnedMessages);
-
       // DISPATCH TO REDUCER
       if (pinnedMessages?.type !== "error") {
-        // console.log("pinned messages", pinnedMessages);
         const contactsState = { ...getState().contacts.contacts };
         const profile = { ...getState().profile };
         const profileList = {
@@ -36,12 +29,63 @@ export const getPinnedMessages =
           pinnedMessages,
           profileList
         );
-        // console.log("todispatch", toDispatch);
+
+        let currentState = { ...getState().p2pmessages };
+
+        if (currentState.conversations[conversant] === undefined) {
+          currentState.conversations[conversant] = {
+            messages: [],
+            pinned: [],
+          };
+          for (const [key, value] of Object.entries(toDispatch.messages)) {
+            if (!currentState.conversations[conversant].pinned.includes(key)) {
+              currentState.conversations[conversant].pinned.push(key);
+            }
+            if (currentState.pinned[key] === undefined) {
+              currentState.pinned[key] = value;
+            } else {
+              continue;
+            }
+          }
+        } else {
+          if (currentState.conversations[conversant].pinned === undefined) {
+            currentState.conversations[conversant].pinned = [];
+            for (const [key, value] of Object.entries(toDispatch.messages)) {
+              if (
+                !currentState.conversations[conversant].pinned.includes(key)
+              ) {
+                currentState.conversations[conversant].pinned.push(key);
+              }
+              if (currentState.pinned[key] === undefined) {
+                currentState.pinned[key] = value;
+              } else {
+                continue;
+              }
+            }
+          } else {
+            for (const [key, value] of Object.entries(toDispatch.messages)) {
+              if (
+                !currentState.conversations[conversant].pinned.includes(key)
+              ) {
+                currentState.conversations[conversant].pinned.push(key);
+              }
+              if (currentState.pinned[key] === undefined) {
+                currentState.pinned[key] = value;
+              } else {
+                continue;
+              }
+            }
+          }
+        }
 
         dispatch({
           type: SET_PINNED,
-          state: { conversant: conversant, messages: toDispatch.messages },
+          state: currentState,
         });
+        // dispatch({
+        //   type: SET_PINNED,
+        //   state: { conversant: conversant, messages: toDispatch.messages },
+        // });
 
         return toDispatch;
       }

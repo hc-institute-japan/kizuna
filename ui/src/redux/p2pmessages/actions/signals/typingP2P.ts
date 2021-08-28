@@ -12,20 +12,37 @@ const typingP2P =
       We ignore the signals coming from agents that are not part
       of the contacts list of the agent.
     */
+
     if (isAdded) {
-      let usernameTyping = contacts[agentHash].username;
+      let currentState = { ...getState().p2pmessages.typing };
+      let profile = contacts[agentHash];
+
+      if (currentState[profile.id] && payload.is_typing) {
+        currentState[profile.id] = profile;
+      } else {
+        if (!payload.is_typing) {
+          delete currentState[profile.id];
+        }
+      }
+
       dispatch({
         type: SET_TYPING,
-        state: {
-          profile: {
-            id: agentHash,
-            username: usernameTyping,
-          },
-          isTyping: payload.is_typing,
-        },
+        state: currentState,
       });
+
+      // dispatch({
+      //   type: SET_TYPING,
+      //   state: {
+      //     profile: {
+      //       id: agentHash,
+      //       username: username,
+      //     },
+      //     isTyping: payload.is_typing,
+      //   },
+      // });
+
+      return true;
     }
-    return;
   };
 
 export default typingP2P;
