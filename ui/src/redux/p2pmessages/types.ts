@@ -138,7 +138,9 @@ export interface P2PMessageConversationState {
 
 /* ACTION TYPES */
 export const SET_MESSAGES = "SET_MESSAGES";
+export const SET_RECEIPTS = "SET_RECEIPTS";
 export const SET_FILES = "SET_FILES";
+
 export const SET_TYPING = "SET_TYPING";
 export const APPEND_MESSAGE = "APPEND_MESSAGE";
 export const APPEND_RECEIPT = "APPEND_RECEIPT";
@@ -152,46 +154,53 @@ export interface SetP2PMessagesAction {
   type: typeof SET_MESSAGES;
   state: P2PMessageConversationState;
 }
-
-// not used
+export interface SetP2PReceiptsAction {
+  type: typeof SET_RECEIPTS;
+  state: { [key: string]: P2PMessageReceipt };
+}
 export interface SetP2PFilesAction {
   type: typeof SET_FILES;
   state: { [key: string]: Uint8Array };
 }
-
-// not used
 export interface SetP2PTypingAction {
   type: typeof SET_TYPING;
-  state: {
-    profile: Profile;
-    isTyping: boolean;
-  };
+  state: { [key: string]: Profile };
 }
-
-// not used
-export interface AppendP2PMessageAction {
-  type: typeof APPEND_MESSAGE;
-  state: {
-    message: P2PMessage;
-    receipt: P2PMessageReceipt;
-    file?: P2PFile;
-    key?: string;
-  };
-}
-
-// not used
-export interface AppendP2PMessageReceiptAction {
-  type: typeof APPEND_RECEIPT;
-  state: P2PMessageReceipt;
-}
-
 export interface SetP2PPinnedMessagesAction {
   type: typeof SET_PINNED;
-  state: {
-    conversant: string;
-    messages: { [key: string]: P2PMessage };
-  };
+  state: P2PMessageConversationState;
 }
+
+// export interface SetP2PTypingAction {
+//   type: typeof SET_TYPING;
+//   state: {
+//     profile: Profile;
+//     isTyping: boolean;
+//   };
+// }
+
+// export interface SetP2PPinnedMessagesAction {
+//   type: typeof SET_PINNED;
+//   state: {
+//     conversant: string;
+//     messages: { [key: string]: P2PMessage };
+//   };
+// }
+
+// export interface AppendP2PMessageAction {
+//   type: typeof APPEND_MESSAGE;
+//   state: {
+//     message: P2PMessage;
+//     receipt: P2PMessageReceipt;
+//     file?: P2PFile;
+//     key?: string;
+//   };
+// }
+
+// export interface AppendP2PMessageReceiptAction {
+//   type: typeof APPEND_RECEIPT;
+//   state: P2PMessageReceipt;
+// }
 
 export interface PinP2PMessageAction {
   type: typeof PIN_MESSAGE;
@@ -211,8 +220,9 @@ export interface UninP2PMessageAction {
 
 export type P2PMessageActionType =
   | SetP2PMessagesAction
-  | AppendP2PMessageAction
-  | AppendP2PMessageReceiptAction
+  | SetP2PReceiptsAction
+  // | AppendP2PMessageAction
+  // | AppendP2PMessageReceiptAction
   | SetP2PFilesAction
   | SetP2PTypingAction
   | PinP2PMessageAction

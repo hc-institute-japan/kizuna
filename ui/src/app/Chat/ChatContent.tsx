@@ -202,7 +202,6 @@ const Chat: React.FC = () => {
       when reaching the beginning/top of the chat box
     */
   const handleOnScrollTop = (complete: any) => {
-    // if (didMountRef2.current === true) {
     if (disableGetNextBatch === false) {
       let lastMessage = messagesWithConversant[0].message;
       dispatch(
@@ -221,10 +220,6 @@ const Chat: React.FC = () => {
         complete();
       });
     }
-    // } else {
-    // didMountRef2.current = true;
-    // }
-    // complete();
     return;
   };
 
