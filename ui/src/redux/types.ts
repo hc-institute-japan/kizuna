@@ -1,3 +1,4 @@
+import { HolochainClient, HoloClient } from "@holochain-open-dev/cell-client";
 import { AgentPubKey, CellId } from "@holochain/conductor-api";
 import { Action, AnyAction } from "redux";
 import { ThunkAction as Thunk, ThunkDispatch } from "redux-thunk";
@@ -19,6 +20,7 @@ interface HolochainConfig {
   getAgentId: () => Promise<AgentPubKey | null>;
   callZome: (config: CallZomeConfig) => Promise<any>;
   retry: (config: CallZomeConfig) => Promise<any>;
+  client: null | HolochainClient | HoloClient;
 }
 
 export type ThunkAction = Thunk<

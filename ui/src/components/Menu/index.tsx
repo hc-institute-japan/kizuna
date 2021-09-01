@@ -10,7 +10,7 @@ import {
 import { banOutline, cogOutline, logOutOutline } from "ionicons/icons";
 import React, { useRef } from "react";
 import { useIntl } from "react-intl";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { isHoloEnv } from "../../connection/constants";
 import { Profile } from "../../redux/profile/types";
@@ -18,6 +18,8 @@ import { RootState } from "../../redux/types";
 import Identicon from "../Identicon";
 import styles from "./style.module.css";
 import { client } from "../../connection/holochainClient";
+import { useAppDispatch } from "../../utils/helpers";
+import { logout } from "../../redux/profile/actions";
 
 interface MenuItem {
   onClick(): any;
@@ -29,7 +31,7 @@ interface MenuItem {
 const Menu: React.FC = () => {
   const history = useHistory();
   const { username, id } = useSelector((state: RootState) => state.profile);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const intl = useIntl();
   const menu = useRef<any>(null);
 
@@ -49,10 +51,11 @@ const Menu: React.FC = () => {
       icon: banOutline,
     },
     {
-      onClick: async () => {
-        let c = (client as any).connection;
-        c.signOut();
-        c.signIn();
+      onClick: () => {
+        // const c = (client as any).connection;
+        // await c.signOut();
+        // await c.signIn();
+        dispatch(logout());
         history.push("/");
       },
       label: intl.formatMessage({ id: "app.menu.logout-label" }),
