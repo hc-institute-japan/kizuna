@@ -7,13 +7,14 @@ import {
 import { store } from "../containers/ReduxContainer";
 import { handleSignal } from "../redux/signal/actions";
 import { CallZomeConfig } from "../redux/types";
+import { appId, appUrl, ENV } from "./constants";
 // @ts-ignore
 global.COMB = undefined;
 const { Connection } = require("@holo-host/web-sdk");
 // @ts-ignore
 window.COMB = require("@holo-host/comb").COMB;
 
-let client: null | HolochainClient | HoloClient = null;
+export let client: null | HolochainClient | HoloClient = null;
 
 let signalHandler: AppSignalCb = (signal) =>
   store?.dispatch(
@@ -24,6 +25,7 @@ const createClient = async (
   env: string
 ): Promise<HoloClient | HolochainClient | null> => {
   switch (env) {
+    case "HOLO":
     case "HCC": {
       const branding = {
         logo_url: "assets/icon/kizuna_logo.png",
@@ -31,22 +33,25 @@ const createClient = async (
       };
 
       const connection = new Connection(
-        `http://localhost:${process.env.REACT_APP_CHAPERONE_PORT}`,
+        appUrl(),
         // "http://localhost:24273",
         signalHandler,
         branding
       );
 
       await connection.ready();
-
       await connection.signIn();
 
-      const appInfo = await connection.appInfo(process.env.REACT_APP_APP_ID);
+      const appInfo = await connection.appInfo(appId());
+
+      if (!appInfo.cell_data)
+        throw new Error(`Holo appInfo() failed: ${JSON.stringify(appInfo)}`);
 
       const cellData = appInfo.cell_data[0];
 
       return new HoloClient(connection, cellData, branding);
     }
+    case "HCDEV":
     case "HC": {
       const appWs = await AppWebsocket.connect(
         process.env.REACT_APP_DNA_INTERFACE_URL as string,
@@ -69,11 +74,13 @@ const createClient = async (
 };
 
 const init: () => any = async () => {
+  console.log("running?");
   if (client) {
     return client;
   }
   try {
-    client = await createClient(process.env.REACT_APP_ENV as string);
+    console.log("is this even trying", ENV);
+    client = await createClient(ENV);
     return client;
 
     // const branding = {
