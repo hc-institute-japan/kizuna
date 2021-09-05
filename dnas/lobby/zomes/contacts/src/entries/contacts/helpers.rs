@@ -1,17 +1,16 @@
+use crate::utils::error;
 use hdk::prelude::*;
 use std::collections::{hash_map, HashMap};
-use crate::utils::error;
 
-use super::{
-    AgentPubKey,
-    AgentPubKeysWrapper,
-    Contact,
-    ContactType,
-};
+use super::{AgentPubKey, AgentPubKeysWrapper, Contact, ContactType};
 
-pub fn check_latest_state( agent_pubkeys: &AgentPubKeysWrapper, check_for: ContactType, ) -> ExternResult<()> {
-    let mut agents_to_contact_type: HashMap<AgentPubKey, Option<Contact>> = std::collections::HashMap::new();
-    let sorted_contacts:Vec<Contact> = query_contacts()?;
+pub fn check_latest_state(
+    agent_pubkeys: &AgentPubKeysWrapper,
+    check_for: ContactType,
+) -> ExternResult<()> {
+    let mut agents_to_contact_type: HashMap<AgentPubKey, Option<Contact>> =
+        std::collections::HashMap::new();
+    let sorted_contacts: Vec<Contact> = query_contacts()?;
 
     for agent in &agent_pubkeys.0 {
         let maybe_contacts = sorted_contacts
@@ -30,12 +29,12 @@ pub fn check_latest_state( agent_pubkeys: &AgentPubKeysWrapper, check_for: Conta
         // max_by_key() could be used which is more accurate but also expensive
         // NOTE: can break with breaking change on query
 
-            if maybe_contacts.get(0).is_some(){
-                let contact:Contact = maybe_contacts.get(0).unwrap().clone(); 
-                agents_to_contact_type.insert(agent.to_owned(), Some(contact));
-            }else{
-                agents_to_contact_type.insert(agent.to_owned(), None);
-            }
+        if maybe_contacts.get(0).is_some() {
+            let contact: Contact = maybe_contacts.get(0).unwrap().clone();
+            agents_to_contact_type.insert(agent.to_owned(), Some(contact));
+        } else {
+            agents_to_contact_type.insert(agent.to_owned(), None);
+        }
     }
 
     match check_for {
@@ -92,7 +91,6 @@ pub fn check_latest_state( agent_pubkeys: &AgentPubKeysWrapper, check_for: Conta
 }
 
 pub fn query_contacts() -> ExternResult<Vec<Contact>> {
-    
     let filter = QueryFilter::new()
         .entry_type(EntryType::App(AppEntryType::new(
             EntryDefIndex::from(0),
@@ -102,24 +100,29 @@ pub fn query_contacts() -> ExternResult<Vec<Contact>> {
         .include_entries(true)
         .header_type(HeaderType::Create);
 
-        let contacts:Vec<Contact> = query(filter)?
-            .into_iter()
-            .filter_map(|e| {
-                if let Ok(Some(contact)) = e.into_inner().1.to_app_option::<Contact>() {
-                    return Some(contact);
-                } else {
-                    None
-                }
-            })
-            .collect::<Vec<Contact>>();
+    let contacts: Vec<Contact> = query(filter)?
+        .into_iter()
+        .filter_map(|e| {
+            if let Ok(Some(contact)) = e.into_inner().1.to_app_option::<Contact>() {
+                return Some(contact);
+            } else {
+                None
+            }
+        })
+        .collect::<Vec<Contact>>();
 
-        Ok(contacts)
+    debug!("contacts query contacts {:?}", contacts.clone());
+    Ok(contacts)
 }
 
 pub fn list_added_or_blocked(filter: ContactType) -> ExternResult<AgentPubKeysWrapper> {
-    
-    let mut agents_to_contact_types: HashMap<AgentPubKey, Vec<Contact>> = std::collections::HashMap::new();
-    let sorted_contacts:Vec<Contact> = query_contacts()?;
+    let mut agents_to_contact_types: HashMap<AgentPubKey, Vec<Contact>> =
+        std::collections::HashMap::new();
+    let sorted_contacts: Vec<Contact> = query_contacts()?;
+    debug!(
+        "contacts list added or blocked sorted_contacts {:?}",
+        sorted_contacts.clone()
+    );
 
     for contact in sorted_contacts {
         for agent_id in &contact.agent_ids {
@@ -156,5 +159,6 @@ pub fn list_added_or_blocked(filter: ContactType) -> ExternResult<AgentPubKeysWr
         })
         .collect();
 
+    debug!("contacts list added or blocked {:?}", filtered_agents);
     Ok(AgentPubKeysWrapper(filtered_agents))
 }

@@ -215,7 +215,7 @@ const Chat: React.FC = () => {
         )
       ).then((res: P2PHashMap) => {
         // disable getNextBatch if return value is empty
-        if (Object.values(res)[0][conversant.id].length <= 0) {
+        if (res && Object.values(res)[0][conversant.id].length <= 0) {
           setDisableGetNextBatch(true);
         }
         complete();
