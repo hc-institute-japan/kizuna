@@ -34,7 +34,7 @@ pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<Gr
     let message = GroupMessage {
         group_hash: message_input.group_hash.clone(),
         payload,
-        created: to_timestamp(sys_time()?),
+        created: sys_time()?,
         sender: message_input.sender.clone(),
         reply_to: message_input.reply_to.clone(),
     };

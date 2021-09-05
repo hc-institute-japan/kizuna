@@ -1,23 +1,18 @@
 use hdk::prelude::*;
 
-mod utils;
 mod entries;
-use crate::utils::to_timestamp;
+mod utils;
+// use crate::utils::to_timestamp;
 
+use contacts::{AgentPubKeysWrapper, BooleanWrapper, Contact};
 use entries::contacts;
-use contacts::{
-    AgentPubKeysWrapper,
-    BooleanWrapper,
-    Contact
-};
 
-
-use contacts::list_added::list_added_handler;
-use contacts::in_blocked::in_blocked_handler;
-use contacts::in_contacts::in_contacts_handler;
-use contacts::list_blocked::list_blocked_handler;
 use contacts::add_contacts::add_contacts_handler;
 use contacts::block_contacts::block_contacts_handler;
+use contacts::in_blocked::in_blocked_handler;
+use contacts::in_contacts::in_contacts_handler;
+use contacts::list_added::list_added_handler;
+use contacts::list_blocked::list_blocked_handler;
 use contacts::remove_contacts::remove_contacts_handler;
 use contacts::unblock_contacts::unblock_contacts_handler;
 
@@ -62,9 +57,3 @@ fn in_contacts(agent_pubkey: AgentPubKey) -> ExternResult<BooleanWrapper> {
 fn in_blocked(agent_pubkey: AgentPubKey) -> ExternResult<BooleanWrapper> {
     return in_blocked_handler(agent_pubkey);
 }
-
-
-
-
-
-

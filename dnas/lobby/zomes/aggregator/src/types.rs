@@ -5,7 +5,7 @@ use std::collections::{hash_map::HashMap, BTreeMap};
 use std::time::SystemTime;
 
 // for contacts
-#[derive(Deserialize, Serialize, SerializedBytes, Debug)]
+#[derive(Deserialize, Serialize, SerializedBytes, Debug, Clone)]
 pub struct AgentPubKeys(pub Vec<AgentPubKey>);
 
 // for profiles
@@ -163,6 +163,7 @@ pub struct AgentMessages(HashMap<String, Vec<String>>);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Debug)]
 pub struct MessageBundle(P2PMessageData, Vec<String>);
+
 #[derive(Serialize, Deserialize, SerializedBytes, Debug)]
 pub struct MessageContents(HashMap<String, MessageBundle>);
 

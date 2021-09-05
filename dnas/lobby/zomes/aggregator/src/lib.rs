@@ -29,6 +29,8 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
     let added_contacts: AgentPubKeys =
         call_response_handler(added_contacts_call_response)?.decode()?;
 
+    debug!("aggregator added contacts {:?}", added_contacts);
+
     let added_profiles_call_response: ZomeCallResponse = call(
         None,
         "profiles".into(),
@@ -38,6 +40,8 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
     )?;
     let added_profiles: Vec<AgentProfile> =
         call_response_handler(added_profiles_call_response)?.decode()?;
+
+    debug!("aggregator added profiles {:?}", added_profiles.clone());
 
     /* profiles */
     let user_info_call_response: ZomeCallResponse =
@@ -80,7 +84,6 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
         None,
         &batch_size,
     )?;
-
     let latest_group_messages: GroupMessagesOutput =
         call_response_handler(latest_group_messages_call_response)?.decode()?;
 
@@ -139,6 +142,8 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
         per_group_preference,
     };
 
+    debug!("aggregator data {:?}", aggregated_data);
+
     Ok(aggregated_data)
 }
 
@@ -155,6 +160,11 @@ fn call_response_handler(call_response: ZomeCallResponse) -> ExternResult<Extern
         ZomeCallResponse::NetworkError(error) => {
             return Err(WasmError::Guest(
                 String::from("network error : ") + error.as_ref(),
+            ));
+        }
+        ZomeCallResponse::CountersigningSession(error) => {
+            return Err(WasmError::Guest(
+                String::from("countersigning error : ") + error.as_ref(),
             ));
         }
     }

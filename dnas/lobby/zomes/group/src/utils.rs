@@ -60,6 +60,11 @@ pub fn call_response_handler(call_response: ZomeCallResponse) -> ExternResult<Ex
                 String::from("Network Error : ") + error.as_ref(),
             ));
         }
+        ZomeCallResponse::CountersigningSession(error) => {
+            return Err(WasmError::Guest(
+                String::from("countersigning error : ") + error.as_ref(),
+            ));
+        }
     }
 }
 

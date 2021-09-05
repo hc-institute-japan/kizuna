@@ -14,7 +14,7 @@ pub mod unblock_contacts;
 #[derive(Deserialize, Serialize, SerializedBytes, Debug)]
 pub struct BooleanWrapper(pub bool);
 
-#[derive(Deserialize, Serialize, SerializedBytes, Debug)]
+#[derive(Deserialize, Serialize, SerializedBytes, Debug, Clone)]
 pub struct AgentPubKeysWrapper(pub Vec<AgentPubKey>);
 
 #[derive(Clone, Deserialize, PartialEq, Serialize, SerializedBytes, Debug)]

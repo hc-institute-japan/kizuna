@@ -31,6 +31,7 @@
     "cordova-plugin-file-transfer": "^1.7.1",
     "dotenv": "^10.0.0",
     "ionicons": "^5.0.0",
+    "node-pre-gyp": "^0.17.0",
     "path": "^0.12.7",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
@@ -42,6 +43,8 @@
     "redux": "^4.0.5",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
+    "sqlite": "^4.0.23",
+    "sqlite3": "^5.0.2",
     "tsutils": "^3.20.0",
     "typescript": "^3.8.3"
   },

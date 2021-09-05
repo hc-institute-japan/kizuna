@@ -28,6 +28,7 @@ export const getLatestData =
     /* assume that getAgentId() is non-nullable */
     const myAgentIdB64 = serializeHash(myAgentId!);
 
+    console.log("ui latest data", latestData);
     dispatch<ProfileActionTypes>({
       type: SET_PROFILE,
       id: myAgentIdB64,
@@ -43,13 +44,14 @@ export const getLatestData =
         username: agentProfile.profile.nickname,
       };
     });
-    latestData.blockedContacts.forEach((agentProfile: any) => {
-      const agentId = agentProfile.agentPubKey;
-      blocked[agentId] = {
-        id: agentId,
-        username: agentProfile.profile.nickname,
-      };
-    });
+    if (latestData.blockedContacts)
+      latestData.blockedContacts.forEach((agentProfile: any) => {
+        const agentId = agentProfile.agentPubKey;
+        blocked[agentId] = {
+          id: agentId,
+          username: agentProfile.profile.nickname,
+        };
+      });
 
     dispatch({
       type: SET_CONTACTS,
