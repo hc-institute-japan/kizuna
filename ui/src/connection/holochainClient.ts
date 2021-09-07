@@ -74,7 +74,6 @@ const createClient = async (
 };
 
 const init: () => any = async () => {
-  console.log("running?");
   if (client) {
     return client;
   }
