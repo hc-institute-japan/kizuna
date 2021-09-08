@@ -33,7 +33,9 @@ const createClient = async (
       };
 
       const connection = new Connection(
-        appUrl(),
+        process.env.NODE_ENV === "production"
+          ? "https://devnet-chaperone.holo.host"
+          : appUrl(),
         // "http://localhost:24273",
         signalHandler,
         branding
@@ -48,6 +50,14 @@ const createClient = async (
         throw new Error(`Holo appInfo() failed: ${JSON.stringify(appInfo)}`);
 
       const cellData = appInfo.cell_data[0];
+
+      // TODO: remove this when chaperone is fixed
+      if (!(cellData.cell_id[0] instanceof Uint8Array)) {
+        cellData.cell_id = [
+          new Uint8Array((cellData.cell_id[0] as any).data),
+          new Uint8Array((cellData.cell_id[1] as any).data),
+        ] as any;
+      }
 
       return new HoloClient(connection, cellData, branding);
     }
@@ -78,31 +88,11 @@ const init: () => any = async () => {
     return client;
   }
   try {
-    console.log("is this even trying", ENV);
+    console.log("ENV : ", ENV);
+    console.log(process.env.NODE_ENV);
     client = await createClient(ENV);
+    console.log("ENV : ", client);
     return client;
-
-    // const branding = {
-    //   app_name: "kizuna_test",
-    // };
-
-    // const connection = new Connection(
-    //   "http://localhost:24273",
-    //   signalHandler,
-    //   branding
-    // );
-
-    // await connection.ready();
-
-    // await connection.signIn();
-
-    // const appInfo = await connection.appInfo(
-    //   "uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL"
-    // );
-
-    // const cellData = appInfo.cell_data[0];
-
-    // client = new HoloClient(connection, cellData, branding);
   } catch (error) {
     Object.values(error).forEach((e) => console.error(e));
     console.error(error);
