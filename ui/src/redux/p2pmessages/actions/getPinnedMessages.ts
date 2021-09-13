@@ -9,10 +9,6 @@ import { transformZomeDataToUIData } from "./helpers/transformZomeDateToUIData";
 export const getPinnedMessages =
   (conversant: AgentPubKeyBase64): ThunkAction =>
   async (dispatch, getState, { callZome }) => {
-    const zome_input = {
-      conversant: Buffer.from(deserializeHash(conversant)),
-    };
-
     try {
       // CALL ZOME
       const pinnedMessages = await callZome({

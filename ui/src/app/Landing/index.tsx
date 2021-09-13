@@ -4,11 +4,10 @@ import {
   IonImg,
   IonPage,
   IonRouterLink,
-  IonText,
 } from "@ionic/react";
 import React from "react";
-import styles from "./style.module.css";
 import { FormattedMessage } from "react-intl";
+import styles from "./style.module.css";
 
 const Landing: React.FC = () => (
   <IonPage>

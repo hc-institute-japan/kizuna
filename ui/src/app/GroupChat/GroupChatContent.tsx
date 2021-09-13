@@ -1,6 +1,5 @@
 import { IonContent, IonLoading, IonPage } from "@ionic/react";
 import React, { useEffect, useRef, useState } from "react";
-import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router";
 // Components
@@ -33,7 +32,6 @@ interface GroupChatParams {
 
 const GroupChat: React.FC = () => {
   const dispatch = useAppDispatch();
-  const intl = useIntl();
   const { group } = useParams<GroupChatParams>();
 
   /* local states */

@@ -11,6 +11,7 @@ import { isTextPayload } from "../../../utils/helpers";
 import styles from "./style.module.css";
 
 interface Props {
+  me: boolean;
   message: {
     payload: Payload;
     author: Profile;
@@ -18,14 +19,18 @@ interface Props {
   };
 }
 
-const ReplyTo: React.FC<Props> = ({ message }) => {
+const ReplyTo: React.FC<Props> = ({ me, message }) => {
   const isText = isTextPayload(message?.payload);
   const decoder = new TextDecoder();
   const className = [`${styles["reply-to"]}`];
 
   return (
     <div className={className.join(" ")}>
-      <div className={`${styles["vertical-divider"]} ion-margin-end`}></div>
+      <div
+        className={`${
+          me ? styles["vertical-divider-me"] : styles["vertical-divider-others"]
+        } ion-margin-end`}
+      ></div>
       {isText ? null : (message.payload as FilePayload)?.fileType ===
         "OTHER" ? (
         <IonIcon className="ion-margin-end" icon={documentOutline}></IonIcon>
@@ -45,7 +50,9 @@ const ReplyTo: React.FC<Props> = ({ message }) => {
           ></img>
         </IonThumbnail>
       )}
-      <div className={`${styles.content}`}>
+      <div
+        className={`${me ? styles["content-me"] : styles["content-others"]}`}
+      >
         <IonLabel>{message?.author.username}</IonLabel>
         <p className={styles["sub-label"]}>
           {isText

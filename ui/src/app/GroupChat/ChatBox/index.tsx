@@ -5,21 +5,19 @@ import Chat from "../../../components/Chat";
 import { ChatListMethods } from "../../../components/Chat/types";
 import { FilePayload, Payload } from "../../../redux/commons/types";
 import {
+  fetchFilesBytes,
   getMessagesWithProfile,
   getPreviousGroupMessages,
+  readGroupMessage,
 } from "../../../redux/group/actions";
-import { readGroupMessage } from "../../../redux/group/actions";
-import { fetchFilesBytes } from "../../../redux/group/actions";
 import { pinMessage } from "../../../redux/group/actions/pinMessage";
 import { unpinMessage } from "../../../redux/group/actions/unpinMessage";
 // Redux
 import {
-  GroupMessage,
   GroupMessageBundle,
   GroupMessageReadData,
   GroupMessagesOutput,
 } from "../../../redux/group/types";
-import { Profile } from "../../../redux/profile/types";
 import { RootState } from "../../../redux/types";
 import { useAppDispatch } from "../../../utils/helpers";
 

@@ -125,12 +125,12 @@ const ChatHeader: React.FC<Props> = ({
       state: { profile: { username, id } },
     });
 
-  const handleOnClick = () => {
-    history.push({
-      pathname: `${pathname}/details`,
-      state: { conversant },
-    });
-  };
+  // const handleOnClick = () => {
+  //   history.push({
+  //     pathname: `${pathname}/details`,
+  //     state: { conversant },
+  //   });
+  // };
 
   return (
     <IonHeader>
