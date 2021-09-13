@@ -66,7 +66,7 @@ const Me: React.FC<ChatProps> = ({
             common.bubble
           }`}
         >
-          {replyTo ? <ReplyTo message={replyTo}></ReplyTo> : null}
+          {replyTo ? <ReplyTo me={true} message={replyTo}></ReplyTo> : null}
           {isText ? (
             <Text type="me" message={payload as TextPayload} />
           ) : (

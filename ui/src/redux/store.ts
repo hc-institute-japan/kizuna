@@ -22,8 +22,8 @@ const createStore = (args?: Object) => {
   return create(
     rootReducer,
     applyMiddleware(
-      modifiedThunk as ThunkMiddleware<RootState, AnyAction>
-      // logger
+      modifiedThunk as ThunkMiddleware<RootState, AnyAction>,
+      logger
     )
   );
 };

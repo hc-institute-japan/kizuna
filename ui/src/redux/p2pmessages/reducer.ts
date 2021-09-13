@@ -1,15 +1,14 @@
 import {
-  P2PConversation,
-  P2PMessageActionType,
-  P2PMessageConversationState,
-  SET_MESSAGES,
   APPEND_MESSAGE,
   APPEND_RECEIPT,
-  SET_FILES,
-  SET_TYPING,
+  P2PMessageActionType,
+  P2PMessageConversationState,
   PIN_MESSAGE,
-  UNPIN_MESSAGE,
+  SET_FILES,
+  SET_MESSAGES,
   SET_PINNED,
+  SET_TYPING,
+  UNPIN_MESSAGE,
 } from "./types";
 
 const initialState: P2PMessageConversationState = {

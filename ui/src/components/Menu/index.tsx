@@ -15,6 +15,7 @@ import { useHistory } from "react-router-dom";
 import { isHoloEnv } from "../../connection/constants";
 import { Profile } from "../../redux/profile/types";
 import { RootState } from "../../redux/types";
+import { useAppDispatch } from "../../utils/helpers";
 import Identicon from "../Identicon";
 import styles from "./style.module.css";
 import { client } from "../../connection/holochainClient";

@@ -24,6 +24,7 @@ const ChatPinnedMessage: React.FC = () => {
 
   useEffect(() => {
     dispatch(getPinnedMessages(id));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const messages: any[] = useSelector(

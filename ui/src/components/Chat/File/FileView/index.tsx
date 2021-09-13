@@ -60,7 +60,7 @@ const File: React.FC<Props> = ({ file, onDownload, darken = false }) => {
             </IonLabel>
           </IonRow>
           <IonRow>
-            <IonText>
+            <IonText className={styles["file-size"]}>
               <span>{renderSize()}</span>
             </IonText>
           </IonRow>
