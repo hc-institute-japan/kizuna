@@ -12,8 +12,7 @@ import React, { useRef } from "react";
 import { useIntl } from "react-intl";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { isHoloEnv } from "../../connection/constants";
-import { logout } from "../../redux/profile/actions";
+import { setProfile } from "../../redux/profile/actions";
 import { Profile } from "../../redux/profile/types";
 import { RootState } from "../../redux/types";
 import { useAppDispatch } from "../../utils/helpers";
@@ -29,7 +28,7 @@ interface MenuItem {
 const Menu: React.FC = () => {
   const history = useHistory();
   const { username, id } = useSelector((state: RootState) => state.profile);
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
   const intl = useIntl();
   const menu = useRef<any>(null);
 
