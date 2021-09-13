@@ -49,8 +49,11 @@ const Menu: React.FC = () => {
     },
     {
       onClick: () => {
-        dispatch(setProfile(null));
-        history.push("/");
+        // const c = (client as any).connection;
+        // await c.signOut();
+        // await c.signIn();
+        dispatch(logout());
+        // history.push("/");
       },
       label: intl.formatMessage({ id: "app.menu.logout-label" }),
       icon: logOutOutline,
