@@ -1,6 +1,5 @@
 import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
 import { CombinedState } from "redux";
-import { retry } from "../../../connection/holochainClient";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
 import { timestampToDate } from "../../../utils/helpers";
 import {
@@ -170,7 +169,11 @@ const setGroupMessage = async (
 
 const sendGroupMessage =
   (groupMessageData: GroupMessageInput): ThunkAction =>
-  async (dispatch, getState, { callZome }): Promise<GroupMessage | false> => {
+  async (
+    dispatch,
+    getState,
+    { callZome, retry }
+  ): Promise<GroupMessage | false> => {
     if (isTextPayload(groupMessageData.payloadInput)) {
       let message = groupMessageData.payloadInput.payload.payload;
       /* input sanitization for text payload */
