@@ -55,7 +55,6 @@ const Menu: React.FC = () => {
         // await c.signOut();
         // await c.signIn();
         dispatch(logout());
-        history.push("/");
       },
       label: intl.formatMessage({ id: "app.menu.logout-label" }),
       icon: logOutOutline,

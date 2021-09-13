@@ -116,6 +116,17 @@ checksum = "245097e9a4535ee1e3e3931fcfcd55a796a44c643e8596ff6566d68f09b87bbc"
 name = "contacts"
 version = "0.0.1"
 dependencies = [
+ "contacts 0.0.1 (git+https://github.com/holochain-open-dev/contacts?branch=main)",
+ "derive_more",
+ "hdk",
+ "serde",
+]
+
+[[package]]
+name = "contacts"
+version = "0.0.1"
+source = "git+https://github.com/holochain-open-dev/contacts?branch=main#84eb9bdfaf6cae32d1e6fba971e9552ce61d85c0"
+dependencies = [
  "derive_more",
  "hdk",
  "serde",

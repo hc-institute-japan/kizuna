@@ -1,4 +1,6 @@
 import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
+import { CombinedState } from "redux";
+import { retry } from "../../../connection/holochainClient";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
 import { timestampToDate } from "../../../utils/helpers";
 import {
@@ -10,11 +12,18 @@ import {
   isTextPayload,
   Payload,
 } from "../../commons/types";
+import { ContactsState } from "../../contacts/types";
 import { pushError } from "../../error/actions";
-import { ThunkAction } from "../../types";
+import { ErrorState } from "../../error/types";
+import { LanguageState } from "../../language/types";
+import { P2PMessageConversationState } from "../../p2pmessages/types";
+import { PreferenceState } from "../../preference/types";
+import { ProfileState } from "../../profile/types";
+import { CallZomeConfig, ThunkAction } from "../../types";
 import { setFilesBytes } from "../actions";
 import {
   GroupConversation,
+  GroupConversationsState,
   GroupMessage,
   // IO
   GroupMessageInput,
@@ -23,6 +32,141 @@ import {
   // action types
   SET_GROUP_MESSAGE,
 } from "../types";
+
+const setGroupMessage = async (
+  sendGroupMessageOutput: any,
+  groupMessageData: GroupMessageInput,
+  callZome: (config: CallZomeConfig) => Promise<any>,
+  getState: () => CombinedState<{
+    profile: ProfileState;
+    contacts: ContactsState;
+    preference: PreferenceState;
+    groups: GroupConversationsState;
+    p2pmessages: P2PMessageConversationState;
+    language: LanguageState;
+    error: ErrorState;
+  }>,
+  dispatch: any
+) => {
+  let payload: Payload;
+  let fileBytes: Uint8Array | undefined;
+
+  /* convert the payload returned from HC to UI appropriate payload type */
+  if (isTextPayload(groupMessageData.payloadInput)) {
+    payload = sendGroupMessageOutput.content.payload;
+  } else {
+    let fileType: FileType =
+      sendGroupMessageOutput.content.payload.payload.fileType;
+    /* set the thumbnail if the file type is either a media or video */
+    let thumbnail: Uint8Array | undefined = isOther(fileType)
+      ? undefined
+      : isImage(fileType)
+      ? fileType.payload.thumbnail
+      : fileType.payload.thumbnail;
+    fileBytes = groupMessageData.payloadInput.payload.fileBytes;
+    if (fileType.type === "VIDEO") {
+      const fetchedFileBytes = await callZome({
+        zomeName: ZOMES.GROUP,
+        fnName: FUNCTIONS[ZOMES.GROUP].GET_FILES_BYTES,
+        payload: [
+          sendGroupMessageOutput.content.payload.payload.metadata.fileHash,
+        ],
+      });
+
+      if (fetchedFileBytes?.type !== "error") {
+        dispatch(setFilesBytes({ ...fetchedFileBytes }));
+      }
+    }
+    const filePayload: FilePayload = {
+      type: "FILE",
+      fileName:
+        sendGroupMessageOutput.content.payload.payload.metadata.fileName,
+      fileSize:
+        sendGroupMessageOutput.content.payload.payload.metadata.fileSize,
+      fileType:
+        sendGroupMessageOutput.content.payload.payload.metadata.fileType,
+      fileHash: serializeHash(
+        sendGroupMessageOutput.content.payload.payload.metadata.fileHash
+      ),
+      thumbnail,
+    };
+    payload = filePayload;
+  }
+  const message = sendGroupMessageOutput.content.replyTo
+    ? getState().groups.messages[
+        serializeHash(sendGroupMessageOutput.content.replyTo)
+      ]
+    : null;
+
+  /* the final GroupMessage data type converted from the returned value of the Zome fn above */
+  const groupMessageDataConverted: GroupMessage = {
+    groupMessageId: serializeHash(sendGroupMessageOutput.id),
+    groupId: serializeHash(sendGroupMessageOutput.content.groupHash),
+    author: serializeHash(sendGroupMessageOutput.content.sender),
+    payload,
+    timestamp: timestampToDate(sendGroupMessageOutput.content.created),
+    replyTo: message
+      ? {
+          groupId: message.groupId,
+          author: message.author,
+          payload: message.payload,
+          timestamp: message.timestamp,
+          /*
+            TODO: currently undefined but we will have to modify this once jumping
+            to replied message will be possible.
+          */
+          replyTo: undefined,
+          readList: {},
+        }
+      : undefined,
+    readList: {},
+  };
+
+  const groupId: string = groupMessageDataConverted.groupId;
+  const groupMessageId: string = groupMessageDataConverted.groupMessageId;
+  const groupConversation = getState().groups.conversations[groupId];
+
+  const messageIds = [
+    groupMessageDataConverted.groupMessageId,
+    ...groupConversation.messages,
+  ];
+  const newMessage: { [key: string]: GroupMessage } = {
+    [groupMessageId]: groupMessageDataConverted,
+  };
+  let messages = getState().groups.messages;
+  messages = {
+    ...messages,
+    ...newMessage,
+  };
+
+  let groupFiles = getState().groups.groupFiles;
+  if (!isTextPayload(groupMessageDataConverted.payload)) {
+    // work with file payload
+    const newFile: { [key: string]: Uint8Array } = {
+      [groupMessageDataConverted.payload.fileHash]: fileBytes!,
+    };
+    groupFiles = {
+      ...groupFiles,
+      ...newFile,
+    };
+  }
+
+  const conversations: {
+    [key: string]: GroupConversation;
+  } = {
+    ...getState().groups.conversations,
+    [groupId]: { ...groupConversation, messages: messageIds },
+  };
+
+  dispatch({
+    type: SET_GROUP_MESSAGE,
+    conversations,
+    messages,
+    groupFiles,
+  });
+
+  return groupMessageDataConverted;
+};
 
 const sendGroupMessage =
   (groupMessageData: GroupMessageInput): ThunkAction =>
@@ -43,133 +187,19 @@ const sendGroupMessage =
         : undefined,
     };
 
-    const state = getState();
-
     try {
       const sendGroupMessageOutput = await callZome({
         zomeName: ZOMES.GROUP,
         fnName: FUNCTIONS[ZOMES.GROUP].SEND_MESSAGE,
         payload: input,
       });
-
-      let payload: Payload;
-      let fileBytes: Uint8Array | undefined;
-
-      /* convert the payload returned from HC to UI appropriate payload type */
-      if (isTextPayload(groupMessageData.payloadInput)) {
-        payload = sendGroupMessageOutput.content.payload;
-      } else {
-        let fileType: FileType =
-          sendGroupMessageOutput.content.payload.payload.fileType;
-        /* set the thumbnail if the file type is either a media or video */
-        let thumbnail: Uint8Array | undefined = isOther(fileType)
-          ? undefined
-          : isImage(fileType)
-          ? fileType.payload.thumbnail
-          : fileType.payload.thumbnail;
-        fileBytes = groupMessageData.payloadInput.payload.fileBytes;
-        if (fileType.type === "VIDEO") {
-          const fetchedFileBytes = await callZome({
-            zomeName: ZOMES.GROUP,
-            fnName: FUNCTIONS[ZOMES.GROUP].GET_FILES_BYTES,
-            payload: [
-              sendGroupMessageOutput.content.payload.payload.metadata.fileHash,
-            ],
-          });
-
-          if (fetchedFileBytes?.type !== "error") {
-            dispatch(setFilesBytes({ ...fetchedFileBytes }));
-          }
-        }
-        const filePayload: FilePayload = {
-          type: "FILE",
-          fileName:
-            sendGroupMessageOutput.content.payload.payload.metadata.fileName,
-          fileSize:
-            sendGroupMessageOutput.content.payload.payload.metadata.fileSize,
-          fileType:
-            sendGroupMessageOutput.content.payload.payload.metadata.fileType,
-          fileHash: serializeHash(
-            sendGroupMessageOutput.content.payload.payload.metadata.fileHash
-          ),
-          thumbnail,
-        };
-        payload = filePayload;
-      }
-      const message = sendGroupMessageOutput.content.replyTo
-        ? getState().groups.messages[
-            serializeHash(sendGroupMessageOutput.content.replyTo)
-          ]
-        : null;
-
-      /* the final GroupMessage data type converted from the returned value of the Zome fn above */
-      const groupMessageDataConverted: GroupMessage = {
-        groupMessageId: serializeHash(sendGroupMessageOutput.id),
-        groupId: serializeHash(sendGroupMessageOutput.content.groupHash),
-        author: serializeHash(sendGroupMessageOutput.content.sender),
-        payload,
-        timestamp: timestampToDate(sendGroupMessageOutput.content.created),
-        replyTo: message
-          ? {
-              groupId: message.groupId,
-              author: message.author,
-              payload: message.payload,
-              timestamp: message.timestamp,
-              /*
-                TODO: currently undefined but we will have to modify this once jumping
-                to replied message will be possible.
-              */
-              replyTo: undefined,
-              readList: {},
-            }
-          : undefined,
-        readList: {},
-      };
-
-      const groupId: string = groupMessageDataConverted.groupId;
-      const groupMessageId: string = groupMessageDataConverted.groupMessageId;
-      const groupConversation = state.groups.conversations[groupId];
-
-      const messageIds = [
-        groupMessageDataConverted.groupMessageId,
-        ...groupConversation.messages,
-      ];
-      const newMessage: { [key: string]: GroupMessage } = {
-        [groupMessageId]: groupMessageDataConverted,
-      };
-      let messages = state.groups.messages;
-      messages = {
-        ...messages,
-        ...newMessage,
-      };
-
-      let groupFiles = state.groups.groupFiles;
-      if (!isTextPayload(groupMessageDataConverted.payload)) {
-        // work with file payload
-        const newFile: { [key: string]: Uint8Array } = {
-          [groupMessageDataConverted.payload.fileHash]: fileBytes!,
-        };
-        groupFiles = {
-          ...groupFiles,
-          ...newFile,
-        };
-      }
-
-      const conversations: {
-        [key: string]: GroupConversation;
-      } = {
-        ...state.groups.conversations,
-        [groupId]: { ...groupConversation, messages: messageIds },
-      };
-
-      dispatch<SetGroupMessageAction>({
-        type: SET_GROUP_MESSAGE,
-        conversations,
-        messages,
-        groupFiles,
-      });
-
-      return groupMessageDataConverted;
+      return await setGroupMessage(
+        sendGroupMessageOutput,
+        groupMessageData,
+        callZome,
+        getState,
+        dispatch
+      );
     } catch (e) {
       if (e.message.includes("failed to get the given group id")) {
         dispatch(
@@ -187,11 +217,26 @@ const sendGroupMessage =
           )
         );
       } else {
-        /* 
-          This is the error other than what we defiend in Guest.
-          See connection/holochainClient.ts callZome() for more info.
-        */
-        dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
+        try {
+          const sendGroupMessageOutput = retry({
+            zomeName: ZOMES.GROUP,
+            fnName: FUNCTIONS[ZOMES.GROUP].SEND_MESSAGE,
+            payload: input,
+          });
+          return await setGroupMessage(
+            sendGroupMessageOutput,
+            groupMessageData,
+            callZome,
+            getState,
+            dispatch
+          );
+        } catch (e) {
+          /* 
+            This is the error other than what we defiend in Guest.
+            See connection/holochainClient.ts callZome() for more info.
+          */
+          dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
+        }
       }
     }
     return false;

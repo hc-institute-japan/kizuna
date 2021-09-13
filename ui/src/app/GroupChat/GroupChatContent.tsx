@@ -16,11 +16,7 @@ import {
   sendGroupMessage,
 } from "../../redux/group/actions";
 import { fetchPinnedMessages } from "../../redux/group/actions/fetchPinnedMessages";
-import {
-  GroupConversation,
-  GroupMessage,
-  GroupMessageInput,
-} from "../../redux/group/types";
+import { GroupConversation, GroupMessageInput } from "../../redux/group/types";
 import { RootState } from "../../redux/types";
 import { useAppDispatch } from "../../utils/helpers";
 import ChatBox from "./ChatBox";
@@ -66,14 +62,15 @@ const GroupChat: React.FC = () => {
   /* handles sending of messages. */
   const handleOnSend = (opt?: MessageInputOnSendParams) => {
     const { reply, setIsLoading } = { ...opt };
-    let inputs: GroupMessageInput[] = [];
+    let text: GroupMessageInput | null = null;
+    let file: GroupMessageInput | null = null;
     setIsLoading!(true);
     /*
       append text payload at index 0 and send it first
       for performance purposes
     */
     if (message.length) {
-      inputs.push({
+      text = {
         groupId: groupData!.originalGroupId,
         payloadInput: {
           type: "TEXT",
@@ -82,43 +79,47 @@ const GroupChat: React.FC = () => {
         sender: myProfile.id!,
         // TODO: handle replying to message here as well
         replyTo: reply,
-      });
+      };
     }
 
     if (files.length) {
-      files.forEach((file: any) => {
-        const filePayloadInput: FilePayloadInput = {
-          type: "FILE",
-          payload: {
-            metadata: {
-              fileName: file.metadata.fileName,
-              fileSize: file.metadata.fileSize,
-              fileType: file.metadata.fileType,
-            },
-            fileType: file.fileType,
-            fileBytes: file.fileBytes,
+      // TODO: change when uploading of multiple files is allowed
+      const filePayload: any = files[0];
+      const filePayloadInput: FilePayloadInput = {
+        type: "FILE",
+        payload: {
+          metadata: {
+            fileName: filePayload.metadata.fileName,
+            fileSize: filePayload.metadata.fileSize,
+            fileType: filePayload.metadata.fileType,
           },
-        };
-        const groupMessage: GroupMessageInput = {
-          /* groupData is non-nullable once the page renders */
-          groupId: groupData!.originalGroupId,
-          payloadInput: filePayloadInput,
-          sender: myProfile.id!,
-          // TODO: handle replying to message here as well
-          replyTo: reply,
-        };
-        inputs.push(groupMessage);
-      });
+          fileType: filePayload.fileType,
+          fileBytes: filePayload.fileBytes,
+        },
+      };
+      file = {
+        /* groupData is non-nullable once the page renders */
+        groupId: groupData!.originalGroupId,
+        payloadInput: filePayloadInput,
+        sender: myProfile.id!,
+        // TODO: handle replying to message here as well
+        replyTo: reply,
+      };
     }
 
-    const messagePromises = inputs.map((groupMessage: GroupMessageInput) =>
-      dispatch(sendGroupMessage(groupMessage))
-    );
-
-    Promise.all(messagePromises).then((sentMessages: GroupMessage[]) => {
+    if (text) {
+      dispatch(sendGroupMessage(text)).then((res: any) => {
+        if (file) {
+          dispatch(sendGroupMessage(file));
+          setIsLoading!(false);
+          chatList.current!.scrollToBottom();
+        }
+      });
+    } else if (file) {
+      dispatch(sendGroupMessage(file));
       setIsLoading!(false);
       chatList.current!.scrollToBottom();
-    });
+    }
   };
 
   /* 
