@@ -13,14 +13,12 @@ import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { isHoloEnv } from "../../connection/constants";
+import { logout } from "../../redux/profile/actions";
 import { Profile } from "../../redux/profile/types";
 import { RootState } from "../../redux/types";
 import { useAppDispatch } from "../../utils/helpers";
 import Identicon from "../Identicon";
 import styles from "./style.module.css";
-import { client } from "../../connection/holochainClient";
-import { useAppDispatch } from "../../utils/helpers";
-import { logout } from "../../redux/profile/actions";
 
 interface MenuItem {
   onClick(): any;
