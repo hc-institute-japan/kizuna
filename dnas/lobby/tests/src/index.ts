@@ -35,8 +35,8 @@ const installables: Installables = {
   three: install3Agents,
 };
 
-// group(config, installables);
-// preference(config, installables);
-// aggregator(config, installables);
+group(config, installables);
 contacts(config, installables);
+preference(config, installables);
+aggregator(config, installables);
 // request(config); // not passing
