@@ -33,6 +33,7 @@ const GroupPinnedMessages: React.FC = () => {
 
   useEffect(() => {
     dispatch(getPinnedMessages(group)).then((res: any) => setData(res));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversation, pinnedMesssages]);
 
   return (

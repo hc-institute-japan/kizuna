@@ -6,8 +6,12 @@
   word-break: break-all;
 }
 
+.file-size {
+  color: var(--ion-color-dark-tint);
+}
+
 .file-icon-dark {
-  color: var(--ion-color-medium);
+  color: var(--ion-color-dark-tint);
 }
 
 .file-icon-light {

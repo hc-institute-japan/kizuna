@@ -1,7 +1,7 @@
 import { IonContent, IonPage } from "@ionic/react";
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
-import { useHistory, useLocation, useParams } from "react-router";
+import { useLocation, useParams } from "react-router";
 import { ChatList, Me, Others } from "../../components/Chat";
 import { ChatListMethods } from "../../components/Chat/types";
 import Typing from "../../components/Chat/Typing";
@@ -14,8 +14,8 @@ import { fetchMyContacts } from "../../redux/contacts/actions";
 import { getFileBytes } from "../../redux/p2pmessages/actions/getFileBytes";
 import { getNextBatchMessages } from "../../redux/p2pmessages/actions/getNextBatchMessages";
 import { getPinnedMessages } from "../../redux/p2pmessages/actions/getPinnedMessages";
-import { isTyping } from "../../redux/p2pmessages/actions/isTyping";
 import { getP2PState } from "../../redux/p2pmessages/actions/helpers/getP2PState";
+import { isTyping } from "../../redux/p2pmessages/actions/isTyping";
 // type imports
 import { pinMessage } from "../../redux/p2pmessages/actions/pinMessage";
 import { readMessage } from "../../redux/p2pmessages/actions/readMessage";
@@ -51,6 +51,7 @@ const Chat: React.FC = () => {
 
   useEffect(() => {
     dispatch(getPinnedMessages(id));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const typing = useSelector((state: RootState) => {
@@ -87,7 +88,7 @@ const Chat: React.FC = () => {
   /* REFS */
   const scrollerRef = useRef<ChatListMethods>(null);
   const didMountRef = useRef(false);
-  const didMountRef2 = useRef(false);
+  // const didMountRef2 = useRef(false);
   const inputTimeout = useRef<NodeJS.Timeout>();
   const messageInputRef = useRef<MessageInputMethods | null>(null);
 

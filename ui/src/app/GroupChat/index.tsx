@@ -1,5 +1,4 @@
 import React from "react";
-import { IonRouterOutlet } from "@ionic/react";
 import { Route, Switch } from "react-router";
 import GroupChatContent from "./GroupChatContent";
 import GroupChatDetails from "./GroupChatDetails";
