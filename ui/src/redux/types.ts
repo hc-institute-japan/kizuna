@@ -21,6 +21,7 @@ interface HolochainConfig {
   callZome: (config: CallZomeConfig) => Promise<any>;
   retry: (config: CallZomeConfig) => Promise<any>;
   client: null | HolochainClient | HoloClient;
+  init: () => any;
 }
 
 export type ThunkAction = Thunk<

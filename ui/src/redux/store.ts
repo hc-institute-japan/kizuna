@@ -5,6 +5,7 @@ import {
   callZome,
   getAgentId,
   retry,
+  init,
   client,
 } from "../connection/holochainClient";
 import rootReducer from "./reducers";
@@ -16,6 +17,7 @@ const createStore = (args?: Object) => {
     getAgentId,
     retry,
     client,
+    init,
     ...args,
   });
 
