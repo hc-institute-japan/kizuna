@@ -44,13 +44,13 @@ const File: React.FC<Props> = ({
             file={file}
             onPlayPauseErrorHandler={(setErrorState: any) => {
               if (chatType === "p2p") {
-                dispatch(getFileBytes([file.fileHash])).then((res: any) => {
+                dispatch(getFileBytes([file.fileHash!])).then((res: any) => {
                   if (res) {
                     setErrorState(false);
                   }
                 });
               } else {
-                dispatch(fetchFilesBytes([file.fileHash])).then((res: any) => {
+                dispatch(fetchFilesBytes([file.fileHash!])).then((res: any) => {
                   if (res) {
                     setErrorState(false);
                   }

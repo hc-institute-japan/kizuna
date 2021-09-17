@@ -46,10 +46,12 @@ export interface GroupMessageBundle {
   payload: Payload; // subject to change
   timestamp: Date;
   replyTo?: RepliedMessage;
+  replyToId?: string;
   readList: {
     // key is AgentPubKey
     [key: string]: Date;
   };
+  err?: boolean;
 }
 
 /* INPUT DECLARATION */

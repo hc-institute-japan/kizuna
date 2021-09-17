@@ -95,9 +95,10 @@ const FileBox: React.FC<Props> = ({
             // temp fix. most likely will change when this gets turned into a component
             if (
               (file.payload as FilePayload).fileType === "VIDEO" &&
-              fetchedFiles[(file.payload as FilePayload).fileHash] === undefined
+              fetchedFiles[(file.payload as FilePayload).fileHash!] ===
+                undefined
             ) {
-              dispatch(getFileBytes([(file.payload as FilePayload).fileHash]));
+              dispatch(getFileBytes([(file.payload as FilePayload).fileHash!]));
             }
 
             let month = file.timestamp.getMonth();

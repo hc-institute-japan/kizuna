@@ -26,8 +26,6 @@ import {
   GroupMessage,
   // IO
   GroupMessageInput,
-  // action payload types
-  SetGroupMessageAction,
   // action types
   SET_GROUP_MESSAGE,
 } from "../types";
@@ -142,7 +140,7 @@ const setGroupMessage = async (
   if (!isTextPayload(groupMessageDataConverted.payload)) {
     // work with file payload
     const newFile: { [key: string]: Uint8Array } = {
-      [groupMessageDataConverted.payload.fileHash]: fileBytes!,
+      [groupMessageDataConverted.payload.fileHash!]: fileBytes!,
     };
     groupFiles = {
       ...groupFiles,
@@ -203,6 +201,7 @@ const sendGroupMessage =
         getState,
         dispatch
       );
+      // return false;
     } catch (e) {
       if (e.message.includes("failed to get the given group id")) {
         dispatch(
@@ -238,7 +237,9 @@ const sendGroupMessage =
             This is the error other than what we defiend in Guest.
             See connection/holochainClient.ts callZome() for more info.
           */
-          dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
+          console.log("sending of group message has failed", e);
+          return false;
+          // dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
         }
       }
     }

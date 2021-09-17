@@ -131,12 +131,12 @@ const GroupChatDetails: React.FC = () => {
   };
 
   const handleOnDownload = (file: FilePayload) => {
-    others[file.fileHash] !== undefined
-      ? downloadFile(others[file.fileHash], file.fileName)
-      : dispatch(fetchFilesBytes([file.fileHash])).then(
+    others[file.fileHash!] !== undefined
+      ? downloadFile(others[file.fileHash!], file.fileName)
+      : dispatch(fetchFilesBytes([file.fileHash!])).then(
           (res: { [key: string]: Uint8Array }) => {
             if (res && Object.keys(res).length > 0) {
-              downloadFile(res[file.fileHash], file.fileName);
+              downloadFile(res[file.fileHash!], file.fileName);
             }
           }
         );

@@ -6,6 +6,7 @@
   "app.chat.header-pinned-messages": "掲示板",
   "app.chat.header-search": "検索",
   "app.chat.pinned-message-title": "掲示板",
+  "app.contacts.search": "3文字以上で検索",
   "app.contacts.add": "連絡先に追加",
   "app.contacts.add-message": "{name}が連絡先に追加されました",
   "app.contacts.block": "連絡先をブロック",
