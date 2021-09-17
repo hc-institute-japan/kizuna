@@ -1,5 +1,6 @@
 import { ReactElement } from "react";
 import { FilePayload, Payload } from "../../redux/commons/types";
+import { GroupMessageInput } from "../../redux/group/types";
 import { Profile } from "../../redux/profile/types";
 
 export interface ChatListProps {
@@ -31,9 +32,13 @@ export interface ChatProps {
   replyTo?: { payload: Payload; author: Profile; id: string };
   onSeen?(complete: () => any): any;
   onReply?(message: { payload: Payload; author: string; id: string }): any;
+  onRetry?(message: GroupMessageInput, setLoading: any): any;
+  onDelete?(): any;
   onDownload?(file: FilePayload): any;
   onPinMessage?(): any;
   isPinned: boolean;
+  err?: boolean;
+  errMsg?: GroupMessageInput;
 }
 
 export interface ChatListMethods {

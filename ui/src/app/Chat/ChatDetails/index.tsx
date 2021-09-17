@@ -142,12 +142,12 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
     when clicking the file download button
   */
   const handleDownload = (file: FilePayload) => {
-    fetchedFiles[file.fileHash] !== undefined
-      ? downloadFile(fetchedFiles[file.fileHash], file.fileName)
-      : dispatch(getFileBytes([file.fileHash])).then(
+    fetchedFiles[file.fileHash!] !== undefined
+      ? downloadFile(fetchedFiles[file.fileHash!], file.fileName)
+      : dispatch(getFileBytes([file.fileHash!])).then(
           (res: { [key: string]: Uint8Array }) => {
             if (res && Object.keys(res).length > 0) {
-              downloadFile(res[file.fileHash], file.fileName);
+              downloadFile(res[file.fileHash!], file.fileName);
             }
           }
         );

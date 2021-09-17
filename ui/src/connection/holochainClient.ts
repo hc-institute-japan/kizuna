@@ -83,7 +83,7 @@ const createClient = async (
   }
 };
 
-const init: () => any = async () => {
+export const init: () => any = async () => {
   if (client) {
     return client;
   }

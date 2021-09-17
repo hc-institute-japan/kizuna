@@ -250,12 +250,12 @@ const Chat: React.FC = () => {
     when clicking the file download button
   */
   const onDownloadHandler = (file: FilePayload) => {
-    fetchedFiles[file.fileHash] !== undefined
-      ? downloadFile(fetchedFiles[file.fileHash], file.fileName)
-      : dispatch(getFileBytes([file.fileHash])).then(
+    fetchedFiles[file.fileHash!] !== undefined
+      ? downloadFile(fetchedFiles[file.fileHash!], file.fileName)
+      : dispatch(getFileBytes([file.fileHash!])).then(
           (res: { [key: string]: Uint8Array }) => {
             if (res && Object.keys(res).length > 0) {
-              downloadFile(res[file.fileHash], file.fileName);
+              downloadFile(res[file.fileHash!], file.fileName);
             }
           }
         );
@@ -295,9 +295,9 @@ const Chat: React.FC = () => {
     if (
       payload.type === "FILE" &&
       (payload as FilePayload).fileType === "VIDEO" &&
-      fetchedFiles[payload.fileHash] === undefined
+      fetchedFiles[payload.fileHash!] === undefined
     ) {
-      dispatch(getFileBytes([payload.fileHash]));
+      dispatch(getFileBytes([payload.fileHash!]));
     }
 
     return conversant.id !== author.id ? (

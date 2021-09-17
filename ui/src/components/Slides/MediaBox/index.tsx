@@ -83,7 +83,7 @@ const FileBox: React.FC<Props> = ({
         <VideoPlayer
           download={() => onDownload(message.payload as FilePayload)}
           src={URL.createObjectURL(
-            new Blob([filesBytes[(message.payload as FilePayload).fileHash]], {
+            new Blob([filesBytes[(message.payload as FilePayload).fileHash!]], {
               type: "video/mp4",
             })
           )}
@@ -98,7 +98,7 @@ const FileBox: React.FC<Props> = ({
           onPlayPauseErrorHandler={(setErrorState: any) => {
             if (isP2PMessage(message)) {
               dispatch(
-                getFileBytes([(message.payload as FilePayload).fileHash])
+                getFileBytes([(message.payload as FilePayload).fileHash!])
               ).then((res: any) => {
                 if (res) {
                   setErrorState(false);
@@ -106,7 +106,7 @@ const FileBox: React.FC<Props> = ({
               });
             } else {
               dispatch(
-                fetchFilesBytes([(message.payload as FilePayload).fileHash])
+                fetchFilesBytes([(message.payload as FilePayload).fileHash!])
               ).then((res: any) => {
                 if (res) {
                   setErrorState(false);

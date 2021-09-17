@@ -70,7 +70,7 @@ const PinnedMessages: React.FC<Props> = ({
         );
 
       case "VIDEO": {
-        const blobFileBytes = fileBytes[payload.fileHash];
+        const blobFileBytes = fileBytes[payload.fileHash!];
         return (
           <VideoPlayer
             className={styles.video}
@@ -81,13 +81,13 @@ const PinnedMessages: React.FC<Props> = ({
             )}
             onPlayPauseErrorHandler={(setErrorState: any) => {
               if (type === "p2p")
-                dispatch(getFileBytes([payload.fileHash])).then((res: any) => {
+                dispatch(getFileBytes([payload.fileHash!])).then((res: any) => {
                   if (res) {
                     setErrorState(false);
                   }
                 });
               else
-                dispatch(fetchFilesBytes([payload.fileHash])).then(
+                dispatch(fetchFilesBytes([payload.fileHash!])).then(
                   (res: any) => {
                     if (res) {
                       setErrorState(false);
