@@ -35,7 +35,6 @@ const getPreviousGroupMessages =
         fnName: FUNCTIONS[ZOMES.GROUP].GET_PREVIOUS_GROUP_MESSAGES,
         payload: input,
       });
-      console.log("groupmsgres", groupMessagesRes);
 
       const groupMessagesOutput: GroupMessagesOutput =
         convertFetchedResToGroupMessagesOutput(groupMessagesRes);
@@ -85,7 +84,6 @@ const getPreviousGroupMessages =
         No useful error is getting returned from
         the Guest/Host so we are simply returning a generic error here
       */
-      console.log("is this the error?", e);
       return dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
     }
   };

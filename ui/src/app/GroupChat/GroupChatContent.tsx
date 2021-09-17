@@ -32,6 +32,7 @@ const GroupChat: React.FC = () => {
 
   /* local states */
   const [files, setFiles] = useState<object[]>([]);
+  const [errMsgs, setErrMsgs] = useState<GroupMessageInput[]>([]);
   const [message, setMessage] = useState("");
 
   /* Refs */
@@ -109,16 +110,31 @@ const GroupChat: React.FC = () => {
 
     if (text) {
       dispatch(sendGroupMessage(text)).then((res: any) => {
-        if (file) {
-          dispatch(sendGroupMessage(file));
+        if (!res) {
+          setErrMsgs([...errMsgs, text!]);
           setIsLoading!(false);
           chatList.current!.scrollToBottom();
         }
+        if (file) {
+          dispatch(sendGroupMessage(file)).then((res: any) => {
+            if (!res) {
+              setErrMsgs([...errMsgs, file!]);
+            }
+            setIsLoading!(false);
+            chatList.current!.scrollToBottom();
+          });
+        }
+        setIsLoading!(false);
+        chatList.current!.scrollToBottom();
       });
     } else if (file) {
-      dispatch(sendGroupMessage(file));
-      setIsLoading!(false);
-      chatList.current!.scrollToBottom();
+      dispatch(sendGroupMessage(file)).then((res: any) => {
+        if (!res) {
+          setErrMsgs([...errMsgs, file!]);
+        }
+        setIsLoading!(false);
+        chatList.current!.scrollToBottom();
+      });
     }
   };
 
@@ -178,6 +194,8 @@ const GroupChat: React.FC = () => {
           messageIds={groupData.messages}
           chatList={chatList}
           readReceipt={readReceipt}
+          errMsgs={errMsgs}
+          setErrMsgs={setErrMsgs}
         />
       </IonContent>
 

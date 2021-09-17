@@ -23,7 +23,7 @@ const File: React.FC<Props> = ({ file, onDownload, darken = false }) => {
         state.groups.groupFiles,
         state.p2pmessages.files
       );
-      return fileSet[file.fileHash];
+      return fileSet[file.fileHash!];
     }
   );
   const download = () => {

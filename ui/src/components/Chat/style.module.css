@@ -112,3 +112,20 @@
     filter: invert(100%);
   }
 }
+
+.not-delivered {
+  flex-direction:row-reverse;
+  font-size: small;
+}
+
+.not-delivered-container {
+  --width: auto !important;
+  align-self: flex-end;
+  display: flex;
+  align-items: flex-start;
+  max-width: 80%;
+  padding-top: 0px;
+  padding-bottom: 0.2rem;
+  padding-right: 2.5rem;
+  margin-top: -0.3rem;
+}

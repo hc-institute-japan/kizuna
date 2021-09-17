@@ -11,6 +11,7 @@ const getMyProfile =
         zomeName: ZOMES.PROFILES,
         fnName: FUNCTIONS[ZOMES.PROFILES].GET_MY_PROFILE,
       });
+      console.warn("Agent's profile: ", res);
       const myAgentId = await getAgentId();
       /* assume that getAgentId() is non-nullable */
       const myAgentIdB64 = serializeHash(myAgentId!);

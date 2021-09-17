@@ -22,7 +22,7 @@ const Video: React.FC<Props> = ({
       state.groups.groupFiles,
       state.p2pmessages.files
     );
-    return fileSet[file.fileHash];
+    return fileSet[file.fileHash!];
     // return state.groups.groupFiles[`u${file.fileHash}`];
   });
 

@@ -1,10 +1,11 @@
 import { IonIcon, IonItem, IonText, useIonPopover } from "@ionic/react";
 import {
+  alertCircleOutline,
   checkmarkCircleOutline,
   checkmarkDoneCircle,
   personCircleOutline,
 } from "ionicons/icons";
-import React from "react";
+import React, { useState } from "react";
 import { useIntl } from "react-intl";
 import {
   FilePayload,
@@ -12,6 +13,7 @@ import {
   TextPayload,
 } from "../../../redux/commons/types";
 import { usePressHandlers } from "../../../utils/helpers";
+import Spinner from "../../Spinner";
 import ChatPopover from "../ChatPopover";
 import File from "../File";
 import ReplyTo from "../ReplyTo";
@@ -26,14 +28,19 @@ const Me: React.FC<ChatProps> = ({
   timestamp,
   replyTo,
   onReply,
+  onDelete,
   onPinMessage,
   isPinned,
   type,
   showProfilePicture,
   isSeen = false,
   onDownload,
+  onRetry,
+  errMsg,
+  err,
 }) => {
   const intl = useIntl();
+  const [loading, setLoading] = useState(false);
 
   const onLongPress = (e: any) =>
     present({
@@ -45,8 +52,15 @@ const Me: React.FC<ChatProps> = ({
     onReply: () => {
       if (onReply) onReply({ author, payload, id });
     },
+    onDelete: () => {
+      if (onDelete) onDelete();
+    },
+    onRetry: () => {
+      if (onRetry) onRetry(errMsg!, setLoading);
+    },
     isPinned,
     intl,
+    err,
   });
 
   // const [isModalOpen, setIsModalOpen] = useState(false);
@@ -60,6 +74,7 @@ const Me: React.FC<ChatProps> = ({
         lines="none"
         className={`${common["me-container"]}`}
         {...pressHandlers}
+        onClick={(e: any) => (err ? onLongPress(e) : null)}
       >
         <div
           className={`${common["me"]} ${common[isText ? "text" : "file"]} ${
@@ -88,7 +103,20 @@ const Me: React.FC<ChatProps> = ({
             </h6>
           </IonText>
         </div>
-        {isP2P ? null : (
+        {isP2P ? null : err ? (
+          loading ? (
+            <div className={common.picture}>
+              <Spinner />
+            </div>
+          ) : (
+            <IonIcon
+              color="danger"
+              className={common.picture}
+              style={{ marginLeft: "0.5rem" }}
+              icon={alertCircleOutline}
+            ></IonIcon>
+          )
+        ) : (
           <div className={common.picture} style={{ marginLeft: "0.5rem" }}>
             {showProfilePicture ? (
               <img
@@ -100,6 +128,15 @@ const Me: React.FC<ChatProps> = ({
           </div>
         )}
       </IonItem>
+      {err ? (
+        loading ? null : (
+          <IonItem lines="none" className={styles["not-delivered-container"]}>
+            <IonText className={styles["not-delivered"]} color="danger">
+              Not delivered
+            </IonText>
+          </IonItem>
+        )
+      ) : null}
       {/* <ChatModal
         isPinned={isPinned}
         onPin={onPinMessage as () => any}

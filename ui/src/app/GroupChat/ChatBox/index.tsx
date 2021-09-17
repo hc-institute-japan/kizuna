@@ -3,18 +3,25 @@ import { useSelector } from "react-redux";
 // Components
 import Chat from "../../../components/Chat";
 import { ChatListMethods } from "../../../components/Chat/types";
-import { FilePayload, Payload } from "../../../redux/commons/types";
+import {
+  FilePayload,
+  isTextPayload,
+  Payload,
+} from "../../../redux/commons/types";
 import {
   fetchFilesBytes,
   getMessagesWithProfile,
   getPreviousGroupMessages,
   readGroupMessage,
+  sendGroupMessage,
 } from "../../../redux/group/actions";
 import { pinMessage } from "../../../redux/group/actions/pinMessage";
 import { unpinMessage } from "../../../redux/group/actions/unpinMessage";
 // Redux
 import {
+  GroupMessage,
   GroupMessageBundle,
+  GroupMessageInput,
   GroupMessageReadData,
   GroupMessagesOutput,
 } from "../../../redux/group/types";
@@ -29,6 +36,8 @@ interface Props {
   // TODO: not really sure what type this is
   onReply(message: { author: string; payload: Payload; id: string }): any;
   chatList: React.RefObject<ChatListMethods>;
+  errMsgs: GroupMessageInput[];
+  setErrMsgs: React.Dispatch<React.SetStateAction<GroupMessageInput[]>>;
 }
 const MessageList: React.FC<Props> = ({
   messageIds,
@@ -37,11 +46,16 @@ const MessageList: React.FC<Props> = ({
   chatList,
   groupId,
   readReceipt,
+  errMsgs,
+  setErrMsgs,
 }) => {
   const dispatch = useAppDispatch();
 
   /* Selecotrs */
   const filesBytes = useSelector((state: RootState) => state.groups.groupFiles);
+  const groupMessages = useSelector(
+    (state: RootState) => state.groups.messages
+  );
 
   /* LOCAL STATE */
   const [messages, setMessages] = useState<GroupMessageBundle[]>([]);
@@ -82,7 +96,7 @@ const MessageList: React.FC<Props> = ({
   };
 
   const handleOnDownload = (file: FilePayload) => {
-    const fileBytes = filesBytes[file.fileHash];
+    const fileBytes = filesBytes[file.fileHash!];
 
     if (fileBytes) {
       const blob = new Blob([fileBytes]); // change resultByte to bytes
@@ -91,10 +105,10 @@ const MessageList: React.FC<Props> = ({
       link.download = file.fileName;
       link.click();
     } else {
-      dispatch(fetchFilesBytes([file.fileHash])).then(
+      dispatch(fetchFilesBytes([file.fileHash!])).then(
         (res: { [key: string]: Uint8Array }) => {
           if (res && Object.keys(res).length > 0) {
-            const fetchedFileBytes = res[file.fileHash];
+            const fetchedFileBytes = res[file.fileHash!];
             const blob = new Blob([fetchedFileBytes]); // change resultByte to bytes
             const link = document.createElement("a");
             link.href = window.URL.createObjectURL(blob);
@@ -125,13 +139,120 @@ const MessageList: React.FC<Props> = ({
     }
   };
 
+  const handleDeleteErr = (message: GroupMessageBundle) => {
+    if (message.err) {
+      let errMsg: GroupMessageInput = {
+        groupId: message.groupId,
+        payloadInput: isTextPayload(message.payload)
+          ? {
+              type: "TEXT",
+              payload: {
+                payload: message.payload.payload.payload,
+              },
+            }
+          : {
+              type: "FILE",
+              payload: {
+                metadata: {
+                  fileName: message.payload.fileName,
+                  fileSize: message.payload.fileSize,
+                  fileType: message.payload.fileType,
+                },
+                fileType:
+                  message.payload.fileType === "IMAGE"
+                    ? {
+                        type: "IMAGE",
+                        payload: {
+                          thumbnail: message.payload.thumbnail!,
+                        },
+                      }
+                    : message.payload.fileType === "VIDEO"
+                    ? {
+                        type: "VIDEO",
+                        payload: {
+                          thumbnail: message.payload.thumbnail!,
+                        },
+                      }
+                    : { type: "OTHER" },
+                fileBytes: message.payload.fileBytes!,
+              },
+            },
+        sender: message.author.id,
+        replyTo: message.replyToId,
+      };
+      let errMsgStringified = errMsgs.map((errMsg) => JSON.stringify(errMsg));
+      let messageStringified = messages.map((message) =>
+        JSON.stringify(message)
+      );
+      let iOfErr = errMsgStringified.indexOf(JSON.stringify(errMsg));
+      let iOfMsg = messageStringified.indexOf(JSON.stringify(message));
+      let newErrMsgs = errMsgs;
+      let newMsgs = messages;
+      if (iOfErr > -1) {
+        newErrMsgs.splice(iOfErr, 1);
+      }
+      if (iOfMsg > -1) {
+        newMsgs.splice(iOfMsg, 1);
+      }
+      setMessages([...newMsgs]);
+      setErrMsgs([...newErrMsgs]);
+    }
+  };
+
   /* Effects */
 
   useEffect(() => {
     const messages = dispatch(getMessagesWithProfile(messageIds));
+    if (errMsgs.length !== 0) {
+      errMsgs.forEach((errMsg) => {
+        let payload: Payload | null;
+        if (isTextPayload(errMsg.payloadInput)) {
+          payload = {
+            type: "TEXT",
+            payload: { payload: errMsg.payloadInput.payload.payload },
+          };
+        } else {
+          payload = {
+            type: "FILE",
+            fileName: errMsg.payloadInput.payload.metadata.fileName,
+            fileSize: errMsg.payloadInput.payload.metadata.fileSize,
+            fileType: errMsg.payloadInput.payload.fileType.type,
+            fileBytes: errMsg.payloadInput.payload.fileBytes,
+            thumbnail: errMsg.payloadInput.payload.fileType.payload?.thumbnail,
+          };
+        }
+        let msg: GroupMessageBundle = {
+          groupMessageId: "error message", // TODO: use a unique id
+          groupId: errMsg.groupId,
+          author: { id: profile.id!, username: profile.username! },
+          payload: payload,
+          timestamp: new Date(),
+          replyTo:
+            errMsg.replyTo && groupMessages[errMsg.replyTo]
+              ? {
+                  groupId: groupMessages[errMsg.replyTo].groupId,
+                  author: groupMessages[errMsg.replyTo].author,
+                  payload: groupMessages[errMsg.replyTo].payload,
+                  timestamp: groupMessages[errMsg.replyTo].timestamp,
+                  replyTo: undefined,
+                  readList: groupMessages[errMsg.replyTo].readList,
+                }
+              : undefined, // TODO: change this to display reply message
+          replyToId: errMsg.replyTo ? errMsg.replyTo : undefined,
+          readList: {},
+          err: true,
+        };
+        messages.push(msg);
+      });
+    }
+
+    messages.sort((x: any, y: any) => {
+      return x.timestamp.getTime() - y.timestamp.getTime();
+    });
+
     setMessages(messages);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messageIds, stateMessages]);
+  }, [messageIds, stateMessages, errMsgs]);
 
   return (
     <>
@@ -147,6 +268,21 @@ const MessageList: React.FC<Props> = ({
               <Chat.Me
                 id={message.groupMessageId}
                 onDownload={handleOnDownload}
+                onDelete={() => {
+                  handleDeleteErr(message);
+                }}
+                onRetry={(errMsg: GroupMessageInput, setLoading: any) => {
+                  setLoading(true);
+                  // display loading button
+                  // send the group message
+                  dispatch(sendGroupMessage(errMsg)).then(
+                    (res: GroupMessage | false) => {
+                      setLoading(false);
+                      if (!res) return null;
+                      handleDeleteErr(message);
+                    }
+                  );
+                }}
                 key={i}
                 author={message.author.username}
                 isPinned={pinnedMessages[message.groupMessageId] ? true : false}
@@ -175,6 +311,50 @@ const MessageList: React.FC<Props> = ({
                 showName={true}
                 showProfilePicture={true}
                 onReply={(message) => onReply(message)}
+                err={message.err}
+                errMsg={
+                  message.err
+                    ? {
+                        groupId: message.groupId,
+                        payloadInput: isTextPayload(message.payload)
+                          ? {
+                              type: "TEXT",
+                              payload: {
+                                payload: message.payload.payload.payload,
+                              },
+                            }
+                          : {
+                              type: "FILE",
+                              payload: {
+                                metadata: {
+                                  fileName: message.payload.fileName,
+                                  fileSize: message.payload.fileSize,
+                                  fileType: message.payload.fileType,
+                                },
+                                fileType:
+                                  message.payload.fileType === "IMAGE"
+                                    ? {
+                                        type: "IMAGE",
+                                        payload: {
+                                          thumbnail: message.payload.thumbnail!,
+                                        },
+                                      }
+                                    : message.payload.fileType === "VIDEO"
+                                    ? {
+                                        type: "VIDEO",
+                                        payload: {
+                                          thumbnail: message.payload.thumbnail!,
+                                        },
+                                      }
+                                    : { type: "OTHER" },
+                                fileBytes: message.payload.fileBytes!,
+                              },
+                            },
+                        sender: message.author.id,
+                        replyTo: message.replyToId,
+                      }
+                    : undefined
+                }
               />
             );
           return (
