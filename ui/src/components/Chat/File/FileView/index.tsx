@@ -11,9 +11,10 @@ interface Props {
   file: FilePayload;
   onDownload?(file: FilePayload): any;
   darken?: boolean;
+  err?: boolean;
 }
 
-const File: React.FC<Props> = ({ file, onDownload, darken = false }) => {
+const File: React.FC<Props> = ({ file, onDownload, darken = false, err }) => {
   const { fileName, fileSize } = file;
   const fileBytes = useSelector((state: RootState) =>
     // state.groups.groupFiles[`u${file.fileHash}`]
@@ -43,7 +44,9 @@ const File: React.FC<Props> = ({ file, onDownload, darken = false }) => {
   return (
     <IonGrid>
       <IonRow
-        onClick={onDownload ? () => onDownload(file) : download}
+        onClick={
+          err ? () => null : onDownload ? () => onDownload(file) : download
+        }
         className={`ion-align-items-center ${styles.file}`}
       >
         <div className="ion-padding-end">

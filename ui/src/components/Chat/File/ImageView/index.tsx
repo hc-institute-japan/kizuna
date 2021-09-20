@@ -10,12 +10,15 @@ interface Props {
   file: FilePayload;
   className?: string;
   onDownload?(file: FilePayload): any;
+  err?: boolean;
 }
 
-const Image: React.FC<Props> = ({ src, file, className, onDownload }) => {
+const Image: React.FC<Props> = ({ src, file, className, onDownload, err }) => {
   const [isOpen, setIsOpen] = useState(false);
   const handleOnImageOnClick = () => {
-    setIsOpen(true);
+    if (!err) {
+      setIsOpen(true);
+    }
   };
 
   return (

@@ -36,7 +36,6 @@ const Me: React.FC<ChatProps> = ({
   isSeen = false,
   onDownload,
   onRetry,
-  errMsg,
   err,
 }) => {
   const intl = useIntl();
@@ -56,7 +55,7 @@ const Me: React.FC<ChatProps> = ({
       if (onDelete) onDelete();
     },
     onRetry: () => {
-      if (onRetry) onRetry(errMsg!, setLoading);
+      if (onRetry) onRetry(setLoading);
     },
     isPinned,
     intl,
@@ -91,6 +90,7 @@ const Me: React.FC<ChatProps> = ({
               type="me"
               timestamp={timestamp}
               file={payload as FilePayload}
+              err={err}
             />
           )}
           <IonText>

@@ -9,12 +9,14 @@ interface Props {
   file: FilePayload;
   onDownload?(file: FilePayload): any;
   onPlayPauseErrorHandler?(setErrorState: (bool: boolean) => any): any;
+  err?: boolean;
 }
 
 const Video: React.FC<Props> = ({
   file,
   onDownload,
   onPlayPauseErrorHandler,
+  err,
 }) => {
   const fileBytes = useSelector((state: RootState) => {
     let fileSet = Object.assign(
@@ -39,13 +41,16 @@ const Video: React.FC<Props> = ({
   const renderVideo = useMemo(
     () => (
       <VideoPlayer
-        download={onDownload ? () => onDownload(file) : download}
+        download={
+          err ? () => null : onDownload ? () => onDownload(file) : download
+        }
         src={URL.createObjectURL(new Blob([fileBytes], { type: "video/mp4" }))}
         className={styles.video}
         thumbnail={URL.createObjectURL(
           new Blob([file.thumbnail as Uint8Array], { type: "image/jpeg" })
         )}
         onPlayPauseErrorHandler={onPlayPauseErrorHandler}
+        err={err}
       />
     ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
