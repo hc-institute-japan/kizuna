@@ -10,7 +10,7 @@ import {
 import { banOutline, cogOutline, logOutOutline } from "ionicons/icons";
 import React, { useRef } from "react";
 import { useIntl } from "react-intl";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { setProfile } from "../../redux/profile/actions";
 import { Profile } from "../../redux/profile/types";
@@ -49,11 +49,8 @@ const Menu: React.FC = () => {
     },
     {
       onClick: () => {
-        // const c = (client as any).connection;
-        // await c.signOut();
-        // await c.signIn();
-        dispatch(logout());
-        // history.push("/");
+        dispatch(setProfile(null));
+        history.push("/");
       },
       label: intl.formatMessage({ id: "app.menu.logout-label" }),
       icon: logOutOutline,
