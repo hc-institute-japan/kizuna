@@ -12,6 +12,8 @@ import readGroupMessage from "./readGroupMessage";
 import removeMembers from "./removeMembers";
 import sendGroupMessage from "./sendGroupMessage";
 import sendInitialGroupMessage from "./sendInitialGroupMessage";
+import setErrGroupMessage from "./setErrGroupMessage";
+import removeErrGroupMessage from "./removeErrGroupMessage";
 import { fetchFilesBytes, setFilesBytes } from "./setFilesBytes";
 import updateGroupName from "./updateGroupName";
 
@@ -27,8 +29,10 @@ export {
   getSubsequentGroupMessages,
   indicateGroupTyping,
   readGroupMessage,
+  removeErrGroupMessage,
   removeMembers,
   sendGroupMessage,
+  setErrGroupMessage,
   sendInitialGroupMessage,
   fetchFilesBytes,
   setFilesBytes,

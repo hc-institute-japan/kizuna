@@ -12,6 +12,7 @@ export const REMOVE_MEMBERS = "REMOVE_MEMBERS";
 export const ADD_MEMBERS = "ADD_MEMBERS";
 export const SET_GROUP_MESSAGE = "SET_GROUP_MESSAGE";
 export const SET_GROUP_MESSAGES = "SET_GROUP_MESSAGES";
+export const SET_ERR_GROUP_MESSAGE = "SET_ERR_GROUP_MESSAGE";
 export const SET_LATEST_GROUP_STATE = "SET_LATEST_GROUP_STATE";
 export const SET_LATEST_GROUP_VERSION = "SET_LATEST_GROUP_VERSION";
 export const SET_FILES_BYTES = "SET_FILES_BYTES";
@@ -226,6 +227,9 @@ export interface GroupConversationsState {
   pinnedMessages: {
     [key: string]: GroupMessage;
   };
+  errMsgs: {
+    [key: string]: GroupMessageBundle[];
+  };
 }
 
 export interface AddGroupAction {
@@ -298,6 +302,13 @@ export interface SetGroupMessagesAction {
   };
 }
 
+export interface SetGroupErrMessageAction {
+  type: typeof SET_ERR_GROUP_MESSAGE;
+  errMsgs: {
+    [key: string]: GroupMessageBundle[];
+  };
+}
+
 export interface SetLatestGroupState {
   type: typeof SET_LATEST_GROUP_STATE;
   messages: {
@@ -342,6 +353,7 @@ export type GroupConversationsActionTypes =
   | UpdateGroupNameAction
   | SetGroupMessageAction
   | SetGroupMessagesAction
+  | SetGroupErrMessageAction
   | SetLatestGroupState
   | SetFilesBytes
   | SetGroupTypingIndicator

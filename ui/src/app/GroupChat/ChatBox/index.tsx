@@ -17,6 +17,7 @@ import {
 } from "../../../redux/group/actions";
 import { pinMessage } from "../../../redux/group/actions/pinMessage";
 import { unpinMessage } from "../../../redux/group/actions/unpinMessage";
+import { removeErrGroupMessage } from "../../../redux/group/actions";
 // Redux
 import {
   GroupMessage,
@@ -36,39 +37,32 @@ interface Props {
   // TODO: not really sure what type this is
   onReply(message: { author: string; payload: Payload; id: string }): any;
   chatList: React.RefObject<ChatListMethods>;
-  errMsgs: GroupMessageInput[];
-  setErrMsgs: React.Dispatch<React.SetStateAction<GroupMessageInput[]>>;
 }
-const MessageList: React.FC<Props> = ({
+const ChatBox: React.FC<Props> = ({
   messageIds,
   members,
   onReply,
   chatList,
   groupId,
   readReceipt,
-  errMsgs,
-  setErrMsgs,
 }) => {
   const dispatch = useAppDispatch();
 
   /* Selecotrs */
   const filesBytes = useSelector((state: RootState) => state.groups.groupFiles);
-  const groupMessages = useSelector(
-    (state: RootState) => state.groups.messages
+  const {
+    messages: stateMessages,
+    errMsgs: groupErrMessages,
+    pinnedMessages,
+  } = useSelector((state: RootState) => state.groups);
+  const membersProfile = useSelector(
+    (state: RootState) => state.groups.members
   );
 
   /* LOCAL STATE */
   const [messages, setMessages] = useState<GroupMessageBundle[]>([]);
   const [oldestFetched, setOldestFetched] = useState<boolean>(false);
 
-  const {
-    messages: stateMessages,
-    members: stateMembers,
-    pinnedMessages,
-  } = useSelector((state: RootState) => state.groups);
-  const membersProfile = useSelector(
-    (state: RootState) => state.groups.members
-  );
   const profile = useSelector((state: RootState) => state.profile);
 
   /* Handlers */
@@ -139,120 +133,67 @@ const MessageList: React.FC<Props> = ({
     }
   };
 
-  const handleDeleteErr = (message: GroupMessageBundle) => {
-    if (message.err) {
-      let errMsg: GroupMessageInput = {
-        groupId: message.groupId,
-        payloadInput: isTextPayload(message.payload)
-          ? {
-              type: "TEXT",
-              payload: {
-                payload: message.payload.payload.payload,
-              },
-            }
-          : {
-              type: "FILE",
-              payload: {
-                metadata: {
-                  fileName: message.payload.fileName,
-                  fileSize: message.payload.fileSize,
-                  fileType: message.payload.fileType,
-                },
-                fileType:
-                  message.payload.fileType === "IMAGE"
-                    ? {
-                        type: "IMAGE",
-                        payload: {
-                          thumbnail: message.payload.thumbnail!,
-                        },
-                      }
-                    : message.payload.fileType === "VIDEO"
-                    ? {
-                        type: "VIDEO",
-                        payload: {
-                          thumbnail: message.payload.thumbnail!,
-                        },
-                      }
-                    : { type: "OTHER" },
-                fileBytes: message.payload.fileBytes!,
-              },
+  const handleOnRetry = (setLoading: any, message: GroupMessageBundle) => {
+    const errMsg: GroupMessageInput = {
+      groupId: message.groupId,
+      payloadInput: isTextPayload(message.payload)
+        ? {
+            type: "TEXT",
+            payload: {
+              payload: message.payload.payload.payload,
             },
-        sender: message.author.id,
-        replyTo: message.replyToId,
-      };
-      let errMsgStringified = errMsgs.map((errMsg) => JSON.stringify(errMsg));
-      let messageStringified = messages.map((message) =>
-        JSON.stringify(message)
-      );
-      let iOfErr = errMsgStringified.indexOf(JSON.stringify(errMsg));
-      let iOfMsg = messageStringified.indexOf(JSON.stringify(message));
-      let newErrMsgs = errMsgs;
-      let newMsgs = messages;
-      if (iOfErr > -1) {
-        newErrMsgs.splice(iOfErr, 1);
-      }
-      if (iOfMsg > -1) {
-        newMsgs.splice(iOfMsg, 1);
-      }
-      setMessages([...newMsgs]);
-      setErrMsgs([...newErrMsgs]);
-    }
+          }
+        : {
+            type: "FILE",
+            payload: {
+              metadata: {
+                fileName: message.payload.fileName,
+                fileSize: message.payload.fileSize,
+                fileType: message.payload.fileType,
+              },
+              fileType:
+                message.payload.fileType === "IMAGE"
+                  ? {
+                      type: "IMAGE",
+                      payload: {
+                        thumbnail: message.payload.thumbnail!,
+                      },
+                    }
+                  : message.payload.fileType === "VIDEO"
+                  ? {
+                      type: "VIDEO",
+                      payload: {
+                        thumbnail: message.payload.thumbnail!,
+                      },
+                    }
+                  : { type: "OTHER" },
+              fileBytes: message.payload.fileBytes!,
+            },
+          },
+      sender: message.author.id,
+      replyTo: message.replyToId,
+    };
+    setLoading(true);
+    // display loading button
+    // retry sending the group message
+    dispatch(sendGroupMessage(errMsg)).then((res: GroupMessage | false) => {
+      setLoading(false);
+      if (!res) return null;
+      dispatch(removeErrGroupMessage(message));
+    });
   };
 
   /* Effects */
 
   useEffect(() => {
-    const messages = dispatch(getMessagesWithProfile(messageIds));
-    if (errMsgs.length !== 0) {
-      errMsgs.forEach((errMsg) => {
-        let payload: Payload | null;
-        if (isTextPayload(errMsg.payloadInput)) {
-          payload = {
-            type: "TEXT",
-            payload: { payload: errMsg.payloadInput.payload.payload },
-          };
-        } else {
-          payload = {
-            type: "FILE",
-            fileName: errMsg.payloadInput.payload.metadata.fileName,
-            fileSize: errMsg.payloadInput.payload.metadata.fileSize,
-            fileType: errMsg.payloadInput.payload.fileType.type,
-            fileBytes: errMsg.payloadInput.payload.fileBytes,
-            thumbnail: errMsg.payloadInput.payload.fileType.payload?.thumbnail,
-          };
-        }
-        let msg: GroupMessageBundle = {
-          groupMessageId: "error message", // TODO: use a unique id
-          groupId: errMsg.groupId,
-          author: { id: profile.id!, username: profile.username! },
-          payload: payload,
-          timestamp: new Date(),
-          replyTo:
-            errMsg.replyTo && groupMessages[errMsg.replyTo]
-              ? {
-                  groupId: groupMessages[errMsg.replyTo].groupId,
-                  author: groupMessages[errMsg.replyTo].author,
-                  payload: groupMessages[errMsg.replyTo].payload,
-                  timestamp: groupMessages[errMsg.replyTo].timestamp,
-                  replyTo: undefined,
-                  readList: groupMessages[errMsg.replyTo].readList,
-                }
-              : undefined, // TODO: change this to display reply message
-          replyToId: errMsg.replyTo ? errMsg.replyTo : undefined,
-          readList: {},
-          err: true,
-        };
-        messages.push(msg);
-      });
-    }
-
+    const messages = dispatch(getMessagesWithProfile(messageIds, groupId));
     messages.sort((x: any, y: any) => {
       return x.timestamp.getTime() - y.timestamp.getTime();
     });
 
     setMessages(messages);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [messageIds, stateMessages, errMsgs]);
+  }, [messageIds, stateMessages, groupErrMessages]);
 
   return (
     <>
@@ -268,21 +209,10 @@ const MessageList: React.FC<Props> = ({
               <Chat.Me
                 id={message.groupMessageId}
                 onDownload={handleOnDownload}
-                onDelete={() => {
-                  handleDeleteErr(message);
-                }}
-                onRetry={(errMsg: GroupMessageInput, setLoading: any) => {
-                  setLoading(true);
-                  // display loading button
-                  // send the group message
-                  dispatch(sendGroupMessage(errMsg)).then(
-                    (res: GroupMessage | false) => {
-                      setLoading(false);
-                      if (!res) return null;
-                      handleDeleteErr(message);
-                    }
-                  );
-                }}
+                onDelete={() => dispatch(removeErrGroupMessage(message))}
+                onRetry={(setLoading: any) =>
+                  handleOnRetry(setLoading, message)
+                }
                 key={i}
                 author={message.author.username}
                 isPinned={pinnedMessages[message.groupMessageId] ? true : false}
@@ -312,49 +242,6 @@ const MessageList: React.FC<Props> = ({
                 showProfilePicture={true}
                 onReply={(message) => onReply(message)}
                 err={message.err}
-                errMsg={
-                  message.err
-                    ? {
-                        groupId: message.groupId,
-                        payloadInput: isTextPayload(message.payload)
-                          ? {
-                              type: "TEXT",
-                              payload: {
-                                payload: message.payload.payload.payload,
-                              },
-                            }
-                          : {
-                              type: "FILE",
-                              payload: {
-                                metadata: {
-                                  fileName: message.payload.fileName,
-                                  fileSize: message.payload.fileSize,
-                                  fileType: message.payload.fileType,
-                                },
-                                fileType:
-                                  message.payload.fileType === "IMAGE"
-                                    ? {
-                                        type: "IMAGE",
-                                        payload: {
-                                          thumbnail: message.payload.thumbnail!,
-                                        },
-                                      }
-                                    : message.payload.fileType === "VIDEO"
-                                    ? {
-                                        type: "VIDEO",
-                                        payload: {
-                                          thumbnail: message.payload.thumbnail!,
-                                        },
-                                      }
-                                    : { type: "OTHER" },
-                                fileBytes: message.payload.fileBytes!,
-                              },
-                            },
-                        sender: message.author.id,
-                        replyTo: message.replyToId,
-                      }
-                    : undefined
-                }
               />
             );
           return (
@@ -398,4 +285,4 @@ const MessageList: React.FC<Props> = ({
   );
 };
 
-export default MessageList;
+export default ChatBox;

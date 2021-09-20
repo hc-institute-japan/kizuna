@@ -32,7 +32,7 @@ export interface ChatProps {
   replyTo?: { payload: Payload; author: Profile; id: string };
   onSeen?(complete: () => any): any;
   onReply?(message: { payload: Payload; author: string; id: string }): any;
-  onRetry?(message: GroupMessageInput, setLoading: any): any;
+  onRetry?(setLoading: any): any;
   onDelete?(): any;
   onDownload?(file: FilePayload): any;
   onPinMessage?(): any;
