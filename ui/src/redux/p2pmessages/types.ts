@@ -23,7 +23,9 @@ export interface P2PMessage {
   payload: Payload;
   timestamp: Date;
   replyTo?: P2PMessage;
+  replyToId?: string;
   receipts: P2PMessageReceiptID[];
+  err?: boolean;
 }
 
 export interface P2PMessageReceipt {
@@ -134,10 +136,15 @@ export interface P2PMessageConversationState {
   pinned: {
     [key: string]: P2PMessage;
   };
+  errMsgs: {
+    // key is conversant ID
+    [key: string]: P2PMessage[];
+  };
 }
 
 /* ACTION TYPES */
 export const SET_MESSAGES = "SET_MESSAGES";
+export const SET_ERR_MESSAGE = "SET_ERR_MESSAGE";
 export const SET_FILES = "SET_FILES";
 export const SET_TYPING = "SET_TYPING";
 export const APPEND_MESSAGE = "APPEND_MESSAGE";
@@ -151,6 +158,13 @@ export const SET_PINNED = "SET_PINNED";
 export interface SetP2PMessagesAction {
   type: typeof SET_MESSAGES;
   state: P2PMessageConversationState;
+}
+
+export interface SetErrMessageAction {
+  type: typeof SET_ERR_MESSAGE;
+  state: {
+    errMsgs: { [key: string]: P2PMessage[] };
+  };
 }
 
 // not used
@@ -211,6 +225,7 @@ export interface UninP2PMessageAction {
 
 export type P2PMessageActionType =
   | SetP2PMessagesAction
+  | SetErrMessageAction
   | AppendP2PMessageAction
   | AppendP2PMessageReceiptAction
   | SetP2PFilesAction

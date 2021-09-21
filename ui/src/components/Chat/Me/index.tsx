@@ -103,7 +103,7 @@ const Me: React.FC<ChatProps> = ({
             </h6>
           </IonText>
         </div>
-        {isP2P ? null : err ? (
+        {err ? (
           loading ? (
             <div className={common.picture}>
               <Spinner />
@@ -116,7 +116,7 @@ const Me: React.FC<ChatProps> = ({
               icon={alertCircleOutline}
             ></IonIcon>
           )
-        ) : (
+        ) : isP2P ? null : (
           <div className={common.picture} style={{ marginLeft: "0.5rem" }}>
             {showProfilePicture ? (
               <img

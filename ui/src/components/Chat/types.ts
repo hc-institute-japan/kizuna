@@ -38,7 +38,6 @@ export interface ChatProps {
   onPinMessage?(): any;
   isPinned: boolean;
   err?: boolean;
-  errMsg?: GroupMessageInput;
 }
 
 export interface ChatListMethods {

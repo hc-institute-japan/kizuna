@@ -221,13 +221,13 @@ export interface GroupConversationsState {
   };
   typing: {
     // key is GroupID
-    // TODO: finish this
     [key: string]: Profile[];
   };
   pinnedMessages: {
     [key: string]: GroupMessage;
   };
   errMsgs: {
+    // key is GroupID
     [key: string]: GroupMessageBundle[];
   };
 }
