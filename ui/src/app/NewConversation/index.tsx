@@ -2,7 +2,7 @@ import { IonContent, IonLoading, IonPage } from "@ionic/react";
 import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import { useHistory, useLocation } from "react-router";
-import MessageInput from "../../components/MessageInput";
+import MessageInput, { FileContent } from "../../components/MessageInput";
 import { useToast } from "../../containers/ToastContainer/context";
 import { FilePayloadInput } from "../../redux/commons/types";
 import { sendInitialGroupMessage } from "../../redux/group/actions";
@@ -32,7 +32,7 @@ const NewConversation: React.FC = () => {
   const [selectedContacts, setSelectedContacts] = useState<ProfileListType>({});
   const [search, setSearch] = useState("");
   const [message, setMessage] = useState("");
-  const [files, setFiles] = useState<object[]>([]);
+  const [files, setFiles] = useState<FileContent[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
   /* Handlers */

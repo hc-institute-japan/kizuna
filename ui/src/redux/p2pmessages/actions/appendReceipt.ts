@@ -10,8 +10,8 @@ export const appendReceipt =
   async (dispatch, getState) => {
     let currentState = { ...getState().p2pmessages };
 
-    let receipt = state;
-    let receiptHash = state.p2pMessageReceiptEntryHash;
+    const receipt = state;
+    const receiptHash = state.p2pMessageReceiptEntryHash;
 
     receipt.p2pMessageEntryHashes.forEach((hash) => {
       if (currentState.messages[hash] !== undefined) {

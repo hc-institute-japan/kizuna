@@ -6,6 +6,7 @@ import { ChatList, Me, Others } from "../../components/Chat";
 import { ChatListMethods } from "../../components/Chat/types";
 import Typing from "../../components/Chat/Typing";
 import MessageInput, {
+  FileContent,
   MessageInputMethods,
   MessageInputOnSendParams,
 } from "../../components/MessageInput";
@@ -19,7 +20,9 @@ import { isTyping } from "../../redux/p2pmessages/actions/isTyping";
 // type imports
 import { pinMessage } from "../../redux/p2pmessages/actions/pinMessage";
 import { readMessage } from "../../redux/p2pmessages/actions/readMessage";
+import removeErrMessage from "../../redux/p2pmessages/actions/removeErrMessage";
 import { sendMessage } from "../../redux/p2pmessages/actions/sendMessage";
+import { setErrorMessage } from "../../redux/p2pmessages/actions/setErrMessage";
 import {
   P2PHashMap,
   P2PMessage,
@@ -34,25 +37,21 @@ const Chat: React.FC = () => {
   /* STATES */
   const { id } = useParams<{ id: string }>();
   const [message, setMessage] = useState<string>("");
-  const [files, setFiles] = useState<any[]>([]);
+  const [files, setFiles] = useState<FileContent[]>([]);
   const [replyTo, setReplyTo] = useState<string>("");
   const [messagesWithConversant, setMessagesWithConversant] = useState<any[]>(
     []
   );
   const [disableGetNextBatch, setDisableGetNextBatch] =
     useState<boolean>(false);
-  const { conversations, messages, receipts } = useSelector(
-    (state: RootState) => state.p2pmessages
-  );
-  const fetchedFiles = useSelector(
-    (state: RootState) => state.p2pmessages.files
-  );
-  const pinned = useSelector((state: RootState) => state.p2pmessages.pinned);
-
-  useEffect(() => {
-    dispatch(getPinnedMessages(id));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const {
+    conversations,
+    messages,
+    receipts,
+    errMsgs,
+    files: fetchedFiles,
+    pinned,
+  } = useSelector((state: RootState) => state.p2pmessages);
 
   const typing = useSelector((state: RootState) => {
     const allTypingProfiles = state.p2pmessages.typing;
@@ -117,7 +116,12 @@ const Chat: React.FC = () => {
       );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [conversations, messages, receipts, conversant]);
+  }, [conversations, messages, receipts, conversant, errMsgs]);
+
+  useEffect(() => {
+    dispatch(getPinnedMessages(id));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   /* HANDLERS */
   /*
@@ -158,8 +162,18 @@ const Chat: React.FC = () => {
           "TEXT",
           replyTo !== "" ? replyTo : undefined
         )
-      ).then((res: any) =>
-        files.length
+      ).then((res: any) => {
+        if (!res) {
+          dispatch(
+            setErrorMessage(
+              conversant.id,
+              message,
+              "TEXT",
+              replyTo !== "" ? replyTo : undefined
+            )
+          );
+        }
+        return files.length
           ? files.forEach((file) =>
               setTimeout(
                 dispatch(
@@ -170,12 +184,25 @@ const Chat: React.FC = () => {
                     replyTo !== "" ? replyTo : undefined,
                     file
                   )
-                ).then((res: any) => setIsLoading!(false)),
+                ).then((res: any) => {
+                  if (!res) {
+                    dispatch(
+                      setErrorMessage(
+                        conversant.id,
+                        message,
+                        "FILE",
+                        replyTo !== "" ? replyTo : undefined,
+                        file
+                      )
+                    );
+                  }
+                  setIsLoading!(false);
+                }),
                 3000
               )
             )
-          : setIsLoading!(false)
-      );
+          : setIsLoading!(false);
+      });
     }
 
     if (message === "" && files.length) {
@@ -188,13 +215,23 @@ const Chat: React.FC = () => {
             replyTo !== "" ? replyTo : undefined,
             file
           )
-        )
+        ).then((res: any) => {
+          if (!res) {
+            dispatch(
+              setErrorMessage(
+                conversant.id,
+                message,
+                "FILE",
+                replyTo !== "" ? replyTo : undefined,
+                file
+              )
+            );
+          }
+          setIsLoading!(false);
+        })
       );
-      setIsLoading!(false);
     }
-
     scrollerRef.current!.scrollToBottom();
-
     setReplyTo("");
   };
 
@@ -262,10 +299,57 @@ const Chat: React.FC = () => {
     link.download = fileName;
     link.click();
   };
-  /*
-    handle the clicking of nickname
-  */
 
+  /* 
+    handles retry of sending error message
+  */
+  const onRetryHandler = (setLoading: any, message: P2PMessage) => {
+    setLoading(true);
+
+    if (message.payload.type === "TEXT") {
+      dispatch(
+        sendMessage(
+          conversant.id,
+          message.payload.payload.payload,
+          "TEXT",
+          message.replyToId
+        )
+      ).then((res: any) => {
+        setLoading(false);
+        if (!res) return null;
+        dispatch(removeErrMessage(message));
+      });
+    } else {
+      const file: FileContent = {
+        metadata: {
+          fileName: message.payload.fileName,
+          fileType: message.payload.fileType,
+          fileSize: message.payload.fileSize,
+        },
+        fileType: {
+          type: message.payload.fileType,
+          payload:
+            message.payload.fileType === "OTHER"
+              ? undefined
+              : { thumbnail: message.payload.thumbnail! },
+        },
+        fileBytes: message.payload.fileBytes!,
+      };
+      dispatch(
+        sendMessage(
+          conversant.id,
+          "",
+          "FILE",
+          replyTo !== "" ? replyTo : undefined,
+          file
+        )
+      ).then((res: any) => {
+        setLoading(false);
+        if (!res) return null;
+        dispatch(removeErrMessage(message));
+      });
+    }
+  };
   /* 
     renders the appropriate chat bubble
   */
@@ -274,23 +358,32 @@ const Chat: React.FC = () => {
     receipt: P2PMessageReceipt;
   }) => {
     // assume that this will be called with messages in sorted order
-    let key = messageBundle.message.p2pMessageEntryHash;
-    let author = messageBundle.message.author;
-    let timestamp = messageBundle.receipt.timestamp;
-    let payload = messageBundle.message.payload;
-    let readlist =
-      messageBundle.receipt.status === "read" ? { key: timestamp } : undefined;
-    let replyToData = messageBundle.message.replyTo
+    const key = messageBundle.message.p2pMessageEntryHash;
+    const author = messageBundle.message.author;
+    const payload = messageBundle.message.payload;
+    const replyToData = messageBundle.message.replyTo
       ? {
           payload: messageBundle.message.replyTo.payload,
           author: messageBundle.message.replyTo.author,
           id: messageBundle.message.replyTo.p2pMessageEntryHash,
         }
       : null;
+
+    const timestamp = !messageBundle.message.err
+      ? messageBundle.receipt.timestamp
+      : messageBundle.message.timestamp;
+
+    const readlist = messageBundle.message.err
+      ? undefined
+      : messageBundle.receipt.status === "read"
+      ? { key: timestamp }
+      : undefined;
+
     if (
       payload.type === "FILE" &&
       (payload as FilePayload).fileType === "VIDEO" &&
-      fetchedFiles[payload.fileHash!] === undefined
+      fetchedFiles[payload.fileHash!] === undefined &&
+      !messageBundle.message.err
     ) {
       dispatch(getFileBytes([payload.fileHash!]));
     }
@@ -302,6 +395,10 @@ const Chat: React.FC = () => {
         type="p2p"
         author={author.username}
         timestamp={timestamp}
+        onRetry={(setLoading) =>
+          onRetryHandler(setLoading, messageBundle.message)
+        }
+        onDelete={() => dispatch(removeErrMessage(messageBundle.message))}
         payload={payload}
         readList={readlist ? readlist : {}}
         showProfilePicture={true}
@@ -318,6 +415,7 @@ const Chat: React.FC = () => {
         isPinned={
           pinned[messageBundle.message.p2pMessageEntryHash] ? true : false
         }
+        err={messageBundle.message.err}
       />
     ) : (
       <Others

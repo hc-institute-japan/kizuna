@@ -6,9 +6,12 @@ import { useParams } from "react-router";
 import { ChatListMethods } from "../../components/Chat/types";
 import Typing from "../../components/Chat/Typing";
 import MessageInput, {
+  FileContent,
   MessageInputMethods,
   MessageInputOnSendParams,
 } from "../../components/MessageInput";
+import ChatBox from "./ChatBox";
+import GroupChatHeader from "./GroupChatHeader";
 // Redux
 import { FilePayloadInput } from "../../redux/commons/types";
 import {
@@ -16,11 +19,11 @@ import {
   sendGroupMessage,
 } from "../../redux/group/actions";
 import { fetchPinnedMessages } from "../../redux/group/actions/fetchPinnedMessages";
+import { setErrGroupMessage } from "../../redux/group/actions";
 import { GroupConversation, GroupMessageInput } from "../../redux/group/types";
 import { RootState } from "../../redux/types";
+// Utils
 import { useAppDispatch } from "../../utils/helpers";
-import ChatBox from "./ChatBox";
-import GroupChatHeader from "./GroupChatHeader";
 
 interface GroupChatParams {
   group: string;
@@ -31,13 +34,13 @@ const GroupChat: React.FC = () => {
   const { group } = useParams<GroupChatParams>();
 
   /* local states */
-  const [files, setFiles] = useState<object[]>([]);
-  const [errMsgs, setErrMsgs] = useState<GroupMessageInput[]>([]);
+  const [files, setFiles] = useState<FileContent[]>([]);
   const [message, setMessage] = useState("");
 
   /* Refs */
   const chatList = useRef<ChatListMethods>(null);
   const inputTimeout = useRef<NodeJS.Timeout>();
+  const messageInput = useRef<MessageInputMethods | null>(null);
 
   /* Selectors */
   const groupData = useSelector(
@@ -110,16 +113,10 @@ const GroupChat: React.FC = () => {
 
     if (text) {
       dispatch(sendGroupMessage(text)).then((res: any) => {
-        if (!res) {
-          setErrMsgs([...errMsgs, text!]);
-          setIsLoading!(false);
-          chatList.current!.scrollToBottom();
-        }
+        if (!res) dispatch(setErrGroupMessage(text!));
         if (file) {
           dispatch(sendGroupMessage(file)).then((res: any) => {
-            if (!res) {
-              setErrMsgs([...errMsgs, file!]);
-            }
+            if (!res) dispatch(setErrGroupMessage(file!));
             setIsLoading!(false);
             chatList.current!.scrollToBottom();
           });
@@ -129,9 +126,7 @@ const GroupChat: React.FC = () => {
       });
     } else if (file) {
       dispatch(sendGroupMessage(file)).then((res: any) => {
-        if (!res) {
-          setErrMsgs([...errMsgs, file!]);
-        }
+        if (!res) dispatch(setErrGroupMessage(file!));
         setIsLoading!(false);
         chatList.current!.scrollToBottom();
       });
@@ -176,10 +171,6 @@ const GroupChat: React.FC = () => {
     return setMessage(message);
   };
 
-  // const pinnedMessages = groupData.pinnedMessages?.map(pinnedMessage=>)
-
-  const messageInput = useRef<MessageInputMethods | null>(null);
-
   return groupData ? (
     <IonPage>
       <GroupChatHeader groupData={groupData} />
@@ -194,8 +185,6 @@ const GroupChat: React.FC = () => {
           messageIds={groupData.messages}
           chatList={chatList}
           readReceipt={readReceipt}
-          errMsgs={errMsgs}
-          setErrMsgs={setErrMsgs}
         />
       </IonContent>
 

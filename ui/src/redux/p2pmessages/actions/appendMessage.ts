@@ -15,9 +15,9 @@ export const appendMessage =
   async (dispatch, getState) => {
     let currentState = { ...getState().p2pmessages };
 
-    let conversantID = state.key ? state.key : state.message.receiver.id;
-    let messageHash = state.message.p2pMessageEntryHash;
-    let receiptHash = state.receipt.p2pMessageReceiptEntryHash;
+    const conversantID = state.key ? state.key : state.message.receiver.id;
+    const messageHash = state.message.p2pMessageEntryHash;
+    const receiptHash = state.receipt.p2pMessageReceiptEntryHash;
 
     if (currentState.conversations[conversantID]) {
       currentState.conversations[conversantID] = {

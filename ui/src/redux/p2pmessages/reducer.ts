@@ -6,6 +6,7 @@ import {
   SET_PINNED,
   SET_TYPING,
   SET_RECEIPTS,
+  SET_ERR_MESSAGE,
 } from "./types";
 
 const initialState: P2PMessageConversationState = {
@@ -15,6 +16,7 @@ const initialState: P2PMessageConversationState = {
   files: {},
   typing: {},
   pinned: {},
+  errMsgs: {},
 };
 
 // Hashes within the redux state are base64 strings with u prepended except for FileHash (except when used as key)
@@ -27,6 +29,8 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
         messages: action.state.messages,
         receipts: action.state.receipts,
       };
+    case SET_ERR_MESSAGE:
+      return { ...state, errMsgs: action.state.errMsgs };
     case SET_RECEIPTS:
       return {
         ...state,

@@ -36,7 +36,6 @@ const Me: React.FC<ChatProps> = ({
   isSeen = false,
   onDownload,
   onRetry,
-  errMsg,
   err,
 }) => {
   const intl = useIntl();
@@ -56,7 +55,7 @@ const Me: React.FC<ChatProps> = ({
       if (onDelete) onDelete();
     },
     onRetry: () => {
-      if (onRetry) onRetry(errMsg!, setLoading);
+      if (onRetry) onRetry(setLoading);
     },
     isPinned,
     intl,
@@ -91,6 +90,7 @@ const Me: React.FC<ChatProps> = ({
               type="me"
               timestamp={timestamp}
               file={payload as FilePayload}
+              err={err}
             />
           )}
           <IonText>
@@ -103,7 +103,7 @@ const Me: React.FC<ChatProps> = ({
             </h6>
           </IonText>
         </div>
-        {isP2P ? null : err ? (
+        {err ? (
           loading ? (
             <div className={common.picture}>
               <Spinner />
@@ -116,7 +116,7 @@ const Me: React.FC<ChatProps> = ({
               icon={alertCircleOutline}
             ></IonIcon>
           )
-        ) : (
+        ) : isP2P ? null : (
           <div className={common.picture} style={{ marginLeft: "0.5rem" }}>
             {showProfilePicture ? (
               <img

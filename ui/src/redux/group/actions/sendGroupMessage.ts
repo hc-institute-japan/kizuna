@@ -9,6 +9,7 @@ import {
   isOther,
   // type guards
   isTextPayload,
+  isVideo,
   Payload,
 } from "../../commons/types";
 import { ContactsState } from "../../contacts/types";
@@ -59,7 +60,9 @@ const setGroupMessage = async (
       ? undefined
       : isImage(fileType)
       ? fileType.payload.thumbnail
-      : fileType.payload.thumbnail;
+      : isVideo(fileType)
+      ? fileType.payload.thumbnail
+      : undefined;
     fileBytes = groupMessageData.payloadInput.payload.fileBytes;
     if (fileType.type === "VIDEO") {
       const fetchedFileBytes = await callZome({

@@ -9,6 +9,7 @@ interface Props {
   thumbnail?: string;
   download?(): any;
   onPlayPauseErrorHandler?(setErrorState: (bool: boolean) => any): any;
+  err?: boolean;
 }
 
 const VideoPlayer: React.FC<Props> = ({
@@ -17,6 +18,7 @@ const VideoPlayer: React.FC<Props> = ({
   thumbnail,
   download,
   onPlayPauseErrorHandler,
+  err,
 }) => {
   const style = [styles["video-player"]];
   if (className) style.push(className);
@@ -71,14 +73,16 @@ const VideoPlayer: React.FC<Props> = ({
         onError={handleError}
       />
       {/* {video.current ? ( */}
-      <Controls
-        isPlaying={isPlaying}
-        hasError={hasError}
-        onPlayPauseErrorHandler={errorHandler}
-        duration={currentTime}
-        video={video}
-        modal={[isModalOpen, setIsModalOpen]}
-      />
+      {!err ? (
+        <Controls
+          isPlaying={isPlaying}
+          hasError={hasError}
+          onPlayPauseErrorHandler={errorHandler}
+          duration={currentTime}
+          video={video}
+          modal={[isModalOpen, setIsModalOpen]}
+        />
+      ) : null}
       {/* ) : null} */}
       <VideoPlayerModal
         download={download}
