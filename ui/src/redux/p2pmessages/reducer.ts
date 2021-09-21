@@ -3,12 +3,8 @@ import {
   P2PMessageConversationState,
   SET_MESSAGES,
   SET_FILES,
-  SET_MESSAGES,
   SET_PINNED,
   SET_TYPING,
-  // PIN_MESSAGE,
-  // UNPIN_MESSAGE,
-  SET_PINNED,
   SET_RECEIPTS,
 } from "./types";
 
