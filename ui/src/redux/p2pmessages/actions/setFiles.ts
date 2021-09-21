@@ -7,7 +7,7 @@ import { SET_FILES } from "../types";
 */
 export const setFiles =
   (filesToFetch: { [key: string]: Uint8Array }): ThunkAction =>
-  async (dispatch, _getState, { callZome }) => {
+  async (dispatch, getState, { callZome }) => {
     const fetchedFiles = await callZome({
       zomeName: ZOMES.P2PMESSAGE,
       fnName: FUNCTIONS[ZOMES.P2PMESSAGE].SEND_MESSAGE,
@@ -15,10 +15,17 @@ export const setFiles =
     });
 
     if (fetchedFiles?.type !== "error") {
+      let currentState = { ...getState().p2pmessages.files };
+      currentState = {
+        ...currentState,
+        ...fetchedFiles,
+      };
+
       dispatch({
         type: SET_FILES,
-        sate: fetchedFiles,
+        state: currentState,
       });
+
       return true;
     }
   };
