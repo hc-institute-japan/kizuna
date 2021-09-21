@@ -17,7 +17,7 @@ interface Props {
   onHide(): any;
   onDelete(): any;
   onRetry(): any;
-  err: boolean;
+  err?: boolean;
 }
 
 const ChatPopover: React.FC<Props> = ({

@@ -1,12 +1,13 @@
 import { serializeHash } from "@holochain-open-dev/core-types";
 import { timestampToDate } from "../../../../utils/helpers";
 import { ThunkAction } from "../../../types";
-import { APPEND_MESSAGE, P2PMessage, P2PMessageReceipt } from "../../types";
+import { P2PMessage, P2PMessageReceipt } from "../../types";
+import { appendMessage } from "../../actions/appendMessage";
 
 const receiveP2PMessage =
   (payload: any): ThunkAction =>
   async (dispatch, getState, { callZome }) => {
-    let receivedMessage = payload.message;
+    const receivedMessage = payload.message;
 
     const contactsState = { ...getState().contacts.contacts };
     const profile = { ...getState().profile };
@@ -99,14 +100,13 @@ const receiveP2PMessage =
       status: receipt.status.status,
     };
 
-    dispatch({
-      type: APPEND_MESSAGE,
-      state: {
+    dispatch(
+      appendMessage({
         message: p2pMessage,
         receipt: p2pReceipt,
         key: p2pMessage.author.id,
-      },
-    });
+      })
+    );
   };
 
 export default receiveP2PMessage;

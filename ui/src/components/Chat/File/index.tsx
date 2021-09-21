@@ -13,6 +13,7 @@ interface Props {
   type: "others" | "me";
   chatType: "p2p" | "group";
   onDownload?(file: FilePayload): any;
+  err?: boolean;
 }
 
 const File: React.FC<Props> = ({
@@ -21,6 +22,7 @@ const File: React.FC<Props> = ({
   type,
   onDownload,
   chatType,
+  err,
 }) => {
   const decoder = new TextDecoder("utf-8");
   const dispatch = useAppDispatch();
@@ -33,10 +35,11 @@ const File: React.FC<Props> = ({
             onDownload={onDownload}
             file={file}
             src={decoder.decode(file.thumbnail!)}
+            err={err}
           />
         );
       case "OTHER":
-        return <FileView onDownload={onDownload} file={file} />;
+        return <FileView onDownload={onDownload} file={file} err={err} />;
       case "VIDEO":
         return (
           <VideoView
@@ -57,6 +60,7 @@ const File: React.FC<Props> = ({
                 });
               }
             }}
+            err={err}
           />
         );
       default:

@@ -1,15 +1,15 @@
 import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
-import { ThunkAction } from "../../types";
+import { FileContent } from "../../../components/MessageInput";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
-import { pushError } from "../../../redux/error/actions";
 import {
   P2PMessage,
   P2PMessageReceipt,
 } from "../../../redux/p2pmessages/types";
 import { timestampToDate } from "../../../utils/helpers";
 import { FilePayloadInput, FileType, TextPayload } from "../../commons/types";
-import { MessageInput } from "../types";
+import { ThunkAction } from "../../types";
 import { appendMessage } from "../actions/appendMessage";
+import { MessageInput } from "../types";
 
 /* SENDER */
 /* 
@@ -21,12 +21,12 @@ export const sendMessage =
     message: string,
     type: string,
     replyTo?: string,
-    file?: any
+    file?: FileContent
   ): ThunkAction =>
   async (dispatch, getState, { callZome, retry }) => {
     let payloadInput;
     if (type === "TEXT") {
-      let textPayload: TextPayload = {
+      const textPayload: TextPayload = {
         type: "TEXT",
         payload: {
           payload: message.trim(),
@@ -34,26 +34,26 @@ export const sendMessage =
       };
       payloadInput = textPayload;
     } else {
-      let fileType: FileType = {
-        type: file.fileType.type,
+      const fileType: FileType = {
+        type: file!.fileType.type,
         payload:
-          file.fileType.type !== "OTHER"
-            ? { thumbnail: file.fileType.payload.thumbnail }
+          file!.fileType.type !== "OTHER"
+            ? { thumbnail: file!.fileType.payload!.thumbnail }
             : null,
       };
-      let filePayload: FilePayloadInput = {
+      const filePayload: FilePayloadInput = {
         type: "FILE",
         payload: {
-          metadata: file.metadata,
+          metadata: file!.metadata,
           fileType: fileType,
-          fileBytes: file.fileBytes,
+          fileBytes: file!.fileBytes,
         },
       };
       payloadInput = filePayload;
     }
 
     // construct the message input structure
-    let input: MessageInput = {
+    const input: MessageInput = {
       receiver: Buffer.from(deserializeHash(receiver)),
       payload: payloadInput,
       reply_to: replyTo ? Buffer.from(deserializeHash(replyTo)) : undefined,
@@ -72,8 +72,8 @@ export const sendMessage =
         const [messageID, message] = messageTuple;
         const [receiptID, receipt] = receiptTuple!;
 
-        let messageHash = serializeHash(messageID);
-        let receiptHash = serializeHash(receiptID);
+        const messageHash = serializeHash(messageID);
+        const receiptHash = serializeHash(receiptID);
 
         let payload;
         switch (message.payload.type) {
@@ -142,7 +142,7 @@ export const sendMessage =
           };
         }
 
-        let p2pMessage: P2PMessage = {
+        const p2pMessage: P2PMessage = {
           p2pMessageEntryHash: messageHash,
           author: profileList[serializeHash(message.author)],
           receiver: profileList[serializeHash(message.receiver)],
@@ -152,19 +152,19 @@ export const sendMessage =
           receipts: [receiptHash],
         };
 
-        let messageEntryHash = serializeHash(receipt.id[0]);
-        let p2pReceipt: P2PMessageReceipt = {
+        const messageEntryHash = serializeHash(receipt.id[0]);
+        const p2pReceipt: P2PMessageReceipt = {
           p2pMessageReceiptEntryHash: serializeHash(receiptID),
           p2pMessageEntryHashes: [messageEntryHash],
           timestamp: timestampToDate(receipt.status.timestamp),
           status: receipt.status.status,
         };
 
-        let p2pFile =
+        const p2pFile =
           type === "FILE"
             ? {
                 fileHash: payload.fileHash,
-                fileBytes: file.fileBytes,
+                fileBytes: file!.fileBytes,
               }
             : undefined;
 
@@ -178,12 +178,17 @@ export const sendMessage =
         );
         return true;
       }
+      // return false;
     } catch (e) {
+      // TODO: implement this retry
       // await retry({
       //   zomeName: ZOMES.P2PMESSAGE,
       //   fnName: FUNCTIONS[ZOMES.P2PMESSAGE].SEND_MESSAGE,
       //   payload: input,
       // });
-      dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
+
+      console.log("sending of group message has failed", e);
+      return false;
+      // dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
     }
   };

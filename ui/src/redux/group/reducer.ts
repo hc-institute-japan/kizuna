@@ -5,6 +5,7 @@ import {
   GroupConversationsState,
   REMOVE_MEMBERS,
   SET_CONVERSATIONS,
+  SET_ERR_GROUP_MESSAGE,
   SET_FILES_BYTES,
   SET_GROUP_MESSAGE,
   SET_GROUP_MESSAGES,
@@ -22,6 +23,7 @@ const initialState: GroupConversationsState = {
   members: {},
   typing: {},
   pinnedMessages: {},
+  errMsgs: {},
 };
 
 const reducer = (
@@ -59,6 +61,12 @@ const reducer = (
         conversations: action.conversations,
         messages: action.messages,
         groupFiles: action.groupFiles,
+      };
+    }
+    case SET_ERR_GROUP_MESSAGE: {
+      return {
+        ...state,
+        errMsgs: action.errMsgs,
       };
     }
     case SET_FILES_BYTES:
