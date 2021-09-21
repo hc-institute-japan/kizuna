@@ -4,6 +4,7 @@ import {
   P2PMessageActionType,
   P2PMessageConversationState,
   PIN_MESSAGE,
+  SET_ERR_MESSAGE,
   SET_FILES,
   SET_MESSAGES,
   SET_PINNED,
@@ -18,6 +19,7 @@ const initialState: P2PMessageConversationState = {
   files: {},
   typing: {},
   pinned: {},
+  errMsgs: {},
 };
 
 // Hashes within the redux state are base64 strings with u prepended except for FileHash (except when used as key)
@@ -50,6 +52,7 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
 
       // update copied state
       let stateSet: P2PMessageConversationState = {
+        ...state,
         conversations: {
           ...state.conversations,
           ...stateToSet.conversations,
@@ -62,25 +65,18 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
           ...state.receipts,
           ...receipts,
         },
-        files: {
-          ...state.files,
-        },
-        typing: {
-          ...state.typing,
-        },
-        pinned: {
-          ...state.pinned,
-        },
       };
 
       // console.log("Reducer finished setting messages", stateSet);
       return stateSet;
 
+    case SET_ERR_MESSAGE:
+      return { ...state, errMsgs: action.state.errMsgs };
     case APPEND_MESSAGE:
       // console.log("Reducer appending message", action.state);
 
       // copy state
-      var stateToAppendMessage = state;
+      let stateToAppendMessage = state;
 
       // destructure inputs
       let key = action.state.key
@@ -115,6 +111,7 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
 
       // update state
       stateToAppendMessage = {
+        ...state,
         conversations: {
           ...stateToAppendMessage.conversations,
         },
@@ -126,15 +123,6 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
           ...stateToAppendMessage.receipts,
           [receiptHash]: action.state.receipt,
         },
-        files: {
-          ...stateToAppendMessage.files,
-        },
-        typing: {
-          ...stateToAppendMessage.typing,
-        },
-        pinned: {
-          ...stateToAppendMessage.pinned,
-        },
       };
 
       // console.log("Reducer finished appending message", stateToAppendMessage);
@@ -144,7 +132,7 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
       // console.log("Reducer appending receipt", action.state);
 
       // copy state
-      var stateToAppendReceipt = state;
+      let stateToAppendReceipt = state;
 
       // destructure inputs
       let receiptHashToAppend = action.state.p2pMessageReceiptEntryHash;
@@ -161,6 +149,7 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
 
       // update state
       stateToAppendReceipt = {
+        ...state,
         conversations: {
           ...stateToAppendReceipt.conversations,
         },
@@ -171,15 +160,6 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
           ...stateToAppendReceipt.receipts,
           [receiptHashToAppend]: receiptToAppend,
         },
-        files: {
-          ...stateToAppendReceipt.files,
-        },
-        typing: {
-          ...stateToAppendReceipt.typing,
-        },
-        pinned: {
-          ...stateToAppendReceipt.pinned,
-        },
       };
       // console.log("Reducer finished appending receipt", stateToAppendReceipt);
       return stateToAppendReceipt;
@@ -188,10 +168,11 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
       // console.log("Reducer setting files")
 
       // copy state
-      var stateToSetFiles = state;
+      let stateToSetFiles = state;
 
       //update state
       stateToSetFiles = {
+        ...state,
         conversations: {
           ...stateToSetFiles.conversations,
         },
@@ -205,18 +186,12 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
           ...stateToSetFiles.files,
           ...action.state,
         },
-        typing: {
-          ...stateToSetFiles.typing,
-        },
-        pinned: {
-          ...stateToSetFiles.pinned,
-        },
       };
       // console.log("reducer file set", stateToSetFiles);
       return stateToSetFiles;
 
     case SET_TYPING:
-      var stateToAppendTyping = state;
+      let stateToAppendTyping = state;
       let id = action.state.profile.id;
       let profile = {
         id: id,
@@ -231,6 +206,7 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
       }
 
       stateToAppendTyping = {
+        ...state,
         conversations: {
           ...stateToAppendTyping.conversations,
         },
@@ -253,7 +229,7 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
       return stateToAppendTyping;
 
     case SET_PINNED:
-      var stateToSetPinned = state;
+      let stateToSetPinned = state;
       const pinMessageConversant = action.state.conversant;
 
       if (stateToSetPinned.conversations[pinMessageConversant] === undefined) {
@@ -327,7 +303,7 @@ const reducer = (state = initialState, action: P2PMessageActionType) => {
       return stateToSetPinned;
 
     case PIN_MESSAGE:
-      var stateToAppendPin = state;
+      let stateToAppendPin = state;
       const pinConversant = action.state.conversant;
 
       for (const [key, value] of Object.entries(action.state.messages)) {

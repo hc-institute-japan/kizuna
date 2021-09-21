@@ -5,7 +5,6 @@ import {
   SET_ERR_GROUP_MESSAGE,
 } from "../types";
 
-// TODO: cache error messages
 const removeErrGroupMessage =
   (message: GroupMessageBundle): ThunkAction =>
   async (dispatch, getState) => {

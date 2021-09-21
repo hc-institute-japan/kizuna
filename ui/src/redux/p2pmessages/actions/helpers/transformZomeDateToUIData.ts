@@ -133,6 +133,7 @@ export const transformZomeDataToUIData = (
     files: {},
     typing: {},
     pinned: {},
+    errMsgs: {},
   };
 
   return consolidatedUIObject;

@@ -6,6 +6,7 @@ import { useParams } from "react-router";
 import { ChatListMethods } from "../../components/Chat/types";
 import Typing from "../../components/Chat/Typing";
 import MessageInput, {
+  FileContent,
   MessageInputMethods,
   MessageInputOnSendParams,
 } from "../../components/MessageInput";
@@ -33,7 +34,7 @@ const GroupChat: React.FC = () => {
   const { group } = useParams<GroupChatParams>();
 
   /* local states */
-  const [files, setFiles] = useState<object[]>([]);
+  const [files, setFiles] = useState<FileContent[]>([]);
   const [message, setMessage] = useState("");
 
   /* Refs */
