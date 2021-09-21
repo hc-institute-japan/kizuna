@@ -7,7 +7,7 @@ import { appendMessage } from "../../actions/appendMessage";
 const receiveP2PMessage =
   (payload: any): ThunkAction =>
   async (dispatch, getState, { callZome }) => {
-    let receivedMessage = payload.message;
+    const receivedMessage = payload.message;
 
     const contactsState = { ...getState().contacts.contacts };
     const profile = { ...getState().profile };

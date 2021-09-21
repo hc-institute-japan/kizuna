@@ -3,15 +3,15 @@ import { ThunkAction } from "../../types";
 import { GroupMessage, GroupMessageBundle } from "../types";
 
 const getMessagesWithProfile =
-  (messageIds: string[]): ThunkAction =>
+  (messageIds: string[], groupId: string): ThunkAction =>
   (_dispatch, getState) => {
-    const { messages, members } = getState().groups;
+    const { messages, members, errMsgs } = getState().groups;
     const profile = getState().profile;
     /* 
       Retrieve the messgaes from redux store and modify
       the author field to Profile type.
     */
-    const messageBundles: GroupMessageBundle[] = messageIds.map((messageId) => {
+    let messageBundles: GroupMessageBundle[] = messageIds.map((messageId) => {
       /* retrieve the message content from redux */
       const message: GroupMessage = messages[messageId];
       const authorProfile: Profile = members[message.author];
@@ -28,6 +28,10 @@ const getMessagesWithProfile =
             },
       };
     });
+    // append error messages if there are any
+    if (errMsgs[groupId]) {
+      messageBundles = messageBundles.concat(errMsgs[groupId]);
+    }
     messageBundles.sort((x, y) => {
       return x.timestamp.getTime() - y.timestamp.getTime();
     });
