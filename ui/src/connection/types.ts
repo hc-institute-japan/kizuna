@@ -22,8 +22,15 @@ export const ZOMES: ZomeNameType = {
   CONTACTS: "contacts",
   GROUP: "group",
   AGGREGATOR: "aggregator",
+  WEBRTC: "webrtc",
 };
+
 export const SIGNALS: SignalNameType = {
+  [ZOMES.WEBRTC]: {
+    SEND_OFFER: "SEND_OFFER",
+    SEND_ANSWER: "SEND_ANSWER",
+    SEND_ICE_CANDIDATE: "SEND_ICE_CANDIDATE",
+  },
   [ZOMES.GROUP]: {
     ADDED_TO_GROUP: "ADDED_TO_GROUP",
     GROUP_MESSAGE_DATA: "GROUP_MESSAGE_DATA",
@@ -39,6 +46,9 @@ export const SIGNALS: SignalNameType = {
 };
 
 export const FUNCTIONS: FunctionNameType = {
+  [ZOMES.WEBRTC]: {
+    SIGNAL_RTC: "signal_rtc",
+  },
   [ZOMES.USERNAME]: {
     SET_USERNAME: "set_username",
     GET_USERNAMES: "get_usernames",

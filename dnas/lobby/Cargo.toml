@@ -3,12 +3,14 @@ members = [
     "zomes/group",
     # "zomes/request",
     # "zomes/username",
+    "zomes/webrtc", 
     "zomes/profiles",
     "zomes/contacts",
     "zomes/aggregator",
     "zomes/preference",
     "zomes/p2pmessage",
     "commons/file_types", 
+
 ]
 
 [profile.dev]
