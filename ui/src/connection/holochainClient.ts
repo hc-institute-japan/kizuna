@@ -98,7 +98,7 @@ export const init: () => any = async () => {
 
     // client = new HoloClient(connection, cellData, branding);
   } catch (error) {
-    Object.values(error).forEach((e) => console.error(e));
+    Object.values(error as any).forEach((e) => console.error(e));
     console.error(error);
     throw error;
   }
@@ -148,7 +148,7 @@ export const retry: (config: CallZomeConfig) => Promise<any> = async (
       return await client?.callZome(zomeName, fnName, payload);
     } catch (e) {
       console.warn(e);
-      const { type = null, data = null } = { ...e };
+      const { type = null, data = null } = { ...(e as any) };
       if (type === "error") {
         console.warn(fnName);
         switch (data?.type) {
@@ -216,7 +216,7 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
     return await client?.callZome(zomeName, fnName, payload);
   } catch (e) {
     console.warn(e);
-    const { type = null, data = null } = { ...e };
+    const { type = null, data = null } = { ...(e as any) };
     if (type === "error") {
       console.warn(fnName);
       switch (data?.type) {
