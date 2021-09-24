@@ -44,7 +44,12 @@ pub fn send_message_in_target_date_handler(
             let message = GroupMessage {
                 group_hash: message_input.clone().group_hash,
                 payload,
-                created: to_timestamp(Duration::from_millis(message_input.clone().date)),
+                // created: to_timestamp(Duration::from_millis(message_input.clone().date)),
+                created: Timestamp::from_micros(
+                    Duration::from_millis(message_input.clone().date)
+                        .as_micros()
+                        .try_into()?,
+                ),
                 sender: message_input.clone().sender,
                 reply_to: message_input.clone().reply_to,
             };

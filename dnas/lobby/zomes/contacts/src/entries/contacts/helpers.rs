@@ -111,7 +111,6 @@ pub fn query_contacts() -> ExternResult<Vec<Contact>> {
         })
         .collect::<Vec<Contact>>();
 
-    debug!("contacts query contacts {:?}", contacts.clone());
     Ok(contacts)
 }
 
@@ -119,10 +118,6 @@ pub fn list_added_or_blocked(filter: ContactType) -> ExternResult<AgentPubKeysWr
     let mut agents_to_contact_types: HashMap<AgentPubKey, Vec<Contact>> =
         std::collections::HashMap::new();
     let sorted_contacts: Vec<Contact> = query_contacts()?;
-    debug!(
-        "contacts list added or blocked sorted_contacts {:?}",
-        sorted_contacts.clone()
-    );
 
     for contact in sorted_contacts {
         for agent_id in &contact.agent_ids {
@@ -159,6 +154,5 @@ pub fn list_added_or_blocked(filter: ContactType) -> ExternResult<AgentPubKeysWr
         })
         .collect();
 
-    debug!("contacts list added or blocked {:?}", filtered_agents);
     Ok(AgentPubKeysWrapper(filtered_agents))
 }
