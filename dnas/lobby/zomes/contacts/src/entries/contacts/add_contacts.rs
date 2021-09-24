@@ -9,6 +9,5 @@ pub fn add_contacts_handler(agent_ids: AgentPubKeysWrapper) -> ExternResult<Agen
     check_latest_state(&agent_ids, ContactType::Add)?;
     let added_contact = Contact::new(sys_time()?, agent_ids.0.clone(), ContactType::Add);
     create_entry(&added_contact)?;
-    debug!("contacts zome added contacts {:?}", agent_ids.clone());
     Ok(agent_ids)
 }
