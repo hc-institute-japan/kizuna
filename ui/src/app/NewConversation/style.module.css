@@ -20,3 +20,13 @@
   --background: var(--ion-item-background) !important;
   cursor: pointer;
 }
+
+.warning {
+  display: flex;
+  align-items: center;
+  padding: 0.3rem;
+}
+
+.warning-icon {
+  padding-right: 0.2rem;
+}
