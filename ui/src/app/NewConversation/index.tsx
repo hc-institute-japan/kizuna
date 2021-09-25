@@ -1,4 +1,11 @@
-import { IonContent, IonLoading, IonPage } from "@ionic/react";
+import {
+  IonContent,
+  IonIcon,
+  IonLoading,
+  IonPage,
+  IonText,
+} from "@ionic/react";
+import { warningOutline } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import { useHistory, useLocation } from "react-router";
@@ -129,6 +136,21 @@ const NewConversation: React.FC = () => {
     return () => setContacts({});
   }, [location.state]);
 
+  const renderP2PWarning = () => {
+    return (
+      <div className={styles["warning"]}>
+        <IonIcon
+          icon={warningOutline}
+          color="warning"
+          className={styles["warning-icon"]}
+        />
+        <IonText color="warning">
+          Currently, p2p message only gets sent when the receiver is online
+        </IonText>
+      </div>
+    );
+  };
+
   return (
     <ContactsContext.Provider
       value={[contacts, setContacts, selectedContacts, setSelectedContacts]}
@@ -149,6 +171,9 @@ const NewConversation: React.FC = () => {
             )}
           />
         </IonContent>
+        {Object.values(selectedContacts).length === 1
+          ? renderP2PWarning()
+          : null}
         <MessageInput
           onSend={handleOnSend}
           onChange={(message) => setMessage(message)}
