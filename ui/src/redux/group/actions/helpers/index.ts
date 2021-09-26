@@ -47,10 +47,11 @@ export const convertFetchedResToGroupMessagesOutput = (
           nanos_since_epoch: number;
           secs_since_epoch: number;
         }): Date =>
-          timestampToDate([
-            timestamp.secs_since_epoch,
-            timestamp.nanos_since_epoch,
-          ])
+          // timestampToDate([
+          //   timestamp.secs_since_epoch,
+          //   timestamp.nanos_since_epoch,
+          // ])
+          timestampToDate(timestamp.nanos_since_epoch)
       );
 
       return {
