@@ -39,7 +39,7 @@ const Playground = () => {
   };
 
   const onTrack = (event: RTCTrackEvent) => {
-    console.log(event);
+    // console.log(event);
     setRemoteStream(event.streams[0]!);
     if (!remoteVideo.current!.srcObject) {
       remoteVideo.current!.srcObject = event.streams[0];
@@ -68,8 +68,48 @@ const Playground = () => {
           { urls: "stun:stun2.l.google.com:19302" },
           { urls: "stun:stun3.l.google.com:19302" },
           { urls: "stun:stun4.l.google.com:19302" },
+          { urls: "stun:stun01.sipphone.com" },
+          { urls: "stun:stun.ekiga.net" },
+          { urls: "stun:stun.fwdnet.net" },
+          { urls: "stun:stun.ideasip.com" },
+          { urls: "stun:stun.iptel.org" },
+          { urls: "stun:stun.rixtelecom.se" },
+          { urls: "stun:stun.schlund.de" },
+          { urls: "stun:stunserver.org" },
+          { urls: "stun:stun.softjoys.com" },
+          { urls: "stun:stun.voiparound.com" },
+          { urls: "stun:stun.voipbuster.com" },
+          { urls: "stun:stun.voipstunt.com" },
+          { urls: "stun:stun.voxgratia.org" },
+          { urls: "stun:stun.xten.com" },
+          {
+            urls: "turn:numb.viagenie.ca",
+            credential: "muazkh",
+            username: "webrtc@live.com",
+          },
+          {
+            urls: "turn:192.158.29.39:3478?transport=udp",
+            credential: "JZEOEt2V3Qb0y27GRntt2u2PAYA=",
+            username: "28224511:1379330808",
+          },
+          {
+            urls: "turn:192.158.29.39:3478?transport=tcp",
+            credential: "JZEOEt2V3Qb0y27GRntt2u2PAYA=",
+            username: "28224511:1379330808",
+          },
+          {
+            urls: "turn:turn.bistri.com:80",
+            credential: "homeo",
+            username: "homeo",
+          },
+          {
+            urls: "turn:turn.anyfirewall.com:443?transport=tcp",
+            credential: "webrtc",
+            username: "webrtc",
+          },
         ],
       });
+
       // peerConnection!.onnegotiationneeded = async () => {
       //   await createAndSendOffer();
       // };
@@ -134,9 +174,9 @@ const Playground = () => {
       const top = JSON.parse(candidates.pop() as string);
       dispatch({ type: SET_CANDIDATES, candidates });
 
-      console.group("Candidates: ");
-      console.log(top, candidates);
-      console.groupEnd();
+      // console.group("Candidates: ");
+      // console.log(top, candidates);
+      // console.groupEnd();
 
       peerConnection?.addIceCandidate(top);
     }
@@ -146,11 +186,12 @@ const Playground = () => {
     if (offers.length > 0) {
       // const newRTCPeerConnection = new RTCPeerConnection();
       const top = JSON.parse(offers.pop() as string);
+      // console.log(top);
       peerConnection!.setRemoteDescription(top).catch((e) => console.error(e));
 
-      console.group("Offers: ");
-      console.log(top, offers);
-      console.groupEnd();
+      // console.group("Offers: ");
+      // console.log(top, offers);
+      // console.groupEnd();
 
       dispatch({ type: SET_OFFERS, offers });
 
@@ -175,9 +216,9 @@ const Playground = () => {
     if (answers.length > 0) {
       const top = JSON.parse(answers.pop() as string);
 
-      console.group("Answers: ");
-      console.log(top, answers);
-      console.groupEnd();
+      // console.group("Answers: ");
+      // console.log(top, answers);
+      // console.groupEnd();
 
       dispatch({ type: SET_ANSWERS, answers });
       peerConnection?.setRemoteDescription(top).catch((e) => console.error(e));
