@@ -67,8 +67,8 @@ const ChatBox: React.FC<Props> = ({
 
   /* Handlers */
   const handleOnScrollTop = (complete: any) => {
-    if (!oldestFetched) {
-      let lastMessage = messages[0];
+    const lastMessage = messages[0];
+    if (!oldestFetched && !lastMessage.err) {
       dispatch(
         getPreviousGroupMessages({
           groupId: groupId,

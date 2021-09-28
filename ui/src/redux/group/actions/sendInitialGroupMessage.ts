@@ -9,6 +9,8 @@ import {
 } from "../types";
 import createGroup from "./createGroup";
 import sendGroupMessage from "./sendGroupMessage";
+import setErrGroupMessage from "./setErrGroupMessage";
+import groupMessageData from "./signals/groupMessageData";
 
 const sendInitialGroupMessage =
   (
@@ -32,7 +34,6 @@ const sendInitialGroupMessage =
       );
 
       const inputs: GroupMessageInput[] = [];
-
       /* Work on each file that were uploaded and convert them to appropriate input to Zome fn */
       files.forEach((file: any) => {
         const filePayloadInput: FilePayloadInput = {
@@ -72,12 +73,13 @@ const sendInitialGroupMessage =
       }
 
       const messageResults: any[] = [];
-      inputs.forEach(async (groupMessage: any) => {
-        const messageResult = await dispatch(sendGroupMessage(groupMessage));
-        /* We are ignoring any message that failed to send */
-        if (messageResult !== false) {
-          messageResults.push(messageResult);
-        }
+      inputs.forEach(async (groupMessage) => {
+        // res: boolean | group message res
+        await dispatch(sendGroupMessage(groupMessage)).then((res: any) => {
+          !res
+            ? dispatch(setErrGroupMessage(groupMessage))
+            : messageResults.push(res);
+        });
       });
 
       return {
