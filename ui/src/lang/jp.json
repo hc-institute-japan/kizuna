@@ -15,6 +15,7 @@
   "app.contacts.search-nickname-warning": "検索は３文字以上で可能です",
   "app.contacts.unblock": "連絡先のブロックを解除",
   "app.conversations.empty-conversations": "まだ会話がないようです...",
+  "app.conversations.no-group-messages": "まだメッセージが送信されていません...",
   "app.group-chat.add-member": "追加",
   "app.group-chat.add-member-close": "閉じる",
   "app.group-chat.add-member-contacts": "連絡先",
