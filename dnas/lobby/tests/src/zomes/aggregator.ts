@@ -13,11 +13,10 @@ export default (config) => {
     "get latest state",
     async (s: ScenarioApi, t) => {
       const [conductor] = await s.players([config]);
-      const [alice_lobby_happ] = await installAgents(
-        conductor,
-        ["alice", "bobby"],
-        [MEM_PROOF1, MEM_PROOF2]
-      );
+      const [alice_lobby_happ] = await installAgents(conductor, [
+        "alice",
+        "bobby",
+      ]);
       const [alice_conductor] = alice_lobby_happ.cells;
 
       await createProfile({
