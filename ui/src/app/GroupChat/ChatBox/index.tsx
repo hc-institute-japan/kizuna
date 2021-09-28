@@ -83,10 +83,10 @@ const ChatBox: React.FC<Props> = ({
         if (res && Object.keys(res.groupMessagesContents).length <= 0) {
           setOldestFetched(true);
         }
-        complete();
+        return complete();
       });
     }
-    return null;
+    return complete();
   };
 
   const handleOnDownload = (file: FilePayload) => {
