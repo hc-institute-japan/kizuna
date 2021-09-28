@@ -13,8 +13,8 @@ const network = {
 
 const config = Config.gen({ network });
 
-group(config);
-contacts(config);
-preference(config);
+// group(config);
+// contacts(config);
+// preference(config);
 aggregator(config);
 // request(config); // not passing
