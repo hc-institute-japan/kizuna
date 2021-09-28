@@ -2,7 +2,6 @@ use hdk::prelude::*;
 
 mod entries;
 mod utils;
-// use crate::utils::to_timestamp;
 
 use contacts::{AgentPubKeysWrapper, BooleanWrapper, Contact};
 use entries::contacts;

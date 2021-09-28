@@ -16,13 +16,6 @@ export const getAdjacentMessages =
     last_fetched_message_id?: HoloHashBase64
   ): ThunkAction =>
   async (dispatch, getState, { callZome }) => {
-    // console.log(
-    //   "the time to be passed to HC is ",
-    //   last_fetched_timestamp,
-    //   last_fetched_timestamp
-    //     ? dateToTimestamp(last_fetched_timestamp)
-    //     : undefined
-    // );
     let zome_input = {
       conversant: Buffer.from(deserializeHash(conversant)),
       batch_size: batch_size,
@@ -34,7 +27,6 @@ export const getAdjacentMessages =
         ? Buffer.from(deserializeHash(last_fetched_message_id))
         : undefined,
     };
-    // console.log("action get next input", zome_input);
     try {
       // CALL ZOME
       const adjacentMessages = await callZome({
@@ -55,12 +47,6 @@ export const getAdjacentMessages =
           adjacentMessages,
           profileList
         );
-        // console.log("actions get next", adjacentMessages, toDispatch);
-        // if (Object.values(nextBatchOfMessages[1]).length > 0)
-        //   dispatch({
-        //     type: SET_MESSAGES,
-        //     state: toDispatch,
-        //   });
         return toDispatch;
       }
     } catch (e) {

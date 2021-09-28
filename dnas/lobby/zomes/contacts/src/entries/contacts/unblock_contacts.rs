@@ -1,7 +1,6 @@
 use hdk::prelude::*;
 
 use super::helpers::check_latest_state;
-// use crate::to_timestamp;
 
 use super::{AgentPubKeysWrapper, Contact, ContactType};
 
