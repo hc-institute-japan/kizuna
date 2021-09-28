@@ -6,7 +6,12 @@ import {
   P2PMessageReceipt,
 } from "../../../redux/p2pmessages/types";
 import { timestampToDate } from "../../../utils/helpers";
-import { FilePayloadInput, FileType, TextPayload } from "../../commons/types";
+import {
+  FilePayload,
+  FilePayloadInput,
+  FileType,
+  TextPayload,
+} from "../../commons/types";
 import { ThunkAction } from "../../types";
 import { appendMessage } from "../actions/appendMessage";
 import { MessageInput } from "../types";
@@ -15,6 +20,113 @@ import { MessageInput } from "../types";
 /* 
     action to send a message
 */
+
+interface DispatchState {
+  message: P2PMessage;
+  receipt: P2PMessageReceipt;
+  file: any;
+}
+
+const processSentData = (
+  returnValue: any,
+  contactsState: any,
+  profile: any
+) => {
+  const [messageTuple, receiptTuple] = returnValue;
+  const [messageID, message] = messageTuple;
+  const [receiptID, receipt] = receiptTuple!;
+
+  const messageHash = serializeHash(messageID);
+  const receiptHash = serializeHash(receiptID);
+
+  let payload;
+  switch (message.payload.type) {
+    case "TEXT":
+      payload = message.payload;
+      break;
+    case "FILE":
+      payload = {
+        type: "FILE",
+        fileName: message.payload.payload.metadata.fileName,
+        fileSize: message.payload.payload.metadata.fileSize,
+        fileType: message.payload.payload.fileType.type,
+        fileHash: serializeHash(message.payload.payload.metadata.fileHash),
+        thumbnail:
+          message.payload.payload.fileType.type !== "OTHER"
+            ? message.payload.payload.fileType.payload.thumbnail
+            : null,
+      };
+      break;
+    default:
+      break;
+  }
+
+  const profileList = {
+    ...contactsState,
+    [profile.id!]: { id: profile.id!, username: profile.username! },
+  };
+
+  let transformedReplyTo = undefined;
+  let replyToPayload = undefined;
+  if (message.replyTo !== null) {
+    switch (message.replyTo.payload.type) {
+      case "TEXT":
+        replyToPayload = message.replyTo.payload;
+        break;
+      case "FILE":
+        replyToPayload = {
+          type: "FILE",
+          fileName: message.replyTo.payload.payload.metadata.fileName,
+          fileSize: message.replyTo.payload.payload.metadata.fileSize,
+          fileType: message.replyTo.payload.payload.fileType.type,
+          fileHash: serializeHash(
+            message.replyTo.payload.payload.metadata.fileHash
+          ),
+          thumbnail:
+            message.replyTo.payload.payload.fileType.type !== "OTHER"
+              ? message.replyTo.payload.payload.fileType.payload.thumbnail
+              : null,
+        };
+        break;
+      default:
+        break;
+    }
+
+    transformedReplyTo = {
+      p2pMessageEntryHash: serializeHash(message.replyTo.hash),
+      author: profileList[serializeHash(message.replyTo.author)],
+      receiver: profileList[serializeHash(message.replyTo.receiver)],
+      payload: replyToPayload ? replyToPayload : message.replyTo.payload,
+      timestamp: timestampToDate(message.replyTo.timeSent),
+      receipts: [],
+    };
+  }
+
+  const p2pMessage: P2PMessage = {
+    p2pMessageEntryHash: messageHash,
+    author: profileList[serializeHash(message.author)],
+    receiver: profileList[serializeHash(message.receiver)],
+    payload: payload,
+    timestamp: timestampToDate(message.timeSent),
+    replyTo: transformedReplyTo ? transformedReplyTo : undefined,
+    receipts: [receiptHash],
+  };
+
+  const messageEntryHash = serializeHash(receipt.id[0]);
+  const p2pReceipt: P2PMessageReceipt = {
+    p2pMessageReceiptEntryHash: serializeHash(receiptID),
+    p2pMessageEntryHashes: [messageEntryHash],
+    timestamp: timestampToDate(receipt.status.timestamp),
+    status: receipt.status.status,
+  };
+
+  return {
+    message: p2pMessage,
+    receipt: p2pReceipt,
+    file: undefined,
+  };
+};
+
 export const sendMessage =
   (
     receiver: string,
@@ -68,127 +180,63 @@ export const sendMessage =
       });
 
       if (sentMessage?.type !== "error") {
-        const [messageTuple, receiptTuple] = sentMessage;
-        const [messageID, message] = messageTuple;
-        const [receiptID, receipt] = receiptTuple!;
-
-        const messageHash = serializeHash(messageID);
-        const receiptHash = serializeHash(receiptID);
-
-        let payload;
-        switch (message.payload.type) {
-          case "TEXT":
-            payload = message.payload;
-            break;
-          case "FILE":
-            payload = {
-              type: "FILE",
-              fileName: message.payload.payload.metadata.fileName,
-              fileSize: message.payload.payload.metadata.fileSize,
-              fileType: message.payload.payload.fileType.type,
-              fileHash: serializeHash(
-                message.payload.payload.metadata.fileHash
-              ),
-              thumbnail:
-                message.payload.payload.fileType.type !== "OTHER"
-                  ? message.payload.payload.fileType.payload.thumbnail
-                  : null,
-            };
-            break;
-          default:
-            break;
-        }
-
         const contactsState = { ...getState().contacts.contacts };
         const profile = { ...getState().profile };
-        const profileList = {
-          ...contactsState,
-          [profile.id!]: { id: profile.id!, username: profile.username! },
-        };
 
-        let transformedReplyTo = undefined;
-        let replyToPayload = undefined;
-        if (message.replyTo !== null) {
-          switch (message.replyTo.payload.type) {
-            case "TEXT":
-              replyToPayload = message.replyTo.payload;
-              break;
-            case "FILE":
-              replyToPayload = {
-                type: "FILE",
-                fileName: message.replyTo.payload.payload.metadata.fileName,
-                fileSize: message.replyTo.payload.payload.metadata.fileSize,
-                fileType: message.replyTo.payload.payload.fileType.type,
-                fileHash: serializeHash(
-                  message.replyTo.payload.payload.metadata.fileHash
-                ),
-                thumbnail:
-                  message.replyTo.payload.payload.fileType.type !== "OTHER"
-                    ? message.replyTo.payload.payload.fileType.payload.thumbnail
-                    : null,
-              };
-              break;
-            default:
-              break;
-          }
-
-          transformedReplyTo = {
-            p2pMessageEntryHash: serializeHash(message.replyTo.hash),
-            author: profileList[serializeHash(message.replyTo.author)],
-            receiver: profileList[serializeHash(message.replyTo.receiver)],
-            payload: replyToPayload ? replyToPayload : message.replyTo.payload,
-            timestamp: timestampToDate(message.replyTo.timeSent),
-            receipts: [],
-          };
-        }
-
-        const p2pMessage: P2PMessage = {
-          p2pMessageEntryHash: messageHash,
-          author: profileList[serializeHash(message.author)],
-          receiver: profileList[serializeHash(message.receiver)],
-          payload: payload,
-          timestamp: timestampToDate(message.timeSent),
-          replyTo: transformedReplyTo ? transformedReplyTo : undefined,
-          receipts: [receiptHash],
-        };
-
-        const messageEntryHash = serializeHash(receipt.id[0]);
-        const p2pReceipt: P2PMessageReceipt = {
-          p2pMessageReceiptEntryHash: serializeHash(receiptID),
-          p2pMessageEntryHashes: [messageEntryHash],
-          timestamp: timestampToDate(receipt.status.timestamp),
-          status: receipt.status.status,
-        };
+        const dispatchState: DispatchState = processSentData(
+          sentMessage,
+          contactsState,
+          profile
+        );
 
         const p2pFile =
           type === "FILE"
             ? {
-                fileHash: payload.fileHash,
+                fileHash: (dispatchState.message.payload as FilePayload)
+                  .fileHash,
                 fileBytes: file!.fileBytes,
               }
             : undefined;
 
+        dispatchState.file = p2pFile;
+
         // DISPATCH TO REDUCER
-        dispatch(
-          appendMessage({
-            message: p2pMessage,
-            receipt: p2pReceipt,
-            file: p2pFile !== undefined ? p2pFile : undefined,
-          })
-        );
+        dispatch(appendMessage(dispatchState));
         return true;
       }
-      // return false;
     } catch (e) {
-      // TODO: implement this retry
-      // await retry({
-      //   zomeName: ZOMES.P2PMESSAGE,
-      //   fnName: FUNCTIONS[ZOMES.P2PMESSAGE].SEND_MESSAGE,
-      //   payload: input,
-      // });
+      try {
+        const retriedSend = await retry({
+          zomeName: ZOMES.P2PMESSAGE,
+          fnName: FUNCTIONS[ZOMES.P2PMESSAGE].SEND_MESSAGE,
+          payload: input,
+        });
 
-      console.log("sending of group message has failed", e);
-      return false;
-      // dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
+        if (retriedSend?.type !== "error") {
+          const contactsState = { ...getState().contacts.contacts };
+          const profile = { ...getState().profile };
+
+          const dispatchState: DispatchState = processSentData(
+            retriedSend,
+            contactsState,
+            profile
+          );
+
+          const p2pFile =
+            type === "FILE"
+              ? {
+                  fileHash: (dispatchState.message.payload as FilePayload)
+                    .fileHash,
+                  fileBytes: file!.fileBytes,
+                }
+              : undefined;
+
+          dispatchState.file = p2pFile;
+          dispatch(appendMessage(dispatchState));
+        }
+      } catch (e) {
+        // console.log("sending automatically retried message has failed", e);
+        return false;
+      }
     }
   };
