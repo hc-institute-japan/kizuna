@@ -1,7 +1,8 @@
 import { IonRouterOutlet, IonSplitPane } from "@ionic/react";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Redirect, Route, Switch } from "react-router";
 import Menu from "../../components/Menu";
+import Spinner from "../../components/Spinner";
 import { getLatestData } from "../../redux/commons/actions";
 import { useAppDispatch } from "../../utils/helpers";
 import Blocked from "../Blocked";
@@ -13,13 +14,14 @@ import Profile from "../Profile";
 import Settings from "../Settings";
 
 const Authenticated: React.FC = () => {
+  const [loading, setLoading] = useState<boolean>(true);
   const dispatch = useAppDispatch();
   useEffect(() => {
-    dispatch(getLatestData());
+    dispatch(getLatestData()).then((res: any) => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return (
+  return !loading ? (
     <IonSplitPane contentId="main">
       <Menu />
       <IonRouterOutlet id="main">
@@ -39,6 +41,8 @@ const Authenticated: React.FC = () => {
         </Switch>
       </IonRouterOutlet>
     </IonSplitPane>
+  ) : (
+    <Spinner />
   );
 };
 
