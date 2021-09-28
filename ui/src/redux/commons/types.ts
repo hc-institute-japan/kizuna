@@ -111,7 +111,7 @@ export function isP2PMessage(
 
 export interface Message {
   id: string;
-  sender: Profile;
+  sender?: Profile;
   payloadType: "TEXT" | "FILE";
   /* undefined when payload type is FILE */
   textPayload?: string;
