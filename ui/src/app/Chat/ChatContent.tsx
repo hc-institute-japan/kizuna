@@ -257,15 +257,11 @@ const Chat: React.FC = () => {
           if (Object.values(res)[0][conversant.id].length <= 0) {
             setDisableGetNextBatch(true);
           }
-          complete();
+          return complete();
         });
       }
     }
-    // } else {
-    // didMountRef2.current = true;
-    // }
-    complete();
-    return;
+    return complete();
   };
 
   /* 
