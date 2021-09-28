@@ -7,7 +7,6 @@ use crate::signals::SignalPayload;
 use super::group_helpers::link_and_emit_added_to_group_signals;
 use crate::utils;
 use crate::utils::error;
-// use crate::utils::to_timestamp;
 
 pub fn create_group_handler(
     create_group_input: CreateGroupInput,

@@ -2,17 +2,15 @@ import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
 import { ThunkAction } from "../../types";
 import { P2PMessage, APPEND_RECEIPT } from "../types";
-import { timestampToDate } from "../../../utils/helpers";
+import { dateToTimestamp, timestampToDate } from "../../../utils/helpers";
 
 export const readMessage =
   (messages: P2PMessage[]): ThunkAction =>
   async (dispatch, _getState, { callZome }) => {
     // CONSTRUCT ZOME INPUT
     // construct the timestamp
-    let now = Date.now();
-    let seconds = (now / 1000) >> 0;
-    let nanoseconds = (now % 1000) * 10 ** 6;
-    let timestamp = [seconds, nanoseconds];
+    let now = new Date();
+    let timestamp = dateToTimestamp(now);
 
     // get hashes of messages to be marked
     let hashes: any = [];

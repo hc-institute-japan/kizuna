@@ -8,7 +8,6 @@ use super::group_helpers::get_group_latest_version;
 use super::group_helpers::link_and_emit_added_to_group_signals;
 use crate::utils::error;
 use crate::utils::get_my_blocked_list;
-// use crate::utils::to_timestamp;
 
 pub fn add_members_handler(add_members_input: UpdateMembersIO) -> ExternResult<UpdateMembersIO> {
     let mut new_group_members_from_input: Vec<AgentPubKey> = add_members_input.members.clone();

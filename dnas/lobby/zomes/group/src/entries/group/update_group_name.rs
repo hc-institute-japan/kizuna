@@ -3,7 +3,6 @@ use hdk::prelude::*;
 use super::{group_helpers::get_group_latest_version, GroupOutput};
 use super::{Group, UpdateGroupNameIO};
 use crate::utils::error;
-// use crate::utils::to_timestamp;
 
 pub fn update_group_name_handler(
     update_group_name_input: UpdateGroupNameIO,

@@ -4,7 +4,6 @@ use super::{Group, GroupOutput, UpdateMembersIO};
 
 use super::group_helpers::get_group_latest_version;
 use crate::utils::error;
-// use crate::utils::to_timestamp;
 
 pub fn remove_members_handler(
     remove_members_input: UpdateMembersIO,

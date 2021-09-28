@@ -11,5 +11,6 @@ crate-type = [ "cdylib", "rlib" ]
 [dependencies]
 derive_more = "0"
 serde = "1"
-hdk = "0.0.100"
+hdk = {git = "https://github.com/holochain/holochain", rev = "d7a6ac364a6a50bee6297ec2041e8c1ffe0be7dc", package = "hdk", version = "0.0.107"}
+holo_hash = {version = "0.0.6", features = ["encoding"]}
 username = {git = "https://github.com/holochain-open-dev/username-zome", branch = "bump-hdk-0.0.100", package = "username"}

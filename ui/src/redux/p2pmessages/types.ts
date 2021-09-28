@@ -9,13 +9,6 @@ import {
 } from "../commons/types";
 import { Profile } from "../profile/types";
 
-export interface Read {
-  timestamp: [number, number];
-}
-export interface Delivered {
-  timestamp: [number, number];
-}
-
 export interface P2PMessage {
   p2pMessageEntryHash: MessageID;
   author: Profile;
@@ -55,16 +48,16 @@ export type P2PPinStatus = "pinned" | "unpinned";
 
 /* STRUCTURES */
 export interface Read {
-  timestamp: [number, number];
+  timestamp: number;
 }
 export interface Delivered {
-  timestamp: [number, number];
+  timestamp: number;
 }
 export interface Pinned {
-  timestamp: [number, number];
+  timestamp: number;
 }
 export interface Unpinned {
-  timestamp: [number, number];
+  timestamp: number;
 }
 
 /* INPUT STRUCTURES */
@@ -78,14 +71,14 @@ export interface PinInput {
   id: MessageID[];
   conversant: AgentPubKeyBase64;
   status: String;
-  timestamp: [number, number];
+  timestamp: number;
 }
 
 export interface P2PChatFilterBatch {
   conversant: AgentPubKeyBase64;
   batch_size: number;
   payload_type: String;
-  last_fetched_timestamp?: [number, number];
+  last_fetched_timestamp?: number;
   last_fetched_message_id?: HoloHash;
 }
 

@@ -149,8 +149,6 @@ export const searchContacts: SearchContacts = (contacts, username) =>
   Object.values(contacts).find((curr) => username === curr.username);
 
 export const timestampToDate = (timestamp: number) => {
-  // const { 0: seconds, 1: nanoseconds } = timestamp;
-  // const date = new Date(seconds * 1000 + nanoseconds * 1e-6);
   const microseconds = timestamp;
   const date = new Date(microseconds * 1e-3);
   return date;
@@ -161,11 +159,7 @@ export const dateToTimestamp = (date: Date) => {
   // Timestamp constructor in hc is from_micros()
   const milliseconds = date.getTime();
   const microseconds = milliseconds * 1000;
-  const ret: [number, number] = [microseconds, 0];
-  // const seconds = (milliseconds / 1000) >> 0;
-  // const nanoseconds = (milliseconds % 1000) * 10 ** 6;
-  // const ret: [number, number] = [seconds, nanoseconds];
-  return ret;
+  return microseconds;
 };
 
 export const isTextPayload = (payload: Payload) => payload.type === "TEXT";
