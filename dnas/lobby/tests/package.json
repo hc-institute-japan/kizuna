@@ -13,8 +13,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@holochain/conductor-api": "0.0.4",
-    "@holochain/tryorama": "holochain/tryorama#2f9df8bfb200269f8b49a32bd26745f74827e4da", 
+    "@holochain/conductor-api": "0.2.0",
+    "@holochain/tryorama": "holochain/tryorama#bump-hc-0-0-103",
     "@types/lodash": "^4.14.158",
     "@types/node": "^14.14.37",
     "concurrently": "^5.3.0",
