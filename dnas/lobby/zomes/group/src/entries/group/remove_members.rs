@@ -4,7 +4,6 @@ use super::{Group, GroupOutput, UpdateMembersIO};
 
 use super::group_helpers::get_group_latest_version;
 use crate::utils::error;
-use crate::utils::to_timestamp;
 
 pub fn remove_members_handler(
     remove_members_input: UpdateMembersIO,
@@ -28,7 +27,7 @@ pub fn remove_members_handler(
     // update_entry the Group with new members field using the  original HeaderHash
     let creator: AgentPubKey = agent_info()?.agent_latest_pubkey;
     let group_name: String = latest_group_version.latest_name;
-    let created: Timestamp = to_timestamp(sys_time()?);
+    let created: Timestamp = sys_time()?;
 
     let updated_group: Group = Group::new(group_name, created, creator, group_members.clone());
 

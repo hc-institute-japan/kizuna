@@ -2,10 +2,9 @@ use file_types::Payload;
 use hdk::prelude::*;
 use hdk::prelude::{element::SignedHeaderHashed, holo_hash::AgentPubKeyB64, timestamp::Timestamp};
 use std::collections::{hash_map::HashMap, BTreeMap};
-use std::time::SystemTime;
 
 // for contacts
-#[derive(Deserialize, Serialize, SerializedBytes, Debug)]
+#[derive(Deserialize, Serialize, SerializedBytes, Debug, Clone)]
 pub struct AgentPubKeys(pub Vec<AgentPubKey>);
 
 // for profiles
@@ -63,7 +62,7 @@ pub struct BatchSize(pub u8);
 pub struct GroupMessageHash(pub EntryHash);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
-pub struct ReadList(pub HashMap<String, SystemTime>);
+pub struct ReadList(pub HashMap<String, Timestamp>);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -163,6 +162,7 @@ pub struct AgentMessages(HashMap<String, Vec<String>>);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Debug)]
 pub struct MessageBundle(P2PMessageData, Vec<String>);
+
 #[derive(Serialize, Deserialize, SerializedBytes, Debug)]
 pub struct MessageContents(HashMap<String, MessageBundle>);
 

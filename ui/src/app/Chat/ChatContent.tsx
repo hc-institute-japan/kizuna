@@ -39,9 +39,12 @@ const Chat: React.FC = () => {
   const [message, setMessage] = useState<string>("");
   const [files, setFiles] = useState<FileContent[]>([]);
   const [replyTo, setReplyTo] = useState<string>("");
-  const [messagesWithConversant, setMessagesWithConversant] = useState<any[]>(
-    []
-  );
+  const [messagesWithConversant, setMessagesWithConversant] = useState<
+    {
+      message: P2PMessage;
+      receipt?: P2PMessageReceipt | undefined;
+    }[]
+  >([]);
   const [disableGetNextBatch, setDisableGetNextBatch] =
     useState<boolean>(false);
   const {
@@ -175,31 +178,28 @@ const Chat: React.FC = () => {
         }
         return files.length
           ? files.forEach((file) =>
-              setTimeout(
-                dispatch(
-                  sendMessage(
-                    conversant.id,
-                    message,
-                    "FILE",
-                    replyTo !== "" ? replyTo : undefined,
-                    file
-                  )
-                ).then((res: any) => {
-                  if (!res) {
-                    dispatch(
-                      setErrorMessage(
-                        conversant.id,
-                        message,
-                        "FILE",
-                        replyTo !== "" ? replyTo : undefined,
-                        file
-                      )
-                    );
-                  }
-                  setIsLoading!(false);
-                }),
-                3000
-              )
+              dispatch(
+                sendMessage(
+                  conversant.id,
+                  message,
+                  "FILE",
+                  replyTo !== "" ? replyTo : undefined,
+                  file
+                )
+              ).then((res: any) => {
+                if (!res) {
+                  dispatch(
+                    setErrorMessage(
+                      conversant.id,
+                      message,
+                      "FILE",
+                      replyTo !== "" ? replyTo : undefined,
+                      file
+                    )
+                  );
+                }
+                setIsLoading!(false);
+              })
             )
           : setIsLoading!(false);
       });
@@ -241,24 +241,26 @@ const Chat: React.FC = () => {
     */
   const handleOnScrollTop = (complete: any) => {
     if (disableGetNextBatch === false) {
-      let lastMessage = messagesWithConversant[0].message;
-      dispatch(
-        getNextBatchMessages(
-          conversant.id,
-          5,
-          "All",
-          lastMessage.timestamp,
-          lastMessage.p2pMessageEntryHash
-        )
-      ).then((res: P2PHashMap) => {
-        // disable getNextBatch if return value is empty
-        if (Object.values(res)[0][conversant.id].length <= 0) {
-          setDisableGetNextBatch(true);
-        }
-        complete();
-      });
+      const lastMessage = messagesWithConversant[0].message;
+      if (!lastMessage.err) {
+        dispatch(
+          getNextBatchMessages(
+            conversant.id,
+            5,
+            "All",
+            lastMessage.timestamp,
+            lastMessage.p2pMessageEntryHash
+          )
+        ).then((res: P2PHashMap) => {
+          // disable getNextBatch if return value is empty
+          if (Object.values(res)[0][conversant.id].length <= 0) {
+            setDisableGetNextBatch(true);
+          }
+          return complete();
+        });
+      }
     }
-    return;
+    return complete();
   };
 
   /* 
@@ -269,9 +271,9 @@ const Chat: React.FC = () => {
   // NOTE: removed for now with the implementaation of remote_signal in HC
   const onSeenHandler = (messageBundle: {
     message: P2PMessage;
-    receipt: P2PMessageReceipt;
+    receipt?: P2PMessageReceipt;
   }) => {
-    if (messageBundle.receipt.status !== "read" && readReceipt) {
+    if (messageBundle.receipt!.status !== "read" && readReceipt) {
       dispatch(readMessage([messageBundle.message]));
     }
   };
@@ -355,7 +357,7 @@ const Chat: React.FC = () => {
   */
   const displayMessage = (messageBundle: {
     message: P2PMessage;
-    receipt: P2PMessageReceipt;
+    receipt?: P2PMessageReceipt;
   }) => {
     // assume that this will be called with messages in sorted order
     const key = messageBundle.message.p2pMessageEntryHash;
@@ -370,12 +372,12 @@ const Chat: React.FC = () => {
       : null;
 
     const timestamp = !messageBundle.message.err
-      ? messageBundle.receipt.timestamp
+      ? messageBundle.receipt!.timestamp
       : messageBundle.message.timestamp;
 
     const readlist = messageBundle.message.err
       ? undefined
-      : messageBundle.receipt.status === "read"
+      : messageBundle.receipt!.status === "read"
       ? { key: timestamp }
       : undefined;
 
