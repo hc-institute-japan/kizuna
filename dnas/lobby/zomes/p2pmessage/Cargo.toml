@@ -13,4 +13,4 @@ derive_more = "0"
 serde = "1"
 holo_hash = {git = "https://github.com/holochain/holochain", rev = "d7a6ac364a6a50bee6297ec2041e8c1ffe0be7dc", package = "holo_hash", version = "0.0.7", features = ["encoding"]}
 hdk = {git = "https://github.com/holochain/holochain", rev = "d7a6ac364a6a50bee6297ec2041e8c1ffe0be7dc", package = "hdk", version = "0.0.107"}
-p2pmessage = {git = "https://github.com/hc-institute-japan/p2pmessage-zome", branch="bump-hc-ce5611", package = "p2pmessage"}
+p2pmessage = {git = "https://github.com/hc-institute-japan/p2pmessage-zome", branch="develop", package = "p2pmessage"}
