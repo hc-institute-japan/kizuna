@@ -14,7 +14,7 @@
   "license": "ISC",
   "dependencies": {
     "@holochain/conductor-api": "0.2.0",
-    "@holochain/tryorama": "holochain/tryorama#bump-hc-0-0-103",
+    "@holochain/tryorama": "^0.4.5",
     "@types/lodash": "^4.14.158",
     "@types/node": "^14.14.37",
     "concurrently": "^5.3.0",
