@@ -7,14 +7,13 @@ use crate::signals::SignalPayload;
 use super::group_helpers::link_and_emit_added_to_group_signals;
 use crate::utils;
 use crate::utils::error;
-use crate::utils::to_timestamp;
 
 pub fn create_group_handler(
     create_group_input: CreateGroupInput,
 ) -> ExternResult<CreateGroupOutput> {
     let group_name: String = create_group_input.name;
     let group_members: Vec<AgentPubKey> = create_group_input.members;
-    let created: Timestamp = to_timestamp(sys_time()?);
+    let created: Timestamp = sys_time()?;
     let creator: AgentPubKey = agent_info()?.agent_latest_pubkey;
 
     // get my blocked list from the contacs zome

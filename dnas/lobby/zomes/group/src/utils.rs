@@ -1,12 +1,5 @@
-use hdk::prelude::*;
-use std::time::Duration;
-
 use crate::entries::group::BlockedWrapper;
-use timestamp::Timestamp;
-
-pub(crate) fn to_timestamp(duration: Duration) -> Timestamp {
-    Timestamp(duration.as_secs() as i64, duration.subsec_nanos())
-}
+use hdk::prelude::*;
 
 pub(crate) fn get_my_blocked_list() -> ExternResult<BlockedWrapper> {
     //call list_blocked() to contacts zome
@@ -38,7 +31,7 @@ pub(crate) fn path_from_str(str: &str) -> Path {
 }
 
 pub(crate) fn timestamp_to_days(timestamp: Timestamp) -> i64 {
-    timestamp.0 / (SECONDS * MINUTES * HOURS)
+    timestamp.as_seconds_and_nanos().0 / (SECONDS * MINUTES * HOURS)
 }
 
 pub fn error<T>(reason: &str) -> ExternResult<T> {
@@ -58,6 +51,11 @@ pub fn call_response_handler(call_response: ZomeCallResponse) -> ExternResult<Ex
         ZomeCallResponse::NetworkError(error) => {
             return Err(WasmError::Guest(
                 String::from("Network Error : ") + error.as_ref(),
+            ));
+        }
+        ZomeCallResponse::CountersigningSession(error) => {
+            return Err(WasmError::Guest(
+                String::from("countersigning error : ") + error.as_ref(),
             ));
         }
     }
