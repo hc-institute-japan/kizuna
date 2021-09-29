@@ -1,1 +1,1 @@
-extern crate profiles;
+extern crate hc_contacts;

@@ -3,7 +3,6 @@ use hdk::prelude::*;
 use super::{group_helpers::get_group_latest_version, GroupOutput};
 use super::{Group, UpdateGroupNameIO};
 use crate::utils::error;
-use crate::utils::to_timestamp;
 
 pub fn update_group_name_handler(
     update_group_name_input: UpdateGroupNameIO,
@@ -21,7 +20,7 @@ pub fn update_group_name_handler(
         return error("the new name and old name of the group are the same.");
     }
 
-    let created: Timestamp = to_timestamp(sys_time()?);
+    let created: Timestamp = sys_time()?;
     let creator: AgentPubKey = agent_info()?.agent_latest_pubkey;
     let members: Vec<AgentPubKey> = latest_group_version.members;
 
