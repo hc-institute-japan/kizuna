@@ -17,7 +17,15 @@ pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<Gr
             file_bytes,
         } => {
             let group_file_bytes = GroupFileBytes(file_bytes);
-            create_entry(&group_file_bytes)?;
+            // create_entry(&group_file_bytes)?;
+            host_call::<CreateInput, HeaderHash>(
+                __create,
+                CreateInput::new(
+                    GroupFileBytes::entry_def().id,
+                    Entry::App(group_file_bytes.clone().try_into()?),
+                    ChainTopOrdering::Relaxed,
+                ),
+            )?;
             let group_file_bytes_hash = hash_entry(&group_file_bytes)?;
             Payload::File {
                 file_type: file_type,
@@ -41,27 +49,54 @@ pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<Gr
 
     // commit GroupMessage entry
 
-    create_entry(&message)?;
+    // create_entry(&message)?;
+    host_call::<CreateInput, HeaderHash>(
+        __create,
+        CreateInput::new(
+            GroupMessage::entry_def().id,
+            Entry::App(message.clone().try_into()?),
+            ChainTopOrdering::Relaxed,
+        ),
+    )?;
 
     let group_hash = message.group_hash.clone().to_string(); // message's group hash as string
     let days = timestamp_to_days(message.created.clone()).to_string(); // group message's timestamp into days as string
 
     let group_hash_timestamp_path_hash = path_from_str(&[group_hash, days].join(".")).hash()?;
 
-    create_link(
-        group_hash_timestamp_path_hash,
-        hash_entry(&message)?,
-        LinkTag::new(match message.payload.clone() {
-            Payload::Text { payload: _ } => "text".to_owned(),
-            Payload::File {
-                metadata: _,
-                file_type,
-            } => match file_type {
-                FileType::Image { thumbnail: _ } => "media".to_owned(),
-                FileType::Video { thumbnail: _ } => "media".to_owned(),
-                FileType::Other => "file".to_owned(),
-            },
-        }),
+    // create_link(
+    //     group_hash_timestamp_path_hash,
+    //     hash_entry(&message)?,
+    //     LinkTag::new(match message.payload.clone() {
+    //         Payload::Text { payload: _ } => "text".to_owned(),
+    //         Payload::File {
+    //             metadata: _,
+    //             file_type,
+    //         } => match file_type {
+    //             FileType::Image { thumbnail: _ } => "media".to_owned(),
+    //             FileType::Video { thumbnail: _ } => "media".to_owned(),
+    //             FileType::Other => "file".to_owned(),
+    //         },
+    //     }),
+    // )?;
+    host_call::<CreateLinkInput, HeaderHash>(
+        __create_link,
+        CreateLinkInput::new(
+            group_hash_timestamp_path_hash,
+            hash_entry(&message)?,
+            LinkTag::new(match message.payload.clone() {
+                Payload::Text { payload: _ } => "text".to_owned(),
+                Payload::File {
+                    metadata: _,
+                    file_type,
+                } => match file_type {
+                    FileType::Image { thumbnail: _ } => "media".to_owned(),
+                    FileType::Video { thumbnail: _ } => "media".to_owned(),
+                    FileType::Other => "file".to_owned(),
+                },
+            }),
+            ChainTopOrdering::Relaxed,
+        ),
     )?;
 
     let latest_group_version = get_group_latest_version(message.group_hash.clone())?;
