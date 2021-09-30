@@ -20,3 +20,5 @@ zomes:
     bundled: ../../target/wasm32-unknown-unknown/release/group.wasm 
   - name : profiles
     bundled: ../../target/wasm32-unknown-unknown/release/profiles.wasm 
+  - name : bugging
+    bundled: ../../target/wasm32-unknown-unknown/release/bugging.wasm 

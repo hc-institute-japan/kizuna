@@ -5,6 +5,7 @@ import { getMyProfile } from "../../redux/profile/actions";
 import { RootState } from "../../redux/types";
 import { useAppDispatch } from "../../utils/helpers";
 import Authenticated from "../Authenticated";
+import Playground from "../Playground";
 import Unauthenticated from "../Unauthenticated";
 
 const Auth: React.FC = () => {

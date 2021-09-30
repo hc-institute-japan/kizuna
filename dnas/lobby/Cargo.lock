@@ -7,7 +7,7 @@ name = "aggregator"
 version = "0.0.1"
 dependencies = [
  "derive_more",
- "file_types 0.0.1",
+ "file_types",
  "hdk",
  "holo_hash",
  "serde",
@@ -61,6 +61,16 @@ dependencies = [
  "arrayref",
  "arrayvec",
  "constant_time_eq",
+]
+
+[[package]]
+name = "bugging"
+version = "0.0.1"
+dependencies = [
+ "derive_more",
+ "hdk",
+ "holo_hash",
+ "serde",
 ]
 
 [[package]]
@@ -146,22 +156,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "file_types"
-version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop#0ee78d813025958d79699d9235a5f22e02e83eb5"
-dependencies = [
- "derive_more",
- "hdk",
- "holo_hash",
- "serde",
-]
-
-[[package]]
 name = "group"
 version = "0.0.1"
 dependencies = [
  "derive_more",
- "file_types 0.0.1",
+ "file_types",
  "hdk",
  "holo_hash",
  "serde",
@@ -400,19 +399,7 @@ name = "p2pmessage"
 version = "0.0.1"
 dependencies = [
  "derive_more",
- "hdk",
- "holo_hash",
- "p2pmessage 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop)",
- "serde",
-]
-
-[[package]]
-name = "p2pmessage"
-version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop#0ee78d813025958d79699d9235a5f22e02e83eb5"
-dependencies = [
- "derive_more",
- "file_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop)",
+ "file_types",
  "hdk",
  "holo_hash",
  "serde",
