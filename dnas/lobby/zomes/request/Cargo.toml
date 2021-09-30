@@ -11,5 +11,5 @@ crate-type = [ "cdylib", "rlib" ]
 [dependencies]
 derive_more = "0"
 serde = "1"
-holo_hash = {version = "0.0.6", features = ["encoding"]}
-hdk = {git = "https://github.com/holochain/holochain", rev = "d7a6ac364a6a50bee6297ec2041e8c1ffe0be7dc", package = "hdk", version = "0.0.107"}
+holo_hash = {git = "https://github.com/holochain/holochain", rev = "12dfef0b2a710304697ddcd9ee731b4fe9933b0f", package = "holo_hash", version = "0.0.7", features = ["encoding"]}
+hdk = {git = "https://github.com/holochain/holochain", rev = "12dfef0b2a710304697ddcd9ee731b4fe9933b0f", package = "hdk", version = "0.0.108"}
