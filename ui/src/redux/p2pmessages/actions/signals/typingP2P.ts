@@ -17,7 +17,7 @@ const typingP2P =
       let currentState = { ...getState().p2pmessages.typing };
       let profile = contacts[agentHash];
 
-      if (currentState[profile.id] && payload.is_typing) {
+      if (!currentState[profile.id] && payload.is_typing) {
         currentState[profile.id] = profile;
       } else {
         if (!payload.is_typing) {

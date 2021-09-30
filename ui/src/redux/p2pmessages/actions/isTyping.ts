@@ -10,7 +10,7 @@ export const isTyping =
       isTyping: isTyping,
     };
 
-    callZome({
+    await callZome({
       zomeName: ZOMES.P2PMESSAGE,
       fnName: FUNCTIONS[ZOMES.P2PMESSAGE].TYPING,
       payload: payload,
