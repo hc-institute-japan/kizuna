@@ -43,6 +43,7 @@ entry_def!(GroupMessage
 );
 
 #[hdk_entry(id = "group_file_bytes", visibility = "public")]
+#[derive(Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct GroupFileBytes(SerializedBytes);
 /* END OF GROUP MESSAGE TYPE DEFINITION */
