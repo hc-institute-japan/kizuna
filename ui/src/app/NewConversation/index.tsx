@@ -1,4 +1,11 @@
-import { IonContent, IonLoading, IonPage } from "@ionic/react";
+import {
+  IonContent,
+  IonIcon,
+  IonLoading,
+  IonPage,
+  IonText,
+} from "@ionic/react";
+import { warningOutline } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import { useHistory, useLocation } from "react-router";
@@ -8,6 +15,7 @@ import { FilePayloadInput } from "../../redux/commons/types";
 import { sendInitialGroupMessage } from "../../redux/group/actions";
 import { GroupConversation } from "../../redux/group/types";
 import { sendMessage } from "../../redux/p2pmessages/actions/sendMessage";
+import { setErrorMessage } from "../../redux/p2pmessages/actions/setErrMessage";
 import { Profile, ProfileListType } from "../../redux/profile/types";
 import { useAppDispatch } from "../../utils/helpers";
 import ContactList from "./ContactList";
@@ -55,33 +63,91 @@ const NewConversation: React.FC = () => {
         setIsLoading(true);
         dispatch(sendMessage(contacts[0].id, message, "TEXT", undefined)).then(
           (res: boolean) => {
+            if (!res && files.length <= 0) {
+              setIsLoading(false);
+              dispatch(
+                setErrorMessage(contacts[0].id, message, "TEXT", undefined)
+              );
+              history.push({
+                pathname: `/u/${contacts[0].id}`,
+                state: { username: contacts[0].username },
+              });
+            } else if (!res) {
+              dispatch(
+                setErrorMessage(contacts[0].id, message, "TEXT", undefined)
+              );
+            }
             if (files.length <= 0 && res === true) {
               setIsLoading(false);
               history.push({
                 pathname: `/u/${contacts[0].id}`,
                 state: { username: contacts[0].username },
               });
+            } else if (files.length) {
+              files.forEach((file) => {
+                dispatch(
+                  sendMessage(contacts[0].id, message, "FILE", undefined, file)
+                ).then((res: boolean) => {
+                  if (res === true) {
+                    setIsLoading(false);
+                    history.push({
+                      pathname: `/u/${contacts[0].id}`,
+                      state: { username: contacts[0].username },
+                    });
+                  } else {
+                    dispatch(
+                      setErrorMessage(
+                        contacts[0].id,
+                        message,
+                        "FILE",
+                        undefined,
+                        file
+                      )
+                    );
+                    setIsLoading(false);
+                    history.push({
+                      pathname: `/u/${contacts[0].id}`,
+                      state: { username: contacts[0].username },
+                    });
+                  }
+                });
+              });
             }
           }
         );
       }
 
-      files.forEach((file) => {
-        setIsLoading(true);
-        setTimeout(
+      if (message === "" && files.length) {
+        files.forEach((file) => {
+          setIsLoading(true);
           dispatch(
             sendMessage(contacts[0].id, message, "FILE", undefined, file)
           ).then((res: boolean) => {
             setIsLoading(false);
-            if (res === true) history.push(`/u/${contacts[0].id}`);
-          }),
-          3000
-        );
-      });
-
-      // setIsLoading(false);
-
-      // if (sendRes1 || sendRes2) history.push(`/u/${contacts[0].username}`);
+            if (res === true) {
+              history.push({
+                pathname: `/u/${contacts[0].id}`,
+                state: { username: contacts[0].username },
+              });
+            } else {
+              dispatch(
+                setErrorMessage(
+                  contacts[0].id,
+                  message,
+                  "FILE",
+                  undefined,
+                  file
+                )
+              );
+              setIsLoading(false);
+              history.push({
+                pathname: `/u/${contacts[0].id}`,
+                state: { username: contacts[0].username },
+              });
+            }
+          });
+        });
+      }
     } else if (contacts.length > 1) {
       /* create a Group and send the initial message */
       setIsLoading(true);
@@ -129,6 +195,21 @@ const NewConversation: React.FC = () => {
     return () => setContacts({});
   }, [location.state]);
 
+  const renderP2PWarning = () => {
+    return (
+      <div className={styles["warning"]}>
+        <IonIcon
+          icon={warningOutline}
+          color="warning"
+          className={styles["warning-icon"]}
+        />
+        <IonText color="warning">
+          Currently, p2p message only gets sent when the receiver is online
+        </IonText>
+      </div>
+    );
+  };
+
   return (
     <ContactsContext.Provider
       value={[contacts, setContacts, selectedContacts, setSelectedContacts]}
@@ -149,6 +230,9 @@ const NewConversation: React.FC = () => {
             )}
           />
         </IonContent>
+        {Object.values(selectedContacts).length === 1
+          ? renderP2PWarning()
+          : null}
         <MessageInput
           onSend={handleOnSend}
           onChange={(message) => setMessage(message)}

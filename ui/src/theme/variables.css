@@ -36,8 +36,8 @@ http://ionicframework.com/docs/theming/ */
   --ion-color-success-tint: #42d77d;
 
   /** warning **/
-  --ion-color-warning: #fbc309;
-  --ion-color-warning-rgb: 251,195,9;
+  --ion-color-warning:#e1ad01;
+  --ion-color-warning-rgb: 	225,173,1;
   --ion-color-warning-contrast: #000000;
   --ion-color-warning-contrast-rgb: 0, 0, 0;
   --ion-color-warning-shade: #e0ac08;

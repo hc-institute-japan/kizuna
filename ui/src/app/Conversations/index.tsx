@@ -8,6 +8,7 @@ import {
 } from "@ionic/react";
 import { pencil } from "ionicons/icons";
 import React from "react";
+import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import Conversation from "../../components/Conversation";
@@ -29,6 +30,7 @@ import styles from "./style.module.css";
 const Conversations: React.FC = () => {
   const history = useHistory();
   const dispatch = useAppDispatch();
+  const intl = useIntl();
 
   const contacts = useSelector((state: RootState) => state.contacts.contacts);
   const myProfile = useSelector((state: RootState) => state.profile);
@@ -68,41 +70,74 @@ const Conversations: React.FC = () => {
           we are not displaying people who are not in contacts list right now; this will not be undefined atm
           TODO: may change depending on design implementation for blocked contacts
           */
-        let conversant = contacts[key];
+        const conversant = contacts[key];
 
         // accessing the first index for the latest message
         // TODO: make sure that this is the latest
-        let latestMessageId = p2pState.conversations[key].messages[0];
-        let latestMessage = p2pState.messages[latestMessageId];
-        let message: Message = {
-          id: latestMessage.p2pMessageEntryHash,
-          sender: {
-            id: latestMessage.author.id,
-            username:
-              latestMessage.author.id === myProfile.id
-                ? "You"
-                : conversant.username,
-          },
-          payloadType: latestMessage.payload.type,
-          textPayload: isTextPayload(latestMessage.payload)
-            ? latestMessage.payload.payload.payload
-            : undefined,
-          fileName: !isTextPayload(latestMessage.payload)
-            ? latestMessage.payload.fileName
-            : undefined,
-          /* TODO: change to Date format */
-          timestamp: latestMessage.timestamp,
-        };
+        const latestMessageId = p2pState.conversations[key].messages[0];
+        const latestMessage = p2pState.messages[latestMessageId];
+        let message: Message;
+        let conversation: ConversationDetail | null = null;
+        if (latestMessage) {
+          message = {
+            id: latestMessage.p2pMessageEntryHash,
+            sender: {
+              id: latestMessage.author.id,
+              username:
+                latestMessage.author.id === myProfile.id
+                  ? "You"
+                  : conversant.username,
+            },
+            payloadType: latestMessage.payload.type,
+            textPayload: isTextPayload(latestMessage.payload)
+              ? latestMessage.payload.payload.payload
+              : undefined,
+            fileName: !isTextPayload(latestMessage.payload)
+              ? latestMessage.payload.fileName
+              : undefined,
+            /* TODO: change to Date format */
+            timestamp: latestMessage.timestamp,
+          };
+          // create input to Conversation component
+          conversation = {
+            type: "p2p",
+            id: key,
+            conversationName: conversant.username,
+            latestMessage: message,
+            badgeCount: dispatch(countUnread(conversant.id)),
+          };
+        } else if (p2pState.errMsgs[key][0]) {
+          const latestErrMessage = p2pState.errMsgs[key][0];
+          message = {
+            id: latestErrMessage.p2pMessageEntryHash,
+            sender: {
+              id: latestErrMessage.author.id,
+              username:
+                latestErrMessage.author.id === myProfile.id
+                  ? "You"
+                  : conversant.username,
+            },
+            payloadType: latestErrMessage.payload.type,
+            textPayload: isTextPayload(latestErrMessage.payload)
+              ? latestErrMessage.payload.payload.payload
+              : undefined,
+            fileName: !isTextPayload(latestErrMessage.payload)
+              ? latestErrMessage.payload.fileName
+              : undefined,
+            /* TODO: change to Date format */
+            timestamp: latestErrMessage.timestamp,
+          };
+          // create input to Conversation component
+          conversation = {
+            type: "p2p",
+            id: key,
+            conversationName: conversant.username,
+            latestMessage: message,
+            badgeCount: dispatch(countUnread(conversant.id)),
+          };
+        }
 
-        // create input to Conversation component
-        let conversation: ConversationDetail = {
-          type: "p2p",
-          id: key,
-          conversationName: conversant.username,
-          latestMessage: message,
-          badgeCount: dispatch(countUnread(conversant.id)),
-        };
-        conversationsArray.push(conversation);
+        if (conversation) conversationsArray.push(conversation);
       }
     }
     /* end of code block for p2p logic */
@@ -112,25 +147,17 @@ const Conversations: React.FC = () => {
       const allGroupMessages = groupsState.messages;
       const groupMembers = groupsState.members;
 
-      /* 
-        Currently filtering freshly created group that has no message yet
-        TODO: discuss whether we should create group with an initial message already
-        to avoid this filter.
-      */
-      Object.keys(groupsState.conversations)
-        .filter(
-          (groupId: string) =>
-            groupsState.conversations[groupId].messages[0] !== undefined
-        )
-        .forEach((groupId: string) => {
-          /* 
+      Object.keys(groupsState.conversations).forEach((groupId: string) => {
+        /* 
             TODO: Make sure that the index 0 is the latest message at all times
             especially when messages are received via signal or fetched
           */
-          let latestMessageId = groupsState.conversations[groupId].messages[0];
-          let latestMessage = allGroupMessages[latestMessageId];
-
-          let message: Message = {
+        const latestMessageId = groupsState.conversations[groupId].messages[0];
+        const latestMessage = allGroupMessages[latestMessageId];
+        let message: Message;
+        let conversation: ConversationDetail | null = null;
+        if (latestMessage) {
+          message = {
             id: latestMessage.groupMessageId,
             sender: groupMembers[latestMessage.author]
               ? {
@@ -142,7 +169,6 @@ const Conversations: React.FC = () => {
                   username: myProfile.username!,
                 },
             payloadType: latestMessage.payload.type,
-            /* TODO: change the data type of GroupMessage to Date to avoid this */
             timestamp: latestMessage.timestamp,
             textPayload: isTextPayload(latestMessage.payload)
               ? latestMessage.payload.payload.payload
@@ -151,17 +177,59 @@ const Conversations: React.FC = () => {
               ? latestMessage.payload.fileName
               : undefined,
           };
-
-          let conversation: ConversationDetail = {
+          conversation = {
             id: groupId,
             type: "group",
             conversationName: groupsState.conversations[groupId].name,
             latestMessage: message,
             badgeCount: dispatch(getBadgeCount(groupId)),
           };
+        } else if (groupsState.errMsgs[groupId]) {
+          const latestErrMessage = groupsState.errMsgs[groupId][0];
+          message = {
+            id: latestErrMessage.groupMessageId,
+            sender: latestErrMessage.author,
+            payloadType: latestErrMessage.payload.type,
+            timestamp: latestErrMessage.timestamp,
+            textPayload: isTextPayload(latestErrMessage.payload)
+              ? latestErrMessage.payload.payload.payload
+              : undefined,
+            fileName: !isTextPayload(latestErrMessage.payload)
+              ? latestErrMessage.payload.fileName
+              : undefined,
+          };
+          conversation = {
+            id: groupId,
+            type: "group",
+            conversationName: groupsState.conversations[groupId].name,
+            latestMessage: message,
+            badgeCount: dispatch(getBadgeCount(groupId)),
+          };
+        } else {
+          // edge case: group was created but no message was sent
+          // and the user refreshed the browser so errMessage disappears too
+          // TODO: remove this section once err messages are cached.
+          message = {
+            id: "no message",
+            sender: undefined,
+            payloadType: "TEXT",
+            timestamp: new Date(),
+            textPayload: intl.formatMessage({
+              id: "app.conversations.no-group-messages",
+            }),
+            fileName: undefined,
+          };
+          conversation = {
+            id: groupId,
+            type: "group",
+            conversationName: groupsState.conversations[groupId].name,
+            latestMessage: message,
+            badgeCount: dispatch(getBadgeCount(groupId)),
+          };
+        }
 
-          conversationsArray.push(conversation);
-        });
+        if (conversation) conversationsArray.push(conversation);
+      });
     }
     /* end of code block for group logic */
 

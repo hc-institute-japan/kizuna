@@ -7,13 +7,14 @@ import {
 import { store } from "../containers/ReduxContainer";
 import { handleSignal } from "../redux/signal/actions";
 import { CallZomeConfig } from "../redux/types";
+import { appId, appUrl, ENV } from "./constants";
 // @ts-ignore
 global.COMB = undefined;
 const { Connection } = require("@holo-host/web-sdk");
 // @ts-ignore
 window.COMB = require("@holo-host/comb").COMB;
 
-let client: null | HolochainClient | HoloClient = null;
+export let client: null | HolochainClient | HoloClient = null;
 
 let signalHandler: AppSignalCb = (signal) =>
   store?.dispatch(
@@ -24,6 +25,7 @@ const createClient = async (
   env: string
 ): Promise<HoloClient | HolochainClient | null> => {
   switch (env) {
+    case "HOLO":
     case "HCC": {
       const branding = {
         logo_url: "assets/icon/kizuna_logo.png",
@@ -31,33 +33,47 @@ const createClient = async (
       };
 
       const connection = new Connection(
-        `http://localhost:${process.env.REACT_APP_CHAPERONE_PORT}`,
+        process.env.NODE_ENV === "production"
+          ? "https://devnet-chaperone.holo.host"
+          : appUrl(),
         // "http://localhost:24273",
         signalHandler,
         branding
       );
 
       await connection.ready();
-
       await connection.signIn();
 
-      const appInfo = await connection.appInfo(process.env.REACT_APP_APP_ID);
+      const appInfo = await connection.appInfo(appId());
+
+      if (!appInfo.cell_data)
+        throw new Error(`Holo appInfo() failed: ${JSON.stringify(appInfo)}`);
 
       const cellData = appInfo.cell_data[0];
 
+      // TODO: remove this when chaperone is fixed
+      if (!(cellData.cell_id[0] instanceof Uint8Array)) {
+        cellData.cell_id = [
+          new Uint8Array((cellData.cell_id[0] as any).data),
+          new Uint8Array((cellData.cell_id[1] as any).data),
+        ] as any;
+      }
+
       return new HoloClient(connection, cellData, branding);
     }
+    case "HCDEV":
     case "HC": {
       const appWs = await AppWebsocket.connect(
-        process.env.REACT_APP_DNA_INTERFACE_URL as string,
+        appUrl() as string,
         15000, // holochain's default timeout
         signalHandler
       );
 
       const appInfo = await appWs.appInfo({
-        installed_app_id: "test-app",
+        installed_app_id: appId() as string,
       });
 
+      console.log(appId());
       const cellData = appInfo.cell_data[0];
 
       return new HolochainClient(appWs, cellData);
@@ -73,30 +89,11 @@ export const init: () => any = async () => {
     return client;
   }
   try {
-    client = await createClient(process.env.REACT_APP_ENV as string);
+    console.log("ENV : ", ENV);
+    console.log(process.env.NODE_ENV);
+    client = await createClient(ENV);
+    console.log("ENV : ", client);
     return client;
-
-    // const branding = {
-    //   app_name: "kizuna_test",
-    // };
-
-    // const connection = new Connection(
-    //   "http://localhost:24273",
-    //   signalHandler,
-    //   branding
-    // );
-
-    // await connection.ready();
-
-    // await connection.signIn();
-
-    // const appInfo = await connection.appInfo(
-    //   "uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL"
-    // );
-
-    // const cellData = appInfo.cell_data[0];
-
-    // client = new HoloClient(connection, cellData, branding);
   } catch (error) {
     Object.values(error as any).forEach((e) => console.error(e));
     console.error(error);

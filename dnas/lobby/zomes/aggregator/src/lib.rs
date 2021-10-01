@@ -80,7 +80,6 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
         None,
         &batch_size,
     )?;
-
     let latest_group_messages: GroupMessagesOutput =
         call_response_handler(latest_group_messages_call_response)?.decode()?;
 
@@ -155,6 +154,11 @@ fn call_response_handler(call_response: ZomeCallResponse) -> ExternResult<Extern
         ZomeCallResponse::NetworkError(error) => {
             return Err(WasmError::Guest(
                 String::from("network error : ") + error.as_ref(),
+            ));
+        }
+        ZomeCallResponse::CountersigningSession(error) => {
+            return Err(WasmError::Guest(
+                String::from("countersigning error : ") + error.as_ref(),
             ));
         }
     }

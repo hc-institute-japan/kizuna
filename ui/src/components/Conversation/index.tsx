@@ -66,11 +66,13 @@ const Conversation: React.FC<Props> = ({
             charToShow={10}
           />
         )}
-        <h3>{conversation.latestMessage.sender.username}</h3>
+        {conversation.latestMessage.sender ? (
+          <h3>{conversation.latestMessage.sender.username}</h3>
+        ) : null}
         <p>
           {conversation.latestMessage.payloadType === "TEXT"
             ? conversation.latestMessage.textPayload
-            : myAgentId === conversation.latestMessage.sender.id
+            : myAgentId === conversation.latestMessage.sender!.id
             ? renderMyFileMessage(conversation.latestMessage)
             : renderOthersFileMessage(conversation.latestMessage)}
         </p>
