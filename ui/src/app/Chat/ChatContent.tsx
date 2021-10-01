@@ -458,11 +458,11 @@ const Chat: React.FC = () => {
         <ChatList
           type="p2p"
           onScrollTop={(complete) => handleOnScrollTop(complete)}
-          // onScrollBottom={(complete) => {
-          //   setTimeout(() => {
-          //     complete();
-          //   }, 2000);
-          // }}
+          onScrollBottom={(complete) => {
+            setTimeout(() => {
+              complete();
+            }, 2000);
+          }}
           ref={scrollerRef}
           disabled={disableGetNextBatch}
         >
