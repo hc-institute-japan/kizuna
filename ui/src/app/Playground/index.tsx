@@ -12,9 +12,9 @@ const Playground = () => {
   const onSend = () => {
     console.log(contacts);
     let bob = Object.values(contacts)[0].id;
-    dispatch(sendFoo(bob, "foo"));
+    dispatch(sendFoo(bob));
   };
-  const onGet = () => {
+  const onGetFoos = () => {
     dispatch(getAllFoos());
   };
   useEffect(() => {
@@ -24,7 +24,7 @@ const Playground = () => {
     <IonPage>
       <IonButtons>
         <IonButton onClick={() => onSend()}>Send Foo</IonButton>
-        <IonButton onClick={() => onGet()}>Get Foos</IonButton>
+        <IonButton onClick={() => onGetFoos()}>Get Foos</IonButton>
       </IonButtons>
     </IonPage>
   );

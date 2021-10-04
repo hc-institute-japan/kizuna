@@ -3,16 +3,13 @@ import { pushError } from "../error/actions";
 import { ThunkAction } from "../types";
 
 export const sendFoo =
-  (receiver: string, message: string): ThunkAction =>
+  (receiver: string): ThunkAction =>
   async (dispatch, _getState, { callZome }) => {
     try {
       const foo = await callZome({
         zomeName: "bugging",
-        fnName: "send_message",
-        payload: {
-          receiver: deserializeHash(receiver),
-          payload: { payload: message },
-        },
+        fnName: "send_foo",
+        payload: deserializeHash(receiver),
       });
       console.log(foo);
       return foo;
@@ -28,7 +25,7 @@ export const getAllFoos =
     try {
       const foos = await callZome({
         zomeName: "bugging",
-        fnName: "get_all_messages",
+        fnName: "get_all_foos",
       });
       console.log(foos);
       return foos;
