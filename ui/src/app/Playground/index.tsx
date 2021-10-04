@@ -12,7 +12,7 @@ const Playground = () => {
   const onSend = () => {
     console.log(contacts);
     let bob = Object.values(contacts)[0].id;
-    dispatch(sendFoo(bob));
+    dispatch(sendFoo(bob, "foo"));
   };
   const onGet = () => {
     dispatch(getAllFoos());
