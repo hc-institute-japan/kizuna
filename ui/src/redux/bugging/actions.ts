@@ -9,7 +9,6 @@ export const sendFoo =
       const foo = await callZome({
         zomeName: "bugging",
         fnName: "send_foo",
-        payload: deserializeHash(receiver),
       });
       console.log(foo);
       return foo;

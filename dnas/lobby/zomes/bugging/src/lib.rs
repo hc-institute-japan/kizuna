@@ -7,73 +7,27 @@ pub struct AgentPubKeyWrapper(AgentPubKey);
 
 entry_defs![Foo::entry_def()];
 
-pub fn error<T>(reason: &str) -> ExternResult<T> {
-    Err(WasmError::Guest(String::from(reason)))
-}
-
 #[hdk_extern]
 fn init(_: ()) -> ExternResult<InitCallbackResult> {
-    let zome_name: ZomeName = zome_info()?.zome_name;
-
-    let mut receive_message_function: GrantedFunctions = BTreeSet::new();
-    receive_message_function.insert((zome_name.clone(), "receive_foo".into()));
-
-    create_cap_grant(CapGrantEntry {
-        tag: "receive_foo".into(),
-        access: CapAccess::Unrestricted,
-        functions: receive_message_function,
-    })?;
-
     Ok(InitCallbackResult::Pass)
 }
 
 #[hdk_extern]
-fn send_foo(receiver: AgentPubKey) -> ExternResult<Foo> {
+fn send_foo(_: ()) -> ExternResult<Foo> {
     let foo: Foo = Foo {
         content: "foo".into(),
         time_sent: sys_time()?,
     };
-    let receive_call_result: ZomeCallResponse = call_remote(
-        receiver.clone(),
-        zome_info()?.zome_name,
-        "receive_foo".into(),
-        None,
-        &foo,
-    )?;
-
-    match receive_call_result {
-        ZomeCallResponse::Ok(_) => {
-            let foo_entry = Entry::App(foo.clone().try_into()?);
-            host_call::<CreateInput, HeaderHash>(
-                __create,
-                CreateInput::new(
-                    Foo::entry_def().id,
-                    foo_entry.clone(),
-                    ChainTopOrdering::Relaxed,
-                ),
-            )?;
-            Ok(foo)
-        }
-        ZomeCallResponse::Unauthorized(_, _, _, _) => {
-            return error("Sorry, something went wrong. [Authorization error]");
-        }
-        ZomeCallResponse::NetworkError(_e) => {
-            return error("Sorry, something went wrong. [Network error]");
-        }
-        ZomeCallResponse::CountersigningSession(_e) => {
-            return error("Sorry, something went wrong. [Countersigning error]");
-        }
-    }
-}
-
-#[hdk_extern]
-fn receive_foo(input: Foo) -> ExternResult<()> {
-    let foo_entry = Entry::App(input.clone().try_into()?);
+    let foo_entry = Entry::App(foo.clone().try_into()?);
     host_call::<CreateInput, HeaderHash>(
         __create,
-        CreateInput::new(Foo::entry_def().id, foo_entry, ChainTopOrdering::Relaxed),
+        CreateInput::new(
+            Foo::entry_def().id,
+            foo_entry.clone(),
+            ChainTopOrdering::Relaxed,
+        ),
     )?;
-    Ok(())
+    Ok(foo)
 }
 
 #[hdk_extern]
