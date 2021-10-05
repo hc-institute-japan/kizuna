@@ -148,7 +148,7 @@ dependencies = [
 [[package]]
 name = "file_types"
 version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop#0ee78d813025958d79699d9235a5f22e02e83eb5"
+source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop#ccd9616a13da53d473bc2ce5040b509aeb7c476b"
 dependencies = [
  "derive_more",
  "hdk",
@@ -409,7 +409,7 @@ dependencies = [
 [[package]]
 name = "p2pmessage"
 version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop#0ee78d813025958d79699d9235a5f22e02e83eb5"
+source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop#ccd9616a13da53d473bc2ce5040b509aeb7c476b"
 dependencies = [
  "derive_more",
  "file_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop)",

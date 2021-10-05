@@ -58,7 +58,7 @@ export function getMessagesByGroupByTimestampTest(config, installables) {
         alice_conductor
       );
 
-      await delay();
+      await delay(1000);
 
       const group1Messages: any[] = [];
 
@@ -72,7 +72,7 @@ export function getMessagesByGroupByTimestampTest(config, installables) {
         date: new Date(2021, 1, 9).getTime(),
       });
 
-      await delay();
+      await delay(1000);
 
       group1Messages.push(feb9Message1);
 
@@ -86,7 +86,7 @@ export function getMessagesByGroupByTimestampTest(config, installables) {
         date: new Date(2021, 1, 9).getTime(),
       });
 
-      await delay();
+      await delay(1000);
 
       group1Messages.push(feb9Message2);
 
@@ -100,7 +100,7 @@ export function getMessagesByGroupByTimestampTest(config, installables) {
         date: new Date(2021, 1, 9).getTime(),
       });
 
-      await delay();
+      await delay(1000);
 
       group1Messages.push(feb9Message3);
 
@@ -114,7 +114,7 @@ export function getMessagesByGroupByTimestampTest(config, installables) {
         date: new Date(2021, 1, 9).getTime(),
       });
 
-      await delay();
+      await delay(1000);
 
       group1Messages.push(feb9Message4);
 
@@ -128,7 +128,7 @@ export function getMessagesByGroupByTimestampTest(config, installables) {
         date: new Date(2021, 1, 10).getTime(),
       });
 
-      await delay();
+      await delay(1000);
 
       await readGroupMessage({
         groupId,
@@ -138,7 +138,7 @@ export function getMessagesByGroupByTimestampTest(config, installables) {
         messageIds: group1Messages.map((message) => message.id),
       })(alice_conductor);
 
-      await delay();
+      await delay(1000);
 
       const messagesOnFeb9 = await getMessagesByGroupByTimestamp({
         groupId,
@@ -149,7 +149,7 @@ export function getMessagesByGroupByTimestampTest(config, installables) {
         },
       })(alice_conductor);
 
-      await delay();
+      await delay(1000);
 
       evaluateMessagesByGroupByTimestampResult(
         group1Messages,
@@ -178,7 +178,7 @@ export function getMessagesByGroupByTimestampTest(config, installables) {
         messageIds: [feb10].map((message) => message.id),
       })(alice_conductor);
 
-      await delay();
+      await delay(1000);
 
       const messagesOnFeb10 = await getMessagesByGroupByTimestamp({
         groupId,
@@ -189,7 +189,7 @@ export function getMessagesByGroupByTimestampTest(config, installables) {
         },
       })(alice_conductor);
 
-      await delay();
+      await delay(1000);
       evaluateMessagesByGroupByTimestampResult([feb10], messagesOnFeb10, t);
     }
   );
@@ -226,7 +226,7 @@ export function fetchFilesForAParticularDateTest(config, installables) {
       let { content, groupId, groupRevisionId } = await createGroup(
         create_group_input
       )(alice_conductor);
-      await delay(500);
+      await delay(1000);
 
       let dates: number[] = [
         new Date(2021, 1, 9).getTime(),
