@@ -3,7 +3,7 @@ import { pushError } from "../error/actions";
 import { ThunkAction } from "../types";
 
 export const sendFoo =
-  (receiver: string): ThunkAction =>
+  (): ThunkAction =>
   async (dispatch, _getState, { callZome }) => {
     try {
       const foo = await callZome({

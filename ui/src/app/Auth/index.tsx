@@ -19,14 +19,14 @@ const Auth: React.FC = () => {
     });
   }, [dispatch]);
 
-  // return loading ? (
-  //   <Spinner />
-  // ) : username !== null ? (
-  //   <Authenticated />
-  // ) : (
-  //   <Unauthenticated />
-  // );
-  return <Playground />;
+  return loading ? (
+    <Spinner />
+  ) : username !== null ? (
+    <Authenticated />
+  ) : (
+    <Unauthenticated />
+  );
+  // return <Playground />;
 };
 
 export default Auth;
