@@ -212,11 +212,16 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
   try {
     return await client?.callZome(zomeName, fnName, payload);
   } catch (e) {
-    console.warn(e);
-    console.log("error in zome call: ", zomeName, e);
+    console.log(
+      "zome call has failed in zome: ",
+      zomeName,
+      " with call ",
+      fnName,
+      " error: ",
+      e
+    );
     const { type = null, data = null } = { ...e };
     if (type === "error") {
-      console.warn(fnName);
       switch (data?.type) {
         case "ribosome_error": {
           const regex = /Guest\("([\s\S]*?)"\)/;
