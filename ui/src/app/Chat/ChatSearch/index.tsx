@@ -67,7 +67,7 @@ const ChatSearch: React.FC = () => {
           }
         );
       }}
-      prevHref="/"
+      prevHref={`/u/${id}`}
     ></Search>
   );
 };

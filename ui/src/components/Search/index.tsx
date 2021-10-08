@@ -1,5 +1,4 @@
 import {
-  IonBackButton,
   IonButton,
   IonButtons,
   IonContent,
@@ -11,9 +10,10 @@ import {
   IonPage,
   IonToolbar,
 } from "@ionic/react";
-import { arrowBackOutline, calendar } from "ionicons/icons";
+import { arrowBackOutline, arrowBackSharp, calendar } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
+import { useHistory } from "react-router";
 import { Payload, ReplyTo } from "../../redux/commons/types";
 import { Profile } from "../../redux/profile/types";
 import { RootState } from "../../redux/types";
@@ -46,6 +46,7 @@ const Search: React.FC<Props> = ({
       }[]
     | null
   >(null);
+  const history = useHistory();
 
   useEffect(() => {
     if (messages) {
@@ -68,7 +69,12 @@ const Search: React.FC<Props> = ({
           <IonHeader>
             <IonToolbar>
               <IonButtons>
-                <IonBackButton defaultHref={prevHref} />
+                <IonButton
+                  onClick={() => history.push({ pathname: prevHref })}
+                  className="ion-no-padding"
+                >
+                  <IonIcon slot="icon-only" icon={arrowBackSharp} />
+                </IonButton>
               </IonButtons>
             </IonToolbar>
           </IonHeader>

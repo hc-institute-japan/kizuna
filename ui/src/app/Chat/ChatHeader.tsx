@@ -122,7 +122,7 @@ const ChatHeader: React.FC<Props> = ({
     history.push({
       pathname: `/p/${id}`,
       //   state: { profile: { username: state?.username, id } },
-      state: { profile: { username, id } },
+      state: { profile: { username, id }, prev: `/u/${id}` },
     });
 
   // const handleOnClick = () => {
