@@ -15,7 +15,7 @@ import ImageView from "../../../../components/Chat/File/ImageView/index";
 import VideoView from "../../../../components/Chat/File/VideoView";
 import { FilePayload } from "../../../../redux/commons/types";
 import { getFileBytes } from "../../../../redux/p2pmessages/actions/getFileBytes";
-import { getNextBatchMessages } from "../../../../redux/p2pmessages/actions/getNextBatchMessages";
+import { getPreviousMessages } from "../../../../redux/p2pmessages/actions/getPreviousMessages";
 import { P2PMessage } from "../../../../redux/p2pmessages/types";
 import { Profile } from "../../../../redux/profile/types";
 import { RootState } from "../../../../redux/types";
@@ -73,7 +73,7 @@ const FileBox: React.FC<Props> = ({
     let lastFile: P2PMessage = files[files.length - 1];
 
     dispatch(
-      getNextBatchMessages(
+      getPreviousMessages(
         conversant.id,
         5,
         "File",

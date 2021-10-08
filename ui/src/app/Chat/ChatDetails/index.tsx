@@ -12,7 +12,7 @@ import { RootState } from "../../../redux/types";
 import { Profile } from "../../../redux/profile/types";
 import { FilePayload } from "../../../redux/commons/types";
 import { P2PHashMap, P2PMessage } from "../../../redux/p2pmessages/types";
-import { getNextBatchMessages } from "../../../redux/p2pmessages/actions/getNextBatchMessages";
+import { getPreviousMessages } from "../../../redux/p2pmessages/actions/getPreviousMessages";
 import { getFileBytes } from "../../../redux/p2pmessages/actions/getFileBytes";
 import { useAppDispatch } from "../../../utils/helpers";
 // import { useIntl } from "react-intl";
@@ -39,8 +39,7 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
     (state: RootState) => state.p2pmessages.files
   );
 
-  const [disableGetNextBatch, setDisableGetNextBatch] =
-    useState<boolean>(false);
+  const [disableGetPrevious, setDisableGetPrevious] = useState<boolean>(false);
   const [orderedMedia] = useState<P2PMessage[]>([]);
   const [orderedFiles] = useState<P2PMessage[]>([]);
   const [fileMessageHashes] = useState<{ [key: string]: boolean }>({});
@@ -57,7 +56,7 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
   */
   useEffect(() => {
     dispatch(
-      getNextBatchMessages(
+      getPreviousMessages(
         state.conversant.id,
         40,
         "Other",
@@ -66,7 +65,7 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
       )
     );
     dispatch(
-      getNextBatchMessages(
+      getPreviousMessages(
         state.conversant.id,
         40,
         "Media",
@@ -164,12 +163,12 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
     complete: () => Promise<void>,
     earliestMediaOrFile: any
   ) => {
-    if (!disableGetNextBatch) {
+    if (!disableGetPrevious) {
       let earliest: P2PMessage = earliestMediaOrFile;
 
       if (earliest !== undefined) {
         dispatch(
-          getNextBatchMessages(
+          getPreviousMessages(
             state.conversant.id,
             10,
             (earliest.payload as FilePayload).fileType === "IMAGE" ||
@@ -181,7 +180,7 @@ const ChatDetails: React.FC<Props> = ({ location }) => {
           )
         ).then((res: P2PHashMap) => {
           if (Object.values(res)[0][state.conversant.id].length <= 0) {
-            setDisableGetNextBatch(true);
+            setDisableGetPrevious(true);
           }
           complete();
         });

@@ -20,7 +20,7 @@ pub fn add_members_handler(add_members_input: UpdateMembersIO) -> ExternResult<U
     }
 
     // check if any invitees are blocked and return Err if so.
-    let my_blocked_list: Vec<AgentPubKey> = get_my_blocked_list()?.0;
+    let my_blocked_list: Vec<AgentPubKey> = get_my_blocked_list()?;
 
     for member in new_group_members_from_input.clone() {
         if my_blocked_list.contains(&member) {

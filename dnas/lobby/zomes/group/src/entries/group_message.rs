@@ -51,10 +51,6 @@ pub struct GroupFileBytes(SerializedBytes);
 /* START OF INPUTS TYPES DEFINITION */
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct BatchSize(pub u8);
-
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
-#[serde(rename_all = "camelCase")]
 pub struct GroupMessageInput {
     group_hash: EntryHash,
     payload_input: PayloadInput,
@@ -147,13 +143,9 @@ pub struct GroupMessageElement {
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct ReadList(pub HashMap<String, Timestamp>);
-
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
-#[serde(rename_all = "camelCase")]
 pub struct GroupMessageContent {
     pub group_message_element: GroupMessageElement,
-    pub read_list: ReadList,
+    pub read_list: HashMap<String, Timestamp>,
 }
 
 #[derive(Serialize, Deserialize, SerializedBytes, Debug, Clone)]
@@ -169,29 +161,10 @@ pub struct GroupMessageData {
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
-pub struct GroupMessageHash(pub EntryHash);
-
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct GroupHash(pub EntryHash);
-
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct MessagesByGroup(pub HashMap<String, Vec<GroupMessageHash>>);
-
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct GroupMessagesContents(pub HashMap<String, GroupMessageContent>);
-
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
-#[serde(rename_all = "camelCase")]
 pub struct GroupMessagesOutput {
-    messages_by_group: MessagesByGroup,
-    group_messages_contents: GroupMessagesContents,
+    messages_by_group: HashMap<String, Vec<EntryHash>>,
+    group_messages_contents: HashMap<String, GroupMessageContent>,
 }
-
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
-pub struct FileBytes(pub HashMap<String, SerializedBytes>);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -200,7 +173,4 @@ pub struct GroupMessageWithId {
     pub id: EntryHash,
     pub content: GroupMessage,
 }
-
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
-pub struct PinContents(HashMap<String, GroupMessageElement>);
 /* END OF OUTPUTS TYPES DEFINITION */

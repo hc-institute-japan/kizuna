@@ -4,14 +4,14 @@ use crate::types::*;
 
 #[hdk_extern]
 fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
-    let batch_size: BatchSize = BatchSize(21);
+    let batch_size: u8 = 21;
 
     /* contacts */
     let mut agent_pub_keys: Vec<AgentPubKey> = Vec::new(); // agentPubKeys of members
 
     let blocked_contacts_call_response: ZomeCallResponse =
         call(None, "contacts".into(), "list_blocked".into(), None, &())?;
-    let blocked_contacts: AgentPubKeys =
+    let blocked_contacts: Vec<AgentPubKey> =
         call_response_handler(blocked_contacts_call_response)?.decode()?;
 
     let blocked_profiles_call_response: ZomeCallResponse = call(
@@ -19,14 +19,14 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
         "profiles".into(),
         "get_agents_profile".into(),
         None,
-        &blocked_contacts.0,
+        &blocked_contacts,
     )?;
     let blocked_profiles: Vec<AgentProfile> =
         call_response_handler(blocked_profiles_call_response)?.decode()?;
 
     let added_contacts_call_response: ZomeCallResponse =
         call(None, "contacts".into(), "list_added".into(), None, &())?;
-    let added_contacts: AgentPubKeys =
+    let added_contacts: Vec<AgentPubKey> =
         call_response_handler(added_contacts_call_response)?.decode()?;
 
     let added_profiles_call_response: ZomeCallResponse = call(
@@ -34,7 +34,7 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
         "profiles".into(),
         "get_agents_profile".into(),
         None,
-        &added_contacts.0,
+        &added_contacts,
     )?;
     let added_profiles: Vec<AgentProfile> =
         call_response_handler(added_profiles_call_response)?.decode()?;
@@ -54,9 +54,9 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
     /* group */
     let groups_call_response: ZomeCallResponse =
         call(None, "group".into(), "get_all_my_groups".into(), None, &())?;
-    let groups: MyGroupListWrapper = call_response_handler(groups_call_response)?.decode()?;
+    let groups: Vec<GroupOutput> = call_response_handler(groups_call_response)?.decode()?;
 
-    for group in &groups.0 {
+    for group in &groups {
         agent_pub_keys.extend(group.members.iter().cloned());
         agent_pub_keys.push(group.creator.clone())
     }
@@ -68,7 +68,7 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
         "profiles".into(),
         "get_agents_profile".into(),
         None,
-        &AgentPubKeys(agent_pub_keys),
+        &agent_pub_keys,
     )?;
     let member_profiles: Vec<AgentProfile> =
         call_response_handler(member_profiles_call_response)?.decode()?;

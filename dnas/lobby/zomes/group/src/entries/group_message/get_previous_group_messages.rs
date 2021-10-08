@@ -4,18 +4,15 @@ use std::collections::hash_map::HashMap;
 
 use super::group_message_helpers::*;
 
-use super::{
-    GroupMessageContent, GroupMessageHash, GroupMessagesContents, GroupMessagesOutput,
-    GroupMsgBatchFetchFilter, MessagesByGroup,
-};
+use super::{GroupMessageContent, GroupMessagesOutput, GroupMsgBatchFetchFilter};
 
 pub fn get_previous_group_messages_handler(
     filter: GroupMsgBatchFetchFilter,
 ) -> ExternResult<GroupMessagesOutput> {
     let mut linked_messages: Vec<Link>;
 
-    let mut messages_hashes: Vec<GroupMessageHash> = vec![];
-    let mut messages_by_group: HashMap<String, Vec<GroupMessageHash>> = HashMap::new();
+    let mut messages_hashes: Vec<EntryHash> = vec![];
+    let mut messages_by_group: HashMap<String, Vec<EntryHash>> = HashMap::new();
     let mut group_messages_contents: HashMap<String, GroupMessageContent> = HashMap::new();
 
     let mut pivot_path: Option<EntryHash> = None; // this variable wiil be used if we dont reach the batch_size from the first path evaluated.
@@ -82,7 +79,7 @@ pub fn get_previous_group_messages_handler(
     messages_by_group.insert(filter.group_id.to_string(), messages_hashes);
 
     Ok(GroupMessagesOutput {
-        messages_by_group: MessagesByGroup(messages_by_group),
-        group_messages_contents: GroupMessagesContents(group_messages_contents),
+        messages_by_group: messages_by_group,
+        group_messages_contents: group_messages_contents,
     })
 }

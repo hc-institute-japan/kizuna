@@ -99,7 +99,7 @@ export const FUNCTIONS: FunctionNameType = {
     SEND_MESSAGE_WITH_TIMESTAMP: "send_message_with_timestamp",
     GET_LATEST_MESSAGES: "get_latest_messages",
     GET_MESSAGES_BY_AGENT_BY_TIMESTAMP: "get_messages_by_agent_by_timestamp",
-    GET_NEXT_BATCH_MESSAGES: "get_next_batch_messages",
+    GET_PREVIOUS_MESSAGES: "get_previous_messages",
     GET_ALL_MESSAGES: "get_all_messages",
     READ_MESSAGE: "read_message",
     GET_FILE_BYTES: "get_file_bytes",

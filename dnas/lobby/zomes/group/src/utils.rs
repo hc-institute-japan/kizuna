@@ -1,7 +1,6 @@
-use crate::entries::group::BlockedWrapper;
 use hdk::prelude::*;
 
-pub(crate) fn get_my_blocked_list() -> ExternResult<BlockedWrapper> {
+pub(crate) fn get_my_blocked_list() -> ExternResult<Vec<AgentPubKey>> {
     //call list_blocked() to contacts zome
     let zome_name: ZomeName = ZomeName("contacts".to_owned());
     let function_name: FunctionName = FunctionName("list_blocked".to_owned());
@@ -14,7 +13,7 @@ pub(crate) fn get_my_blocked_list() -> ExternResult<BlockedWrapper> {
         &(),  //This are the input value we send to the fuction we are calling
     )?;
 
-    let my_blocked_list: BlockedWrapper =
+    let my_blocked_list: Vec<AgentPubKey> =
         call_response_handler(my_blocked_list_call_response)?.decode()?;
 
     Ok(my_blocked_list)

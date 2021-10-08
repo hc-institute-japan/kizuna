@@ -13,7 +13,7 @@ import MessageInput, {
 import { FilePayload } from "../../redux/commons/types";
 import { fetchMyContacts } from "../../redux/contacts/actions";
 import { getFileBytes } from "../../redux/p2pmessages/actions/getFileBytes";
-import { getNextBatchMessages } from "../../redux/p2pmessages/actions/getNextBatchMessages";
+import { getPreviousMessages } from "../../redux/p2pmessages/actions/getPreviousMessages";
 import { getPinnedMessages } from "../../redux/p2pmessages/actions/getPinnedMessages";
 import { getP2PState } from "../../redux/p2pmessages/actions/helpers/getP2PState";
 import { isTyping } from "../../redux/p2pmessages/actions/isTyping";
@@ -45,8 +45,7 @@ const Chat: React.FC = () => {
       receipt?: P2PMessageReceipt | undefined;
     }[]
   >([]);
-  const [disableGetNextBatch, setDisableGetNextBatch] =
-    useState<boolean>(false);
+  const [disableGetPrevious, setDisableGetPrevious] = useState<boolean>(false);
   const {
     conversations,
     messages,
@@ -240,11 +239,11 @@ const Chat: React.FC = () => {
       when reaching the beginning/top of the chat box
     */
   const handleOnScrollTop = (complete: any) => {
-    if (disableGetNextBatch === false) {
+    if (disableGetPrevious === false) {
       const lastMessage = messagesWithConversant[0].message;
       if (!lastMessage.err) {
         dispatch(
-          getNextBatchMessages(
+          getPreviousMessages(
             conversant.id,
             5,
             "All",
@@ -252,9 +251,9 @@ const Chat: React.FC = () => {
             lastMessage.p2pMessageEntryHash
           )
         ).then((res: P2PHashMap) => {
-          // disable getNextBatch if return value is empty
+          // disable getPrevious if return value is empty
           if (Object.values(res)[0][conversant.id].length <= 0) {
-            setDisableGetNextBatch(true);
+            setDisableGetPrevious(true);
           }
           return complete();
         });
@@ -464,7 +463,7 @@ const Chat: React.FC = () => {
           //   }, 2000);
           // }}
           ref={scrollerRef}
-          disabled={disableGetNextBatch}
+          disabled={disableGetPrevious}
         >
           {messagesWithConversant.map((messageBundle) =>
             displayMessage(messageBundle)

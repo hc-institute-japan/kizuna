@@ -1,16 +1,16 @@
 use hdk::prelude::*;
 use std::collections::HashMap;
 
-use super::{
-    GroupHash, GroupMessage, GroupMessageData, GroupMessageElement, GroupMessageWithId, PinContents,
-};
+use super::{GroupMessage, GroupMessageData, GroupMessageElement, GroupMessageWithId};
 use crate::utils::{try_get_and_convert, try_get_and_convert_with_header};
 
-pub fn get_pinned_messages_handler(group_hash: GroupHash) -> ExternResult<PinContents> {
+pub fn get_pinned_messages_handler(
+    group_hash: EntryHash,
+) -> ExternResult<HashMap<String, GroupMessageElement>> {
     let mut pin_contents: HashMap<String, GroupMessageElement> = HashMap::new();
 
     // the target of the link being the group message
-    let links = get_links(group_hash.0, Some(LinkTag::new("pinned".to_owned())))?.into_inner();
+    let links = get_links(group_hash, Some(LinkTag::new("pinned".to_owned())))?.into_inner();
 
     for link in links {
         // We try to hit the cache with content() before reaching the network
@@ -45,5 +45,5 @@ pub fn get_pinned_messages_handler(group_hash: GroupHash) -> ExternResult<PinCon
         pin_contents.insert(link.target.clone().to_string(), group_message_element);
     }
 
-    Ok(PinContents(pin_contents))
+    Ok(pin_contents)
 }

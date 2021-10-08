@@ -8,8 +8,8 @@ version = "0.0.1"
 dependencies = [
  "derive_more",
  "file_types 0.0.1",
- "hdk",
- "holo_hash",
+ "hdk 0.0.109",
+ "holo_hash 0.0.8",
  "serde",
 ]
 
@@ -100,8 +100,8 @@ version = "0.0.1"
 dependencies = [
  "contacts 0.0.1 (git+https://github.com/holochain-open-dev/contacts?branch=main)",
  "derive_more",
- "hdk",
- "holo_hash",
+ "hdk 0.0.109",
+ "holo_hash 0.0.8",
  "serde",
 ]
 
@@ -111,8 +111,8 @@ version = "0.0.1"
 source = "git+https://github.com/holochain-open-dev/contacts?branch=main#11e6d182e616066f6fa68251f7d9766c34545cc5"
 dependencies = [
  "derive_more",
- "hdk",
- "holo_hash",
+ "hdk 0.0.108",
+ "holo_hash 0.0.7",
  "serde",
 ]
 
@@ -140,19 +140,19 @@ name = "file_types"
 version = "0.0.1"
 dependencies = [
  "derive_more",
- "hdk",
- "holo_hash",
+ "hdk 0.0.109",
+ "holo_hash 0.0.8",
  "serde",
 ]
 
 [[package]]
 name = "file_types"
 version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop#ccd9616a13da53d473bc2ce5040b509aeb7c476b"
+source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop#70b0576911b1404ae950d8be7de7555ab8f5af68"
 dependencies = [
  "derive_more",
- "hdk",
- "holo_hash",
+ "hdk 0.0.109",
+ "holo_hash 0.0.8",
  "serde",
 ]
 
@@ -162,8 +162,8 @@ version = "0.0.1"
 dependencies = [
  "derive_more",
  "file_types 0.0.1",
- "hdk",
- "holo_hash",
+ "hdk 0.0.109",
+ "holo_hash 0.0.8",
  "serde",
 ]
 
@@ -176,11 +176,11 @@ checksum = "ab5ef0d4909ef3724cc8cce6ccc8572c5c817592e9285f5464f8e86f8bd3726e"
 [[package]]
 name = "hc_zome_profiles"
 version = "0.0.1"
-source = "git+https://github.com/tatssato/profiles?rev=99e3464f0a5cbdb342438eea4dccd48c89e3d44e#99e3464f0a5cbdb342438eea4dccd48c89e3d44e"
+source = "git+https://github.com/tatssato/profiles?rev=1513197959ee987bd9f6523f3ba59c857f4483df#1513197959ee987bd9f6523f3ba59c857f4483df"
 dependencies = [
  "derive_more",
- "hdk",
- "holo_hash",
+ "hdk 0.0.109",
+ "holo_hash 0.0.8",
  "serde",
 ]
 
@@ -189,10 +189,28 @@ name = "hdk"
 version = "0.0.108"
 source = "git+https://github.com/holochain/holochain?rev=12dfef0b2a710304697ddcd9ee731b4fe9933b0f#12dfef0b2a710304697ddcd9ee731b4fe9933b0f"
 dependencies = [
- "hdk_derive",
- "holo_hash",
+ "hdk_derive 0.0.10",
+ "holo_hash 0.0.7",
  "holochain_wasmer_guest",
- "holochain_zome_types",
+ "holochain_zome_types 0.0.10",
+ "paste",
+ "serde",
+ "serde_bytes",
+ "thiserror",
+ "tracing",
+ "tracing-core",
+ "tracing-subscriber",
+]
+
+[[package]]
+name = "hdk"
+version = "0.0.109"
+source = "git+https://github.com/holochain/holochain?rev=holochain-0.0.109#af7de6eca55d8dd3d22bbfccee738fd11f2a2e12"
+dependencies = [
+ "hdk_derive 0.0.11",
+ "holo_hash 0.0.8",
+ "holochain_wasmer_guest",
+ "holochain_zome_types 0.0.11",
  "paste",
  "serde",
  "serde_bytes",
@@ -207,7 +225,19 @@ name = "hdk_derive"
 version = "0.0.10"
 source = "git+https://github.com/holochain/holochain?rev=12dfef0b2a710304697ddcd9ee731b4fe9933b0f#12dfef0b2a710304697ddcd9ee731b4fe9933b0f"
 dependencies = [
- "holochain_zome_types",
+ "holochain_zome_types 0.0.10",
+ "paste",
+ "proc-macro2",
+ "quote",
+ "syn",
+]
+
+[[package]]
+name = "hdk_derive"
+version = "0.0.11"
+source = "git+https://github.com/holochain/holochain?rev=holochain-0.0.109#af7de6eca55d8dd3d22bbfccee738fd11f2a2e12"
+dependencies = [
+ "holochain_zome_types 0.0.11",
  "paste",
  "proc-macro2",
  "quote",
@@ -218,6 +248,20 @@ dependencies = [
 name = "holo_hash"
 version = "0.0.7"
 source = "git+https://github.com/holochain/holochain?rev=12dfef0b2a710304697ddcd9ee731b4fe9933b0f#12dfef0b2a710304697ddcd9ee731b4fe9933b0f"
+dependencies = [
+ "base64",
+ "blake2b_simd",
+ "derive_more",
+ "holochain_serialized_bytes",
+ "serde",
+ "serde_bytes",
+ "thiserror",
+]
+
+[[package]]
+name = "holo_hash"
+version = "0.0.8"
+source = "git+https://github.com/holochain/holochain?rev=holochain-0.0.109#af7de6eca55d8dd3d22bbfccee738fd11f2a2e12"
 dependencies = [
  "base64",
  "blake2b_simd",
@@ -284,10 +328,28 @@ version = "0.0.10"
 source = "git+https://github.com/holochain/holochain?rev=12dfef0b2a710304697ddcd9ee731b4fe9933b0f#12dfef0b2a710304697ddcd9ee731b4fe9933b0f"
 dependencies = [
  "chrono",
- "holo_hash",
+ "holo_hash 0.0.7",
  "holochain_serialized_bytes",
  "holochain_wasmer_common",
- "kitsune_p2p_timestamp",
+ "kitsune_p2p_timestamp 0.0.4",
+ "paste",
+ "serde",
+ "serde_bytes",
+ "subtle",
+ "thiserror",
+ "tracing",
+]
+
+[[package]]
+name = "holochain_zome_types"
+version = "0.0.11"
+source = "git+https://github.com/holochain/holochain?rev=holochain-0.0.109#af7de6eca55d8dd3d22bbfccee738fd11f2a2e12"
+dependencies = [
+ "chrono",
+ "holo_hash 0.0.8",
+ "holochain_serialized_bytes",
+ "holochain_wasmer_common",
+ "kitsune_p2p_timestamp 0.0.5",
  "paste",
  "serde",
  "serde_bytes",
@@ -325,6 +387,16 @@ checksum = "b71991ff56294aa922b450139ee08b3bfc70982c6b2c7562771375cf73542dd4"
 name = "kitsune_p2p_timestamp"
 version = "0.0.4"
 source = "git+https://github.com/holochain/holochain?rev=12dfef0b2a710304697ddcd9ee731b4fe9933b0f#12dfef0b2a710304697ddcd9ee731b4fe9933b0f"
+dependencies = [
+ "chrono",
+ "serde",
+ "thiserror",
+]
+
+[[package]]
+name = "kitsune_p2p_timestamp"
+version = "0.0.5"
+source = "git+https://github.com/holochain/holochain?rev=holochain-0.0.109#af7de6eca55d8dd3d22bbfccee738fd11f2a2e12"
 dependencies = [
  "chrono",
  "serde",
@@ -400,8 +472,8 @@ name = "p2pmessage"
 version = "0.0.1"
 dependencies = [
  "derive_more",
- "hdk",
- "holo_hash",
+ "hdk 0.0.109",
+ "holo_hash 0.0.8",
  "p2pmessage 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop)",
  "serde",
 ]
@@ -409,12 +481,12 @@ dependencies = [
 [[package]]
 name = "p2pmessage"
 version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop#ccd9616a13da53d473bc2ce5040b509aeb7c476b"
+source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop#70b0576911b1404ae950d8be7de7555ab8f5af68"
 dependencies = [
  "derive_more",
  "file_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop)",
- "hdk",
- "holo_hash",
+ "hdk 0.0.109",
+ "holo_hash 0.0.8",
  "serde",
 ]
 
@@ -469,8 +541,8 @@ name = "preference"
 version = "0.0.1"
 dependencies = [
  "derive_more",
- "hdk",
- "holo_hash",
+ "hdk 0.0.109",
+ "holo_hash 0.0.8",
  "serde",
 ]
 
@@ -489,8 +561,8 @@ version = "0.0.1"
 dependencies = [
  "derive_more",
  "hc_zome_profiles",
- "hdk",
- "holo_hash",
+ "hdk 0.0.109",
+ "holo_hash 0.0.8",
  "serde",
 ]
 

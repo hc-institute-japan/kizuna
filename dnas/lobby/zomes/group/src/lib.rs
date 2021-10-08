@@ -1,4 +1,4 @@
-use std::collections::BTreeSet;
+use std::collections::{BTreeSet, HashMap};
 
 use hdk::prelude::*;
 
@@ -36,16 +36,12 @@ use validation_rules::ValidationInput;
 use signals::{SignalDetails, SignalPayload};
 
 use group_message::{
-    BatchSize, FileBytes, GroupChatFilter, GroupFileBytes, GroupHash, GroupMessage,
-    GroupMessageInput, GroupMessageInputWithDate, GroupMessageReadData, GroupMessageWithId,
-    GroupMessagesOutput, GroupMsgAdjacentFetchFilter, GroupMsgBatchFetchFilter,
-    GroupTypingDetailData, PinContents, PinDetail,
+    GroupChatFilter, GroupFileBytes, GroupMessage, GroupMessageElement, GroupMessageInput,
+    GroupMessageInputWithDate, GroupMessageReadData, GroupMessageWithId, GroupMessagesOutput,
+    GroupMsgAdjacentFetchFilter, GroupMsgBatchFetchFilter, GroupTypingDetailData, PinDetail,
 };
 
-use group::{
-    CreateGroupInput, CreateGroupOutput, EntryHashWrapper, Group, MyGroupListWrapper,
-    UpdateGroupNameIO, UpdateMembersIO,
-};
+use group::{CreateGroupInput, CreateGroupOutput, Group, UpdateGroupNameIO, UpdateMembersIO};
 
 entry_defs![
     Group::entry_def(),
@@ -121,13 +117,13 @@ fn update_group_name(
 }
 
 #[hdk_extern]
-fn get_all_my_groups(_: ()) -> ExternResult<MyGroupListWrapper> {
+fn get_all_my_groups(_: ()) -> ExternResult<Vec<GroupOutput>> {
     return get_all_my_groups_handler();
 }
 
 #[hdk_extern]
-fn get_group_latest_version(group_id: EntryHashWrapper) -> ExternResult<GroupOutput> {
-    return group_helpers::get_group_latest_version(group_id.group_hash);
+fn get_group_latest_version(group_id: EntryHash) -> ExternResult<GroupOutput> {
+    return group_helpers::get_group_latest_version(group_id);
 }
 
 // Group Message CRUD
@@ -158,7 +154,7 @@ fn get_adjacent_group_messages(
 }
 
 #[hdk_extern]
-fn get_latest_messages_for_all_groups(batch_size: BatchSize) -> ExternResult<GroupMessagesOutput> {
+fn get_latest_messages_for_all_groups(batch_size: u8) -> ExternResult<GroupMessagesOutput> {
     return get_latest_messages_for_all_groups_handler(batch_size);
 }
 
@@ -170,7 +166,7 @@ fn get_messages_by_group_by_timestamp(
 }
 
 #[hdk_extern]
-fn get_files_bytes(file_hashes: Vec<EntryHash>) -> ExternResult<FileBytes> {
+fn get_files_bytes(file_hashes: Vec<EntryHash>) -> ExternResult<HashMap<String, SerializedBytes>> {
     return get_files_bytes_handler(file_hashes);
 }
 
@@ -185,7 +181,9 @@ fn unpin_message(pin_detail: PinDetail) -> ExternResult<()> {
 }
 
 #[hdk_extern]
-fn get_pinned_messages(group_hash: GroupHash) -> ExternResult<PinContents> {
+fn get_pinned_messages(
+    group_hash: EntryHash,
+) -> ExternResult<HashMap<String, GroupMessageElement>> {
     return get_pinned_messages_handler(group_hash);
 }
 

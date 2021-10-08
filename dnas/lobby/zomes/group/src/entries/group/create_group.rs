@@ -17,7 +17,7 @@ pub fn create_group_handler(
     let creator: AgentPubKey = agent_info()?.agent_latest_pubkey;
 
     // get my blocked list from the contacs zome
-    let my_blocked_list: Vec<AgentPubKey> = utils::get_my_blocked_list()?.0;
+    let my_blocked_list: Vec<AgentPubKey> = utils::get_my_blocked_list()?;
 
     // if even one member of the group is in my blocked list we have to return an error
     for member in group_members.clone() {

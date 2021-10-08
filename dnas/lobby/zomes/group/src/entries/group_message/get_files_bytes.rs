@@ -2,9 +2,11 @@ use crate::utils::*;
 use hdk::prelude::*;
 use std::collections::hash_map::HashMap;
 
-use super::{FileBytes, GroupFileBytes};
+use super::GroupFileBytes;
 
-pub fn get_files_bytes_handler(file_hashes: Vec<EntryHash>) -> ExternResult<FileBytes> {
+pub fn get_files_bytes_handler(
+    file_hashes: Vec<EntryHash>,
+) -> ExternResult<HashMap<String, SerializedBytes>> {
     let mut all_file_bytes: HashMap<String, SerializedBytes> = HashMap::new();
 
     /* We are only concerned with the content and not the metadata here */
@@ -27,5 +29,5 @@ pub fn get_files_bytes_handler(file_hashes: Vec<EntryHash>) -> ExternResult<File
             return error("The file bytes were not found");
         }
     }
-    Ok(FileBytes(all_file_bytes))
+    Ok(all_file_bytes)
 }
