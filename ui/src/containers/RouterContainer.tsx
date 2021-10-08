@@ -4,7 +4,9 @@ import { BrowserRouter } from "react-router-dom";
 
 const RouterContainer: React.FC = ({ children }) => (
   <IonReactRouter>
-    <BrowserRouter>{children}</BrowserRouter>
+    {/* <BrowserRouter> */}
+    {children}
+    {/* </BrowserRouter> */}
   </IonReactRouter>
 );
 

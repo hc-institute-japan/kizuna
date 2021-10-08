@@ -18,12 +18,8 @@ const HomeTabBar: React.FC = () => (
   <IonTabs>
     <IonRouterOutlet id="home">
       <Redirect exact path="/home" to="/home/messaging"></Redirect>
-      <Route
-        path="/home/messaging"
-        render={() => <Conversations />}
-        exact={true}
-      />
-      <Route path="/home/contacts" render={() => <Contacts />} exact={true} />
+      <Route path="/home/messaging" render={() => <Conversations />} exact />
+      <Route path="/home/contacts" render={() => <Contacts />} exact />
     </IonRouterOutlet>
     <IonTabBar slot="bottom" className={styles["home-tab-bar"]}>
       <IonTabButton tab="messaging" href="/home/messaging">
