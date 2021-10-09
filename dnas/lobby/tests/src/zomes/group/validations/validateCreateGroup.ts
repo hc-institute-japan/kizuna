@@ -26,6 +26,11 @@ export default function validateCreateGroupTest(config, installables) {
 
       const alice_conductor = alice_happ.cells[0];
 
+      // signal handlers assignment
+      alice.setSignalHandler((signal) => {});
+      bobby.setSignalHandler((signal) => {});
+      charlie.setSignalHandler((signal) => {});
+
       // 1 - craete a valid group
 
       let create_group_input = {

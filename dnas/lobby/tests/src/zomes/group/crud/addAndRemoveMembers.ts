@@ -54,6 +54,10 @@ export default function addAndRemoveMembersTest(config, installables) {
         counter: 0,
         payload: null,
       };
+      let david_signal_listener = {
+        counter: 0,
+        payload: null,
+      };
 
       // set signal handlers
       alice.setSignalHandler((signal) => {
@@ -64,6 +68,9 @@ export default function addAndRemoveMembersTest(config, installables) {
       });
       charlie.setSignalHandler((signal) => {
         signalHandler(signal, charlie_signal_listener);
+      });
+      david.setSignalHandler((signal) => {
+        signalHandler(signal, david_signal_listener);
       });
 
       await delay(2000);
