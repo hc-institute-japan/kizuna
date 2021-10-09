@@ -206,33 +206,35 @@ export const sendMessage =
       }
     } catch (e) {
       try {
-        const retriedSend = await retry({
-          zomeName: ZOMES.P2PMESSAGE,
-          fnName: FUNCTIONS[ZOMES.P2PMESSAGE].SEND_MESSAGE,
-          payload: input,
-        });
+        if (!e.message.includes("Timed out")) {
+          const retriedSend = await retry({
+            zomeName: ZOMES.P2PMESSAGE,
+            fnName: FUNCTIONS[ZOMES.P2PMESSAGE].SEND_MESSAGE,
+            payload: input,
+          });
 
-        if (retriedSend?.type !== "error") {
-          const contactsState = { ...getState().contacts.contacts };
-          const profile = { ...getState().profile };
+          if (retriedSend?.type !== "error") {
+            const contactsState = { ...getState().contacts.contacts };
+            const profile = { ...getState().profile };
 
-          const dispatchState: DispatchState = processSentData(
-            retriedSend,
-            contactsState,
-            profile
-          );
+            const dispatchState: DispatchState = processSentData(
+              retriedSend,
+              contactsState,
+              profile
+            );
 
-          const p2pFile =
-            type === "FILE"
-              ? {
-                  fileHash: (dispatchState.message.payload as FilePayload)
-                    .fileHash,
-                  fileBytes: file!.fileBytes,
-                }
-              : undefined;
+            const p2pFile =
+              type === "FILE"
+                ? {
+                    fileHash: (dispatchState.message.payload as FilePayload)
+                      .fileHash,
+                    fileBytes: file!.fileBytes,
+                  }
+                : undefined;
 
-          dispatchState.file = p2pFile;
-          dispatch(appendMessage(dispatchState));
+            dispatchState.file = p2pFile;
+            dispatch(appendMessage(dispatchState));
+          }
         }
       } catch (e) {
         // console.log("sending automatically retried message has failed", e);

@@ -66,7 +66,7 @@ const GroupSearch: React.FC = () => {
           });
         });
       }}
-      prevHref="/"
+      prevHref={`/g/${group}`}
       type="group"
     ></Search>
   );

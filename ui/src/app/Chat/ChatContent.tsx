@@ -268,7 +268,6 @@ const Chat: React.FC = () => {
       which emits a signal to the sender
       when the chat bubble comes into view
     */
-  // NOTE: removed for now with the implementaation of remote_signal in HC
   const onSeenHandler = (messageBundle: {
     message: P2PMessage;
     receipt?: P2PMessageReceipt;
@@ -431,7 +430,10 @@ const Chat: React.FC = () => {
         showProfilePicture={true}
         onPinMessage={() => dispatch(pinMessage([messageBundle.message]))}
         showName={true}
-        onSeen={(complete) => onSeenHandler(messageBundle)}
+        // TODO: enable once conductor can handle many call_remotes
+        // or once we have a better implementation.
+        // onSeen={(complete) => onSeenHandler(messageBundle)}
+        onSeen={(complete) => {}}
         onDownload={(file) => onDownloadHandler(file)}
         replyTo={replyToData ? replyToData : undefined}
         onReply={(message) => {

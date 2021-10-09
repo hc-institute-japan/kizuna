@@ -64,15 +64,16 @@ const createClient = async (
     case "HCDEV":
     case "HC": {
       const appWs = await AppWebsocket.connect(
-        process.env.REACT_APP_DNA_INTERFACE_URL as string,
+        appUrl() as string,
         15000, // holochain's default timeout
         signalHandler
       );
 
       const appInfo = await appWs.appInfo({
-        installed_app_id: "test-app",
+        installed_app_id: appId() as string,
       });
 
+      console.log(appId());
       const cellData = appInfo.cell_data[0];
 
       return new HolochainClient(appWs, cellData);
@@ -211,11 +212,16 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
   try {
     return await client?.callZome(zomeName, fnName, payload);
   } catch (e) {
-    console.warn(e);
-    console.log("error in zome call: ", zomeName, e);
+    console.log(
+      "zome call has failed in zome: ",
+      zomeName,
+      " with call ",
+      fnName,
+      " error: ",
+      e
+    );
     const { type = null, data = null } = { ...e };
     if (type === "error") {
-      console.warn(fnName);
       switch (data?.type) {
         case "ribosome_error": {
           const regex = /Guest\("([\s\S]*?)"\)/;

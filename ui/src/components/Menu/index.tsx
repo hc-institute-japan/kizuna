@@ -66,7 +66,7 @@ const Menu: React.FC = () => {
     menu?.current?.close();
     history.push({
       pathname: `/p/${id}`,
-      state: { profile: { username, id } as Profile },
+      state: { profile: { username, id } as Profile, prev: `/home` },
     });
   };
 

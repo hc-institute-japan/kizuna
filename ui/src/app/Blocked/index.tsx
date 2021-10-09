@@ -1,13 +1,15 @@
 import {
-  IonBackButton,
+  IonButton,
   IonButtons,
   IonContent,
   IonHeader,
+  IonIcon,
   IonItem,
   IonLabel,
   IonPage,
   IonToolbar,
 } from "@ionic/react";
+import { arrowBackSharp } from "ionicons/icons";
 import React from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
@@ -33,8 +35,13 @@ const Blocked = () => {
     <IonPage>
       <IonHeader>
         <IonToolbar>
-          <IonButtons>
-            <IonBackButton defaultHref="/home"></IonBackButton>
+          <IonButtons slot="start">
+            <IonButton
+              onClick={() => history.push({ pathname: `/home` })}
+              className="ion-no-padding"
+            >
+              <IonIcon slot="icon-only" icon={arrowBackSharp} />
+            </IonButton>
           </IonButtons>
         </IonToolbar>
       </IonHeader>

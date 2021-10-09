@@ -1,13 +1,15 @@
 import {
-  IonBackButton,
+  IonButton,
   IonButtons,
   IonHeader,
+  IonIcon,
   IonPage,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
+import { arrowBackSharp } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router";
+import { useHistory, useLocation } from "react-router";
 import ProfileInfo from "../../components/ProfileInfo";
 import { Profile as ProfileType } from "../../redux/profile/types";
 import ProfileMenuItems from "./ProfileMenuItems";
@@ -21,6 +23,7 @@ interface LocationProps {
 const Profile: React.FC = () => {
   const _isMounted = useRef(true);
   const { state } = useLocation<LocationProps>();
+  const history = useHistory();
   const [profile, setProfile] = useState<null | ProfileType>(null);
   // const [loading, setLoading] = useState(false);
 
@@ -40,9 +43,17 @@ const Profile: React.FC = () => {
       <IonHeader className={styles.header}>
         <IonToolbar>
           <IonButtons>
-            <IonBackButton
-              defaultHref={state?.prev ? state.prev : "/home/contacts"}
-            />
+            <IonButton
+              onClick={() => {
+                console.log(state);
+                history.push({
+                  pathname: state?.prev ? state.prev : "/home/contacts",
+                });
+              }}
+              className="ion-no-padding"
+            >
+              <IonIcon slot="icon-only" icon={arrowBackSharp} />
+            </IonButton>
           </IonButtons>
           {profile ? <ProfileMenuItems profile={profile} /> : null}
         </IonToolbar>
