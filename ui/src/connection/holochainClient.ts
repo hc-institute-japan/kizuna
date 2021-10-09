@@ -34,7 +34,7 @@ const createClient = async (
 
       const connection = new Connection(
         process.env.NODE_ENV === "production"
-          ? "https://devnet-chaperone.holo.host"
+          ? "https://chaperone.holo.host"
           : appUrl(),
         // "http://localhost:24273",
         signalHandler,

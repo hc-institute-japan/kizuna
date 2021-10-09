@@ -129,11 +129,11 @@ dependencies = [
 [[package]]
 name = "contacts"
 version = "0.0.1"
-source = "git+https://github.com/holochain-open-dev/contacts?branch=main#9a273fb35d277f45c7cf05604902243d54afd1ea"
+source = "git+https://github.com/holochain-open-dev/contacts?branch=main#d21d090423d574263df2c4a435a01d1125f6e427"
 dependencies = [
  "derive_more",
- "hdk 0.0.107",
- "holo_hash 0.0.6",
+ "hdk 0.0.109",
+ "holo_hash 0.0.8",
  "serde",
 ]
 
@@ -340,24 +340,6 @@ dependencies = [
 
 [[package]]
 name = "hdk"
-version = "0.0.107"
-source = "git+https://github.com/holochain/holochain?rev=d7a6ac364a6a50bee6297ec2041e8c1ffe0be7dc#d7a6ac364a6a50bee6297ec2041e8c1ffe0be7dc"
-dependencies = [
- "hdk_derive 0.0.9",
- "holo_hash 0.0.7",
- "holochain_wasmer_guest 0.0.73",
- "holochain_zome_types 0.0.9",
- "paste",
- "serde",
- "serde_bytes",
- "thiserror",
- "tracing",
- "tracing-core",
- "tracing-subscriber",
-]
-
-[[package]]
-name = "hdk"
 version = "0.0.109"
 source = "git+https://github.com/holochain/holochain?rev=holochain-0.0.109#af7de6eca55d8dd3d22bbfccee738fd11f2a2e12"
 dependencies = [
@@ -380,18 +362,6 @@ version = "0.0.2-alpha.1"
 source = "git+https://github.com/holochain/holochain?rev=363af6d8af8d18e4616f6aa56ad4d1f0fabaafb7#363af6d8af8d18e4616f6aa56ad4d1f0fabaafb7"
 dependencies = [
  "holochain_zome_types 0.0.2-alpha.1",
- "paste",
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "hdk_derive"
-version = "0.0.9"
-source = "git+https://github.com/holochain/holochain?rev=d7a6ac364a6a50bee6297ec2041e8c1ffe0be7dc#d7a6ac364a6a50bee6297ec2041e8c1ffe0be7dc"
-dependencies = [
- "holochain_zome_types 0.0.9",
  "paste",
  "proc-macro2",
  "quote",
@@ -430,32 +400,6 @@ dependencies = [
  "fixt",
  "holochain_serialized_bytes 0.0.50",
  "rand 0.7.3",
- "serde",
- "serde_bytes",
- "thiserror",
-]
-
-[[package]]
-name = "holo_hash"
-version = "0.0.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4a29197878928112186c00a22b849160814f0bc4bb87f2467f4a76313e449a16"
-dependencies = [
- "base64",
- "blake2b_simd",
- "derive_more",
- "holochain_serialized_bytes 0.0.51",
- "serde",
- "serde_bytes",
- "thiserror",
-]
-
-[[package]]
-name = "holo_hash"
-version = "0.0.7"
-source = "git+https://github.com/holochain/holochain?rev=d7a6ac364a6a50bee6297ec2041e8c1ffe0be7dc#d7a6ac364a6a50bee6297ec2041e8c1ffe0be7dc"
-dependencies = [
- "holochain_serialized_bytes 0.0.51",
  "serde",
  "serde_bytes",
  "thiserror",
@@ -598,24 +542,6 @@ dependencies = [
 
 [[package]]
 name = "holochain_zome_types"
-version = "0.0.9"
-source = "git+https://github.com/holochain/holochain?rev=d7a6ac364a6a50bee6297ec2041e8c1ffe0be7dc#d7a6ac364a6a50bee6297ec2041e8c1ffe0be7dc"
-dependencies = [
- "chrono",
- "holo_hash 0.0.7",
- "holochain_serialized_bytes 0.0.51",
- "holochain_wasmer_common 0.0.73",
- "kitsune_p2p_timestamp 0.0.3",
- "paste",
- "serde",
- "serde_bytes",
- "subtle",
- "thiserror",
- "tracing",
-]
-
-[[package]]
-name = "holochain_zome_types"
 version = "0.0.11"
 source = "git+https://github.com/holochain/holochain?rev=holochain-0.0.109#af7de6eca55d8dd3d22bbfccee738fd11f2a2e12"
 dependencies = [
@@ -623,7 +549,7 @@ dependencies = [
  "holo_hash 0.0.8",
  "holochain_serialized_bytes 0.0.51",
  "holochain_wasmer_common 0.0.73",
- "kitsune_p2p_timestamp 0.0.5",
+ "kitsune_p2p_timestamp",
  "paste",
  "serde",
  "serde_bytes",
@@ -678,16 +604,6 @@ version = "0.0.1"
 dependencies = [
  "hc_joining_code",
  "hdk 0.0.101-alpha.0",
-]
-
-[[package]]
-name = "kitsune_p2p_timestamp"
-version = "0.0.3"
-source = "git+https://github.com/holochain/holochain?rev=d7a6ac364a6a50bee6297ec2041e8c1ffe0be7dc#d7a6ac364a6a50bee6297ec2041e8c1ffe0be7dc"
-dependencies = [
- "chrono",
- "serde",
- "thiserror",
 ]
 
 [[package]]
@@ -913,9 +829,9 @@ dependencies = [
 
 [[package]]
 name = "quote"
-version = "1.0.9"
+version = "1.0.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c3d0b9745dc2debf507c8422de05d7226cc1f0644216dfdfead988f9b1ab32a7"
+checksum = "38bc8cc6a5f2e3655e0899c1b848643b2562f853f114bfec7be120678e3ace05"
 dependencies = [
  "proc-macro2",
 ]
@@ -1285,9 +1201,9 @@ checksum = "6bdef32e8150c2a081110b42772ffe7d7c9032b606bc226c8260fd97e0976601"
 
 [[package]]
 name = "syn"
-version = "1.0.77"
+version = "1.0.80"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5239bc68e0fef57495900cfea4e8dc75596d9a319d7e16b1e0a440d24e6fe0a0"
+checksum = "d010a1623fbd906d51d650a9916aaefc05ffa0e4053ff7fe601167f3e715d194"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1296,18 +1212,18 @@ dependencies = [
 
 [[package]]
 name = "thiserror"
-version = "1.0.29"
+version = "1.0.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "602eca064b2d83369e2b2f34b09c70b605402801927c65c11071ac911d299b88"
+checksum = "854babe52e4df1653706b98fcfc05843010039b406875930a70e4d9644e5c417"
 dependencies = [
  "thiserror-impl",
 ]
 
 [[package]]
 name = "thiserror-impl"
-version = "1.0.29"
+version = "1.0.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bad553cc2c78e8de258400763a647e80e6d1b31ee237275d756f6836d204494c"
+checksum = "aa32fd3f627f367fe16f893e2597ae3c05020f8bba2666a4e6ea73d377e5714b"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1336,9 +1252,9 @@ dependencies = [
 
 [[package]]
 name = "tracing"
-version = "0.1.28"
+version = "0.1.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "84f96e095c0c82419687c20ddf5cb3eadb61f4e1405923c9dc8e53a1adacbda8"
+checksum = "375a639232caf30edfc78e8d89b2d4c375515393e7af7e16f01cd96917fb2105"
 dependencies = [
  "cfg-if 1.0.0",
  "pin-project-lite",
@@ -1348,9 +1264,9 @@ dependencies = [
 
 [[package]]
 name = "tracing-attributes"
-version = "0.1.16"
+version = "0.1.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "98863d0dd09fa59a1b79c6750ad80dbda6b75f4e71c437a6a1a8cb91a8bcbd77"
+checksum = "f4f480b8f81512e825f337ad51e94c1eb5d3bbdf2b363dcd01e2b19a9ffe3f8e"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1359,9 +1275,9 @@ dependencies = [
 
 [[package]]
 name = "tracing-core"
-version = "0.1.20"
+version = "0.1.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "46125608c26121c81b0c6d693eab5a420e416da7e43c426d2e8f7df8da8a3acf"
+checksum = "1f4ed65637b8390770814083d20756f87bfa2c21bf2f110babdc5438351746e4"
 dependencies = [
  "lazy_static",
 ]
@@ -1389,9 +1305,9 @@ dependencies = [
 
 [[package]]
 name = "tracing-subscriber"
-version = "0.2.24"
+version = "0.2.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "fdd0568dbfe3baf7048b7908d2b32bca0d81cd56bec6d2a8f894b01d74f86be3"
+checksum = "0e0d2eaa99c3c2e41547cfa109e910a68ea03823cccad4a0525dcbc9b01e8c71"
 dependencies = [
  "ansi_term",
  "chrono",
