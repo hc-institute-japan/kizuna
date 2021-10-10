@@ -1,22 +1,25 @@
 import {
-  IonBackButton,
   IonButton,
   IonButtons,
   IonContent,
   IonHeader,
+  IonIcon,
   IonInput,
   IonLabel,
   IonLoading,
   IonPage,
   IonToolbar,
 } from "@ionic/react";
+import { arrowBackSharp } from "ionicons/icons";
 import React, { useState } from "react";
 import { useIntl } from "react-intl";
+import { useHistory } from "react-router";
 import styles from "./style.module.css";
 
 const Login: React.FC = () => {
   const [username, setUsername] = useState("");
   const intl = useIntl();
+  const history = useHistory();
 
   const handleOnClick = () => {};
 
@@ -25,7 +28,12 @@ const Login: React.FC = () => {
       <IonHeader>
         <IonToolbar className={styles.toolbar}>
           <IonButtons slot="start">
-            <IonBackButton defaultHref="/" />
+            <IonButton
+              onClick={() => history.push({ pathname: `/` })}
+              className="ion-no-padding"
+            >
+              <IonIcon slot="icon-only" icon={arrowBackSharp} />
+            </IonButton>
           </IonButtons>
         </IonToolbar>
       </IonHeader>

@@ -6,7 +6,6 @@ import profileReducer from "./profile/reducer";
 import p2pmessagesReducer from "./p2pmessages/reducer";
 import languageReducer from "./language/reducer";
 import errorReducer from "./error/reducer";
-import webRTCReducer from "./webrtc/reducer";
 
 const rootReducer = combineReducers({
   profile: profileReducer,
@@ -16,7 +15,6 @@ const rootReducer = combineReducers({
   p2pmessages: p2pmessagesReducer,
   language: languageReducer,
   error: errorReducer,
-  webrtc: webRTCReducer,
 });
 
 export default rootReducer;

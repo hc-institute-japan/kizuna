@@ -45,10 +45,10 @@ export function getLatestMessagesForAllGroupsTest(config, installables) {
       };
 
       let group_1 = await createGroup(create_group_input)(alice_conductor);
-      await delay(500);
+      await delay(1000);
 
       let group_2 = await createGroup(create_group_input_2)(alice_conductor);
-      await delay(500);
+      await delay(1000);
 
       // we send one message per group created and we'll see if the app its doing what we expect it to do
 
@@ -63,7 +63,7 @@ export function getLatestMessagesForAllGroupsTest(config, installables) {
         sender: alicePubKey,
       });
 
-      await delay(200);
+      await delay(1000);
 
       await sendMessage(bobby_conductor, {
         groupId: group_2.groupId,
@@ -76,7 +76,7 @@ export function getLatestMessagesForAllGroupsTest(config, installables) {
         sender: bobbyPubKey,
       });
 
-      await delay(500);
+      await delay(1000);
 
       // then we get the latest messages for all the groups
 

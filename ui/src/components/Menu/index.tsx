@@ -12,6 +12,7 @@ import React, { useRef } from "react";
 import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
+import { isHoloEnv } from "../../connection/constants";
 import { setProfile } from "../../redux/profile/actions";
 import { Profile } from "../../redux/profile/types";
 import { RootState } from "../../redux/types";
@@ -23,6 +24,7 @@ interface MenuItem {
   onClick(): any;
   label: string;
   icon: string;
+  disabled?: boolean;
 }
 
 const Menu: React.FC = () => {
@@ -54,6 +56,7 @@ const Menu: React.FC = () => {
       },
       label: intl.formatMessage({ id: "app.menu.logout-label" }),
       icon: logOutOutline,
+      disabled: !isHoloEnv() ? true : false,
     },
   ];
 
@@ -61,7 +64,7 @@ const Menu: React.FC = () => {
     menu?.current?.close();
     history.push({
       pathname: `/p/${id}`,
-      state: { profile: { username, id } as Profile },
+      state: { profile: { username, id } as Profile, prev: `/home` },
     });
   };
 
@@ -84,13 +87,14 @@ const Menu: React.FC = () => {
               <IonLabel>{username}</IonLabel>
             </IonItem>
           </IonItemGroup>
-          {menuList.map(({ onClick, label, icon }) => (
+          {menuList.map(({ onClick, label, icon, disabled }) => (
             <IonItem
               key={label}
               onClick={() => {
                 menu?.current?.close();
                 onClick();
               }}
+              disabled={disabled}
             >
               <IonIcon className="ion-margin-end" icon={icon} />
               <IonLabel>{label}</IonLabel>

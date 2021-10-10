@@ -3,7 +3,7 @@ manifest_version: "1"
 name: kizuna
 uuid: 00000000-0000-0000-0000-000000000000
 properties: ~
-zomes:
+zomes: 
   - name: aggregator
     bundled: ../../target/wasm32-unknown-unknown/release/aggregator.wasm
   - name: contacts
@@ -15,10 +15,8 @@ zomes:
   # - name: request
   #   bundled: ../../target/wasm32-unknown-unknown/release/request.wasm
   # - name: username
-  #   bundled: ../../target/wasm32-unknown-unknown/release/username.wasm
-  - name: group
-    bundled: ../../target/wasm32-unknown-unknown/release/group.wasm
-  - name: profiles
-    bundled: ../../target/wasm32-unknown-unknown/release/profiles.wasm
-  - name: webrtc
-    bundled: ../../target/wasm32-unknown-unknown/release/webrtc.wasm
+  #   bundled: ../../target/wasm32-unknown-unknown/release/username.wasm  
+  - name : group
+    bundled: ../../target/wasm32-unknown-unknown/release/group.wasm 
+  - name : profiles
+    bundled: ../../target/wasm32-unknown-unknown/release/profiles.wasm 

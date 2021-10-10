@@ -1,16 +1,18 @@
 import {
-  IonBackButton,
+  IonButton,
   IonButtons,
   IonContent,
   IonHeader,
+  IonIcon,
   IonPage,
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
+import { arrowBackSharp } from "ionicons/icons";
 import React, { useEffect } from "react";
 import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
-import { useParams } from "react-router";
+import { useHistory, useParams } from "react-router";
 import PinnedMessages from "../../../components/PinnedMessages";
 import { getPinnedMessages } from "../../../redux/p2pmessages/actions/getPinnedMessages";
 import { RootState } from "../../../redux/types";
@@ -19,6 +21,7 @@ import { useAppDispatch } from "../../../utils/helpers";
 const ChatPinnedMessage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const intl = useIntl();
+  const history = useHistory();
 
   const dispatch = useAppDispatch();
 
@@ -59,7 +62,12 @@ const ChatPinnedMessage: React.FC = () => {
       <IonHeader>
         <IonToolbar>
           <IonButtons>
-            <IonBackButton defaultHref={`/u/${id}`}></IonBackButton>
+            <IonButton
+              onClick={() => history.push({ pathname: `/u/${id}` })}
+              className="ion-no-padding"
+            >
+              <IonIcon slot="icon-only" icon={arrowBackSharp} />
+            </IonButton>
             <IonTitle>
               {intl.formatMessage({
                 id: "app.chat.pinned-message-title",

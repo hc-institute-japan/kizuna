@@ -1,6 +1,6 @@
 export const ENV: "HCDEV" | "HC" | "HCC" | "HOLO" =
   process.env.NODE_ENV === "production"
-    ? "HOLO"
+    ? "HC"
     : (process.env.REACT_APP_ENV as any);
 
 export const appId = (): string | undefined => {

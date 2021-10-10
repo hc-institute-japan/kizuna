@@ -5,6 +5,7 @@ import { pushError } from "../../../redux/error/actions";
 import { dateToTimestamp } from "../../../utils/helpers";
 import { AgentPubKeyBase64, HoloHashBase64, SET_MESSAGES } from "../types";
 import { transformZomeDataToUIData } from "./helpers/transformZomeDateToUIData";
+import { setMessages } from "./setMessages";
 
 // action to get messages in batches (called while scrolling in chat boxes and media boxes)
 export const getNextBatchMessages =
@@ -48,10 +49,7 @@ export const getNextBatchMessages =
           profileList
         );
         if (Object.values(nextBatchOfMessages[1]).length > 0)
-          dispatch({
-            type: SET_MESSAGES,
-            state: toDispatch,
-          });
+          dispatch(setMessages(toDispatch));
         return nextBatchOfMessages;
       }
     } catch (e) {

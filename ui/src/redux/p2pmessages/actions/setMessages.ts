@@ -12,7 +12,7 @@ export const setMessages =
     let { conversations, messages, receipts } = state;
 
     for (const [key, value] of Object.entries(conversations)) {
-      let existing = state.conversations[key];
+      let existing = currentState.conversations[key];
       if (existing === undefined) {
         currentState.conversations[key] = {
           messages: value.messages,

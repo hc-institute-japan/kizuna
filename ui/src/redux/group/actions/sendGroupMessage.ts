@@ -223,18 +223,20 @@ const sendGroupMessage =
         );
       } else {
         try {
-          const sendGroupMessageOutput = retry({
-            zomeName: ZOMES.GROUP,
-            fnName: FUNCTIONS[ZOMES.GROUP].SEND_MESSAGE,
-            payload: input,
-          });
-          return await setGroupMessage(
-            sendGroupMessageOutput,
-            groupMessageData,
-            callZome,
-            getState,
-            dispatch
-          );
+          if (!e.includes("Timed out")) {
+            const sendGroupMessageOutput = retry({
+              zomeName: ZOMES.GROUP,
+              fnName: FUNCTIONS[ZOMES.GROUP].SEND_MESSAGE,
+              payload: input,
+            });
+            return await setGroupMessage(
+              sendGroupMessageOutput,
+              groupMessageData,
+              callZome,
+              getState,
+              dispatch
+            );
+          }
         } catch (e) {
           /* 
             This is the error other than what we defiend in Guest.

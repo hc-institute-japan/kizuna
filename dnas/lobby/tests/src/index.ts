@@ -29,14 +29,23 @@ const install2Agents: InstallAgentsHapps = [[[kizuna]], [[kizuna]]];
 
 const install3Agents: InstallAgentsHapps = [[[kizuna]], [[kizuna]], [[kizuna]]];
 
+const install5Agents: InstallAgentsHapps = [
+  [[kizuna]],
+  [[kizuna]],
+  [[kizuna]],
+  [[kizuna]],
+  [[kizuna]],
+];
+
 const installables: Installables = {
   one: installAgent,
   two: install2Agents,
   three: install3Agents,
+  five: install5Agents,
 };
 
 group(config, installables);
 contacts(config, installables);
-preference(config, installables);
+preference(config, installables); // *timeout in register_dna
 aggregator(config, installables);
-// request(config); // not passing
+// request(config); // not used

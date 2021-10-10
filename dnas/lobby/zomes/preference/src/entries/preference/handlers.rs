@@ -4,7 +4,8 @@ use super::*;
 
 pub(crate) fn fetch_preference() -> ExternResult<(SignedHeaderHashed, Preference)> {
     let filter: QueryFilter = filter_for(QueryTarget::Preference, true)?;
-    let query_result = query(filter)?;
+    let mut query_result = query(filter)?;
+    query_result.reverse();
 
     if query_result.get(0).is_some() {
         //this unwrap is safe here, we check first the value on the condition above
@@ -62,7 +63,8 @@ pub(crate) fn set_preference(preference_io: PreferenceIO) -> ExternResult<Prefer
 pub(crate) fn fetch_per_agent_preference() -> ExternResult<(SignedHeaderHashed, PerAgentPreference)>
 {
     let filter: QueryFilter = filter_for(QueryTarget::AgentPreference, true)?;
-    let query_result = query(filter)?;
+    let mut query_result = query(filter)?;
+    query_result.reverse();
 
     if query_result.get(0).is_some() {
         //this unwrap is safe here, we check first the value on the condition above
@@ -128,7 +130,8 @@ pub(crate) fn set_per_agent_preference(
 pub(crate) fn fetch_per_group_preference() -> ExternResult<(SignedHeaderHashed, PerGroupPreference)>
 {
     let filter: QueryFilter = filter_for(QueryTarget::GroupPreference, true)?;
-    let query_result = query(filter)?;
+    let mut query_result = query(filter)?;
+    query_result.reverse();
 
     if query_result.get(0).is_some() {
         //this unwrap is safe here, we check first the value on the condition above
