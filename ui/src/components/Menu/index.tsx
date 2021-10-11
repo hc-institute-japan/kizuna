@@ -7,7 +7,12 @@ import {
   IonList,
   IonMenu,
 } from "@ionic/react";
-import { banOutline, cogOutline, logOutOutline } from "ionicons/icons";
+import {
+  banOutline,
+  cogOutline,
+  logOutOutline,
+  warningOutline,
+} from "ionicons/icons";
 import React, { useRef } from "react";
 import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
@@ -48,6 +53,12 @@ const Menu: React.FC = () => {
       },
       label: intl.formatMessage({ id: "app.menu.blocked-label" }),
       icon: banOutline,
+    },
+    {
+      onClick: () =>
+        window.open("https://github.com/hc-institute-japan/kizuna/issues/new"),
+      label: intl.formatMessage({ id: "app.menu.report-label" }),
+      icon: warningOutline,
     },
     {
       onClick: () => {

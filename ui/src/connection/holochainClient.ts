@@ -65,7 +65,7 @@ const createClient = async (
     case "HC": {
       const appWs = await AppWebsocket.connect(
         appUrl() as string,
-        15000, // holochain's default timeout
+        60000,
         signalHandler
       );
 

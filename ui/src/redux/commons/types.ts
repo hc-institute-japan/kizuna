@@ -128,7 +128,7 @@ export interface Conversation {
   // src: string;
   sender?: string;
   latestMessage: Message;
-  badgeCount: number;
+  badgeCount?: number;
 }
 
 export type Conversations = Conversation[];

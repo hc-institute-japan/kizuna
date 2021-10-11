@@ -67,6 +67,7 @@
   "app.menu.blocked-label": "Blocked",
   "app.menu.logout-label": "Logout",
   "app.menu.settings-label": "Settings",
+  "app.menu.report-label": "Report an issue",
   "app.new-conversation.header-title": "New Message",
   "app.new-conversation.message-placeholder": "Compose message...",
   "app.new-conversation.no-contacts-toast": "Please select a contact...",

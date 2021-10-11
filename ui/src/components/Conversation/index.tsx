@@ -77,7 +77,7 @@ const Conversation: React.FC<Props> = ({
             : renderOthersFileMessage(conversation.latestMessage)}
         </p>
       </IonLabel>
-      {conversation.badgeCount > 20 ? (
+      {!conversation.badgeCount ? null : conversation.badgeCount > 20 ? (
         <IonBadge slot="">20+</IonBadge>
       ) : conversation.badgeCount > 0 ? (
         <IonBadge slot="">{conversation.badgeCount}</IonBadge>

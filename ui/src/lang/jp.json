@@ -67,6 +67,7 @@
   "app.menu.blocked-label": "ブロック",
   "app.menu.logout-label": "ログアウト",
   "app.menu.settings-label": "設定",
+  "app.menu.report-label": "問題を報告する",
   "app.new-conversation.header-title": "新しいメッセージ",
   "app.new-conversation.message-placeholder": "メッセージを入力してください...",
   "app.new-conversation.no-contacts-toast": "連絡先を選択してください...",
