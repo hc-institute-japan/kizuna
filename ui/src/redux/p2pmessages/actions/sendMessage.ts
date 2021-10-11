@@ -234,8 +234,10 @@ export const sendMessage =
 
             dispatchState.file = p2pFile;
             dispatch(appendMessage(dispatchState));
+            return true;
           }
         }
+        return false;
       } catch (e) {
         // console.log("sending automatically retried message has failed", e);
         return false;

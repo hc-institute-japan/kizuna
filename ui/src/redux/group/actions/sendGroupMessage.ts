@@ -237,6 +237,7 @@ const sendGroupMessage =
               dispatch
             );
           }
+          return false;
         } catch (e) {
           /* 
             This is the error other than what we defiend in Guest.
