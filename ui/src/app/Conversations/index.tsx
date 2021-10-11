@@ -104,7 +104,8 @@ const Conversations: React.FC = () => {
             id: key,
             conversationName: conversant.username,
             latestMessage: message,
-            badgeCount: dispatch(countUnread(conversant.id)),
+            // TODO: enable this once we have a better implementation of read message
+            // badgeCount: dispatch(countUnread(conversant.id)),
           };
         } else if (p2pState.errMsgs[key][0]) {
           const latestErrMessage = p2pState.errMsgs[key][0];
@@ -133,7 +134,8 @@ const Conversations: React.FC = () => {
             id: key,
             conversationName: conversant.username,
             latestMessage: message,
-            badgeCount: dispatch(countUnread(conversant.id)),
+            // TODO: enable this once we have a better implementation of read message
+            // badgeCount: dispatch(countUnread(conversant.id)),
           };
         }
 
