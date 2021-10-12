@@ -30,6 +30,7 @@ const createClient = async (
       const branding = {
         logo_url: "assets/icon/kizuna_logo.png",
         app_name: "Kizuna Messaging App",
+        skip_registration: true,
       };
 
       const connection = new Connection(
