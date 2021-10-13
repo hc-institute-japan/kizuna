@@ -54,6 +54,10 @@ export default function addAndRemoveMembersTest(config, installables) {
         counter: 0,
         payload: null,
       };
+      let david_signal_listener = {
+        counter: 0,
+        payload: null,
+      };
 
       // set signal handlers
       alice.setSignalHandler((signal) => {
@@ -64,6 +68,9 @@ export default function addAndRemoveMembersTest(config, installables) {
       });
       charlie.setSignalHandler((signal) => {
         signalHandler(signal, charlie_signal_listener);
+      });
+      david.setSignalHandler((signal) => {
+        signalHandler(signal, david_signal_listener);
       });
 
       await delay(2000);
@@ -134,9 +141,7 @@ export default function addAndRemoveMembersTest(config, installables) {
       // );
 
       // 3 - check if the values has changed and the group state is at an expected state
-      let updated_group = await getLatestGroupVersion({ groupHash: groupId })(
-        alice_conductor
-      );
+      let updated_group = await getLatestGroupVersion(groupId)(alice_conductor);
       await delay();
 
       t.deepEqual(updated_group.latestName, create_group_input.name);
@@ -207,9 +212,7 @@ export default function addAndRemoveMembersTest(config, installables) {
 
       // 6 - check if the values has changed and the group state is the expected
 
-      updated_group = await getLatestGroupVersion({ groupHash: groupId })(
-        alice_conductor
-      );
+      updated_group = await getLatestGroupVersion(groupId)(alice_conductor);
       updated_group.created = original_group_content.created;
       await delay();
 

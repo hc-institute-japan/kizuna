@@ -5,8 +5,7 @@ use file_types::PayloadType;
 use std::collections::hash_map::HashMap;
 
 use super::{
-    GroupMessage, GroupMessageContent, GroupMessageData, GroupMessageElement, GroupMessageHash,
-    GroupMessageWithId, ReadList,
+    GroupMessage, GroupMessageContent, GroupMessageData, GroupMessageElement, GroupMessageWithId,
 };
 
 pub enum Direction {
@@ -70,7 +69,7 @@ pub fn get_linked_messages_from_path(
 pub fn collect_messages_info(
     linked_messages: &mut Vec<Link>,
     batch_size: usize,
-    messages_hashes: &mut Vec<GroupMessageHash>,
+    messages_hashes: &mut Vec<EntryHash>,
     group_messages_contents: &mut HashMap<String, GroupMessageContent>,
     direction: Direction,
 ) -> ExternResult<()> {
@@ -129,7 +128,7 @@ pub fn collect_messages_info(
                             message_hash.clone().to_string(),
                             GroupMessageContent {
                                 group_message_element,
-                                read_list: ReadList(read_list.clone()),
+                                read_list: read_list.clone(),
                             },
                         );
 
@@ -142,7 +141,7 @@ pub fn collect_messages_info(
                 }
             }
         }
-        messages_hashes.push(GroupMessageHash(message_hash));
+        messages_hashes.push(message_hash);
     }
 
     Ok(())

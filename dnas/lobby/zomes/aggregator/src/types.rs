@@ -3,10 +3,6 @@ use hdk::prelude::*;
 use hdk::prelude::{element::SignedHeaderHashed, holo_hash::AgentPubKeyB64, timestamp::Timestamp};
 use std::collections::{hash_map::HashMap, BTreeMap};
 
-// for contacts
-#[derive(Deserialize, Serialize, SerializedBytes, Debug, Clone)]
-pub struct AgentPubKeys(pub Vec<AgentPubKey>);
-
 // for profiles
 #[derive(Clone, Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -51,19 +47,7 @@ pub struct GroupOutput {
     // group_versions: Vec<Group>,
 }
 
-#[derive(Deserialize, Serialize, SerializedBytes, Debug)]
-pub struct MyGroupListWrapper(pub Vec<GroupOutput>);
-
 // for group chat
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
-pub struct BatchSize(pub u8);
-
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Hash, PartialEq, Eq, Debug)]
-pub struct GroupMessageHash(pub EntryHash);
-
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
-pub struct ReadList(pub HashMap<String, Timestamp>);
-
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct GroupMessage {
@@ -105,20 +89,14 @@ pub struct GroupMessageElement {
 #[serde(rename_all = "camelCase")]
 pub struct GroupMessageContent {
     pub group_message_element: GroupMessageElement,
-    pub read_list: ReadList,
+    pub read_list: HashMap<String, Timestamp>,
 }
-
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
-pub struct MessagesByGroup(pub HashMap<String, Vec<GroupMessageHash>>);
-
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
-pub struct GroupMessagesContents(pub HashMap<String, GroupMessageContent>);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct GroupMessagesOutput {
-    messages_by_group: MessagesByGroup,
-    group_messages_contents: GroupMessagesContents,
+    messages_by_group: HashMap<String, Vec<EntryHash>>,
+    group_messages_contents: HashMap<String, GroupMessageContent>,
 }
 
 // for p2p chat
@@ -157,20 +135,12 @@ pub enum Status {
     Read { timestamp: Timestamp },
 }
 
-#[derive(Serialize, Deserialize, SerializedBytes, Debug)]
-pub struct AgentMessages(HashMap<String, Vec<String>>);
-
-#[derive(Serialize, Deserialize, SerializedBytes, Debug)]
-pub struct MessageBundle(P2PMessageData, Vec<String>);
-
-#[derive(Serialize, Deserialize, SerializedBytes, Debug)]
-pub struct MessageContents(HashMap<String, MessageBundle>);
-
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
-pub struct ReceiptContents(HashMap<String, P2PMessageReceipt>);
-
-#[derive(Serialize, Deserialize, SerializedBytes, Debug)]
-pub struct P2PMessageHashTables(AgentMessages, MessageContents, ReceiptContents);
+#[derive(Serialize, Deserialize, Clone, SerializedBytes, Debug)]
+pub struct P2PMessageHashTables(
+    HashMap<String, Vec<String>>,                   // AgentMessages
+    HashMap<String, (P2PMessageData, Vec<String>)>, // MessageContents
+    HashMap<String, P2PMessageReceipt>,             // ReceiptContents
+);
 
 // for preference
 #[derive(Serialize, Deserialize, SerializedBytes, Debug)]
@@ -203,7 +173,7 @@ pub struct AggregatedLatestData {
     pub added_contacts: Vec<AgentProfileCamel>,
     pub blocked_contacts: Vec<AgentProfileCamel>,
     // for group
-    pub groups: MyGroupListWrapper,
+    pub groups: Vec<GroupOutput>,
     pub latest_group_messages: GroupMessagesOutput,
     pub member_profiles: Vec<AgentProfileCamel>,
     // for p2pmessage

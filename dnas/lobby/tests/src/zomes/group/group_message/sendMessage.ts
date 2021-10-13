@@ -124,6 +124,11 @@ export function sendMessageswithFilesTest(config, installables) {
       const bobby_conductor = bobby_happ.cells[0];
 
       await delay();
+
+      // signal handlers assignment
+      alice.setSignalHandler((signal) => {});
+      bobby.setSignalHandler((signal) => {});
+
       let create_group_input = {
         name: "Group_name",
         members: [bobbyPubKey],
@@ -349,6 +354,10 @@ export function sendLargeSetOfFilesTest(config, installables) {
       const alice_conductor = alice_happ.cells[0];
 
       await delay(2000);
+
+      // signal handlers assignment
+      alice.setSignalHandler((signal) => {});
+      bobby.setSignalHandler((signal) => {});
 
       let fileName: string;
       let filePath;

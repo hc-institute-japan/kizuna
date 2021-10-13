@@ -116,26 +116,6 @@ impl GroupOutput {
 }
 /* END OF OUTPUT TYPES DEFINITION */
 
-/* WRAPPERS TYPES DEFINITION */
-#[derive(Deserialize, Serialize, SerializedBytes, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct BlockedWrapper(pub Vec<AgentPubKey>);
-
-#[derive(Deserialize, Serialize, SerializedBytes, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct MyGroupListWrapper(pub Vec<GroupOutput>);
-
-#[derive(Deserialize, Serialize, SerializedBytes, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct AgentPubKeysWrapper(Vec<AgentPubKey>);
-
-#[derive(Deserialize, Serialize, SerializedBytes, Debug)]
-#[serde(rename_all = "camelCase")]
-pub struct EntryHashWrapper {
-    pub group_hash: EntryHash,
-}
-/* END OF WRAPPERS TYPES DEFINITION */
-
 // //VALIDATION TYPES DEFINITION (this types are created just for testing purposes and can be removed in the future)
 // #[derive(Deserialize, Serialize, SerializedBytes, Debug)]
 // #[serde(rename_all = "camelCase")]

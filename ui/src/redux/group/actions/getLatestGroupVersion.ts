@@ -23,9 +23,7 @@ const getLatestGroupVersion =
       const latestGroupVersionRes = await callZome({
         zomeName: ZOMES.GROUP,
         fnName: FUNCTIONS[ZOMES.GROUP].GET_GROUP_LATEST_VERSION,
-        payload: {
-          groupHash: deserializeHash(groupId),
-        },
+        payload: deserializeHash(groupId),
       });
 
       const input = {

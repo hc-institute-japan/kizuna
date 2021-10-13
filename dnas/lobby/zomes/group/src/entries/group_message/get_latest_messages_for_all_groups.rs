@@ -5,18 +5,15 @@ use std::collections::hash_map::HashMap;
 
 use super::get_previous_group_messages::get_previous_group_messages_handler;
 
-use super::{
-    BatchSize, GroupMessageContent, GroupMessageHash, GroupMessagesContents, GroupMessagesOutput,
-    GroupMsgBatchFetchFilter, MessagesByGroup,
-};
+use super::{GroupMessageContent, GroupMessagesOutput, GroupMsgBatchFetchFilter};
 
 pub fn get_latest_messages_for_all_groups_handler(
-    batch_size: BatchSize,
+    batch_size: u8,
 ) -> ExternResult<GroupMessagesOutput> {
-    let batch_size: u8 = batch_size.0;
+    let batch_size: u8 = batch_size;
 
     // initialize MessagesByGroup
-    let mut messages_by_group: HashMap<String, Vec<GroupMessageHash>> = HashMap::new();
+    let mut messages_by_group: HashMap<String, Vec<EntryHash>> = HashMap::new();
 
     // initialize GroupMessagesContents HashMap
     let mut messages_contents: HashMap<String, GroupMessageContent> = HashMap::new();
@@ -45,11 +42,11 @@ pub fn get_latest_messages_for_all_groups_handler(
             get_previous_group_messages_handler(batch_filter)?;
 
         // insert GroupMessagesContents and MessagesByGroup values from returned GroupMessagesOutput into the initialized MessagesByGroup and GroupMessagesContents
-        for (key, value) in messages_output.messages_by_group.0.drain() {
+        for (key, value) in messages_output.messages_by_group.drain() {
             messages_by_group.insert(key, value);
         }
 
-        for (key, value) in messages_output.group_messages_contents.0.drain() {
+        for (key, value) in messages_output.group_messages_contents.drain() {
             messages_contents.insert(key, value);
         }
     }
@@ -57,8 +54,8 @@ pub fn get_latest_messages_for_all_groups_handler(
     // construct GroupMessagesOutput
 
     let output: GroupMessagesOutput = GroupMessagesOutput {
-        messages_by_group: MessagesByGroup(messages_by_group),
-        group_messages_contents: GroupMessagesContents(messages_contents),
+        messages_by_group: messages_by_group,
+        group_messages_contents: messages_contents,
     };
 
     Ok(output)

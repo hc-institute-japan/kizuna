@@ -8,7 +8,7 @@ import { transformZomeDataToUIData } from "./helpers/transformZomeDateToUIData";
 import { setMessages } from "./setMessages";
 
 // action to get messages in batches (called while scrolling in chat boxes and media boxes)
-export const getNextBatchMessages =
+export const getPreviousMessages =
   (
     conversant: AgentPubKeyBase64,
     batch_size: number,
@@ -32,7 +32,7 @@ export const getNextBatchMessages =
       // CALL ZOME
       const nextBatchOfMessages = await callZome({
         zomeName: ZOMES.P2PMESSAGE,
-        fnName: FUNCTIONS[ZOMES.P2PMESSAGE].GET_NEXT_BATCH_MESSAGES,
+        fnName: FUNCTIONS[ZOMES.P2PMESSAGE].GET_PREVIOUS_MESSAGES,
         payload: zome_input,
       });
 

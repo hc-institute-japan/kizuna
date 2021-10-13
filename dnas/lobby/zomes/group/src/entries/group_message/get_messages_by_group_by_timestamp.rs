@@ -8,9 +8,8 @@ use crate::utils::{error, timestamp_to_days, try_get_and_convert};
 
 use super::GroupMessageData;
 use super::{
-    GroupChatFilter, GroupMessage, GroupMessageContent, GroupMessageElement, GroupMessageHash,
-    GroupMessageWithId, GroupMessagesContents, GroupMessagesOutput, MessagesByGroup, PayloadType,
-    ReadList,
+    GroupChatFilter, GroupMessage, GroupMessageContent, GroupMessageElement, GroupMessageWithId,
+    GroupMessagesOutput, PayloadType,
 };
 
 pub fn get_messages_by_group_by_timestamp_handler(
@@ -35,9 +34,9 @@ pub fn get_messages_by_group_by_timestamp_handler(
         },
     ) {
         Ok(message_links) => {
-            let mut messages_by_group: HashMap<String, Vec<GroupMessageHash>> = HashMap::new();
+            let mut messages_by_group: HashMap<String, Vec<EntryHash>> = HashMap::new();
             let mut group_messages_content: HashMap<String, GroupMessageContent> = HashMap::new();
-            let mut messages_hashes: Vec<GroupMessageHash> = Vec::new();
+            let mut messages_hashes: Vec<EntryHash> = Vec::new();
             let links = message_links.into_inner();
 
             for i in 0..links.len() {
@@ -94,11 +93,11 @@ pub fn get_messages_by_group_by_timestamp_handler(
                                     message_hash.clone().to_string(),
                                     GroupMessageContent {
                                         group_message_element,
-                                        read_list: ReadList(read_list),
+                                        read_list: read_list,
                                     },
                                 );
 
-                                messages_hashes.push(GroupMessageHash(message_hash.clone()));
+                                messages_hashes.push(message_hash.clone());
                             }
 
                             None => {}
@@ -119,8 +118,8 @@ pub fn get_messages_by_group_by_timestamp_handler(
             );
 
             Ok(GroupMessagesOutput {
-                messages_by_group: MessagesByGroup(messages_by_group),
-                group_messages_contents: GroupMessagesContents(group_messages_content),
+                messages_by_group: messages_by_group,
+                group_messages_contents: group_messages_content,
             })
         }
         Err(_) => error("Cannot get links on this path"),

@@ -33,6 +33,11 @@ export default function updateGroupNameTest(config, installables) {
 
       await delay(2000);
 
+      // signal handlers assignment
+      alice.setSignalHandler((signal) => {});
+      bobby.setSignalHandler((signal) => {});
+      charlie.setSignalHandler((signal) => {});
+
       // 1- create group
       let create_group_input = {
         name: "Group_name",
@@ -71,9 +76,9 @@ export default function updateGroupNameTest(config, installables) {
 
       // 3- check if the values has changed and the group state is as expected
 
-      let updated_group = await getLatestGroupVersion({
-        groupHash: update_group_name_io.groupId,
-      })(alice_conductor);
+      let updated_group = await getLatestGroupVersion(
+        update_group_name_io.groupId
+      )(alice_conductor);
 
       updated_group.created = original_group_content.created;
 

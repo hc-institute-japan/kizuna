@@ -2,20 +2,17 @@ use hdk::prelude::*;
 use std::collections::HashMap;
 
 use super::group_message_helpers::*;
-use super::{
-    GroupMessageContent, GroupMessageHash, GroupMessagesContents, GroupMessagesOutput,
-    GroupMsgAdjacentFetchFilter, MessagesByGroup,
-};
+use super::{GroupMessageContent, GroupMessagesOutput, GroupMsgAdjacentFetchFilter};
 use crate::utils::*;
 
 pub fn get_adjacent_group_messages_handler(
     filter: GroupMsgAdjacentFetchFilter,
 ) -> ExternResult<GroupMessagesOutput> {
     // We need the previous and subsequent vec for counting of batch size
-    let mut messages_hashes: Vec<GroupMessageHash> = Vec::new();
-    let mut subsequent_messages_hashes: Vec<GroupMessageHash> = Vec::new();
-    let mut previous_messages_hashes: Vec<GroupMessageHash> = Vec::new();
-    let mut messages_by_group: HashMap<String, Vec<GroupMessageHash>> = HashMap::new();
+    let mut messages_hashes: Vec<EntryHash> = Vec::new();
+    let mut subsequent_messages_hashes: Vec<EntryHash> = Vec::new();
+    let mut previous_messages_hashes: Vec<EntryHash> = Vec::new();
+    let mut messages_by_group: HashMap<String, Vec<EntryHash>> = HashMap::new();
     let mut group_messages_contents: HashMap<String, GroupMessageContent> = HashMap::new();
 
     // links to group message where link.timestamp < filter.message_timestamp
@@ -149,7 +146,7 @@ pub fn get_adjacent_group_messages_handler(
     messages_by_group.insert(filter.group_id.to_string(), messages_hashes);
 
     Ok(GroupMessagesOutput {
-        messages_by_group: MessagesByGroup(messages_by_group),
-        group_messages_contents: GroupMessagesContents(group_messages_contents),
+        messages_by_group: messages_by_group,
+        group_messages_contents: group_messages_contents,
     })
 }

@@ -1,10 +1,10 @@
 use hdk::prelude::*;
 
 use super::group_helpers::get_group_latest_version;
-use super::{Group, GroupOutput, MyGroupListWrapper};
+use super::{Group, GroupOutput};
 use crate::utils::error;
 
-pub fn get_all_my_groups_handler() -> ExternResult<MyGroupListWrapper> {
+pub fn get_all_my_groups_handler() -> ExternResult<Vec<GroupOutput>> {
     let my_pub_key: AgentPubKey = agent_info()?.agent_latest_pubkey;
     let mut my_linked_groups_entries: Vec<GroupOutput> = vec![];
     let mut group_id: EntryHash;
@@ -51,7 +51,7 @@ pub fn get_all_my_groups_handler() -> ExternResult<MyGroupListWrapper> {
         }
     }
 
-    let output: MyGroupListWrapper = MyGroupListWrapper(my_linked_groups_entries);
+    let output = my_linked_groups_entries;
 
     Ok(output)
 }

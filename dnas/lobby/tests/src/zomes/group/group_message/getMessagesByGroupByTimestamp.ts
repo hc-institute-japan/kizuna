@@ -34,7 +34,7 @@ export function getMessagesByGroupByTimestampTest(config, installables) {
       const alice_conductor = alice_happ.cells[0];
       const bobby_conductor = bobby_happ.cells[0];
       const charlie_conductor = charlie_happ.cells[0];
-      let list = {};
+      let list = [];
 
       // set signal hanlders
       alice.setSignalHandler((signal) => {
@@ -217,6 +217,10 @@ export function fetchFilesForAParticularDateTest(config, installables) {
       const bobby_conductor = bobby_happ.cells[0];
 
       await delay(2000);
+
+      // signal handlers assignment
+      alice.setSignalHandler((signal) => {});
+      bobby.setSignalHandler((signal) => {});
 
       let create_group_input = {
         name: "Group_name",
