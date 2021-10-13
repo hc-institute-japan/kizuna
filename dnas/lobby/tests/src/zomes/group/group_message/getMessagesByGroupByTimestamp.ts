@@ -34,7 +34,7 @@ export function getMessagesByGroupByTimestampTest(config, installables) {
       const alice_conductor = alice_happ.cells[0];
       const bobby_conductor = bobby_happ.cells[0];
       const charlie_conductor = charlie_happ.cells[0];
-      let list = {};
+      let list = [];
 
       // set signal hanlders
       alice.setSignalHandler((signal) => {

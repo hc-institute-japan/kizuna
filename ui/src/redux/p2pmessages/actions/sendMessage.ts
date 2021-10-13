@@ -170,7 +170,6 @@ export const sendMessage =
       payload: payloadInput,
       reply_to: replyTo ? Buffer.from(deserializeHash(replyTo)) : undefined,
     };
-    console.log("nicko send input", input);
 
     // CALL ZOME
     try {
