@@ -32,6 +32,11 @@ export function getPreviousGroupMessagesTest(config, installables) {
       const bobby_conductor = bobby_happ.cells[0];
       const charlie_conductor = charlie_happ.cells[0];
 
+      // signal handlers assignment
+      alice.setSignalHandler((signal) => {});
+      bobby.setSignalHandler((signal) => {});
+      charlie.setSignalHandler((signal) => {});
+
       await delay();
 
       let create_group_input = {

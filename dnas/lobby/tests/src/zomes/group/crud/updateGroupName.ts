@@ -33,6 +33,11 @@ export default function updateGroupNameTest(config, installables) {
 
       await delay(2000);
 
+      // signal handlers assignment
+      alice.setSignalHandler((signal) => {});
+      bobby.setSignalHandler((signal) => {});
+      charlie.setSignalHandler((signal) => {});
+
       // 1- create group
       let create_group_input = {
         name: "Group_name",

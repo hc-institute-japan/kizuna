@@ -23,6 +23,10 @@ export function groupTypingIndicatorTest(config, installables) {
 
       const alice_conductor = alice_happ.cells[0];
 
+      let alice_signal_listener = {
+        counter: 0,
+        payload: Buffer,
+      };
       let bobby_signal_listener = {
         counter: 0,
         payload: Buffer,
@@ -32,6 +36,9 @@ export function groupTypingIndicatorTest(config, installables) {
         payload: Buffer,
       };
       // set signal hanlders
+      alice.setSignalHandler((signal) => {
+        signalHandler(signal, alice_signal_listener);
+      });
       bobby.setSignalHandler((signal) => {
         signalHandler(signal, bobby_signal_listener);
       });

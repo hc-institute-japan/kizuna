@@ -36,6 +36,11 @@ export function pinMessageTest(config, installables) {
 
       await delay(2000);
 
+      // signal handlers assignment
+      alice.setSignalHandler((signal) => {});
+      bobby.setSignalHandler((signal) => {});
+      charlie.setSignalHandler((signal) => {});
+
       let create_group_input = {
         name: "Group_name",
         members: [bobbyPubKey, charliePubKey],
