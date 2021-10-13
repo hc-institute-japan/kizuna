@@ -72,8 +72,6 @@ const createClient = async (
       const appInfo = await appWs.appInfo({
         installed_app_id: appId() as string,
       });
-
-      console.log(appId());
       const cellData = appInfo.cell_data[0];
 
       return new HolochainClient(appWs, cellData);
@@ -89,10 +87,7 @@ export const init: () => any = async () => {
     return client;
   }
   try {
-    console.log("ENV : ", ENV);
-    console.log(process.env.NODE_ENV);
     client = await createClient(ENV);
-    console.log("ENV : ", client);
     return client;
   } catch (error) {
     Object.values(error).forEach((e) => console.error(e));
@@ -142,7 +137,7 @@ export const retry: (config: CallZomeConfig) => Promise<any> = async (
 
   while (callFailed && retryCount < max_retries) {
     try {
-      return await client?.callZome(zomeName, fnName, payload);
+      return await client?.callZome(zomeName, fnName, payload, 60000);
     } catch (e) {
       console.warn(e);
       const { type = null, data = null } = { ...e };
@@ -210,7 +205,7 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
     payload = null,
   } = config;
   try {
-    return await client?.callZome(zomeName, fnName, payload);
+    return await client?.callZome(zomeName, fnName, payload, 60000);
   } catch (e) {
     console.log(
       "zome call has failed in zome: ",
