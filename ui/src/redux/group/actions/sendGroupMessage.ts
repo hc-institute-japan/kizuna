@@ -223,7 +223,7 @@ const sendGroupMessage =
         );
       } else {
         try {
-          if (!e.includes("Timed out")) {
+          if (!e.message.includes("Timed out")) {
             const sendGroupMessageOutput = retry({
               zomeName: ZOMES.GROUP,
               fnName: FUNCTIONS[ZOMES.GROUP].SEND_MESSAGE,
