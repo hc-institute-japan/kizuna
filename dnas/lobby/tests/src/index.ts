@@ -45,7 +45,7 @@ const installables: Installables = {
 };
 
 group(config, installables);
-contacts(config, installables);
-preference(config, installables); // *timeout in register_dna
-aggregator(config, installables);
+// contacts(config, installables);
+// preference(config, installables); // *timeout in register_dna
+// aggregator(config, installables);
 // request(config); // not used
