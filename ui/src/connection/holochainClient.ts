@@ -33,14 +33,7 @@ const createClient = async (
         skip_registration: true,
       };
 
-      const connection = new Connection(
-        process.env.NODE_ENV === "production"
-          ? "https://chaperone.holo.host"
-          : appUrl(),
-        // "http://localhost:24273",
-        signalHandler,
-        branding
-      );
+      const connection = new Connection(appUrl(), signalHandler, branding);
 
       await connection.ready();
       await connection.signIn();
@@ -86,14 +79,9 @@ const createClient = async (
 };
 
 export const init: () => any = async () => {
-  if (client) {
-    return client;
-  }
+  if (client) return client;
   try {
-    console.log("ENV : ", ENV);
-    console.log(process.env.NODE_ENV);
     client = await createClient(ENV);
-    console.log("ENV : ", client);
     return client;
   } catch (error) {
     Object.values(error).forEach((e) => console.error(e));
@@ -106,16 +94,11 @@ let myAgentId: AgentPubKey | null;
 
 /* DO NOT USE THIS AS IT IS BUT INSTEAD USE THE getAgentId() ACTION FROM PROFILE INSTEAD */
 export const getAgentId: () => Promise<AgentPubKey | null> = async () => {
-  if (myAgentId) {
-    return myAgentId;
-  }
+  if (myAgentId) return myAgentId;
   await init();
   try {
     const info = await client?.cellId[1];
-
-    if (info) {
-      return info;
-    }
+    if (info) return info;
     return null;
   } catch (e) {
     console.warn(e);
@@ -143,12 +126,16 @@ export const retry: (config: CallZomeConfig) => Promise<any> = async (
 
   while (callFailed && retryCount < max_retries) {
     try {
-      return await client?.callZome(zomeName, fnName, payload);
+      return await client?.callZome(
+        zomeName,
+        fnName,
+        payload,
+        typeof client === typeof HolochainClient ? 60000 : undefined
+      );
     } catch (e) {
       console.warn(e);
       const { type = null, data = null } = { ...e };
       if (type === "error") {
-        console.warn(fnName);
         switch (data?.type) {
           case "ribosome_error":
             console.log("ribsosome error", e);
@@ -211,14 +198,19 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
     payload = null,
   } = config;
   try {
-    return await client?.callZome(zomeName, fnName, payload);
+    return await client?.callZome(
+      zomeName,
+      fnName,
+      payload,
+      typeof client === typeof HolochainClient ? 60000 : undefined
+    );
   } catch (e) {
     console.log(
       "zome call has failed in zome: ",
       zomeName,
       " with call ",
       fnName,
-      " error: ",
+      ". Error: ",
       e
     );
     const { type = null, data = null } = { ...e };

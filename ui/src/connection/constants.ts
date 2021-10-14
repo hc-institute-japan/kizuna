@@ -1,7 +1,5 @@
-export const ENV: "HCDEV" | "HC" | "HCC" | "HOLO" =
-  process.env.NODE_ENV === "production"
-    ? "HOLO"
-    : (process.env.REACT_APP_ENV as any);
+export const ENV: "HCDEV" | "HC" | "HCC" | "HOLO" = process.env
+  .REACT_APP_ENV as any;
 
 export const appId = (): string | undefined => {
   if (ENV === "HC" || ENV === "HCDEV") {
@@ -18,7 +16,7 @@ export const appUrl = () => {
   if (ENV === "HC") return `ws://localhost:8888`;
   else if (ENV === "HCDEV") return process.env.REACT_APP_DNA_INTERFACE_URL;
   else if (ENV === "HCC") return "http://localhost:24273";
-  else if (ENV === "HOLO") return "https://devnet-chaperone.holo.host";
+  else if (ENV === "HOLO") return "https://chaperone.holo.host";
   else return null;
 };
 
