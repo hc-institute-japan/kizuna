@@ -121,7 +121,6 @@ const AddMemberModal: React.FC<Props> = ({
           </IonButtons>
         </IonToolbar>
       </IonContent>
-      )
     </IonModal>
   );
 };
