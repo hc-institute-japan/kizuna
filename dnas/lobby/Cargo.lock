@@ -148,7 +148,7 @@ dependencies = [
 [[package]]
 name = "file_types"
 version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?rev=538d4bb125f22cc018558bed618031be128a750a#538d4bb125f22cc018558bed618031be128a750a"
+source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop#54111a1c412fcb334e48541442dc296f72392c07"
 dependencies = [
  "derive_more",
  "hdk",
@@ -402,17 +402,17 @@ dependencies = [
  "derive_more",
  "hdk",
  "holo_hash",
- "p2pmessage 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?rev=538d4bb125f22cc018558bed618031be128a750a)",
+ "p2pmessage 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop)",
  "serde",
 ]
 
 [[package]]
 name = "p2pmessage"
 version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?rev=538d4bb125f22cc018558bed618031be128a750a#538d4bb125f22cc018558bed618031be128a750a"
+source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop#54111a1c412fcb334e48541442dc296f72392c07"
 dependencies = [
  "derive_more",
- "file_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?rev=538d4bb125f22cc018558bed618031be128a750a)",
+ "file_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop)",
  "hdk",
  "holo_hash",
  "serde",
@@ -476,9 +476,9 @@ dependencies = [
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.29"
+version = "1.0.30"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b9f5105d4fdaab20335ca9565e106a5d9b82b6219b5ba735731124ac6711d23d"
+checksum = "edc3358ebc67bc8b7fa0c007f945b0b18226f78437d61bec735a9eb96b61ee70"
 dependencies = [
  "unicode-xid",
 ]
@@ -648,9 +648,9 @@ dependencies = [
 
 [[package]]
 name = "sharded-slab"
-version = "0.1.3"
+version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "740223c51853f3145fe7c90360d2d4232f2b62e3449489c207eccde818979982"
+checksum = "900fba806f70c630b0a382d0d825e17a0f19fcd059a2ade1ff237bcddf446b31"
 dependencies = [
  "lazy_static",
 ]
