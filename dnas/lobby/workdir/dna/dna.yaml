@@ -19,4 +19,6 @@ zomes:
   - name : group
     bundled: ../../target/wasm32-unknown-unknown/release/group.wasm 
   - name : profiles
-    bundled: ../../target/wasm32-unknown-unknown/release/profiles.wasm 
+    bundled: ../../target/wasm32-unknown-unknown/release/profiles.wasm
+  # - name : joining_code
+  #   bundled: ../../target/wasm32-unknown-unknown/release/joining_code.wasm 

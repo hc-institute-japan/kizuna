@@ -18,6 +18,7 @@ import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { isHoloEnv } from "../../connection/constants";
+import { logout } from "../../redux/profile/actions";
 import { Profile } from "../../redux/profile/types";
 import { RootState } from "../../redux/types";
 import Identicon from "../Identicon";
@@ -60,10 +61,15 @@ const Menu: React.FC = () => {
       icon: warningOutline,
     },
     {
-      onClick: () => {},
+      onClick: () => {
+        // const c = (client as any).connection;
+        // await c.signOut();
+        // await c.signIn();
+        dispatch(logout());
+      },
       label: intl.formatMessage({ id: "app.menu.logout-label" }),
       icon: logOutOutline,
-      disabled: !isHoloEnv() ? true : false,
+      disabled: isHoloEnv() ? false : true,
     },
   ];
 
@@ -94,7 +100,7 @@ const Menu: React.FC = () => {
               <IonLabel>{username}</IonLabel>
             </IonItem>
           </IonItemGroup>
-          {menuList.map(({ onClick, label, icon, disabled }) => (
+          {menuList.map(({ onClick, label, icon, disabled = false }) => (
             <IonItem
               key={label}
               onClick={() => {

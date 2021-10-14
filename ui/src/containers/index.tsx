@@ -8,17 +8,17 @@ import ToastContainer from "./ToastContainer";
 
 const Container: React.FC = ({ children }) => {
   return (
-    <IonicContainer>
-      <RouterContainer>
-        <ReduxContainer>
+    <ReduxContainer>
+      <IonicContainer>
+        <RouterContainer>
           <IntlContainer>
             <ToastContainer>
               <ErrorHandler>{children}</ErrorHandler>
             </ToastContainer>
           </IntlContainer>
-        </ReduxContainer>
-      </RouterContainer>
-    </IonicContainer>
+        </RouterContainer>
+      </IonicContainer>
+    </ReduxContainer>
   );
 };
 
