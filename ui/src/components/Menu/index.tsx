@@ -18,10 +18,8 @@ import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { isHoloEnv } from "../../connection/constants";
-import { setProfile } from "../../redux/profile/actions";
 import { Profile } from "../../redux/profile/types";
 import { RootState } from "../../redux/types";
-import { useAppDispatch } from "../../utils/helpers";
 import Identicon from "../Identicon";
 import styles from "./style.module.css";
 
@@ -35,7 +33,6 @@ interface MenuItem {
 const Menu: React.FC = () => {
   const history = useHistory();
   const { username, id } = useSelector((state: RootState) => state.profile);
-  const dispatch = useAppDispatch();
   const intl = useIntl();
   const menu = useRef<any>(null);
 
@@ -56,15 +53,14 @@ const Menu: React.FC = () => {
     },
     {
       onClick: () =>
-        window.open("https://github.com/hc-institute-japan/kizuna/issues/new"),
+        window.open(
+          "https://github.com/hc-institute-japan/kizuna/issues/new?assignees=&labels=bug&template=bug_report.md&title="
+        ),
       label: intl.formatMessage({ id: "app.menu.report-label" }),
       icon: warningOutline,
     },
     {
-      onClick: () => {
-        dispatch(setProfile(null));
-        history.push("/");
-      },
+      onClick: () => {},
       label: intl.formatMessage({ id: "app.menu.logout-label" }),
       icon: logOutOutline,
       disabled: !isHoloEnv() ? true : false,

@@ -44,12 +44,11 @@ const Profile: React.FC = () => {
         <IonToolbar>
           <IonButtons>
             <IonButton
-              onClick={() => {
-                console.log(state);
+              onClick={() =>
                 history.push({
                   pathname: state?.prev ? state.prev : "/home/contacts",
-                });
-              }}
+                })
+              }
               className="ion-no-padding"
             >
               <IonIcon slot="icon-only" icon={arrowBackSharp} />
