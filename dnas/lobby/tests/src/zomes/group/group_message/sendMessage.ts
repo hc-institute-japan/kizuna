@@ -2,6 +2,7 @@ import { Orchestrator } from "@holochain/tryorama";
 import { ScenarioApi } from "@holochain/tryorama/lib/api";
 import * as fs from "fs";
 import * as path from "path";
+import { installAgents } from "../../../install";
 import { delay } from "../../../utils";
 import { sendMessageSignalHandler, strToUtf8Bytes } from "../utils";
 import {
@@ -9,12 +10,6 @@ import {
   getPreviousGroupMessages,
   sendMessage,
 } from "../zome_fns";
-import {
-  installAgents,
-  MEM_PROOF1,
-  MEM_PROOF2,
-  MEM_PROOF3,
-} from "../../../install";
 export function sendMessageTest(config) {
   let orchestrator = new Orchestrator();
 
@@ -22,21 +17,9 @@ export function sendMessageTest(config) {
     "Tests for text send_message",
     async (s: ScenarioApi, t) => {
       const [alice, bobby, charlie] = await s.players([config, config, config]);
-      const [alice_lobby_happ] = await installAgents(
-        alice,
-        ["alice"],
-        [MEM_PROOF1]
-      );
-      const [bobby_lobby_happ] = await installAgents(
-        bobby,
-        ["bobby"],
-        [MEM_PROOF2]
-      );
-      const [charlie_lobby_happ] = await installAgents(
-        charlie,
-        ["charlie"],
-        [MEM_PROOF3]
-      );
+      const [alice_lobby_happ] = await installAgents(alice, ["alice"]);
+      const [bobby_lobby_happ] = await installAgents(bobby, ["bobby"]);
+      const [charlie_lobby_happ] = await installAgents(charlie, ["charlie"]);
       const [alice_conductor] = alice_lobby_happ.cells;
       const [bobby_conductor] = bobby_lobby_happ.cells;
       const [charlie_conductor] = charlie_lobby_happ.cells;
@@ -125,17 +108,9 @@ export function sendMessageswithFilesTest(config) {
   orchestrator.registerScenario(
     "send messages with files",
     async (s: ScenarioApi, t) => {
-      const [alice, bobby] = await s.players([config, config, config]);
-      const [alice_lobby_happ] = await installAgents(
-        alice,
-        ["alice"],
-        [MEM_PROOF1]
-      );
-      const [bobby_lobby_happ] = await installAgents(
-        bobby,
-        ["bobby"],
-        [MEM_PROOF2]
-      );
+      const [alice, bobby] = await s.players([config, config]);
+      const [alice_lobby_happ] = await installAgents(alice, ["alice"]);
+      const [bobby_lobby_happ] = await installAgents(bobby, ["bobby"]);
 
       const [alice_conductor] = alice_lobby_happ.cells;
       const [bobby_conductor] = bobby_lobby_happ.cells;
@@ -357,21 +332,9 @@ export function sendLargeSetOfFilesTest(config) {
     "we should send and then return a large set of messages with files",
     async (s: ScenarioApi, t) => {
       const [alice, bobby, charlie] = await s.players([config, config, config]);
-      const [alice_lobby_happ] = await installAgents(
-        alice,
-        ["alice"],
-        [MEM_PROOF1]
-      );
-      const [bobby_lobby_happ] = await installAgents(
-        bobby,
-        ["bobby"],
-        [MEM_PROOF2]
-      );
-      const [charlie_lobby_happ] = await installAgents(
-        charlie,
-        ["charlie"],
-        [MEM_PROOF3]
-      );
+      const [alice_lobby_happ] = await installAgents(alice, ["alice"]);
+      const [bobby_lobby_happ] = await installAgents(bobby, ["bobby"]);
+      const [charlie_lobby_happ] = await installAgents(charlie, ["charlie"]);
       const [alice_conductor] = alice_lobby_happ.cells;
 
       const alicePubKey = alice_lobby_happ.agent;

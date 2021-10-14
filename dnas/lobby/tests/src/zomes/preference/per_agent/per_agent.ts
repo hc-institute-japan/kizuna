@@ -35,31 +35,11 @@ const per_agent = (config) => {
     "Get and set per agent preference",
     async (s, t) => {
       const [conductor] = await s.players([config]);
-      const [alice_lobby_happ] = await installAgents(
-        conductor,
-        ["alice"],
-        [MEM_PROOF1]
-      );
-      const [bobby_lobby_happ] = await installAgents(
-        conductor,
-        ["bobby"],
-        [MEM_PROOF2]
-      );
-      const [clark_lobby_happ] = await installAgents(
-        conductor,
-        ["clark"],
-        [MEM_PROOF3]
-      );
-      const [diego_lobby_happ] = await installAgents(
-        conductor,
-        ["diego"],
-        [MEM_PROOF4]
-      );
-      const [ethan_lobby_happ] = await installAgents(
-        conductor,
-        ["ethan"],
-        [MEM_PROOF5]
-      );
+      const [alice_lobby_happ] = await installAgents(conductor, ["alice"]);
+      const [bobby_lobby_happ] = await installAgents(conductor, ["bobby"]);
+      const [clark_lobby_happ] = await installAgents(conductor, ["clark"]);
+      const [diego_lobby_happ] = await installAgents(conductor, ["diego"]);
+      const [ethan_lobby_happ] = await installAgents(conductor, ["ethan"]);
 
       const [alice_conductor] = alice_lobby_happ.cells;
 

@@ -28,11 +28,7 @@ const global = (config) => {
     "Get and set global preference",
     async (s, t) => {
       const [conductor] = await s.players([config]);
-      const [alice_lobby_happ] = await installAgents(
-        conductor,
-        ["alice"],
-        [MEM_PROOF1]
-      );
+      const [alice_lobby_happ] = await installAgents(conductor, ["alice"]);
 
       const [alice_conductor] = alice_lobby_happ.cells;
       // const [alice_dna, alice_pubkey] = alice_conductor.cellId;

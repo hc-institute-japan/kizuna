@@ -28,11 +28,7 @@ const per_group = (config) => {
     "Get and set per group preference",
     async (s, t) => {
       const [conductor] = await s.players([config]);
-      const [alice_lobby_happ] = await installAgents(
-        conductor,
-        ["alice"],
-        [MEM_PROOF1]
-      );
+      const [alice_lobby_happ] = await installAgents(conductor, ["alice"]);
       const alice_conductor = alice_lobby_happ[0].cells[0];
 
       let preference = null;

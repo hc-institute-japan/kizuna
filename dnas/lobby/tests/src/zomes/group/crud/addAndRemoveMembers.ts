@@ -1,22 +1,16 @@
 import { Orchestrator } from "@holochain/tryorama";
 import { ScenarioApi } from "@holochain/tryorama/lib/api";
-import {
-  signalHandler,
-  createGroup,
-  AddGroupMebers,
-  removeGroupMembers,
-  getLatestGroupVersion,
-  getAllMyGroups,
-} from "../zome_fns";
+import { installAgents } from "../../../install";
 import { delay } from "../../../utils";
 import { getGroupfromGroupOutput } from "../utils";
 import {
-  installAgents,
-  MEM_PROOF1,
-  MEM_PROOF2,
-  MEM_PROOF3,
-  MEM_PROOF4,
-} from "../../../install";
+  AddGroupMebers,
+  createGroup,
+  getAllMyGroups,
+  getLatestGroupVersion,
+  removeGroupMembers,
+  signalHandler,
+} from "../zome_fns";
 
 export default function addAndRemoveMembersTest(config) {
   let orchestrator = new Orchestrator();
@@ -30,26 +24,10 @@ export default function addAndRemoveMembersTest(config) {
         config,
         config,
       ]);
-      const [alice_lobby_happ] = await installAgents(
-        alice,
-        ["alice"],
-        [MEM_PROOF1]
-      );
-      const [bobby_lobby_happ] = await installAgents(
-        bobby,
-        ["bobby"],
-        [MEM_PROOF2]
-      );
-      const [charlie_lobby_happ] = await installAgents(
-        charlie,
-        ["charlie"],
-        [MEM_PROOF3]
-      );
-      const [david_lobby_happ] = await installAgents(
-        david,
-        ["david"],
-        [MEM_PROOF4]
-      );
+      const [alice_lobby_happ] = await installAgents(alice, ["alice"]);
+      const [bobby_lobby_happ] = await installAgents(bobby, ["bobby"]);
+      const [charlie_lobby_happ] = await installAgents(charlie, ["charlie"]);
+      const [david_lobby_happ] = await installAgents(david, ["david"]);
       const [alice_conductor] = alice_lobby_happ.cells;
       const [bobby_conductor] = bobby_lobby_happ.cells;
       const [charlie_conductor] = charlie_lobby_happ.cells;

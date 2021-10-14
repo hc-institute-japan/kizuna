@@ -1,19 +1,14 @@
 import { Orchestrator } from "@holochain/tryorama";
 import { ScenarioApi } from "@holochain/tryorama/lib/api";
+import { installAgents } from "../../../install";
 import { delay } from "../../../utils";
 import {
   createGroup,
-  sendMessage,
-  pinMessage,
-  unpinMessage,
   getPinnnedMessages,
+  pinMessage,
+  sendMessage,
+  unpinMessage,
 } from "../zome_fns";
-import {
-  installAgents,
-  MEM_PROOF1,
-  MEM_PROOF2,
-  MEM_PROOF3,
-} from "../../../install";
 
 export function pinMessageTest(config) {
   let orchestrator = new Orchestrator();
@@ -26,21 +21,9 @@ export function pinMessageTest(config) {
         pin_message, unpin_message, get_pinned_messages
       */
       const [alice, bobby, charlie] = await s.players([config, config, config]);
-      const [alice_lobby_happ] = await installAgents(
-        alice,
-        ["alice"],
-        [MEM_PROOF1]
-      );
-      const [bobby_lobby_happ] = await installAgents(
-        bobby,
-        ["bobby"],
-        [MEM_PROOF2]
-      );
-      const [charlie_lobby_happ] = await installAgents(
-        charlie,
-        ["charlie"],
-        [MEM_PROOF3]
-      );
+      const [alice_lobby_happ] = await installAgents(alice, ["alice"]);
+      const [bobby_lobby_happ] = await installAgents(bobby, ["bobby"]);
+      const [charlie_lobby_happ] = await installAgents(charlie, ["charlie"]);
       const [alice_conductor] = alice_lobby_happ.cells;
       const [bobby_conductor] = bobby_lobby_happ.cells;
 

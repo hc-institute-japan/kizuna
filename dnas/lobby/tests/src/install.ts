@@ -36,7 +36,7 @@ export const installAgents = async (
   const dnaHash = await conductor.registerDna(
     { path: chessDna },
     conductor.scenarioUID,
-    { skip_proof: false, holo_agent_override }
+    { skip_proof: !memProofArray ? true : false, holo_agent_override }
   );
   const agentsHapps: Array<InstalledHapp> = [];
   for (let i = 0; i < agentNames.length; i++) {
