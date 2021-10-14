@@ -21,6 +21,7 @@ import { isHoloEnv } from "../../connection/constants";
 import { logout } from "../../redux/profile/actions";
 import { Profile } from "../../redux/profile/types";
 import { RootState } from "../../redux/types";
+import { useAppDispatch } from "../../utils/helpers";
 import Identicon from "../Identicon";
 import styles from "./style.module.css";
 
@@ -35,6 +36,7 @@ const Menu: React.FC = () => {
   const history = useHistory();
   const { username, id } = useSelector((state: RootState) => state.profile);
   const intl = useIntl();
+  const dispatch = useAppDispatch();
   const menu = useRef<any>(null);
 
   const menuList: MenuItem[] = [
