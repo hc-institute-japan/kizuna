@@ -3,6 +3,7 @@ members = [
     "zomes/group",
     # "zomes/request",
     # "zomes/username",
+    "zomes/webrtc", 
     "zomes/profiles",
     "zomes/contacts",
     "zomes/aggregator",

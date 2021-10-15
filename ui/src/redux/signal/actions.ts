@@ -22,6 +22,15 @@ export const handleSignal =
   (type: string, payload: any): any =>
   async (dispatch: ThunkDispatch<RootState, any, AnyAction>) => {
     switch (type) {
+      case SIGNALS[ZOMES.WEBRTC].SEND_OFFER:
+        dispatch(receiveOffer(payload));
+        break;
+      case SIGNALS[ZOMES.WEBRTC].SEND_ANSWER:
+        dispatch(receiveAnswer(payload));
+        break;
+      case SIGNALS[ZOMES.WEBRTC].SEND_ICE_CANDIDATE:
+        dispatch(receiveCandidate(payload));
+        break;
       case SIGNALS[ZOMES.GROUP].ADDED_TO_GROUP:
         dispatch(addedToGroup(payload));
         break;
