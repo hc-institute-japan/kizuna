@@ -10,6 +10,7 @@ import MessageInput, {
   MessageInputMethods,
   MessageInputOnSendParams,
 } from "../../components/MessageInput";
+import { useCallModal } from "../../containers/CallModalContainer";
 import { FilePayload } from "../../redux/commons/types";
 import { fetchMyContacts } from "../../redux/contacts/actions";
 import { getFileBytes } from "../../redux/p2pmessages/actions/getFileBytes";
@@ -30,6 +31,7 @@ import {
 } from "../../redux/p2pmessages/types";
 import { Profile } from "../../redux/profile/types";
 import { RootState } from "../../redux/types";
+import { SET_CALLS } from "../../redux/webrtc/types";
 import { useAppDispatch } from "../../utils/helpers";
 import ChatHeader from "./ChatHeader";
 
@@ -45,6 +47,7 @@ const Chat: React.FC = () => {
       receipt?: P2PMessageReceipt | undefined;
     }[]
   >([]);
+
   const [disableGetNextBatch, setDisableGetNextBatch] =
     useState<boolean>(false);
   const {
@@ -73,6 +76,25 @@ const Chat: React.FC = () => {
   const { readReceipt, typingIndicator } = useSelector(
     (state: RootState) => state.preference
   );
+
+  const { calls } = useSelector((state: RootState) => state.webrtc);
+  const { show } = useCallModal();
+
+  useEffect(() => {
+    // console.log(calls);
+    const call = calls.pop();
+    if (call) {
+      show((state) => state.RECEIVING, {
+        name: call!.name,
+        agents: [id],
+      });
+
+      dispatch({
+        type: SET_CALLS,
+        calls,
+      });
+    }
+  }, [calls]);
 
   const dispatch = useAppDispatch();
   // const history = useHistory();

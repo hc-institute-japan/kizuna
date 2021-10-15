@@ -5,7 +5,6 @@ import { ThunkAction } from "../../types";
 const sendRTC =
   (name: string, payload: string, agents: AgentPubKeyBase64[]): ThunkAction =>
   async (_dispatch, _getState, { callZome }) => {
-    // console.log(agents);
     callZome({
       zomeName: ZOMES.WEBRTC,
       fnName: FUNCTIONS[ZOMES.WEBRTC].SIGNAL_RTC,

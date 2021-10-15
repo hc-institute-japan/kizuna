@@ -13,6 +13,7 @@ import {
 } from "@ionic/react";
 import {
   arrowBackSharp,
+  callOutline,
   ellipsisVerticalOutline,
   informationCircleOutline,
   personCircleOutline,
@@ -21,9 +22,14 @@ import {
 } from "ionicons/icons";
 import React from "react";
 import { IntlShape, useIntl } from "react-intl";
+import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import AgentIdentifier from "../../components/AgentIdentifier";
+import { useCallModal } from "../../containers/CallModalContainer";
 import { Profile } from "../../redux/profile/types";
+import { RootState } from "../../redux/types";
+import sendCallRequest from "../../redux/webrtc/actions/sendCallRequest";
+import { useAppDispatch } from "../../utils/helpers";
 import styles from "./style.module.css";
 
 interface Props {
@@ -117,6 +123,8 @@ const ChatHeader: React.FC<Props> = ({
     intl,
   });
   const handleOnBack = () => history.push({ pathname: `/home` });
+  const dispatch = useAppDispatch();
+  const myUsername = useSelector((state: RootState) => state.profile.username);
 
   const handleOnProfileClick = () =>
     history.push({
@@ -131,6 +139,17 @@ const ChatHeader: React.FC<Props> = ({
   //     state: { conversant },
   //   });
   // };
+
+  const { show } = useCallModal();
+
+  const onCall = () => {
+    show((states) => states.REQUESTING, {
+      name: conversant.username,
+      agents: [conversant.id],
+    });
+
+    dispatch(sendCallRequest([conversant.id], myUsername!));
+  };
 
   return (
     <IonHeader>
@@ -152,6 +171,11 @@ const ChatHeader: React.FC<Props> = ({
             <AgentIdentifier nickname={username} id={id} />
           </IonTitle>
         </div>
+        <IonButtons slot="end">
+          <IonButton onClick={onCall}>
+            <IonIcon icon={callOutline}></IonIcon>
+          </IonButton>
+        </IonButtons>
         <IonButtons slot="end">
           <IonButton onClick={(e) => present({ event: e.nativeEvent })}>
             <IonIcon icon={ellipsisVerticalOutline}></IonIcon>

@@ -1,4 +1,5 @@
 import React from "react";
+import CallModalContainer from "./CallModalContainer";
 import ErrorHandler from "./ErrorHandlerContainer";
 import IntlContainer from "./IntlContainer";
 import IonicContainer from "./IonicContainer";
@@ -12,9 +13,11 @@ const Container: React.FC = ({ children }) => {
       <RouterContainer>
         <ReduxContainer>
           <IntlContainer>
-            <ToastContainer>
-              <ErrorHandler>{children}</ErrorHandler>
-            </ToastContainer>
+            <CallModalContainer>
+              <ToastContainer>
+                <ErrorHandler>{children}</ErrorHandler>
+              </ToastContainer>
+            </CallModalContainer>
           </IntlContainer>
         </ReduxContainer>
       </RouterContainer>

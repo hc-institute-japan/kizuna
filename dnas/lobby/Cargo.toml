@@ -9,6 +9,7 @@ members = [
     "zomes/preference",
     "zomes/p2pmessage",
     "commons/file_types", 
+    "zomes/webrtc"
 ]
 
 [profile.dev]

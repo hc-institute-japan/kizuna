@@ -22,6 +22,7 @@ export const ZOMES: ZomeNameType = {
   CONTACTS: "contacts",
   GROUP: "group",
   AGGREGATOR: "aggregator",
+  WEBRTC: "webrtc",
 };
 export const SIGNALS: SignalNameType = {
   [ZOMES.GROUP]: {
@@ -35,6 +36,13 @@ export const SIGNALS: SignalNameType = {
     RECEIVE_P2P_RECEIPT: "RECEIVE_P2P_RECEIPT",
     SYNC_P2P_PINS: "SYNC_P2P_PINS",
     TYPING_P2P: "TYPING_P2P",
+  },
+  [ZOMES.WEBRTC]: {
+    REQUESTING_CALL: "REQUESTING_CALL",
+    ACCEPTING_CALL: "ACCEPTING_CALL",
+    SEND_OFFER: "SEND_OFFER",
+    SEND_ANSWER: "SEND_ANSWER",
+    SEND_ICE_CANDIDATE: "SEND_ICE_CANDIDATE",
   },
 };
 
@@ -108,5 +116,8 @@ export const FUNCTIONS: FunctionNameType = {
     GET_PINNED_MESSAGES: "get_pinned_messages",
     GET_NEXT_MESSAGES: "get_next_messages",
     GET_ADJACENT_MESSAGES: "get_adjacent_messages",
+  },
+  [ZOMES.WEBRTC]: {
+    SIGNAL_RTC: "signal_rtc",
   },
 };
