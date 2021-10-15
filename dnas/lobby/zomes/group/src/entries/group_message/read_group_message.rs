@@ -35,11 +35,16 @@ pub fn read_group_message_handler(
             let options = GetOptions::content();
             message_entry = get(message_entry_hash.clone(), options)?;
         }
-        // link GroupMessage -> AgentPubKey to indicate that it is read.
-        create_link(
-            message_entry_hash,
-            my_agent_pubkey.clone().into(),
-            LinkTag::new("read".to_owned()),
+        // link GroupMessage -> AgentPubKey to indicate that it is read
+        // with ChainTopOrdering::Relaxed because order doesn't matter
+        host_call::<CreateLinkInput, HeaderHash>(
+            __create_link,
+            CreateLinkInput::new(
+                message_entry_hash,
+                my_agent_pubkey.clone().into(),
+                LinkTag::new("read".to_owned()),
+                ChainTopOrdering::Relaxed,
+            ),
         )?;
     }
 
