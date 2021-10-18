@@ -312,7 +312,7 @@ dependencies = [
 [[package]]
 name = "hc_zome_profiles"
 version = "0.0.1"
-source = "git+https://github.com/tatssato/profiles?rev=283929207e158b338914fd93196bbc5be20837bf#283929207e158b338914fd93196bbc5be20837bf"
+source = "git+https://github.com/tatssato/profiles?branch=kizuna#38ac372177ce974633bea54df1700b288ae7faed"
 dependencies = [
  "derive_more",
  "hdk 0.0.109",
@@ -576,9 +576,9 @@ dependencies = [
 
 [[package]]
 name = "instant"
-version = "0.1.11"
+version = "0.1.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "716d3d89f35ac6a34fd0eed635395f4c3b76fa889338a4632e5231a8684216bd"
+checksum = "7a5bbe824c507c5da5956355e86a746d82e0e1464f65d862cc5e71da70e94b2c"
 dependencies = [
  "cfg-if 1.0.0",
 ]
@@ -624,9 +624,9 @@ checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
 name = "libc"
-version = "0.2.103"
+version = "0.2.104"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd8f7255a17a627354f321ef0055d63b898c6fb27eff628af4d1b66b7331edf6"
+checksum = "7b2f96d100e1cf1929e7719b7edb3b90ab5298072638fccd77be9ce942ecdfce"
 
 [[package]]
 name = "lock_api"
