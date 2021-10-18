@@ -66,11 +66,9 @@ const groupMessageData =
     const groupId: string = groupMessage.groupId;
     const groupMessageId: string = groupMessage.groupMessageId;
     const groupConversation = state.groups.conversations[groupId];
+    const currMessages = groupConversation ? groupConversation.messages : [];
 
-    const messageIds = [
-      groupMessage.groupMessageId,
-      ...groupConversation.messages,
-    ];
+    const messageIds = [groupMessage.groupMessageId, ...currMessages];
 
     const newMessage: { [key: string]: GroupMessage } = {
       [groupMessageId]: groupMessage,
