@@ -108,25 +108,28 @@ export function sendMessageswithFilesTest(config) {
   orchestrator.registerScenario(
     "send messages with files",
     async (s: ScenarioApi, t) => {
-      const [alice, bobby] = await s.players([config, config]);
+      const [alice, bobby, charlie] = await s.players([config, config, config]);
       const [alice_lobby_happ] = await installAgents(alice, ["alice"]);
       const [bobby_lobby_happ] = await installAgents(bobby, ["bobby"]);
+      const [charlie_lobby_happ] = await installAgents(charlie, ["charlie"]);
 
       const [alice_conductor] = alice_lobby_happ.cells;
       const [bobby_conductor] = bobby_lobby_happ.cells;
 
       const alicePubKey = alice_lobby_happ.agent;
       const bobbyPubKey = bobby_lobby_happ.agent;
+      const charliePubKey = charlie_lobby_happ.agent;
 
       await delay();
 
       // signal handlers assignment
       alice.setSignalHandler((signal) => {});
       bobby.setSignalHandler((signal) => {});
+      charlie.setSignalHandler((signal) => {});
 
       let create_group_input = {
         name: "Group_name",
-        members: [bobbyPubKey],
+        members: [bobbyPubKey, charliePubKey],
       };
 
       let { content, groupId, group_revision_id } = await createGroup(
@@ -344,12 +347,14 @@ export function sendLargeSetOfFilesTest(config) {
 
       const alicePubKey = alice_lobby_happ.agent;
       const bobbyPubKey = bobby_lobby_happ.agent;
+      const charliePubKey = charlie_lobby_happ.agent;
 
       await delay(2000);
 
       // signal handlers assignment
       alice.setSignalHandler((signal) => {});
       bobby.setSignalHandler((signal) => {});
+      charlie.setSignalHandler((signal) => {});
 
       let fileName: string;
       let filePath;
@@ -359,7 +364,7 @@ export function sendLargeSetOfFilesTest(config) {
 
       let create_group_input = {
         name: "Group_name",
-        members: [bobbyPubKey],
+        members: [bobbyPubKey, charliePubKey],
       };
 
       let { groupId, content } = await createGroup(create_group_input)(

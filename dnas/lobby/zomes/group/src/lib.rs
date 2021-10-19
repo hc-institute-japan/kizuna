@@ -5,15 +5,21 @@ use hdk::prelude::*;
 mod entries;
 mod signals;
 mod utils;
-mod validation_rules;
 
 use entries::group::{self, GroupOutput};
 use entries::group_message;
 
 use group::{
-    add_members::add_members_handler, create_group::create_group_handler,
-    get_all_my_groups::get_all_my_groups_handler, group_helpers,
-    remove_members::remove_members_handler, update_group_name::update_group_name_handler,
+    add_members::add_members_handler,
+    create_group::create_group_handler,
+    get_all_my_groups::get_all_my_groups_handler,
+    group_helpers,
+    remove_members::remove_members_handler,
+    update_group_name::update_group_name_handler,
+    validations::{
+        validate_create_group::validate_create_group_handler,
+        validate_update_group::validate_update_group_handler,
+    },
 };
 
 use group_message::{
@@ -29,9 +35,6 @@ use group_message::{
     send_message_in_target_date::send_message_in_target_date_handler,
     unpin_message::unpin_message_handler,
 };
-
-use validation_rules::run_validations::run_validations_handler;
-use validation_rules::ValidationInput;
 
 use signals::{SignalDetails, SignalPayload};
 
@@ -199,6 +202,16 @@ fn indicate_group_typing(group_typing_detail_data: GroupTypingDetailData) -> Ext
     return indicate_group_typing_handler(group_typing_detail_data);
 }
 
+#[hdk_extern]
+fn validate_create_entry_group(data: ValidateData) -> ExternResult<ValidateCallbackResult> {
+    return validate_create_group_handler(data);
+}
+
+#[hdk_extern]
+fn validate_update_entry_group(data: ValidateData) -> ExternResult<ValidateCallbackResult> {
+    return validate_update_group_handler(data);
+}
+
 /*
 These function are only used for testing purposes
 should be uncommented on production use
@@ -208,9 +221,4 @@ fn send_message_in_target_date(
     message_input: GroupMessageInputWithDate,
 ) -> ExternResult<GroupMessageWithId> {
     return send_message_in_target_date_handler(message_input);
-}
-
-#[hdk_extern]
-fn run_validation(validation_input: ValidationInput) -> ExternResult<ValidateCallbackResult> {
-    return run_validations_handler(validation_input);
 }

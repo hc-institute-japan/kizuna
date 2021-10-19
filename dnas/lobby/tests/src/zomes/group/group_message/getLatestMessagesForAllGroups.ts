@@ -41,7 +41,7 @@ export function getLatestMessagesForAllGroupsTest(config) {
 
       let create_group_input_2 = {
         name: "Group_name_2",
-        members: [alicePubKey, charliePubKey],
+        members: [bobbyPubKey, charliePubKey],
       };
 
       let group_1 = await createGroup(create_group_input)(alice_conductor);

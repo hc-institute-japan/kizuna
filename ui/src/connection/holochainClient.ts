@@ -231,8 +231,7 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
           throw {
             type: "error",
             function: fnName,
-            message:
-              "An internal error occured. This is likely a bug in holochain.",
+            message: data.data,
           };
         }
         default:
