@@ -14,6 +14,11 @@ jobs:
       with:
         nix_path: nixpkgs=channel:nixos-unstable
     
+    - name: cachix
+      run: |
+        nix-env -iA cachix -f https://cachix.org/api/v1/install
+        cachix use holochain-cia
+    
     - name: build-holochain
       run: |
         cd $GITHUB_WORKSPACE
