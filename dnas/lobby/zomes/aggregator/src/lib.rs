@@ -138,6 +138,8 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
         per_group_preference,
     };
 
+    debug!("Kizuna log: Current latest data {:#?}", aggregated_data);
+
     Ok(aggregated_data)
 }
 
