@@ -44,11 +44,11 @@ pub fn get_messages_by_group_by_timestamp_handler(
 
             let links = message_links.into_inner();
 
-            // create input for getting the messages
+            // create input for getting the messages => input: Vec<(message_hash, GetOptions)
             let get_input = links
                 .clone()
                 .into_iter()
-                .map(|link| GetInput::new(link.target.into(), GetOptions::default()))
+                .map(|link| GetInput::new(link.target.into(), GetOptions::content()))
                 .collect();
 
             // parallel get messages
@@ -81,7 +81,7 @@ pub fn get_messages_by_group_by_timestamp_handler(
                     timestamps.push(link.timestamp);
                     let message_hash: EntryHash = link.target.clone().into();
                     message_hashes_for_read.push(message_hash);
-                    GetInput::new(link.target.into(), GetOptions::default())
+                    GetInput::new(link.target.into(), GetOptions::content())
                 })
                 .collect();
 
