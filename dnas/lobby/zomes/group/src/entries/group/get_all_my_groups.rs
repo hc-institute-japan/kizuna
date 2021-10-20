@@ -24,11 +24,8 @@ pub fn get_all_my_groups_handler() -> ExternResult<Vec<GroupOutput>> {
         .collect();
 
     for details in get_output_result {
-        debug!("nicko get all my groups map details {:?}", details.clone());
         match details {
             Details::Entry(group_entry_details) => {
-                debug!("nicko get all my groups reaches inside match statement of details entry",);
-
                 if let Entry::App(group_entry_bytes) = group_entry_details.entry {
                     let group_sb: SerializedBytes = group_entry_bytes.into_sb();
                     let first_ver_group: Group = group_sb.try_into()?;
