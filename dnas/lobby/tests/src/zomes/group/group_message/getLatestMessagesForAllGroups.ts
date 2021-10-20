@@ -86,9 +86,6 @@ export function getLatestMessagesForAllGroupsTest(config) {
 
       messages_hashes = Object.values(output.groupMessagesContents);
 
-      console.log("here are the message hashes", messages_hashes);
-      console.log("here are the message hashes", output);
-
       t.deepEqual(messages_hashes.length, 2);
     }
   );
