@@ -1,6 +1,5 @@
 use hdk::prelude::*;
 
-use element::ElementEntry;
 use std::collections::HashMap;
 use timestamp::Timestamp;
 
@@ -39,8 +38,7 @@ pub fn get_messages_by_group_by_timestamp_handler(
             let mut messages_hashes: Vec<EntryHash> = Vec::new();
 
             let mut all_read_list: HashMap<String, HashMap<String, Timestamp>> = HashMap::new();
-            let mut message_hashes_for_read = Vec::new();
-            let mut timestamps = Vec::new();
+            let mut read_message_hashes: Vec<EntryHash> = Vec::new();
 
             let links = message_links.into_inner();
 
@@ -51,83 +49,42 @@ pub fn get_messages_by_group_by_timestamp_handler(
                 .map(|link| GetInput::new(link.target.into(), GetOptions::content()))
                 .collect();
 
+            // create input for getting the read links => input: Vec<(message_hash, "read")>
+            let get_input_message_hashes: Vec<GetLinksInput> = links
+                .clone()
+                .into_iter()
+                .map(|link| {
+                    read_message_hashes.push(link.target.clone().into());
+                    all_read_list.insert(link.target.clone().to_string(), HashMap::new());
+                    GetLinksInput::new(link.target.into(), Some(LinkTag::new("read".to_owned())))
+                })
+                .collect();
+
+            // parallel get links for all message_hash
+            let read_links = HDK.with(|h| h.borrow().get_links(get_input_message_hashes))?;
+            let read_links_2 = read_links
+                .into_iter()
+                .map(|links| links.into_inner())
+                .zip(read_message_hashes);
+
+            for (links_vec, message_hash) in read_links_2 {
+                match all_read_list.get_mut(&message_hash.to_string()) {
+                    Some(hashmap) => {
+                        for link in links_vec {
+                            (*hashmap).insert(link.target.to_string(), link.timestamp.to_owned());
+                        }
+                        ()
+                    }
+                    None => (),
+                }
+            }
+
             // parallel get messages
             let get_output = HDK.with(|h| h.borrow().get(get_input))?;
             let get_output_result: Vec<Element> = get_output
                 .into_iter()
                 .filter_map(|maybe_option| maybe_option)
                 .collect();
-
-            // create input for getting the read links => input: Vec<(message_hash, "read")>
-            let get_input_message_hashes: Vec<GetLinksInput> = links
-                .clone()
-                .into_iter()
-                .map(|link| {
-                    GetLinksInput::new(link.target.into(), Some(LinkTag::new("read".to_owned())))
-                })
-                .collect();
-
-            // parallel get links
-            let read_links: Vec<Link> = HDK
-                .with(|h| h.borrow().get_links(get_input_message_hashes))?
-                .into_iter()
-                .map(|links| links.into_inner())
-                .flatten()
-                .collect();
-
-            let get_input_for_read: Vec<GetInput> = read_links
-                .into_iter()
-                .map(|link| {
-                    timestamps.push(link.timestamp);
-                    let message_hash: EntryHash = link.target.clone().into();
-                    message_hashes_for_read.push(message_hash);
-                    GetInput::new(link.target.into(), GetOptions::content())
-                })
-                .collect();
-
-            let get_output_for_read = HDK.with(|h| h.borrow().get(get_input_for_read))?;
-
-            let zipped: Vec<((Element, EntryHash), Timestamp)> = get_output_for_read
-                .into_iter()
-                .zip(message_hashes_for_read)
-                .zip(timestamps)
-                .filter_map(|((element_maybe_option, message_hash), timestamp)| {
-                    match element_maybe_option {
-                        Some(element) => {
-                            return Some(((element, message_hash), timestamp.to_owned()))
-                        }
-                        None => return None,
-                    }
-                })
-                .collect();
-
-            for ((element, message_hash), timestamp) in zipped.into_iter() {
-                match element.into_inner().1 {
-                    ElementEntry::Present(entry) => {
-                        if let Entry::Agent(agent_pubkey) = entry {
-                            match all_read_list.get_mut(&message_hash.clone().to_string()) {
-                                Some(hashmap) => {
-                                    hashmap.insert(
-                                        agent_pubkey.clone().to_string(),
-                                        timestamp.to_owned(),
-                                    );
-                                    ()
-                                }
-                                None => {
-                                    let mut new = HashMap::new();
-                                    new.insert(
-                                        agent_pubkey.clone().to_string(),
-                                        timestamp.to_owned(),
-                                    );
-                                    all_read_list.insert(message_hash.clone().to_string(), new);
-                                    ()
-                                }
-                            };
-                        }
-                    }
-                    _ => (),
-                };
-            }
 
             for element in get_output_result {
                 match element.entry().to_owned().to_app_option::<GroupMessage>() {
@@ -159,7 +116,6 @@ pub fn get_messages_by_group_by_timestamp_handler(
                                 entry: group_message_data,
                                 signed_header: element.signed_header().to_owned(),
                             };
-
                             group_messages_content.insert(
                                 message_hash.clone().to_string(),
                                 GroupMessageContent {

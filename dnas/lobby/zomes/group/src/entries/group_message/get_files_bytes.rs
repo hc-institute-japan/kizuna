@@ -11,7 +11,7 @@ pub fn get_files_bytes_handler(
 
     let get_input = file_hashes
         .into_iter()
-        .map(|hash| GetInput::new(hash.into(), GetOptions::contnt()))
+        .map(|hash| GetInput::new(hash.into(), GetOptions::content()))
         .collect();
 
     let get_output = HDK.with(|h| h.borrow().get(get_input))?;
