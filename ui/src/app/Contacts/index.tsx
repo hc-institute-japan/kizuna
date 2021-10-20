@@ -5,6 +5,7 @@ import ContactsList from "../../components/ContactList";
 import Spinner from "../../components/Spinner";
 import Toolbar from "../../components/Toolbar";
 import { fetchMyContacts } from "../../redux/contacts/actions";
+import { IndexedContacts } from "../../redux/contacts/types";
 import { RootState } from "../../redux/types";
 import { indexContacts, useAppDispatch } from "../../utils/helpers";
 import AddContactFAB from "./AddContact/AddContactFAB";
@@ -17,6 +18,38 @@ const Contacts: React.FC = () => {
   const [loading, setLoading] = useState<boolean>();
   const dispatch = useAppDispatch();
   const contacts = useSelector((state: RootState) => state.contacts.contacts);
+  // const contacts = {
+  //   0: {
+  //     id: "aaaaa",
+  //     username: "apple",
+  //   },
+  //   6: {
+  //     id: "aaaaa",
+  //     username: "andy",
+  //   },
+  //   1: {
+  //     id: "aaaaa",
+  //     username: "keith",
+  //   },
+  //   2: {
+  //     id: "bbbbb",
+  //     username: "gardose",
+  //   },
+  //   3: {
+  //     id: "bbbbb",
+  //     username: "ggrdose",
+  //   },
+  //   12: {
+  //     id: "bbbbb",
+  //     username: "bbah",
+  //   },
+  //   17: {
+  //     id: "bbbbb",
+  //     username: "bbblyat",
+  //   },
+  // };
+  // const [indexedContacts, setIndexedContacts] =
+  //   useState<null | IndexedContacts>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -24,6 +57,16 @@ const Contacts: React.FC = () => {
       setLoading(false);
     });
   }, [dispatch]);
+
+  // useEffect(() => {
+  //   setIndexedContacts(
+  //     indexContacts(
+  //       Object.values(contacts).filter((contact) =>
+  //         contact.username.toLowerCase().includes(search.toLowerCase())
+  //       )
+  //     )
+  //   );
+  // }, [contacts]);
 
   const indexedContacts = indexContacts(
     Object.values(contacts).filter((contact) =>
@@ -38,7 +81,7 @@ const Contacts: React.FC = () => {
         {loading ? (
           <Spinner name="crescent" />
         ) : Object.values(contacts).length !== 0 ? (
-          <ContactsList contacts={indexedContacts} />
+          <ContactsList contacts={indexedContacts ? indexedContacts : {}} />
         ) : (
           <EmptyContacts />
         )}
