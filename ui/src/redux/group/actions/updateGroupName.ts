@@ -63,16 +63,37 @@ const updateGroupName =
 
       return updateGroupNameData;
     } catch (e) {
-      /*
-        We are not handling the "same name with old group name"
-        as it is safe to assume that it is being handled above
-      */
-      if (e.message === "failed to get the given group id") {
-        return dispatch(
-          pushError("TOAST", {}, { id: "redux.err.group.update-group-name.2" })
-        );
-      } else {
-        return dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
+      switch (true) {
+        case e.message.includes("failed to get the given group id"):
+          return dispatch(
+            pushError(
+              "TOAST",
+              {},
+              { id: "redux.err.group.update-group-name.2" }
+            )
+          );
+        case e.message.includes(
+          "the group name must be 1 to 50 characters length"
+        ):
+          return dispatch(
+            pushError(
+              "TOAST",
+              {},
+              { id: "redux.err.group.update-group-name.3" }
+            )
+          );
+        case e.message.includes(
+          "cannot update a group entry if you are not the group creator (admin)"
+        ):
+          return dispatch(
+            pushError(
+              "TOAST",
+              {},
+              { id: "redux.err.group.update-group-name.4" }
+            )
+          );
+        default:
+          return dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
       }
     }
   };

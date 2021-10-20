@@ -7,6 +7,7 @@ pub mod get_all_my_groups;
 pub mod group_helpers;
 pub mod remove_members;
 pub mod update_group_name;
+pub mod validations;
 
 /* GROUP TYPE DEFINITION, GETTERS, SETTERS, ENTRY_DEF, UTILS ... */
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
@@ -115,12 +116,3 @@ impl GroupOutput {
     }
 }
 /* END OF OUTPUT TYPES DEFINITION */
-
-// //VALIDATION TYPES DEFINITION (this types are created just for testing purposes and can be removed in the future)
-// #[derive(Deserialize, Serialize, SerializedBytes, Debug)]
-// #[serde(rename_all = "camelCase")]
-// pub struct ValidationInput {
-//     pub validation_type: String,
-//     pub group_revision_id: HeaderHash,
-// }
-// //END OF VALIDATION TYPES DEFINITION
