@@ -3,13 +3,16 @@ use hdk::prelude::*;
 use crate::group::Group;
 
 // TODO: implement unit test
+/**
+ * validate creation of group entry. returning error if,
+ *
+ * creator pubkey does not match the signature
+ * group name is more than 50 characters
+ * group name is less than one character long
+ * group members field is < 2 pubkeys
+ * group creator AgentPubKey is included in the group members
+*/
 pub fn validate_create_group_handler(data: ValidateData) -> ExternResult<ValidateCallbackResult> {
-    //data = { element = { signed_header, entry } , validation_package <Option> }
-    // 1- create is valid if creator pubkey matches the signature
-    // 2- create is valid if group name is not more than 50 characters ; create is valid if group name is at least one character long
-    // 3- group members cannot be empty and must at least include 2 pubkeys
-    // 4- creator AgentPubKey is not included int he group members
-
     let entry_author_pub_key: AgentPubKey = data.element.header().author().clone();
     let entry: Option<Group> = data.element.entry().to_app_option()?.clone();
 
@@ -20,20 +23,20 @@ pub fn validate_create_group_handler(data: ValidateData) -> ExternResult<Validat
 
         if !group_creator_pub_key.eq(&entry_author_pub_key) {
             return Ok(ValidateCallbackResult::Invalid(
-                "the group creator pubkey dosent match with the signature".into(),
-            )); //validation(1)
+                "the group creator pubkey dosent match with the header signature".into(),
+            ));
         }
 
         if group_name_length < 1 || group_name_length > 50 {
             return Ok(ValidateCallbackResult::Invalid(
                 "the group name must at least contain 1 character and maximun 50 characters".into(),
-            )); //validation(2)
+            ));
         }
 
         if group_members_length < 2 {
             return Ok(ValidateCallbackResult::Invalid(
                 "groups cannot be created with less than 3 members".into(),
-            )); //validation(3)
+            ));
         }
 
         if group
@@ -42,7 +45,7 @@ pub fn validate_create_group_handler(data: ValidateData) -> ExternResult<Validat
         {
             return Ok(ValidateCallbackResult::Invalid(
                 "creator AgentPubKey cannot be included in the group members list".into(),
-            )); //validation(4)
+            ));
         }
     }
 

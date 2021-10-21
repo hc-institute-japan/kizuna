@@ -5,6 +5,7 @@ import updateGroupNameTest from "./crud/updateGroupName";
 
 // validation
 import validateCreateGroupTest from "./validations/validateCreateGroup";
+import validateUpdateGroupTest from "./validations/validateUpdateGroup";
 
 // group message
 import {
@@ -30,6 +31,7 @@ export default (config) => {
   createGroupTest(config); // ok
   updateGroupNameTest(config); //ok
   validateCreateGroupTest(config); // ok
+  validateUpdateGroupTest(config); // ok
 
   // GroupMessage related tests
   sendMessageTest(config); // ok

@@ -41,7 +41,7 @@ export function getLatestMessagesForAllGroupsTest(config) {
 
       let create_group_input_2 = {
         name: "Group_name_2",
-        members: [alicePubKey, charliePubKey],
+        members: [bobbyPubKey, charliePubKey],
       };
 
       let group_1 = await createGroup(create_group_input)(alice_conductor);
@@ -85,9 +85,6 @@ export function getLatestMessagesForAllGroupsTest(config) {
       await delay(1000);
 
       messages_hashes = Object.values(output.groupMessagesContents);
-
-      console.log("here are the message hashes", messages_hashes);
-      console.log("here are the message hashes", output);
 
       t.deepEqual(messages_hashes.length, 2);
     }

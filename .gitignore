@@ -6,3 +6,6 @@ target/
 # rust cargo
 .cargo/
 
+# hc
+.hc*
+
