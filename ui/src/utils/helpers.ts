@@ -97,8 +97,8 @@ export const indexContacts: (contacts: Profile[]) => IndexedContacts = (
     a.username.toLocaleLowerCase().localeCompare(b.username.toLocaleLowerCase())
   );
 
-  if (contacts.length > 0) {
-    contacts.forEach((contact: Profile) => {
+  if (sortedContacts.length > 0) {
+    sortedContacts.forEach((contact: Profile) => {
       const currChar = contact.username.charAt(0).toLocaleLowerCase();
       let currArr = indexedContacts[currChar];
 

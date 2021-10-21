@@ -18,38 +18,6 @@ const Contacts: React.FC = () => {
   const [loading, setLoading] = useState<boolean>();
   const dispatch = useAppDispatch();
   const contacts = useSelector((state: RootState) => state.contacts.contacts);
-  // const contacts = {
-  //   0: {
-  //     id: "aaaaa",
-  //     username: "apple",
-  //   },
-  //   6: {
-  //     id: "aaaaa",
-  //     username: "andy",
-  //   },
-  //   1: {
-  //     id: "aaaaa",
-  //     username: "keith",
-  //   },
-  //   2: {
-  //     id: "bbbbb",
-  //     username: "gardose",
-  //   },
-  //   3: {
-  //     id: "bbbbb",
-  //     username: "ggrdose",
-  //   },
-  //   12: {
-  //     id: "bbbbb",
-  //     username: "bbah",
-  //   },
-  //   17: {
-  //     id: "bbbbb",
-  //     username: "bbblyat",
-  //   },
-  // };
-  // const [indexedContacts, setIndexedContacts] =
-  //   useState<null | IndexedContacts>(null);
 
   useEffect(() => {
     setLoading(true);
@@ -57,16 +25,6 @@ const Contacts: React.FC = () => {
       setLoading(false);
     });
   }, [dispatch]);
-
-  // useEffect(() => {
-  //   setIndexedContacts(
-  //     indexContacts(
-  //       Object.values(contacts).filter((contact) =>
-  //         contact.username.toLowerCase().includes(search.toLowerCase())
-  //       )
-  //     )
-  //   );
-  // }, [contacts]);
 
   const indexedContacts = indexContacts(
     Object.values(contacts).filter((contact) =>
