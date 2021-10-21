@@ -13,7 +13,7 @@ pub fn get_all_my_groups_handler() -> ExternResult<Vec<GroupOutput>> {
     let get_input: Vec<GetInput> = links
         .into_inner()
         .into_iter()
-        .map(|link| GetInput::new(link.target.into(), GetOptions::latest()))
+        .map(|link| GetInput::new(link.target.into(), GetOptions::content()))
         .collect();
 
     let get_output = HDK.with(|h| h.borrow().get_details(get_input))?;
