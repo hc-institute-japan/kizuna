@@ -56,13 +56,11 @@ export function pinMessageTest(config) {
       });
       await delay();
 
-      let x = await pinMessage(groupId, id)(bobby_conductor);
-      console.log("here is pin message", x);
+      await pinMessage(groupId, id)(bobby_conductor);
 
       await delay();
 
       let pinned_messages = await getPinnnedMessages(groupId)(alice_conductor);
-      console.log("here are the pinned messages", pinned_messages);
       t.deepEqual(Object.keys(pinned_messages).length, 1);
 
       await unpinMessage(groupId, id)(bobby_conductor);
@@ -71,8 +69,7 @@ export function pinMessageTest(config) {
       pinned_messages = await getPinnnedMessages(groupId)(alice_conductor);
       t.deepEqual(Object.keys(pinned_messages).length, 0);
 
-      x = await pinMessage(groupId, id)(alice_conductor);
-      console.log("here is pin message", x);
+      await pinMessage(groupId, id)(alice_conductor);
 
       pinned_messages = await getPinnnedMessages(groupId)(alice_conductor);
       t.deepEqual(Object.keys(pinned_messages).length, 1);

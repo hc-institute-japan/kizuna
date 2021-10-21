@@ -31,7 +31,7 @@ const AddContactModal: React.FC<Props> = ({ isOpen, onCancel }) => {
       dispatch(searchProfiles(searchKey)).then((profiles: Profile[]) => {
         if (profiles) {
           const filteredProfiles = profiles.filter((profile: Profile) =>
-            profile.username.includes(searchKey)
+            profile.username.toLowerCase().includes(searchKey.toLowerCase())
           );
           setProfiles(filteredProfiles);
         }

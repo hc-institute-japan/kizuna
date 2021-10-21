@@ -84,20 +84,34 @@ const addMembers =
 
       return updateGroupMembersData;
     } catch (e) {
-      switch (e.message) {
-        case "members field is empty":
+      switch (true) {
+        case e.message.includes("members field is empty"):
           dispatch(
             pushError("TOAST", {}, { id: "redux.err.group.add-members.1" })
           );
           return false;
-        case "cannot create group with blocked agents":
+        case e.message.includes("cannot create group with blocked agents"):
           dispatch(
             pushError("TOAST", {}, { id: "redux.err.group.add-members.2" })
           );
           return false;
-        case "failed to get the given group id":
+        case e.message.includes("failed to get the given group id"):
           dispatch(
             pushError("TOAST", {}, { id: "redux.err.group.add-members.3" })
+          );
+          return false;
+        case e.message.includes(
+          "cannot update a group entry if you are not the group creator (admin)"
+        ):
+          dispatch(
+            pushError("TOAST", {}, { id: "redux.err.group.add-members.4" })
+          );
+          return false;
+        case e.message.includes(
+          "creator AgentPubKey cannot be included in the group members list"
+        ):
+          dispatch(
+            pushError("TOAST", {}, { id: "redux.err.group.add-members.5" })
           );
           return false;
         default:

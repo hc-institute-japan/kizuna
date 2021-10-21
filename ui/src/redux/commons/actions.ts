@@ -140,6 +140,8 @@ export const getLatestData =
 
       return null;
     } catch (e) {
-      dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
+      dispatch(
+        pushError("TOAST", {}, { id: "redux.err.commons-get-latest-data" })
+      );
     }
   };

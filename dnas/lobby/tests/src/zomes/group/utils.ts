@@ -11,8 +11,6 @@ export function sendMessageSignalHandler(signal, signals) {
   return function (sender) {
     if (signal.data.payload.payload.type === "GROUP_MESSAGE_DATA") {
       signals.push(signal.data.payload.payload);
-      console.log("here is data", signals);
-      console.log("here is signal", signal.data.payload.payload);
     }
   };
 }

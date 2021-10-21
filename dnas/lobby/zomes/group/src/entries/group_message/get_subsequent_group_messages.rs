@@ -35,7 +35,7 @@ pub fn get_subsequent_group_messages_handler(
         )?;
 
         // we will collect the messages and all the info we need of then using this function
-        collect_messages_info(
+        collect_and_insert_messages(
             &mut linked_messages, // the linked message list contains all the messages linked to one especific path
             filter.batch_size.clone().into(),
             &mut messages_hashes,
@@ -64,7 +64,7 @@ pub fn get_subsequent_group_messages_handler(
             linked_messages =
                 get_linked_messages_from_path(path_hash, filter.payload_type.clone(), None, None)?;
 
-            collect_messages_info(
+            collect_and_insert_messages(
                 &mut linked_messages, // the linked message list contains all the messages linked to one especific path
                 filter.batch_size.clone().into(),
                 &mut messages_hashes,

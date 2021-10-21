@@ -134,12 +134,8 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [onSend, reset]);
-  useEffect(() => {
-    onFileSelectCallback();
-  }, [files, onFileSelectCallback]);
-  useEffect(() => {
-    onChangeCallback();
-  }, [message, onChangeCallback]);
+  useEffect(() => onFileSelectCallback(), [files, onFileSelectCallback]);
+  useEffect(() => onChangeCallback(), [message, onChangeCallback]);
   const { showToast } = useToast();
 
   const handleOnFileChange = () => {

@@ -9,7 +9,7 @@ import {
   IonPage,
   IonToolbar,
 } from "@ionic/react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import HomeInput from "../../components/Input/HomeInput";
 import { createProfile } from "../../redux/profile/actions";
@@ -39,17 +39,14 @@ const Register: React.FC = () => {
 
   const handleOnSubmit = () => {
     setLoading(true);
+    console.log(nickname);
     dispatch(createProfile(nickname)).then((res: any) => {
-      if (!res) {
-        // setError(
-        //   intl.formatMessage({
-        //     id: "app.register.error-existing-username",
-        //   })
-        // );
-        setLoading(false);
-      }
+      if (!res) setLoading(false);
     });
   };
+
+  const handleOnKeyDown = (event: React.KeyboardEvent) =>
+    event.key === "Enter" && !event.shiftKey ? handleOnSubmit() : null;
 
   return (
     <IonPage>
@@ -72,6 +69,9 @@ const Register: React.FC = () => {
               <HomeInput
                 value={nickname}
                 onIonChange={handleOnChange}
+                onKeyPress={(event: React.KeyboardEvent) =>
+                  handleOnKeyDown(event)
+                }
                 placeholder={intl.formatMessage({
                   id: "app.register.username-placeholder",
                 })}

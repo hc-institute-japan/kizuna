@@ -1,6 +1,7 @@
 use hdk::prelude::*;
 
-use crate::utils::{error, try_get_and_convert};
+use crate::utils::{error, try_get_and_convert, try_get_and_convert_with_header};
+
 use file_types::PayloadType;
 use std::collections::hash_map::HashMap;
 
@@ -66,81 +67,73 @@ pub fn get_linked_messages_from_path(
     return Ok(linked_messages);
 }
 
-pub fn collect_messages_info(
+pub fn collect_and_insert_messages(
     linked_messages: &mut Vec<Link>,
     batch_size: usize,
     messages_hashes: &mut Vec<EntryHash>,
     group_messages_contents: &mut HashMap<String, GroupMessageContent>,
     direction: Direction,
 ) -> ExternResult<()> {
-    let mut read_list: HashMap<String, Timestamp> = HashMap::new();
-
     while !linked_messages.is_empty() && messages_hashes.len() < batch_size {
+        let mut read_list: HashMap<String, Timestamp> = HashMap::new();
+        // collect all the values to fill the group_message_content. these values are:
+
+        // - the message entry_hash (aka link target)
+        // - the GroupMessageData (constructed from the element fetched from entry hash of the message )
+        // - the read_list for that message ( got it from the links related to the message with the tag "read" )
+
         let link: Link;
         match direction {
             Direction::Previous => link = linked_messages.pop().unwrap(),
             Direction::Subsequent => link = linked_messages.remove(0),
         }
+
         let message_hash = link.target;
+        let message_with_header: (SignedHeaderHashed, GroupMessage) =
+            try_get_and_convert_with_header(message_hash.clone(), GetOptions::content())?;
+        let message = message_with_header.1;
+        let header = message_with_header.0;
 
-        if let Some(message_element) = get(message_hash.clone(), GetOptions::content())? {
-            // collect all the values to fill the group_message_content. these values are:
+        let read_links: Vec<Link> =
+            get_links(message_hash.clone(), Some(LinkTag::new("read")))?.into_inner();
 
-            // - the message entry_hash (aka the link target)
-            // - the GroupMessageData (constructed from the element fetched from entry hash of the message )
-            // - the read_list for that message ( got it from the links related to the message with the tag "read" )
-
-            let read_links: Vec<Link> =
-                get_links(message_hash.clone(), Some(LinkTag::new("read")))?.into_inner();
-
-            for link in read_links {
-                let reader: AgentPubKey = link.target.into();
-                read_list.insert(reader.to_string(), link.timestamp);
-            }
-
-            match message_element.entry().to_app_option::<GroupMessage>() {
-                Ok(option) => match option {
-                    Some(group_message) => {
-                        let mut group_message_data = GroupMessageData {
-                            message_id: message_hash.clone(),
-                            group_hash: group_message.group_hash.clone(),
-                            sender: group_message.sender.clone(),
-                            payload: group_message.payload.clone(),
-                            created: group_message.created.clone(),
-                            reply_to: None,
-                        };
-
-                        if let Some(reply_to_hash) = group_message.reply_to.clone() {
-                            let replied_message: GroupMessage =
-                                try_get_and_convert(reply_to_hash.clone(), GetOptions::content())?;
-                            group_message_data.reply_to = Some(GroupMessageWithId {
-                                id: reply_to_hash,
-                                content: replied_message,
-                            });
-                        }
-
-                        let group_message_element: GroupMessageElement = GroupMessageElement {
-                            entry: group_message_data,
-                            signed_header: message_element.signed_header().to_owned(),
-                        };
-
-                        group_messages_contents.insert(
-                            message_hash.clone().to_string(),
-                            GroupMessageContent {
-                                group_message_element,
-                                read_list: read_list.clone(),
-                            },
-                        );
-
-                        read_list.clear();
-                    }
-                    None => {}
-                },
-                Err(_) => {
-                    return error("the group message ElementEntry enum is not of Present variant");
-                }
-            }
+        for link in read_links {
+            let reader: AgentPubKey = link.target.into();
+            read_list.insert(reader.to_string(), link.timestamp);
         }
+
+        let mut group_message_data = GroupMessageData {
+            message_id: message_hash.clone(),
+            group_hash: message.group_hash.clone(),
+            sender: message.sender.clone(),
+            payload: message.payload.clone(),
+            created: message.created.clone(),
+            reply_to: None,
+        };
+
+        if let Some(reply_to_hash) = message.reply_to.clone() {
+            let replied_message: GroupMessage =
+                try_get_and_convert(reply_to_hash.clone(), GetOptions::content())?;
+            group_message_data.reply_to = Some(GroupMessageWithId {
+                id: reply_to_hash,
+                content: replied_message,
+            });
+        }
+
+        let group_message_element: GroupMessageElement = GroupMessageElement {
+            entry: group_message_data,
+            signed_header: header,
+        };
+
+        group_messages_contents.insert(
+            message_hash.clone().to_string(),
+            GroupMessageContent {
+                group_message_element,
+                read_list: read_list.clone(),
+            },
+        );
+        read_list.clear();
+
         messages_hashes.push(message_hash);
     }
 

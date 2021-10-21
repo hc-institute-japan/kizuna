@@ -136,10 +136,13 @@ export const fetchUsernameOfMembers = async (
   });
 
   if (undefinedProfiles?.length) {
+    const undefinedProfilesB64 = undefinedProfiles.map((undefinedProfile) =>
+      serializeHash(undefinedProfile)
+    );
     const res = await callZome({
       zomeName: ZOMES.PROFILES,
       fnName: FUNCTIONS[ZOMES.PROFILES].GET_AGENTS_PROFILES,
-      payload: undefinedProfiles,
+      payload: undefinedProfilesB64,
     });
     res.forEach((agentProfile: AgentProfile) => {
       let id = agentProfile.agent_pub_key;
