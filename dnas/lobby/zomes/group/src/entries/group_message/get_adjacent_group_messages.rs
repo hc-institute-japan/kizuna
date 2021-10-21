@@ -57,7 +57,7 @@ pub fn get_adjacent_group_messages_handler(
       for the group messages linked to a specific path constructed above in the first call
       and link.timestamp > filter.message_timestamp in the second call to collect_message_info()
     */
-    collect_messages_info(
+    collect_and_insert_messages(
         &mut previous_linked_messages,
         filter.batch_size.clone().into(),
         &mut previous_messages_hashes,
@@ -65,7 +65,7 @@ pub fn get_adjacent_group_messages_handler(
         Direction::Previous,
     )?;
 
-    collect_messages_info(
+    collect_and_insert_messages(
         &mut subsequent_linked_messages,
         filter.batch_size.clone().into(),
         &mut subsequent_messages_hashes,
@@ -98,7 +98,7 @@ pub fn get_adjacent_group_messages_handler(
             previous_linked_messages =
                 get_linked_messages_from_path(path_hash, file_types::PayloadType::All, None, None)?;
 
-            collect_messages_info(
+            collect_and_insert_messages(
                 &mut previous_linked_messages,
                 filter.batch_size.clone().into(),
                 &mut previous_messages_hashes,
@@ -130,7 +130,7 @@ pub fn get_adjacent_group_messages_handler(
             subsequent_linked_messages =
                 get_linked_messages_from_path(path_hash, file_types::PayloadType::All, None, None)?;
 
-            collect_messages_info(
+            collect_and_insert_messages(
                 &mut subsequent_linked_messages,
                 filter.batch_size.clone().into(),
                 &mut subsequent_messages_hashes,

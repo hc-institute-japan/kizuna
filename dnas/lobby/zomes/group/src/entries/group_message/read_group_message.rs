@@ -40,7 +40,7 @@ pub fn read_group_message_handler(
         // link GroupMessage -> AgentPubKey to indicate that it is read
         // with ChainTopOrdering::Relaxed because order doesn't matter
         // only create link if the message entry was retrieved
-        if let Some(e) = message_entry {
+        if let Some(_) = message_entry {
             host_call::<CreateLinkInput, HeaderHash>(
                 __create_link,
                 CreateLinkInput::new(
