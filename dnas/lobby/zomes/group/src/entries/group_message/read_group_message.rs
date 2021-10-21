@@ -7,6 +7,7 @@ pub fn read_group_message_handler(
     group_message_read_data: GroupMessageReadData,
 ) -> ExternResult<GroupMessageReadData> {
     // We immediately send a signal for immediate feedback for other agents.
+    // TODO: move this to post commit
     let signal_detail = SignalDetails {
         name: SignalName::GROUP_MESSAGE_READ.to_owned(),
         payload: SignalPayload::GroupMessageRead(group_message_read_data.clone()),
@@ -27,25 +28,29 @@ pub fn read_group_message_handler(
         we wait here until the entry can be retrieved even before the create_link() is executed.
         https://forum.holochain.org/t/problem-that-may-occur-when-creating-a-link-between-two-entries-when-the-said-entries-are-literally-just-created-in-the-dht/6316/3
         TODO: use https://docs.rs/hdk/0.0.100/hdk/time/fn.sleep.html to lessen burden.
-        TODO: refactor the flow of creating a link from an EntryHash received from the signal as
-        the receiver of signal has no guarantee that the sender of signal succefully created the entry
         */
         let mut message_entry: Option<Element> = None;
-        while let None = message_entry {
+        let mut n = 0;
+        // only try to get the message entry fixed number of times
+        while n < 5 {
             let options = GetOptions::content();
             message_entry = get(message_entry_hash.clone(), options)?;
+            n += 1
         }
         // link GroupMessage -> AgentPubKey to indicate that it is read
         // with ChainTopOrdering::Relaxed because order doesn't matter
-        host_call::<CreateLinkInput, HeaderHash>(
-            __create_link,
-            CreateLinkInput::new(
-                message_entry_hash,
-                my_agent_pubkey.clone().into(),
-                LinkTag::new("read".to_owned()),
-                ChainTopOrdering::Relaxed,
-            ),
-        )?;
+        // only create link if the message entry was retrieved
+        if let Some(e) = message_entry {
+            host_call::<CreateLinkInput, HeaderHash>(
+                __create_link,
+                CreateLinkInput::new(
+                    message_entry_hash,
+                    my_agent_pubkey.clone().into(),
+                    LinkTag::new("read".to_owned()),
+                    ChainTopOrdering::Relaxed,
+                ),
+            )?;
+        }
     }
 
     Ok(group_message_read_data)
