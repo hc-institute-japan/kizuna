@@ -170,11 +170,7 @@ const setGroupMessage = async (
 
 const sendGroupMessage =
   (groupMessageData: GroupMessageInput): ThunkAction =>
-  async (
-    dispatch,
-    getState,
-    { callZome, retry }
-  ): Promise<GroupMessage | false> => {
+  async (dispatch, getState, { callZome, retry }) => {
     if (isTextPayload(groupMessageData.payloadInput)) {
       let message = groupMessageData.payloadInput.payload.payload;
       /* input sanitization for text payload */
@@ -206,50 +202,63 @@ const sendGroupMessage =
       );
       // return false;
     } catch (e) {
-      if (e.message.includes("failed to get the given group id")) {
-        dispatch(
-          pushError(
-            "TOAST",
-            {},
-            {
-              id: "redux.err.group.send-group-message.1",
-              value: {
-                payload: isTextPayload(groupMessageData.payloadInput)
-                  ? groupMessageData.payloadInput.payload
-                  : groupMessageData.payloadInput.payload.metadata.fileName,
-              },
-            }
-          )
-        );
-      } else {
-        try {
-          if (!e.message.includes("Timed out")) {
-            const sendGroupMessageOutput = retry({
-              zomeName: ZOMES.GROUP,
-              fnName: FUNCTIONS[ZOMES.GROUP].SEND_MESSAGE,
-              payload: input,
-            });
-            return await setGroupMessage(
-              sendGroupMessageOutput,
-              groupMessageData,
-              callZome,
-              getState,
-              dispatch
-            );
-          }
-          return false;
-        } catch (e) {
-          /* 
-            This is the error other than what we defiend in Guest.
-            See connection/holochainClient.ts callZome() for more info.
-          */
-          console.log("sending of group message has failed", e);
-          return false;
-          // dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
+      try {
+        if (!e.message.includes("Timed out")) {
+          const sendGroupMessageOutput = retry({
+            zomeName: ZOMES.GROUP,
+            fnName: FUNCTIONS[ZOMES.GROUP].SEND_MESSAGE,
+            payload: input,
+          });
+          return await setGroupMessage(
+            sendGroupMessageOutput,
+            groupMessageData,
+            callZome,
+            getState,
+            dispatch
+          );
+        } else {
+          return dispatch(
+            pushError("TOAST", {}, { id: "redux.err.conductor-time-out" })
+          );
         }
+      } catch (e) {
+        handleError(e, dispatch, groupMessageData);
+        console.log("sending of group message has failed", e);
+        return false;
       }
     }
-    return false;
   };
+
+const handleError = (
+  e: any,
+  dispatch: any,
+  groupMessageData: GroupMessageInput
+) => {
+  switch (true) {
+    case e.message.includes("failed to get the given group id"):
+      dispatch(
+        pushError(
+          "TOAST",
+          {},
+          {
+            id: "redux.err.group.send-group-message.1",
+            value: {
+              payload: isTextPayload(groupMessageData.payloadInput)
+                ? groupMessageData.payloadInput.payload
+                : groupMessageData.payloadInput.payload.metadata.fileName,
+            },
+          }
+        )
+      );
+      break;
+    case e.message.includes("failed to get the replied message from DHT"):
+      dispatch(
+        pushError("TOAST", {}, { id: "redux.err.group.send-group-message.2" })
+      );
+      break;
+    default:
+      break;
+  }
+};
 
 export default sendGroupMessage;

@@ -111,7 +111,7 @@ const GroupChat: React.FC = () => {
 
     if (text) {
       dispatch(sendGroupMessage(text)).then((res: any) => {
-        if (!res) dispatch(setErrGroupMessage(text!));
+        if (res === false) dispatch(setErrGroupMessage(text!));
         if (file) {
           dispatch(sendGroupMessage(file)).then((res: any) => {
             if (!res) dispatch(setErrGroupMessage(file!));
