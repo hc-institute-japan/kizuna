@@ -10,8 +10,6 @@ pub fn get_adjacent_group_messages_handler(
 ) -> ExternResult<GroupMessagesOutput> {
     // We need the previous and subsequent vec for counting of batch size
     let mut messages_hashes: Vec<EntryHash> = Vec::new();
-    let mut subsequent_messages_hashes: Vec<EntryHash> = Vec::new();
-    let mut previous_messages_hashes: Vec<EntryHash> = Vec::new();
     let mut messages_by_group: HashMap<String, Vec<EntryHash>> = HashMap::new();
     let mut group_messages_contents: HashMap<String, GroupMessageContent> = HashMap::new();
 
@@ -25,7 +23,7 @@ pub fn get_adjacent_group_messages_handler(
         path_from_str(&[filter.group_id.clone().to_string(), days].join(".")).hash()?;
 
     // targets are group message entryhash
-    let mut linked_messages = get_linked_messages_from_path(
+    let mut linked_messages = get_linked_messages_hash(
         pivot_path_hash.clone(),
         file_types::PayloadType::All,
         None,
@@ -52,34 +50,13 @@ pub fn get_adjacent_group_messages_handler(
             .for_each(|link| subsequent_linked_messages.push(link));
     }
 
-    /*
-      collect message info for links where link.timestamp < filter.message_timestamp
-      for the group messages linked to a specific path constructed above in the first call
-      and link.timestamp > filter.message_timestamp in the second call to collect_message_info()
-    */
-    collect_and_insert_messages(
-        &mut previous_linked_messages,
-        filter.batch_size.clone().into(),
-        &mut previous_messages_hashes,
-        &mut group_messages_contents,
-        Direction::Previous,
-    )?;
-
-    collect_and_insert_messages(
-        &mut subsequent_linked_messages,
-        filter.batch_size.clone().into(),
-        &mut subsequent_messages_hashes,
-        &mut group_messages_contents,
-        Direction::Subsequent,
-    )?;
-
     // construct the group id path which has all the unix timestamp paths as children
     let group_path = path_from_str(&filter.group_id.to_string());
     // This is so that we don't get the children paths just in case it is gathered in the first loop
     let mut maybe_children_paths: Option<Vec<Link>> = None;
 
     // check if we gathered enough previous messages and if not collect more
-    if previous_messages_hashes.len() < filter.batch_size.into() {
+    if previous_linked_messages.len() < filter.batch_size.into() {
         let mut children_paths = group_path.children()?.into_inner();
         // for later use in the subsequent loop
         maybe_children_paths = Some(children_paths.clone());
@@ -92,24 +69,17 @@ pub fn get_adjacent_group_messages_handler(
         )?;
 
         while !children_paths.is_empty()
-            && previous_messages_hashes.len() < filter.batch_size.clone().into()
+            && previous_linked_messages.len() < filter.batch_size.clone().into()
         {
             let path_hash: EntryHash = children_paths.pop().unwrap().target; // unwrap is safe here (checked that the vector wasnt empty before this)
-            previous_linked_messages =
-                get_linked_messages_from_path(path_hash, file_types::PayloadType::All, None, None)?;
-
-            collect_and_insert_messages(
-                &mut previous_linked_messages,
-                filter.batch_size.clone().into(),
-                &mut previous_messages_hashes,
-                &mut group_messages_contents,
-                Direction::Previous,
-            )?;
+            let mut new_links =
+                get_linked_messages_hash(path_hash, file_types::PayloadType::All, None, None)?;
+            previous_linked_messages.append(&mut new_links);
         }
     }
 
-    // check if we gathered enough subsequent messages and if not collect more
-    if subsequent_messages_hashes.len() < filter.batch_size.into() {
+    // check if we gathered enough subsequent linked messages and if not collect more
+    if subsequent_linked_messages.len() < filter.batch_size.into() {
         let mut children_paths: Vec<Link>;
         if let Some(links) = maybe_children_paths {
             children_paths = links;
@@ -124,24 +94,32 @@ pub fn get_adjacent_group_messages_handler(
         )?;
 
         while !children_paths.is_empty()
-            && previous_messages_hashes.len() < filter.batch_size.clone().into()
+            && subsequent_linked_messages.len() < filter.batch_size.clone().into()
         {
             let path_hash: EntryHash = children_paths.pop().unwrap().target; // unwrap is safe here (checked that the vector wasnt empty before this)
-            subsequent_linked_messages =
-                get_linked_messages_from_path(path_hash, file_types::PayloadType::All, None, None)?;
-
-            collect_and_insert_messages(
-                &mut subsequent_linked_messages,
-                filter.batch_size.clone().into(),
-                &mut subsequent_messages_hashes,
-                &mut group_messages_contents,
-                Direction::Subsequent,
-            )?;
+            let mut new_links =
+                get_linked_messages_hash(path_hash, file_types::PayloadType::All, None, None)?;
+            subsequent_linked_messages.append(&mut new_links)
         }
     }
 
-    messages_hashes.append(&mut previous_messages_hashes);
-    messages_hashes.append(&mut subsequent_messages_hashes);
+    // truncate any excess number of links we retrieved
+    previous_linked_messages.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
+    subsequent_linked_messages.sort_by(|a, b| a.timestamp.cmp(&b.timestamp));
+    previous_linked_messages.truncate(filter.batch_size.into());
+    subsequent_linked_messages.truncate(filter.batch_size.into());
+    subsequent_linked_messages.append(&mut previous_linked_messages);
+    linked_messages = subsequent_linked_messages;
+
+    // finally retrieve the messages from all links gathered
+    collect_and_insert_messages(
+        linked_messages,
+        &mut messages_hashes,
+        &mut group_messages_contents,
+    )?;
+
+    // and the read_list
+    collect_and_insert_read_list(&mut group_messages_contents)?;
 
     messages_by_group.insert(filter.group_id.to_string(), messages_hashes);
 
