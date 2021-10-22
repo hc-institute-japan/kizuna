@@ -118,6 +118,7 @@
   "redux.err.group.create-group.3": "Oops, you cannot create groups including yourself as a member",
   "redux.err.group.create-group.4": "Oops, group name must be at least more than 1 and less than 50 characters",
   "redux.err.group.get-latest-group-version.1": "Sorry, failed to get the latest version of the group",
+  "redux.err.group.pin-message": "Sorry, failed to pin the message. Please try again shortly.",
   "redux.err.group.remove-members.1": "Oops, you tried to remove members without providing who should be removed",
   "redux.err.group.remove-members.2": "Sorry, member/s were not removed due to failure in getting group id",
   "redux.err.group.remove-members.3": "Oops, a group must at leaset have 3 members",

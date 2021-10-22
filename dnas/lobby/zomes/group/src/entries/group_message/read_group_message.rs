@@ -32,7 +32,7 @@ pub fn read_group_message_handler(
         let mut message_element: Option<Element> = None;
         let mut n = 0;
         // only try to get the message entry fixed number of times
-        while n < 5 {
+        while n < 3 && message_element == None {
             let options = GetOptions::content();
             message_element = get(message_entry_hash.clone(), options)?;
             n += 1

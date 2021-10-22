@@ -116,6 +116,7 @@
   "redux.err.group.create-group.3": "自分をメンバーに加えることはできません",
   "redux.err.group.create-group.4": "グループ名は最低１文字最大５０文字です",
   "redux.err.group.get-latest-group-version.1": "グループの最新情報の取得に失敗しました",
+  "redux.err.group.pin-message": "ピン留めに失敗しました。再度お試しください",
   "redux.err.group.remove-members.1": "おっと, 削除するメンバーを指定せずにメンバー削除をしようとしています",
   "redux.err.group.remove-members.2": "グループIDの取得に失敗したため、メンバーの削除に失敗しました",
   "redux.err.group.remove-members.3": "グループメンバーは最低3人必要です",
