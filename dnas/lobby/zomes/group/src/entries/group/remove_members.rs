@@ -57,7 +57,7 @@ pub fn remove_members_handler(
     let get_links_output = HDK
         .with(|h| h.borrow().get_links(get_links_input))?
         .into_iter()
-        .map(|links| links.into_inner())
+        // .map(|links| links.into_inner())
         .flatten()
         .collect::<Vec<Link>>();
 

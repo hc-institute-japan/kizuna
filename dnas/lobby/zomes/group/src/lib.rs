@@ -61,7 +61,7 @@ pub fn init(_: ()) -> ExternResult<InitCallbackResult> {
     // TODO: name may be changed to better suit the context of cap grant.s
     let tag: String = "group_zome_cap_grant".into();
     let access: CapAccess = CapAccess::Unrestricted;
-    let zome_name: ZomeName = zome_info()?.zome_name;
+    let zome_name: ZomeName = zome_info()?.name;
 
     fuctions.insert((zome_name.clone(), FunctionName("recv_remote_signal".into())));
 

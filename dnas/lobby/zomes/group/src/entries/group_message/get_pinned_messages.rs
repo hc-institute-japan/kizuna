@@ -10,7 +10,8 @@ pub fn get_pinned_messages_handler(
     let mut pin_contents: HashMap<String, GroupMessageElement> = HashMap::new();
 
     // the target of the link being the group message
-    let links = get_links(group_hash, Some(LinkTag::new("pinned".to_owned())))?.into_inner();
+    // let links = get_links(group_hash, Some(LinkTag::new("pinned".to_owned())))?.into_inner();
+    let links = get_links(group_hash, Some(LinkTag::new("pinned".to_owned())))?;
 
     for link in links {
         // We try to hit the cache with content() before reaching the network

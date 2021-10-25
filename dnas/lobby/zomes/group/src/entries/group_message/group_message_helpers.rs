@@ -26,16 +26,20 @@ pub fn get_linked_messages_hash(
 
     match payload_type {
         PayloadType::Text => {
-            linked_messages = get_links(path_hash, Some(LinkTag::new("text")))?.into_inner();
+            // linked_messages = get_links(path_hash, Some(LinkTag::new("text")))?.into_inner();
+            linked_messages = get_links(path_hash, Some(LinkTag::new("text")))?;
         }
         PayloadType::File => {
-            linked_messages = get_links(path_hash, Some(LinkTag::new("file")))?.into_inner();
+            // linked_messages = get_links(path_hash, Some(LinkTag::new("file")))?.into_inner();
+            linked_messages = get_links(path_hash, Some(LinkTag::new("file")))?;
         }
         PayloadType::Media => {
-            linked_messages = get_links(path_hash, Some(LinkTag::new("media")))?.into_inner();
+            // linked_messages = get_links(path_hash, Some(LinkTag::new("media")))?.into_inner();
+            linked_messages = get_links(path_hash, Some(LinkTag::new("media")))?;
         }
         PayloadType::All => {
-            linked_messages = get_links(path_hash, None)?.into_inner();
+            // linked_messages = get_links(path_hash, None)?.into_inner();
+            linked_messages = get_links(path_hash, None)?;
         }
     }
 
@@ -162,7 +166,7 @@ pub fn collect_and_insert_read_list(
     let read_links = HDK.with(|h| h.borrow().get_links(get_input_message_hashes))?;
     let read_links_with_message_hash = read_links
         .into_iter()
-        .map(|links| links.into_inner())
+        // .map(|links| links.into_inner())
         .zip(message_hashes);
 
     for (links_vec, message_hash) in read_links_with_message_hash {
