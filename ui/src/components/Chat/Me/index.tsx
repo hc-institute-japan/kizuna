@@ -1,4 +1,10 @@
-import { IonIcon, IonItem, IonText, useIonPopover } from "@ionic/react";
+import {
+  IonIcon,
+  IonItem,
+  IonText,
+  isPlatform,
+  useIonPopover,
+} from "@ionic/react";
 import {
   alertCircleOutline,
   checkmarkCircleOutline,
@@ -67,11 +73,17 @@ const Me: React.FC<ChatProps> = ({
   const isText = isTextPayload(payload);
   const isP2P = type === "p2p";
 
+  const fileMaxWidth = isText
+    ? ""
+    : isPlatform("desktop")
+    ? common["max-file"]
+    : "";
+
   return (
     <>
-      <IonItem
-        lines="none"
-        className={`${common["me-container"]}`}
+      <div
+        // lines="none"
+        className={`${common["me-container"]} ${fileMaxWidth}`}
         {...pressHandlers}
         onClick={(e: any) => (err ? onLongPress(e) : null)}
       >
@@ -127,7 +139,7 @@ const Me: React.FC<ChatProps> = ({
             ) : null}
           </div>
         )}
-      </IonItem>
+      </div>
       {err ? (
         loading ? null : (
           <IonItem lines="none" className={styles["not-delivered-container"]}>

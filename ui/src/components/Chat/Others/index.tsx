@@ -1,4 +1,4 @@
-import { IonItem, IonText, useIonPopover } from "@ionic/react";
+import { IonItem, IonText, isPlatform, useIonPopover } from "@ionic/react";
 import { personCircleOutline } from "ionicons/icons";
 import React from "react";
 import { useIntl } from "react-intl";
@@ -53,6 +53,11 @@ const Others: React.FC<ChatProps> = ({
 
   const isText = isTextPayload(payload);
   const isP2P = type === "p2p";
+  const fileMaxWidth = isText
+    ? ""
+    : isPlatform("desktop")
+    ? common["max-file"]
+    : "";
 
   return (
     <>
@@ -62,9 +67,8 @@ const Others: React.FC<ChatProps> = ({
         </IonItem>
       ) : null}
 
-      <IonItem
-        lines="none"
-        className={`${common["others-container"]}`}
+      <div
+        className={`${common["others-container"]} ${fileMaxWidth}`}
         {...pressHandlers}
       >
         {isP2P ? null : (
@@ -98,7 +102,7 @@ const Others: React.FC<ChatProps> = ({
           )}
           <MessageTimestamp onSeen={onSeen} timestamp={timestamp} />
         </div>
-      </IonItem>
+      </div>
       {/* <ChatModal
         onPin={onPinMessage as () => any}
         isPinned={isPinned}
