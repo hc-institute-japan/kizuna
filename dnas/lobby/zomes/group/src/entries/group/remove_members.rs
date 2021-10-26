@@ -33,19 +33,37 @@ pub fn remove_members_handler(
 
     update_entry(group_revision_id, &updated_group)?;
 
-    // for all removed members we should delete the links between them and the group entry
-    for removed_member in members_to_remove {
-        // get links for each removed member
-        // TODO: see if looping through all links here is too much of an overload and change implementation if necessary.
-        let groups_linked: Vec<Link> =
-            get_links(removed_member.into(), Some(LinkTag::new("member")))?.into_inner();
+    // // for all removed members we should delete the links between them and the group entry
+    // for removed_member in members_to_remove {
+    //     // get links for each removed member
+    //     // TODO: see if looping through all links here is too much of an overload and change implementation if necessary.
+    //     let groups_linked: Vec<Link> =
+    //         get_links(removed_member.into(), Some(LinkTag::new("member")))?.into_inner();
 
-        // filter all the groups linked to this agent to get the link between this group(group_id) and the agent(AgentPubKey)
-        for link in groups_linked {
-            if link.target.eq(&group_id) {
-                // finally when we find the link we have to delete it -- delete_link(add_link_header: HeaderHash) -> HdkResult<HeaderHash>
-                delete_link(link.create_link_hash)?;
-            }
+    //     // filter all the groups linked to this agent to get the link between this group(group_id) and the agent(AgentPubKey)
+    //     for link in groups_linked {
+    //         if link.target.eq(&group_id) {
+    //             // finally when we find the link we have to delete it -- delete_link(add_link_header: HeaderHash) -> HdkResult<HeaderHash>
+    //             delete_link(link.create_link_hash)?;
+    //         }
+    //     }
+    // }
+
+    let get_links_input = members_to_remove
+        .into_iter()
+        .map(|member| GetLinksInput::new(member.into(), Some(LinkTag::new("member"))))
+        .collect();
+
+    let get_links_output = HDK
+        .with(|h| h.borrow().get_links(get_links_input))?
+        .into_iter()
+        .map(|links| links.into_inner())
+        .flatten()
+        .collect::<Vec<Link>>();
+
+    for link in get_links_output.into_iter() {
+        if link.target.eq(&group_id) {
+            delete_link(link.create_link_hash)?;
         }
     }
 

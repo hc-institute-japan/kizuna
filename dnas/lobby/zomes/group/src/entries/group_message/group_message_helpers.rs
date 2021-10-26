@@ -1,6 +1,7 @@
 use hdk::prelude::*;
 
-use crate::utils::{error, try_get_and_convert};
+use crate::utils::{error, try_from_element_with_header, try_get_and_convert};
+
 use file_types::PayloadType;
 use std::collections::hash_map::HashMap;
 
@@ -13,7 +14,7 @@ pub enum Direction {
     Subsequent,
 }
 
-pub fn get_linked_messages_from_path(
+pub fn get_linked_messages_hash(
     path_hash: EntryHash,
     payload_type: PayloadType,
     last_fetched: Option<EntryHash>,
@@ -66,82 +67,121 @@ pub fn get_linked_messages_from_path(
     return Ok(linked_messages);
 }
 
-pub fn collect_messages_info(
-    linked_messages: &mut Vec<Link>,
-    batch_size: usize,
+pub fn collect_and_insert_messages(
+    linked_messages: Vec<Link>,
     messages_hashes: &mut Vec<EntryHash>,
     group_messages_contents: &mut HashMap<String, GroupMessageContent>,
-    direction: Direction,
 ) -> ExternResult<()> {
-    let mut read_list: HashMap<String, Timestamp> = HashMap::new();
+    // collect values to fill the group_message_content.
+    // - message entry_hash (aka link target)
+    // - GroupMessageData (constructed from the element fetched from entry hash of the message )
 
-    while !linked_messages.is_empty() && messages_hashes.len() < batch_size {
-        let link: Link;
-        match direction {
-            Direction::Previous => link = linked_messages.pop().unwrap(),
-            Direction::Subsequent => link = linked_messages.remove(0),
+    let message_hashes: Vec<EntryHash> = linked_messages
+        .into_iter()
+        .map(|link| link.target)
+        .collect();
+    let get_input = message_hashes
+        .into_iter()
+        .map(|eh| GetInput::new(eh.clone().into(), GetOptions::content()))
+        .collect::<Vec<GetInput>>();
+
+    // TODO: add a debugger here to solve the "Entry Not Found" error
+    let get_output = HDK.with(|h| h.borrow().get(get_input))?;
+    let messages_with_header: Vec<(SignedHeaderHashed, GroupMessage)> = get_output
+        .into_iter()
+        .filter_map(|maybe_option| maybe_option)
+        .map(|e| match try_from_element_with_header::<GroupMessage>(e) {
+            Ok(res) => Some(res),
+            _ => None,
+        })
+        .filter_map(|maybe_message| maybe_message)
+        .collect();
+
+    for message_with_header in messages_with_header {
+        let message = message_with_header.1;
+        let signed_header = message_with_header.0;
+        let message_hash = signed_header.header().entry_hash().unwrap(); // safely unwraps as all headers here are of create variant
+        let mut group_message_data = GroupMessageData {
+            message_id: message_hash.clone(),
+            group_hash: message.group_hash.clone(),
+            sender: message.sender.clone(),
+            payload: message.payload.clone(),
+            created: message.created.clone(),
+            reply_to: None,
+        };
+
+        // TODO: refactor to be a multi get
+        if let Some(reply_to_hash) = message.reply_to.clone() {
+            let replied_message: GroupMessage =
+                try_get_and_convert(reply_to_hash.clone(), GetOptions::content())?;
+            group_message_data.reply_to = Some(GroupMessageWithId {
+                id: reply_to_hash,
+                content: replied_message,
+            });
         }
-        let message_hash = link.target;
 
-        if let Some(message_element) = get(message_hash.clone(), GetOptions::content())? {
-            // collect all the values to fill the group_message_content. these values are:
+        let group_message_element: GroupMessageElement = GroupMessageElement {
+            entry: group_message_data,
+            signed_header: signed_header.clone(),
+        };
 
-            // - the message entry_hash (aka the link target)
-            // - the GroupMessageData (constructed from the element fetched from entry hash of the message )
-            // - the read_list for that message ( got it from the links related to the message with the tag "read" )
+        group_messages_contents.insert(
+            message_hash.clone().to_string(),
+            GroupMessageContent {
+                group_message_element,
+                read_list: HashMap::new(), // read list will be collected in a separate helper
+            },
+        );
+        messages_hashes.push(message_hash.clone());
+    }
 
-            let read_links: Vec<Link> =
-                get_links(message_hash.clone(), Some(LinkTag::new("read")))?.into_inner();
+    Ok(())
+}
 
-            for link in read_links {
-                let reader: AgentPubKey = link.target.into();
-                read_list.insert(reader.to_string(), link.timestamp);
-            }
+pub fn collect_and_insert_read_list(
+    group_messages_contents: &mut HashMap<String, GroupMessageContent>,
+) -> ExternResult<()> {
+    let mut all_read_list: HashMap<String, HashMap<String, Timestamp>> = HashMap::new();
 
-            match message_element.entry().to_app_option::<GroupMessage>() {
-                Ok(option) => match option {
-                    Some(group_message) => {
-                        let mut group_message_data = GroupMessageData {
-                            message_id: message_hash.clone(),
-                            group_hash: group_message.group_hash.clone(),
-                            sender: group_message.sender.clone(),
-                            payload: group_message.payload.clone(),
-                            created: group_message.created.clone(),
-                            reply_to: None,
-                        };
+    let message_hashes = group_messages_contents
+        .values()
+        .map(|msg| msg.group_message_element.entry.message_id.clone())
+        .collect::<Vec<EntryHash>>();
 
-                        if let Some(reply_to_hash) = group_message.reply_to.clone() {
-                            let replied_message: GroupMessage =
-                                try_get_and_convert(reply_to_hash.clone(), GetOptions::content())?;
-                            group_message_data.reply_to = Some(GroupMessageWithId {
-                                id: reply_to_hash,
-                                content: replied_message,
-                            });
-                        }
+    // create input for getting the read links => input: Vec<(message_hash, "read")>
+    let get_input_message_hashes: Vec<GetLinksInput> = message_hashes
+        .clone()
+        .into_iter()
+        .map(|eh| {
+            all_read_list.insert(eh.clone().to_string(), HashMap::new());
+            GetLinksInput::new(eh.into(), Some(LinkTag::new("read".to_owned())))
+        })
+        .collect();
 
-                        let group_message_element: GroupMessageElement = GroupMessageElement {
-                            entry: group_message_data,
-                            signed_header: message_element.signed_header().to_owned(),
-                        };
+    // parallel get links for all message_hash
+    let read_links = HDK.with(|h| h.borrow().get_links(get_input_message_hashes))?;
+    let read_links_with_message_hash = read_links
+        .into_iter()
+        .map(|links| links.into_inner())
+        .zip(message_hashes);
 
-                        group_messages_contents.insert(
-                            message_hash.clone().to_string(),
-                            GroupMessageContent {
-                                group_message_element,
-                                read_list: read_list.clone(),
-                            },
-                        );
-
-                        read_list.clear();
-                    }
-                    None => {}
-                },
-                Err(_) => {
-                    return error("the group message ElementEntry enum is not of Present variant");
+    for (links_vec, message_hash) in read_links_with_message_hash {
+        match all_read_list.get_mut(&message_hash.to_string()) {
+            Some(hashmap) => {
+                for link in links_vec {
+                    hashmap.insert(link.target.to_string(), link.timestamp.to_owned());
                 }
+                ()
             }
+            None => (),
         }
-        messages_hashes.push(message_hash);
+    }
+
+    for (message_hash, read_list) in all_read_list {
+        match group_messages_contents.get_mut(&message_hash) {
+            Some(message) => message.read_list = read_list,
+            None => (),
+        }
     }
 
     Ok(())

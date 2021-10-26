@@ -75,7 +75,7 @@ const sendInitialGroupMessage =
       inputs.forEach(async (groupMessage) => {
         // res: boolean | group message res
         await dispatch(sendGroupMessage(groupMessage)).then((res: any) => {
-          !res
+          res === false
             ? dispatch(setErrGroupMessage(groupMessage))
             : messageResults.push(res);
         });

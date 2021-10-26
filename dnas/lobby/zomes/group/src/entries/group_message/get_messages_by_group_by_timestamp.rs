@@ -1,10 +1,9 @@
 use hdk::prelude::*;
 
-use element::ElementEntry;
 use std::collections::HashMap;
 use timestamp::Timestamp;
 
-use crate::utils::{error, timestamp_to_days, try_get_and_convert};
+use crate::utils::{timestamp_to_days, try_from_element, try_get_and_convert};
 
 use super::GroupMessageData;
 use super::{
@@ -24,7 +23,7 @@ pub fn get_messages_by_group_by_timestamp_handler(
         .to_string(),
     );
 
-    match get_links(
+    let message_links = get_links(
         path.hash()?,
         match group_chat_filter.payload_type {
             PayloadType::Text => Some(LinkTag::new("text".to_owned())),
@@ -32,96 +31,110 @@ pub fn get_messages_by_group_by_timestamp_handler(
             PayloadType::Media => Some(LinkTag::new("media".to_owned())),
             PayloadType::All => None,
         },
-    ) {
-        Ok(message_links) => {
-            let mut messages_by_group: HashMap<String, Vec<EntryHash>> = HashMap::new();
-            let mut group_messages_content: HashMap<String, GroupMessageContent> = HashMap::new();
-            let mut messages_hashes: Vec<EntryHash> = Vec::new();
-            let links = message_links.into_inner();
+    )?;
 
-            for i in 0..links.len() {
-                let message_link = links[i].clone();
-                let message_hash = message_link.target;
+    let mut messages_by_group: HashMap<String, Vec<EntryHash>> = HashMap::new();
+    let mut group_messages_content: HashMap<String, GroupMessageContent> = HashMap::new();
+    let mut messages_hashes: Vec<EntryHash> = Vec::new();
 
-                if let Some(element) = get(message_hash.clone(), GetOptions::content())? {
-                    let read_links =
-                        get_links(message_hash.clone(), Some(LinkTag::new("read".to_owned())))?;
-                    let mut read_list: HashMap<String, Timestamp> = HashMap::new();
+    let mut all_read_list: HashMap<String, HashMap<String, Timestamp>> = HashMap::new();
+    let mut read_message_hashes: Vec<EntryHash> = Vec::new();
 
-                    for j in 0..read_links.clone().into_inner().len() {
-                        let read_link = read_links.clone().into_inner()[j].clone();
+    let links = message_links.into_inner();
 
-                        if let Some(element) = get(read_link.target, GetOptions::default())? {
-                            if let ElementEntry::Present(entry) = element.into_inner().1 {
-                                if let Entry::Agent(agent_pubkey) = entry {
-                                    read_list.insert(agent_pubkey.to_string(), read_link.timestamp);
-                                };
-                            };
-                        };
-                    }
+    // create input for getting the messages => input: Vec<(message_hash, GetOptions)
+    let get_input = links
+        .clone()
+        .into_iter()
+        .map(|link| GetInput::new(link.target.into(), GetOptions::content()))
+        .collect();
 
-                    match element.entry().to_owned().to_app_option::<GroupMessage>() {
-                        Ok(option) => match option {
-                            Some(group_message) => {
-                                let mut group_message_data = GroupMessageData {
-                                    message_id: message_hash.clone(),
-                                    group_hash: group_message.group_hash.clone(),
-                                    sender: group_message.sender.clone(),
-                                    payload: group_message.payload.clone(),
-                                    created: group_message.created.clone(),
-                                    reply_to: None,
-                                };
+    // create input for getting the read links => input: Vec<(message_hash, "read")>
+    let get_input_message_hashes: Vec<GetLinksInput> = links
+        .clone()
+        .into_iter()
+        .map(|link| {
+            read_message_hashes.push(link.target.clone().into());
+            all_read_list.insert(link.target.clone().to_string(), HashMap::new());
+            GetLinksInput::new(link.target.into(), Some(LinkTag::new("read".to_owned())))
+        })
+        .collect();
 
-                                if let Some(reply_to_hash) = group_message.reply_to.clone() {
-                                    let replied_message: GroupMessage = try_get_and_convert(
-                                        reply_to_hash.clone(),
-                                        GetOptions::content(),
-                                    )?;
-                                    group_message_data.reply_to = Some(GroupMessageWithId {
-                                        id: reply_to_hash,
-                                        content: replied_message,
-                                    });
-                                }
+    // parallel get links for all message_hash
+    let read_links = HDK.with(|h| h.borrow().get_links(get_input_message_hashes))?;
+    let read_links_2 = read_links
+        .into_iter()
+        .map(|links| links.into_inner())
+        .zip(read_message_hashes);
 
-                                let group_message_element: GroupMessageElement =
-                                    GroupMessageElement {
-                                        entry: group_message_data,
-                                        signed_header: element.signed_header().to_owned(),
-                                    };
-
-                                group_messages_content.insert(
-                                    message_hash.clone().to_string(),
-                                    GroupMessageContent {
-                                        group_message_element,
-                                        read_list: read_list,
-                                    },
-                                );
-
-                                messages_hashes.push(message_hash.clone());
-                            }
-
-                            None => {}
-                        },
-
-                        Err(_) => {
-                            return error(
-                                "the group message ElementEntry enum is not of Present variant",
-                            );
-                        }
-                    }
-                };
+    for (links_vec, message_hash) in read_links_2 {
+        match all_read_list.get_mut(&message_hash.to_string()) {
+            Some(hashmap) => {
+                for link in links_vec {
+                    hashmap.insert(link.target.to_string(), link.timestamp.to_owned());
+                }
+                ()
             }
-
-            messages_by_group.insert(
-                group_chat_filter.clone().group_id.to_string(),
-                messages_hashes,
-            );
-
-            Ok(GroupMessagesOutput {
-                messages_by_group: messages_by_group,
-                group_messages_contents: group_messages_content,
-            })
+            None => (),
         }
-        Err(_) => error("Cannot get links on this path"),
     }
+
+    // parallel get messages
+    let get_output = HDK.with(|h| h.borrow().get(get_input))?;
+    let get_output_result: Vec<Element> = get_output
+        .into_iter()
+        .filter_map(|maybe_option| maybe_option)
+        .collect();
+
+    for element in get_output_result {
+        let group_message: GroupMessage = try_from_element(element.clone())?;
+
+        let message_hash = hash_entry(group_message.clone())?;
+
+        let mut group_message_data = GroupMessageData {
+            message_id: message_hash.clone(),
+            group_hash: group_message.group_hash.clone(),
+            sender: group_message.sender.clone(),
+            payload: group_message.payload.clone(),
+            created: group_message.created.clone(),
+            reply_to: None,
+        };
+
+        if let Some(reply_to_hash) = group_message.reply_to.clone() {
+            let replied_message: GroupMessage =
+                try_get_and_convert(reply_to_hash.clone(), GetOptions::content())?;
+            group_message_data.reply_to = Some(GroupMessageWithId {
+                id: reply_to_hash,
+                content: replied_message,
+            });
+        }
+
+        let group_message_element: GroupMessageElement = GroupMessageElement {
+            entry: group_message_data,
+            signed_header: element.signed_header().to_owned(),
+        };
+        group_messages_content.insert(
+            message_hash.clone().to_string(),
+            GroupMessageContent {
+                group_message_element,
+                // read_list: read_list,
+                read_list: match all_read_list.get(&message_hash.clone().to_string()) {
+                    Some(hashmap) => hashmap.to_owned(),
+                    None => HashMap::new(),
+                },
+            },
+        );
+
+        messages_hashes.push(message_hash.clone());
+    }
+
+    messages_by_group.insert(
+        group_chat_filter.clone().group_id.to_string(),
+        messages_hashes,
+    );
+
+    Ok(GroupMessagesOutput {
+        messages_by_group: messages_by_group,
+        group_messages_contents: group_messages_content,
+    })
 }

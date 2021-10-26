@@ -47,6 +47,28 @@ pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<Gr
         reply_to: message_input.reply_to.clone(),
     };
 
+    let mut replied_message_with_id: Option<GroupMessageWithId> = None;
+    if let Some(hash) = message_input.reply_to.clone() {
+        let mut n = 0;
+        let mut message_element: Option<Element> = None;
+        // try to retrieve the message being replied to before proceeding.
+        // return error if it can't be retrieved.
+        while n < 3 && message_element == None {
+            let options = GetOptions::content();
+            message_element = get(hash.clone(), options)?;
+            n += 1
+        }
+        if let Some(e) = message_element {
+            let replied_message = try_from_element(e)?;
+            replied_message_with_id = Some(GroupMessageWithId {
+                id: hash,
+                content: replied_message,
+            })
+        } else {
+            return error("failed to get the replied message from DHT");
+        }
+    }
+
     // commit GroupMessage entry
 
     // create_entry(&message)?;
@@ -64,21 +86,6 @@ pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<Gr
 
     let group_hash_timestamp_path_hash = path_from_str(&[group_hash, days].join(".")).hash()?;
 
-    // create_link(
-    //     group_hash_timestamp_path_hash,
-    //     hash_entry(&message)?,
-    //     LinkTag::new(match message.payload.clone() {
-    //         Payload::Text { payload: _ } => "text".to_owned(),
-    //         Payload::File {
-    //             metadata: _,
-    //             file_type,
-    //         } => match file_type {
-    //             FileType::Image { thumbnail: _ } => "media".to_owned(),
-    //             FileType::Video { thumbnail: _ } => "media".to_owned(),
-    //             FileType::Other => "file".to_owned(),
-    //         },
-    //     }),
-    // )?;
     host_call::<CreateLinkInput, HeaderHash>(
         __create_link,
         CreateLinkInput::new(
@@ -111,14 +118,7 @@ pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<Gr
         sender: message.sender.clone(),
         reply_to: None,
     };
-    if let Some(hash) = message_input.reply_to.clone() {
-        let replied_message: GroupMessage =
-            try_get_and_convert(hash.clone(), GetOptions::content())?;
-        group_message_data.reply_to = Some(GroupMessageWithId {
-            id: hash,
-            content: replied_message,
-        });
-    }
+    group_message_data.reply_to = replied_message_with_id;
 
     let group_message_with_id = GroupMessageWithId {
         id: message_hash,
