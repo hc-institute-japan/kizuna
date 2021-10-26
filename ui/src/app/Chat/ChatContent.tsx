@@ -267,14 +267,31 @@ const Chat: React.FC = () => {
       which emits a signal to the sender
       when the chat bubble comes into view
     */
+
+  const [messageReceipts, setMessageReceipts] = useState<P2PMessage[]>([]);
   const onSeenHandler = (messageBundle: {
     message: P2PMessage;
     receipt?: P2PMessageReceipt;
   }) => {
     if (messageBundle.receipt!.status !== "read" && readReceipt) {
-      dispatch(readMessage([messageBundle.message]));
+      // dispatch(readMessage([messageBundle.message]));
+      setMessageReceipts((currMessageReceipts) => [
+        ...currMessageReceipts,
+        messageBundle.message,
+      ]);
     }
   };
+
+  const receiptsTimeout = useRef<NodeJS.Timeout>();
+  useEffect(() => {
+    if (messageReceipts.length > 0) {
+      if (receiptsTimeout.current) clearTimeout(receiptsTimeout.current);
+      receiptsTimeout.current = setTimeout(() => {
+        dispatch(readMessage(messageReceipts));
+        setMessageReceipts([]);
+      }, 1000);
+    }
+  }, [messageReceipts]);
 
   /* 
     downloads a file when already in redux state
@@ -431,8 +448,8 @@ const Chat: React.FC = () => {
         showName={true}
         // TODO: enable once conductor can handle many call_remotes
         // or once we have a better implementation.
-        // onSeen={(complete) => onSeenHandler(messageBundle)}
-        onSeen={(complete) => {}}
+        onSeen={(complete) => onSeenHandler(messageBundle)}
+        // onSeen={(complete) => {}}
         onDownload={(file) => onDownloadHandler(file)}
         replyTo={replyToData ? replyToData : undefined}
         onReply={(message) => {
