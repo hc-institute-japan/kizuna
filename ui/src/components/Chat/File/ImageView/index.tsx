@@ -38,11 +38,11 @@ const Image: React.FC<Props> = ({ src, file, className, onDownload, err }) => {
         style={{ maxHeight }}
       >
         <IonImg
-          onIonImgDidLoad={() => {
+          onIonImgDidLoad={() =>
             setMaxHeight(
               `${container.current!.getBoundingClientRect().width * 1.25}px`
-            );
-          }}
+            )
+          }
           onClick={handleOnImageOnClick}
           src={src}
         />

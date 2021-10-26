@@ -84,8 +84,8 @@ const Me: React.FC<ChatProps> = ({
       <div
         // lines="none"
         className={`${common["me-container"]} ${fileMaxWidth}`}
-        {...pressHandlers}
         onClick={(e: any) => (err ? onLongPress(e) : null)}
+        {...pressHandlers}
       >
         <div
           className={`${common["me"]} ${common[isText ? "text" : "file"]} ${
