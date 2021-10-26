@@ -22,7 +22,6 @@ pub fn get_latest_messages_for_all_groups_handler(
     let agent_pub_key: AgentPubKey = agent_info()?.agent_latest_pubkey;
     let linked_groups_to_the_agent: Vec<EntryHash> =
         get_links(agent_pub_key.into(), Some(LinkTag::new("member")))?
-            // .into_inner()
             .into_iter()
             .map(|link_to_group| -> EntryHash { link_to_group.target })
             .collect();

@@ -57,7 +57,6 @@ pub fn get_adjacent_group_messages_handler(
 
     // check if we gathered enough previous messages and if not collect more
     if previous_linked_messages.len() < filter.batch_size.into() {
-        // let mut children_paths = group_path.children()?.into_inner();
         let mut children_paths = group_path.children()?;
         // for later use in the subsequent loop
         maybe_children_paths = Some(children_paths.clone());
@@ -85,7 +84,6 @@ pub fn get_adjacent_group_messages_handler(
         if let Some(links) = maybe_children_paths {
             children_paths = links;
         } else {
-            // children_paths = group_path.children()?.into_inner();
             children_paths = group_path.children()?;
         }
         // remove the paths that are older than the pivot path

@@ -6,7 +6,6 @@ pub fn unpin_message_handler(pin_detail: PinDetail) -> ExternResult<()> {
         pin_detail.group_hash.clone(),
         Some(LinkTag::new("pinned".to_owned())),
     )?;
-    // .into_inner();
 
     let unpin_message_link_index = links
         .clone()

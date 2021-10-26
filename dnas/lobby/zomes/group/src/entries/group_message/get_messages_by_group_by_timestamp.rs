@@ -40,7 +40,6 @@ pub fn get_messages_by_group_by_timestamp_handler(
     let mut all_read_list: HashMap<String, HashMap<String, Timestamp>> = HashMap::new();
     let mut read_message_hashes: Vec<EntryHash> = Vec::new();
 
-    // let links = message_links.into_inner();
     let links = message_links;
 
     // create input for getting the messages => input: Vec<(message_hash, GetOptions)
@@ -63,10 +62,7 @@ pub fn get_messages_by_group_by_timestamp_handler(
 
     // parallel get links for all message_hash
     let read_links = HDK.with(|h| h.borrow().get_links(get_input_message_hashes))?;
-    let read_links_2 = read_links
-        .into_iter()
-        // .map(|links| links.into_inner())
-        .zip(read_message_hashes);
+    let read_links_2 = read_links.into_iter().zip(read_message_hashes);
 
     for (links_vec, message_hash) in read_links_2 {
         match all_read_list.get_mut(&message_hash.to_string()) {
