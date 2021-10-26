@@ -92,6 +92,9 @@ fn recv_remote_signal(signal: ExternIO) -> ExternResult<()> {
         SignalPayload::GroupMessageData(_) => {
             emit_signal(&signal_detail)?;
         }
+        SignalPayload::PinMessageData(_) => {
+            emit_signal(&signal_detail)?;
+        }
     }
     Ok(())
 }

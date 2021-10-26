@@ -24,7 +24,6 @@ export const pinMessage =
       };
 
       const conversation = conversations[groupId];
-      // if (!message.replyTo) delete message["replyTo"];
       pinnedMessages[groupMessageId] = message;
       if (conversation.pinnedMessages)
         conversation.pinnedMessages!.push(groupMessageId);
