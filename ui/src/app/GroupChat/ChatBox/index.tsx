@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 // Components
 import Chat from "../../../components/Chat";
@@ -58,12 +58,15 @@ const ChatBox: React.FC<Props> = ({
   const membersProfile = useSelector(
     (state: RootState) => state.groups.members
   );
+  const profile = useSelector((state: RootState) => state.profile);
 
   /* LOCAL STATE */
   const [messages, setMessages] = useState<GroupMessageBundle[]>([]);
+  const [messagesReceipt, setMessagesReceipt] = useState<string[]>([]);
   const [oldestFetched, setOldestFetched] = useState<boolean>(false);
 
-  const profile = useSelector((state: RootState) => state.profile);
+  /* REFs */
+  const receiptsTimeout = useRef<NodeJS.Timeout>();
 
   /* Handlers */
   const handleOnScrollTop = (complete: any) => {
@@ -119,16 +122,8 @@ const ChatBox: React.FC<Props> = ({
       const read: boolean = Object.keys(message.readList).includes(profile.id!);
 
       if (!read) {
-        const groupMessageReadData: GroupMessageReadData = {
-          groupId: groupId,
-          messageIds: [message.groupMessageId],
-          reader: profile.id!,
-          timestamp: message.timestamp,
-          members,
-        };
-        dispatch(readGroupMessage(groupMessageReadData)).then((res: any) => {
-          complete();
-        });
+        setMessagesReceipt([...messagesReceipt, message.groupMessageId]);
+        complete();
       }
     }
   };
@@ -194,6 +189,25 @@ const ChatBox: React.FC<Props> = ({
     setMessages(messages);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messageIds, stateMessages, groupErrMessages]);
+
+  // debounce and read messages
+  useEffect(() => {
+    if (messagesReceipt.length > 0) {
+      if (receiptsTimeout.current) clearTimeout(receiptsTimeout.current);
+      receiptsTimeout.current = setTimeout(() => {
+        const groupMessageReadData: GroupMessageReadData = {
+          groupId: groupId,
+          messageIds: messagesReceipt,
+          reader: profile.id!,
+          timestamp: new Date(),
+          members,
+        };
+        dispatch(readGroupMessage(groupMessageReadData)).then((res: any) => {
+          setMessagesReceipt([]);
+        });
+      }, 1000);
+    }
+  }, [messagesReceipt]);
 
   return (
     <>
