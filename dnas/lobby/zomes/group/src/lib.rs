@@ -31,6 +31,7 @@ use group_message::{
     get_previous_group_messages::get_previous_group_messages_handler,
     get_subsequent_group_messages::get_subsequent_group_messages_handler,
     indicate_group_typing::indicate_group_typing_handler, pin_message::pin_message_handler,
+    post_commit::group_message_post_commit::group_message_post_commit,
     read_group_message::read_group_message_handler, send_message::send_message_handler,
     send_message_in_target_date::send_message_in_target_date_handler,
     unpin_message::unpin_message_handler,
@@ -94,6 +95,29 @@ fn recv_remote_signal(signal: ExternIO) -> ExternResult<()> {
         }
     }
     Ok(())
+}
+
+#[hdk_extern]
+fn post_commit(signed_headers: Vec<SignedHeaderHashed>) -> ExternResult<PostCommitCallbackResult> {
+    let headers = signed_headers
+        .into_iter()
+        .map(|sh| sh.header().to_owned())
+        .collect::<Vec<Header>>();
+    for header in headers {
+        match header {
+            Header::Create(create) => match create.clone().entry_type {
+                EntryType::App(app_entry_type) => match app_entry_type.id() {
+                    // group message
+                    EntryDefIndex(2) => group_message_post_commit(create)?,
+                    _ => (),
+                },
+                _ => (),
+            },
+            _ => (),
+        }
+    }
+
+    Ok(PostCommitCallbackResult::Success)
 }
 
 // Group CRUD
