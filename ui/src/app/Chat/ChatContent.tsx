@@ -369,13 +369,14 @@ const Chat: React.FC = () => {
         }
       : null;
 
-    const timestamp = !messageBundle.message.err
-      ? messageBundle.receipt!.timestamp
-      : messageBundle.message.timestamp;
+    const timestamp =
+      !messageBundle.message.err && messageBundle.receipt
+        ? messageBundle.receipt!.timestamp
+        : messageBundle.message.timestamp;
 
     const readlist = messageBundle.message.err
       ? undefined
-      : messageBundle.receipt!.status === "read"
+      : messageBundle.receipt && messageBundle.receipt!.status === "read"
       ? { key: timestamp }
       : undefined;
 
@@ -431,8 +432,8 @@ const Chat: React.FC = () => {
         showName={true}
         // TODO: enable once conductor can handle many call_remotes
         // or once we have a better implementation.
-        // onSeen={(complete) => onSeenHandler(messageBundle)}
-        onSeen={(complete) => {}}
+        onSeen={(complete) => onSeenHandler(messageBundle)}
+        // onSeen={(complete) => {}}
         onDownload={(file) => onDownloadHandler(file)}
         replyTo={replyToData ? replyToData : undefined}
         onReply={(message) => {
