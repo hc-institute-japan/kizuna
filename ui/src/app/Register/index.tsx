@@ -9,7 +9,7 @@ import {
   IonPage,
   IonToolbar,
 } from "@ionic/react";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useIntl } from "react-intl";
 import HomeInput from "../../components/Input/HomeInput";
 import { createProfile } from "../../redux/profile/actions";
@@ -39,7 +39,6 @@ const Register: React.FC = () => {
 
   const handleOnSubmit = () => {
     setLoading(true);
-    console.log(nickname);
     dispatch(createProfile(nickname)).then((res: any) => {
       if (!res) setLoading(false);
     });

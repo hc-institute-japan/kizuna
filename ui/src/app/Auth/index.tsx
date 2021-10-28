@@ -20,7 +20,6 @@ const Auth: React.FC = () => {
 
   useEffect(() => {
     dispatch(getMyProfile()).then((bool: boolean) => {
-      console.log(bool);
       if (!bool) setErr(true);
       setLoading(false);
     });
