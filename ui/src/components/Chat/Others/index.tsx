@@ -67,7 +67,8 @@ const Others: React.FC<ChatProps> = ({
         </IonItem>
       ) : null}
 
-      <div
+      <IonItem
+        lines="none"
         className={`${common["others-container"]} ${fileMaxWidth}`}
         {...pressHandlers}
       >
@@ -102,7 +103,7 @@ const Others: React.FC<ChatProps> = ({
           )}
           <MessageTimestamp onSeen={onSeen} timestamp={timestamp} />
         </div>
-      </div>
+      </IonItem>
       {/* <ChatModal
         onPin={onPinMessage as () => any}
         isPinned={isPinned}

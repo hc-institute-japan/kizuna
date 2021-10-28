@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 // Components
 import Chat from "../../../components/Chat";
@@ -68,7 +68,8 @@ const ChatBox: React.FC<Props> = ({
   /* Handlers */
   const handleOnScrollTop = (complete: any) => {
     const lastMessage = messages[0];
-    if (!oldestFetched && !lastMessage.err) {
+
+    if (!oldestFetched && lastMessage && !lastMessage.err) {
       dispatch(
         getPreviousGroupMessages({
           groupId: groupId,
@@ -83,10 +84,10 @@ const ChatBox: React.FC<Props> = ({
         if (res && Object.keys(res.groupMessagesContents).length <= 0) {
           setOldestFetched(true);
         }
-        return complete();
+        complete();
       });
     }
-    return complete();
+    complete();
   };
 
   const handleOnDownload = (file: FilePayload) => {
@@ -114,11 +115,35 @@ const ChatBox: React.FC<Props> = ({
     }
   };
 
+  const [readData, setReadData] = useState<GroupMessageReadData[]>([]);
+
+  const receiptsTimeout = useRef<NodeJS.Timeout>();
+  useEffect(() => {
+    if (readData.length > 0) {
+      if (receiptsTimeout.current) clearTimeout(receiptsTimeout.current);
+      receiptsTimeout.current = setTimeout(() => {
+        const first = readData[0];
+        const readListData: GroupMessageReadData = {
+          ...first,
+          messageIds: readData.map((item) => item.messageIds).flat(),
+        };
+        dispatch(readGroupMessage(readListData));
+        console.log(readListData.messageIds);
+        setReadData([]);
+      }, 1500);
+    }
+  }, [readData]);
+
   const handleOnSeen = (complete: () => any, message: any) => {
     if (readReceipt) {
       const read: boolean = Object.keys(message.readList).includes(profile.id!);
 
       if (!read) {
+        // setReadData((currReadData) => ({
+        //   ...currReadData!,
+        //   messageIds: [...currReadData!.messageIds, message.groupMessageId],
+        // }));
+
         const groupMessageReadData: GroupMessageReadData = {
           groupId: groupId,
           messageIds: [message.groupMessageId],
@@ -126,9 +151,7 @@ const ChatBox: React.FC<Props> = ({
           timestamp: message.timestamp,
           members,
         };
-        dispatch(readGroupMessage(groupMessageReadData)).then((res: any) => {
-          complete();
-        });
+        setReadData((currReadData) => [...currReadData, groupMessageReadData]);
       }
     }
   };

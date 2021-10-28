@@ -120,12 +120,25 @@ const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
     },
   }));
 
+  const list = useRef<HTMLIonListElement>(null);
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (
+        list.current!.getBoundingClientRect().height <=
+        (list.current!.parentNode as any).getBoundingClientRect().height
+      ) {
+        if (onScrollTop) onScrollTop(complete, {} as any);
+      }
+    }, 500);
+  }, [children]);
+
   return (
-    <IonList className={`${styles.chat} chat-list`}>
+    <IonList ref={list} className={`${styles.chat} chat-list`}>
       {onScrollTop ? (
         <IonInfiniteScroll
           disabled={disabled ? true : false}
-          threshold="0px"
+          threshold="0"
           ref={infiniteScroll}
           position="top"
           /* Adding a 1 second timeout just because messages are being fetched too freakin' fast locally :D */
@@ -144,7 +157,7 @@ const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
           disabled={disabled ? true : false}
           threshold="0px"
           ref={infiniteScrollBottom}
-          position="top"
+          position="bottom"
           /* Adding a 1 second timeout just because messages are being fetched too freakin' fast locally :D */
           onIonInfinite={(e) =>
             setTimeout(() => onScrollBottom(completeBottom, e), 1000)

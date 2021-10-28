@@ -81,8 +81,8 @@ const Me: React.FC<ChatProps> = ({
 
   return (
     <>
-      <div
-        // lines="none"
+      <IonItem
+        lines="none"
         className={`${common["me-container"]} ${fileMaxWidth}`}
         onClick={(e: any) => (err ? onLongPress(e) : null)}
         {...pressHandlers}
@@ -139,7 +139,7 @@ const Me: React.FC<ChatProps> = ({
             ) : null}
           </div>
         )}
-      </div>
+      </IonItem>
       {err ? (
         loading ? null : (
           <IonItem lines="none" className={styles["not-delivered-container"]}>
