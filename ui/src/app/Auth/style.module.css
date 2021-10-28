@@ -1,0 +1,21 @@
+.err {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  height: 100%;
+  width: 100%;
+}
+
+.err ion-icon {
+  font-size: 4rem;
+  padding: .5rem;
+}
+
+.err ion-text {
+  font-size: 1.2rem;
+  text-align: center;
+  width: 70vw;
+  word-break: keep-all;
+}
