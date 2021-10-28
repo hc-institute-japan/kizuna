@@ -120,7 +120,6 @@ const ChatBox: React.FC<Props> = ({
 
   const [readData, setReadData] = useState<GroupMessageReadData[]>([]);
 
-  const receiptsTimeout = useRef<NodeJS.Timeout>();
   useEffect(() => {
     if (readData.length > 0) {
       if (receiptsTimeout.current) clearTimeout(receiptsTimeout.current);
@@ -155,6 +154,7 @@ const ChatBox: React.FC<Props> = ({
           members,
         };
         setReadData((currReadData) => [...currReadData, groupMessageReadData]);
+        complete();
       }
     }
   };
