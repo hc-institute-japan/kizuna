@@ -13,4 +13,4 @@ derive_more = "0"
 serde = "1"
 username = {git = "https://github.com/holochain-open-dev/username-zome", branch = "bump-hdk-0.0.100", package = "username"}
 hdk = "0.0.112"
-holo_hash = {version = "0.0.10", features = ["encoding"]}
+holo_hash = {version = "*", features = ["encoding"]}
