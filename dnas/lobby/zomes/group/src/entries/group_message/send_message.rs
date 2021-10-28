@@ -52,7 +52,7 @@ pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<Gr
         // try to retrieve the message being replied to before proceeding.
         // return error if it can't be retrieved.
         while n < 3 && message_element == None {
-            let options = GetOptions::content();
+            let options = GetOptions::latest();
             message_element = get(hash.clone(), options)?;
             n += 1
         }
