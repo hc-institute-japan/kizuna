@@ -58,12 +58,15 @@ const ChatBox: React.FC<Props> = ({
   const membersProfile = useSelector(
     (state: RootState) => state.groups.members
   );
+  const profile = useSelector((state: RootState) => state.profile);
 
   /* LOCAL STATE */
   const [messages, setMessages] = useState<GroupMessageBundle[]>([]);
+  const [messagesReceipt, setMessagesReceipt] = useState<string[]>([]);
   const [oldestFetched, setOldestFetched] = useState<boolean>(false);
 
-  const profile = useSelector((state: RootState) => state.profile);
+  /* REFs */
+  const receiptsTimeout = useRef<NodeJS.Timeout>();
 
   /* Handlers */
   const handleOnScrollTop = (complete: any) => {
@@ -217,6 +220,25 @@ const ChatBox: React.FC<Props> = ({
     setMessages(messages);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messageIds, stateMessages, groupErrMessages]);
+
+  // debounce and read messages
+  useEffect(() => {
+    if (messagesReceipt.length > 0) {
+      if (receiptsTimeout.current) clearTimeout(receiptsTimeout.current);
+      receiptsTimeout.current = setTimeout(() => {
+        const groupMessageReadData: GroupMessageReadData = {
+          groupId: groupId,
+          messageIds: messagesReceipt,
+          reader: profile.id!,
+          timestamp: new Date(),
+          members,
+        };
+        dispatch(readGroupMessage(groupMessageReadData)).then((res: any) => {
+          setMessagesReceipt([]);
+        });
+      }, 1000);
+    }
+  }, [messagesReceipt]);
 
   return (
     <>
