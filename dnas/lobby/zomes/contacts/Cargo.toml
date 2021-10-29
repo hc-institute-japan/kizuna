@@ -12,5 +12,5 @@ crate-type = [ "cdylib", "rlib" ]
 derive_more = "0"
 serde = "1"
 hdk = "0.0.112"
-holo_hash = {version = "0.0.10", features = ["encoding"]}
+holo_hash = {version = "*", features = ["encoding"]}
 hc_contacts = {git = "https://github.com/holochain-open-dev/contacts", package = "contacts", branch="main"}

@@ -46,7 +46,7 @@ pub fn get_messages_by_group_by_timestamp_handler(
     let get_input = links
         .clone()
         .into_iter()
-        .map(|link| GetInput::new(link.target.into(), GetOptions::content()))
+        .map(|link| GetInput::new(link.target.into(), GetOptions::latest()))
         .collect();
 
     // create input for getting the read links => input: Vec<(message_hash, "read")>
@@ -99,7 +99,7 @@ pub fn get_messages_by_group_by_timestamp_handler(
 
         if let Some(reply_to_hash) = group_message.reply_to.clone() {
             let replied_message: GroupMessage =
-                try_get_and_convert(reply_to_hash.clone(), GetOptions::content())?;
+                try_get_and_convert(reply_to_hash.clone(), GetOptions::latest())?;
             group_message_data.reply_to = Some(GroupMessageWithId {
                 id: reply_to_hash,
                 content: replied_message,

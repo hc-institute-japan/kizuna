@@ -82,7 +82,7 @@ pub fn collect_and_insert_messages(
         .collect();
     let get_input = message_hashes
         .into_iter()
-        .map(|eh| GetInput::new(eh.clone().into(), GetOptions::content()))
+        .map(|eh| GetInput::new(eh.clone().into(), GetOptions::latest()))
         .collect::<Vec<GetInput>>();
 
     // TODO: add a debugger here to solve the "Entry Not Found" error
@@ -113,7 +113,7 @@ pub fn collect_and_insert_messages(
         // TODO: refactor to be a multi get
         if let Some(reply_to_hash) = message.reply_to.clone() {
             let replied_message: GroupMessage =
-                try_get_and_convert(reply_to_hash.clone(), GetOptions::content())?;
+                try_get_and_convert(reply_to_hash.clone(), GetOptions::latest())?;
             group_message_data.reply_to = Some(GroupMessageWithId {
                 id: reply_to_hash,
                 content: replied_message,

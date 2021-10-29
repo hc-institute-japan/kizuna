@@ -9,7 +9,7 @@ dependencies = [
  "derive_more",
  "file_types 0.0.1",
  "hdk",
- "holo_hash",
+ "holo_hash 0.0.11",
  "serde",
 ]
 
@@ -116,7 +116,7 @@ dependencies = [
  "contacts 0.0.1 (git+https://github.com/holochain-open-dev/contacts?branch=main)",
  "derive_more",
  "hdk",
- "holo_hash",
+ "holo_hash 0.0.11",
  "serde",
 ]
 
@@ -127,7 +127,7 @@ source = "git+https://github.com/holochain-open-dev/contacts?branch=main#fb9f20d
 dependencies = [
  "derive_more",
  "hdk",
- "holo_hash",
+ "holo_hash 0.0.10",
  "serde",
 ]
 
@@ -156,18 +156,18 @@ version = "0.0.1"
 dependencies = [
  "derive_more",
  "hdk",
- "holo_hash",
+ "holo_hash 0.0.10",
  "serde",
 ]
 
 [[package]]
 name = "file_types"
 version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=post-commit#d14f4febe6eec415bc931a58f4322847b8695698"
+source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=post-commit#b09e65753482e436c53e827ea26a5356468349c9"
 dependencies = [
  "derive_more",
  "hdk",
- "holo_hash",
+ "holo_hash 0.0.10",
  "serde",
 ]
 
@@ -190,7 +190,7 @@ dependencies = [
  "derive_more",
  "file_types 0.0.1",
  "hdk",
- "holo_hash",
+ "holo_hash 0.0.11",
  "serde",
 ]
 
@@ -207,7 +207,7 @@ source = "git+https://github.com/holochain-open-dev/profiles?branch=main#d11e644
 dependencies = [
  "derive_more",
  "hdk",
- "holo_hash",
+ "holo_hash 0.0.10",
  "serde",
 ]
 
@@ -218,7 +218,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ff876079ec7a06b7917ed66968503685db908513694de3e8e2948d126bfa6255"
 dependencies = [
  "hdk_derive",
- "holo_hash",
+ "holo_hash 0.0.10",
  "holochain_wasmer_guest",
  "holochain_zome_types",
  "paste",
@@ -248,6 +248,22 @@ name = "holo_hash"
 version = "0.0.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ee83d18d883878dc9e6da3e162a42b882db62f3fd7e957e0b5b85f04a5dbe117"
+dependencies = [
+ "base64",
+ "blake2b_simd",
+ "derive_more",
+ "holochain_serialized_bytes",
+ "kitsune_p2p_dht_arc",
+ "serde",
+ "serde_bytes",
+ "thiserror",
+]
+
+[[package]]
+name = "holo_hash"
+version = "0.0.11"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "12dd2004f3732b61a4a508b97cae2d12a0809cc2b441da023274a760405871e6"
 dependencies = [
  "base64",
  "blake2b_simd",
@@ -316,7 +332,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d287e13e403ea66f9615e3a301acd49f9649a0bb97c5a74fa14b23e13b126077"
 dependencies = [
  "chrono",
- "holo_hash",
+ "holo_hash 0.0.10",
  "holochain_serialized_bytes",
  "holochain_wasmer_common",
  "kitsune_p2p_timestamp",
@@ -460,7 +476,7 @@ version = "0.0.1"
 dependencies = [
  "derive_more",
  "hdk",
- "holo_hash",
+ "holo_hash 0.0.11",
  "p2pmessage 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=post-commit)",
  "serde",
 ]
@@ -468,12 +484,12 @@ dependencies = [
 [[package]]
 name = "p2pmessage"
 version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=post-commit#d14f4febe6eec415bc931a58f4322847b8695698"
+source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=post-commit#b09e65753482e436c53e827ea26a5356468349c9"
 dependencies = [
  "derive_more",
  "file_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=post-commit)",
  "hdk",
- "holo_hash",
+ "holo_hash 0.0.10",
  "serde",
 ]
 
@@ -529,15 +545,15 @@ version = "0.0.1"
 dependencies = [
  "derive_more",
  "hdk",
- "holo_hash",
+ "holo_hash 0.0.11",
  "serde",
 ]
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.30"
+version = "1.0.32"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "edc3358ebc67bc8b7fa0c007f945b0b18226f78437d61bec735a9eb96b61ee70"
+checksum = "ba508cc11742c0dc5c1659771673afbab7a0efab23aa17e854cbab0837ed0b43"
 dependencies = [
  "unicode-xid",
 ]
@@ -549,7 +565,7 @@ dependencies = [
  "derive_more",
  "hc_zome_profiles",
  "hdk",
- "holo_hash",
+ "holo_hash 0.0.11",
  "serde",
 ]
 
@@ -728,9 +744,9 @@ checksum = "6bdef32e8150c2a081110b42772ffe7d7c9032b606bc226c8260fd97e0976601"
 
 [[package]]
 name = "syn"
-version = "1.0.80"
+version = "1.0.81"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d010a1623fbd906d51d650a9916aaefc05ffa0e4053ff7fe601167f3e715d194"
+checksum = "f2afee18b8beb5a596ecb4a2dce128c719b4ba399d34126b9e4396e3f9860966"
 dependencies = [
  "proc-macro2",
  "quote",

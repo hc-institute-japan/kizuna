@@ -12,5 +12,5 @@ crate-type = [ "cdylib", "rlib" ]
 serde = "1"
 derive_more = "0"
 hdk = "0.0.112"
-holo_hash = {version = "0.0.10", features = ["encoding"]}
+holo_hash = {version = "*", features = ["encoding"]}
 file_types = { version = "0.0.1", path = "../../commons/file_types" }

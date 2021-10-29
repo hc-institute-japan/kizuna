@@ -10,12 +10,12 @@ use crate::{
 pub fn group_message_post_commit(create_header: Create) -> ExternResult<()> {
     // this should always hit the cache
     let group_message: GroupMessage =
-        try_get_and_convert(create_header.entry_hash.clone(), GetOptions::content())?;
+        try_get_and_convert(create_header.entry_hash.clone(), GetOptions::latest())?;
     let mut replied_message_with_id: Option<GroupMessageWithId> = None;
     if let Some(hash) = group_message.reply_to.clone() {
         // this should not hit None assuming that the prior send_message call
         // was able to fetch the replied message
-        let message_element: Option<Element> = get(hash.clone(), GetOptions::content())?;
+        let message_element: Option<Element> = get(hash.clone(), GetOptions::latest())?;
         if let Some(e) = message_element {
             let replied_message = try_from_element(e)?;
             replied_message_with_id = Some(GroupMessageWithId {

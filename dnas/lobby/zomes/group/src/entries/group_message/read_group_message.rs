@@ -21,7 +21,7 @@ pub fn read_group_message_handler(
         let mut n = 0;
         // only try to get the message entry fixed number of times
         while n < 3 && message_element == None {
-            let options = GetOptions::content();
+            let options = GetOptions::latest();
             message_element = get(message_entry_hash.clone(), options)?;
             n += 1
         }
