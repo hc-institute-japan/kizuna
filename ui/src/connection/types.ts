@@ -35,6 +35,8 @@ export const SIGNALS: SignalNameType = {
     RECEIVE_P2P_RECEIPT: "RECEIVE_P2P_RECEIPT",
     SYNC_P2P_PINS: "SYNC_P2P_PINS",
     TYPING_P2P: "TYPING_P2P",
+    POST_COMMIT_ERROR_COMMIT_MESSAGE: "POST_COMMIT_ERROR_COMMIT_MESSAGE",
+    POST_COMMIT_ERROR_COMMIT_RECEIPT: "POST_COMMIT_ERROR_COMMIT_RECEIPT",
   },
 };
 
@@ -97,6 +99,7 @@ export const FUNCTIONS: FunctionNameType = {
   [ZOMES.P2PMESSAGE]: {
     SEND_MESSAGE: "send_message",
     SEND_MESSAGE_WITH_TIMESTAMP: "send_message_with_timestamp",
+    COMMIT_MESSAGE_TO_RECEIVER: "commit_mesage_to_receiver_chain",
     GET_LATEST_MESSAGES: "get_latest_messages",
     GET_MESSAGES_BY_AGENT_BY_TIMESTAMP: "get_messages_by_agent_by_timestamp",
     GET_PREVIOUS_MESSAGES: "get_previous_messages",

@@ -1,5 +1,6 @@
 import { IonIcon, IonItem, IonText, useIonPopover } from "@ionic/react";
 import {
+  radioButtonOff,
   alertCircleOutline,
   checkmarkCircleOutline,
   checkmarkDoneCircle,
@@ -98,12 +99,18 @@ const Me: React.FC<ChatProps> = ({
               {intl.formatTime(timestamp)}
               <IonIcon
                 size="medium"
-                icon={isSeen ? checkmarkDoneCircle : checkmarkCircleOutline}
+                icon={
+                  isSeen
+                    ? checkmarkDoneCircle
+                    : err && id !== "error message"
+                    ? radioButtonOff
+                    : checkmarkCircleOutline
+                }
               />
             </h6>
           </IonText>
         </div>
-        {err ? (
+        {err && id === "error message" ? (
           loading ? (
             <div className={common.picture}>
               <Spinner />
@@ -128,7 +135,7 @@ const Me: React.FC<ChatProps> = ({
           </div>
         )}
       </IonItem>
-      {err ? (
+      {err && id === "error message" ? (
         loading ? null : (
           <IonItem lines="none" className={styles["not-delivered-container"]}>
             <IonText className={styles["not-delivered"]} color="danger">
