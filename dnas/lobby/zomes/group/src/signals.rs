@@ -2,7 +2,7 @@ use hdk::prelude::*;
 
 use crate::entries::{
     group::GroupOutput,
-    group_message::{GroupMessageData, GroupMessageReadData, GroupTypingDetailData},
+    group_message::{GroupMessageData, GroupMessageReadData, GroupTypingDetailData, PinDetail},
 };
 
 // Signal Details is a warpper for all the signals we can send from the happ
@@ -21,6 +21,7 @@ pub enum SignalPayload {
     GroupTypingDetail(GroupTypingDetailData),
     GroupMessageRead(GroupMessageReadData),
     GroupMessageData(GroupMessageData),
+    PinMessageData(PinDetail),
 }
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
@@ -30,4 +31,5 @@ impl SignalName {
     pub const GROUP_TYPING_DETAIL: &'static str = &"GROUP_TYPING_DETAIL";
     pub const GROUP_MESSAGE_READ: &'static str = &"GROUP_MESSAGE_READ";
     pub const GROUP_MESSAGE_DATA: &'static str = &"GROUP_MESSAGE_DATA";
+    pub const PIN_MESSAGE_DATA: &'static str = &"PIN_MESSAGE_DATA";
 }

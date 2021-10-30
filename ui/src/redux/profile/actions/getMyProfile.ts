@@ -15,11 +15,13 @@ const getMyProfile =
       const myAgentId = await getAgentId();
       /* assume that getAgentId() is non-nullable */
       const myAgentIdB64 = serializeHash(myAgentId!);
-      dispatch<ProfileActionTypes>({
-        type: SET_PROFILE,
-        nickname: res.profile.nickname,
-        id: myAgentIdB64,
-      });
+      if (res) {
+        dispatch<ProfileActionTypes>({
+          type: SET_PROFILE,
+          nickname: res.profile.nickname,
+          id: myAgentIdB64,
+        });
+      }
       return true;
     } catch (e) {}
     return false;

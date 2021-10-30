@@ -1,4 +1,5 @@
 {
+  "app.auth.err": "プロフィールの取得に失敗しました。Holochain Launcherを再起動して下さい。Holoホスティングネットワーク使用の場合は、新しいブラウザからKizunaをアクセスして下さい",
   "app.chat.chat-details.files": "ファイル",
   "app.chat.chat-details.info": "チャット情報",
   "app.chat.chat-details.media": "メディア",
@@ -86,9 +87,9 @@
   "app.settings.read-receipt-label": "既読通知",
   "app.settings.typing-indicator-label": "入力中通知",
   "components.chat.chat-list.today": "今日",
-  "components.chat.chat-modal-pin": "メッセージをピン留め",
+  "components.chat.chat-modal-pin": "ピン留め",
   "components.chat.chat-modal-reply": "返信",
-  "components.chat.chat-modal-unpin": "メッセージのピン留めを解除",
+  "components.chat.chat-modal-unpin": "ピン留め解除",
   "components.chat.media-modal-download": "ダウンロード",
   "components.conversation.me-file-string": "あなたは{fileName}を送りました",
   "components.conversation.other-file-string": "{name}が{fileName}を送信しました",

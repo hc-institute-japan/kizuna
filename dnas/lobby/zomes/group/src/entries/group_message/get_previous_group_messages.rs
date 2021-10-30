@@ -71,6 +71,24 @@ pub fn get_previous_group_messages_handler(
     // and the read_list
     collect_and_insert_read_list(&mut group_messages_contents)?;
 
+    let hashes_in_contents: Vec<String> = group_messages_contents.clone().into_keys().collect();
+    let messages_hashes_string: Vec<String> = messages_hashes
+        .clone()
+        .into_iter()
+        .map(|eh| eh.to_string())
+        .collect();
+    let difference: Vec<String> = messages_hashes_string
+        .into_iter()
+        .filter(|item| !hashes_in_contents.contains(item))
+        .collect();
+    debug!("here are the unfetched messages {:?}", difference);
+
+    // TODO: remove this once the bug in holochain is fixed where the author of the entry
+    // can fetch the entry but other agents cannot.
+    messages_hashes.retain(|eh| {
+        let string_hash = eh.to_string();
+        return !difference.contains(&string_hash);
+    });
     messages_by_group.insert(filter.group_id.to_string(), messages_hashes);
 
     Ok(GroupMessagesOutput {

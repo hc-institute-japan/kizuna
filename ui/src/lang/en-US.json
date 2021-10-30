@@ -1,4 +1,5 @@
 {
+  "app.auth.err": "We're sorry. We failed to get your profile. Please try restarting your Holochain Launcher, or access Kizuna from a new browser if you are in Holo hosting network.",
   "app.chat.chat-details.files": "FILES",
   "app.chat.chat-details.info": "INFO",
   "app.chat.chat-details.media": "MEDIA",
