@@ -125,10 +125,13 @@ const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
   useEffect(() => {
     setTimeout(() => {
       if (
+        list.current &&
         list.current!.getBoundingClientRect().height <=
-        (list.current!.parentNode as any).getBoundingClientRect().height
+          (list.current!.parentNode as any).getBoundingClientRect().height
       ) {
-        if (onScrollTop) onScrollTop(complete, {} as any);
+        if (onScrollTop) {
+          onScrollTop(complete, {} as any);
+        }
       }
     }, 500);
   }, [children]);
