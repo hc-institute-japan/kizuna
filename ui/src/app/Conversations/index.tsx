@@ -104,8 +104,7 @@ const Conversations: React.FC = () => {
             id: key,
             conversationName: conversant.username,
             latestMessage: message,
-            // TODO: enable this once we have a better implementation of read message
-            // badgeCount: dispatch(countUnread(conversant.id)),
+            badgeCount: dispatch(countUnread(conversant.id)),
           };
         } else if (p2pState.errMsgs[key][0]) {
           const latestErrMessage = p2pState.errMsgs[key][0];
@@ -134,8 +133,7 @@ const Conversations: React.FC = () => {
             id: key,
             conversationName: conversant.username,
             latestMessage: message,
-            // TODO: enable this once we have a better implementation of read message
-            // badgeCount: dispatch(countUnread(conversant.id)),
+            badgeCount: dispatch(countUnread(conversant.id)),
           };
         }
 
@@ -185,7 +183,7 @@ const Conversations: React.FC = () => {
             conversationName: groupsState.conversations[groupId].name,
             latestMessage: message,
             // enable this once we have a better implementation of read message
-            // badgeCount: dispatch(getBadgeCount(groupId)),
+            badgeCount: dispatch(getBadgeCount(groupId)),
           };
         } else if (groupsState.errMsgs[groupId]) {
           const latestErrMessage = groupsState.errMsgs[groupId][0];
@@ -227,8 +225,7 @@ const Conversations: React.FC = () => {
             type: "group",
             conversationName: groupsState.conversations[groupId].name,
             latestMessage: message,
-            // enable this once we have a better implementation of read message
-            // badgeCount: dispatch(getBadgeCount(groupId)),
+            badgeCount: dispatch(getBadgeCount(groupId)),
           };
         }
 
