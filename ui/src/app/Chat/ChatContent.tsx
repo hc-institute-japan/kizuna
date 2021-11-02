@@ -253,8 +253,10 @@ const Chat: React.FC = () => {
     */
   const handleOnScrollTop = (complete: any) => {
     if (disableGetPrevious === false) {
-      const lastMessage = messagesWithConversant[0].message;
-      if (!lastMessage.err) {
+      const lastMessage = messagesWithConversant[0]
+        ? messagesWithConversant[0].message
+        : null;
+      if (lastMessage && !lastMessage.err) {
         dispatch(
           getPreviousMessages(
             conversant.id,
