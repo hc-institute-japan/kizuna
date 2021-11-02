@@ -128,7 +128,10 @@ export const retry: (config: CallZomeConfig) => Promise<any> = async (
         zomeName,
         fnName,
         payload,
-        typeof client === typeof HolochainClient ? 60000 : undefined
+        process.env.REACT_APP_ENV === "HC" ||
+          process.env.REACT_APP_ENV === "HCDEV"
+          ? 30000
+          : undefined
       );
     } catch (e) {
       console.warn(e);
@@ -195,12 +198,16 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
     // provenance = info?.cell_data[0].cell_id[1],
     payload = null,
   } = config;
+  console.log(process.env.REACT_APP_ENV);
   try {
     return await client?.callZome(
       zomeName,
       fnName,
       payload,
-      typeof client === typeof HolochainClient ? 60000 : undefined
+      process.env.REACT_APP_ENV === "HC" ||
+        process.env.REACT_APP_ENV === "HCDEV"
+        ? 30000
+        : undefined
     );
   } catch (e) {
     console.log(

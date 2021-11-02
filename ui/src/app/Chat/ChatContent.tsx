@@ -253,25 +253,25 @@ const Chat: React.FC = () => {
     */
   const handleOnScrollTop = (complete: any) => {
     if (disableGetPrevious === false) {
-      if (messagesWithConversant) {
-        const lastMessage = messagesWithConversant[0]?.message;
-        if (lastMessage && !lastMessage.err) {
-          dispatch(
-            getPreviousMessages(
-              conversant.id,
-              5,
-              "All",
-              lastMessage.timestamp,
-              lastMessage.p2pMessageEntryHash
-            )
-          ).then((res: P2PHashMap) => {
-            // disable getPrevious if return value is empty
-            if (Object.values(res)[0][conversant.id].length <= 0) {
-              setDisableGetPrevious(true);
-            }
-            return complete();
-          });
-        }
+      const lastMessage = messagesWithConversant[0]
+        ? messagesWithConversant[0].message
+        : null;
+      if (lastMessage && !lastMessage.err) {
+        dispatch(
+          getPreviousMessages(
+            conversant.id,
+            5,
+            "All",
+            lastMessage.timestamp,
+            lastMessage.p2pMessageEntryHash
+          )
+        ).then((res: P2PHashMap) => {
+          // disable getPrevious if return value is empty
+          if (Object.values(res)[0][conversant.id].length <= 0) {
+            setDisableGetPrevious(true);
+          }
+          return complete();
+        });
       }
     }
     return complete();

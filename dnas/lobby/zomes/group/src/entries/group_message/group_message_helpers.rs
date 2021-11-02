@@ -169,7 +169,8 @@ pub fn collect_and_insert_read_list(
         match all_read_list.get_mut(&message_hash.to_string()) {
             Some(hashmap) => {
                 for link in links_vec {
-                    hashmap.insert(link.target.to_string(), link.timestamp.to_owned());
+                    let apk: AgentPubKey = link.target.into();
+                    hashmap.insert(apk.to_string(), link.timestamp.to_owned());
                 }
                 ()
             }
