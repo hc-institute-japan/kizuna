@@ -163,7 +163,7 @@ dependencies = [
 [[package]]
 name = "file_types"
 version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=post-commit#b09e65753482e436c53e827ea26a5356468349c9"
+source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop#8b038c8b8a505080436a0685ba655d5e432c02e3"
 dependencies = [
  "derive_more",
  "hdk",
@@ -414,9 +414,9 @@ checksum = "e2abad23fbc42b3700f2f279844dc832adb2b2eb069b2df918f455c4e18cc646"
 
 [[package]]
 name = "libc"
-version = "0.2.105"
+version = "0.2.106"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "869d572136620d55835903746bcb5cdc54cb2851fd0aeec53220b4bb65ef3013"
+checksum = "a60553f9a9e039a333b4e9b20573b9e9b9c0bb3a11e201ccc48ef4283456d673"
 
 [[package]]
 name = "lock_api"
@@ -477,17 +477,17 @@ dependencies = [
  "derive_more",
  "hdk",
  "holo_hash 0.0.11",
- "p2pmessage 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=post-commit)",
+ "p2pmessage 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop)",
  "serde",
 ]
 
 [[package]]
 name = "p2pmessage"
 version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=post-commit#b09e65753482e436c53e827ea26a5356468349c9"
+source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop#8b038c8b8a505080436a0685ba655d5e432c02e3"
 dependencies = [
  "derive_more",
- "file_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=post-commit)",
+ "file_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop)",
  "hdk",
  "holo_hash 0.0.10",
  "serde",
