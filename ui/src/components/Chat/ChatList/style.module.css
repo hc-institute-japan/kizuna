@@ -3,7 +3,6 @@
   flex-direction: column !important;
   background: transparent;
   flex: 1;
-  min-height: 100%;
 }
 
 .chat:before {

@@ -46,6 +46,7 @@ const Chat: React.FC = () => {
       receipt?: P2PMessageReceipt | undefined;
     }[]
   >([]);
+  const [messageReceipts, setMessageReceipts] = useState<P2PMessage[]>([]);
   const [disableGetPrevious, setDisableGetPrevious] = useState<boolean>(false);
   const {
     conversations,
@@ -90,6 +91,7 @@ const Chat: React.FC = () => {
   /* REFS */
   const scrollerRef = useRef<ChatListMethods>(null);
   const didMountRef = useRef(false);
+  const receiptsTimeout = useRef<NodeJS.Timeout>();
   // const didMountRef2 = useRef(false);
   const inputTimeout = useRef<NodeJS.Timeout>();
   const messageInputRef = useRef<MessageInputMethods | null>(null);
@@ -126,6 +128,17 @@ const Chat: React.FC = () => {
     dispatch(getPinnedMessages(id));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // debounce to dispatch readMessage
+  useEffect(() => {
+    if (messageReceipts.length > 0) {
+      if (receiptsTimeout.current) clearTimeout(receiptsTimeout.current);
+      receiptsTimeout.current = setTimeout(() => {
+        dispatch(readMessage(messageReceipts));
+        setMessageReceipts([]);
+      }, 1000);
+    }
+  }, [messageReceipts]);
 
   /* HANDLERS */
   /*
@@ -242,8 +255,10 @@ const Chat: React.FC = () => {
     */
   const handleOnScrollTop = (complete: any) => {
     if (disableGetPrevious === false) {
-      const lastMessage = messagesWithConversant[0].message;
-      if (lastMessage.err === undefined) {
+      const lastMessage = messagesWithConversant[0]
+        ? messagesWithConversant[0].message
+        : null;
+      if (lastMessage && !lastMessage.err) {
         dispatch(
           getPreviousMessages(
             conversant.id,
@@ -269,12 +284,17 @@ const Chat: React.FC = () => {
       which emits a signal to the sender
       when the chat bubble comes into view
     */
+
   const onSeenHandler = (messageBundle: {
     message: P2PMessage;
     receipt?: P2PMessageReceipt;
   }) => {
     if (messageBundle.receipt!.status !== "read" && readReceipt) {
-      dispatch(readMessage([messageBundle.message]));
+      // dispatch(readMessage([messageBundle.message]));
+      setMessageReceipts((currMessageReceipts) => [
+        ...currMessageReceipts,
+        messageBundle.message,
+      ]);
     }
   };
 

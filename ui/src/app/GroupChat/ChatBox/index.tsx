@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 // Components
 import Chat from "../../../components/Chat";
@@ -58,17 +58,21 @@ const ChatBox: React.FC<Props> = ({
   const membersProfile = useSelector(
     (state: RootState) => state.groups.members
   );
+  const profile = useSelector((state: RootState) => state.profile);
 
   /* LOCAL STATE */
   const [messages, setMessages] = useState<GroupMessageBundle[]>([]);
+  const [messagesReceipt, setMessagesReceipt] = useState<string[]>([]);
   const [oldestFetched, setOldestFetched] = useState<boolean>(false);
 
-  const profile = useSelector((state: RootState) => state.profile);
+  /* REFs */
+  const receiptsTimeout = useRef<NodeJS.Timeout>();
 
   /* Handlers */
   const handleOnScrollTop = (complete: any) => {
     const lastMessage = messages[0];
-    if (!oldestFetched && !lastMessage.err) {
+
+    if (!oldestFetched && lastMessage && !lastMessage.err) {
       dispatch(
         getPreviousGroupMessages({
           groupId: groupId,
@@ -83,10 +87,10 @@ const ChatBox: React.FC<Props> = ({
         if (res && Object.keys(res.groupMessagesContents).length <= 0) {
           setOldestFetched(true);
         }
-        return complete();
+        complete();
       });
     }
-    return complete();
+    complete();
   };
 
   const handleOnDownload = (file: FilePayload) => {
@@ -114,11 +118,34 @@ const ChatBox: React.FC<Props> = ({
     }
   };
 
+  const [readData, setReadData] = useState<GroupMessageReadData[]>([]);
+
+  useEffect(() => {
+    if (readData.length > 0) {
+      if (receiptsTimeout.current) clearTimeout(receiptsTimeout.current);
+      receiptsTimeout.current = setTimeout(() => {
+        const first = readData[0];
+        const readListData: GroupMessageReadData = {
+          ...first,
+          messageIds: readData.map((item) => item.messageIds).flat(),
+        };
+        dispatch(readGroupMessage(readListData));
+        console.log(readListData.messageIds);
+        setReadData([]);
+      }, 1500);
+    }
+  }, [readData]);
+
   const handleOnSeen = (complete: () => any, message: any) => {
     if (readReceipt) {
       const read: boolean = Object.keys(message.readList).includes(profile.id!);
 
       if (!read) {
+        // setReadData((currReadData) => ({
+        //   ...currReadData!,
+        //   messageIds: [...currReadData!.messageIds, message.groupMessageId],
+        // }));
+
         const groupMessageReadData: GroupMessageReadData = {
           groupId: groupId,
           messageIds: [message.groupMessageId],
@@ -126,9 +153,8 @@ const ChatBox: React.FC<Props> = ({
           timestamp: message.timestamp,
           members,
         };
-        dispatch(readGroupMessage(groupMessageReadData)).then((res: any) => {
-          complete();
-        });
+        setReadData((currReadData) => [...currReadData, groupMessageReadData]);
+        complete();
       }
     }
   };
@@ -194,6 +220,25 @@ const ChatBox: React.FC<Props> = ({
     setMessages(messages);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messageIds, stateMessages, groupErrMessages]);
+
+  // debounce and read messages
+  useEffect(() => {
+    if (messagesReceipt.length > 0) {
+      if (receiptsTimeout.current) clearTimeout(receiptsTimeout.current);
+      receiptsTimeout.current = setTimeout(() => {
+        const groupMessageReadData: GroupMessageReadData = {
+          groupId: groupId,
+          messageIds: messagesReceipt,
+          reader: profile.id!,
+          timestamp: new Date(),
+          members,
+        };
+        dispatch(readGroupMessage(groupMessageReadData)).then((res: any) => {
+          setMessagesReceipt([]);
+        });
+      }, 1000);
+    }
+  }, [messagesReceipt]);
 
   return (
     <>
