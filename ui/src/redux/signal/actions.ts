@@ -9,6 +9,7 @@ import receiveP2PMessage from "../p2pmessages/actions/signals/receiveP2PMessage"
 import receiveP2PReceipt from "../p2pmessages/actions/signals/receiveP2PReceipt";
 import receiveP2PPin from "../p2pmessages/actions/signals/receiveP2PPin";
 import typingP2P from "../p2pmessages/actions/signals/typingP2P";
+import recommitMessage from "../p2pmessages/actions/signals/recommitMessage";
 import { RootState } from "../types";
 import pinMessageData from "../group/actions/signals/pinMessageData";
 
@@ -42,6 +43,9 @@ export const handleSignal =
         break;
       case SIGNALS[ZOMES.P2PMESSAGE].SYNC_P2P_PINS:
         dispatch(receiveP2PPin(payload));
+        break;
+      case SIGNALS[ZOMES.P2PMESSAGE].POST_COMMIT_ERROR_COMMIT_MESSAGE:
+        dispatch(recommitMessage(payload));
         break;
     }
   };

@@ -65,7 +65,7 @@ pub fn get_group_latest_version(group_id: EntryHash) -> ExternResult<GroupOutput
                 if let Some(latest_group_entry_hash) = latest_group_header.entry_hash() {
                     let latest_group: Group = try_get_and_convert(
                         latest_group_entry_hash.to_owned(),
-                        GetOptions::content(),
+                        GetOptions::latest(),
                     )?;
                     let group_output = GroupOutput {
                         group_id,

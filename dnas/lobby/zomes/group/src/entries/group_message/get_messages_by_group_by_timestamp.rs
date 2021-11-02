@@ -40,13 +40,13 @@ pub fn get_messages_by_group_by_timestamp_handler(
     let mut all_read_list: HashMap<String, HashMap<String, Timestamp>> = HashMap::new();
     let mut read_message_hashes: Vec<EntryHash> = Vec::new();
 
-    let links = message_links.into_inner();
+    let links = message_links;
 
     // create input for getting the messages => input: Vec<(message_hash, GetOptions)
     let get_input = links
         .clone()
         .into_iter()
-        .map(|link| GetInput::new(link.target.into(), GetOptions::content()))
+        .map(|link| GetInput::new(link.target.into(), GetOptions::latest()))
         .collect();
 
     // create input for getting the read links => input: Vec<(message_hash, "read")>
@@ -62,10 +62,7 @@ pub fn get_messages_by_group_by_timestamp_handler(
 
     // parallel get links for all message_hash
     let read_links = HDK.with(|h| h.borrow().get_links(get_input_message_hashes))?;
-    let read_links_2 = read_links
-        .into_iter()
-        .map(|links| links.into_inner())
-        .zip(read_message_hashes);
+    let read_links_2 = read_links.into_iter().zip(read_message_hashes);
 
     for (links_vec, message_hash) in read_links_2 {
         match all_read_list.get_mut(&message_hash.to_string()) {
@@ -102,7 +99,7 @@ pub fn get_messages_by_group_by_timestamp_handler(
 
         if let Some(reply_to_hash) = group_message.reply_to.clone() {
             let replied_message: GroupMessage =
-                try_get_and_convert(reply_to_hash.clone(), GetOptions::content())?;
+                try_get_and_convert(reply_to_hash.clone(), GetOptions::latest())?;
             group_message_data.reply_to = Some(GroupMessageWithId {
                 id: reply_to_hash,
                 content: replied_message,

@@ -12,5 +12,5 @@ crate-type = [ "cdylib", "rlib" ]
 derive_more = "0"
 serde = "1"
 profiles = {git = "https://github.com/holochain-open-dev/profiles", branch="main", package = "hc_zome_profiles"}
-holo_hash = {git = "https://github.com/holochain/holochain", rev = "holochain-0.0.109", package = "holo_hash", version = "0.0.8", features = ["encoding"]}
-hdk = "0.0.109"
+hdk = "0.0.112"
+holo_hash = {version = "*", features = ["encoding"]}
