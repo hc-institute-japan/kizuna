@@ -100,8 +100,8 @@ fn recv_remote_signal(signal: ExternIO) -> ExternResult<()> {
     Ok(())
 }
 
-#[hdk_extern]
-fn post_commit(signed_headers: Vec<SignedHeaderHashed>) -> ExternResult<PostCommitCallbackResult> {
+#[hdk_extern(infallible)]
+fn post_commit(signed_headers: Vec<SignedHeaderHashed>) {
     let headers = signed_headers
         .into_iter()
         .map(|sh| sh.header().to_owned())
@@ -111,7 +111,7 @@ fn post_commit(signed_headers: Vec<SignedHeaderHashed>) -> ExternResult<PostComm
             Header::Create(create) => match create.clone().entry_type {
                 EntryType::App(app_entry_type) => match app_entry_type.id() {
                     // group message
-                    EntryDefIndex(2) => group_message_post_commit(create)?,
+                    EntryDefIndex(2) => group_message_post_commit(create).unwrap(),
                     _ => (),
                 },
                 _ => (),
@@ -119,8 +119,6 @@ fn post_commit(signed_headers: Vec<SignedHeaderHashed>) -> ExternResult<PostComm
             _ => (),
         }
     }
-
-    Ok(PostCommitCallbackResult::Success)
 }
 
 // Group CRUD
