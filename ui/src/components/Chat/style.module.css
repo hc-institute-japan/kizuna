@@ -55,11 +55,16 @@
   align-self: flex-end;
   display: flex;
   align-items: flex-start;
-  max-width: 80%;
+  max-width: 75%;
+  /* min-width: 60%; */
 }
 
 .me {
   background: var(--ion-color-primary);
+}
+
+.max-file {
+  width: 30%;
 }
 
 .others-container {
@@ -67,7 +72,7 @@
   align-self: flex-start;
   display: flex;
   align-items: flex-start;
-  max-width: 80%;
+  max-width: 75%;
 }
 
 .others {
@@ -114,7 +119,7 @@
 }
 
 .not-delivered {
-  flex-direction:row-reverse;
+  flex-direction: row-reverse;
   font-size: small;
 }
 

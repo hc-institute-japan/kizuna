@@ -1,10 +1,8 @@
 use hdk::prelude::*;
 
-use super::{
-    GroupFileBytes, GroupMessage, GroupMessageData, GroupMessageInput, GroupMessageWithId,
-};
-use crate::group_helpers::get_group_latest_version;
-use crate::signals::{SignalDetails, SignalName, SignalPayload};
+use super::{GroupFileBytes, GroupMessage, GroupMessageInput, GroupMessageWithId};
+// use crate::group_helpers::get_group_latest_version;
+// use crate::signals::{SignalDetails, SignalName, SignalPayload};
 use crate::utils::*;
 use file_types::{FileMetadata, FileType, Payload, PayloadInput};
 
@@ -47,6 +45,28 @@ pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<Gr
         reply_to: message_input.reply_to.clone(),
     };
 
+    let mut _replied_message_with_id: Option<GroupMessageWithId> = None;
+    if let Some(hash) = message_input.reply_to.clone() {
+        let mut n = 0;
+        let mut message_element: Option<Element> = None;
+        // try to retrieve the message being replied to before proceeding.
+        // return error if it can't be retrieved.
+        while n < 3 && message_element == None {
+            let options = GetOptions::latest();
+            message_element = get(hash.clone(), options)?;
+            n += 1
+        }
+        if let Some(e) = message_element {
+            let replied_message = try_from_element(e)?;
+            _replied_message_with_id = Some(GroupMessageWithId {
+                id: hash,
+                content: replied_message,
+            })
+        } else {
+            return error("failed to get the replied message from DHT");
+        }
+    }
+
     // commit GroupMessage entry
 
     // create_entry(&message)?;
@@ -64,21 +84,6 @@ pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<Gr
 
     let group_hash_timestamp_path_hash = path_from_str(&[group_hash, days].join(".")).hash()?;
 
-    // create_link(
-    //     group_hash_timestamp_path_hash,
-    //     hash_entry(&message)?,
-    //     LinkTag::new(match message.payload.clone() {
-    //         Payload::Text { payload: _ } => "text".to_owned(),
-    //         Payload::File {
-    //             metadata: _,
-    //             file_type,
-    //         } => match file_type {
-    //             FileType::Image { thumbnail: _ } => "media".to_owned(),
-    //             FileType::Video { thumbnail: _ } => "media".to_owned(),
-    //             FileType::Other => "file".to_owned(),
-    //         },
-    //     }),
-    // )?;
     host_call::<CreateLinkInput, HeaderHash>(
         __create_link,
         CreateLinkInput::new(
@@ -99,53 +104,12 @@ pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<Gr
         ),
     )?;
 
-    let latest_group_version = get_group_latest_version(message.group_hash.clone())?;
-
     let message_hash = hash_entry(&message)?;
-
-    let mut group_message_data: GroupMessageData = GroupMessageData {
-        message_id: message_hash.clone(),
-        group_hash: message.group_hash.clone(),
-        payload: message.payload.clone(),
-        created: message.created.clone(),
-        sender: message.sender.clone(),
-        reply_to: None,
-    };
-    if let Some(hash) = message_input.reply_to.clone() {
-        let replied_message: GroupMessage =
-            try_get_and_convert(hash.clone(), GetOptions::content())?;
-        group_message_data.reply_to = Some(GroupMessageWithId {
-            id: hash,
-            content: replied_message,
-        });
-    }
 
     let group_message_with_id = GroupMessageWithId {
         id: message_hash,
         content: message,
     };
 
-    let signal = SignalDetails {
-        name: SignalName::GROUP_MESSAGE_DATA.to_owned(),
-        payload: SignalPayload::GroupMessageData(group_message_data.clone()),
-    };
-
-    remote_signal(
-        ExternIO::encode(signal)?,
-        [
-            vec![latest_group_version.creator.clone()],
-            latest_group_version.members.clone(),
-        ]
-        .concat()
-        .into_iter()
-        .filter_map(|agent| {
-            if &agent != &message_input.sender {
-                Some(agent)
-            } else {
-                None
-            }
-        })
-        .collect(),
-    )?;
     Ok(group_message_with_id)
 }

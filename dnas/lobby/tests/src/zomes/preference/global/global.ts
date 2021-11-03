@@ -1,4 +1,5 @@
 import { Orchestrator } from "@holochain/tryorama";
+import { installAgents, MEM_PROOF1 } from "../../../install";
 import { Installables } from "../../../types";
 import { delay } from "../../../utils";
 
@@ -22,17 +23,14 @@ const call = async (
 
 let orchestrator = new Orchestrator();
 
-const global = (config, installables: Installables) => {
+const global = (config) => {
   orchestrator.registerScenario(
     "Get and set global preference",
     async (s, t) => {
-      const [alice] = await s.players([config]);
-      await alice.startup({});
-      const [alice_lobby_happ] = await alice.installAgentsHapps(
-        installables.one
-      );
-      const alice_conductor = alice_lobby_happ[0].cells[0];
+      const [conductor] = await s.players([config]);
+      const [alice_lobby_happ] = await installAgents(conductor, ["alice"]);
 
+      const [alice_conductor] = alice_lobby_happ.cells;
       // const [alice_dna, alice_pubkey] = alice_conductor.cellId;
       let preference = null;
 

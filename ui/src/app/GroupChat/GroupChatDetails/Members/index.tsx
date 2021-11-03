@@ -161,7 +161,6 @@ const Members: React.FC<Props> = ({ groupId, groupRevisionId }) => {
         <IonItem lines="none" key={member.id}>
           <IonLabel className={styles["member-name"]}>
             {member.username}
-            {/* TOOD: remove this <br /> and find a less uglier way of breaking line */}
             <br />
             {isCreator
               ? intl.formatMessage({ id: "app.group-chat.admin-role" })

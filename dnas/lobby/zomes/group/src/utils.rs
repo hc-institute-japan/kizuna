@@ -91,6 +91,18 @@ pub fn try_from_element<T: TryFrom<SerializedBytes>>(element: Element) -> Extern
     }
 }
 
+pub fn try_from_element_with_header<T: TryFrom<SerializedBytes>>(
+    element: Element,
+) -> ExternResult<(SignedHeaderHashed, T)> {
+    match element.entry() {
+        element::ElementEntry::Present(entry) => Ok((
+            element.signed_header().to_owned(),
+            try_from_entry::<T>(entry.clone())?,
+        )),
+        _ => error("Could not convert element"),
+    }
+}
+
 pub fn try_from_entry<T: TryFrom<SerializedBytes>>(entry: Entry) -> ExternResult<T> {
     match entry {
         Entry::App(content) => match T::try_from(content.into_sb()) {

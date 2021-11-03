@@ -1,17 +1,8 @@
-import {
-  Config,
-  NetworkType,
-  InstallAgentsHapps,
-  TransportConfigType,
-} from "@holochain/tryorama";
-import { Installables } from "./types";
-import path from "path";
-
-import request from "./zomes/request";
-import contacts from "./zomes/contacts";
-import preference from "./zomes/preference";
-import group from "./zomes/group";
+import { Config, NetworkType, TransportConfigType } from "@holochain/tryorama";
 import aggregator from "./zomes/aggregator";
+import contacts from "./zomes/contacts";
+import group from "./zomes/group";
+import preference from "./zomes/preference";
 
 // QUIC
 const network = {
@@ -21,31 +12,9 @@ const network = {
 };
 
 const config = Config.gen({ network });
-const kizuna = path.join(__dirname, "../../workdir/dna/kizuna.dna");
 
-const installAgent: InstallAgentsHapps = [[[kizuna]]];
-
-const install2Agents: InstallAgentsHapps = [[[kizuna]], [[kizuna]]];
-
-const install3Agents: InstallAgentsHapps = [[[kizuna]], [[kizuna]], [[kizuna]]];
-
-const install5Agents: InstallAgentsHapps = [
-  [[kizuna]],
-  [[kizuna]],
-  [[kizuna]],
-  [[kizuna]],
-  [[kizuna]],
-];
-
-const installables: Installables = {
-  one: installAgent,
-  two: install2Agents,
-  three: install3Agents,
-  five: install5Agents,
-};
-
-group(config, installables);
-contacts(config, installables);
-preference(config, installables); // *timeout in register_dna
-aggregator(config, installables);
-// request(config); // not used
+group(config);
+contacts(config);
+preference(config);
+aggregator(config);
+// request(config); // not passing

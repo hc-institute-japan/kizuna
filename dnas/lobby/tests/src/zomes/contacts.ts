@@ -1,4 +1,5 @@
 import { Orchestrator } from "@holochain/tryorama";
+import { installAgents } from "../install";
 
 function addContacts(agentPubKeys) {
   return (conductor) =>
@@ -42,16 +43,18 @@ function inBlocked(agentPubKey) {
 
 let orchestrator = new Orchestrator();
 
-export default (config, installables) => {
+export default (config) => {
   orchestrator.registerScenario("add a contact", async (s, t) => {
     const [conductor] = await s.players([config]);
-    const [[alice_lobby_happ], [bobby_lobby_happ]] =
-      await conductor.installAgentsHapps(installables.two);
+    const [alice_lobby_happ, bobby_lobby_happ] = await installAgents(
+      conductor,
+      ["alice", "bobby"]
+    );
     const [alice_conductor] = alice_lobby_happ.cells;
     const [bobby_conductor] = bobby_lobby_happ.cells;
 
-    const [dna_hash_1, agent_pubkey_alice] = alice_conductor.cellId;
-    const [dna_hash_2, agent_pubkey_bobby] = bobby_conductor.cellId;
+    const agent_pubkey_alice = alice_lobby_happ.agent;
+    const agent_pubkey_bobby = bobby_lobby_happ.agent;
 
     // add self
     const add_self = await addContacts([agent_pubkey_alice])(alice_conductor);
@@ -92,12 +95,13 @@ export default (config, installables) => {
 
   orchestrator.registerScenario("remove a contact", async (s, t) => {
     const [conductor] = await s.players([config]);
-    const [[alice_lobby_happ], [bobby_lobby_happ]] =
-      await conductor.installAgentsHapps(installables.two);
+    const [alice_lobby_happ, bobby_lobby_happ] = await installAgents(
+      conductor,
+      ["alice", "bobby"]
+    );
     const [alice_conductor] = alice_lobby_happ.cells;
-    const [bobby_conductor] = bobby_lobby_happ.cells;
 
-    const [dna_hash_2, agent_pubkey_bobby] = bobby_conductor.cellId;
+    const agent_pubkey_bobby = bobby_lobby_happ.agent;
 
     // no contact then remove
     // const none_then_remove = await removeContacts([agent_pubkey_bobby])(alice_conductor);
@@ -127,15 +131,13 @@ export default (config, installables) => {
 
   orchestrator.registerScenario("list added", async (s, t) => {
     const [conductor] = await s.players([config]);
-    const [[alice_lobby_happ], [bobby_lobby_happ], [clark_lobby_happ]] =
-      await conductor.installAgentsHapps(installables.three);
+    const [alice_lobby_happ, bobby_lobby_happ, clark_lobby_happ] =
+      await installAgents(conductor, ["alice", "bobby", "clark"]);
     const [alice_conductor] = alice_lobby_happ.cells;
-    const [bobby_conductor] = bobby_lobby_happ.cells;
-    const [clark_conductor] = clark_lobby_happ.cells;
 
-    const [dna_hash_1, agent_pubkey_alice] = alice_conductor.cellId;
-    const [dna_hash_2, agent_pubkey_bobby] = bobby_conductor.cellId;
-    const [dna_hash_3, agent_pubkey_clark] = clark_conductor.cellId;
+    const agent_pubkey_alice = alice_lobby_happ.agent;
+    const agent_pubkey_bobby = bobby_lobby_happ.agent;
+    const agent_pubkey_clark = clark_lobby_happ.agent;
 
     const empty_list_added = await listAdded()(alice_conductor);
     await addContacts([
@@ -171,15 +173,12 @@ export default (config, installables) => {
 
   orchestrator.registerScenario("block contact", async (s, t) => {
     const [conductor] = await s.players([config]);
-    const [[alice_lobby_happ], [bobby_lobby_happ], [clark_lobby_happ]] =
-      await conductor.installAgentsHapps(installables.three);
+    const [alice_lobby_happ, bobby_lobby_happ, clark_lobby_happ] =
+      await installAgents(conductor, ["alice", "bobby", "clark"]);
     const [alice_conductor] = alice_lobby_happ.cells;
-    const [bobby_conductor] = bobby_lobby_happ.cells;
-    const [clark_conductor] = clark_lobby_happ.cells;
 
-    const [dna_hash_1, agent_pubkey_alice] = alice_conductor.cellId;
-    const [dna_hash_2, agent_pubkey_bobby] = bobby_conductor.cellId;
-    const [dna_hash_3, agent_pubkey_clark] = clark_conductor.cellId;
+    const agent_pubkey_bobby = bobby_lobby_happ.agent;
+    const agent_pubkey_clark = clark_lobby_happ.agent;
 
     // block myself
     // const block_myself_result = await blockContacts([agent_pubkey_alice])(alice_conductor);
@@ -223,15 +222,13 @@ export default (config, installables) => {
 
   orchestrator.registerScenario("unblock contact", async (s, t) => {
     const [conductor] = await s.players([config]);
-    const [[alice_lobby_happ], [bobby_lobby_happ], [clark_lobby_happ]] =
-      await conductor.installAgentsHapps(installables.three);
+    const [alice_lobby_happ, bobby_lobby_happ, clark_lobby_happ] =
+      await installAgents(conductor, ["alice", "bobby", "clark"]);
     const [alice_conductor] = alice_lobby_happ.cells;
-    const [bobby_conductor] = bobby_lobby_happ.cells;
-    const [clark_conductor] = clark_lobby_happ.cells;
 
-    const [dna_hash_1, agent_pubkey_alice] = alice_conductor.cellId;
-    const [dna_hash_2, agent_pubkey_bobby] = bobby_conductor.cellId;
-    const [dna_hash_3, agent_pubkey_clark] = clark_conductor.cellId;
+    const agent_pubkey_alice = alice_lobby_happ.agent;
+    const agent_pubkey_bobby = bobby_lobby_happ.agent;
+    const agent_pubkey_clark = clark_lobby_happ.agent;
 
     // no contact then unblock
     // const none_then_unblock = await unblockContacts([agent_pubkey_bobby])(alice_conductor);
@@ -264,15 +261,12 @@ export default (config, installables) => {
 
   orchestrator.registerScenario("list blocked", async (s, t) => {
     const [conductor] = await s.players([config]);
-    const [[alice_lobby_happ], [bobby_lobby_happ], [clark_lobby_happ]] =
-      await conductor.installAgentsHapps(installables.three);
+    const [alice_lobby_happ, bobby_lobby_happ, clark_lobby_happ] =
+      await installAgents(conductor, ["alice", "bobby", "clark"]);
     const [alice_conductor] = alice_lobby_happ.cells;
-    const [bobby_conductor] = bobby_lobby_happ.cells;
-    const [clark_conductor] = clark_lobby_happ.cells;
 
-    const [dna_hash_1, agent_pubkey_alice] = alice_conductor.cellId;
-    const [dna_hash_2, agent_pubkey_bobby] = bobby_conductor.cellId;
-    const [dna_hash_3, agent_pubkey_clark] = clark_conductor.cellId;
+    const agent_pubkey_bobby = bobby_lobby_happ.agent;
+    const agent_pubkey_clark = clark_lobby_happ.agent;
 
     const empty_list_blocked = await listBlocked()(alice_conductor);
     await blockContacts([agent_pubkey_bobby, agent_pubkey_clark])(
@@ -304,15 +298,13 @@ export default (config, installables) => {
 
   orchestrator.registerScenario("check in blocked list", async (s, t) => {
     const [conductor] = await s.players([config]);
-    const [[alice_lobby_happ], [bobby_lobby_happ], [clark_lobby_happ]] =
-      await conductor.installAgentsHapps(installables.three);
+    const [alice_lobby_happ, bobby_lobby_happ, clark_lobby_happ] =
+      await installAgents(conductor, ["alice", "bobby", "clark"]);
     const [alice_conductor] = alice_lobby_happ.cells;
-    const [bobby_conductor] = bobby_lobby_happ.cells;
-    const [clark_conductor] = clark_lobby_happ.cells;
 
-    const [dna_hash_1, agent_pubkey_alice] = alice_conductor.cellId;
-    const [dna_hash_2, agent_pubkey_bobby] = bobby_conductor.cellId;
-    const [dna_hash_3, agent_pubkey_clark] = clark_conductor.cellId;
+    const agent_pubkey_alice = alice_lobby_happ.agent;
+    const agent_pubkey_bobby = bobby_lobby_happ.agent;
+    const agent_pubkey_clark = clark_lobby_happ.agent;
 
     await blockContacts([agent_pubkey_bobby])(alice_conductor);
     await blockContacts([agent_pubkey_clark])(alice_conductor);

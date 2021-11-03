@@ -1,6 +1,6 @@
 import { Orchestrator } from "@holochain/tryorama";
 import { ScenarioApi } from "@holochain/tryorama/lib/api";
-
+import { installAgents } from "../install";
 let orchestrator = new Orchestrator();
 
 function createProfile(profileInput) {
@@ -8,22 +8,18 @@ function createProfile(profileInput) {
     conductor.call("profiles", "create_profile", profileInput);
 }
 
-export default (config, installables) => {
+export default (config) => {
   orchestrator.registerScenario(
     "get latest state",
     async (s: ScenarioApi, t) => {
       const [conductor] = await s.players([config]);
-      const [[alice_lobby_happ], [bobby_lobby_happ]] =
-        await conductor.installAgentsHapps(installables.two);
+      const [alice_lobby_happ] = await installAgents(conductor, ["alice"]);
       const [alice_conductor] = alice_lobby_happ.cells;
-      const [bobby_conductor] = bobby_lobby_happ.cells;
 
-      const profile = await createProfile({
+      await createProfile({
         nickname: "alice_nick",
         fields: {},
       })(alice_conductor);
-
-      console.log("this is the profile", profile);
 
       const aggreageted_result = await alice_conductor.call(
         "aggregator",

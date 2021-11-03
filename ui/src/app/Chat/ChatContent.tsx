@@ -32,6 +32,7 @@ import { Profile } from "../../redux/profile/types";
 import { RootState } from "../../redux/types";
 import { useAppDispatch } from "../../utils/helpers";
 import ChatHeader from "./ChatHeader";
+import recommitMessage from "../../redux/p2pmessages/actions/signals/recommitMessage";
 
 const Chat: React.FC = () => {
   /* STATES */
@@ -45,6 +46,7 @@ const Chat: React.FC = () => {
       receipt?: P2PMessageReceipt | undefined;
     }[]
   >([]);
+  const [messageReceipts, setMessageReceipts] = useState<P2PMessage[]>([]);
   const [disableGetPrevious, setDisableGetPrevious] = useState<boolean>(false);
   const {
     conversations,
@@ -89,6 +91,7 @@ const Chat: React.FC = () => {
   /* REFS */
   const scrollerRef = useRef<ChatListMethods>(null);
   const didMountRef = useRef(false);
+  const receiptsTimeout = useRef<NodeJS.Timeout>();
   // const didMountRef2 = useRef(false);
   const inputTimeout = useRef<NodeJS.Timeout>();
   const messageInputRef = useRef<MessageInputMethods | null>(null);
@@ -116,6 +119,7 @@ const Chat: React.FC = () => {
       dispatch(getP2PState(conversant)).then((res: any) =>
         setMessagesWithConversant(res)
       );
+      console.log("disptaching getp2pstate");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversations, messages, receipts, conversant, errMsgs]);
@@ -124,6 +128,17 @@ const Chat: React.FC = () => {
     dispatch(getPinnedMessages(id));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // debounce to dispatch readMessage
+  useEffect(() => {
+    if (messageReceipts.length > 0) {
+      if (receiptsTimeout.current) clearTimeout(receiptsTimeout.current);
+      receiptsTimeout.current = setTimeout(() => {
+        dispatch(readMessage(messageReceipts));
+        setMessageReceipts([]);
+      }, 1000);
+    }
+  }, [messageReceipts]);
 
   /* HANDLERS */
   /*
@@ -240,8 +255,10 @@ const Chat: React.FC = () => {
     */
   const handleOnScrollTop = (complete: any) => {
     if (disableGetPrevious === false) {
-      const lastMessage = messagesWithConversant[0].message;
-      if (!lastMessage.err) {
+      const lastMessage = messagesWithConversant[0]
+        ? messagesWithConversant[0].message
+        : null;
+      if (lastMessage && !lastMessage.err) {
         dispatch(
           getPreviousMessages(
             conversant.id,
@@ -267,12 +284,17 @@ const Chat: React.FC = () => {
       which emits a signal to the sender
       when the chat bubble comes into view
     */
+
   const onSeenHandler = (messageBundle: {
     message: P2PMessage;
     receipt?: P2PMessageReceipt;
   }) => {
     if (messageBundle.receipt!.status !== "read" && readReceipt) {
-      dispatch(readMessage([messageBundle.message]));
+      // dispatch(readMessage([messageBundle.message]));
+      setMessageReceipts((currMessageReceipts) => [
+        ...currMessageReceipts,
+        messageBundle.message,
+      ]);
     }
   };
 
@@ -306,48 +328,52 @@ const Chat: React.FC = () => {
   const onRetryHandler = (setLoading: any, message: P2PMessage) => {
     setLoading(true);
 
-    if (message.payload.type === "TEXT") {
-      dispatch(
-        sendMessage(
-          conversant.id,
-          message.payload.payload.payload,
-          "TEXT",
-          message.replyToId
-        )
-      ).then((res: any) => {
-        setLoading(false);
-        if (!res) return null;
-        dispatch(removeErrMessage(message));
-      });
+    if (message.p2pMessageEntryHash === "error message") {
+      if (message.payload.type === "TEXT") {
+        dispatch(
+          sendMessage(
+            conversant.id,
+            message.payload.payload.payload,
+            "TEXT",
+            message.replyToId
+          )
+        ).then((res: any) => {
+          setLoading(false);
+          if (!res) return null;
+          dispatch(removeErrMessage(message));
+        });
+      } else {
+        const file: FileContent = {
+          metadata: {
+            fileName: message.payload.fileName,
+            fileType: message.payload.fileType,
+            fileSize: message.payload.fileSize,
+          },
+          fileType: {
+            type: message.payload.fileType,
+            payload:
+              message.payload.fileType === "OTHER"
+                ? undefined
+                : { thumbnail: message.payload.thumbnail! },
+          },
+          fileBytes: message.payload.fileBytes!,
+        };
+        dispatch(
+          sendMessage(
+            conversant.id,
+            "",
+            "FILE",
+            replyTo !== "" ? replyTo : undefined,
+            file
+          )
+        ).then((res: any) => {
+          setLoading(false);
+          if (!res) return null;
+          dispatch(removeErrMessage(message));
+        });
+      }
     } else {
-      const file: FileContent = {
-        metadata: {
-          fileName: message.payload.fileName,
-          fileType: message.payload.fileType,
-          fileSize: message.payload.fileSize,
-        },
-        fileType: {
-          type: message.payload.fileType,
-          payload:
-            message.payload.fileType === "OTHER"
-              ? undefined
-              : { thumbnail: message.payload.thumbnail! },
-        },
-        fileBytes: message.payload.fileBytes!,
-      };
-      dispatch(
-        sendMessage(
-          conversant.id,
-          "",
-          "FILE",
-          replyTo !== "" ? replyTo : undefined,
-          file
-        )
-      ).then((res: any) => {
-        setLoading(false);
-        if (!res) return null;
-        dispatch(removeErrMessage(message));
-      });
+      dispatch(recommitMessage(message)).then((res: any) => setLoading(false));
     }
   };
   /* 
@@ -357,6 +383,12 @@ const Chat: React.FC = () => {
     message: P2PMessage;
     receipt?: P2PMessageReceipt;
   }) => {
+    console.log(
+      "displaying message",
+      messageBundle.message.payload,
+      messageBundle.message.err,
+      messageBundle.receipt
+    );
     // assume that this will be called with messages in sorted order
     const key = messageBundle.message.p2pMessageEntryHash;
     const author = messageBundle.message.author;
@@ -369,13 +401,14 @@ const Chat: React.FC = () => {
         }
       : null;
 
-    const timestamp = !messageBundle.message.err
-      ? messageBundle.receipt!.timestamp
-      : messageBundle.message.timestamp;
+    const timestamp =
+      messageBundle.message.err === undefined && messageBundle.receipt
+        ? messageBundle.receipt!.timestamp
+        : messageBundle.message.timestamp;
 
     const readlist = messageBundle.message.err
       ? undefined
-      : messageBundle.receipt!.status === "read"
+      : messageBundle.receipt && messageBundle.receipt!.status === "read"
       ? { key: timestamp }
       : undefined;
 
@@ -383,7 +416,7 @@ const Chat: React.FC = () => {
       payload.type === "FILE" &&
       (payload as FilePayload).fileType === "VIDEO" &&
       fetchedFiles[payload.fileHash!] === undefined &&
-      !messageBundle.message.err
+      messageBundle.message.err === undefined
     ) {
       dispatch(getFileBytes([payload.fileHash!]));
     }
@@ -431,8 +464,8 @@ const Chat: React.FC = () => {
         showName={true}
         // TODO: enable once conductor can handle many call_remotes
         // or once we have a better implementation.
-        // onSeen={(complete) => onSeenHandler(messageBundle)}
-        onSeen={(complete) => {}}
+        onSeen={(complete) => onSeenHandler(messageBundle)}
+        // onSeen={(complete) => {}}
         onDownload={(file) => onDownloadHandler(file)}
         replyTo={replyToData ? replyToData : undefined}
         onReply={(message) => {

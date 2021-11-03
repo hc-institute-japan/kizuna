@@ -53,9 +53,7 @@ const GroupChat: React.FC = () => {
     (state: RootState) => state.preference
   );
 
-  /**
-   * Hooks
-   */
+  /* Hooks */
 
   useEffect(() => {
     if (groupData) dispatch(fetchPinnedMessages(groupData?.originalGroupId));
@@ -113,7 +111,7 @@ const GroupChat: React.FC = () => {
 
     if (text) {
       dispatch(sendGroupMessage(text)).then((res: any) => {
-        if (!res) dispatch(setErrGroupMessage(text!));
+        if (res === false) dispatch(setErrGroupMessage(text!));
         if (file) {
           dispatch(sendGroupMessage(file)).then((res: any) => {
             if (!res) dispatch(setErrGroupMessage(file!));
@@ -202,9 +200,7 @@ const GroupChat: React.FC = () => {
         onFileSelect={(files) => setFiles(files)}
       />
     </IonPage>
-  ) : (
-    <IonLoading isOpen={true} />
-  );
+  ) : null;
 };
 
 export default GroupChat;

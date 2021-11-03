@@ -2,6 +2,7 @@ import { Orchestrator } from "@holochain/tryorama";
 import { ScenarioApi } from "@holochain/tryorama/lib/api";
 import * as fs from "fs";
 import * as path from "path";
+import { installAgents } from "../../../install";
 import { delay } from "../../../utils";
 import { sendMessageSignalHandler, strToUtf8Bytes } from "../utils";
 import {
@@ -9,28 +10,23 @@ import {
   getPreviousGroupMessages,
   sendMessage,
 } from "../zome_fns";
-
-export function sendMessageTest(config, installables) {
+export function sendMessageTest(config) {
   let orchestrator = new Orchestrator();
 
   orchestrator.registerScenario(
     "Tests for text send_message",
     async (s: ScenarioApi, t) => {
       const [alice, bobby, charlie] = await s.players([config, config, config]);
+      const [alice_lobby_happ] = await installAgents(alice, ["alice"]);
+      const [bobby_lobby_happ] = await installAgents(bobby, ["bobby"]);
+      const [charlie_lobby_happ] = await installAgents(charlie, ["charlie"]);
+      const [alice_conductor] = alice_lobby_happ.cells;
+      const [bobby_conductor] = bobby_lobby_happ.cells;
+      const [charlie_conductor] = charlie_lobby_happ.cells;
 
-      const [[alice_happ]] = await alice.installAgentsHapps(installables.one);
-      const [[bobby_happ]] = await bobby.installAgentsHapps(installables.one);
-      const [[charlie_happ]] = await charlie.installAgentsHapps(
-        installables.one
-      );
-
-      const alicePubKey = alice_happ.agent;
-      const bobbyPubKey = bobby_happ.agent;
-      const charliePubKey = charlie_happ.agent;
-
-      const alice_conductor = alice_happ.cells[0];
-      const bobby_conductor = bobby_happ.cells[0];
-      const charlie_conductor = charlie_happ.cells[0];
+      const alicePubKey = alice_lobby_happ.agent;
+      const bobbyPubKey = bobby_lobby_happ.agent;
+      const charliePubKey = charlie_lobby_happ.agent;
 
       let signals = [];
       const messagesSent: any[] = [];
@@ -106,32 +102,34 @@ export function sendMessageTest(config, installables) {
   orchestrator.run();
 }
 
-export function sendMessageswithFilesTest(config, installables) {
+export function sendMessageswithFilesTest(config) {
   let orchestrator = new Orchestrator();
 
   orchestrator.registerScenario(
     "send messages with files",
     async (s: ScenarioApi, t) => {
-      const [alice, bobby] = await s.players([config, config, config]);
+      const [alice, bobby, charlie] = await s.players([config, config, config]);
+      const [alice_lobby_happ] = await installAgents(alice, ["alice"]);
+      const [bobby_lobby_happ] = await installAgents(bobby, ["bobby"]);
+      const [charlie_lobby_happ] = await installAgents(charlie, ["charlie"]);
 
-      const [[alice_happ]] = await alice.installAgentsHapps(installables.one);
-      const [[bobby_happ]] = await bobby.installAgentsHapps(installables.one);
+      const [alice_conductor] = alice_lobby_happ.cells;
+      const [bobby_conductor] = bobby_lobby_happ.cells;
 
-      const alicePubKey = alice_happ.agent;
-      const bobbyPubKey = bobby_happ.agent;
-
-      const alice_conductor = alice_happ.cells[0];
-      const bobby_conductor = bobby_happ.cells[0];
+      const alicePubKey = alice_lobby_happ.agent;
+      const bobbyPubKey = bobby_lobby_happ.agent;
+      const charliePubKey = charlie_lobby_happ.agent;
 
       await delay();
 
       // signal handlers assignment
       alice.setSignalHandler((signal) => {});
       bobby.setSignalHandler((signal) => {});
+      charlie.setSignalHandler((signal) => {});
 
       let create_group_input = {
         name: "Group_name",
-        members: [bobbyPubKey],
+        members: [bobbyPubKey, charliePubKey],
       };
 
       let { content, groupId, group_revision_id } = await createGroup(
@@ -335,29 +333,28 @@ export function sendMessageswithFilesTest(config, installables) {
   orchestrator.run();
 }
 
-export function sendLargeSetOfFilesTest(config, installables) {
+export function sendLargeSetOfFilesTest(config) {
   let orchestrator = new Orchestrator();
 
   orchestrator.registerScenario(
     "we should send and then return a large set of messages with files",
     async (s: ScenarioApi, t) => {
-      const [alice, bobby] = await s.players([config, config]);
+      const [alice, bobby, charlie] = await s.players([config, config, config]);
+      const [alice_lobby_happ] = await installAgents(alice, ["alice"]);
+      const [bobby_lobby_happ] = await installAgents(bobby, ["bobby"]);
+      const [charlie_lobby_happ] = await installAgents(charlie, ["charlie"]);
+      const [alice_conductor] = alice_lobby_happ.cells;
 
-      const [[alice_happ]] = await alice.installAgentsHapps(installables.one);
-      const [[bobby_happ]] = await bobby.installAgentsHapps(installables.one);
-
-      // await s.shareAllNodes([alice, bobby]);
-
-      const alicePubKey = alice_happ.agent;
-      const bobbyPubKey = bobby_happ.agent;
-
-      const alice_conductor = alice_happ.cells[0];
+      const alicePubKey = alice_lobby_happ.agent;
+      const bobbyPubKey = bobby_lobby_happ.agent;
+      const charliePubKey = charlie_lobby_happ.agent;
 
       await delay(2000);
 
       // signal handlers assignment
       alice.setSignalHandler((signal) => {});
       bobby.setSignalHandler((signal) => {});
+      charlie.setSignalHandler((signal) => {});
 
       let fileName: string;
       let filePath;
@@ -367,7 +364,7 @@ export function sendLargeSetOfFilesTest(config, installables) {
 
       let create_group_input = {
         name: "Group_name",
-        members: [bobbyPubKey],
+        members: [bobbyPubKey, charliePubKey],
       };
 
       let { groupId, content } = await createGroup(create_group_input)(

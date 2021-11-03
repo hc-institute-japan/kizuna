@@ -10,7 +10,6 @@ import {
 import createGroup from "./createGroup";
 import sendGroupMessage from "./sendGroupMessage";
 import setErrGroupMessage from "./setErrGroupMessage";
-import groupMessageData from "./signals/groupMessageData";
 
 const sendInitialGroupMessage =
   (
@@ -76,7 +75,7 @@ const sendInitialGroupMessage =
       inputs.forEach(async (groupMessage) => {
         // res: boolean | group message res
         await dispatch(sendGroupMessage(groupMessage)).then((res: any) => {
-          !res
+          res === false
             ? dispatch(setErrGroupMessage(groupMessage))
             : messageResults.push(res);
         });
@@ -88,13 +87,37 @@ const sendInitialGroupMessage =
       };
     } catch (e) {
       /* err from createGoup.ts */
-      if (e.message.includes("cannot create group with blocked agents")) {
-        dispatch(
-          pushError("TOAST", {}, { id: "redux.err.group.create-group.1" })
-        );
-      } else {
-        /* This error will be errors other than Guest from host/conductor (or holo-web-sdk) */
-        dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
+      switch (true) {
+        case e.message.includes("cannot create group with blocked agents"):
+          dispatch(
+            pushError("TOAST", {}, { id: "redux.err.group.create-group.1" })
+          );
+          break;
+        case e.message.includes(
+          "groups cannot be created with less than 3 members"
+        ):
+          dispatch(
+            pushError("TOAST", {}, { id: "redux.err.group.create-group.2" })
+          );
+          break;
+        case e.message.includes(
+          "creator AgentPubKey cannot be included in the group members list"
+        ):
+          dispatch(
+            pushError("TOAST", {}, { id: "redux.err.group.create-group.3" })
+          );
+          break;
+        case e.message.includes(
+          "the group name must at least contain 1 character and maximun 50 characters"
+        ):
+          console.log(e);
+          dispatch(
+            pushError("TOAST", {}, { id: "redux.err.group.create-group.4" })
+          );
+          break;
+        default:
+          dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
+          return false;
       }
     }
     return false;

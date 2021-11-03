@@ -1,4 +1,12 @@
 import { Orchestrator } from "@holochain/tryorama";
+import {
+  installAgents,
+  MEM_PROOF1,
+  MEM_PROOF2,
+  MEM_PROOF3,
+  MEM_PROOF4,
+  MEM_PROOF5,
+} from "../../../install";
 import { Installables } from "../../../types";
 import { delay } from "../../../utils";
 
@@ -22,55 +30,31 @@ const call = async (
 
 let orchestrator = new Orchestrator();
 
-const per_agent = (config, installables: Installables) => {
+const per_agent = (config) => {
   orchestrator.registerScenario(
     "Get and set per agent preference",
     async (s, t) => {
-      const [alice, bobby, clark, diego, ethan] = await s.players([
-        config,
-        config,
-        config,
-        config,
-        config,
+      const [conductor] = await s.players([config]);
+      const [
+        alice_lobby_happ,
+        bobby_lobby_happ,
+        clark_lobby_happ,
+        diego_lobby_happ,
+        ethan_lobby_happ,
+      ] = await installAgents(conductor, [
+        "alice",
+        "bobby",
+        "clark",
+        "diego",
+        "ethan",
       ]);
-      await alice.startup({});
-      await bobby.startup({});
-      await clark.startup({});
-      await diego.startup({});
-      await ethan.startup({});
-      delay(5000);
-      const [alice_lobby_happ] = await alice.installAgentsHapps(
-        installables.one
-      );
-      console.log("installed happ to agent 1/5");
-      const [bobby_lobby_happ] = await bobby.installAgentsHapps(
-        installables.one
-      );
-      console.log("installed happ to agent 2/5");
-      const [clark_lobby_happ] = await clark.installAgentsHapps(
-        installables.one
-      );
-      console.log("installed happ to agent 3/5");
-      const [diego_lobby_happ] = await diego.installAgentsHapps(
-        installables.one
-      );
-      console.log("installed happ to agent 4/5");
-      const [ethan_lobby_happ] = await ethan.installAgentsHapps(
-        installables.one
-      );
-      console.log("installed happ to agent 5/5");
 
-      const alice_conductor = alice_lobby_happ[0].cells[0];
-      const bobby_conductor = bobby_lobby_happ[0].cells[0];
-      const clark_conductor = clark_lobby_happ[0].cells[0];
-      const diego_conductor = diego_lobby_happ[0].cells[0];
-      const ethan_conductor = ethan_lobby_happ[0].cells[0];
+      const [alice_conductor] = alice_lobby_happ.cells;
 
-      const [alice_dna, alice_pubkey] = alice_conductor.cellId;
-      const [bobby_dna, bobby_pubkey] = bobby_conductor.cellId;
-      const [charlie_dna, clark_pubkey] = clark_conductor.cellId;
-      const [diego_dna, diego_pubkey] = diego_conductor.cellId;
-      const [ethan_dna, ethan_pubkey] = ethan_conductor.cellId;
+      const bobby_pubkey = bobby_lobby_happ.agent;
+      const clark_pubkey = clark_lobby_happ.agent;
+      const diego_pubkey = diego_lobby_happ.agent;
+      const ethan_pubkey = ethan_lobby_happ.agent;
 
       let preference = null;
 

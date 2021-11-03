@@ -117,13 +117,7 @@ export function signalHandler(signal, signal_listener) {
 }
 
 // contacts
-function blockContacts(agentPubKeys) {
+export function blockContacts(agentPubKeys) {
   return (conductor) =>
     conductor.call("contacts", "block_contacts", agentPubKeys);
-}
-
-// VAlIDATION FUCNTIONS
-export function runValidationRules(validation_input) {
-  return (conductor) =>
-    conductor.call("group", "run_validation", validation_input);
 }

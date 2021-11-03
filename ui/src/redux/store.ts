@@ -1,7 +1,13 @@
 import { AnyAction, applyMiddleware, createStore as create } from "redux";
 import logger from "redux-logger";
 import thunk, { ThunkMiddleware } from "redux-thunk";
-import { callZome, getAgentId, retry } from "../connection/holochainClient";
+import {
+  callZome,
+  getAgentId,
+  retry,
+  init,
+  client,
+} from "../connection/holochainClient";
 import rootReducer from "./reducers";
 import { RootState } from "./types";
 
@@ -10,6 +16,8 @@ const createStore = (args?: Object) => {
     callZome,
     getAgentId,
     retry,
+    client,
+    init,
     ...args,
   });
 

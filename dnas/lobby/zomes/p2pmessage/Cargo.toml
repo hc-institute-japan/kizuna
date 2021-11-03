@@ -11,6 +11,6 @@ crate-type = [ "cdylib", "rlib" ]
 [dependencies]
 derive_more = "0"
 serde = "1"
-holo_hash = {git = "https://github.com/holochain/holochain", rev = "holochain-0.0.109", package = "holo_hash", version = "0.0.8", features = ["encoding"]}
-hdk = {git = "https://github.com/holochain/holochain", rev = "holochain-0.0.109", package = "hdk", version = "0.0.109"}
-p2pmessage = {git = "https://github.com/hc-institute-japan/p2pmessage-zome", rev="538d4bb125f22cc018558bed618031be128a750a", package = "p2pmessage"}
+hdk = "0.0.113"
+holo_hash = {version = "*", features = ["encoding"]}
+p2pmessage = {git = "https://github.com/hc-institute-japan/p2pmessage-zome", branch="hc-0.0.113", package = "p2pmessage"}

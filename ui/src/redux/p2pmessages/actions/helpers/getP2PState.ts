@@ -18,20 +18,27 @@ export const getP2PState =
     }[] = messagesWithConversant
       ? messagesWithConversant.messages.map((messageID) => {
           let message = state.messages[messageID];
-          let receiptIDs = message.receipts;
-          let filteredReceipts = receiptIDs.map((id) => {
-            let receipt = state.receipts[id];
-            return receipt;
-          });
-          filteredReceipts.sort((a: any, b: any) => {
-            let receiptTimestampA = a.timestamp.getTime();
-            let receiptTimestampB = b.timestamp.getTime();
-            if (receiptTimestampA > receiptTimestampB) return -1;
-            if (receiptTimestampA < receiptTimestampB) return 1;
-            return 0;
-          });
-          let latestReceipt = filteredReceipts[0];
-          return { message: message, receipt: latestReceipt };
+          if (message.receipts.length > 0) {
+            console.log("process message");
+            let receiptIDs = message.receipts;
+            let filteredReceipts = receiptIDs.map((id) => {
+              let receipt = state.receipts[id];
+              return receipt;
+            });
+            filteredReceipts.sort((a: any, b: any) => {
+              let receiptTimestampA = a.timestamp.getTime();
+              let receiptTimestampB = b.timestamp.getTime();
+              if (receiptTimestampA > receiptTimestampB) return -1;
+              if (receiptTimestampA < receiptTimestampB) return 1;
+              return 0;
+            });
+            message.err = false;
+            let latestReceipt = filteredReceipts[0];
+            return { message: message, receipt: latestReceipt };
+          } else {
+            message.err = true;
+            return { message: message, receipt: undefined };
+          }
         })
       : [];
     errMsgs.forEach((errMsg: P2PMessage) => {

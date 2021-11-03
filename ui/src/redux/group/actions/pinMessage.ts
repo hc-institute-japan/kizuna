@@ -24,7 +24,6 @@ export const pinMessage =
       };
 
       const conversation = conversations[groupId];
-      // if (!message.replyTo) delete message["replyTo"];
       pinnedMessages[groupMessageId] = message;
       if (conversation.pinnedMessages)
         conversation.pinnedMessages!.push(groupMessageId);
@@ -42,6 +41,10 @@ export const pinMessage =
         },
       });
     } catch (e) {
-      return dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
+      if (e.message.includes("failed to get the message being pinned")) {
+        dispatch(pushError("TOAST", {}, { id: "redux.err.group.pin-message" }));
+      } else {
+        return dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
+      }
     }
   };

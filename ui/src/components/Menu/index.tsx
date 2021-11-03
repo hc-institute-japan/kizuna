@@ -18,7 +18,7 @@ import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { isHoloEnv } from "../../connection/constants";
-import { setProfile } from "../../redux/profile/actions";
+import { logout } from "../../redux/profile/actions";
 import { Profile } from "../../redux/profile/types";
 import { RootState } from "../../redux/types";
 import { useAppDispatch } from "../../utils/helpers";
@@ -35,8 +35,8 @@ interface MenuItem {
 const Menu: React.FC = () => {
   const history = useHistory();
   const { username, id } = useSelector((state: RootState) => state.profile);
-  const dispatch = useAppDispatch();
   const intl = useIntl();
+  const dispatch = useAppDispatch();
   const menu = useRef<any>(null);
 
   const menuList: MenuItem[] = [
@@ -56,18 +56,22 @@ const Menu: React.FC = () => {
     },
     {
       onClick: () =>
-        window.open("https://github.com/hc-institute-japan/kizuna/issues/new"),
+        window.open(
+          "https://github.com/hc-institute-japan/kizuna/issues/new?assignees=&labels=bug&template=bug_report.md&title="
+        ),
       label: intl.formatMessage({ id: "app.menu.report-label" }),
       icon: warningOutline,
     },
     {
       onClick: () => {
-        dispatch(setProfile(null));
-        history.push("/");
+        // const c = (client as any).connection;
+        // await c.signOut();
+        // await c.signIn();
+        dispatch(logout());
       },
       label: intl.formatMessage({ id: "app.menu.logout-label" }),
       icon: logOutOutline,
-      disabled: !isHoloEnv() ? true : false,
+      disabled: isHoloEnv() ? false : true,
     },
   ];
 
@@ -98,7 +102,7 @@ const Menu: React.FC = () => {
               <IonLabel>{username}</IonLabel>
             </IonItem>
           </IonItemGroup>
-          {menuList.map(({ onClick, label, icon, disabled }) => (
+          {menuList.map(({ onClick, label, icon, disabled = false }) => (
             <IonItem
               key={label}
               onClick={() => {

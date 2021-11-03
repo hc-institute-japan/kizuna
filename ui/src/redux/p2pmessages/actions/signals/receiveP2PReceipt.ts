@@ -1,7 +1,7 @@
 import { serializeHash } from "@holochain-open-dev/core-types";
 import { timestampToDate } from "../../../../utils/helpers";
 import { ThunkAction } from "../../../types";
-import { APPEND_RECEIPT } from "../../types";
+import { appendReceipt } from "../appendReceipt";
 
 const receiveP2PReceipt =
   (payload: any): ThunkAction =>
@@ -20,10 +20,7 @@ const receiveP2PReceipt =
       status: payload.receipt[receiptHash].status.status,
     };
 
-    dispatch({
-      type: APPEND_RECEIPT,
-      state: p2pReceipt,
-    });
+    dispatch(appendReceipt(p2pReceipt));
   };
 
 export default receiveP2PReceipt;

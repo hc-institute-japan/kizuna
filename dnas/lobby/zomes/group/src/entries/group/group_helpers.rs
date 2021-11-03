@@ -3,7 +3,7 @@ use hdk::prelude::*;
 use super::{Group, GroupOutput};
 use crate::signals::{SignalDetails, SignalName, SignalPayload};
 
-use crate::utils::error;
+use crate::utils::{error, try_get_and_convert};
 
 pub fn get_group_latest_version(group_id: EntryHash) -> ExternResult<GroupOutput> {
     /*
@@ -63,30 +63,25 @@ pub fn get_group_latest_version(group_id: EntryHash) -> ExternResult<GroupOutput
                 from this group using "hdk3::get"
                 */
                 if let Some(latest_group_entry_hash) = latest_group_header.entry_hash() {
-                    if let Some(latest_group_element) =
-                        get(latest_group_entry_hash.clone(), GetOptions::content())?
-                    {
-                        let latest_group_version: Option<Group> =
-                            latest_group_element.entry().to_app_option()?;
-
-                        if let Some(group) = latest_group_version {
-                            let group_output = GroupOutput {
-                                group_id,
-                                group_revision_id: group_entry_details.headers[0]
-                                    .clone()
-                                    .as_hash()
-                                    .to_owned(),
-                                latest_name: group.name,
-                                members: group.members,
-                                creator: group.creator,
-                                created: group.created,
-                            };
-                            return Ok(group_output);
-                        }
-                    }
+                    let latest_group: Group = try_get_and_convert(
+                        latest_group_entry_hash.to_owned(),
+                        GetOptions::latest(),
+                    )?;
+                    let group_output = GroupOutput {
+                        group_id,
+                        group_revision_id: group_entry_details.headers[0]
+                            .clone()
+                            .as_hash()
+                            .to_owned(),
+                        latest_name: latest_group.name,
+                        members: latest_group.members,
+                        creator: latest_group.creator,
+                        created: latest_group.created,
+                    };
+                    return Ok(group_output);
                 }
             }
-            _ => (), // this case will not happen
+            _ => (), // unreachable
         } // match ends
     } // if let ends
 
@@ -111,10 +106,4 @@ pub fn link_and_emit_added_to_group_signals(
     remote_signal(ExternIO::encode(signal)?, agents)?;
 
     Ok(())
-}
-pub fn get_group_entry_from_element(element: Element) -> ExternResult<Group> {
-    if let Some(group) = element.entry().to_app_option()? {
-        return Ok(group);
-    }
-    return error("we can't get the entry for the given element");
 }

@@ -40,16 +40,12 @@ const Register: React.FC = () => {
   const handleOnSubmit = () => {
     setLoading(true);
     dispatch(createProfile(nickname)).then((res: any) => {
-      if (!res) {
-        // setError(
-        //   intl.formatMessage({
-        //     id: "app.register.error-existing-username",
-        //   })
-        // );
-        setLoading(false);
-      }
+      if (!res) setLoading(false);
     });
   };
+
+  const handleOnKeyDown = (event: React.KeyboardEvent) =>
+    event.key === "Enter" && !event.shiftKey ? handleOnSubmit() : null;
 
   return (
     <IonPage>
@@ -72,6 +68,9 @@ const Register: React.FC = () => {
               <HomeInput
                 value={nickname}
                 onIonChange={handleOnChange}
+                onKeyPress={(event: React.KeyboardEvent) =>
+                  handleOnKeyDown(event)
+                }
                 placeholder={intl.formatMessage({
                   id: "app.register.username-placeholder",
                 })}

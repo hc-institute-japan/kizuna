@@ -1,8 +1,9 @@
 import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
 import { ThunkAction } from "../../types";
-import { P2PMessage, APPEND_RECEIPT } from "../types";
+import { P2PMessage } from "../types";
 import { dateToTimestamp, timestampToDate } from "../../../utils/helpers";
+import { appendReceipt } from "./appendReceipt";
 
 export const readMessage =
   (messages: P2PMessage[]): ThunkAction =>
@@ -43,17 +44,14 @@ export const readMessage =
         messageIDs.push(serializeHash(id));
       });
 
-      let p2preceipt = {
+      let p2pReceipt = {
         p2pMessageReceiptEntryHash: key,
         p2pMessageEntryHashes: messageIDs,
         timestamp: timestampToDate(readReceiptMap[key].status.timestamp),
         status: readReceiptMap[key].status.status,
       };
 
-      dispatch({
-        type: APPEND_RECEIPT,
-        state: p2preceipt,
-      });
+      dispatch(appendReceipt(p2pReceipt));
       return true;
     }
 

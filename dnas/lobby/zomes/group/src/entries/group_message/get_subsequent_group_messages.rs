@@ -8,7 +8,7 @@ use crate::utils::*;
 pub fn get_subsequent_group_messages_handler(
     filter: GroupMsgBatchFetchFilter,
 ) -> ExternResult<GroupMessagesOutput> {
-    let mut linked_messages: Vec<Link>;
+    let mut linked_messages: Vec<Link> = Vec::default();
 
     let mut messages_hashes: Vec<EntryHash> = vec![];
     let mut messages_by_group: HashMap<String, Vec<EntryHash>> = HashMap::new();
@@ -27,54 +27,47 @@ pub fn get_subsequent_group_messages_handler(
         pivot_path = Some(path_hash.clone());
 
         // get the messages linked to this path (this list was sorted & filtered inside the method)
-        linked_messages = get_linked_messages_from_path(
+        linked_messages = get_linked_messages_hash(
             path_hash,
             filter.payload_type.clone(),
             filter.last_fetched.clone(),
             Some(Direction::Subsequent),
         )?;
-
-        // we will collect the messages and all the info we need of then using this function
-        collect_messages_info(
-            &mut linked_messages, // the linked message list contains all the messages linked to one especific path
-            filter.batch_size.clone().into(),
-            &mut messages_hashes,
-            &mut group_messages_contents,
-            Direction::Subsequent,
-        )?;
     }
 
     // here we have to check if we already reach the batch size or not (if we dont reached yet the batch size we will repeat the proccess this time we will get all the pahs instead the especific one )
 
-    if messages_hashes.len() < filter.batch_size.into() {
+    if linked_messages.len() < filter.batch_size.into() {
         // generate the general group path (only the group_id)
         let group_path: Path = path_from_str(&filter.group_id.to_string());
 
         // get the list of childrens for this path
-        let mut children_paths: Vec<Link> = group_path.children()?.into_inner();
+        let mut children_paths: Vec<Link> = group_path.children()?;
 
-        // filter this childrens to removed the path we dont need to check
+        // remove path we dont need to check
         filter_path_children(&mut children_paths, pivot_path, Direction::Subsequent)?;
 
         // iterate the childrens until we reach the batch size or we run out of paths
         while !children_paths.is_empty() && messages_hashes.len() < filter.batch_size.into() {
             let path_hash: EntryHash = children_paths.pop().unwrap().target; // this unwrap is safe (we check the vector wasnt empty before this)
 
-            // get the messages linked to this path (this list was sorted & filter inside the method )
-            linked_messages =
-                get_linked_messages_from_path(path_hash, filter.payload_type.clone(), None, None)?;
-
-            collect_messages_info(
-                &mut linked_messages, // the linked message list contains all the messages linked to one especific path
-                filter.batch_size.clone().into(),
-                &mut messages_hashes,
-                &mut group_messages_contents,
-                Direction::Subsequent,
-            )?;
+            let mut new_links =
+                get_linked_messages_hash(path_hash, filter.payload_type.clone(), None, None)?;
+            linked_messages.append(&mut new_links);
         }
     }
+    linked_messages.sort_by(|a, b| a.timestamp.cmp(&b.timestamp));
+    linked_messages.truncate(filter.batch_size.into());
 
-    // at this point we have all the data we need to return to the ui
+    collect_and_insert_messages(
+        linked_messages,
+        &mut messages_hashes,
+        &mut group_messages_contents,
+    )?;
+
+    // and the read_list
+    collect_and_insert_read_list(&mut group_messages_contents)?;
+
     messages_by_group.insert(filter.group_id.to_string(), messages_hashes);
 
     Ok(GroupMessagesOutput {

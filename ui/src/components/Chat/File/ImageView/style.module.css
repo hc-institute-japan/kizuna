@@ -1,4 +1,10 @@
 .image {
   border-radius: 5px;
   overflow: hidden;
+  /* max-width: 80%; */
+  min-width: 50%;
+}
+
+.image img {
+  object-position: center center;
 }

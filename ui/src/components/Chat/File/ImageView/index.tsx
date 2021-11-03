@@ -1,5 +1,5 @@
 import { IonImg } from "@ionic/react";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { FilePayload } from "../../../../redux/commons/types";
 
 import ImageModal from "./ImageModal";
@@ -21,6 +21,9 @@ const Image: React.FC<Props> = ({ src, file, className, onDownload, err }) => {
     }
   };
 
+  const container = useRef<HTMLDivElement>(null);
+  const [maxHeight, setMaxHeight] = useState("auto");
+
   return (
     <>
       <ImageModal
@@ -29,8 +32,20 @@ const Image: React.FC<Props> = ({ src, file, className, onDownload, err }) => {
         src={src}
         file={file}
       />
-      <div className={`${styles.image} ${className ? className : ""}`}>
-        <IonImg onClick={handleOnImageOnClick} src={src} />
+      <div
+        ref={container}
+        className={`${styles.image} ${className ? className : ""}`}
+        style={{ maxHeight }}
+      >
+        <IonImg
+          onIonImgDidLoad={() =>
+            setMaxHeight(
+              `${container.current!.getBoundingClientRect().width * 1.25}px`
+            )
+          }
+          onClick={handleOnImageOnClick}
+          src={src}
+        />
       </div>
     </>
   );

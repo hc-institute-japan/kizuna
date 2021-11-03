@@ -1,4 +1,5 @@
 import { deserializeHash } from "@holochain-open-dev/core-types";
+
 import { useCallback, useRef, useState } from "react";
 import { IntlShape } from "react-intl";
 import { useDispatch } from "react-redux";
@@ -91,26 +92,25 @@ export const indexContacts: (contacts: Profile[]) => IndexedContacts = (
   contacts
 ) => {
   let indexedContacts: IndexedContacts = {};
-  if (contacts.length > 0) {
-    let char = contacts[0].username.charAt(0).toUpperCase();
-    indexedContacts[char] = [];
-    contacts.forEach((contact: Profile) => {
-      const currChar = contact.username.charAt(0).toUpperCase();
-      if (currChar !== char) {
-        char = currChar;
-        indexedContacts[char] = [];
+
+  const sortedContacts = contacts.sort((a, b) =>
+    a.username.toLocaleLowerCase().localeCompare(b.username.toLocaleLowerCase())
+  );
+
+  if (sortedContacts.length > 0) {
+    sortedContacts.forEach((contact: Profile) => {
+      const currChar = contact.username.charAt(0).toLocaleLowerCase();
+      let currArr = indexedContacts[currChar];
+
+      if (currArr === undefined) {
+        indexedContacts[currChar] = [];
+        currArr = indexedContacts[currChar];
       }
-      const currArr = indexedContacts[currChar];
       currArr.push(contact);
     });
   }
-  const orderedIndexedContacts = Object.keys(indexedContacts)
-    .sort()
-    .reduce((obj: any, key: any) => {
-      obj[key] = indexedContacts[key];
-      return obj;
-    }, {});
-  return orderedIndexedContacts;
+
+  return indexedContacts;
 };
 
 export const debounce: (callback: () => any, delay?: number) => Function = (

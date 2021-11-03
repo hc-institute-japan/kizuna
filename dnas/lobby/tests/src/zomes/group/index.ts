@@ -5,6 +5,7 @@ import updateGroupNameTest from "./crud/updateGroupName";
 
 // validation
 import validateCreateGroupTest from "./validations/validateCreateGroup";
+import validateUpdateGroupTest from "./validations/validateUpdateGroup";
 
 // group message
 import {
@@ -24,21 +25,23 @@ import { getLatestMessagesForAllGroupsTest } from "./group_message/getLatestMess
 import { groupTypingIndicatorTest } from "./group_message/typingIndicator";
 import { readGroupMessageTest } from "./group_message/readGroupMessage";
 
-export default (config, installables) => {
+export default (config) => {
   // Group CRUD and validation related tests.
-  createGroupTest(config, installables);
-  addAndRemoveMembersTest(config, installables); // *timeout in register_dna
-  updateGroupNameTest(config, installables);
-  validateCreateGroupTest(config, installables);
+  addAndRemoveMembersTest(config); // ok
+  createGroupTest(config); // ok
+  updateGroupNameTest(config); //ok
+  validateCreateGroupTest(config); // ok
+  validateUpdateGroupTest(config); // ok
+
   // GroupMessage related tests
-  sendMessageTest(config, installables);
-  pinMessageTest(config, installables);
-  sendMessageswithFilesTest(config, installables);
-  sendLargeSetOfFilesTest(config, installables);
-  getPreviousGroupMessagesTest(config, installables);
-  getMessagesByGroupByTimestampTest(config, installables); // *timeout in register_dna
-  getLatestMessagesForAllGroupsTest(config, installables);
-  fetchFilesForAParticularDateTest(config, installables);
-  groupTypingIndicatorTest(config, installables); // *timeout in register_dna
-  readGroupMessageTest(config, installables); // *timeout in register dna
+  sendMessageTest(config); // ok
+  pinMessageTest(config); // ok
+  sendMessageswithFilesTest(config); // ok
+  sendLargeSetOfFilesTest(config); //ok
+  getPreviousGroupMessagesTest(config); // ok
+  getMessagesByGroupByTimestampTest(config); // ok
+  getLatestMessagesForAllGroupsTest(config); // ok
+  fetchFilesForAParticularDateTest(config); // ok
+  groupTypingIndicatorTest(config); //ok
+  readGroupMessageTest(config); // ok
 };

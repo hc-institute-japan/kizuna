@@ -10,12 +10,12 @@ pub fn get_pinned_messages_handler(
     let mut pin_contents: HashMap<String, GroupMessageElement> = HashMap::new();
 
     // the target of the link being the group message
-    let links = get_links(group_hash, Some(LinkTag::new("pinned".to_owned())))?.into_inner();
+    let links = get_links(group_hash, Some(LinkTag::new("pinned".to_owned())))?;
 
     for link in links {
         // We try to hit the cache with content() before reaching the network
         let pinned_message_element: (SignedHeaderHashed, GroupMessage) =
-            try_get_and_convert_with_header(link.target.clone(), GetOptions::content())?;
+            try_get_and_convert_with_header(link.target.clone(), GetOptions::latest())?;
         let pinned_message_header: SignedHeaderHashed = pinned_message_element.0;
         let pinned_message: GroupMessage = pinned_message_element.1;
 
@@ -30,7 +30,7 @@ pub fn get_pinned_messages_handler(
 
         if let Some(reply_to_hash) = pinned_message.reply_to.clone() {
             let replied_message: GroupMessage =
-                try_get_and_convert(reply_to_hash.clone(), GetOptions::content())?;
+                try_get_and_convert(reply_to_hash.clone(), GetOptions::latest())?;
             group_message_data.reply_to = Some(GroupMessageWithId {
                 id: reply_to_hash,
                 content: replied_message,
