@@ -1,6 +1,6 @@
 use file_types::Payload;
 use hdk::prelude::*;
-use hdk::prelude::{element::SignedHeaderHashed, holo_hash::AgentPubKeyB64, timestamp::Timestamp};
+use hdk::prelude::{element::SignedHeaderHashed, timestamp::Timestamp};
 use std::collections::{hash_map::HashMap, BTreeMap};
 
 // for profiles
@@ -13,7 +13,7 @@ pub struct Profile {
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct AgentProfile {
-    pub agent_pub_key: AgentPubKeyB64,
+    pub agent_pub_key: AgentPubKey,
     pub profile: Profile,
 }
 
@@ -21,7 +21,7 @@ pub struct AgentProfile {
 #[serde(rename_all = "camelCase")]
 // Is there a way not to do this ugly thing? :(
 pub struct AgentProfileCamel {
-    pub agent_pub_key: AgentPubKeyB64,
+    pub agent_pub_key: AgentPubKey,
     pub profile: Profile,
 }
 

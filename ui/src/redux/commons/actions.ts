@@ -40,7 +40,7 @@ export const getLatestData =
       let contacts: { [key: string]: Profile } = {};
       let blocked: { [key: string]: Profile } = {};
       latestData.addedContacts.forEach((agentProfile: any) => {
-        const agentId = agentProfile.agentPubKey;
+        const agentId = serializeHash(agentProfile.agentPubKey);
         contacts[agentId] = {
           id: agentId,
           username: agentProfile.profile.nickname,
@@ -48,7 +48,7 @@ export const getLatestData =
       });
       if (latestData.blockedContacts)
         latestData.blockedContacts.forEach((agentProfile: any) => {
-          const agentId = agentProfile.agentPubKey;
+          const agentId = serializeHash(agentProfile.agentPubKey);
           blocked[agentId] = {
             id: agentId,
             username: agentProfile.profile.nickname,
@@ -94,7 +94,7 @@ export const getLatestData =
       const groupMembers: Profile[] = latestData.memberProfiles.map(
         (agentProfile: any): Profile => {
           return {
-            id: agentProfile.agentPubKey,
+            id: serializeHash(agentProfile.agentPubKey),
             username: agentProfile.profile.nickname,
           };
         }
