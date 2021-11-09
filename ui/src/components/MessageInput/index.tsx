@@ -6,7 +6,7 @@ import {
   IonTextarea,
   IonToolbar,
 } from "@ionic/react";
-import { attachOutline } from "ionicons/icons";
+import { attachOutline, apertureOutline } from "ionicons/icons";
 import React, {
   forwardRef,
   ForwardRefRenderFunction,
@@ -23,6 +23,7 @@ import { Payload } from "../../redux/commons/types";
 import EndButtons from "./EndButtons";
 import FileView from "./FileView";
 import ReplyView from "./ReplyView";
+import GifKeyboard from "../Gif/GifKeyboard";
 import styles from "./style.module.css";
 
 export interface FileContent {
@@ -88,7 +89,10 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
   const [loading, setLoading] = useState<boolean>(false);
   const file = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<FileContent[]>([]);
+  const [gif, setGif] = useState<string>("");
   const handleOnFileClick = () => file?.current?.click();
+
+  const [showGifs, setShowGifs] = useState<boolean>(false);
 
   const onFileSelectCallback = useCallback(() => {
     if (onFileSelect) onFileSelect(files);
@@ -111,6 +115,21 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
     setMessage("");
     setFiles([]);
     if (file.current) file.current!.value = "";
+  };
+
+  const handleOnGifClick = () => {
+    setShowGifs(!showGifs);
+  };
+
+  const handleOnGifSelect = (url: string) => {
+    setMessage(url);
+    if (onSend) {
+      console.log("sending gif", url);
+      onSend({
+        message: url,
+        setIsLoading: setLoading,
+      });
+    }
   };
 
   const onKeyDown = (event: KeyboardEvent) => {
@@ -285,6 +304,9 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
                 <IonIcon color="medium" icon={attachOutline} />
               </IonButton>
             )}
+            <IonButton onClick={handleOnGifClick}>
+              <IonIcon color="medium" icon={apertureOutline} />
+            </IonButton>
           </IonButtons>
           <IonTextarea
             value={message}
@@ -322,6 +344,12 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
         </IonToolbar>
       </IonFooter>
       <input ref={file} type="file" hidden onChange={handleOnFileChange} />
+      {showGifs ? (
+        <GifKeyboard
+          onSelect={handleOnGifSelect}
+          // onChange={(message: string) => handleOnChange(message)}
+        />
+      ) : null}
     </>
   );
 };

@@ -4,6 +4,13 @@ export interface gif {
   gif: media;
 }
 
+export interface gifResult {
+  id: string;
+  title: string;
+  content_description: string;
+  media: any;
+}
+
 export interface media {
   preview: string;
   size: number;

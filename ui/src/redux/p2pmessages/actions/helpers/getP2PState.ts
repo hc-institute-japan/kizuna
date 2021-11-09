@@ -19,7 +19,6 @@ export const getP2PState =
       ? messagesWithConversant.messages.map((messageID) => {
           let message = state.messages[messageID];
           if (message.receipts.length > 0) {
-            console.log("process message");
             let receiptIDs = message.receipts;
             let filteredReceipts = receiptIDs.map((id) => {
               let receipt = state.receipts[id];

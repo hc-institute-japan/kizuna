@@ -33,6 +33,7 @@ import { RootState } from "../../redux/types";
 import { useAppDispatch } from "../../utils/helpers";
 import ChatHeader from "./ChatHeader";
 import recommitMessage from "../../redux/p2pmessages/actions/signals/recommitMessage";
+import GifKeyboard from "../../components/Gif/GifKeyboard";
 
 const Chat: React.FC = () => {
   /* STATES */
@@ -119,7 +120,6 @@ const Chat: React.FC = () => {
       dispatch(getP2PState(conversant)).then((res: any) =>
         setMessagesWithConversant(res)
       );
-      console.log("disptaching getp2pstate");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversations, messages, receipts, conversant, errMsgs]);
@@ -383,12 +383,6 @@ const Chat: React.FC = () => {
     message: P2PMessage;
     receipt?: P2PMessageReceipt;
   }) => {
-    console.log(
-      "displaying message",
-      messageBundle.message.payload,
-      messageBundle.message.err,
-      messageBundle.receipt
-    );
     // assume that this will be called with messages in sorted order
     const key = messageBundle.message.p2pMessageEntryHash;
     const author = messageBundle.message.author;
@@ -514,6 +508,10 @@ const Chat: React.FC = () => {
         onChange={(message: string) => handleOnChange(message, conversant)}
         onFileSelect={(files) => setFiles(files)}
       />
+      {/* {showGifs ? <GifKeyboard
+        onSend={handleOnSubmit}
+        onChange={(message: string) => handleOnChange(message, conversant)}
+      /> : null} */}
     </IonPage>
   );
 };

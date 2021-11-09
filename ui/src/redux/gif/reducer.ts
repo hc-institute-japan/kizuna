@@ -7,7 +7,9 @@ const initialState = {
 const reducer = (state = initialState, action: GifActionType) => {
   switch (action.type) {
     case SET_GIFS:
-      return state;
+      let currentState = state;
+      currentState.gifs = action.state;
+      return currentState;
     default:
       return state;
   }

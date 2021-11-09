@@ -12,7 +12,6 @@ import Home from "../Home";
 import NewConversation from "../NewConversation";
 import Profile from "../Profile";
 import Settings from "../Settings";
-import { searchTrending } from "../../redux/gif/actions/searchTrending";
 
 const Authenticated: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -20,7 +19,7 @@ const Authenticated: React.FC = () => {
   useEffect(() => {
     dispatch(getLatestData()).then((res: any) => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    dispatch(searchTrending());
+    // dispatch(searchTrending());
   }, []);
 
   return !loading ? (

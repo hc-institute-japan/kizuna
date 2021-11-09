@@ -1,10 +1,9 @@
-import { ThunkAction } from "../../types";
+import { useSelector } from "react-redux";
+import { RootState, ThunkAction } from "../../types";
 import { getGifs } from "./utils";
 
 export const searchTrending = (): ThunkAction => async (dispatch, getState) => {
-  let currentState = { ...getState().p2pmessages };
-
-  getGifs(undefined);
-
-  return true;
+  let gifs = dispatch(getGifs(undefined));
+  console.log("searcha action", gifs);
+  return gifs;
 };
