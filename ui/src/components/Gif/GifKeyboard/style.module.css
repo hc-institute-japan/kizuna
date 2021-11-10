@@ -23,6 +23,14 @@
 }
 
 .box {
-  border: 2px;
-  border-color: black;
+  max-height: 20%
+}
+
+.wrapper {
+  position: relative;
+  max-height: 30%
+}
+
+.size {
+  max-height: 30%;
 }

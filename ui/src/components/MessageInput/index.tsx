@@ -5,6 +5,7 @@ import {
   IonIcon,
   IonTextarea,
   IonToolbar,
+  IonContent,
 } from "@ionic/react";
 import { attachOutline, apertureOutline } from "ionicons/icons";
 import React, {
@@ -343,13 +344,15 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
           />
         </IonToolbar>
       </IonFooter>
-      <input ref={file} type="file" hidden onChange={handleOnFileChange} />
       {showGifs ? (
-        <GifKeyboard
-          onSelect={handleOnGifSelect}
-          // onChange={(message: string) => handleOnChange(message)}
-        />
+        <IonContent className={styles.gifArea}>
+          <GifKeyboard
+            onSelect={handleOnGifSelect}
+            // onChange={(message: string) => handleOnChange(message)}
+          />
+        </IonContent>
       ) : null}
+      <input ref={file} type="file" hidden onChange={handleOnFileChange} />
     </>
   );
 };

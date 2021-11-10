@@ -112,26 +112,26 @@ const GifKeyboard: React.FC<Props> = ({ onSend, onChange, onSelect }) => {
     });
 
   return (
-    <React.Fragment>
-      <IonSearchbar
-        value={searchText}
-        onIonChange={
-          // setSearchText(e.detail.value!);
-          handleOnChange
-          // handleOnSubmit(e.detail.value!);
-        }
-        debounce={2000}
-      ></IonSearchbar>
-      <IonGrid>
-        <IonRow className={styles.mediarow}>{renderGif()}</IonRow>
-
-        <IonRow>
-          <IonInfiniteScroll position="bottom">
+    <>
+      <div slot="fixed" className={styles.wrapper}>
+        <IonSearchbar
+          slot="fixed"
+          value={searchText}
+          onIonChange={
+            // setSearchText(e.detail.value!);
+            handleOnChange
+            // handleOnSubmit(e.detail.value!);
+          }
+          debounce={2000}
+        ></IonSearchbar>
+        <IonInfiniteScroll className={styles.size} position="bottom">
+          <IonGrid>
+            <IonRow className={styles.mediarow}>{renderGif()}</IonRow>
             <IonInfiniteScrollContent></IonInfiniteScrollContent>
-          </IonInfiniteScroll>
-        </IonRow>
-      </IonGrid>
-    </React.Fragment>
+          </IonGrid>
+        </IonInfiniteScroll>
+      </div>
+    </>
   );
 };
 
