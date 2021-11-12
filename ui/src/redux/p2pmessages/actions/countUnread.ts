@@ -21,8 +21,10 @@ export const countUnread =
         return 0;
       });
       let latestReceipt = filteredReceipts[0];
-      if (latestReceipt.status !== "read" && message.author.id === conversant)
-        unreadCounter = unreadCounter + 1;
+      if (latestReceipt) {
+        if (latestReceipt.status !== "read" && message.author.id === conversant)
+          unreadCounter = unreadCounter + 1;
+      }
     });
 
     return unreadCounter;
