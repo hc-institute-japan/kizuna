@@ -119,7 +119,6 @@ const Chat: React.FC = () => {
       dispatch(getP2PState(conversant)).then((res: any) =>
         setMessagesWithConversant(res)
       );
-      console.log("disptaching getp2pstate");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [conversations, messages, receipts, conversant, errMsgs]);
@@ -148,7 +147,12 @@ const Chat: React.FC = () => {
   const handleOnChange = (message: string, conversant: Profile) => {
     if (didMountRef.current === true) {
       if (typingIndicator) {
-        dispatch(isTyping(conversant.id, message.length !== 0 ? true : false));
+        dispatch(
+          isTyping(
+            conversant.id,
+            message && message.length !== 0 ? true : false
+          )
+        );
 
         if (inputTimeout.current) clearTimeout(inputTimeout.current);
 
@@ -269,7 +273,7 @@ const Chat: React.FC = () => {
           )
         ).then((res: P2PHashMap) => {
           // disable getPrevious if return value is empty
-          if (Object.values(res)[0][conversant.id].length <= 0) {
+          if (res && Object.values(res)[0][conversant.id].length <= 0) {
             setDisableGetPrevious(true);
           }
           return complete();
@@ -383,12 +387,6 @@ const Chat: React.FC = () => {
     message: P2PMessage;
     receipt?: P2PMessageReceipt;
   }) => {
-    console.log(
-      "displaying message",
-      messageBundle.message.payload,
-      messageBundle.message.err,
-      messageBundle.receipt
-    );
     // assume that this will be called with messages in sorted order
     const key = messageBundle.message.p2pMessageEntryHash;
     const author = messageBundle.message.author;

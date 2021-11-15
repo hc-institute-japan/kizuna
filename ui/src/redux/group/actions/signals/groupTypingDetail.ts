@@ -17,7 +17,7 @@ const fetchProfile = async (
     fnName: FUNCTIONS[ZOMES.PROFILES].GET_AGENT_PROFILE,
     payload: indicatedBy,
   });
-  let id = fetchedProfile.agent_pub_key;
+  let id = serializeHash(fetchedProfile.agent_pub_key);
   return {
     id: id,
     username: fetchedProfile.profile.nickname,
