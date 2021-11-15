@@ -23,7 +23,7 @@ const fetchMyContacts =
           payload: idsB64,
         });
         profilesOutput.forEach((agentProfile: AgentProfile) => {
-          const id = serializeHash(agentProfile.agent_pub_key);
+          const id = agentProfile.agent_pub_key;
           contacts[id] = {
             id,
             username: agentProfile.profile.nickname,

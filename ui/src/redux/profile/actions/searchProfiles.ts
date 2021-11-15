@@ -23,12 +23,12 @@ const searchProfiles =
       const filteredMappedProfiles: Profile[] = res
         .filter(
           (res: AgentProfile) =>
-            !Object.keys(contacts).includes(serializeHash(res.agent_pub_key)) &&
-            serializeHash(res.agent_pub_key) !== id
+            !Object.keys(contacts).includes(res.agent_pub_key) &&
+            res.agent_pub_key !== id
         )
         .map((v: AgentProfile) => {
           return {
-            id: serializeHash(v.agent_pub_key),
+            id: v.agent_pub_key,
             username: v.profile.nickname,
           };
         });
