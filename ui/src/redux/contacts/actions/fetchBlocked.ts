@@ -13,17 +13,18 @@ const fetchBlocked =
         zomeName: ZOMES.CONTACTS,
         fnName: FUNCTIONS[ZOMES.CONTACTS].LIST_BLOCKED,
       });
+      const idsB64 = ids.map((id) => serializeHash(id));
 
       let blocked: { [key: string]: Profile } = {};
       try {
         const profilesOutput = await callZome({
           zomeName: ZOMES.PROFILES,
           fnName: FUNCTIONS[ZOMES.PROFILES].GET_AGENTS_PROFILES,
-          payload: ids,
+          payload: idsB64,
         });
 
         profilesOutput.forEach((agentProfile: AgentProfile) => {
-          const id = serializeHash(agentProfile.agent_pub_key);
+          const id = agentProfile.agent_pub_key;
           blocked[id] = {
             id,
             username: agentProfile.profile.nickname,
