@@ -508,10 +508,6 @@ const Chat: React.FC = () => {
         onChange={(message: string) => handleOnChange(message, conversant)}
         onFileSelect={(files) => setFiles(files)}
       />
-      {/* {showGifs ? <GifKeyboard
-        onSend={handleOnSubmit}
-        onChange={(message: string) => handleOnChange(message, conversant)}
-      /> : null} */}
     </IonPage>
   );
 };

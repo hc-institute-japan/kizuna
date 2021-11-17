@@ -5,7 +5,6 @@ import {
   IonIcon,
   IonTextarea,
   IonToolbar,
-  IonContent,
 } from "@ionic/react";
 import { attachOutline, apertureOutline } from "ionicons/icons";
 import React, {
@@ -90,7 +89,6 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
   const [loading, setLoading] = useState<boolean>(false);
   const file = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<FileContent[]>([]);
-  const [gif, setGif] = useState<string>("");
   const handleOnFileClick = () => file?.current?.click();
 
   const [showGifs, setShowGifs] = useState<boolean>(false);
@@ -125,7 +123,6 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
   const handleOnGifSelect = (url: string) => {
     setMessage(url);
     if (onSend) {
-      console.log("sending gif", url);
       onSend({
         message: url,
         setIsLoading: setLoading,
@@ -296,6 +293,7 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
   return (
     <>
       <IonFooter>
+        {showGifs ? <GifKeyboard onSelect={handleOnGifSelect} /> : null}
         {isReply ? <ReplyView messageState={[isReply, setIsReply]} /> : null}
         {renderFileView}
         <IonToolbar className={styles.toolbar}>
@@ -344,14 +342,6 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
           />
         </IonToolbar>
       </IonFooter>
-      {showGifs ? (
-        <IonContent className={styles.gifArea}>
-          <GifKeyboard
-            onSelect={handleOnGifSelect}
-            // onChange={(message: string) => handleOnChange(message)}
-          />
-        </IonContent>
-      ) : null}
       <input ref={file} type="file" hidden onChange={handleOnFileChange} />
     </>
   );

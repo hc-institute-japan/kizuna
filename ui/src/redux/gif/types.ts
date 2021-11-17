@@ -18,6 +18,11 @@ export interface media {
   dimensions: [number, number];
 }
 
+export interface returnValue {
+  gifs: any[];
+  next: any;
+}
+
 // {
 //     "id": "12759384",
 //     "title": "",

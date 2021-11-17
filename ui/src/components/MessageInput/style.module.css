@@ -33,6 +33,19 @@
   font-size: 0.97rem;
 }
 
-.gifArea {
-  max-height: 60%
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.blackborder {
+  border-color: black;
+  border-width: 2px;
+  border-style: outset;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 200px;
 }

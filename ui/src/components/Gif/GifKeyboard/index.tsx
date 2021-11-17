@@ -1,22 +1,25 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import {
-  IonContent,
   IonGrid,
   IonRow,
-  IonButton,
+  IonContent,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
   IonCol,
   IonCard,
+  IonCardHeader,
   IonImg,
   IonSearchbar,
 } from "@ionic/react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../redux/types";
-import { getGifs } from "../../../redux/gif/actions/utils";
+import { getGifs } from "../../../redux/gif/actions/getGifs";
 import styles from "./style.module.css";
 import { useAppDispatch } from "../../../utils/helpers";
+import Spinner from "../../../components/Spinner";
 import GifSearchBox from "../GifSearchBox";
+import { getGifsState } from "../../../redux/gif/actions/getGifsState";
+import { returnValue } from "../../../redux/gif/types";
 
 export interface FileContent {
   metadata: {
@@ -52,42 +55,40 @@ const GifKeyboard: React.FC<Props> = ({ onSend, onChange, onSelect }) => {
   const dispatch = useAppDispatch();
   const [searchText, setSearchText] = useState("");
   const [selectedGif, setSelectedGif] = useState("");
-  const [loading, setLoading] = useState<boolean>(true);
-  let gifs = useSelector((state: RootState) => state.gif.gifs);
-
-  useEffect(() => {
-    dispatch(getGifs(undefined));
-  }, []);
+  const [gifs, setGifs] = useState<any[]>([]);
+  const [next, setNext] = useState<any>(undefined);
 
   const handleOnChange = (e: CustomEvent) => setSearchText(e.detail.value!);
 
-  // const handleOnSubmit = (term: string) => {
-  //   dispatch(getGifs(term));
-  // };
+  const handleOnClick = (url: string) => {
+    setSelectedGif(url);
+  };
+
+  const handleOnScrollBottom = (complete: () => Promise<void>) => {
+    dispatch(getGifs(searchText, next)).then((res: any) => {
+      setGifs(gifs.concat(...res.gifs));
+      setNext(res.next);
+    });
+    complete();
+  };
 
   const onChangeCallback = useCallback(() => {
-    // if (onChange) onChange(selectedGif);
     if (onSelect) onSelect(selectedGif);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedGif]);
 
-  const handleOnClick = (url: string) => {
-    setSelectedGif(url);
-    // if (onSend) {
-    //   console.log("sending", url);
-    //   onSend({
-    //     message: url,
-    //     // reply: isReply?.id,
-    //     setIsLoading: setLoading,
-    //   });
-    // }
-  };
-
   useEffect(() => {
-    dispatch(getGifs(searchText));
+    dispatch(getGifs(searchText)).then((res: any) => {
+      setGifs(res.gifs);
+      setNext(res.next);
+    });
+    dispatch(getGifsState()).then((res: any[]) => setGifs(res));
   }, [searchText]);
 
   useEffect(() => onChangeCallback(), [selectedGif, onChangeCallback]);
+
+  const infiniteGifScroll = useRef<HTMLIonInfiniteScrollElement>(null);
+  const complete: () => any = () => infiniteGifScroll.current?.complete();
 
   const renderGif = () =>
     Object.values(gifs).map((gif: any) => {
@@ -112,26 +113,35 @@ const GifKeyboard: React.FC<Props> = ({ onSend, onChange, onSelect }) => {
     });
 
   return (
-    <>
-      <div slot="fixed" className={styles.wrapper}>
+    <IonCard className={styles.card}>
+      <IonCardHeader>
         <IonSearchbar
-          slot="fixed"
           value={searchText}
-          onIonChange={
-            // setSearchText(e.detail.value!);
-            handleOnChange
-            // handleOnSubmit(e.detail.value!);
-          }
+          onIonChange={handleOnChange}
           debounce={2000}
         ></IonSearchbar>
-        <IonInfiniteScroll className={styles.size} position="bottom">
+      </IonCardHeader>
+
+      <IonContent className={styles.box}>
+        {gifs && Object.values(gifs).length > 0 ? (
           <IonGrid>
             <IonRow className={styles.mediarow}>{renderGif()}</IonRow>
-            <IonInfiniteScrollContent></IonInfiniteScrollContent>
+            <IonInfiniteScroll
+              ref={infiniteGifScroll}
+              position="bottom"
+              onIonInfinite={(e) => {
+                handleOnScrollBottom(complete);
+                console.log("scrolls", e);
+              }}
+            >
+              <IonInfiniteScrollContent loadingSpinner="circles"></IonInfiniteScrollContent>
+            </IonInfiniteScroll>
           </IonGrid>
-        </IonInfiniteScroll>
-      </div>
-    </>
+        ) : (
+          <Spinner />
+        )}
+      </IonContent>
+    </IonCard>
   );
 };
 

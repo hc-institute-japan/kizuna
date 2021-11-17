@@ -6,10 +6,9 @@ export const setGifs =
   async (dispatch, getState) => {
     //   let currentState = { ...getState().gif };
 
-    console.log("setGifs", fetchedGifs);
     dispatch({
       type: SET_GIFS,
-      state: fetchedGifs,
+      state: fetchedGifs.gifs,
     });
 
     return;
