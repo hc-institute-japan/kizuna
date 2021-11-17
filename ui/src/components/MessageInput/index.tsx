@@ -89,6 +89,7 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
   const [loading, setLoading] = useState<boolean>(false);
   const file = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<FileContent[]>([]);
+  const [selectedGif, setSelectedGif] = useState("");
   const handleOnFileClick = () => file?.current?.click();
 
   const [showGifs, setShowGifs] = useState<boolean>(false);
@@ -109,6 +110,18 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [message]);
 
+  const onGifSelectCallback = useCallback(() => {
+    if (onSend && selectedGif !== "") {
+      onSend({
+        message: selectedGif,
+        // reply: isReply?.id,
+        setIsLoading: setLoading,
+      });
+      setShowGifs(!showGifs);
+      reset();
+    }
+  }, [selectedGif]);
+
   const reset = () => {
     setIsReply(undefined);
     setMessage("");
@@ -121,13 +134,15 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
   };
 
   const handleOnGifSelect = (url: string) => {
-    setMessage(url);
-    if (onSend) {
-      onSend({
-        message: url,
-        setIsLoading: setLoading,
-      });
-    }
+    setSelectedGif(url);
+    // if (onSend && message.trim().length !== 0) {
+    //   onSend({
+    //     message: url,
+    //     // reply: isReply?.id,
+    //     setIsLoading: setLoading,
+    //   });
+    //   reset();
+    // }
   };
 
   const onKeyDown = (event: KeyboardEvent) => {
@@ -153,6 +168,7 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
   }, [onSend, reset]);
   useEffect(() => onFileSelectCallback(), [files, onFileSelectCallback]);
   useEffect(() => onChangeCallback(), [message, onChangeCallback]);
+  useEffect(() => onGifSelectCallback(), [selectedGif, onGifSelectCallback]);
   const { showToast } = useToast();
 
   const handleOnFileChange = () => {

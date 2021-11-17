@@ -33,7 +33,6 @@ import { RootState } from "../../redux/types";
 import { useAppDispatch } from "../../utils/helpers";
 import ChatHeader from "./ChatHeader";
 import recommitMessage from "../../redux/p2pmessages/actions/signals/recommitMessage";
-import GifKeyboard from "../../components/Gif/GifKeyboard";
 
 const Chat: React.FC = () => {
   /* STATES */
@@ -169,13 +168,13 @@ const Chat: React.FC = () => {
       when clicking the send button  
     */
   const handleOnSubmit = (opt?: MessageInputOnSendParams) => {
-    let { setIsLoading } = { ...opt };
+    let { message: message2, setIsLoading } = { ...opt };
     setIsLoading!(true);
-    if (message !== "") {
+    if (message2 && message2 !== "") {
       dispatch(
         sendMessage(
           conversant.id,
-          message,
+          message2,
           "TEXT",
           replyTo !== "" ? replyTo : undefined
         )
@@ -219,7 +218,7 @@ const Chat: React.FC = () => {
       });
     }
 
-    if (message === "" && files.length) {
+    if (message2 === "" && files.length) {
       files.forEach((file) =>
         dispatch(
           sendMessage(

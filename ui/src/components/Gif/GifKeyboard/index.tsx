@@ -11,15 +11,11 @@ import {
   IonImg,
   IonSearchbar,
 } from "@ionic/react";
-import { useSelector } from "react-redux";
-import { RootState } from "../../../redux/types";
 import { getGifs } from "../../../redux/gif/actions/getGifs";
 import styles from "./style.module.css";
 import { useAppDispatch } from "../../../utils/helpers";
 import Spinner from "../../../components/Spinner";
-import GifSearchBox from "../GifSearchBox";
 import { getGifsState } from "../../../redux/gif/actions/getGifsState";
-import { returnValue } from "../../../redux/gif/types";
 
 export interface FileContent {
   metadata: {
@@ -41,10 +37,6 @@ export interface MessageInputOnSendParams {
   setIsLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-// export interface MessageInputMethods {
-//   reply: (message: { payload: Payload; author: string; id: string }) => any;
-// }
-
 interface Props {
   onChange?: (message: string) => any;
   onSend?: (opt?: MessageInputOnSendParams) => any;
@@ -62,6 +54,7 @@ const GifKeyboard: React.FC<Props> = ({ onSend, onChange, onSelect }) => {
 
   const handleOnClick = (url: string) => {
     setSelectedGif(url);
+    resetSearchText();
   };
 
   const handleOnScrollBottom = (complete: () => Promise<void>) => {
@@ -71,6 +64,8 @@ const GifKeyboard: React.FC<Props> = ({ onSend, onChange, onSelect }) => {
     });
     complete();
   };
+
+  const resetSearchText = () => setSearchText("");
 
   const onChangeCallback = useCallback(() => {
     if (onSelect) onSelect(selectedGif);
@@ -129,10 +124,7 @@ const GifKeyboard: React.FC<Props> = ({ onSend, onChange, onSelect }) => {
             <IonInfiniteScroll
               ref={infiniteGifScroll}
               position="bottom"
-              onIonInfinite={(e) => {
-                handleOnScrollBottom(complete);
-                console.log("scrolls", e);
-              }}
+              onIonInfinite={(e) => handleOnScrollBottom(complete)}
             >
               <IonInfiniteScrollContent loadingSpinner="circles"></IonInfiniteScrollContent>
             </IonInfiniteScroll>
