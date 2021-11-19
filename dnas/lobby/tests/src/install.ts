@@ -47,6 +47,7 @@ export const installAgents = async (
 
     let dna = {
       hash: dnaHash,
+      role_id: "lobby",
       nick: "kizuna",
     };
     if (memProofArray) {

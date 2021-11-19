@@ -10,7 +10,7 @@
     "@holo-host/web-sdk": "^0.5.3",
     "@holochain-open-dev/cell-client": "0.0.7",
     "@holochain-open-dev/core-types": "git+https://github.com/holochain-open-dev/core-types.git#build",
-    "@holochain/conductor-api": "^0.2.1",
+    "@holochain/conductor-api": "^0.2.4",
     "@ionic-native/core": "^5.31.1",
     "@ionic-native/file": "^5.31.1",
     "@ionic-native/file-transfer": "^5.31.1",
