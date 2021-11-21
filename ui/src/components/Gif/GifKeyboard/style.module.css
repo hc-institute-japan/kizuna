@@ -8,14 +8,11 @@
 .header {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  align-items: center;
 }
 
-.label {
-
-  margin-left: 1vw;
-  font-size: 2vw;
-  color: black
+.searchbar {
+  width: 100%
 }
 
 .box {
@@ -23,7 +20,7 @@
 }
 
 .boxexpanded {
-  min-height: 60vh;
+  min-height: 50vh;
 }
 
 .mediarow {
@@ -35,29 +32,17 @@
 
 .mediacard {
   height: 100%;
-  max-height: 180px;
+  max-height: 10vh;
   margin-left: 0;
   margin-right: 0;
   margin-top: 0;
   margin-bottom: 0;
-  border: blue;
-  /* overflow-wrap:break-word; */
 }
 
-.searchbar {
-  width: 80%
-}
-
-.buttonexpand {
-  size: "small";
-  color: none;
-  border: none;
-  background-color: none;
-  outline: none;
-}
-
-.buttonback {
-  display: flex;
+.gifpreview {
+  object-fit: cover;
+  max-height: 10vh;
+  height: 100%;
 }
 
 .categorytext {
@@ -73,12 +58,8 @@
   font-style: bold;
   margin: 0;
 
-text-shadow: 2px 2px gray;
+  text-shadow: 2px 2px gray;
   -webkit-text-stroke-color: gray;
   -webkit-text-stroke-width: .025em;
   overflow-wrap: anywhere;
-}
-
-.gifpreview {
-  object-fit: cover;
 }

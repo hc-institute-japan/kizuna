@@ -13,7 +13,6 @@ import {
   IonText,
   IonButton,
   IonIcon,
-  IonLabel,
 } from "@ionic/react";
 import {
   chevronUpOutline,
@@ -152,6 +151,7 @@ const GifKeyboard: React.FC<Props> = ({ onSend, onChange, onSelect }) => {
               onClick={() => handleOnClick(gif.media[0].gif.url)}
             >
               <IonImg
+                className={styles.gifpreview}
                 src={
                   gif.media[0].tinygif.preview
                     ? gif.media[0].nanogif.url
@@ -167,6 +167,11 @@ const GifKeyboard: React.FC<Props> = ({ onSend, onChange, onSelect }) => {
   return (
     <IonCard className={styles.card}>
       <IonCardHeader className={styles.header}>
+        {showCategories ? null : (
+          <IonButton onClick={handleOnBackClick} fill="clear">
+            <IonIcon icon={arrowBack} />
+          </IonButton>
+        )}
         <IonSearchbar
           className={styles.searchbar}
           value={searchText}
@@ -174,20 +179,11 @@ const GifKeyboard: React.FC<Props> = ({ onSend, onChange, onSelect }) => {
           debounce={2000}
         ></IonSearchbar>
 
-        <IonButton
-          onClick={handleOnExpandClick}
-          className={styles.buttonexpand}
-        >
+        <IonButton onClick={handleOnExpandClick} fill="clear">
           <IonIcon icon={expanded ? chevronDownOutline : chevronUpOutline} />
         </IonButton>
       </IonCardHeader>
-      {showCategories ? (
-        <IonLabel className={styles.label}>Categories</IonLabel>
-      ) : (
-        <IonButton onClick={handleOnBackClick}>
-          <IonIcon icon={arrowBack} />
-        </IonButton>
-      )}
+
       <IonContent className={expanded ? styles.boxexpanded : styles.box}>
         {gifs && Object.values(gifs).length > 0 ? (
           <IonGrid>
@@ -197,6 +193,7 @@ const GifKeyboard: React.FC<Props> = ({ onSend, onChange, onSelect }) => {
             <IonInfiniteScroll
               ref={infiniteGifScroll}
               position="bottom"
+              threshold="0px"
               onIonInfinite={(e) => handleOnScrollBottom(complete)}
             >
               <IonInfiniteScrollContent loadingSpinner="circles"></IonInfiniteScrollContent>
