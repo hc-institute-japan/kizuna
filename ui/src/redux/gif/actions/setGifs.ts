@@ -8,7 +8,7 @@ export const setGifs =
 
     dispatch({
       type: SET_GIFS,
-      state: fetchedGifs.gifs,
+      state: fetchedGifs,
     });
 
     return;

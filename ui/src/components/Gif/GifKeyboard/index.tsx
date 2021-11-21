@@ -10,8 +10,18 @@ import {
   IonCardHeader,
   IonImg,
   IonSearchbar,
+  IonText,
+  IonButton,
+  IonIcon,
+  IonLabel,
 } from "@ionic/react";
+import {
+  chevronUpOutline,
+  chevronDownOutline,
+  arrowBack,
+} from "ionicons/icons";
 import { getGifs } from "../../../redux/gif/actions/getGifs";
+import { getCategories } from "../../../redux/gif/actions/getCategories";
 import styles from "./style.module.css";
 import { useAppDispatch } from "../../../utils/helpers";
 import Spinner from "../../../components/Spinner";
@@ -47,14 +57,37 @@ const GifKeyboard: React.FC<Props> = ({ onSend, onChange, onSelect }) => {
   const dispatch = useAppDispatch();
   const [searchText, setSearchText] = useState("");
   const [selectedGif, setSelectedGif] = useState("");
+  const [categories, setCategories] = useState<any[]>([]);
+  const [showCategories, setShowCategories] = useState<boolean>(true);
   const [gifs, setGifs] = useState<any[]>([]);
   const [next, setNext] = useState<any>(undefined);
+  const [expanded, setExpanded] = useState<boolean>(false);
 
   const handleOnChange = (e: CustomEvent) => setSearchText(e.detail.value!);
 
   const handleOnClick = (url: string) => {
     setSelectedGif(url);
     resetSearchText();
+  };
+
+  const handleOnExpandClick = () => {
+    setExpanded(!expanded);
+  };
+
+  const handleOnBackClick = () => {
+    setShowCategories(true);
+  };
+
+  const handleOnCategoryClick = (searchTerm: string) => {
+    setSearchText(searchTerm);
+    console.log("category click", searchTerm);
+    console.log("category click", searchText);
+
+    dispatch(getGifs(searchText)).then((res: any) => {
+      setGifs(res.gifs);
+      setNext(res.next);
+    });
+    setShowCategories(false);
   };
 
   const handleOnScrollBottom = (complete: () => Promise<void>) => {
@@ -73,6 +106,10 @@ const GifKeyboard: React.FC<Props> = ({ onSend, onChange, onSelect }) => {
   }, [selectedGif]);
 
   useEffect(() => {
+    dispatch(getCategories()).then((res: any) => {
+      console.log("keyboard categories", res);
+      setCategories(res.top);
+    });
     dispatch(getGifs(searchText)).then((res: any) => {
       setGifs(res.gifs);
       setNext(res.next);
@@ -84,6 +121,26 @@ const GifKeyboard: React.FC<Props> = ({ onSend, onChange, onSelect }) => {
 
   const infiniteGifScroll = useRef<HTMLIonInfiniteScrollElement>(null);
   const complete: () => any = () => infiniteGifScroll.current?.complete();
+
+  const renderCategories = () =>
+    Object.values(categories).map((category: any) => {
+      console.log("category path", category, category.name);
+      return (
+        <React.Fragment key={category.path}>
+          <IonCol size="4">
+            <IonCard
+              className={styles.mediacard}
+              onClick={() => handleOnCategoryClick(category.searchterm)}
+            >
+              <IonText className={styles.categorytext}>
+                {category.name.replace("#", "").toUpperCase()}
+              </IonText>
+              <IonImg className={styles.gifpreview} src={category.image} />
+            </IonCard>
+          </IonCol>
+        </React.Fragment>
+      );
+    });
 
   const renderGif = () =>
     Object.values(gifs).map((gif: any) => {
@@ -109,18 +166,34 @@ const GifKeyboard: React.FC<Props> = ({ onSend, onChange, onSelect }) => {
 
   return (
     <IonCard className={styles.card}>
-      <IonCardHeader>
+      <IonCardHeader className={styles.header}>
         <IonSearchbar
+          className={styles.searchbar}
           value={searchText}
           onIonChange={handleOnChange}
           debounce={2000}
         ></IonSearchbar>
-      </IonCardHeader>
 
-      <IonContent className={styles.box}>
+        <IonButton
+          onClick={handleOnExpandClick}
+          className={styles.buttonexpand}
+        >
+          <IonIcon icon={expanded ? chevronDownOutline : chevronUpOutline} />
+        </IonButton>
+      </IonCardHeader>
+      {showCategories ? (
+        <IonLabel className={styles.label}>Categories</IonLabel>
+      ) : (
+        <IonButton onClick={handleOnBackClick}>
+          <IonIcon icon={arrowBack} />
+        </IonButton>
+      )}
+      <IonContent className={expanded ? styles.boxexpanded : styles.box}>
         {gifs && Object.values(gifs).length > 0 ? (
           <IonGrid>
-            <IonRow className={styles.mediarow}>{renderGif()}</IonRow>
+            <IonRow className={styles.mediarow}>
+              {showCategories ? renderCategories() : renderGif()}
+            </IonRow>
             <IonInfiniteScroll
               ref={infiniteGifScroll}
               position="bottom"

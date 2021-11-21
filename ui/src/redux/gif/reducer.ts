@@ -2,6 +2,7 @@ import { GifActionType, SET_GIFS } from "./types";
 
 const initialState = {
   gifs: {},
+  categories: {},
 };
 
 const reducer = (state = initialState, action: GifActionType) => {

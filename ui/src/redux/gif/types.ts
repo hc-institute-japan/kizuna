@@ -4,6 +4,13 @@ export interface gif {
   gif: media;
 }
 
+export interface category {
+  searchterm: string;
+  path: string;
+  image: string;
+  name: string;
+}
+
 export interface gifResult {
   id: string;
   title: string;
@@ -53,11 +60,17 @@ export interface returnValue {
 
 /* ACTION TYPES */
 export const SET_GIFS = "SET_GIFS";
+export const SET_CATEGORIES = "SET_CATEGORIES";
 
 /* ACTION INTERFACES */
 export interface SetGifStateAction {
   type: typeof SET_GIFS;
   state: { [key: string]: gif };
+}
+
+export interface SetCategoryStateAction {
+  type: typeof SET_CATEGORIES;
+  state: { [key: string]: category };
 }
 
 export type GifActionType = SetGifStateAction;
