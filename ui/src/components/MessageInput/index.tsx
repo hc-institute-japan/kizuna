@@ -6,7 +6,7 @@ import {
   IonTextarea,
   IonToolbar,
 } from "@ionic/react";
-import { attachOutline, apertureOutline } from "ionicons/icons";
+import { attachOutline } from "ionicons/icons";
 import React, {
   forwardRef,
   ForwardRefRenderFunction,
@@ -320,7 +320,7 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
               </IonButton>
             )}
             <IonButton onClick={handleOnGifClick}>
-              <IonIcon color="medium" icon={apertureOutline} />
+              <IonIcon color="medium" icon="assets/icon/gif.svg" />
             </IonButton>
           </IonButtons>
           <IonTextarea
