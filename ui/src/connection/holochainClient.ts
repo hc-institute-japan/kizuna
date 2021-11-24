@@ -206,7 +206,7 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
       payload,
       process.env.REACT_APP_ENV === "HC" ||
         process.env.REACT_APP_ENV === "HCDEV"
-        ? 30000
+        ? 60000
         : undefined
     );
   } catch (e) {
