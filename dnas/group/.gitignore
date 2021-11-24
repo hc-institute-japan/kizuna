@@ -1,0 +1,5 @@
+.workdir
+.gz
+.cargo/
+*.dna
+*.happ

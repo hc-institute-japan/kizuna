@@ -1,0 +1,15 @@
+[package]
+name = "meta"
+version = "0.0.1"
+authors = [ "hcij" ]
+edition = "2018"
+
+[lib]
+name = "meta"
+crate-type = [ "cdylib", "rlib" ]
+
+[dependencies]
+derive_more = "0"
+serde = "1"
+hdk = "0.0.115"
+holo_hash = {version = "*", features = ["encoding"]}

@@ -1,0 +1,10 @@
+[workspace]
+members = [
+    "zomes/meta",
+]
+
+[profile.dev]
+opt-level = "z"
+
+[profile.release]
+opt-level = "z"

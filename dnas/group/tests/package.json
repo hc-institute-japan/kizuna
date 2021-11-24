@@ -1,0 +1,28 @@
+{
+  "name": "demo-1",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "RUST_LOG=info TRYORAMA_LOG_LEVEL=error RUST_BACKTRACE=1 TRYORAMA_HOLOCHAIN_PATH=\"holochain\" ts-node src/index.ts",
+    "split": "TRYORAMA_LOG_LEVEL=info RUST_LOG=debug RUST_BACKTRACE=1 TRYORAMA_HOLOCHAIN_PATH=\"holochain\"",
+    "t": "TRYORAMA_HOLOCHAIN_PATH=\"holochain\" ts-node src/index.ts",
+    "b": "cd .. && cargo build --release --target wasm32-unknown-unknown && dna-util -c ./kizuna.dna.workdir && cd tests",
+    "build:dna": "cd .. && CARGO_TARGET_DIR=target cargo build --release --target wasm32-unknown-unknown && hc dna pack dna",
+    "build:happ": " cd ../ && hc app pack ../happ"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@holochain/tryorama": "^0.4.5",
+    "@types/lodash": "^4.14.158",
+    "@types/node": "^14.14.37",
+    "concurrently": "^5.3.0",
+    "eslint-plugin-prettier": "^3.3.1",
+    "js-base64": "^3.6.0",
+    "lodash": "^4.17.19",
+    "tape": "^5.0.1",
+    "ts-node": "^8.10.2",
+    "typescript": "^3.9.6"
+  }
+}

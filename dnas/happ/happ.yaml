@@ -1,0 +1,26 @@
+---
+manifest_version: "1"
+name: kizuna
+description: ~
+roles:
+  - id: lobby
+    provisioning:
+      strategy: create
+      deferred: false
+    dna:
+      bundled: "../lobby/dna/lobby.dna"
+      properties: ~
+      uuid: ~
+      version: ~
+      clone_limit: 0
+  - id: group
+    provisioning:
+      strategy: create
+      deferred: false
+    dna:
+      bundled: "../group/dna/group.dna"
+      properties: ~
+      uuid: ~
+      version: ~
+      clone_limit: 0
+
