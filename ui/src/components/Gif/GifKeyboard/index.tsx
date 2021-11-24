@@ -75,6 +75,7 @@ const GifKeyboard: React.FC<Props> = ({ onSend, onChange, onSelect }) => {
 
   const handleOnBackClick = () => {
     setShowCategories(true);
+    resetSearchText();
   };
 
   const handleOnCategoryClick = (searchTerm: string) => {
@@ -91,7 +92,7 @@ const GifKeyboard: React.FC<Props> = ({ onSend, onChange, onSelect }) => {
 
   const handleOnScrollBottom = (complete: () => Promise<void>) => {
     dispatch(getGifs(searchText, next)).then((res: any) => {
-      setGifs(gifs.concat(...res.gifs));
+      setGifs(gifs ? gifs.concat(...res.gifs) : res.gifs);
       setNext(res.next);
     });
     complete();
@@ -106,7 +107,6 @@ const GifKeyboard: React.FC<Props> = ({ onSend, onChange, onSelect }) => {
 
   useEffect(() => {
     dispatch(getCategories()).then((res: any) => {
-      console.log("keyboard categories", res);
       setCategories(res.top);
     });
     dispatch(getGifs(searchText)).then((res: any) => {
@@ -121,45 +121,43 @@ const GifKeyboard: React.FC<Props> = ({ onSend, onChange, onSelect }) => {
   const infiniteGifScroll = useRef<HTMLIonInfiniteScrollElement>(null);
   const complete: () => any = () => infiniteGifScroll.current?.complete();
 
-  const renderCategories = () =>
-    Object.values(categories).map((category: any) => {
-      console.log("category path", category, category.name);
+  const renderCategories = () => {
+    return Object.values(categories).map((category: any) => {
       return (
         <React.Fragment key={category.path}>
-          <IonCol size="4">
-            <IonCard
-              className={styles.mediacard}
-              onClick={() => handleOnCategoryClick(category.searchterm)}
-            >
+          <IonCard
+            className={styles.mediacard2}
+            onClick={() => handleOnCategoryClick(category.searchterm)}
+          >
+            <div className={styles.textholder}>
               <IonText className={styles.categorytext}>
                 {category.name.replace("#", "").toUpperCase()}
               </IonText>
-              <IonImg className={styles.gifpreview} src={category.image} />
-            </IonCard>
-          </IonCol>
+            </div>
+            <IonImg className={styles.gifpreview} src={category.image} />
+          </IonCard>
         </React.Fragment>
       );
     });
+  };
 
   const renderGif = () =>
     Object.values(gifs).map((gif: any) => {
       return (
         <React.Fragment key={gif.id}>
-          <IonCol size="3">
-            <IonCard
-              className={styles.mediacard}
-              onClick={() => handleOnClick(gif.media[0].gif.url)}
-            >
-              <IonImg
-                className={styles.gifpreview}
-                src={
-                  gif.media[0].tinygif.preview
-                    ? gif.media[0].nanogif.url
-                    : gif.media[0].gif.preview
-                }
-              />
-            </IonCard>
-          </IonCol>
+          <IonCard
+            className={styles.mediacard}
+            onClick={() => handleOnClick(gif.media[0].gif.url)}
+          >
+            <IonImg
+              className={styles.gifpreview}
+              src={
+                gif.media[0].tinygif.preview
+                  ? gif.media[0].nanogif.url
+                  : gif.media[0].gif.preview
+              }
+            />
+          </IonCard>
         </React.Fragment>
       );
     });
@@ -186,10 +184,11 @@ const GifKeyboard: React.FC<Props> = ({ onSend, onChange, onSelect }) => {
 
       <IonContent className={expanded ? styles.boxexpanded : styles.box}>
         {gifs && Object.values(gifs).length > 0 ? (
-          <IonGrid>
-            <IonRow className={styles.mediarow}>
-              {showCategories ? renderCategories() : renderGif()}
-            </IonRow>
+          <div className={styles.images}>
+            {showCategories && searchText === ""
+              ? renderCategories()
+              : renderGif()}
+
             <IonInfiniteScroll
               ref={infiniteGifScroll}
               position="bottom"
@@ -198,7 +197,7 @@ const GifKeyboard: React.FC<Props> = ({ onSend, onChange, onSelect }) => {
             >
               <IonInfiniteScrollContent loadingSpinner="circles"></IonInfiniteScrollContent>
             </IonInfiniteScroll>
-          </IonGrid>
+          </div>
         ) : (
           <Spinner />
         )}

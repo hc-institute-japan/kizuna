@@ -21,7 +21,6 @@ export const getCategories = (): ThunkAction => (dispatch, getState) => {
         let responseObjects = JSON.parse(xmlHttp.responseText);
         let top = responseObjects["tags"];
         let returnValue = { top };
-        console.log("top categories", top);
         dispatch(setCategories(top));
         resolve(returnValue);
       } else {
