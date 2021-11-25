@@ -13,6 +13,7 @@ import {
   IonText,
   IonButton,
   IonIcon,
+  IonItemDivider,
 } from "@ionic/react";
 import {
   chevronUpOutline,
@@ -124,19 +125,17 @@ const GifKeyboard: React.FC<Props> = ({ onSend, onChange, onSelect }) => {
   const renderCategories = () => {
     return Object.values(categories).map((category: any) => {
       return (
-        <React.Fragment key={category.path}>
-          <IonCard
-            className={styles.mediacard2}
+        <div>
+          <div
+            className={styles.textholder}
             onClick={() => handleOnCategoryClick(category.searchterm)}
           >
-            <div className={styles.textholder}>
-              <IonText className={styles.categorytext}>
-                {category.name.replace("#", "").toUpperCase()}
-              </IonText>
-            </div>
-            <IonImg className={styles.gifpreview} src={category.image} />
-          </IonCard>
-        </React.Fragment>
+            <IonText className={styles.categorytext}>
+              {category.name.replace("#", "").toUpperCase()}
+            </IonText>
+          </div>
+          <img className={styles.categorypreview} src={category.image} />
+        </div>
       );
     });
   };
@@ -144,26 +143,28 @@ const GifKeyboard: React.FC<Props> = ({ onSend, onChange, onSelect }) => {
   const renderGif = () =>
     Object.values(gifs).map((gif: any) => {
       return (
-        <React.Fragment key={gif.id}>
-          <IonCard
-            className={styles.mediacard}
+        // <IonCard
+        //   className={styles.gifcard}
+        //   onClick={() => handleOnClick(gif.media[0].gif.url)}
+        // >
+        <div>
+          <img
+            className={styles.gifpreview}
             onClick={() => handleOnClick(gif.media[0].gif.url)}
-          >
-            <IonImg
-              className={styles.gifpreview}
-              src={
-                gif.media[0].tinygif.preview
-                  ? gif.media[0].nanogif.url
-                  : gif.media[0].gif.preview
-              }
-            />
-          </IonCard>
-        </React.Fragment>
+            alt={gif.title}
+            src={
+              gif.media[0].tinygif.preview
+                ? gif.media[0].nanogif.url
+                : gif.media[0].gif.preview
+            }
+          />
+        </div>
+        // </IonCard>
       );
     });
 
   return (
-    <IonCard className={styles.card}>
+    <IonCard className={styles.keyboardcontainer}>
       <IonCardHeader className={styles.header}>
         {showCategories ? null : (
           <IonButton onClick={handleOnBackClick} fill="clear">
@@ -171,7 +172,6 @@ const GifKeyboard: React.FC<Props> = ({ onSend, onChange, onSelect }) => {
           </IonButton>
         )}
         <IonSearchbar
-          className={styles.searchbar}
           value={searchText}
           onIonChange={handleOnChange}
           debounce={2000}
@@ -182,7 +182,9 @@ const GifKeyboard: React.FC<Props> = ({ onSend, onChange, onSelect }) => {
         </IonButton>
       </IonCardHeader>
 
-      <IonContent className={expanded ? styles.boxexpanded : styles.box}>
+      <IonContent
+        className={expanded ? styles.gifcontainerexpanded : styles.gifcontainer}
+      >
         {gifs && Object.values(gifs).length > 0 ? (
           <div className={styles.images}>
             {showCategories && searchText === ""
