@@ -6,7 +6,6 @@ const recommitMessage =
   (payload: any): ThunkAction =>
   async (dispatch, getState, { callZome }) => {
     let message = payload;
-    console.log("recommitting message", message);
 
     let input = {
       receiver: message.receiver,
@@ -22,7 +21,6 @@ const recommitMessage =
         payload: input,
       });
 
-      console.log(recommit);
       if (recommit?.type !== "error") {
         dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
         return false;

@@ -4,6 +4,5 @@ import { getGifs } from "./getGifs";
 
 export const searchTrending = (): ThunkAction => async (dispatch, getState) => {
   let gifs = dispatch(getGifs(undefined));
-  console.log("searcha action", gifs);
   return gifs;
 };

@@ -30,7 +30,6 @@ export const getLatestData =
       /* assume that getAgentId() is non-nullable */
       const myAgentIdB64 = serializeHash(myAgentId!);
 
-      console.log("ui latest data", latestData);
       dispatch<ProfileActionTypes>({
         type: SET_PROFILE,
         id: myAgentIdB64,

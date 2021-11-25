@@ -81,8 +81,6 @@ const GifKeyboard: React.FC<Props> = ({ onSend, onChange, onSelect }) => {
 
   const handleOnCategoryClick = (searchTerm: string) => {
     setSearchText(searchTerm);
-    console.log("category click", searchTerm);
-    console.log("category click", searchText);
 
     dispatch(getGifs(searchText)).then((res: any) => {
       setGifs(res.gifs);
