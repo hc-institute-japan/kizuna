@@ -198,7 +198,6 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
     // provenance = info?.cell_data[0].cell_id[1],
     payload = null,
   } = config;
-  console.log(process.env.REACT_APP_ENV);
   try {
     return await client?.callZome(
       zomeName,
