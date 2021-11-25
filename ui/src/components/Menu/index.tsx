@@ -1,11 +1,14 @@
 import {
   IonContent,
+  IonFooter,
   IonIcon,
   IonItem,
   IonItemGroup,
   IonLabel,
   IonList,
   IonMenu,
+  IonText,
+  IonToolbar,
 } from "@ionic/react";
 import {
   banOutline,
@@ -117,6 +120,13 @@ const Menu: React.FC = () => {
           ))}
         </IonList>
       </IonContent>
+      <IonFooter className="ion-no-border">
+        <IonToolbar>
+          <IonText className={`ion-padding ${styles["version"]}`}>
+            {intl.formatMessage({ id: "app.menu.version" })} 0.1.9
+          </IonText>
+        </IonToolbar>
+      </IonFooter>
     </IonMenu>
   );
 };
