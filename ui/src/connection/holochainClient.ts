@@ -25,36 +25,36 @@ const createClient = async (
   env: string
 ): Promise<HoloClient | HolochainClient | null> => {
   switch (env) {
-    case "HOLO":
-    case "HCC": {
-      const branding = {
-        logo_url: "assets/icon/kizuna_logo.png",
-        app_name: "Kizuna Messaging App",
-        skip_registration: true,
-      };
+    // case "HOLO":
+    // case "HCC": {
+    //   const branding = {
+    //     logo_url: "assets/icon/kizuna_logo.png",
+    //     app_name: "Kizuna Messaging App",
+    //     skip_registration: true,
+    //   };
 
-      const connection = new Connection(appUrl(), signalHandler, branding);
+    //   const connection = new Connection(appUrl(), signalHandler, branding);
 
-      await connection.ready();
-      await connection.signIn();
+    //   await connection.ready();
+    //   await connection.signIn();
 
-      const appInfo = await connection.appInfo(appId());
+    //   const appInfo = await connection.appInfo(appId());
 
-      if (!appInfo.cell_data)
-        throw new Error(`Holo appInfo() failed: ${JSON.stringify(appInfo)}`);
+    //   if (!appInfo.cell_data)
+    //     throw new Error(`Holo appInfo() failed: ${JSON.stringify(appInfo)}`);
 
-      const cellData = appInfo.cell_data[0];
+    //   const cellData = appInfo.cell_data[0];
 
-      // TODO: remove this when chaperone is fixed
-      if (!(cellData.cell_id[0] instanceof Uint8Array)) {
-        cellData.cell_id = [
-          new Uint8Array((cellData.cell_id[0] as any).data),
-          new Uint8Array((cellData.cell_id[1] as any).data),
-        ] as any;
-      }
+    //   // TODO: remove this when chaperone is fixed
+    //   if (!(cellData.cell_id[0] instanceof Uint8Array)) {
+    //     cellData.cell_id = [
+    //       new Uint8Array((cellData.cell_id[0] as any).data),
+    //       new Uint8Array((cellData.cell_id[1] as any).data),
+    //     ] as any;
+    //   }
 
-      return new HoloClient(connection, cellData, branding);
-    }
+    //   return new HoloClient(connection, cellData, branding);
+    // }
     case "HCDEV":
     case "HC": {
       const appWs = await AppWebsocket.connect(
