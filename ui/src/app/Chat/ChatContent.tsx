@@ -147,7 +147,12 @@ const Chat: React.FC = () => {
   const handleOnChange = (message: string, conversant: Profile) => {
     if (didMountRef.current === true) {
       if (typingIndicator) {
-        dispatch(isTyping(conversant.id, message.length !== 0 ? true : false));
+        dispatch(
+          isTyping(
+            conversant.id,
+            message && message.length !== 0 ? true : false
+          )
+        );
 
         if (inputTimeout.current) clearTimeout(inputTimeout.current);
 
@@ -268,7 +273,7 @@ const Chat: React.FC = () => {
           )
         ).then((res: P2PHashMap) => {
           // disable getPrevious if return value is empty
-          if (Object.values(res)[0][conversant.id].length <= 0) {
+          if (res && Object.values(res)[0][conversant.id].length <= 0) {
             setDisableGetPrevious(true);
           }
           return complete();

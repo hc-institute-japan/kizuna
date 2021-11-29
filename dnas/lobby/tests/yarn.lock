@@ -11,13 +11,12 @@
     "enabled" "2.0.x"
     "kuler" "^2.0.0"
 
-"@holochain/conductor-api@^0.2.0":
-  "integrity" "sha512-H7C3LeSGE98/SCg5TcUQRMP3afZ1IDzjKMBUlIPTJbUcBhwgwdVg87XBhkI1atPnKyxugYdgelQtT+6hKu6GNA=="
-  "resolved" "https://registry.npmjs.org/@holochain/conductor-api/-/conductor-api-0.2.1.tgz"
-  "version" "0.2.1"
+"@holochain/conductor-api@^0.2.4":
+  "integrity" "sha512-MoTUv+sAQA8d1XJyqSxdcxBAO+bkCKbvuzhEaDTOrqyct7LPUzivPYinoDqmwpF2R6/kZpQVw8FZ+zVwENPnVA=="
+  "resolved" "https://registry.npmjs.org/@holochain/conductor-api/-/conductor-api-0.2.4.tgz"
+  "version" "0.2.4"
   dependencies:
     "@msgpack/msgpack" "2.4.0"
-    "@types/ws" "^7.2.4"
     "cross-fetch" "^3.1.4"
     "isomorphic-ws" "^4.0.1"
     "nanoid" "^3.1.9"
@@ -33,12 +32,12 @@
     "winston" "^3.2.1"
     "winston-null" "^2.0.0"
 
-"@holochain/tryorama@^0.4.5":
-  "integrity" "sha512-KKPn9dpBJwn46ZKXe8917uJbK7d/yjckbPWXxRh7MawALzN9Fp9hGIFCjfM9U9EMDS3vc8rtPKzc1cWj9HGuZg=="
-  "resolved" "https://registry.npmjs.org/@holochain/tryorama/-/tryorama-0.4.5.tgz"
-  "version" "0.4.5"
+"@holochain/tryorama@^0.4.6":
+  "integrity" "sha512-OtfpHC/+RswD7Ljhbvie6+27Upyt2Itkc2h3ypnJ4COkM4SLc8DkTlycBUh7iohivQ4YEqTkrZRofDFHQsVBPw=="
+  "resolved" "https://registry.npmjs.org/@holochain/tryorama/-/tryorama-0.4.6.tgz"
+  "version" "0.4.6"
   dependencies:
-    "@holochain/conductor-api" "^0.2.0"
+    "@holochain/conductor-api" "^0.2.4"
     "@holochain/hachiko" "^0.5.2"
     "@iarna/toml" "^2.2.5"
     "@msgpack/msgpack" "^2.1.0"
@@ -78,17 +77,10 @@
   "resolved" "https://registry.npmjs.org/@types/lodash/-/lodash-4.14.175.tgz"
   "version" "4.14.175"
 
-"@types/node@*", "@types/node@^14.14.37":
+"@types/node@^14.14.37":
   "integrity" "sha512-zv8ukKci1mrILYiQOwGSV4FpkZhyxQtuFWGya2GujWg+zVAeRQ4qbaMmWp9vb9889CFA8JECH7lkwCL6Ygg8kA=="
   "resolved" "https://registry.npmjs.org/@types/node/-/node-14.17.21.tgz"
   "version" "14.17.21"
-
-"@types/ws@^7.2.4":
-  "integrity" "sha512-JQbbmxZTZehdc2iszGKs5oC3NFnjeay7mtAWrdt7qNtAVK0g19muApzAy4bm9byz79xa2ZnO/BOBC2R8RC5Lww=="
-  "resolved" "https://registry.npmjs.org/@types/ws/-/ws-7.4.7.tgz"
-  "version" "7.4.7"
-  dependencies:
-    "@types/node" "*"
 
 "ansi-regex@^4.1.0":
   "integrity" "sha512-1apePfXM1UOSqw0o9IiFAovVz9M5S1Dg+4TrDwfMewQ6p/rmMueb7tWZjQ1rx4Loy1ArBggoqGpfqqdI4rondg=="
@@ -901,9 +893,9 @@
   "version" "2.0.0"
 
 "nanoid@^3.1.9":
-  "integrity" "sha512-dW2pUSGZ8ZnCFIlBIA31SV8huOGCHb6OwzVCc7A69rb/a+SgPBwfmLvK5TKQ3INPbRkcI8a/Owo0XbiTNH19wg=="
-  "resolved" "https://registry.npmjs.org/nanoid/-/nanoid-3.1.29.tgz"
-  "version" "3.1.29"
+  "integrity" "sha512-zJpuPDwOv8D2zq2WRoMe1HsfZthVewpel9CAvTfc/2mBD1uUT/agc5f7GHGWXlYkFvi1mVxe4IjvP2HNrop7nQ=="
+  "resolved" "https://registry.npmjs.org/nanoid/-/nanoid-3.1.30.tgz"
+  "version" "3.1.30"
 
 "next-tick@^1.1.0", "next-tick@1":
   "integrity" "sha512-CXdUiJembsNjuToQvxayPZF9Vqht7hewsvy2sOWafLvi2awflj9mOC6bHIg50orX8IJvWKY9wYQ/zB2kogPslQ=="

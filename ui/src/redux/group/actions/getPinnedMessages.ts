@@ -33,6 +33,7 @@ export const getPinnedMessages =
 
           return pinnedMessages.map((messageId) => {
             const message = getState().groups.pinnedMessages[messageId];
+            // console.log(message);
             const author = authorProfiles[message.author];
 
             return {

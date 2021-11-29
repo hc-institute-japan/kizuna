@@ -2,7 +2,7 @@
 manifest_version: "1"
 name: kizuna
 description: ~
-slots:
+roles:
   - id: kizuna
     provisioning:
       strategy: create

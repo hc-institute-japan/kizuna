@@ -130,7 +130,6 @@ const ChatBox: React.FC<Props> = ({
           messageIds: readData.map((item) => item.messageIds).flat(),
         };
         dispatch(readGroupMessage(readListData));
-        console.log(readListData.messageIds);
         setReadData([]);
       }, 1500);
     }

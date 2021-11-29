@@ -45,7 +45,9 @@ const Register: React.FC = () => {
   };
 
   const handleOnKeyDown = (event: React.KeyboardEvent) =>
-    event.key === "Enter" && !event.shiftKey ? handleOnSubmit() : null;
+    event.key === "Enter" && !event.shiftKey && !error
+      ? handleOnSubmit()
+      : null;
 
   return (
     <IonPage>

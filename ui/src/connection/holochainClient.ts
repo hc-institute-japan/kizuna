@@ -198,7 +198,6 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
     // provenance = info?.cell_data[0].cell_id[1],
     payload = null,
   } = config;
-  // console.log(process.env.REACT_APP_ENV);
   try {
     return await client?.callZome(
       zomeName,
@@ -206,7 +205,7 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
       payload,
       process.env.REACT_APP_ENV === "HC" ||
         process.env.REACT_APP_ENV === "HCDEV"
-        ? 30000
+        ? 60000
         : undefined
     );
   } catch (e) {
