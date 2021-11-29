@@ -123,7 +123,7 @@ const GifKeyboard: React.FC<Props> = ({ onSend, onChange, onSelect }) => {
   const renderCategories = () => {
     return Object.values(categories).map((category: any) => {
       return (
-        <div>
+        <div key={category.name}>
           <div
             className={styles.textholder}
             onClick={() => handleOnCategoryClick(category.searchterm)}
@@ -145,7 +145,7 @@ const GifKeyboard: React.FC<Props> = ({ onSend, onChange, onSelect }) => {
         //   className={styles.gifcard}
         //   onClick={() => handleOnClick(gif.media[0].gif.url)}
         // >
-        <div>
+        <div key={gif.media[0].nanogif.url}>
           <img
             className={styles.gifpreview}
             onClick={() => handleOnClick(gif.media[0].gif.url)}

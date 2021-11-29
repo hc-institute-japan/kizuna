@@ -7,9 +7,11 @@ const searchLimit = 20;
 let baseUrl = "https://g.tenor.com/v1";
 
 export const getCategories = (): ThunkAction => (dispatch, getState) => {
+  const { language } = getState().language;
+  const locale = language === "en" ? "en_US" : "ja_JP";
   return new Promise(function (resolve, reject) {
     var endpoint = "/categories?";
-    let searchUrl = baseUrl + endpoint + "key=" + apikey;
+    let searchUrl = baseUrl + endpoint + "key=" + apikey + "&locale=" + locale;
 
     var xmlHttp = new XMLHttpRequest();
 
