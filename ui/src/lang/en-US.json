@@ -69,6 +69,7 @@
   "app.menu.logout-label": "Logout",
   "app.menu.report-label": "Report an issue",
   "app.menu.settings-label": "Settings",
+  "app.menu.version": "version",
   "app.new-conversation.header-title": "New Message",
   "app.new-conversation.message-placeholder": "Compose message...",
   "app.new-conversation.no-contacts-toast": "Please select a contact...",

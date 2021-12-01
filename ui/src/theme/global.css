@@ -8,5 +8,5 @@ ion-text,
 p,
 ion-label,
 span {
-  word-break: break-all;
+  word-break: keep-all;
 }
