@@ -1,19 +1,14 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import {
-  IonGrid,
-  IonRow,
   IonContent,
   IonInfiniteScroll,
   IonInfiniteScrollContent,
-  IonCol,
   IonCard,
   IonCardHeader,
-  IonImg,
   IonSearchbar,
   IonText,
   IonButton,
   IonIcon,
-  IonItemDivider,
 } from "@ionic/react";
 import {
   chevronUpOutline,
@@ -91,7 +86,7 @@ const GifKeyboard: React.FC<Props> = ({ onSend, onChange, onSelect }) => {
 
   const handleOnScrollBottom = (complete: () => Promise<void>) => {
     dispatch(getGifs(searchText, next)).then((res: any) => {
-      setGifs(gifs ? gifs.concat(...res.gifs) : res.gifs);
+      setGifs(gifs ? [...gifs, ...res.gifs] : res.gifs);
       setNext(res.next);
     });
     complete();
