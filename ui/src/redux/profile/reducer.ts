@@ -8,6 +8,7 @@ import {
 const initialState: ProfileState = {
   id: null,
   username: null, // TODO: change this to nickname in next clean up
+  fields: {},
 };
 
 const reducer = (state = initialState, action: ProfileActionTypes) => {
@@ -23,8 +24,8 @@ const reducer = (state = initialState, action: ProfileActionTypes) => {
         ...state,
         username: action.nickname,
         id: action.id,
+        fields: action.fields,
       };
-
     default:
       return state;
   }

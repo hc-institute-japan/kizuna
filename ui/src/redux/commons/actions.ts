@@ -1,4 +1,4 @@
-import { serializeHash } from "@holochain-open-dev/core-types";
+import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../connection/types";
 import { timestampToDate } from "../../utils/helpers";
 import { SET_BLOCKED, SET_CONTACTS } from "../contacts/types";
@@ -30,10 +30,12 @@ export const getLatestData =
       /* assume that getAgentId() is non-nullable */
       const myAgentIdB64 = serializeHash(myAgentId!);
 
+      const url = latestData.userInfo.profile.fields.avatar;
       dispatch<ProfileActionTypes>({
         type: SET_PROFILE,
         id: myAgentIdB64,
         nickname: latestData.userInfo.profile.nickname,
+        fields: { avatar: url },
       });
 
       let contacts: { [key: string]: Profile } = {};

@@ -13,12 +13,18 @@ export interface AgentProfile {
 export interface Profile {
   id: string;
   username: string;
+  fields: {
+    [key: string]: any;
+  };
 }
 
 // TODO: change username to nickname in the next clean up
 export interface ProfileState {
   id: string | null;
   username: string | null;
+  fields: {
+    [key: string]: any;
+  };
 }
 
 interface SetUsernameAction {
@@ -31,6 +37,7 @@ interface SetProfileAction {
   type: typeof SET_PROFILE;
   nickname: string;
   id: string;
+  fields: {};
 }
 
 export type ProfileListType = {

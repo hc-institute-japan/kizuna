@@ -82,6 +82,7 @@
   "app.register.register": "Register nickname",
   "app.register.username-label": "Nickname",
   "app.register.username-placeholder": "Type your nickname here...",
+  "app.register.error-no-image": "No image selected",
   "app.settings.language-label": "Language",
   "app.settings.preference-label": "Preference",
   "app.settings.read-receipt-label": "Read Receipt",

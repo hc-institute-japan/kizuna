@@ -1,4 +1,5 @@
 import {
+  IonAvatar,
   IonContent,
   IonIcon,
   IonItem,
@@ -34,7 +35,10 @@ interface MenuItem {
 
 const Menu: React.FC = () => {
   const history = useHistory();
-  const { username, id } = useSelector((state: RootState) => state.profile);
+  const { username, id, avatar } = useSelector((state: RootState) => {
+    return { ...state.profile, avatar: state.profile.fields.avatar };
+  });
+
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const menu = useRef<any>(null);
@@ -88,16 +92,19 @@ const Menu: React.FC = () => {
       <IonContent className={`${styles.menu} ion-padding-top`}>
         <IonList id="inbox-list" lines="none">
           <IonItemGroup className="ion-no-margin">
-            <span className={`${styles["container"]} ion-margin`}>
-              {/* <IonAvatar className="ion-margin-start">
+            {/* <IonAvatar className="ion-margin-start">
                 <img
                   className={styles.avatar}
                   alt="Your user"
                   src={personCircleOutline}
                 ></img>
               </IonAvatar> */}
-              <Identicon hash={id!} size={50} />
-            </span>
+            <div className={`${styles.container} ion-padding`}>
+              <IonAvatar>
+                <img src={avatar}></img>
+              </IonAvatar>
+            </div>
+
             <IonItem onClick={handleOnClick} lines="none">
               <IonLabel>{username}</IonLabel>
             </IonItem>

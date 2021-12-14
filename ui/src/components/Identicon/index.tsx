@@ -7,9 +7,10 @@ interface Props {
   hash: string;
   size?: number | undefined;
   shape?: "circle" | "square";
+  className?: string;
 }
 
-const Identicon: React.FC<Props> = ({ hash, size = 32 }) => {
+const Identicon: React.FC<Props> = ({ hash, size = 32, className = "" }) => {
   // const canvas = document.getElementById(styles.icon) as HTMLCanvasElement;
   const canvas = useRef<HTMLCanvasElement>(null);
   const opts = {
@@ -23,10 +24,10 @@ const Identicon: React.FC<Props> = ({ hash, size = 32 }) => {
     <div>
       <canvas
         ref={canvas}
-        className={styles["icon"]}
+        className={`${styles["icon"]} ${className}`}
         id="identicon"
-        width="20"
-        height="20"
+        width={size}
+        height={size}
       />
     </div>
   );
