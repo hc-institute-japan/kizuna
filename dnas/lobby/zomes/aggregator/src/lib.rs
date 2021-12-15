@@ -45,7 +45,7 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
     /*
     There is a strong assumption here that profile will not be
     variant None since it is assumed that the agent already made a profile before making this call
-    from the frontend
+    from the frontend.
     */
     let user_info: AgentProfile = call_response_handler(user_info_call_response)?
         .decode::<Option<AgentProfile>>()?
