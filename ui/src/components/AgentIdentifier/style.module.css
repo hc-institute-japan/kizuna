@@ -6,5 +6,11 @@
 
 .avatar {
   padding-right: 1rem;
-  margin-bottom: -7px;
+}
+
+.container {
+  padding-bottom: 0.5rem;
+  padding-top: 0.5rem;
+  display: flex;
+  align-items: center;
 }

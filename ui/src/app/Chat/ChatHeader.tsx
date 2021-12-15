@@ -15,7 +15,6 @@ import {
   arrowBackSharp,
   ellipsisVerticalOutline,
   informationCircleOutline,
-  personCircleOutline,
   pin,
   search,
 } from "ionicons/icons";
@@ -142,8 +141,8 @@ const ChatHeader: React.FC<Props> = ({
           </IonButton>
         </IonButtons>
         <div className={styles["title-container"]}>
-          <IonAvatar className="ion-padding">
-            <Identicon hash={id} avatar={conversant.fields.avatar} />
+          <IonAvatar className={`${styles["avatar"]} ion-padding`}>
+            <Identicon hash={id} avatar={conversant.fields.avatar} size={50} />
           </IonAvatar>
           <IonTitle className={styles["title"]} onClick={handleOnProfileClick}>
             <AgentIdentifier nickname={username} id={id} />

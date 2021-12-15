@@ -11,7 +11,6 @@ import {
 import { arrowBackSharp } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory, useLocation } from "react-router";
-import Identicon from "../../components/Identicon";
 import ProfileInfo from "../../components/ProfileInfo";
 import { Profile as ProfileType } from "../../redux/profile/types";
 import ProfileMenuItems from "./ProfileMenuItems";

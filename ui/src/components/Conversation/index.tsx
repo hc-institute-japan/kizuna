@@ -58,11 +58,14 @@ const Conversation: React.FC<Props> = ({
         {conversation.type === "group" ? (
           <h2>{conversation.conversationName}</h2>
         ) : (
-          <AgentIdentifier
-            nickname={conversation.conversationName}
-            id={conversation.id}
-            charToShow={10}
-          />
+          <div className={styles["identifier"]}>
+            <AgentIdentifier
+              noSpace={true}
+              nickname={conversation.conversationName}
+              id={conversation.id}
+              charToShow={10}
+            />
+          </div>
         )}
         {conversation.latestMessage.sender ? (
           <h3>{conversation.latestMessage.sender.username}</h3>

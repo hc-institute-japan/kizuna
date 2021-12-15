@@ -1,23 +1,23 @@
 import { serializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
+import { binaryToUrl } from "../../../utils/helpers";
 import { pushError } from "../../error/actions";
 import { ThunkAction } from "../../types";
 import { ProfileActionTypes, SET_PROFILE } from "../types";
 
 const createProfile =
-  (nickname: string, image: string | null): ThunkAction =>
+  (nickname: string, image: Uint8Array | null): ThunkAction =>
   async (dispatch, _getState, { callZome, getAgentId }) => {
     try {
       const myAgentId = await getAgentId();
       /* assume that getAgentId() is non-nullable */
       const myAgentIdB64 = serializeHash(myAgentId!);
 
-      console.log(image);
       const payload = image
         ? {
             nickname,
             fields: {
-              avatar: image,
+              avatar: serializeHash(image),
             },
           }
         : { nickname, fields: {} };
@@ -30,7 +30,7 @@ const createProfile =
         type: SET_PROFILE,
         id: myAgentIdB64,
         nickname: res.profile.nickname,
-        fields: {},
+        fields: image ? { avatar: binaryToUrl(serializeHash(image)) } : {},
       });
       return res;
     } catch (e) {

@@ -21,14 +21,14 @@ interface Props {
   dismiss(): any;
 }
 
-interface Item {
+interface ItemInterface {
   label: string;
   value: number;
   onChange(value: number): any;
   dismiss(): any;
 }
 
-const Item: React.FC<Item> = ({ label, value, onChange, dismiss }) => (
+const Item: React.FC<ItemInterface> = ({ label, value, onChange, dismiss }) => (
   <IonItem
     onClick={() => {
       onChange(value);

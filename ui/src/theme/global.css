@@ -12,6 +12,6 @@ ion-modal.fullscreen {
 ion-text,
 p,
 ion-label,
-span {
-  word-break: break-all;
+span, h6, div {
+  word-break: keep-all;
 }

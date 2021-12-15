@@ -130,10 +130,10 @@ const ChatBox: React.FC<Props> = ({
           messageIds: readData.map((item) => item.messageIds).flat(),
         };
         dispatch(readGroupMessage(readListData));
-        console.log(readListData.messageIds);
         setReadData([]);
       }, 1500);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [readData]);
 
   const handleOnSeen = (complete: () => any, message: any) => {
@@ -238,6 +238,7 @@ const ChatBox: React.FC<Props> = ({
         });
       }, 1000);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messagesReceipt]);
 
   return (

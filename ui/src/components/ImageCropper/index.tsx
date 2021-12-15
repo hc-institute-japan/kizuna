@@ -10,7 +10,7 @@ interface Props {
   src: string;
   prevPath: string;
   dismiss(): any;
-  onComplete(srcSet: string | null): any;
+  onComplete(binary: Uint8Array | null): any;
 }
 
 const ImageCropper: React.FC<Props> = ({
@@ -20,7 +20,7 @@ const ImageCropper: React.FC<Props> = ({
   onComplete,
 }) => {
   const [crop, setCrop] = useState<Partial<Crop>>({ x: 0, y: 0, aspect: 1 });
-  const [srcSet, setSrcSet] = useState<string | null>(null);
+  const [binary, setBinary] = useState<Uint8Array | null>(null);
   const imageContainer = useRef<HTMLDivElement | null>(null);
   const [style, setStyle] = useState({});
 
@@ -66,57 +66,11 @@ const ImageCropper: React.FC<Props> = ({
             });
           }
         }
-        // console.log(
-        //   imageContainer.current!.getBoundingClientRect().height,
-        //   img.naturalHeight
-        // );
-
-        // console.log(
-        //   // vert,
-        //   imageContainer.current!.getBoundingClientRect().height /
-        //     img.naturalHeight
-        // );
-
-        // const ratio = img.naturalHeight / img.naturalWidth;
-
-        // if (ratio === 1) {
-        //   setStyle({ width: "100vw" });
-        // } else if (ratio > 1) {
-        //   const percentage =
-        //     imageContainer.current!.getBoundingClientRect().height /
-        //     img.naturalHeight;
-
-        //   const width = img.naturalWidth * percentage;
-
-        //   setStyle({
-        //     height: imageContainer.current!.getBoundingClientRect().height,
-        //     width,
-        //   });
-        // } else {
-        //   const percentage =
-        //     imageContainer.current!.getBoundingClientRect().width / img.width;
-
-        //   const height = img.naturalHeight * percentage;
-
-        //   setStyle({
-        //     width: imageContainer.current!.getBoundingClientRect().width,
-        //     height,
-        //   });
-        // }
-
-        // if square, width = 100
-        // else if(tall)
-        // get percentage
-        // adjust width using height percentage
-        // else (wide)
-        // get percentage width
-        // adjust height
-        // const ratio = img.naturalHeight/ img.naturalWidth
-        // };
       }, 500);
     };
 
     img.src = src;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const header = useRef<HTMLDivElement>(null);
   // const footer = useRef<HTMLIonFooterElement>(null);
@@ -134,6 +88,7 @@ const ImageCropper: React.FC<Props> = ({
 
   const dismissPopover = () => dismissP();
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [show, dismissP] = useIonPopover(CropPopover, {
     onChange,
     dismiss: dismissPopover,
@@ -156,7 +111,6 @@ const ImageCropper: React.FC<Props> = ({
     ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
     ctx.imageSmoothingQuality = "high";
 
-    // console.log(canvas, img);
     if (img)
       ctx.drawImage(
         img,
@@ -171,35 +125,23 @@ const ImageCropper: React.FC<Props> = ({
       );
     canvas.toBlob(
       (blob) => {
-        // const canvasImage = ctx.getImageData(
-        //   crop.x! * scaleX,
-        //   crop.y! * scaleY,
-        //   crop.width! * scaleX,
-        //   crop.height! * scaleY
-        // );
-        // const binary = new Uint8Array(canvasImage.data.length);
-        // canvasImage.data.forEach((byte, i) => {
-        //   binary[i] = byte;
-        // });
-
-        setSrcSet(URL.createObjectURL(blob!));
+        blob?.arrayBuffer().then((v) => {
+          const binary = new Uint8Array(v);
+          setBinary(binary);
+        });
       },
       "image/jpeg",
       1
     );
-
-    // As Base64 string
-    // return base64Image;
-
-    // As a blob
   }
 
   useEffect(() => {
-    if (srcSet) {
-      onComplete(srcSet);
-      setSrcSet(null);
+    if (binary) {
+      onComplete(binary);
+      setBinary(null);
     }
-  }, [srcSet]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [binary]);
 
   const onConfirm = () => {
     getCroppedImg();

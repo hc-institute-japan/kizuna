@@ -12,7 +12,7 @@ const ContactItem: React.FC<Props> = ({ contact, onClick }) => {
   const handleOnClick = () => onClick(contact);
 
   return (
-    <IonItem onClick={handleOnClick} lines="none">
+    <IonItem onClick={handleOnClick}>
       <AgentIdentifier
         displayAvatar={true}
         avatar={contact.fields.avatar}

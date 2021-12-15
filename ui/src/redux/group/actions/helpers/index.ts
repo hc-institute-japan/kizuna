@@ -150,7 +150,11 @@ export const fetchUsernameOfMembers = async (
       membersUsernames[id] = {
         id,
         username: agentProfile.profile.nickname,
-        fields: agentProfile.profile.fields,
+        fields: agentProfile.profile.fields.avatar
+          ? {
+              avatar: agentProfile.profile.fields.avatar,
+            }
+          : {},
       };
     });
   }

@@ -7,11 +7,10 @@ import {
   useIonPopover,
 } from "@ionic/react";
 import {
-  radioButtonOff,
   alertCircleOutline,
   checkmarkCircleOutline,
   checkmarkDoneCircle,
-  personCircleOutline,
+  radioButtonOff,
 } from "ionicons/icons";
 import React, { useState } from "react";
 import { useIntl } from "react-intl";
@@ -21,7 +20,6 @@ import {
   TextPayload,
 } from "../../../redux/commons/types";
 import { usePressHandlers } from "../../../utils/helpers";
-import AgentIdentifier from "../../AgentIdentifier";
 import Identicon from "../../Identicon";
 import Spinner from "../../Spinner";
 import ChatPopover from "../ChatPopover";
@@ -141,12 +139,12 @@ const Me: React.FC<ChatProps> = ({
         ) : isP2P ? null : (
           <div className={common["picture"]} style={{ marginLeft: "0.5rem" }}>
             {showProfilePicture ? (
-              !profile.fields.avatar ? (
-                <IonAvatar>
+              profile.fields.avatar ? (
+                <IonAvatar className={common["avatar-container"]}>
                   <img src={profile.fields.avatar} alt="avatar"></img>
                 </IonAvatar>
               ) : (
-                <Identicon hash={profile.id!} />
+                <Identicon hash={profile.id!} size={35} />
               )
             ) : null}
           </div>

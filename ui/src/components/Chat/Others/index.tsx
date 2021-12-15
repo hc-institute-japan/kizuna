@@ -5,7 +5,6 @@ import {
   isPlatform,
   useIonPopover,
 } from "@ionic/react";
-import { personCircleOutline } from "ionicons/icons";
 import React from "react";
 import { useIntl } from "react-intl";
 import {
@@ -14,13 +13,12 @@ import {
   TextPayload,
 } from "../../../redux/commons/types";
 import { usePressHandlers } from "../../../utils/helpers";
-import AgentIdentifier from "../../AgentIdentifier";
 import Identicon from "../../Identicon";
 import ChatPopover from "../ChatPopover";
 import File from "../File";
 import MessageTimestamp from "../MessageTimestamp";
 import ReplyTo from "../ReplyTo";
-import { default as common, default as styles } from "../style.module.css";
+import { default as common } from "../style.module.css";
 import Text from "../Text";
 import { ChatProps } from "../types";
 
@@ -81,14 +79,14 @@ const Others: React.FC<ChatProps> = ({
         {...pressHandlers}
       >
         {isP2P ? null : (
-          <div className={common.picture} style={{ marginRight: "0.5rem" }}>
+          <div className={common["picture"]} style={{ marginRight: "0.5rem" }}>
             {showProfilePicture ? (
               profile.fields.avatar ? (
-                <IonAvatar>
+                <IonAvatar className={common["avatar-container"]}>
                   <img src={profile.fields.avatar} alt="avatar"></img>
                 </IonAvatar>
               ) : (
-                <Identicon hash={profile.id!} />
+                <Identicon hash={profile.id!} size={35} />
               )
             ) : null}
           </div>

@@ -87,7 +87,6 @@ const Chat: React.FC = () => {
     fetchMyContacts();
     return "";
   });
-  const profile = useSelector((state: RootState) => state.profile);
   /* REFS */
   const scrollerRef = useRef<ChatListMethods>(null);
   const didMountRef = useRef(false);
@@ -137,6 +136,7 @@ const Chat: React.FC = () => {
         setMessageReceipts([]);
       }, 1000);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messageReceipts]);
 
   /* HANDLERS */

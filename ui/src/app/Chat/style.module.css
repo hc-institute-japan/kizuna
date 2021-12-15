@@ -7,11 +7,18 @@
 
 .title-container {
   display: flex;
+
+}
+
+.avatar {
+  width: 70px;
+  height: 70px;
 }
 
 .title {
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-left: -20px !important;
 }
 
 .chat > ion-item {

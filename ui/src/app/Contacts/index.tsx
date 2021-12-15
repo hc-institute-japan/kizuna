@@ -5,7 +5,6 @@ import ContactsList from "../../components/ContactList";
 import Spinner from "../../components/Spinner";
 import Toolbar from "../../components/Toolbar";
 import { fetchMyContacts } from "../../redux/contacts/actions";
-import { IndexedContacts } from "../../redux/contacts/types";
 import { RootState } from "../../redux/types";
 import { indexContacts, useAppDispatch } from "../../utils/helpers";
 import AddContactFAB from "./AddContact/AddContactFAB";

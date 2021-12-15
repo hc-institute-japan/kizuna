@@ -1,7 +1,8 @@
-import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
+import { serializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../connection/types";
-import { timestampToDate } from "../../utils/helpers";
+import { binaryToUrl, timestampToDate } from "../../utils/helpers";
 import { SET_BLOCKED, SET_CONTACTS } from "../contacts/types";
+import { pushError } from "../error/actions";
 import { convertFetchedResToGroupMessagesOutput } from "../group/actions/helpers";
 import {
   GroupConversation,
@@ -9,12 +10,11 @@ import {
   SetLatestGroupState,
   SET_LATEST_GROUP_STATE,
 } from "../group/types";
-import { setMessages } from "../p2pmessages/actions/setMessages";
 import { transformZomeDataToUIData } from "../p2pmessages/actions/helpers/transformZomeDateToUIData";
+import { setMessages } from "../p2pmessages/actions/setMessages";
 import { SET_PREFERENCE } from "../preference/types";
 import { Profile, ProfileActionTypes, SET_PROFILE } from "../profile/types";
 import { ThunkAction } from "../types";
-import { pushError } from "../error/actions";
 
 export const getLatestData =
   (): ThunkAction =>
@@ -30,12 +30,13 @@ export const getLatestData =
       /* assume that getAgentId() is non-nullable */
       const myAgentIdB64 = serializeHash(myAgentId!);
 
-      const url = latestData.userInfo.profile.fields.avatar;
       dispatch<ProfileActionTypes>({
         type: SET_PROFILE,
         id: myAgentIdB64,
         nickname: latestData.userInfo.profile.nickname,
-        fields: { avatar: url },
+        fields: latestData.userInfo.profile.fields.avatar
+          ? { avatar: binaryToUrl(latestData.userInfo.profile.fields.avatar) }
+          : {},
       });
 
       let contacts: { [key: string]: Profile } = {};
@@ -45,7 +46,11 @@ export const getLatestData =
         contacts[agentId] = {
           id: agentId,
           username: agentProfile.profile.nickname,
-          fields: agentProfile.profile.fields,
+          fields: agentProfile.profile.fields.avatar
+            ? {
+                avatar: binaryToUrl(agentProfile.profile.fields.avatar),
+              }
+            : {},
         };
       });
       if (latestData.blockedContacts)
@@ -54,7 +59,11 @@ export const getLatestData =
           blocked[agentId] = {
             id: agentId,
             username: agentProfile.profile.nickname,
-            fields: agentProfile.profile.fields,
+            fields: agentProfile.profile.fields.avatar
+              ? {
+                  avatar: binaryToUrl(agentProfile.profile.fields.avatar),
+                }
+              : {},
           };
         });
 
@@ -97,9 +106,13 @@ export const getLatestData =
       const groupMembers: Profile[] = latestData.memberProfiles.map(
         (agentProfile: any): Profile => {
           return {
-            id: agentProfile.agentPubKey,
+            id: serializeHash(agentProfile.agentPubKey),
             username: agentProfile.profile.nickname,
-            fields: agentProfile.profile.fields,
+            fields: agentProfile.profile.fields.avatar
+              ? {
+                  avatar: binaryToUrl(agentProfile.profile.fields.avatar),
+                }
+              : {},
           };
         }
       );

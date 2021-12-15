@@ -38,7 +38,7 @@ const Identicon: React.FC<Props> = ({
           height={size}
         />
       ) : (
-        <IonAvatar>
+        <IonAvatar className={styles["avatar"]}>
           <img src={avatar} alt="avatar"></img>
         </IonAvatar>
       )}

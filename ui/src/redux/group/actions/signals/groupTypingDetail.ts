@@ -21,7 +21,9 @@ const fetchProfile = async (
   return {
     id: id,
     username: fetchedProfile.profile.nickname,
-    fields: fetchedProfile.profile.fields,
+    fields: fetchedProfile.profile.fields.avatar
+      ? { avatar: fetchedProfile.profile.fields.avatar }
+      : {},
   };
 };
 

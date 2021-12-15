@@ -4,7 +4,9 @@ export const SET_PROFILE = "SET_PROFILE";
 export interface AgentProfile {
   agent_pub_key: string;
   profile: {
-    fields: object;
+    fields: {
+      [key: string]: any;
+    };
     nickname: string;
   };
 }

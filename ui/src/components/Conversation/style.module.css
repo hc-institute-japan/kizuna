@@ -2,6 +2,11 @@
   filter: invert(0%);
 }
 
+.identifier {
+  padding-bottom: -0.5rem !important;
+  padding-top: -0.5rem !important;
+}
+
 @media (prefers-color-scheme: dark) {
   .avatar {
     filter: invert(100%);

@@ -10,6 +10,7 @@ interface Props {
   displayId?: boolean;
   displayAvatar?: boolean;
   displayNickname?: boolean;
+  noSpace?: boolean;
 }
 
 const AgentIdentifier: React.FC<Props> = ({
@@ -20,6 +21,7 @@ const AgentIdentifier: React.FC<Props> = ({
   displayId = true,
   displayAvatar = false,
   displayNickname = true,
+  noSpace = false,
 }) => {
   /* trim the hash type prefix */
   const trimmedId = id.slice(5);
@@ -30,17 +32,17 @@ const AgentIdentifier: React.FC<Props> = ({
     </span>
   );
   const renderAvatar = (id: string) => (
-    <span className={styles["avatar"]}>
-      <Identicon hash={id} avatar={avatar} />
-    </span>
+    <div className={styles["avatar"]}>
+      <Identicon hash={id} avatar={avatar} size={50} />
+    </div>
   );
 
   return (
-    <>
+    <div className={!noSpace ? styles["container"] : styles[""]}>
       {displayAvatar ? renderAvatar(id) : null}
       {displayNickname ? nickname : null}
       {displayId ? renderId(trimmedId, charToShow) : null}
-    </>
+    </div>
   );
 };
 

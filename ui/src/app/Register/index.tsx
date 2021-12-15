@@ -27,7 +27,7 @@ const Register: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const dispatch = useAppDispatch();
   const file = useRef<HTMLInputElement>(null);
-  const [src, setSrc] = useState<Uint8Array | null>(null);
+  const [binary, setBinary] = useState<Uint8Array | null>(null);
   const profilePicture = useRef<HTMLImageElement>(null);
 
   const intl = useIntl();
@@ -52,6 +52,7 @@ const Register: React.FC = () => {
             id: "app.register.error-invalid-username",
           })
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleOnSubmit = () => {
@@ -59,9 +60,7 @@ const Register: React.FC = () => {
     dispatch(
       createProfile(
         nickname,
-        !profilePicture.current!.src.includes("svg")
-          ? profilePicture.current!.src
-          : null
+        !profilePicture.current!.src.includes("svg") ? binary : null
       )
     ).then((res: any) => {
       if (!res) setLoading(false);
@@ -69,8 +68,9 @@ const Register: React.FC = () => {
   };
 
   useEffect(() => {
-    if (src) present({ cssClass: `cropper ${styles.modal}` });
-  }, [src]);
+    if (binary) present({ cssClass: `cropper ${styles.modal}` });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [binary]);
 
   const handleOnFileChange = () => {
     Array.from(file.current ? file.current.files! : new FileList()).forEach(
@@ -85,7 +85,7 @@ const Register: React.FC = () => {
               readerEvent.target?.result as string
             );
 
-            setSrc(encoded);
+            setBinary(encoded);
           };
         });
       }
@@ -100,18 +100,18 @@ const Register: React.FC = () => {
   const decodeSrc = () => {
     const decoder = new TextDecoder();
 
-    return src ? decoder.decode(src) : "";
+    return binary ? decoder.decode(binary) : "";
   };
 
   const [present, dismiss] = useIonModal(ImageCropper, {
     src: decodeSrc(),
     prevPath: "/register",
     dismiss: onDismiss,
-    onComplete: (src: string) => {
-      if (src) {
-        const decoder = new TextDecoder();
-        profilePicture.current!.src = src;
-        // setSrc(decodersrc));
+    onComplete: (binary: Uint8Array) => {
+      if (binary) {
+        const blob = new Blob([binary], { type: "image/jpeg" });
+        profilePicture.current!.src = URL.createObjectURL(blob);
+        setBinary(binary);
       }
     },
   });
@@ -156,10 +156,10 @@ const Register: React.FC = () => {
             <div
               className={styles["profile-picture"]}
               onClick={() => {
-                if (!src) file?.current?.click();
+                if (!binary) file?.current?.click();
                 else {
                   file!.current!.value = "";
-                  setSrc(null);
+                  setBinary(null);
                   profilePicture.current!.src = personCircleOutline;
                 }
               }}
@@ -170,7 +170,7 @@ const Register: React.FC = () => {
                 src={personCircleOutline}
               ></img>
               <div className={styles.icon}>
-                {src === null ? (
+                {binary === null ? (
                   <IonIcon size="large" icon={imageOutline}></IonIcon>
                 ) : (
                   <IonIcon size="large" icon={close}></IonIcon>
