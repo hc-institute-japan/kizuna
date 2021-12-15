@@ -1,4 +1,5 @@
 import {
+  IonAvatar,
   IonButton,
   IonButtons,
   IonIcon,
@@ -8,9 +9,11 @@ import {
 import { add } from "ionicons/icons";
 import React, { useState } from "react";
 import AgentIdentifier from "../../../components/AgentIdentifier";
+import Identicon from "../../../components/Identicon";
 import { addContact } from "../../../redux/contacts/actions";
 import { Profile } from "../../../redux/profile/types";
 import { useAppDispatch } from "../../../utils/helpers";
+import styles from "../style.module.css";
 
 interface Props {
   contact: Profile;
@@ -29,9 +32,16 @@ const AddContactItem: React.FC<Props> = ({ contact, onCompletion }) => {
     });
   };
 
+  console.log(contact.fields);
+
   return (
     <IonItem lines="none">
-      <AgentIdentifier nickname={contact.username} id={contact.id} />
+      <AgentIdentifier
+        displayAvatar={true}
+        avatar={contact.fields.avatar}
+        nickname={contact.username}
+        id={contact.id}
+      />
       <IonButtons slot="end">
         {isLoading ? (
           <IonSpinner />

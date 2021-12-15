@@ -35,8 +35,8 @@ interface MenuItem {
 
 const Menu: React.FC = () => {
   const history = useHistory();
-  const { username, id, avatar } = useSelector((state: RootState) => {
-    return { ...state.profile, avatar: state.profile.fields.avatar };
+  const { username, id, fields } = useSelector((state: RootState) => {
+    return { ...state.profile };
   });
 
   const intl = useIntl();
@@ -83,7 +83,7 @@ const Menu: React.FC = () => {
     menu?.current?.close();
     history.push({
       pathname: `/p/${id}`,
-      state: { profile: { username, id } as Profile, prev: `/home` },
+      state: { profile: { username, id, fields } as Profile, prev: `/home` },
     });
   };
 
@@ -92,17 +92,14 @@ const Menu: React.FC = () => {
       <IonContent className={`${styles.menu} ion-padding-top`}>
         <IonList id="inbox-list" lines="none">
           <IonItemGroup className="ion-no-margin">
-            {/* <IonAvatar className="ion-margin-start">
-                <img
-                  className={styles.avatar}
-                  alt="Your user"
-                  src={personCircleOutline}
-                ></img>
-              </IonAvatar> */}
             <div className={`${styles.container} ion-padding`}>
-              <IonAvatar>
-                <img src={avatar}></img>
-              </IonAvatar>
+              {fields.avatar ? (
+                <IonAvatar>
+                  <img src={fields.avatar} alt="avatar"></img>
+                </IonAvatar>
+              ) : (
+                <Identicon hash={id!} size={60} />
+              )}
             </div>
 
             <IonItem onClick={handleOnClick} lines="none">

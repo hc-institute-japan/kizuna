@@ -18,7 +18,12 @@ const ContactItem: React.FC<Props> = ({ contact }) => {
 
   return (
     <IonItem onClick={handleOnClick} lines="none" key={JSON.stringify(contact)}>
-      <AgentIdentifier nickname={contact.username} id={contact.id} />
+      <AgentIdentifier
+        displayAvatar={true}
+        avatar={contact.fields.avatar}
+        nickname={contact.username}
+        id={contact.id}
+      />
       {/* <IonButtons slot="end">
         <IonButton>
           <IonIcon icon={chatboxOutline} />

@@ -1,4 +1,5 @@
 import {
+  IonAvatar,
   IonIcon,
   IonItem,
   IonText,
@@ -20,6 +21,8 @@ import {
   TextPayload,
 } from "../../../redux/commons/types";
 import { usePressHandlers } from "../../../utils/helpers";
+import AgentIdentifier from "../../AgentIdentifier";
+import Identicon from "../../Identicon";
 import Spinner from "../../Spinner";
 import ChatPopover from "../ChatPopover";
 import File from "../File";
@@ -30,8 +33,8 @@ import { ChatProps } from "../types";
 
 const Me: React.FC<ChatProps> = ({
   id,
+  profile,
   payload,
-  author,
   timestamp,
   replyTo,
   onReply,
@@ -56,7 +59,7 @@ const Me: React.FC<ChatProps> = ({
     onHide: () => dismiss(),
     onPin: onPinMessage,
     onReply: () => {
-      if (onReply) onReply({ author, payload, id });
+      if (onReply) onReply({ author: profile.username, payload, id });
     },
     onDelete: () => {
       if (onDelete) onDelete();
@@ -136,13 +139,15 @@ const Me: React.FC<ChatProps> = ({
             ></IonIcon>
           )
         ) : isP2P ? null : (
-          <div className={common.picture} style={{ marginLeft: "0.5rem" }}>
+          <div className={common["picture"]} style={{ marginLeft: "0.5rem" }}>
             {showProfilePicture ? (
-              <img
-                className={styles.avatar}
-                alt={`${author}'s profile`}
-                src={personCircleOutline}
-              />
+              !profile.fields.avatar ? (
+                <IonAvatar>
+                  <img src={profile.fields.avatar} alt="avatar"></img>
+                </IonAvatar>
+              ) : (
+                <Identicon hash={profile.id!} />
+              )
             ) : null}
           </div>
         )}

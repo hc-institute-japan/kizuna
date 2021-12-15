@@ -5,28 +5,26 @@ import { ThunkAction } from "../../types";
 import { ProfileActionTypes, SET_PROFILE } from "../types";
 
 const createProfile =
-  (nickname: string, image: string): ThunkAction =>
+  (nickname: string, image: string | null): ThunkAction =>
   async (dispatch, _getState, { callZome, getAgentId }) => {
     try {
       const myAgentId = await getAgentId();
       /* assume that getAgentId() is non-nullable */
       const myAgentIdB64 = serializeHash(myAgentId!);
 
-      const avatarEntryHash = await callZome({
-        zomeName: ZOMES.PROFILES,
-        fnName: FUNCTIONS[ZOMES.PROFILES].SET_AVATAR_BYTES,
-        payload: image,
-      });
-
+      console.log(image);
+      const payload = image
+        ? {
+            nickname,
+            fields: {
+              avatar: image,
+            },
+          }
+        : { nickname, fields: {} };
       const res = await callZome({
         zomeName: ZOMES.PROFILES,
         fnName: FUNCTIONS[ZOMES.PROFILES].CREATE_PROFILE,
-        payload: {
-          nickname,
-          fields: {
-            avatar: image,
-          },
-        },
+        payload,
       });
       dispatch<ProfileActionTypes>({
         type: SET_PROFILE,

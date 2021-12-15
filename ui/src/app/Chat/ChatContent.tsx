@@ -35,6 +35,7 @@ import ChatHeader from "./ChatHeader";
 import recommitMessage from "../../redux/p2pmessages/actions/signals/recommitMessage";
 
 const Chat: React.FC = () => {
+  const dispatch = useAppDispatch();
   /* STATES */
   const { id } = useParams<{ id: string }>();
   const [message, setMessage] = useState<string>("");
@@ -75,8 +76,6 @@ const Chat: React.FC = () => {
     (state: RootState) => state.preference
   );
 
-  const dispatch = useAppDispatch();
-  // const history = useHistory();
   const { pathname, state }: { pathname: string; state: { username: string } } =
     useLocation();
 
@@ -88,6 +87,7 @@ const Chat: React.FC = () => {
     fetchMyContacts();
     return "";
   });
+  const profile = useSelector((state: RootState) => state.profile);
   /* REFS */
   const scrollerRef = useRef<ChatListMethods>(null);
   const didMountRef = useRef(false);
@@ -422,9 +422,9 @@ const Chat: React.FC = () => {
     return conversant.id !== author.id ? (
       <Me
         id={messageBundle.message.p2pMessageEntryHash}
+        profile={messageBundle.message.author}
         key={key}
         type="p2p"
-        author={author.username}
         timestamp={timestamp}
         onRetry={(setLoading) =>
           onRetryHandler(setLoading, messageBundle.message)
@@ -451,9 +451,9 @@ const Chat: React.FC = () => {
     ) : (
       <Others
         id={messageBundle.message.p2pMessageEntryHash}
+        profile={messageBundle.message.author}
         key={key}
         type="p2p"
-        author={author.username}
         timestamp={timestamp}
         payload={payload}
         readList={readlist ? readlist : {}}

@@ -23,6 +23,7 @@ import React from "react";
 import { IntlShape, useIntl } from "react-intl";
 import { useHistory } from "react-router";
 import AgentIdentifier from "../../components/AgentIdentifier";
+import Identicon from "../../components/Identicon";
 import { Profile } from "../../redux/profile/types";
 import styles from "./style.module.css";
 
@@ -142,11 +143,7 @@ const ChatHeader: React.FC<Props> = ({
         </IonButtons>
         <div className={styles["title-container"]}>
           <IonAvatar className="ion-padding">
-            <img
-              className={styles["avatar"]}
-              src={personCircleOutline}
-              alt={username}
-            />
+            <Identicon hash={id} avatar={conversant.fields.avatar} />
           </IonAvatar>
           <IonTitle className={styles["title"]} onClick={handleOnProfileClick}>
             <AgentIdentifier nickname={username} id={id} />

@@ -27,6 +27,7 @@ const fetchMyContacts =
           contacts[id] = {
             id,
             username: agentProfile.profile.nickname,
+            fields: agentProfile.profile.fields,
           };
         });
         dispatch({

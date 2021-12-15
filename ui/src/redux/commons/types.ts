@@ -123,6 +123,7 @@ export interface Message {
 /* used in Conversations page */
 export interface Conversation {
   type: "p2p" | "group";
+  avatar?: string;
   id: string;
   conversationName: string;
   // src: string;

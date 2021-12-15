@@ -13,7 +13,12 @@ const ContactItem: React.FC<Props> = ({ contact, onClick }) => {
 
   return (
     <IonItem onClick={handleOnClick} lines="none">
-      <AgentIdentifier nickname={contact.username} id={contact.id} />
+      <AgentIdentifier
+        displayAvatar={true}
+        avatar={contact.fields.avatar}
+        nickname={contact.username}
+        id={contact.id}
+      />
     </IonItem>
   );
 };

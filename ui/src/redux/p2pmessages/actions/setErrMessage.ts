@@ -12,7 +12,7 @@ export const setErrorMessage =
     file?: FileContent
   ): ThunkAction =>
   (dispatch, getState) => {
-    const { id, username } = getState().profile;
+    const { id, username, fields } = getState().profile;
     const contacts = getState().contacts.contacts;
     const { messages } = getState().p2pmessages;
 
@@ -34,8 +34,12 @@ export const setErrorMessage =
     }
     let message: P2PMessage = {
       p2pMessageEntryHash: "error message", // TODO: use a unique ID
-      author: { id: id!, username: username! },
-      receiver: { id: receiver, username: contacts[receiver].username! },
+      author: { id: id!, username: username!, fields },
+      receiver: {
+        id: receiver,
+        username: contacts[receiver].username!,
+        fields: contacts[receiver].fields,
+      },
       payload: payload,
       timestamp: new Date(),
       replyTo:

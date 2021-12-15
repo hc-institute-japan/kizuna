@@ -44,16 +44,14 @@ const Conversation: React.FC<Props> = ({
       <IonAvatar slot="start">
         <img
           className={styles.avatar}
-          /*
-            TODO: add actual avatar of the conversation to the prop being passed
-            to avoid this
-          */
           src={
             conversation.type === "group"
               ? peopleCircleOutline
+              : conversation.avatar
+              ? conversation.avatar
               : personCircleOutline
           }
-          alt={`${conversation.conversationName}'s chat`}
+          alt="avatar"
         />
       </IonAvatar>
       <IonLabel>

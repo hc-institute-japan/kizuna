@@ -3,3 +3,8 @@
   font-size: small;
   padding-left: 5px;
 }
+
+.avatar {
+  padding-right: 1rem;
+  margin-bottom: -7px;
+}

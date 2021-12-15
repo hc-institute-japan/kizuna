@@ -28,6 +28,7 @@ const fetchBlocked =
           blocked[id] = {
             id,
             username: agentProfile.profile.nickname,
+            fields: agentProfile.profile.fields,
           };
         });
         dispatch({

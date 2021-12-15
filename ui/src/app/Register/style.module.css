@@ -44,8 +44,8 @@
 .icon {
   position: absolute;
   border-radius: 50%;
-  right: 5px;
-  bottom: 5px;
+  right: -10px;
+  bottom: -5px;
 }
 
 .profile-picture:hover {

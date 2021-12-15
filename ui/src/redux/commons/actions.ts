@@ -45,6 +45,7 @@ export const getLatestData =
         contacts[agentId] = {
           id: agentId,
           username: agentProfile.profile.nickname,
+          fields: agentProfile.profile.fields,
         };
       });
       if (latestData.blockedContacts)
@@ -53,6 +54,7 @@ export const getLatestData =
           blocked[agentId] = {
             id: agentId,
             username: agentProfile.profile.nickname,
+            fields: agentProfile.profile.fields,
           };
         });
 
@@ -97,6 +99,7 @@ export const getLatestData =
           return {
             id: agentProfile.agentPubKey,
             username: agentProfile.profile.nickname,
+            fields: agentProfile.profile.fields,
           };
         }
       );
@@ -131,7 +134,11 @@ export const getLatestData =
       const profile = { ...getState().profile };
       const profileList = {
         ...contactsState,
-        [profile.id!]: { id: profile.id!, username: profile.username! },
+        [profile.id!]: {
+          id: profile.id!,
+          username: profile.username!,
+          fields: profile.fields,
+        },
       };
       const toDispatch = transformZomeDataToUIData(
         latestData.latestP2pMessages,

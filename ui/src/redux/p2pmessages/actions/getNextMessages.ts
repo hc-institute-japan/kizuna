@@ -41,7 +41,11 @@ export const getNextMessages =
         const profile = { ...getState().profile };
         const profileList = {
           ...contactsState,
-          [profile.id!]: { id: profile.id!, username: profile.username! },
+          [profile.id!]: {
+            id: profile.id!,
+            username: profile.username!,
+            fields: profile.fields,
+          },
         };
         let toDispatch = transformZomeDataToUIData(
           nextBatchOfMessages,

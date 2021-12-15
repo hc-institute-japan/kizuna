@@ -43,11 +43,21 @@
   background-size: cover;
   border-radius: 50%;
   overflow: hidden;
+  margin-top: 0.3rem;
 }
 
 .picture > img {
   height: calc(1.1rem + 0.5rem + 0.5rem);
   width: calc(1.1rem + 0.5rem + 0.5rem);
+}
+
+.avatar-container {
+  flex-shrink: 0;
+  overflow: hidden;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  border-radius: 50%;
 }
 
 .me-container {

@@ -30,6 +30,7 @@ const searchProfiles =
           return {
             id: v.agent_pub_key,
             username: v.profile.nickname,
+            fields: v.profile.fields,
           };
         });
       return filteredMappedProfiles;

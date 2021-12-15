@@ -27,7 +27,11 @@ export const getLatestMessages =
         const profile = { ...getState().profile };
         const profileList = {
           ...contactsState,
-          [profile.id!]: { id: profile.id!, username: profile.username! },
+          [profile.id!]: {
+            id: profile.id!,
+            username: profile.username!,
+            fields: profile.fields,
+          },
         };
         let toDispatch = transformZomeDataToUIData(p2pLatestState, profileList);
         dispatch(setMessages(toDispatch));

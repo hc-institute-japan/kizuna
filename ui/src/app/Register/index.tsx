@@ -18,7 +18,7 @@ import { createProfile } from "../../redux/profile/actions";
 import { useAppDispatch } from "../../utils/helpers";
 import { isUsernameFormatValid } from "../../utils/regex";
 import styles from "./style.module.css";
-import { close, imageOutline } from "ionicons/icons";
+import { close, imageOutline, personCircleOutline } from "ionicons/icons";
 import ImageCropper from "../../components/ImageCropper";
 
 const Register: React.FC = () => {
@@ -37,11 +37,7 @@ const Register: React.FC = () => {
 
     setError(
       isUsernameFormatValid(e.detail.value!) && e.detail!.value!.length >= 3
-        ? src
-          ? null
-          : intl.formatMessage({
-              id: "app.register.error-no-image",
-            })
+        ? null
         : intl.formatMessage({
             id: "app.register.error-invalid-username",
           })
@@ -51,11 +47,7 @@ const Register: React.FC = () => {
   useEffect(() => {
     setError(
       isUsernameFormatValid(nickname!) && nickname.length >= 3
-        ? src
-          ? null
-          : intl.formatMessage({
-              id: "app.register.error-no-image",
-            })
+        ? null
         : intl.formatMessage({
             id: "app.register.error-invalid-username",
           })
@@ -64,11 +56,16 @@ const Register: React.FC = () => {
 
   const handleOnSubmit = () => {
     setLoading(true);
-    dispatch(createProfile(nickname, profilePicture.current!.src)).then(
-      (res: any) => {
-        if (!res) setLoading(false);
-      }
-    );
+    dispatch(
+      createProfile(
+        nickname,
+        !profilePicture.current!.src.includes("svg")
+          ? profilePicture.current!.src
+          : null
+      )
+    ).then((res: any) => {
+      if (!res) setLoading(false);
+    });
   };
 
   useEffect(() => {
@@ -163,14 +160,14 @@ const Register: React.FC = () => {
                 else {
                   file!.current!.value = "";
                   setSrc(null);
-                  profilePicture.current!.src =
-                    "https://i.pinimg.com/originals/9f/cf/5c/9fcf5c21548f9c4dfb01519aac97b5a7.jpg";
+                  profilePicture.current!.src = personCircleOutline;
                 }
               }}
             >
               <img
+                alt="avatar"
                 ref={profilePicture}
-                src="https://i.pinimg.com/originals/9f/cf/5c/9fcf5c21548f9c4dfb01519aac97b5a7.jpg"
+                src={personCircleOutline}
               ></img>
               <div className={styles.icon}>
                 {src === null ? (

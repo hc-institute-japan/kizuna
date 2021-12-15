@@ -1,4 +1,10 @@
-import { IonItem, IonText, isPlatform, useIonPopover } from "@ionic/react";
+import {
+  IonAvatar,
+  IonItem,
+  IonText,
+  isPlatform,
+  useIonPopover,
+} from "@ionic/react";
 import { personCircleOutline } from "ionicons/icons";
 import React from "react";
 import { useIntl } from "react-intl";
@@ -8,6 +14,8 @@ import {
   TextPayload,
 } from "../../../redux/commons/types";
 import { usePressHandlers } from "../../../utils/helpers";
+import AgentIdentifier from "../../AgentIdentifier";
+import Identicon from "../../Identicon";
 import ChatPopover from "../ChatPopover";
 import File from "../File";
 import MessageTimestamp from "../MessageTimestamp";
@@ -18,7 +26,7 @@ import { ChatProps } from "../types";
 
 const Others: React.FC<ChatProps> = ({
   id,
-  author,
+  profile,
   type,
   timestamp,
   payload,
@@ -39,7 +47,7 @@ const Others: React.FC<ChatProps> = ({
     onHide: () => dismiss(),
     onPin: onPinMessage,
     onReply: () => {
-      if (onReply) onReply({ author, payload, id });
+      if (onReply) onReply({ author: profile.username, payload, id });
     },
     isPinned,
     intl,
@@ -63,7 +71,7 @@ const Others: React.FC<ChatProps> = ({
     <>
       {isP2P ? null : showName ? (
         <IonItem lines="none" className={`${common["author-name"]}`}>
-          <IonText color="medium">{author}</IonText>
+          <IonText color="medium">{profile.username}</IonText>
         </IonItem>
       ) : null}
 
@@ -75,11 +83,13 @@ const Others: React.FC<ChatProps> = ({
         {isP2P ? null : (
           <div className={common.picture} style={{ marginRight: "0.5rem" }}>
             {showProfilePicture ? (
-              <img
-                className={styles.avatar}
-                src={`${personCircleOutline}`}
-                alt={`${author}'s profile`}
-              />
+              profile.fields.avatar ? (
+                <IonAvatar>
+                  <img src={profile.fields.avatar} alt="avatar"></img>
+                </IonAvatar>
+              ) : (
+                <Identicon hash={profile.id!} />
+              )
             ) : null}
           </div>
         )}

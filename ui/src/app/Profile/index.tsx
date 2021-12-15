@@ -1,4 +1,5 @@
 import {
+  IonAvatar,
   IonButton,
   IonButtons,
   IonHeader,
@@ -10,6 +11,7 @@ import {
 import { arrowBackSharp } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useHistory, useLocation } from "react-router";
+import Identicon from "../../components/Identicon";
 import ProfileInfo from "../../components/ProfileInfo";
 import { Profile as ProfileType } from "../../redux/profile/types";
 import ProfileMenuItems from "./ProfileMenuItems";
@@ -55,6 +57,16 @@ const Profile: React.FC = () => {
             </IonButton>
           </IonButtons>
           {profile ? <ProfileMenuItems profile={profile} /> : null}
+        </IonToolbar>
+
+        <IonToolbar className={styles["profile-picture-toolbar"]}>
+          {profile ? (
+            profile.fields.avatar ? (
+              <IonAvatar className={styles["profile-picture"]}>
+                <img src={profile.fields.avatar} alt="avatar"></img>
+              </IonAvatar>
+            ) : null
+          ) : null}
         </IonToolbar>
         <IonToolbar className={styles["profile-toolbar"]}>
           <IonTitle className={styles["nickname"]}>

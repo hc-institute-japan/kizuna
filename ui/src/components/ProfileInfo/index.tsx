@@ -23,7 +23,7 @@ const ProfileInfo: React.FC<Props> = ({ nickname, id }) => {
         </IonItem>
 
         <IonItem lines="none">
-          <p>{nickname}</p>
+          <IonText>{nickname}</IonText>
         </IonItem>
 
         <IonItem lines="none">
