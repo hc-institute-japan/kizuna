@@ -60,7 +60,7 @@
 }
 
 
-img {
+.textholder img {
   margin: 5px 5px 5px 5px;
   border-radius: 5%;
   object-fit: cover;
