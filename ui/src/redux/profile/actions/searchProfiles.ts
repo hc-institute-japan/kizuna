@@ -1,5 +1,5 @@
-import { serializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
+import { binaryToUrl } from "../../../utils/helpers";
 import { ThunkAction } from "../../types";
 import { AgentProfile, Profile } from "../types";
 
@@ -36,6 +36,11 @@ const searchProfiles =
           return {
             id: v.agent_pub_key,
             username: v.profile.nickname,
+            fields: v.profile.fields.avatar
+              ? {
+                  avatar: binaryToUrl(v.profile.fields.avatar),
+                }
+              : {},
           };
         });
       console.log(filteredMappedProfiles);

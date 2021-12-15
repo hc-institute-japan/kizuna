@@ -1,4 +1,4 @@
-import { IonContent, IonLoading, IonPage } from "@ionic/react";
+import { IonContent, IonPage } from "@ionic/react";
 import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router";
@@ -10,20 +10,20 @@ import MessageInput, {
   MessageInputMethods,
   MessageInputOnSendParams,
 } from "../../components/MessageInput";
-import ChatBox from "./ChatBox";
-import GroupChatHeader from "./GroupChatHeader";
 // Redux
 import { FilePayloadInput } from "../../redux/commons/types";
 import {
   indicateGroupTyping,
   sendGroupMessage,
+  setErrGroupMessage,
 } from "../../redux/group/actions";
 import { fetchPinnedMessages } from "../../redux/group/actions/fetchPinnedMessages";
-import { setErrGroupMessage } from "../../redux/group/actions";
 import { GroupConversation, GroupMessageInput } from "../../redux/group/types";
 import { RootState } from "../../redux/types";
 // Utils
 import { useAppDispatch } from "../../utils/helpers";
+import ChatBox from "./ChatBox";
+import GroupChatHeader from "./GroupChatHeader";
 
 interface GroupChatParams {
   group: string;

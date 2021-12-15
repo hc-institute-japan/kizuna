@@ -11,7 +11,7 @@ import {
 const setErrGroupMessage =
   (errMsg: GroupMessageInput): ThunkAction =>
   async (dispatch, getState) => {
-    const { id, username } = getState().profile;
+    const { id, username, fields } = getState().profile;
     const groups = getState().groups;
     let payload: Payload | null;
     if (isTextPayload(errMsg.payloadInput)) {
@@ -32,7 +32,7 @@ const setErrGroupMessage =
     const msg: GroupMessageBundle = {
       groupMessageId: "error message", // TODO: use a unique id
       groupId: errMsg.groupId,
-      author: { username: username!, id: id! },
+      author: { username: username!, id: id!, fields },
       payload: payload,
       timestamp: new Date(),
       replyTo:

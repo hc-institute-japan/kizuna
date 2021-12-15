@@ -12,11 +12,12 @@
 }
 
 .form {
-  flex: 1;
+  /* flex: 1; */
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+
+  align-items: center;
   justify-content: center;
 }
 
@@ -31,4 +32,38 @@
 .toolbar {
   --background: transparent !important;
   --ion-color-base: transparent !important;
+}
+
+.profile-picture {
+  position: relative;
+  width: 170px;
+  height: 170px;
+  margin-bottom: 4rem;
+}
+
+.icon {
+  position: absolute;
+  border-radius: 50%;
+  right: -10px;
+  bottom: -5px;
+}
+
+.profile-picture:hover {
+  cursor: pointer;
+}
+
+.profile-picture img {
+  width: 170px;
+  height: 170px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.modal .modal-wrapper {
+  --min-height: 100vh !important;
+  --min-width: 100vw !important;
+  --max-height: 100vh !important;
+  --max-width: 100vw !important;
+  --height: 100vh !important;
+  --width: 100vw !important;
 }

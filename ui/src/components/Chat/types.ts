@@ -19,8 +19,8 @@ export interface ChatListProps {
 
 export interface ChatProps {
   id: string;
+  profile: Profile;
   type?: "group" | "p2p";
-  author: string;
   timestamp: Date;
   payload: Payload;
   readList: {

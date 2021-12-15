@@ -1,12 +1,11 @@
 import { AnyAction, applyMiddleware, createStore as create } from "redux";
-import logger from "redux-logger";
 import thunk, { ThunkMiddleware } from "redux-thunk";
 import {
   callZome,
-  getAgentId,
-  retry,
-  init,
   client,
+  getAgentId,
+  init,
+  retry,
 } from "../connection/holochainClient";
 import rootReducer from "./reducers";
 import { RootState } from "./types";

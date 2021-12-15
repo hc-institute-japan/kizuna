@@ -15,7 +15,7 @@ import React, {
 } from "react";
 import { useIntl } from "react-intl";
 import styles from "./style.module.css";
-import { ChatListMethods, ChatListProps } from "../types";
+import { ChatListMethods, ChatListProps, ChatProps } from "../types";
 
 const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
   { children, type = "p2p", onScrollTop, disabled, onScrollBottom },
@@ -43,9 +43,9 @@ const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
     if (i === 0) showProfilePicture = true;
 
     const prevChild = arrChildren[i - 1];
-    const props = child?.props;
-    const prevChildProps = prevChild?.props;
-    if (props?.author !== prevChildProps?.author) {
+    const props: ChatProps = child?.props;
+    const prevChildProps: ChatProps = prevChild?.props;
+    if (props?.profile.id !== prevChildProps?.profile.id) {
       showProfilePicture = true;
       space = true;
     }
@@ -134,6 +134,7 @@ const ChatList: ForwardRefRenderFunction<ChatListMethods, ChatListProps> = (
         }
       }
     }, 500);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [children]);
 
   return (

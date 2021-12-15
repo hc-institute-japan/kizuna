@@ -15,7 +15,6 @@ import {
   arrowBackSharp,
   ellipsisVerticalOutline,
   informationCircleOutline,
-  personCircleOutline,
   pin,
   search,
 } from "ionicons/icons";
@@ -23,6 +22,7 @@ import React from "react";
 import { IntlShape, useIntl } from "react-intl";
 import { useHistory } from "react-router";
 import AgentIdentifier from "../../components/AgentIdentifier";
+import Identicon from "../../components/Identicon";
 import { Profile } from "../../redux/profile/types";
 import styles from "./style.module.css";
 
@@ -141,12 +141,8 @@ const ChatHeader: React.FC<Props> = ({
           </IonButton>
         </IonButtons>
         <div className={styles["title-container"]}>
-          <IonAvatar className="ion-padding">
-            <img
-              className={styles["avatar"]}
-              src={personCircleOutline}
-              alt={username}
-            />
+          <IonAvatar className={`${styles["avatar"]} ion-padding`}>
+            <Identicon hash={id} avatar={conversant.fields.avatar} size={50} />
           </IonAvatar>
           <IonTitle className={styles["title"]} onClick={handleOnProfileClick}>
             <AgentIdentifier nickname={username} id={id} />

@@ -25,6 +25,13 @@
 .container {
   align-items: center;
   display: flex;
+  position: relative;
+  width: auto;
+}
+
+.identicon {
+  position: absolute;
+  bottom: 0;
 }
 
 @media (prefers-color-scheme: dark) {

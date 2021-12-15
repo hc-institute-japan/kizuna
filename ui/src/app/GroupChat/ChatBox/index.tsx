@@ -133,6 +133,7 @@ const ChatBox: React.FC<Props> = ({
         setReadData([]);
       }, 1500);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [readData]);
 
   const handleOnSeen = (complete: () => any, message: any) => {
@@ -237,6 +238,7 @@ const ChatBox: React.FC<Props> = ({
         });
       }, 1000);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messagesReceipt]);
 
   return (
@@ -252,13 +254,13 @@ const ChatBox: React.FC<Props> = ({
             return (
               <Chat.Me
                 id={message.groupMessageId}
+                profile={message.author}
                 onDownload={handleOnDownload}
                 onDelete={() => dispatch(removeErrGroupMessage(message))}
                 onRetry={(setLoading: any) =>
                   handleOnRetry(setLoading, message)
                 }
                 key={i}
-                author={message.author.username}
                 isPinned={pinnedMessages[message.groupMessageId] ? true : false}
                 timestamp={message.timestamp}
                 payload={message.payload}
@@ -276,6 +278,8 @@ const ChatBox: React.FC<Props> = ({
                           id: membersProfile[message.replyTo!.author].id,
                           username:
                             membersProfile[message.replyTo!.author].username,
+                          fields:
+                            membersProfile[message.replyTo!.author].fields,
                         },
                         id: `${i}`,
                       }
@@ -291,6 +295,7 @@ const ChatBox: React.FC<Props> = ({
           return (
             <Chat.Others
               id={message.groupMessageId}
+              profile={message.author}
               onDownload={handleOnDownload}
               key={i}
               isPinned={pinnedMessages[message.groupMessageId] ? true : false}
@@ -299,7 +304,6 @@ const ChatBox: React.FC<Props> = ({
                   dispatch(unpinMessage(groupId, message.groupMessageId));
                 else dispatch(pinMessage(groupId, message.groupMessageId));
               }}
-              author={message.author.username}
               timestamp={message.timestamp}
               payload={message.payload}
               readList={message.readList}
@@ -312,6 +316,7 @@ const ChatBox: React.FC<Props> = ({
                         id: membersProfile[message.replyTo!.author].id,
                         username:
                           membersProfile[message.replyTo!.author].username,
+                        fields: membersProfile[message.replyTo!.author].fields,
                       },
                       id: `${i}`,
                     }

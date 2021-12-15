@@ -25,6 +25,7 @@ const getMessagesWithProfile =
             {
               username: profile.username!,
               id: message.author,
+              fields: profile.fields,
             },
       };
     });

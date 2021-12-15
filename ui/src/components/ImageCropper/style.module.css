@@ -1,0 +1,24 @@
+.content {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.image-cropper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header {
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.react-crop {
+  height: 100%;
+}

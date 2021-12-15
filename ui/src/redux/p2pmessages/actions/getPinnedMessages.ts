@@ -23,7 +23,11 @@ export const getPinnedMessages =
         const profile = { ...getState().profile };
         const profileList = {
           ...contactsState,
-          [profile.id!]: { id: profile.id!, username: profile.username! },
+          [profile.id!]: {
+            id: profile.id!,
+            username: profile.username!,
+            fields: profile.fields,
+          },
         };
         const toDispatch = transformZomeDataToUIData(
           pinnedMessages,

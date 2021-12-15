@@ -1,3 +1,10 @@
+.avatar-container {
+  align-items: center;
+  display: flex;
+  position: relative;
+  width: auto;
+}
+
 .contacts-list {
   background: var(--ion-background-color) !important;
 }

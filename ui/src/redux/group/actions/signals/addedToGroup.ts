@@ -16,7 +16,7 @@ const addedToGroup =
 
     const state = getState();
     const contacts = state.contacts.contacts;
-    const username = state.profile.username!; // At this point, username is non-nullable
+    const { username, fields } = state.profile; // At this point, username is non-nullable
     const id = await getAgentId();
     const myAgentId = serializeHash(id!); // AgentPubKey should be non-nullable here
 
@@ -51,7 +51,8 @@ const addedToGroup =
           : member === myAgentId
           ? {
               id: myAgentId,
-              username,
+              username: username!,
+              fields,
             }
           : null;
         if (memberProfile) {
@@ -81,6 +82,11 @@ const addedToGroup =
         membersProfile[id] = {
           id,
           username: agentProfile.profile.nickname,
+          fields: agentProfile.profile.fields.avatar
+            ? {
+                avatar: agentProfile.profile.fields.avatar,
+              }
+            : {},
         };
       });
     }

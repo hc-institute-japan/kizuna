@@ -31,7 +31,12 @@ const AddContactItem: React.FC<Props> = ({ contact, onCompletion }) => {
 
   return (
     <IonItem lines="none">
-      <AgentIdentifier nickname={contact.username} id={contact.id} />
+      <AgentIdentifier
+        displayAvatar={true}
+        avatar={contact.fields.avatar}
+        nickname={contact.username}
+        id={contact.id}
+      />
       <IonButtons slot="end">
         {isLoading ? (
           <IonSpinner />

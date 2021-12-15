@@ -23,7 +23,7 @@ const ProfileInfo: React.FC<Props> = ({ nickname, id }) => {
         </IonItem>
 
         <IonItem lines="none">
-          <p>{nickname}</p>
+          <IonText>{nickname}</IonText>
         </IonItem>
 
         <IonItem lines="none">
@@ -39,7 +39,7 @@ const ProfileInfo: React.FC<Props> = ({ nickname, id }) => {
             {intl.formatMessage({ id: "components.profile-info.identicon" })}
           </h3>
         </IonItem>
-        <IonItem className={styles["avatar"]}>
+        <IonItem className={styles["avatar"]} lines="none">
           <Identicon hash={id} size={40} />
         </IonItem>
       </IonItemGroup>
