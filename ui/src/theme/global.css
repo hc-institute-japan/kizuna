@@ -13,5 +13,13 @@ ion-text,
 p,
 ion-label,
 span, h6, div {
-  word-break: keep-all;
+  -ms-word-break: break-all;
+  word-break: break-all;
+
+  /* Non standard for WebKit */
+  word-break: break-word;
+
+  -webkit-hyphens: auto;
+  -moz-hyphens: auto;
+  hyphens: auto;
 }
