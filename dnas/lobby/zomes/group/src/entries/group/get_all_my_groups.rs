@@ -11,9 +11,8 @@ pub fn get_all_my_groups_handler() -> ExternResult<Vec<GroupOutput>> {
     let links = get_links(my_pub_key.into(), Some(LinkTag::new("member")))?;
 
     let get_input: Vec<GetInput> = links
-        .into_inner()
         .into_iter()
-        .map(|link| GetInput::new(link.target.into(), GetOptions::content()))
+        .map(|link| GetInput::new(link.target.into(), GetOptions::latest()))
         .collect();
 
     let get_output = HDK.with(|h| h.borrow().get_details(get_input))?;

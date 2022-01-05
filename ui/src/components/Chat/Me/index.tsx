@@ -1,4 +1,5 @@
 import {
+  IonAvatar,
   IonIcon,
   IonItem,
   IonText,
@@ -9,7 +10,7 @@ import {
   alertCircleOutline,
   checkmarkCircleOutline,
   checkmarkDoneCircle,
-  personCircleOutline,
+  radioButtonOff,
 } from "ionicons/icons";
 import React, { useState } from "react";
 import { useIntl } from "react-intl";
@@ -19,6 +20,7 @@ import {
   TextPayload,
 } from "../../../redux/commons/types";
 import { usePressHandlers } from "../../../utils/helpers";
+import Identicon from "../../Identicon";
 import Spinner from "../../Spinner";
 import ChatPopover from "../ChatPopover";
 import File from "../File";
@@ -29,8 +31,8 @@ import { ChatProps } from "../types";
 
 const Me: React.FC<ChatProps> = ({
   id,
+  profile,
   payload,
-  author,
   timestamp,
   replyTo,
   onReply,
@@ -55,7 +57,7 @@ const Me: React.FC<ChatProps> = ({
     onHide: () => dismiss(),
     onPin: onPinMessage,
     onReply: () => {
-      if (onReply) onReply({ author, payload, id });
+      if (onReply) onReply({ author: profile.username, payload, id });
     },
     onDelete: () => {
       if (onDelete) onDelete();
@@ -110,12 +112,18 @@ const Me: React.FC<ChatProps> = ({
               {intl.formatTime(timestamp)}
               <IonIcon
                 size="medium"
-                icon={isSeen ? checkmarkDoneCircle : checkmarkCircleOutline}
+                icon={
+                  isSeen
+                    ? checkmarkDoneCircle
+                    : err && id !== "error message"
+                    ? radioButtonOff
+                    : checkmarkCircleOutline
+                }
               />
             </h6>
           </IonText>
         </div>
-        {err ? (
+        {err && id === "error message" ? (
           loading ? (
             <div className={common.picture}>
               <Spinner />
@@ -129,18 +137,20 @@ const Me: React.FC<ChatProps> = ({
             ></IonIcon>
           )
         ) : isP2P ? null : (
-          <div className={common.picture} style={{ marginLeft: "0.5rem" }}>
+          <div className={common["picture"]} style={{ marginLeft: "0.5rem" }}>
             {showProfilePicture ? (
-              <img
-                className={styles.avatar}
-                alt={`${author}'s profile`}
-                src={personCircleOutline}
-              />
+              profile.fields.avatar ? (
+                <IonAvatar className={common["avatar-container"]}>
+                  <img src={profile.fields.avatar} alt="avatar"></img>
+                </IonAvatar>
+              ) : (
+                <Identicon hash={profile.id!} size={35} />
+              )
             ) : null}
           </div>
         )}
       </IonItem>
-      {err ? (
+      {err && id === "error message" ? (
         loading ? null : (
           <IonItem lines="none" className={styles["not-delivered-container"]}>
             <IonText className={styles["not-delivered"]} color="danger">

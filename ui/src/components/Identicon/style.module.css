@@ -2,3 +2,10 @@
   border-radius: 50%;
   margin-bottom: 5px;
 }
+
+.avatar { 
+  height: 100%;
+  width: 100%;
+  max-width: 50px !important;
+  max-height: 50px !important;
+}

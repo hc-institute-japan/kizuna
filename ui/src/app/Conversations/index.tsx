@@ -87,6 +87,10 @@ const Conversations: React.FC = () => {
                 latestMessage.author.id === myProfile.id
                   ? "You"
                   : conversant.username,
+              fields:
+                latestMessage.author.id === myProfile.id
+                  ? myProfile.fields
+                  : conversant.fields,
             },
             payloadType: latestMessage.payload.type,
             textPayload: isTextPayload(latestMessage.payload)
@@ -102,10 +106,12 @@ const Conversations: React.FC = () => {
           conversation = {
             type: "p2p",
             id: key,
+            avatar: conversant.fields.avatar
+              ? conversant.fields.avatar
+              : undefined,
             conversationName: conversant.username,
             latestMessage: message,
-            // TODO: enable this once we have a better implementation of read message
-            // badgeCount: dispatch(countUnread(conversant.id)),
+            badgeCount: dispatch(countUnread(conversant.id)),
           };
         } else if (p2pState.errMsgs[key][0]) {
           const latestErrMessage = p2pState.errMsgs[key][0];
@@ -117,6 +123,10 @@ const Conversations: React.FC = () => {
                 latestErrMessage.author.id === myProfile.id
                   ? "You"
                   : conversant.username,
+              fields:
+                latestErrMessage.author.id === myProfile.id
+                  ? myProfile.fields
+                  : conversant.fields,
             },
             payloadType: latestErrMessage.payload.type,
             textPayload: isTextPayload(latestErrMessage.payload)
@@ -134,8 +144,7 @@ const Conversations: React.FC = () => {
             id: key,
             conversationName: conversant.username,
             latestMessage: message,
-            // TODO: enable this once we have a better implementation of read message
-            // badgeCount: dispatch(countUnread(conversant.id)),
+            badgeCount: dispatch(countUnread(conversant.id)),
           };
         }
 
@@ -165,10 +174,12 @@ const Conversations: React.FC = () => {
               ? {
                   id: groupMembers[latestMessage.author].id,
                   username: groupMembers[latestMessage.author].username,
+                  fields: groupMembers[latestMessage.author].fields,
                 }
               : {
                   id: myProfile.id!,
                   username: myProfile.username!,
+                  fields: myProfile.fields,
                 },
             payloadType: latestMessage.payload.type,
             timestamp: latestMessage.timestamp,
@@ -185,7 +196,7 @@ const Conversations: React.FC = () => {
             conversationName: groupsState.conversations[groupId].name,
             latestMessage: message,
             // enable this once we have a better implementation of read message
-            // badgeCount: dispatch(getBadgeCount(groupId)),
+            badgeCount: dispatch(getBadgeCount(groupId)),
           };
         } else if (groupsState.errMsgs[groupId]) {
           const latestErrMessage = groupsState.errMsgs[groupId][0];
@@ -227,8 +238,7 @@ const Conversations: React.FC = () => {
             type: "group",
             conversationName: groupsState.conversations[groupId].name,
             latestMessage: message,
-            // enable this once we have a better implementation of read message
-            // badgeCount: dispatch(getBadgeCount(groupId)),
+            badgeCount: dispatch(getBadgeCount(groupId)),
           };
         }
 

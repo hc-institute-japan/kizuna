@@ -222,3 +222,8 @@ const preventDefault = (event: TouchEvent) => {
     event.preventDefault();
   }
 };
+
+export const binaryToUrl = (hash: string) =>
+  URL.createObjectURL(
+    new Blob([deserializeHash(hash)], { type: "image/jpeg" })
+  );

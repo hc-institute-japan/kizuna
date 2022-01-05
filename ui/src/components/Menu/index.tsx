@@ -1,11 +1,15 @@
 import {
+  IonAvatar,
   IonContent,
+  IonFooter,
   IonIcon,
   IonItem,
   IonItemGroup,
   IonLabel,
   IonList,
   IonMenu,
+  IonText,
+  IonToolbar,
 } from "@ionic/react";
 import {
   banOutline,
@@ -34,7 +38,10 @@ interface MenuItem {
 
 const Menu: React.FC = () => {
   const history = useHistory();
-  const { username, id } = useSelector((state: RootState) => state.profile);
+  const { username, id, fields } = useSelector((state: RootState) => {
+    return { ...state.profile };
+  });
+
   const intl = useIntl();
   const dispatch = useAppDispatch();
   const menu = useRef<any>(null);
@@ -79,7 +86,7 @@ const Menu: React.FC = () => {
     menu?.current?.close();
     history.push({
       pathname: `/p/${id}`,
-      state: { profile: { username, id } as Profile, prev: `/home` },
+      state: { profile: { username, id, fields } as Profile, prev: `/home` },
     });
   };
 
@@ -88,16 +95,16 @@ const Menu: React.FC = () => {
       <IonContent className={`${styles.menu} ion-padding-top`}>
         <IonList id="inbox-list" lines="none">
           <IonItemGroup className="ion-no-margin">
-            <span className={`${styles["container"]} ion-margin`}>
-              {/* <IonAvatar className="ion-margin-start">
-                <img
-                  className={styles.avatar}
-                  alt="Your user"
-                  src={personCircleOutline}
-                ></img>
-              </IonAvatar> */}
-              <Identicon hash={id!} size={50} />
-            </span>
+            <div className={`${styles.container} ion-padding`}>
+              {fields.avatar ? (
+                <IonAvatar>
+                  <img src={fields.avatar} alt="avatar"></img>
+                </IonAvatar>
+              ) : (
+                <Identicon hash={id!} size={60} />
+              )}
+            </div>
+
             <IonItem onClick={handleOnClick} lines="none">
               <IonLabel>{username}</IonLabel>
             </IonItem>
@@ -117,6 +124,13 @@ const Menu: React.FC = () => {
           ))}
         </IonList>
       </IonContent>
+      <IonFooter className="ion-no-border">
+        <IonToolbar>
+          <IonText className={`ion-padding ${styles["version"]}`}>
+            {intl.formatMessage({ id: "app.menu.version" })} 0.2.0
+          </IonText>
+        </IonToolbar>
+      </IonFooter>
     </IonMenu>
   );
 };

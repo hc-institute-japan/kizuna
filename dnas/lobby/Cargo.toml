@@ -8,7 +8,7 @@ members = [
     "zomes/aggregator",
     "zomes/preference",
     "zomes/p2pmessage",
-    "zomes/joining_code",
+    # "zomes/joining_code",
     "commons/file_types", 
 ]
 

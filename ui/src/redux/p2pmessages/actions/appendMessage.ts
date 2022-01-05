@@ -8,7 +8,7 @@ import { P2PMessage, P2PMessageReceipt, P2PFile, SET_MESSAGES } from "../types";
 export const appendMessage =
   (state: {
     message: P2PMessage;
-    receipt: P2PMessageReceipt;
+    receipt?: P2PMessageReceipt;
     file?: P2PFile;
     key?: string;
   }): ThunkAction =>
@@ -17,7 +17,9 @@ export const appendMessage =
 
     const conversantID = state.key ? state.key : state.message.receiver.id;
     const messageHash = state.message.p2pMessageEntryHash;
-    const receiptHash = state.receipt.p2pMessageReceiptEntryHash;
+    const receiptHash = state.receipt
+      ? state.receipt.p2pMessageReceiptEntryHash
+      : undefined;
 
     if (currentState.conversations[conversantID]) {
       currentState.conversations[conversantID] = {
@@ -42,10 +44,11 @@ export const appendMessage =
       [messageHash]: state.message,
     };
 
-    currentState.receipts = {
-      ...currentState.receipts,
-      [receiptHash]: state.receipt,
-    };
+    if (receiptHash) currentState.receipts[receiptHash] = state.receipt!;
+    // currentState.receipts = {
+    //   ...currentState.receipts,
+    //   [receiptHash]: state.receipt,
+    // };
 
     dispatch({
       type: SET_MESSAGES,

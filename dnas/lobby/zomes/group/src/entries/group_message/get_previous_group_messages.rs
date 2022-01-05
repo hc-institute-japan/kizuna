@@ -42,7 +42,7 @@ pub fn get_previous_group_messages_handler(
         let group_path: Path = path_from_str(&filter.group_id.to_string());
 
         // get the list of childrens for this path
-        let mut children_paths: Vec<Link> = group_path.children()?.into_inner();
+        let mut children_paths: Vec<Link> = group_path.children()?;
 
         // remove the path we dont need to check
         filter_path_children(&mut children_paths, pivot_path, Direction::Previous)?;

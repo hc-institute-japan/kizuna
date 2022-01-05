@@ -1,7 +1,8 @@
 import { serializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../connection/types";
-import { timestampToDate } from "../../utils/helpers";
+import { binaryToUrl, timestampToDate } from "../../utils/helpers";
 import { SET_BLOCKED, SET_CONTACTS } from "../contacts/types";
+import { pushError } from "../error/actions";
 import { convertFetchedResToGroupMessagesOutput } from "../group/actions/helpers";
 import {
   GroupConversation,
@@ -9,12 +10,11 @@ import {
   SetLatestGroupState,
   SET_LATEST_GROUP_STATE,
 } from "../group/types";
-import { setMessages } from "../p2pmessages/actions/setMessages";
 import { transformZomeDataToUIData } from "../p2pmessages/actions/helpers/transformZomeDateToUIData";
+import { setMessages } from "../p2pmessages/actions/setMessages";
 import { SET_PREFERENCE } from "../preference/types";
 import { Profile, ProfileActionTypes, SET_PROFILE } from "../profile/types";
 import { ThunkAction } from "../types";
-import { pushError } from "../error/actions";
 
 export const getLatestData =
   (): ThunkAction =>
@@ -30,28 +30,40 @@ export const getLatestData =
       /* assume that getAgentId() is non-nullable */
       const myAgentIdB64 = serializeHash(myAgentId!);
 
-      console.log("ui latest data", latestData);
       dispatch<ProfileActionTypes>({
         type: SET_PROFILE,
         id: myAgentIdB64,
         nickname: latestData.userInfo.profile.nickname,
+        fields: latestData.userInfo.profile.fields.avatar
+          ? { avatar: binaryToUrl(latestData.userInfo.profile.fields.avatar) }
+          : {},
       });
 
       let contacts: { [key: string]: Profile } = {};
       let blocked: { [key: string]: Profile } = {};
       latestData.addedContacts.forEach((agentProfile: any) => {
-        const agentId = agentProfile.agentPubKey;
+        const agentId = serializeHash(agentProfile.agentPubKey);
         contacts[agentId] = {
           id: agentId,
           username: agentProfile.profile.nickname,
+          fields: agentProfile.profile.fields.avatar
+            ? {
+                avatar: binaryToUrl(agentProfile.profile.fields.avatar),
+              }
+            : {},
         };
       });
       if (latestData.blockedContacts)
         latestData.blockedContacts.forEach((agentProfile: any) => {
-          const agentId = agentProfile.agentPubKey;
+          const agentId = serializeHash(agentProfile.agentPubKey);
           blocked[agentId] = {
             id: agentId,
             username: agentProfile.profile.nickname,
+            fields: agentProfile.profile.fields.avatar
+              ? {
+                  avatar: binaryToUrl(agentProfile.profile.fields.avatar),
+                }
+              : {},
           };
         });
 
@@ -94,11 +106,20 @@ export const getLatestData =
       const groupMembers: Profile[] = latestData.memberProfiles.map(
         (agentProfile: any): Profile => {
           return {
-            id: agentProfile.agentPubKey,
+            id: serializeHash(agentProfile.agentPubKey),
             username: agentProfile.profile.nickname,
+            fields: agentProfile.profile.fields.avatar
+              ? {
+                  avatar: binaryToUrl(agentProfile.profile.fields.avatar),
+                }
+              : {},
           };
         }
       );
+
+      console.log("latest groups", groups);
+      console.log("latest group messages", groupMessagesOutput);
+      console.log("latest group members", groupMembers);
 
       // let groups: GroupConversation[] = groups;
       // let groupMessagesOutput: GroupMessagesOutput = action.groupMessagesOutput;
@@ -130,12 +151,17 @@ export const getLatestData =
       const profile = { ...getState().profile };
       const profileList = {
         ...contactsState,
-        [profile.id!]: { id: profile.id!, username: profile.username! },
+        [profile.id!]: {
+          id: profile.id!,
+          username: profile.username!,
+          fields: profile.fields,
+        },
       };
       const toDispatch = transformZomeDataToUIData(
         latestData.latestP2pMessages,
         profileList
       );
+      console.log("latest p2p messages", toDispatch);
       dispatch(setMessages(toDispatch));
 
       return null;

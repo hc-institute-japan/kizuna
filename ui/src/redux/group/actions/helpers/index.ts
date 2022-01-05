@@ -117,7 +117,7 @@ export const fetchUsernameOfMembers = async (
   const contacts = state.contacts.contacts;
   // can assume that this is non-nullable since agent cannot call this
   // function without having a username.
-  const username = state.profile.username!;
+  const myProfile = state.profile;
 
   let undefinedProfiles: AgentPubKey[] = [];
   let membersUsernames: { [key: string]: Profile } = {};
@@ -128,7 +128,8 @@ export const fetchUsernameOfMembers = async (
     } else if (member === myAgentId) {
       membersUsernames[myAgentId] = {
         id: myAgentId,
-        username,
+        username: myProfile.username!,
+        fields: myProfile.fields,
       };
     } else {
       undefinedProfiles.push(deserializeAgentPubKey(member));
@@ -146,7 +147,15 @@ export const fetchUsernameOfMembers = async (
     });
     res.forEach((agentProfile: AgentProfile) => {
       let id = agentProfile.agent_pub_key;
-      membersUsernames[id] = { id, username: agentProfile.profile.nickname };
+      membersUsernames[id] = {
+        id,
+        username: agentProfile.profile.nickname,
+        fields: agentProfile.profile.fields.avatar
+          ? {
+              avatar: agentProfile.profile.fields.avatar,
+            }
+          : {},
+      };
     });
   }
 

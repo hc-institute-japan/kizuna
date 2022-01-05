@@ -18,10 +18,20 @@
   --background: var(--ion-item-background) !important;
   cursor: pointer;
 }
+.menu {
+  display: flex;
+}
 
 .container {
   align-items: center;
   display: flex;
+  position: relative;
+  width: auto;
+}
+
+.identicon {
+  position: absolute;
+  bottom: 0;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -33,4 +43,9 @@
     max-height: 150%;
     max-width: 150%;
   }
+}
+
+.version {
+  font-size: small;
+  color: var(--ion-color-medium);
 }

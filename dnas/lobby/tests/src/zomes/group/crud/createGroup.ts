@@ -43,7 +43,7 @@ export default function createGroupTest(config) {
         signalHandler(signal, charlie_signal_listener);
       });
 
-      await delay(2000);
+      await delay(5000);
 
       // 1 - create one group with a set of members
       let create_group_input = {

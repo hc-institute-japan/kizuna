@@ -1,5 +1,6 @@
 import { serializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
+import { binaryToUrl } from "../../../utils/helpers";
 import { pushError } from "../../error/actions";
 import { AgentProfile, Profile } from "../../profile/types";
 import { ThunkAction } from "../../types";
@@ -28,6 +29,9 @@ const fetchBlocked =
           blocked[id] = {
             id,
             username: agentProfile.profile.nickname,
+            fields: agentProfile.profile.fields.avatar
+              ? { avatar: binaryToUrl(agentProfile.profile.fields.avatar) }
+              : {},
           };
         });
         dispatch({

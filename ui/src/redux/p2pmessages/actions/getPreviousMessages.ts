@@ -1,9 +1,9 @@
 import { deserializeHash } from "@holochain-open-dev/core-types";
-import { ThunkAction } from "../../types";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
 import { pushError } from "../../../redux/error/actions";
 import { dateToTimestamp } from "../../../utils/helpers";
-import { AgentPubKeyBase64, HoloHashBase64, SET_MESSAGES } from "../types";
+import { ThunkAction } from "../../types";
+import { AgentPubKeyBase64, HoloHashBase64 } from "../types";
 import { transformZomeDataToUIData } from "./helpers/transformZomeDateToUIData";
 import { setMessages } from "./setMessages";
 
@@ -42,7 +42,11 @@ export const getPreviousMessages =
         const profile = { ...getState().profile };
         const profileList = {
           ...contactsState,
-          [profile.id!]: { id: profile.id!, username: profile.username! },
+          [profile.id!]: {
+            id: profile.id!,
+            username: profile.username!,
+            fields: profile.fields,
+          },
         };
         let toDispatch = transformZomeDataToUIData(
           nextBatchOfMessages,

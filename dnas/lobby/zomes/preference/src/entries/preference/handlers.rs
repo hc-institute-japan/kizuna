@@ -207,7 +207,7 @@ fn filter_for(query_target: QueryTarget, include_entries: bool) -> ExternResult<
     let query_filter: QueryFilter = QueryFilter::new()
         .entry_type(EntryType::App(AppEntryType::new(
             EntryDefIndex::from(entry_index),
-            zome_info()?.zome_id,
+            zome_info()?.id,
             EntryVisibility::Private,
         )))
         .include_entries(include_entries);

@@ -14,6 +14,7 @@ export const setProfile =
       id: myAgentIdB64,
       /* assert that nickname is non-nullable */
       nickname: nickname!,
+      fields: {},
     });
   };
 

@@ -23,7 +23,7 @@ import { MessageInput } from "../types";
 
 interface DispatchState {
   message: P2PMessage;
-  receipt: P2PMessageReceipt;
+  receipt: P2PMessageReceipt | undefined;
   file: any;
 }
 
@@ -32,12 +32,13 @@ const processSentData = (
   contactsState: any,
   profile: any
 ) => {
-  const [messageTuple, receiptTuple] = returnValue;
-  const [messageID, message] = messageTuple;
-  const [receiptID, receipt] = receiptTuple!;
+  // const [messageTuple, receiptTuple] = returnValue;
+  // const messageTuple = returnValue;
+  const [messageID, message] = returnValue;
+  // const [receiptID, receipt] = receiptTuple!;
 
   const messageHash = serializeHash(messageID);
-  const receiptHash = serializeHash(receiptID);
+  // const receiptHash = serializeHash(receiptID);
 
   let payload;
   switch (message.payload.type) {
@@ -109,20 +110,22 @@ const processSentData = (
     payload: payload,
     timestamp: timestampToDate(message.timeSent),
     replyTo: transformedReplyTo ? transformedReplyTo : undefined,
-    receipts: [receiptHash],
+    // receipts: [receiptHash],
+    receipts: [],
   };
 
-  const messageEntryHash = serializeHash(receipt.id[0]);
-  const p2pReceipt: P2PMessageReceipt = {
-    p2pMessageReceiptEntryHash: serializeHash(receiptID),
-    p2pMessageEntryHashes: [messageEntryHash],
-    timestamp: timestampToDate(receipt.status.timestamp),
-    status: receipt.status.status,
-  };
+  // const messageEntryHash = serializeHash(receipt.id[0]);
+  // const p2pReceipt: P2PMessageReceipt = {
+  //   p2pMessageReceiptEntryHash: serializeHash(receiptID),
+  //   p2pMessageEntryHashes: [messageEntryHash],
+  //   timestamp: timestampToDate(receipt.status.timestamp),
+  //   status: receipt.status.status,
+  // };
 
   return {
     message: p2pMessage,
-    receipt: p2pReceipt,
+    // receipt: p2pReceipt,
+    receipt: undefined,
     file: undefined,
   };
 };

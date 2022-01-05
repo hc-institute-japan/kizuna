@@ -32,8 +32,10 @@ import { Profile } from "../../redux/profile/types";
 import { RootState } from "../../redux/types";
 import { useAppDispatch } from "../../utils/helpers";
 import ChatHeader from "./ChatHeader";
+import recommitMessage from "../../redux/p2pmessages/actions/signals/recommitMessage";
 
 const Chat: React.FC = () => {
+  const dispatch = useAppDispatch();
   /* STATES */
   const { id } = useParams<{ id: string }>();
   const [message, setMessage] = useState<string>("");
@@ -74,8 +76,6 @@ const Chat: React.FC = () => {
     (state: RootState) => state.preference
   );
 
-  const dispatch = useAppDispatch();
-  // const history = useHistory();
   const { pathname, state }: { pathname: string; state: { username: string } } =
     useLocation();
 
@@ -136,6 +136,7 @@ const Chat: React.FC = () => {
         setMessageReceipts([]);
       }, 1000);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messageReceipts]);
 
   /* HANDLERS */
@@ -146,7 +147,12 @@ const Chat: React.FC = () => {
   const handleOnChange = (message: string, conversant: Profile) => {
     if (didMountRef.current === true) {
       if (typingIndicator) {
-        dispatch(isTyping(conversant.id, message.length !== 0 ? true : false));
+        dispatch(
+          isTyping(
+            conversant.id,
+            message && message.length !== 0 ? true : false
+          )
+        );
 
         if (inputTimeout.current) clearTimeout(inputTimeout.current);
 
@@ -167,13 +173,13 @@ const Chat: React.FC = () => {
       when clicking the send button  
     */
   const handleOnSubmit = (opt?: MessageInputOnSendParams) => {
-    let { setIsLoading } = { ...opt };
+    let { message: message2, setIsLoading } = { ...opt };
     setIsLoading!(true);
-    if (message !== "") {
+    if (message2 && message2 !== "") {
       dispatch(
         sendMessage(
           conversant.id,
-          message,
+          message2,
           "TEXT",
           replyTo !== "" ? replyTo : undefined
         )
@@ -217,7 +223,7 @@ const Chat: React.FC = () => {
       });
     }
 
-    if (message === "" && files.length) {
+    if (message2 === "" && files.length) {
       files.forEach((file) =>
         dispatch(
           sendMessage(
@@ -267,7 +273,7 @@ const Chat: React.FC = () => {
           )
         ).then((res: P2PHashMap) => {
           // disable getPrevious if return value is empty
-          if (Object.values(res)[0][conversant.id].length <= 0) {
+          if (res && Object.values(res)[0][conversant.id].length <= 0) {
             setDisableGetPrevious(true);
           }
           return complete();
@@ -326,48 +332,52 @@ const Chat: React.FC = () => {
   const onRetryHandler = (setLoading: any, message: P2PMessage) => {
     setLoading(true);
 
-    if (message.payload.type === "TEXT") {
-      dispatch(
-        sendMessage(
-          conversant.id,
-          message.payload.payload.payload,
-          "TEXT",
-          message.replyToId
-        )
-      ).then((res: any) => {
-        setLoading(false);
-        if (!res) return null;
-        dispatch(removeErrMessage(message));
-      });
+    if (message.p2pMessageEntryHash === "error message") {
+      if (message.payload.type === "TEXT") {
+        dispatch(
+          sendMessage(
+            conversant.id,
+            message.payload.payload.payload,
+            "TEXT",
+            message.replyToId
+          )
+        ).then((res: any) => {
+          setLoading(false);
+          if (!res) return null;
+          dispatch(removeErrMessage(message));
+        });
+      } else {
+        const file: FileContent = {
+          metadata: {
+            fileName: message.payload.fileName,
+            fileType: message.payload.fileType,
+            fileSize: message.payload.fileSize,
+          },
+          fileType: {
+            type: message.payload.fileType,
+            payload:
+              message.payload.fileType === "OTHER"
+                ? undefined
+                : { thumbnail: message.payload.thumbnail! },
+          },
+          fileBytes: message.payload.fileBytes!,
+        };
+        dispatch(
+          sendMessage(
+            conversant.id,
+            "",
+            "FILE",
+            replyTo !== "" ? replyTo : undefined,
+            file
+          )
+        ).then((res: any) => {
+          setLoading(false);
+          if (!res) return null;
+          dispatch(removeErrMessage(message));
+        });
+      }
     } else {
-      const file: FileContent = {
-        metadata: {
-          fileName: message.payload.fileName,
-          fileType: message.payload.fileType,
-          fileSize: message.payload.fileSize,
-        },
-        fileType: {
-          type: message.payload.fileType,
-          payload:
-            message.payload.fileType === "OTHER"
-              ? undefined
-              : { thumbnail: message.payload.thumbnail! },
-        },
-        fileBytes: message.payload.fileBytes!,
-      };
-      dispatch(
-        sendMessage(
-          conversant.id,
-          "",
-          "FILE",
-          replyTo !== "" ? replyTo : undefined,
-          file
-        )
-      ).then((res: any) => {
-        setLoading(false);
-        if (!res) return null;
-        dispatch(removeErrMessage(message));
-      });
+      dispatch(recommitMessage(message)).then((res: any) => setLoading(false));
     }
   };
   /* 
@@ -389,13 +399,14 @@ const Chat: React.FC = () => {
         }
       : null;
 
-    const timestamp = !messageBundle.message.err
-      ? messageBundle.receipt!.timestamp
-      : messageBundle.message.timestamp;
+    const timestamp =
+      messageBundle.message.err === undefined && messageBundle.receipt
+        ? messageBundle.receipt!.timestamp
+        : messageBundle.message.timestamp;
 
     const readlist = messageBundle.message.err
       ? undefined
-      : messageBundle.receipt!.status === "read"
+      : messageBundle.receipt && messageBundle.receipt!.status === "read"
       ? { key: timestamp }
       : undefined;
 
@@ -403,7 +414,7 @@ const Chat: React.FC = () => {
       payload.type === "FILE" &&
       (payload as FilePayload).fileType === "VIDEO" &&
       fetchedFiles[payload.fileHash!] === undefined &&
-      !messageBundle.message.err
+      messageBundle.message.err === undefined
     ) {
       dispatch(getFileBytes([payload.fileHash!]));
     }
@@ -411,9 +422,9 @@ const Chat: React.FC = () => {
     return conversant.id !== author.id ? (
       <Me
         id={messageBundle.message.p2pMessageEntryHash}
+        profile={messageBundle.message.author}
         key={key}
         type="p2p"
-        author={author.username}
         timestamp={timestamp}
         onRetry={(setLoading) =>
           onRetryHandler(setLoading, messageBundle.message)
@@ -440,9 +451,9 @@ const Chat: React.FC = () => {
     ) : (
       <Others
         id={messageBundle.message.p2pMessageEntryHash}
+        profile={messageBundle.message.author}
         key={key}
         type="p2p"
-        author={author.username}
         timestamp={timestamp}
         payload={payload}
         readList={readlist ? readlist : {}}

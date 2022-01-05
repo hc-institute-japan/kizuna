@@ -1,4 +1,5 @@
 import {
+  IonAvatar,
   IonButton,
   IonButtons,
   IonHeader,
@@ -55,6 +56,16 @@ const Profile: React.FC = () => {
             </IonButton>
           </IonButtons>
           {profile ? <ProfileMenuItems profile={profile} /> : null}
+        </IonToolbar>
+
+        <IonToolbar className={styles["profile-picture-toolbar"]}>
+          {profile ? (
+            profile.fields.avatar ? (
+              <IonAvatar className={styles["profile-picture"]}>
+                <img src={profile.fields.avatar} alt="avatar"></img>
+              </IonAvatar>
+            ) : null
+          ) : null}
         </IonToolbar>
         <IonToolbar className={styles["profile-toolbar"]}>
           <IonTitle className={styles["nickname"]}>

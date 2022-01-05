@@ -1,15 +1,23 @@
 import renderIcon from "@holo-host/identicon";
 import { deserializeHash } from "@holochain-open-dev/core-types";
+import { IonAvatar } from "@ionic/react";
 import React, { useEffect, useRef } from "react";
 import styles from "./style.module.css";
 
 interface Props {
   hash: string;
   size?: number | undefined;
+  avatar?: string;
   shape?: "circle" | "square";
+  className?: string;
 }
 
-const Identicon: React.FC<Props> = ({ hash, size = 32 }) => {
+const Identicon: React.FC<Props> = ({
+  hash,
+  size = 32,
+  className = "",
+  avatar = undefined,
+}) => {
   // const canvas = document.getElementById(styles.icon) as HTMLCanvasElement;
   const canvas = useRef<HTMLCanvasElement>(null);
   const opts = {
@@ -21,13 +29,19 @@ const Identicon: React.FC<Props> = ({ hash, size = 32 }) => {
   });
   return (
     <div>
-      <canvas
-        ref={canvas}
-        className={styles["icon"]}
-        id="identicon"
-        width="20"
-        height="20"
-      />
+      {!avatar ? (
+        <canvas
+          ref={canvas}
+          className={`${styles["icon"]} ${className}`}
+          id="identicon"
+          width={size}
+          height={size}
+        />
+      ) : (
+        <IonAvatar className={styles["avatar"]}>
+          <img src={avatar} alt="avatar"></img>
+        </IonAvatar>
+      )}
     </div>
   );
 };

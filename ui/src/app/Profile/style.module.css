@@ -2,6 +2,24 @@
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-picture {
+  width: auto;
+  height: 12rem;
+
+}
+.profile-picture-toolbar {
+  margin-top: 1rem;
+  height: 25vh;
+  align-items: center;
+  width: auto;
 }
 
 .nickname {
@@ -13,7 +31,7 @@
 }
 
 .profile-toolbar {
-  height: 30vh;
+  height: 10vh;
   display: flex;
   flex-direction: column;
   /* --background: linear-gradient(
@@ -24,18 +42,6 @@
   justify-content: flex-end;
 }
 
-.content {
-  display: flex;
-
-  width: 100%;
-  justify-content: center;
-  align-items: center;
-}
-
-.content p {
-  font-size: 2rem;
-  font-weight: lighter;
-}
 
 .content-icon {
   padding-right: 1.5rem;

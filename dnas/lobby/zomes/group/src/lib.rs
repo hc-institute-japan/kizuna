@@ -31,6 +31,7 @@ use group_message::{
     get_previous_group_messages::get_previous_group_messages_handler,
     get_subsequent_group_messages::get_subsequent_group_messages_handler,
     indicate_group_typing::indicate_group_typing_handler, pin_message::pin_message_handler,
+    post_commit::group_message_post_commit::group_message_post_commit,
     read_group_message::read_group_message_handler, send_message::send_message_handler,
     send_message_in_target_date::send_message_in_target_date_handler,
     unpin_message::unpin_message_handler,
@@ -61,7 +62,7 @@ pub fn init(_: ()) -> ExternResult<InitCallbackResult> {
     // TODO: name may be changed to better suit the context of cap grant.s
     let tag: String = "group_zome_cap_grant".into();
     let access: CapAccess = CapAccess::Unrestricted;
-    let zome_name: ZomeName = zome_info()?.zome_name;
+    let zome_name: ZomeName = zome_info()?.name;
 
     fuctions.insert((zome_name.clone(), FunctionName("recv_remote_signal".into())));
 
@@ -97,6 +98,27 @@ fn recv_remote_signal(signal: ExternIO) -> ExternResult<()> {
         }
     }
     Ok(())
+}
+
+#[hdk_extern(infallible)]
+fn post_commit(signed_headers: Vec<SignedHeaderHashed>) {
+    let headers = signed_headers
+        .into_iter()
+        .map(|sh| sh.header().to_owned())
+        .collect::<Vec<Header>>();
+    for header in headers {
+        match header {
+            Header::Create(create) => match create.clone().entry_type {
+                EntryType::App(app_entry_type) => match app_entry_type.id() {
+                    // group message
+                    EntryDefIndex(2) => group_message_post_commit(create).unwrap(),
+                    _ => (),
+                },
+                _ => (),
+            },
+            _ => (),
+        }
+    }
 }
 
 // Group CRUD

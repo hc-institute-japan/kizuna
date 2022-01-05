@@ -3,6 +3,11 @@
   width: 100%;
 }
 
+.container ion-text {
+  font-size: 1.2rem;
+  font-weight: lighter;
+}
+
 /* .avatar {
   margin: 16px;
 } */

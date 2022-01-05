@@ -26,16 +26,16 @@ pub fn get_linked_messages_hash(
 
     match payload_type {
         PayloadType::Text => {
-            linked_messages = get_links(path_hash, Some(LinkTag::new("text")))?.into_inner();
+            linked_messages = get_links(path_hash, Some(LinkTag::new("text")))?;
         }
         PayloadType::File => {
-            linked_messages = get_links(path_hash, Some(LinkTag::new("file")))?.into_inner();
+            linked_messages = get_links(path_hash, Some(LinkTag::new("file")))?;
         }
         PayloadType::Media => {
-            linked_messages = get_links(path_hash, Some(LinkTag::new("media")))?.into_inner();
+            linked_messages = get_links(path_hash, Some(LinkTag::new("media")))?;
         }
         PayloadType::All => {
-            linked_messages = get_links(path_hash, None)?.into_inner();
+            linked_messages = get_links(path_hash, None)?;
         }
     }
 
@@ -82,7 +82,7 @@ pub fn collect_and_insert_messages(
         .collect();
     let get_input = message_hashes
         .into_iter()
-        .map(|eh| GetInput::new(eh.clone().into(), GetOptions::content()))
+        .map(|eh| GetInput::new(eh.clone().into(), GetOptions::latest()))
         .collect::<Vec<GetInput>>();
 
     // TODO: add a debugger here to solve the "Entry Not Found" error
@@ -113,7 +113,7 @@ pub fn collect_and_insert_messages(
         // TODO: refactor to be a multi get
         if let Some(reply_to_hash) = message.reply_to.clone() {
             let replied_message: GroupMessage =
-                try_get_and_convert(reply_to_hash.clone(), GetOptions::content())?;
+                try_get_and_convert(reply_to_hash.clone(), GetOptions::latest())?;
             group_message_data.reply_to = Some(GroupMessageWithId {
                 id: reply_to_hash,
                 content: replied_message,
@@ -160,10 +160,7 @@ pub fn collect_and_insert_read_list(
 
     // parallel get links for all message_hash
     let read_links = HDK.with(|h| h.borrow().get_links(get_input_message_hashes))?;
-    let read_links_with_message_hash = read_links
-        .into_iter()
-        .map(|links| links.into_inner())
-        .zip(message_hashes);
+    let read_links_with_message_hash = read_links.into_iter().zip(message_hashes);
 
     for (links_vec, message_hash) in read_links_with_message_hash {
         match all_read_list.get_mut(&message_hash.to_string()) {

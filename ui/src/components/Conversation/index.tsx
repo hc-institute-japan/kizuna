@@ -44,27 +44,28 @@ const Conversation: React.FC<Props> = ({
       <IonAvatar slot="start">
         <img
           className={styles.avatar}
-          /*
-            TODO: add actual avatar of the conversation to the prop being passed
-            to avoid this
-          */
           src={
             conversation.type === "group"
               ? peopleCircleOutline
+              : conversation.avatar
+              ? conversation.avatar
               : personCircleOutline
           }
-          alt={`${conversation.conversationName}'s chat`}
+          alt="avatar"
         />
       </IonAvatar>
       <IonLabel>
         {conversation.type === "group" ? (
           <h2>{conversation.conversationName}</h2>
         ) : (
-          <AgentIdentifier
-            nickname={conversation.conversationName}
-            id={conversation.id}
-            charToShow={10}
-          />
+          <div className={styles["identifier"]}>
+            <AgentIdentifier
+              noSpace={true}
+              nickname={conversation.conversationName}
+              id={conversation.id}
+              charToShow={10}
+            />
+          </div>
         )}
         {conversation.latestMessage.sender ? (
           <h3>{conversation.latestMessage.sender.username}</h3>
@@ -77,11 +78,11 @@ const Conversation: React.FC<Props> = ({
             : renderOthersFileMessage(conversation.latestMessage)}
         </p>
       </IonLabel>
-      {/* {!conversation.badgeCount ? null : conversation.badgeCount > 20 ? (
+      {!conversation.badgeCount ? null : conversation.badgeCount > 20 ? (
         <IonBadge slot="">20+</IonBadge>
       ) : conversation.badgeCount > 0 ? (
         <IonBadge slot="">{conversation.badgeCount}</IonBadge>
-      ) : null} */}
+      ) : null}
     </IonItem>
   );
 };

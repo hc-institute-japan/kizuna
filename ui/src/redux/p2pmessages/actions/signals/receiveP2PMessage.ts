@@ -13,7 +13,11 @@ const receiveP2PMessage =
     const profile = { ...getState().profile };
     const profileList = {
       ...contactsState,
-      [profile.id!]: { id: profile.id!, username: profile.username! },
+      [profile.id!]: {
+        id: profile.id!,
+        username: profile.username!,
+        fields: profile.fields,
+      },
     };
 
     const [messageTuple, receiptTuple] = receivedMessage;

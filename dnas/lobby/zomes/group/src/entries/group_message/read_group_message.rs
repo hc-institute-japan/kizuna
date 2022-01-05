@@ -6,18 +6,6 @@ use crate::signals::{SignalDetails, SignalName, SignalPayload};
 pub fn read_group_message_handler(
     group_message_read_data: GroupMessageReadData,
 ) -> ExternResult<GroupMessageReadData> {
-    // We immediately send a signal for immediate feedback for other agents.
-    // TODO: move this to post commit
-    let signal_detail = SignalDetails {
-        name: SignalName::GROUP_MESSAGE_READ.to_owned(),
-        payload: SignalPayload::GroupMessageRead(group_message_read_data.clone()),
-    };
-
-    remote_signal(
-        ExternIO::encode(signal_detail)?,
-        group_message_read_data.members.clone(),
-    )?;
-
     let my_agent_pubkey = agent_info()?.agent_latest_pubkey;
     for message_entry_hash in group_message_read_data.message_ids.clone() {
         /*
@@ -33,7 +21,7 @@ pub fn read_group_message_handler(
         let mut n = 0;
         // only try to get the message entry fixed number of times
         while n < 3 && message_element == None {
-            let options = GetOptions::content();
+            let options = GetOptions::latest();
             message_element = get(message_entry_hash.clone(), options)?;
             n += 1
         }
@@ -52,6 +40,16 @@ pub fn read_group_message_handler(
             )?;
         }
     }
+
+    let signal_detail = SignalDetails {
+        name: SignalName::GROUP_MESSAGE_READ.to_owned(),
+        payload: SignalPayload::GroupMessageRead(group_message_read_data.clone()),
+    };
+
+    remote_signal(
+        ExternIO::encode(signal_detail)?,
+        group_message_read_data.members.clone(),
+    )?;
 
     Ok(group_message_read_data)
 }
