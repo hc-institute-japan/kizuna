@@ -163,7 +163,7 @@ dependencies = [
 [[package]]
 name = "file_types"
 version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.118#3124bd63a6974d3b12ec1d394b4e381e43ec5efd"
+source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop#4cd77afc8394bfa1dec1938d5300bf4c3d1428b3"
 dependencies = [
  "derive_more",
  "hdk",
@@ -203,7 +203,7 @@ checksum = "ab5ef0d4909ef3724cc8cce6ccc8572c5c817592e9285f5464f8e86f8bd3726e"
 [[package]]
 name = "hc_zome_profiles"
 version = "0.0.1"
-source = "git+https://github.com/tatssato/profiles?branch=hdk-0.0.118#66c7e73e328f0a94f561743cb982c2e0899b3944"
+source = "git+https://github.com/holochain-open-dev/profiles?branch=main#eaad47f2639fc9713887c90280780b15ad6b2815"
 dependencies = [
  "derive_more",
  "hdk",
@@ -461,17 +461,17 @@ dependencies = [
  "derive_more",
  "hdk",
  "holo_hash",
- "p2pmessage 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.118)",
+ "p2pmessage 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop)",
  "serde",
 ]
 
 [[package]]
 name = "p2pmessage"
 version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.118#3124bd63a6974d3b12ec1d394b4e381e43ec5efd"
+source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop#4cd77afc8394bfa1dec1938d5300bf4c3d1428b3"
 dependencies = [
  "derive_more",
- "file_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.118)",
+ "file_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop)",
  "hdk",
  "holo_hash",
  "serde",
