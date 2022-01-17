@@ -22,8 +22,8 @@ pub fn get_subsequent_group_messages_handler(
         let days: String =
             timestamp_to_days(filter.last_message_timestamp.clone().unwrap()).to_string();
 
-        let path_hash =
-            path_from_str(&[filter.group_id.clone().to_string(), days].join(".")).hash()?;
+        let path_hash = path_from_str(&[filter.group_id.clone().to_string(), days].join("."))?
+            .path_entry_hash()?;
         pivot_path = Some(path_hash.clone());
 
         // get the messages linked to this path (this list was sorted & filtered inside the method)
@@ -39,7 +39,7 @@ pub fn get_subsequent_group_messages_handler(
 
     if linked_messages.len() < filter.batch_size.into() {
         // generate the general group path (only the group_id)
-        let group_path: Path = path_from_str(&filter.group_id.to_string());
+        let group_path: Path = path_from_str(&filter.group_id.to_string())?;
 
         // get the list of childrens for this path
         let mut children_paths: Vec<Link> = group_path.children()?;

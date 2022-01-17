@@ -58,8 +58,7 @@ pub fn send_message_in_target_date_handler(
 
             let group_hash = message.clone().group_hash.to_string(); // message's group hash as string
             let days = timestamp_to_days(message.clone().created).to_string(); // group message's timestamp into days as string
-
-            match path_from_str(&[group_hash, days].join(".")).hash() {
+            match path_from_str(&[group_hash, days].join("."))?.path_entry_hash() {
                 Ok(hash) => {
                     create_link(
                         hash.clone(),
