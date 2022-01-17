@@ -1,5 +1,6 @@
 {
   "app.auth.err": "We're sorry. We failed to get your profile. Please try restarting your Holochain Launcher, or access Kizuna from a new browser if you are in Holo hosting network.",
+  "app.blocked.empty-blocked-list": "You have not blocked anybody yet",
   "app.chat.chat-details.files": "FILES",
   "app.chat.chat-details.info": "INFO",
   "app.chat.chat-details.media": "MEDIA",
@@ -80,10 +81,10 @@
   "app.profile.to-be-implemented-header": "Oops!",
   "app.register.error-existing-username": "Sorry! That username is already taken",
   "app.register.error-invalid-username": "Nickname must be at least 3 characters and contain 1 alphanumberic character",
+  "app.register.error-no-image": "No image selected",
   "app.register.register": "Register nickname",
   "app.register.username-label": "Nickname",
   "app.register.username-placeholder": "Type your nickname here...",
-  "app.register.error-no-image": "No image selected",
   "app.settings.language-label": "Language",
   "app.settings.preference-label": "Preference",
   "app.settings.read-receipt-label": "Read Receipt",

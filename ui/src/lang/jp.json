@@ -1,5 +1,6 @@
 {
   "app.auth.err": "プロフィールの取得に失敗しました。Holochain Launcherを再起動して下さい。Holoホスティングネットワーク使用の場合は、新しいブラウザからKizunaをアクセスして下さい",
+  "app.blocked.empty-blocked-list": "まだ、誰もブロックされていません",
   "app.chat.chat-details.files": "ファイル",
   "app.chat.chat-details.info": "チャット情報",
   "app.chat.chat-details.media": "メディア",
