@@ -28,6 +28,7 @@ export default function addAndRemoveMembersTest(config) {
       const [bobby_lobby_happ] = await installAgents(bobby, ["bobby"]);
       const [charlie_lobby_happ] = await installAgents(charlie, ["charlie"]);
       const [david_lobby_happ] = await installAgents(david, ["david"]);
+      s.shareAllNodes([alice, bobby, charlie, david]);
       const [alice_conductor] = alice_lobby_happ.cells;
       const [bobby_conductor] = bobby_lobby_happ.cells;
       const [charlie_conductor] = charlie_lobby_happ.cells;

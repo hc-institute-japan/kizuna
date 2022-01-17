@@ -1,4 +1,4 @@
-import { InstalledHapp, Player } from "@holochain/tryorama";
+import { InstallAgentsHapps, InstalledHapp, Player } from "@holochain/tryorama";
 import path from "path";
 
 export const MEM_PROOF1 = Buffer.from(
@@ -24,7 +24,7 @@ export const MEM_PROOF5 = Buffer.from(
 
 export const MEM_PROOF_READ_ONLY = Buffer.from([0]);
 
-const chessDna = path.join(__dirname, "../../workdir/dna/kizuna.dna");
+const lobbyDna = path.join(__dirname, "../../workdir/dna/lobby.dna");
 
 export const installAgents = async (
   conductor: Player,
@@ -34,7 +34,7 @@ export const installAgents = async (
 ) => {
   const admin = conductor.adminWs();
   const dnaHash = await conductor.registerDna(
-    { path: chessDna },
+    { path: lobbyDna },
     conductor.scenarioUID,
     { skip_proof: !memProofArray ? true : false, holo_agent_override }
   );

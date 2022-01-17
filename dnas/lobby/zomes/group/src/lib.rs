@@ -51,7 +51,8 @@ entry_defs![
     Group::entry_def(),
     Path::entry_def(),
     GroupMessage::entry_def(),
-    GroupFileBytes::entry_def()
+    GroupFileBytes::entry_def(),
+    PathEntry::entry_def()
 ];
 
 // this is only exposed outside of WASM for testing purposes.

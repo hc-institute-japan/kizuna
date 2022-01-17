@@ -23,10 +23,10 @@ const SECONDS: i64 = 60;
 const MINUTES: i64 = 60;
 const HOURS: i64 = 24;
 
-pub(crate) fn path_from_str(str: &str) -> Path {
+pub(crate) fn path_from_str(str: &str) -> ExternResult<Path> {
     let path = Path::from(str);
-    path.ensure().expect("Cannot ensure path.");
-    path
+    path.ensure()?;
+    Ok(path)
 }
 
 pub(crate) fn timestamp_to_days(timestamp: Timestamp) -> i64 {
