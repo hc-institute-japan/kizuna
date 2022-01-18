@@ -81,9 +81,8 @@ pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<Gr
 
     let group_hash = message.group_hash.clone().to_string(); // message's group hash as string
     let days = timestamp_to_days(message.created.clone()).to_string(); // group message's timestamp into days as string
-
-    let group_hash_timestamp_path_hash = path_from_str(&[group_hash, days].join(".")).hash()?;
-
+    let group_hash_timestamp_path_hash =
+        path_from_str(&[group_hash, days].join("."))?.path_entry_hash()?;
     host_call::<CreateLinkInput, HeaderHash>(
         __create_link,
         CreateLinkInput::new(
@@ -105,7 +104,6 @@ pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<Gr
     )?;
 
     let message_hash = hash_entry(&message)?;
-
     let group_message_with_id = GroupMessageWithId {
         id: message_hash,
         content: message,

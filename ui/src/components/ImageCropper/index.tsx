@@ -1,4 +1,11 @@
-import { IonButton, IonIcon, IonPage, useIonPopover } from "@ionic/react";
+import {
+  IonButton,
+  IonIcon,
+  IonLoading,
+  IonPage,
+  IonSpinner,
+  useIonPopover,
+} from "@ionic/react";
 import { arrowBack, checkmarkOutline } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import ReactCrop, { Crop } from "react-image-crop";
@@ -163,18 +170,23 @@ const ImageCropper: React.FC<Props> = ({
           </IonButton>
         </div>
         <div className={styles["image-cropper"]} ref={imageContainer}>
-          <ReactCrop
-            circularCrop
-            ref={cropRef}
-            imageStyle={{
-              ...style,
-              objectFit: "contain",
-            }}
-            src={src}
-            onChange={(crop) => setCrop(crop)}
-            keepSelection={true}
-            crop={crop}
-          />
+          {Object.keys(style).length > 0 ? (
+            <ReactCrop
+              circularCrop
+              ref={cropRef}
+              imageStyle={{
+                // ...(Object.keys(style).length === 0 ? {} : style),
+                ...style,
+                objectFit: "contain",
+              }}
+              src={src}
+              onChange={(crop) => setCrop(crop)}
+              keepSelection={true}
+              crop={crop}
+            />
+          ) : (
+            <IonSpinner></IonSpinner>
+          )}
         </div>
       </div>
       {/* <IonFooter ref={footer}>

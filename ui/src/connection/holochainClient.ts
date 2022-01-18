@@ -1,4 +1,8 @@
-import { HolochainClient, HoloClient } from "@holochain-open-dev/cell-client";
+import {
+  HolochainClient,
+  HoloClient,
+  WebSdkClient,
+} from "@holochain-open-dev/cell-client";
 import {
   AgentPubKey,
   AppSignalCb,
@@ -10,7 +14,6 @@ import { CallZomeConfig } from "../redux/types";
 import { appId, appUrl, ENV } from "./constants";
 // @ts-ignore
 global.COMB = undefined;
-const { Connection } = require("@holo-host/web-sdk");
 // @ts-ignore
 window.COMB = require("@holo-host/comb").COMB;
 
@@ -32,18 +35,20 @@ const createClient = async (
         app_name: "Kizuna Messaging App",
         skip_registration: true,
       };
+      const client = new WebSdkClient(appUrl()!, branding);
 
-      const connection = new Connection(appUrl(), signalHandler, branding);
+      await client.connection.ready();
+      await client.connection.signIn();
 
-      await connection.ready();
-      await connection.signIn();
+      const appInfo = await client.connection.appInfo(appId());
 
-      const appInfo = await connection.appInfo(appId());
+      console.log("here is the appInfo, ", appInfo);
 
       if (!appInfo.cell_data)
         throw new Error(`Holo appInfo() failed: ${JSON.stringify(appInfo)}`);
 
       const cellData = appInfo.cell_data[0];
+      console.log("the cell data is: ", cellData);
 
       // TODO: remove this when chaperone is fixed
       if (!(cellData.cell_id[0] instanceof Uint8Array)) {
@@ -53,7 +58,7 @@ const createClient = async (
         ] as any;
       }
 
-      return new HoloClient(connection, cellData, branding);
+      return new HoloClient(client, cellData);
     }
     case "HCDEV":
     case "HC": {
