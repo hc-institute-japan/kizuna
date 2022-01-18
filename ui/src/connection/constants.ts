@@ -16,8 +16,7 @@ export const appUrl = () => {
   if (ENV === "HC") return `ws://localhost:8888`;
   else if (ENV === "HCDEV") return process.env.REACT_APP_DNA_INTERFACE_URL;
   else if (ENV === "HCC") return "http://localhost:24273";
-  else if (ENV === "HOLO") return "https://chaperone.holo.host";
-  else return null;
+  else return "https://devnet-chaperone.holo.host";
 };
 
 export const isHoloEnv = () => {
