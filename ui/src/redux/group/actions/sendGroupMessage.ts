@@ -223,7 +223,7 @@ const sendGroupMessage =
         }
       } catch (e) {
         handleError(e, dispatch, groupMessageData);
-        console.log("sending of group message has failed", e);
+        // console.log("sending of group message has failed", e);
         return false;
       }
     }

@@ -19,7 +19,7 @@ const searchProfiles =
       filter the contacts that are already added
       and remove yourself from the searched result as well as duplicates
       */
-      console.log("searched profiles", res);
+      // console.log("searched profiles", res);
 
       const keys = res.map((o) => o.agent_pub_key);
 
@@ -43,7 +43,7 @@ const searchProfiles =
               : {},
           };
         });
-      console.log(filteredMappedProfiles);
+      // console.log(filteredMappedProfiles);
       return filteredMappedProfiles;
     } catch (e) {}
     return false;

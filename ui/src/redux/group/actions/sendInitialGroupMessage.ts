@@ -1,3 +1,4 @@
+import { serializeHash } from "@holochain-open-dev/core-types";
 import { FilePayloadInput } from "../../commons/types";
 import { pushError } from "../../error/actions";
 import { Profile } from "../../profile/types";
@@ -110,7 +111,7 @@ const sendInitialGroupMessage =
         case e.message.includes(
           "the group name must at least contain 1 character and maximun 50 characters"
         ):
-          console.log(e);
+          // console.log(e);
           dispatch(
             pushError("TOAST", {}, { id: "redux.err.group.create-group.4" })
           );

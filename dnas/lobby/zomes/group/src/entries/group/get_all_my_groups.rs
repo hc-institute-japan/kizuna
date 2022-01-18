@@ -30,6 +30,7 @@ pub fn get_all_my_groups_handler() -> ExternResult<Vec<GroupOutput>> {
                     let first_ver_group: Group = group_sb.try_into()?;
                     // get original value of created and creator here
                     let group_id = hash_entry(first_ver_group.clone())?;
+
                     let mut group = first_ver_group;
 
                     // This is the SignedHeaderHashed of the sole Create Header of Group
@@ -43,6 +44,7 @@ pub fn get_all_my_groups_handler() -> ExternResult<Vec<GroupOutput>> {
 
                         group.name = latest_group.latest_name; // latest group name
                         group.members = latest_group.members; // latest group members
+                        group.avatar = latest_group.avatar;
                     }
 
                     my_linked_groups_entries.push(GroupOutput::new(

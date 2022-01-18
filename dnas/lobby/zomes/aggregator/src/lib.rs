@@ -21,6 +21,7 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
         None,
         &blocked_contacts,
     )?;
+
     let blocked_profiles: Vec<AgentProfile> =
         call_response_handler(blocked_profiles_call_response)?.decode()?;
 

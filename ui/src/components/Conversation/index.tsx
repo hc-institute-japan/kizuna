@@ -1,3 +1,4 @@
+import { deserializeHash } from "@holochain-open-dev/core-types";
 import { IonAvatar, IonBadge, IonItem, IonLabel } from "@ionic/react";
 import { peopleCircleOutline, personCircleOutline } from "ionicons/icons";
 import React from "react";
@@ -39,21 +40,38 @@ const Conversation: React.FC<Props> = ({
       }
     );
 
-  return (
-    <IonItem onClick={onClick}>
-      <IonAvatar slot="start">
+  const renderAvatar = () => {
+    if (conversation.avatar)
+      return (
+        <img
+          src={
+            conversation.type === "group"
+              ? URL.createObjectURL(
+                  new Blob([deserializeHash(conversation.avatar!)], {
+                    type: "image/jpeg",
+                  })
+                )
+              : conversation.avatar
+          }
+          alt="avatar"
+        />
+      );
+    else
+      return (
         <img
           className={styles.avatar}
           src={
             conversation.type === "group"
               ? peopleCircleOutline
-              : conversation.avatar
-              ? conversation.avatar
               : personCircleOutline
           }
           alt="avatar"
         />
-      </IonAvatar>
+      );
+  };
+  return (
+    <IonItem onClick={onClick}>
+      <IonAvatar slot="start">{renderAvatar()}</IonAvatar>
       <IonLabel>
         {conversation.type === "group" ? (
           <h2>{conversation.conversationName}</h2>

@@ -81,7 +81,7 @@ pub fn get_previous_group_messages_handler(
         .into_iter()
         .filter(|item| !hashes_in_contents.contains(item))
         .collect();
-    debug!("here are the unfetched messages {:?}", difference);
+    // debug!("here are the unfetched messages {:?}", difference);
 
     // TODO: remove this once the bug in holochain is fixed where the author of the entry
     // can fetch the entry but other agents cannot.
