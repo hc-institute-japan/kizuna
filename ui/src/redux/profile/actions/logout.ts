@@ -5,7 +5,7 @@ const logout =
   async (_dispatch, _getState, { client, init }) => {
     const c = client ? (client as any) : await init();
     await c.connection.signOut();
-    await c.connection.signIn();
+    window.location.reload();
   };
 
 export default logout;
