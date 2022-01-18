@@ -36,19 +36,22 @@ const createClient = async (
         skip_registration: true,
       };
       const client = new WebSdkClient(appUrl()!, branding);
+      console.log("client being returned from cell-client", client);
 
       await client.connection.ready();
+      console.log("connection is ready");
       await client.connection.signIn();
+      console.log("signed in");
 
       const appInfo = await client.connection.appInfo(appId());
 
-      console.log("here is the appInfo, ", appInfo);
+      console.log("app info: ", appInfo);
 
       if (!appInfo.cell_data)
         throw new Error(`Holo appInfo() failed: ${JSON.stringify(appInfo)}`);
 
       const cellData = appInfo.cell_data[0];
-      console.log("the cell data is: ", cellData);
+      console.log("cell data: ", cellData);
 
       // TODO: remove this when chaperone is fixed
       if (!(cellData.cell_id[0] instanceof Uint8Array)) {
