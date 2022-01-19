@@ -26,7 +26,6 @@ import { ContactsContext } from "./context";
 import NewConversationHeader from "./NewConversationHeader";
 import SelectedContactsHeader from "./SelectedContactsHeader";
 import styles from "./style.module.css";
-import people from "./people.png";
 
 interface StateProps {
   contacts: ProfileListType;
@@ -171,34 +170,22 @@ const NewConversation: React.FC = () => {
         };
         return filePayloadInput;
       });
-      const image = new Image();
-      image.onload = () => {
-        const canvas = document.createElement("canvas");
-        const context = canvas.getContext("2d");
-        canvas.height = image.height;
-        canvas.width = image.width;
-        context?.drawImage(image, 0, 0);
-        dispatch(
-          sendInitialGroupMessage(
-            contacts,
-            message2 ? message2 : message,
-            fileInputs
-          )
-        ).then(
-          (
-            res:
-              | { groupResult: GroupConversation; messageResults: any[] }
-              | false
-          ) => {
-            setIsLoading(false);
-            if (res !== false) {
-              history.push(`/g/${res.groupResult.originalGroupId}`);
-            }
+      dispatch(
+        sendInitialGroupMessage(
+          contacts,
+          message2 ? message2 : message,
+          fileInputs
+        )
+      ).then(
+        (
+          res: { groupResult: GroupConversation; messageResults: any[] } | false
+        ) => {
+          setIsLoading(false);
+          if (res !== false) {
+            history.push(`/g/${res.groupResult.originalGroupId}`);
           }
-        );
-      };
-
-      image.src = people;
+        }
+      );
     } else {
       showErrorToast({
         message: intl.formatMessage({
