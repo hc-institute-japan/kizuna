@@ -71,24 +71,24 @@ const removeMembers =
       return updateGroupMembersData;
     } catch (e) {
       switch (true) {
-        case e.message.includes("members field is empty"):
+        case (e as any).message.includes("members field is empty"):
           dispatch(
             pushError("TOAST", {}, { id: "redux.err.group.remove-members.1" })
           );
           return false;
-        case e.message.includes("failed to get the given group id"):
+        case (e as any).message.includes("failed to get the given group id"):
           dispatch(
             pushError("TOAST", {}, { id: "redux.err.group.remove-members.2" })
           );
           return false;
-        case e.message.includes(
+        case (e as any).message.includes(
           "groups cannot be created with less than 3 members"
         ):
           dispatch(
             pushError("TOAST", {}, { id: "redux.err.group.remove-members.3" })
           );
           return false;
-        case e.message.includes(
+        case (e as any).message.includes(
           "cannot update a group entry if you are not the group creator (admin)"
         ):
           dispatch(

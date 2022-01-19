@@ -88,26 +88,28 @@ const sendInitialGroupMessage =
     } catch (e) {
       /* err from createGoup.ts */
       switch (true) {
-        case e.message.includes("cannot create group with blocked agents"):
+        case (e as any).message.includes(
+          "cannot create group with blocked agents"
+        ):
           dispatch(
             pushError("TOAST", {}, { id: "redux.err.group.create-group.1" })
           );
           break;
-        case e.message.includes(
+        case (e as any).message.includes(
           "groups cannot be created with less than 3 members"
         ):
           dispatch(
             pushError("TOAST", {}, { id: "redux.err.group.create-group.2" })
           );
           break;
-        case e.message.includes(
+        case (e as any).message.includes(
           "creator AgentPubKey cannot be included in the group members list"
         ):
           dispatch(
             pushError("TOAST", {}, { id: "redux.err.group.create-group.3" })
           );
           break;
-        case e.message.includes(
+        case (e as any).message.includes(
           "the group name must at least contain 1 character and maximun 50 characters"
         ):
           console.log(e);

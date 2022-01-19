@@ -25,11 +25,11 @@ const registerUsername =
       });
       return res;
     } catch (e) {
-      if (e.message.includes("already taken"))
+      if ((e as any).message.includes("already taken"))
         dispatch(
           pushError("TOAST", {}, { id: "redux.err.profile.set-username.1" })
         );
-      else if (e.message.includes("already has a username"))
+      else if ((e as any).message.includes("already has a username"))
         dispatch(
           pushError("TOAST", {}, { id: "redux.err.profile.set-username.2" })
         );

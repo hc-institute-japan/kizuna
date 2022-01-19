@@ -64,7 +64,7 @@ const updateGroupName =
       return updateGroupNameData;
     } catch (e) {
       switch (true) {
-        case e.message.includes("failed to get the given group id"):
+        case (e as any).message.includes("failed to get the given group id"):
           return dispatch(
             pushError(
               "TOAST",
@@ -72,7 +72,7 @@ const updateGroupName =
               { id: "redux.err.group.update-group-name.2" }
             )
           );
-        case e.message.includes(
+        case (e as any).message.includes(
           "the group name must be 1 to 50 characters length"
         ):
           return dispatch(
@@ -82,7 +82,7 @@ const updateGroupName =
               { id: "redux.err.group.update-group-name.3" }
             )
           );
-        case e.message.includes(
+        case (e as any).message.includes(
           "cannot update a group entry if you are not the group creator (admin)"
         ):
           return dispatch(
