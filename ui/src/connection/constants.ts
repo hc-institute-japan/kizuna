@@ -15,8 +15,9 @@ export const appUrl = () => {
   // for launcher
   if (ENV === "HC") return `ws://localhost:8888`;
   else if (ENV === "HCDEV") return process.env.REACT_APP_DNA_INTERFACE_URL;
-  else if (ENV === "HCC") return "http://localhost:24273";
-  else if (ENV === "HOLO") return "https://chaperone.holo.host";
+  else if (ENV === "HCC")
+    return `http://localhost:${process.env.REACT_APP_CHAPERONE_PORT}`;
+  else if (ENV === "HOLO") return "https://devnet-chaperone.holo.host";
   else return null;
 };
 
