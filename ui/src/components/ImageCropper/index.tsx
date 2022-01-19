@@ -1,12 +1,12 @@
 import {
   IonButton,
-  IonIcon,
-  IonLoading,
+  IonButtons,
+  IonLabel,
   IonPage,
   IonSpinner,
+  IonTitle,
   useIonPopover,
 } from "@ionic/react";
-import { arrowBack, checkmarkOutline } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import ReactCrop, { Crop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
@@ -33,7 +33,6 @@ const ImageCropper: React.FC<Props> = ({
 
   useEffect(() => {
     const img = new Image();
-
     img.onload = () => {
       setTimeout(() => {
         if (window.innerHeight >= window.innerWidth) {
@@ -47,7 +46,9 @@ const ImageCropper: React.FC<Props> = ({
             setStyle({ width: "100vw" });
           } else {
             setStyle({
-              height: "100vh",
+              height: `calc(100vh - ${
+                header.current?.getBoundingClientRect().height
+              }px - ${footer.current?.getBoundingClientRect().height}px)`,
               width:
                 (imageContainer.current!.getBoundingClientRect().height /
                   img.naturalHeight) *
@@ -62,7 +63,11 @@ const ImageCropper: React.FC<Props> = ({
             img.naturalWidth * percentage <=
             imageContainer.current!.getBoundingClientRect().width
           ) {
-            setStyle({ height: "100vh" });
+            setStyle({
+              height: `calc(100vh - ${
+                header.current?.getBoundingClientRect().height
+              }px - ${footer.current?.getBoundingClientRect().height}px)`,
+            });
           } else {
             setStyle({
               width: "100vw",
@@ -75,12 +80,11 @@ const ImageCropper: React.FC<Props> = ({
         }
       }, 500);
     };
-
     img.src = src;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const header = useRef<HTMLDivElement>(null);
-  // const footer = useRef<HTMLIonFooterElement>(null);
+  const footer = useRef<HTMLDivElement>(null);
 
   const onChange = (crop: number) => {
     setCrop((currCrop) => {
@@ -161,13 +165,15 @@ const ImageCropper: React.FC<Props> = ({
     <IonPage>
       <div className={styles.content}>
         <div className={styles.header} ref={header}>
+          <IonTitle>Crop Image</IonTitle>
+          {/* 
           <IonButton fill="clear" href={prevPath}>
             <IonIcon icon={arrowBack} />
           </IonButton>
 
           <IonButton fill="clear" onClick={onConfirm}>
             <IonIcon icon={checkmarkOutline} />
-          </IonButton>
+          </IonButton> */}
         </div>
         <div className={styles["image-cropper"]} ref={imageContainer}>
           {Object.keys(style).length > 0 ? (
@@ -188,6 +194,16 @@ const ImageCropper: React.FC<Props> = ({
             <IonSpinner></IonSpinner>
           )}
         </div>
+      </div>
+      <div className={styles.footer} ref={footer}>
+        <IonButtons>
+          <IonButton href={prevPath} fill="outline" color="danger">
+            <IonLabel>Cancel</IonLabel>
+          </IonButton>
+          <IonButton onClick={onConfirm} fill="solid" color="success">
+            <IonLabel>Confirm</IonLabel>
+          </IonButton>
+        </IonButtons>
       </div>
       {/* <IonFooter ref={footer}>
         <IonToolbar>
