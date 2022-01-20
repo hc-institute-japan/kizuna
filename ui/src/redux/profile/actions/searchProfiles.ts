@@ -21,17 +21,12 @@ const searchProfiles =
       */
       console.log("searched profiles", res);
 
-      const keys = res.map((o) => o.agent_pub_key);
-
       const filteredMappedProfiles: Profile[] = res
         .filter(
           (res: AgentProfile) =>
             !Object.keys(contacts).includes(res.agent_pub_key) &&
             res.agent_pub_key !== id
         )
-        .filter(
-          ({ agent_pub_key }, index) => !keys.includes(agent_pub_key, index + 1)
-        ) // TODO: properly identify the cause of duplicate on HC side and fix it.
         .map((v: AgentProfile) => {
           return {
             id: v.agent_pub_key,
