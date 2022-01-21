@@ -87,6 +87,7 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
   const intl = useIntl();
   const [isReply, setIsReply] = useState<ReplyParams | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
+  const [onComposition, setOnComposition] = useState<boolean>(false);
   const file = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<FileContent[]>([]);
   const [selectedGif, setSelectedGif] = useState("");
@@ -145,8 +146,18 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
     // }
   };
 
+  const handleComposition = (event: CompositionEvent) => {
+    if (event.type === "compositionstart") {
+      setOnComposition(true);
+    }
+    if (event.type === "compositionend") {
+      setOnComposition(false);
+    }
+  };
+
   const onKeyDown = (event: KeyboardEvent) => {
-    if (onSend && event.key === "Enter" && !event.shiftKey) {
+    console.log(onComposition);
+    if (onSend && event.key === "Enter" && !event.shiftKey && !onComposition) {
       if (message.trim().length !== 0 || files.length > 0) {
         onSend({
           files,
@@ -339,6 +350,12 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
             placeholder={intl.formatMessage({
               id: "app.new-conversation.message-placeholder",
             })}
+            ref={(el) => {
+              if (el) {
+                el.addEventListener("compositionstart", handleComposition);
+                el.addEventListener("compositionend", handleComposition);
+              }
+            }}
           />
           <EndButtons
             files={files}
