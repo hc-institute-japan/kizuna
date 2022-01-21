@@ -188,19 +188,19 @@ const sendGroupMessage =
     };
 
     try {
-      const sendGroupMessageOutput = await callZome({
-        zomeName: ZOMES.GROUP,
-        fnName: FUNCTIONS[ZOMES.GROUP].SEND_MESSAGE,
-        payload: input,
-      });
-      return await setGroupMessage(
-        sendGroupMessageOutput,
-        groupMessageData,
-        callZome,
-        getState,
-        dispatch
-      );
-      // return false;
+      // const sendGroupMessageOutput = await callZome({
+      //   zomeName: ZOMES.GROUP,
+      //   fnName: FUNCTIONS[ZOMES.GROUP].SEND_MESSAGE,
+      //   payload: input,
+      // });
+      // return await setGroupMessage(
+      //   sendGroupMessageOutput,
+      //   groupMessageData,
+      //   callZome,
+      //   getState,
+      //   dispatch
+      // );
+      return false;
     } catch (e) {
       try {
         if (!(e as any).message.includes("Timed out")) {
