@@ -18,6 +18,12 @@
   padding-top: 0.3rem;
 }
 
+.message-text {
+  word-break: keep-all !important;
+  white-space: nowrap;
+  padding-top: 0.2rem;
+}
+
 .file {
   padding-left: 0.3rem;
   padding-right: 0.3rem;
@@ -31,7 +37,7 @@
 
 .author-name {
   flex-shrink: 0;
-  margin-left: calc(1.1rem + 0.5rem + 0.5rem + 0.5rem);
+  margin-left: calc(1.8rem + 0.5rem + 0.5rem + 0.5rem);
 }
 
 .picture {
@@ -44,6 +50,7 @@
   background-position: center;
   background-size: cover;
   margin-top: 0.6rem;
+  padding-right: 2.5rem;
 }
 
 .picture > img {
@@ -52,10 +59,10 @@
 }
 
 .avatar-container {
-  height: 100%;
-  width: 100%;
+  height: 100% !important;
   max-height: 35px;
   max-width: 35px;
+  width: 35px;
 }
 
 .me-container {
@@ -139,6 +146,6 @@
   max-width: 80%;
   padding-top: 0px;
   padding-bottom: 0.2rem;
-  padding-right: 2.5rem;
+  padding-right: 3rem;
   margin-top: -0.3rem;
 }
