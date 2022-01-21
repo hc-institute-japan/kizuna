@@ -58,7 +58,9 @@ const createClient = async (
         ] as any;
       }
 
-      return new HoloClient(client, cellData);
+      const holoClient = new HoloClient(client, cellData);
+      holoClient.addSignalHandler(signalHandler);
+      return holoClient;
     }
     case "HCDEV":
     case "HC": {
