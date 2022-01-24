@@ -26,7 +26,11 @@ const ImageCropper: React.FC<Props> = ({
   dismiss,
   onComplete,
 }) => {
-  const [crop, setCrop] = useState<Partial<Crop>>({ x: 0, y: 0, aspect: 1 });
+  const [crop, setCrop] = useState<Partial<Crop>>({
+    x: 0,
+    y: 0,
+    aspect: 1,
+  });
   const [binary, setBinary] = useState<Uint8Array | null>(null);
   const imageContainer = useRef<HTMLDivElement | null>(null);
   const [style, setStyle] = useState({});
@@ -35,16 +39,33 @@ const ImageCropper: React.FC<Props> = ({
     const img = new Image();
     img.onload = () => {
       setTimeout(() => {
+        // mobile if innerHeight is greater than innerWidth
+
         if (window.innerHeight >= window.innerWidth) {
           const percentage =
             imageContainer.current!.getBoundingClientRect().width /
             img.naturalWidth;
+
+          if (img.naturalWidth * percentage >= img.naturalHeight * percentage)
+            setCrop((currCrop) => ({
+              ...currCrop,
+              width: percentage * img.naturalHeight,
+              height: percentage * img.naturalHeight,
+            }));
+          else
+            setCrop((currCrop) => ({
+              ...currCrop,
+              width: percentage * img.naturalWidth,
+              height: percentage * img.naturalWidth,
+            }));
+
           if (
             img.naturalHeight * percentage <=
             imageContainer.current!.getBoundingClientRect().height
-          ) {
+          )
+            // Set to 100vw because height can never be greater than container height
             setStyle({ width: "100vw" });
-          } else {
+          else
             setStyle({
               height: `calc(100vh - ${
                 header.current?.getBoundingClientRect().height
@@ -54,21 +75,33 @@ const ImageCropper: React.FC<Props> = ({
                   img.naturalHeight) *
                 img.naturalWidth,
             });
-          }
         } else {
           const percentage =
             imageContainer.current!.getBoundingClientRect().height /
             img.naturalHeight;
+
+          if (img.naturalWidth * percentage >= img.naturalHeight * percentage)
+            setCrop((currCrop) => ({
+              ...currCrop,
+              width: percentage * img.naturalHeight,
+              height: percentage * img.naturalHeight,
+            }));
+          else
+            setCrop((currCrop) => ({
+              ...currCrop,
+              width: percentage * img.naturalWidth,
+              height: percentage * img.naturalWidth,
+            }));
           if (
             img.naturalWidth * percentage <=
             imageContainer.current!.getBoundingClientRect().width
-          ) {
+          )
             setStyle({
               height: `calc(100vh - ${
                 header.current?.getBoundingClientRect().height
               }px - ${footer.current?.getBoundingClientRect().height}px)`,
             });
-          } else {
+          else
             setStyle({
               width: "100vw",
               height:
@@ -76,7 +109,6 @@ const ImageCropper: React.FC<Props> = ({
                   img.naturalWidth) *
                 img.naturalHeight,
             });
-          }
         }
       }, 500);
     };
@@ -161,6 +193,8 @@ const ImageCropper: React.FC<Props> = ({
 
   const cropRef = useRef<ReactCrop | null>(null);
 
+  const onChangeCrop = (crop: Crop) => setCrop(crop);
+
   return (
     <IonPage>
       <div className={styles.content}>
@@ -186,7 +220,7 @@ const ImageCropper: React.FC<Props> = ({
                 objectFit: "contain",
               }}
               src={src}
-              onChange={(crop) => setCrop(crop)}
+              onChange={onChangeCrop}
               keepSelection={true}
               crop={crop}
             />
