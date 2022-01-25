@@ -11,19 +11,20 @@ import {
   IonToolbar,
   useIonModal,
 } from "@ionic/react";
+import { close, imageOutline, personCircleOutline } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
+import ImageCropper from "../../components/ImageCropper";
 import HomeInput from "../../components/Input/HomeInput";
 import { createProfile } from "../../redux/profile/actions";
 import { useAppDispatch } from "../../utils/helpers";
 import { isUsernameFormatValid } from "../../utils/regex";
 import styles from "./style.module.css";
-import { close, imageOutline, personCircleOutline } from "ionicons/icons";
-import ImageCropper from "../../components/ImageCropper";
 
 const Register: React.FC = () => {
   const [nickname, setNickname] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [isDisabled, setIsDisabled] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
   const dispatch = useAppDispatch();
   const file = useRef<HTMLInputElement>(null);
@@ -45,15 +46,11 @@ const Register: React.FC = () => {
   };
 
   useEffect(() => {
-    setError(
-      isUsernameFormatValid(nickname!) && nickname.length >= 3
-        ? null
-        : intl.formatMessage({
-            id: "app.register.error-invalid-username",
-          })
-    );
+    if (error || nickname.length === 0 || binary === null) setIsDisabled(true);
+    else setIsDisabled(false);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [error, nickname, binary]);
 
   const handleOnSubmit = () => {
     setLoading(true);
@@ -143,6 +140,17 @@ const Register: React.FC = () => {
   //   return canvas.toDataURL();
   // };
 
+  const onAvatarChange = () => {
+    file.current!.value = "";
+    file.current?.click();
+  };
+
+  // const onRemoveAvatar = () => {
+  //   file!.current!.value = "";
+  //   setBinary(null);
+  //   profilePicture.current!.src = personCircleOutline;
+  // };
+
   return (
     <IonPage>
       <IonHeader>
@@ -155,28 +163,39 @@ const Register: React.FC = () => {
       <IonContent>
         <div className={styles.register}>
           <div className={styles.form}>
-            <div
-              className={styles["profile-picture"]}
-              onClick={() => {
-                if (!binary) file?.current?.click();
-                else {
-                  file!.current!.value = "";
-                  setBinary(null);
-                  profilePicture.current!.src = personCircleOutline;
-                }
-              }}
-            >
-              <img
-                alt="avatar"
-                ref={profilePicture}
-                src={personCircleOutline}
-              ></img>
-              <div className={styles.icon}>
-                {binary === null ? (
-                  <IonIcon size="large" icon={imageOutline}></IonIcon>
-                ) : (
-                  <IonIcon size="large" icon={close}></IonIcon>
-                )}
+            <div className={styles["profile-picture"]}>
+              <IonLabel className={styles.label}>
+                {intl.formatMessage({
+                  id: "app.register.avatar-label",
+                })}
+              </IonLabel>
+              <div className={styles["profile-picture-content"]}>
+                <div className={styles["avatar-container"]}>
+                  <img
+                    alt="avatar"
+                    ref={profilePicture}
+                    src={personCircleOutline}
+                    className={`${styles.avatar} ${
+                      binary ? "" : styles.default
+                    }`}
+                  />
+                </div>
+                <div className="ion-padding-start">
+                  <IonButtons>
+                    <IonButton
+                      onClick={onAvatarChange}
+                      fill="solid"
+                      type="button"
+                      color="primary"
+                    >
+                      <IonLabel className={styles["button-label"]}>
+                        {intl.formatMessage({
+                          id: "app.register.button-avatar-label",
+                        })}
+                      </IonLabel>
+                    </IonButton>
+                  </IonButtons>
+                </div>
               </div>
             </div>
             <div>
@@ -206,7 +225,7 @@ const Register: React.FC = () => {
               />
             </div>
           </div>
-          <IonButton onClick={handleOnSubmit} disabled={error ? true : false}>
+          <IonButton onClick={handleOnSubmit} disabled={isDisabled}>
             {intl.formatMessage({
               id: "app.register.register",
             })}

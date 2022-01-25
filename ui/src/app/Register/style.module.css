@@ -34,11 +34,46 @@
   --ion-color-base: transparent !important;
 }
 
-.profile-picture {
-  position: relative;
+.avatar-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar {
+  width: 100%;
+  max-width: 100px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+@media (prefers-color-scheme: dark) {
+  .default {
+    filter: invert(100%);
+  }
+}
+
+.buttons {
+  display: fle;
+}
+
+/* .profile-picture {
+   position: relative;
   width: 170px;
   height: 170px;
-  margin-bottom: 4rem;
+  margin-bottom: 4rem; 
+} */
+
+.profile-picture-content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.button-label {
+  font-size: 0.8rem;
 }
 
 .icon {
@@ -52,12 +87,12 @@
   cursor: pointer;
 }
 
-.profile-picture img {
+/* .profile-picture img {
   width: 170px;
   height: 170px;
   object-fit: cover;
   border-radius: 50%;
-}
+} */
 
 .modal .modal-wrapper {
   --min-height: 100vh !important;
