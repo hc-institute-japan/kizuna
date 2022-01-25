@@ -13,13 +13,16 @@ import removeMembers from "./removeMembers";
 import sendGroupMessage from "./sendGroupMessage";
 import sendInitialGroupMessage from "./sendInitialGroupMessage";
 import setErrGroupMessage from "./setErrGroupMessage";
+import { createGroupDna, test } from "./createGroupDna";
 import removeErrGroupMessage from "./removeErrGroupMessage";
 import { fetchFilesBytes, setFilesBytes } from "./setFilesBytes";
 import updateGroupName from "./updateGroupName";
 
 export {
+  test,
   addMembers,
   createGroup,
+  createGroupDna,
   getBadgeCount,
   getLatestGroupVersion,
   getMessagesWithProfile,

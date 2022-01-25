@@ -8,6 +8,7 @@ import { getMyProfile } from "../../redux/profile/actions";
 import { RootState } from "../../redux/types";
 import { useAppDispatch } from "../../utils/helpers";
 import Authenticated from "../Authenticated";
+import Playground from "../Playground";
 import Unauthenticated from "../Unauthenticated";
 import styles from "./style.module.css";
 
@@ -32,16 +33,16 @@ const Auth: React.FC = () => {
     </div>
   );
 
-  return loading ? (
-    <Spinner />
-  ) : username !== null ? (
-    <Authenticated />
-  ) : !err ? (
-    <Unauthenticated />
-  ) : (
-    renderErrPage()
-  );
-  // return <Playground />;
+  // return loading ? (
+  //   <Spinner />
+  // ) : username !== null ? (
+  //   <Authenticated />
+  // ) : !err ? (
+  //   <Unauthenticated />
+  // ) : (
+  //   renderErrPage()
+  // );
+  return <Playground />;
 };
 
 export default Auth;

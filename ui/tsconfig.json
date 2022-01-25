@@ -19,9 +19,12 @@
     "noEmit": true,
     "jsx": "react",
     "noFallthroughCasesInSwitch": true,
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "typeRoots": [
+      "./src/utils/moduleTypes.d.ts"
+    ]
   },
   "include": [
     "src"
-  ]
+  ],
 }

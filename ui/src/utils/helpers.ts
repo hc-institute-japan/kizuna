@@ -222,3 +222,8 @@ const preventDefault = (event: TouchEvent) => {
     event.preventDefault();
   }
 };
+
+export const generatePassphrase = async () => {
+  const { default: randomWord } = await import("diceware-word");
+  return `${randomWord()} ${randomWord()} ${randomWord()} ${randomWord()} ${randomWord()}`;
+};

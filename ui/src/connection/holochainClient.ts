@@ -1,5 +1,8 @@
 import { HolochainClient, HoloClient } from "@holochain-open-dev/cell-client";
+import { serializeHash } from "@holochain-open-dev/core-types";
 import {
+  InstalledCell,
+  AdminWebsocket,
   AgentPubKey,
   AppSignalCb,
   AppWebsocket,
@@ -7,7 +10,7 @@ import {
 import { store } from "../containers/ReduxContainer";
 import { handleSignal } from "../redux/signal/actions";
 import { CallZomeConfig } from "../redux/types";
-import { appId, appUrl, ENV } from "./constants";
+import { adminUrl, appId, appUrl, ENV } from "./constants";
 // @ts-ignore
 global.COMB = undefined;
 const { Connection } = require("@holo-host/web-sdk");
@@ -15,6 +18,7 @@ const { Connection } = require("@holo-host/web-sdk");
 window.COMB = require("@holo-host/comb").COMB;
 
 export let client: null | HolochainClient | HoloClient = null;
+export let adminWs: AdminWebsocket | null = null;
 
 let signalHandler: AppSignalCb = (signal) =>
   store?.dispatch(
@@ -62,6 +66,13 @@ const createClient = async (
         60000,
         signalHandler
       );
+
+      if (!adminWs) {
+        adminWs = await AdminWebsocket.connect(adminUrl()!, 60000);
+        adminWs.client.socket.addEventListener("close", () => {
+          console.log("admin websocket closed");
+        });
+      }
 
       const appInfo = await appWs.appInfo({
         installed_app_id: appId() as string,
@@ -192,7 +203,7 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
   await init();
 
   const {
-    // cellId = info?.cell_data[0].cell_id,
+    cellId,
     zomeName,
     fnName,
     // provenance = info?.cell_data[0].cell_id[1],
@@ -206,6 +217,10 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
       process.env.REACT_APP_ENV === "HC" ||
         process.env.REACT_APP_ENV === "HCDEV"
         ? 60000
+        : undefined,
+      process.env.REACT_APP_ENV === "HC" ||
+        process.env.REACT_APP_ENV === "HCDEV"
+        ? cellId
         : undefined
     );
   } catch (e) {
@@ -247,4 +262,44 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
 
     throw e;
   }
+};
+
+export const createGroupDna = async (creator: string, timestamp: number) => {
+  await init();
+
+  const appInfo = await ((client as any).appWebsocket as AppWebsocket).appInfo({
+    installed_app_id: "kizuna",
+  });
+  const installedCells = appInfo.cell_data;
+  const cell = installedCells.find(
+    (c) => c.role_id === "group"
+  ) as InstalledCell;
+  const myAgentPubKey = await getAgentId();
+  const groupDnaHash = cell.cell_id[0];
+  if (!myAgentPubKey) {
+    throw new Error(
+      "Cannot install a new project because no AgentPubKey is known locally"
+    );
+  }
+
+  const newGroupHash = await adminWs!.registerDna({
+    hash: groupDnaHash,
+    uid: "", // TODO: set proper UID here when secret code is available
+  });
+
+  const installed_app_id = `kizuna-group-${creator}-${timestamp}`;
+  // INSTALL
+  const installedAppInfo = await adminWs!.installApp({
+    agent_key: myAgentPubKey!,
+    installed_app_id,
+    dnas: [
+      {
+        role_id: installed_app_id,
+        hash: newGroupHash,
+      },
+    ],
+  });
+  await adminWs!.enableApp({ installed_app_id });
+  const cellId = installedAppInfo.cell_data[0].cell_id;
+  return cellId;
 };

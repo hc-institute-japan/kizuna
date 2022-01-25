@@ -14,9 +14,17 @@ export const appId = (): string | undefined => {
 export const appUrl = () => {
   // for launcher
   if (ENV === "HC") return `ws://localhost:8888`;
-  else if (ENV === "HCDEV") return process.env.REACT_APP_DNA_INTERFACE_URL;
+  else if (ENV === "HCDEV")
+    return `ws://localhost:${process.env.REACT_APP_DNA_INTERFACE_URL}`;
   else if (ENV === "HCC") return "http://localhost:24273";
   else if (ENV === "HOLO") return "https://chaperone.holo.host";
+  else return null;
+};
+
+export const adminUrl = () => {
+  if (ENV === "HC") return `ws://localhost:8889`;
+  else if (ENV === "HCDEV")
+    return `ws://localhost:${process.env.REACT_APP_ADMIN_PORT}`;
   else return null;
 };
 

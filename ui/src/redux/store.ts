@@ -7,6 +7,8 @@ import {
   retry,
   init,
   client,
+  createGroupDna,
+  adminWs,
 } from "../connection/holochainClient";
 import rootReducer from "./reducers";
 import { RootState } from "./types";
@@ -18,6 +20,8 @@ const createStore = (args?: Object) => {
     retry,
     client,
     init,
+    createGroupDna,
+    adminWs,
     ...args,
   });
 
