@@ -3,11 +3,7 @@ import {
   HoloClient,
   WebSdkClient,
 } from "@holochain-open-dev/cell-client";
-import {
-  AgentPubKey,
-  AppSignalCb,
-  AppWebsocket,
-} from "@holochain/conductor-api";
+import { AgentPubKey, AppSignalCb, AppWebsocket } from "@holochain/client";
 import { store } from "../containers/ReduxContainer";
 import { handleSignal } from "../redux/signal/actions";
 import { CallZomeConfig } from "../redux/types";
