@@ -14,14 +14,14 @@ p,
 ion-label,
 span, h6, div {
   /* These are technically the same, but use both */
-  overflow-wrap: break-word;
-  word-wrap: break-word;
+  /* overflow-wrap: break-word;
+  word-wrap: break-word; */
 
-  -ms-word-break: break-all;
+  /* -ms-word-break: break-all; */
   /* This is the dangerous one in WebKit, as it breaks things wherever */
-  word-break: break-all;
+  /* word-break: break-all; */
   /* Instead use this non-standard one: */
-  word-break: break-word;
+  /* word-break: break-word; */
 
   /* Adds a hyphen where the word breaks, if supported (No Blink) */
   -ms-hyphens: auto;

@@ -58,7 +58,9 @@ const createClient = async (
         ] as any;
       }
 
-      return new HoloClient(client, cellData);
+      const holoClient = new HoloClient(client, cellData);
+      holoClient.addSignalHandler(signalHandler);
+      return holoClient;
     }
     case "HCDEV":
     case "HC": {
@@ -87,7 +89,7 @@ export const init: () => any = async () => {
     client = await createClient(ENV);
     return client;
   } catch (error) {
-    Object.values(error).forEach((e) => console.error(e));
+    Object.values(error as object).forEach((e) => console.error(e));
     console.error(error);
     throw error;
   }
@@ -140,7 +142,7 @@ export const retry: (config: CallZomeConfig) => Promise<any> = async (
       );
     } catch (e) {
       console.warn(e);
-      const { type = null, data = null } = { ...e };
+      const { type = null, data = null } = { ...(e as any) };
       if (type === "error") {
         switch (data?.type) {
           case "ribosome_error":
@@ -222,7 +224,7 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
       ". Error: ",
       e
     );
-    const { type = null, data = null } = { ...e };
+    const { type = null, data = null } = { ...(e as any) };
     if (type === "error") {
       switch (data?.type) {
         case "ribosome_error": {

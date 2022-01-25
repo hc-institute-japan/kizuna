@@ -1,0 +1,5 @@
+.message-text {
+  word-break: keep-all !important;
+  white-space: nowrap;
+  padding-top: 0.2rem;
+}
