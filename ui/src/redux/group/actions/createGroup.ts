@@ -46,6 +46,7 @@ const createGroup =
         creator: serializeHash(createGroupRes.content.creator),
         messages: [],
         pinnedMessages: [],
+        avatar: null,
       };
 
       const groupMembers = [...groupData.members, groupData.creator];

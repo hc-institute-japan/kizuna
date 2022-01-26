@@ -194,6 +194,12 @@ const Conversations: React.FC = () => {
             id: groupId,
             type: "group",
             conversationName: groupsState.conversations[groupId].name,
+            ...(groupsState.conversations[groupId].avatar
+              ? {
+                  avatar: groupsState.conversations[groupId].avatar!,
+                }
+              : {}),
+
             latestMessage: message,
             // enable this once we have a better implementation of read message
             badgeCount: dispatch(getBadgeCount(groupId)),

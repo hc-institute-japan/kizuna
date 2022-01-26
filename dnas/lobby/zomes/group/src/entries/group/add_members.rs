@@ -31,6 +31,7 @@ pub fn add_members_handler(add_members_input: UpdateMembersIO) -> ExternResult<U
     // get most recent Group Entry
     let latest_group_version: GroupOutput = get_group_latest_version(group_id.clone())?;
     let mut group_members: Vec<AgentPubKey> = latest_group_version.members;
+    let avatar = latest_group_version.avatar;
     let creator: AgentPubKey = agent_info()?.agent_latest_pubkey;
 
     // filter the list of members the admin want to add to avoid duplicated members
@@ -44,7 +45,13 @@ pub fn add_members_handler(add_members_input: UpdateMembersIO) -> ExternResult<U
     let group_name: String = latest_group_version.latest_name;
     let created: Timestamp = sys_time()?;
 
-    let updated_group: Group = Group::new(group_name, created, creator, group_members.clone());
+    let updated_group: Group = Group::new(
+        group_name,
+        created,
+        creator,
+        group_members.clone(),
+        avatar.clone(),
+    );
 
     // update_entry the Group with new members field with original HeaderHash
     update_entry(group_revision_id.clone(), &updated_group)?;
@@ -56,6 +63,7 @@ pub fn add_members_handler(add_members_input: UpdateMembersIO) -> ExternResult<U
         members: updated_group.members.clone(),
         creator: updated_group.creator.clone(),
         created: updated_group.created.clone(),
+        avatar,
     };
 
     let signal_payload: SignalPayload = SignalPayload::AddedToGroup(group_output);

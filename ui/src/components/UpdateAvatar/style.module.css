@@ -1,0 +1,34 @@
+.profile-picture-content {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.avatar-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar {
+  width: 100%;
+  max-width: 100px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.button-label {
+  font-size: 0.8rem;
+}
+
+.label {
+  font-size: 1.3rem;
+}
+
+@media (prefers-color-scheme: dark) {
+  .default {
+    filter: invert(100%);
+  }
+}

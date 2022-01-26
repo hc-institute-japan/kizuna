@@ -15,6 +15,7 @@ use group::{
     get_all_my_groups::get_all_my_groups_handler,
     group_helpers,
     remove_members::remove_members_handler,
+    update_group_avatar::update_group_avatar_handler,
     update_group_name::update_group_name_handler,
     validations::{
         validate_create_group::validate_create_group_handler,
@@ -45,7 +46,10 @@ use group_message::{
     GroupMsgAdjacentFetchFilter, GroupMsgBatchFetchFilter, GroupTypingDetailData, PinDetail,
 };
 
-use group::{CreateGroupInput, CreateGroupOutput, Group, UpdateGroupNameIO, UpdateMembersIO};
+use group::{
+    CreateGroupInput, CreateGroupOutput, Group, UpdateGroupAvatarIO, UpdateGroupNameIO,
+    UpdateMembersIO,
+};
 
 entry_defs![
     Group::entry_def(),
@@ -143,6 +147,13 @@ fn update_group_name(
     update_group_name_input: UpdateGroupNameIO,
 ) -> ExternResult<UpdateGroupNameIO> {
     return update_group_name_handler(update_group_name_input);
+}
+
+#[hdk_extern]
+fn update_group_avatar(
+    update_group_avatar_input: UpdateGroupAvatarIO,
+) -> ExternResult<UpdateGroupAvatarIO> {
+    return update_group_avatar_handler(update_group_avatar_input);
 }
 
 #[hdk_extern]

@@ -35,6 +35,7 @@ const addedToGroup =
       */
       messages: [],
       pinnedMessages: [],
+      avatar: payload.avatar,
     };
 
     /* 

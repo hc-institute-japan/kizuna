@@ -1,4 +1,4 @@
-import { serializeHash } from "@holochain-open-dev/core-types";
+import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../connection/types";
 import { binaryToUrl, timestampToDate } from "../../utils/helpers";
 import { SET_BLOCKED, SET_CONTACTS } from "../contacts/types";
@@ -85,7 +85,6 @@ export const getLatestData =
           typingIndicator: latestData.globalPreference.typingIndicator,
         },
       });
-
       const groupMessagesOutput: GroupMessagesOutput =
         convertFetchedResToGroupMessagesOutput(latestData.latestGroupMessages);
 
@@ -100,6 +99,7 @@ export const getLatestData =
           messages:
             groupMessagesOutput.messagesByGroup[serializeHash(group.groupId)],
           pinnedMessages: [],
+          avatar: group.avatar,
         })
       );
 
@@ -117,9 +117,9 @@ export const getLatestData =
         }
       );
 
-      console.log("latest groups", groups);
-      console.log("latest group messages", groupMessagesOutput);
-      console.log("latest group members", groupMembers);
+      // console.log("latest groups", groups);
+      // console.log("latest group messages", groupMessagesOutput);
+      // console.log("latest group members", groupMembers);
 
       // let groups: GroupConversation[] = groups;
       // let groupMessagesOutput: GroupMessagesOutput = action.groupMessagesOutput;
@@ -161,7 +161,7 @@ export const getLatestData =
         latestData.latestP2pMessages,
         profileList
       );
-      console.log("latest p2p messages", toDispatch);
+      // console.log("latest p2p messages", toDispatch);
       dispatch(setMessages(toDispatch));
 
       return null;
