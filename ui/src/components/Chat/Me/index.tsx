@@ -108,7 +108,9 @@ const Me: React.FC<ChatProps> = ({
             />
           )}
           <IonText>
-            <h6 className="ion-no-margin ion-text-end">
+            <h6
+              className={`ion-no-margin ion-text-end ${styles["message-text"]}`}
+            >
               {intl.formatTime(timestamp)}
               <IonIcon
                 size="medium"
@@ -144,7 +146,9 @@ const Me: React.FC<ChatProps> = ({
                   <img src={profile.fields.avatar} alt="avatar"></img>
                 </IonAvatar>
               ) : (
-                <Identicon hash={profile.id!} size={35} />
+                <IonAvatar className={common["avatar-container"]}>
+                  <Identicon hash={profile.id!} size={35} />
+                </IonAvatar>
               )
             ) : null}
           </div>

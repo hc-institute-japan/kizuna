@@ -8,6 +8,8 @@ import { Profile } from "../profile/types";
 
 export const ADD_GROUP = "ADD_GROUP";
 export const UPDATE_GROUP_NAME = "UPDATE_GROUP_NAME";
+export const UPDATE_GROUP_AVATAR = "UPDATE_GROUP_AVATAR";
+
 export const REMOVE_MEMBERS = "REMOVE_MEMBERS";
 export const ADD_MEMBERS = "ADD_MEMBERS";
 export const SET_GROUP_MESSAGE = "SET_GROUP_MESSAGE";
@@ -182,7 +184,7 @@ export interface GroupConversation {
   createdAt: Date;
   creator: string;
   // TODO: enable setting of avatar for a GroupConversation
-  avatar?: string;
+  avatar: string | null;
   messages: GroupMessageIDB64[];
   pinnedMessages: GroupMessageIDB64[];
 }
@@ -196,6 +198,12 @@ export interface UpdateGroupMembersData {
 
 export interface UpdateGroupNameData {
   name: string;
+  groupId: GroupIDB64;
+  groupRevisionId: GroupRevisionIDB64;
+}
+
+export interface UpdateGroupAvatarData {
+  avatar: string;
   groupId: GroupIDB64;
   groupRevisionId: GroupRevisionIDB64;
 }
@@ -274,6 +282,13 @@ export interface RemoveMembersAction {
 
 export interface UpdateGroupNameAction {
   type: typeof UPDATE_GROUP_NAME;
+  conversations: {
+    [key: string]: GroupConversation;
+  };
+}
+
+export interface UpdateGroupAvatarAction {
+  type: typeof UPDATE_GROUP_AVATAR;
   conversations: {
     [key: string]: GroupConversation;
   };
@@ -359,4 +374,5 @@ export type GroupConversationsActionTypes =
   | SetGroupTypingIndicator
   | SetGroupReadMessage
   | SetPinnedMessages
-  | SetConversations;
+  | SetConversations
+  | UpdateGroupAvatarAction;

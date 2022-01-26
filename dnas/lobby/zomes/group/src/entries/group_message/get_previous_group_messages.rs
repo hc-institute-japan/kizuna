@@ -24,7 +24,7 @@ pub fn get_previous_group_messages_handler(
             timestamp_to_days(filter.last_message_timestamp.clone().unwrap()).to_string();
 
         let path_hash =
-            path_from_str(&[filter.group_id.clone().to_string(), days].join(".")).hash()?;
+            path_from_str(&[filter.group_id.clone().to_string(), days].join("."))?.hash()?;
         pivot_path = Some(path_hash.clone());
 
         // get the messages linked to this path (this list was sorted & filtered inside the method)
@@ -39,7 +39,7 @@ pub fn get_previous_group_messages_handler(
     // check whether batch size is reached and collect some more messages if not
     if linked_messages.len() < filter.batch_size.into() {
         // generate the group path
-        let group_path: Path = path_from_str(&filter.group_id.to_string());
+        let group_path: Path = path_from_str(&filter.group_id.to_string())?;
 
         // get the list of childrens for this path
         let mut children_paths: Vec<Link> = group_path.children()?;
@@ -81,7 +81,7 @@ pub fn get_previous_group_messages_handler(
         .into_iter()
         .filter(|item| !hashes_in_contents.contains(item))
         .collect();
-    debug!("here are the unfetched messages {:?}", difference);
+    // debug!("here are the unfetched messages {:?}", difference);
 
     // TODO: remove this once the bug in holochain is fixed where the author of the entry
     // can fetch the entry but other agents cannot.

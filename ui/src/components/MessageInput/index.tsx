@@ -23,6 +23,7 @@ import { Payload } from "../../redux/commons/types";
 import EndButtons from "./EndButtons";
 import FileView from "./FileView";
 import ReplyView from "./ReplyView";
+import GifKeyboard from "../Gif/GifKeyboard";
 import styles from "./style.module.css";
 
 export interface FileContent {
@@ -86,9 +87,13 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
   const intl = useIntl();
   const [isReply, setIsReply] = useState<ReplyParams | undefined>(undefined);
   const [loading, setLoading] = useState<boolean>(false);
+  const [onComposition, setOnComposition] = useState<boolean>(false);
   const file = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<FileContent[]>([]);
+  const [selectedGif, setSelectedGif] = useState("");
   const handleOnFileClick = () => file?.current?.click();
+
+  const [showGifs, setShowGifs] = useState<boolean>(false);
 
   const onFileSelectCallback = useCallback(() => {
     if (onFileSelect) onFileSelect(files);
@@ -106,6 +111,18 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [message]);
 
+  const onGifSelectCallback = useCallback(() => {
+    if (onSend && selectedGif !== "") {
+      onSend({
+        message: selectedGif,
+        // reply: isReply?.id,
+        setIsLoading: setLoading,
+      });
+      setShowGifs(!showGifs);
+      reset();
+    }
+  }, [selectedGif]);
+
   const reset = () => {
     setIsReply(undefined);
     setMessage("");
@@ -113,8 +130,33 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
     if (file.current) file.current!.value = "";
   };
 
+  const handleOnGifClick = () => {
+    setShowGifs(!showGifs);
+  };
+
+  const handleOnGifSelect = (url: string) => {
+    setSelectedGif(url);
+    // if (onSend && message.trim().length !== 0) {
+    //   onSend({
+    //     message: url,
+    //     // reply: isReply?.id,
+    //     setIsLoading: setLoading,
+    //   });
+    //   reset();
+    // }
+  };
+
+  const handleComposition = (event: CompositionEvent) => {
+    if (event.type === "compositionstart") {
+      setOnComposition(true);
+    }
+    if (event.type === "compositionend") {
+      setOnComposition(false);
+    }
+  };
+
   const onKeyDown = (event: KeyboardEvent) => {
-    if (onSend && event.key === "Enter" && !event.shiftKey) {
+    if (onSend && event.key === "Enter" && !event.shiftKey && !onComposition) {
       if (message.trim().length !== 0 || files.length > 0) {
         onSend({
           files,
@@ -136,6 +178,7 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
   }, [onSend, reset]);
   useEffect(() => onFileSelectCallback(), [files, onFileSelectCallback]);
   useEffect(() => onChangeCallback(), [message, onChangeCallback]);
+  useEffect(() => onGifSelectCallback(), [selectedGif, onGifSelectCallback]);
   const { showToast } = useToast();
 
   const handleOnFileChange = () => {
@@ -276,6 +319,7 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
   return (
     <>
       <IonFooter>
+        {showGifs ? <GifKeyboard onSelect={handleOnGifSelect} /> : null}
         {isReply ? <ReplyView messageState={[isReply, setIsReply]} /> : null}
         {renderFileView}
         <IonToolbar className={styles.toolbar}>
@@ -285,6 +329,9 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
                 <IonIcon color="medium" icon={attachOutline} />
               </IonButton>
             )}
+            <IonButton onClick={handleOnGifClick}>
+              <IonIcon color="medium" icon="assets/icon/gif.svg" />
+            </IonButton>
           </IonButtons>
           <IonTextarea
             value={message}
@@ -302,6 +349,12 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
             placeholder={intl.formatMessage({
               id: "app.new-conversation.message-placeholder",
             })}
+            ref={(el) => {
+              if (el) {
+                el.addEventListener("compositionstart", handleComposition);
+                el.addEventListener("compositionend", handleComposition);
+              }
+            }}
           />
           <EndButtons
             files={files}

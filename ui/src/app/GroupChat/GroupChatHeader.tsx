@@ -1,3 +1,4 @@
+import { deserializeHash } from "@holochain-open-dev/core-types";
 import {
   IonAvatar,
   IonButton,
@@ -96,6 +97,7 @@ const GroupChatHeader: React.FC<Props> = ({ groupData }) => {
     history,
     intl,
   });
+
   return (
     <IonHeader>
       <IonToolbar>
@@ -111,11 +113,22 @@ const GroupChatHeader: React.FC<Props> = ({ groupData }) => {
           <IonAvatar className="ion-padding">
             {/* TODO: proper picture for default avatar if none is set */}
             {/* TODO: Display an actual avatar set by the group creator */}
-            <img
-              className={styles["avatar"]}
-              src={peopleCircleOutline}
-              alt={groupData!.name}
-            />
+            {groupData.avatar ? (
+              <img
+                src={URL.createObjectURL(
+                  new Blob([deserializeHash(groupData.avatar)], {
+                    type: "image/jpeg",
+                  })
+                )}
+                alt={groupData!.name}
+              ></img>
+            ) : (
+              <img
+                className={styles["avatar"]}
+                src={peopleCircleOutline}
+                alt={groupData!.name}
+              />
+            )}
           </IonAvatar>
 
           <IonTitle className={styles["title"]}>{groupData!.name}</IonTitle>

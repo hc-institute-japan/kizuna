@@ -41,7 +41,9 @@ export const pinMessage =
         },
       });
     } catch (e) {
-      if (e.message.includes("failed to get the message being pinned")) {
+      if (
+        (e as any).message.includes("failed to get the message being pinned")
+      ) {
         dispatch(pushError("TOAST", {}, { id: "redux.err.group.pin-message" }));
       } else {
         return dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));

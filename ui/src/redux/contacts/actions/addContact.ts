@@ -21,7 +21,7 @@ const addContact =
       dispatch({ type: SET_CONTACTS, contacts });
       return true;
     } catch (e) {
-      if (e.message.includes("agent already added"))
+      if ((e as any).message.includes("agent already added"))
         dispatch(
           pushError(
             "TOAST",
@@ -32,7 +32,7 @@ const addContact =
             }
           )
         );
-      else if (e.message.includes("agent is blocked"))
+      else if ((e as any).message.includes("agent is blocked"))
         dispatch(
           pushError(
             "TOAST",

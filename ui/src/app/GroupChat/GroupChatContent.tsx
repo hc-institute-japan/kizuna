@@ -63,7 +63,7 @@ const GroupChat: React.FC = () => {
 
   /* handles sending of messages. */
   const handleOnSend = (opt?: MessageInputOnSendParams) => {
-    const { reply, setIsLoading } = { ...opt };
+    const { message: message2, reply, setIsLoading } = { ...opt };
     let text: GroupMessageInput | null = null;
     let file: GroupMessageInput | null = null;
     setIsLoading!(true);
@@ -71,12 +71,12 @@ const GroupChat: React.FC = () => {
       append text payload at index 0 and send it first
       for performance purposes
     */
-    if (message.length) {
+    if (message2!.length) {
       text = {
         groupId: groupData!.originalGroupId,
         payloadInput: {
           type: "TEXT",
-          payload: { payload: message },
+          payload: { payload: message2! },
         },
         sender: myProfile.id!,
         // TODO: handle replying to message here as well

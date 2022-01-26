@@ -34,12 +34,16 @@
   --ion-color-base: transparent !important;
 }
 
-.profile-picture {
-  position: relative;
+.buttons {
+  display: flex;
+}
+
+/* .profile-picture {
+   position: relative;
   width: 170px;
   height: 170px;
-  margin-bottom: 4rem;
-}
+  margin-bottom: 4rem; 
+} */
 
 .icon {
   position: absolute;
@@ -48,15 +52,15 @@
   bottom: -5px;
 }
 
-.profile-picture:hover {
-  cursor: pointer;
-}
-
-.profile-picture img {
+/* .profile-picture img {
   width: 170px;
   height: 170px;
   object-fit: cover;
   border-radius: 50%;
+} */
+
+.avatar-button:hover {
+  cursor: pointer;
 }
 
 .modal .modal-wrapper {

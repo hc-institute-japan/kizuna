@@ -1,3 +1,4 @@
+import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
 import {
   IonButton,
   IonButtons,
@@ -9,28 +10,38 @@ import {
   IonPage,
   IonSlide,
   IonSlides,
+  IonText,
   IonTitle,
   IonToolbar,
+  useIonModal,
 } from "@ionic/react";
-import { arrowBackSharp } from "ionicons/icons";
+import {
+  arrowBackSharp,
+  imageOutline,
+  peopleCircleOutline,
+} from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
+import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router";
+import ImageCropper from "../../../components/ImageCropper";
 import FileBox from "../../../components/Slides/FileBox";
 import MediaBox from "../../../components/Slides/MediaBox";
 import { FetchPayloadType, FilePayload } from "../../../redux/commons/types";
-import { getPreviousGroupMessages } from "../../../redux/group/actions";
-import { fetchFilesBytes } from "../../../redux/group/actions";
-// Redux
-import { updateGroupName } from "../../../redux/group/actions";
+import {
+  fetchFilesBytes,
+  getPreviousGroupMessages,
+  updateGroupAvatar,
+  updateGroupName,
+} from "../../../redux/group/actions";
 import { GroupMessage } from "../../../redux/group/types";
 import { RootState } from "../../../redux/types";
 import { useAppDispatch } from "../../../utils/helpers";
 import EndButtons from "./EndButtons";
+import Members from "./Members";
 // Components
 import SegmentTabs from "./SegmentTabs";
 import styles from "./style.module.css";
-import Members from "./Members";
 import UpdateGroupName from "./UpdateGroupName";
 
 interface GroupChatParams {
@@ -50,6 +61,7 @@ const GroupChatDetails: React.FC = () => {
   const groupData = useSelector(
     (state: RootState) => state.groups.conversations[group]
   );
+
   const myProfile = useSelector((state: RootState) => state.profile);
   const { conversations, messages } = useSelector(
     (state: RootState) => state.groups
@@ -241,6 +253,73 @@ const GroupChatDetails: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const file = useRef<HTMLInputElement>(null);
+  const [binary, setBinary] = useState<null | Uint8Array>(null);
+  const groupPicture = useRef<HTMLImageElement>(null);
+
+  const decodeSrc = () => {
+    const decoder = new TextDecoder();
+
+    return binary ? decoder.decode(binary) : "";
+  };
+
+  const onDismiss = () => {
+    setBinary(null);
+    dismiss();
+  };
+
+  const [present, dismiss] = useIonModal(ImageCropper, {
+    src: decodeSrc(),
+    prevPath: "/register",
+    dismiss: onDismiss,
+    onComplete: (binary: Uint8Array) => {
+      if (binary) {
+        const blob = new Blob([binary], { type: "image/jpeg" });
+        dispatch(
+          updateGroupAvatar({
+            avatar: serializeHash(binary),
+            groupId: groupData!.originalGroupId,
+            groupRevisionId: groupData!.originalGroupRevisionId,
+          })
+        );
+        groupPicture.current!.src = URL.createObjectURL(blob);
+        // setBinary(binary);
+      }
+    },
+  });
+
+  const handleOnFileChange = () => {
+    Array.from(file.current ? file.current.files! : new FileList()).forEach(
+      (file) => {
+        file.arrayBuffer().then((arrBuffer) => {
+          const fileSize = file.size;
+          const fileName = file.name;
+          // 15mb = 15728640b, file.size is of type bytes
+          if (fileSize < 15728640) {
+            const encoder = new TextEncoder();
+            const reader = new FileReader();
+
+            reader.readAsDataURL(file);
+            reader.onload = (readerEvent) => {
+              const encoded = encoder.encode(
+                readerEvent.target?.result as string
+              );
+
+              setBinary(encoded);
+            };
+          }
+        });
+      }
+    );
+  };
+
+  useEffect(() => {
+    if (binary) present({ cssClass: `cropper ${styles.modal}` });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [binary]);
+
+  const intl = useIntl();
+
   return (
     <>
       {groupData ? (
@@ -261,7 +340,56 @@ const GroupChatDetails: React.FC = () => {
                 disabled={groupData.creator !== myProfile.id ? true : false}
               />
             </IonToolbar>
-
+            <div className={styles["avatar-container"]}>
+              {/* <UpdateAvatar
+                imageRef={groupPicture}
+                onChange={() => {}}
+              ></UpdateAvatar> */}
+              <div className={styles["avatar-content"]}>
+                <div className={styles["avatar"]}>
+                  {groupData.avatar ? (
+                    <div className={styles["image-container-set"]}>
+                      <img
+                        ref={groupPicture}
+                        src={URL.createObjectURL(
+                          new Blob([deserializeHash(groupData.avatar)], {
+                            type: "image/jpeg",
+                          })
+                        )}
+                      />
+                    </div>
+                  ) : (
+                    <div className={styles["image-container"]}>
+                      <img
+                        ref={groupPicture}
+                        src={peopleCircleOutline}
+                        className={styles.img}
+                      ></img>
+                    </div>
+                  )}
+                  <div
+                    onClick={() => file.current?.click()}
+                    className={styles.overlay}
+                  >
+                    <IonText className="ion-text-center">
+                      {intl.formatMessage({
+                        id: "app.group-chat.change-avatar",
+                      })}
+                    </IonText>
+                  </div>
+                </div>
+                <div className={styles["icon-overlay"]}>
+                  <IonIcon size="large" icon={imageOutline}></IonIcon>
+                </div>
+              </div>
+              <input
+                ref={file}
+                type="file"
+                hidden
+                accept="image/png, image/jpeg"
+                onChange={handleOnFileChange}
+              />
+            </div>
             <IonTitle className={styles.groupname}>{groupData!.name}</IonTitle>
 
             <SegmentTabs

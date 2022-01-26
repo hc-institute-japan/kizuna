@@ -38,7 +38,10 @@ const Contacts: React.FC = () => {
         {loading ? (
           <Spinner name="crescent" />
         ) : Object.values(contacts).length !== 0 ? (
-          <ContactsList contacts={indexedContacts ? indexedContacts : {}} />
+          <ContactsList
+            displayMsgBtn={true}
+            contacts={indexedContacts ? indexedContacts : {}}
+          />
         ) : (
           <EmptyContacts />
         )}

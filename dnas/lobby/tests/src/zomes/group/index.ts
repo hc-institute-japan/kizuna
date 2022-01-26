@@ -27,21 +27,21 @@ import { readGroupMessageTest } from "./group_message/readGroupMessage";
 
 export default (config) => {
   // Group CRUD and validation related tests.
-  addAndRemoveMembersTest(config); // ok
-  createGroupTest(config); // ok
-  updateGroupNameTest(config); //ok
-  validateCreateGroupTest(config); // ok
-  validateUpdateGroupTest(config); // ok
+  // addAndRemoveMembersTest(config); // ok
+  // createGroupTest(config); // ok
+  // updateGroupNameTest(config); //ok
+  // validateCreateGroupTest(config); // ok
+  // validateUpdateGroupTest(config); // ok
 
   // GroupMessage related tests
-  sendMessageTest(config); // ok
-  pinMessageTest(config); // ok
-  sendMessageswithFilesTest(config); // ok
-  sendLargeSetOfFilesTest(config); //ok
-  getPreviousGroupMessagesTest(config); // ok
-  getMessagesByGroupByTimestampTest(config); // ok
-  getLatestMessagesForAllGroupsTest(config); // ok
-  fetchFilesForAParticularDateTest(config); // ok
-  groupTypingIndicatorTest(config); //ok
+  // sendMessageTest(config); // ok
+  // pinMessageTest(config); // ok
+  // sendMessageswithFilesTest(config); // ok
+  // sendLargeSetOfFilesTest(config); //ok
+  // getPreviousGroupMessagesTest(config); // ok
+  // getMessagesByGroupByTimestampTest(config); // ok
+  // getLatestMessagesForAllGroupsTest(config); // ok
+  // fetchFilesForAParticularDateTest(config); // ok
+  // groupTypingIndicatorTest(config); //ok
   readGroupMessageTest(config); // ok
 };

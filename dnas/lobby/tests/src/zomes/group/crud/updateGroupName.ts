@@ -20,6 +20,7 @@ export default function updateGroupNameTest(config) {
       const [alice_lobby_happ] = await installAgents(alice, ["alice"]);
       const [bobby_lobby_happ] = await installAgents(bobby, ["bobby"]);
       const [charlie_lobby_happ] = await installAgents(charlie, ["charlie"]);
+      s.shareAllNodes([alice, bobby, charlie]);
       const [alice_conductor] = alice_lobby_happ.cells;
       const [bobby_conductor] = bobby_lobby_happ.cells;
       const [charlie_conductor] = charlie_lobby_happ.cells;

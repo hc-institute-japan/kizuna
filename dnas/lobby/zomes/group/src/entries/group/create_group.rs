@@ -13,8 +13,10 @@ pub fn create_group_handler(
 ) -> ExternResult<CreateGroupOutput> {
     let group_name: String = create_group_input.name;
     let group_members: Vec<AgentPubKey> = create_group_input.members;
+    // let avatar = create_group_input.avatar;
     let created: Timestamp = sys_time()?;
     let creator: AgentPubKey = agent_info()?.agent_latest_pubkey;
+    // let avatar =
 
     // get my blocked list from the contacs zome
     let my_blocked_list: Vec<AgentPubKey> = utils::get_my_blocked_list()?;
@@ -26,7 +28,13 @@ pub fn create_group_handler(
         }
     }
 
-    let group: Group = Group::new(group_name, created, creator.clone(), group_members.clone());
+    let group: Group = Group::new(
+        group_name,
+        created,
+        creator.clone(),
+        group_members.clone(),
+        None,
+    );
 
     // commit group entry
     let group_revision_id: HeaderHash = create_entry(&group.clone())?;
@@ -38,6 +46,7 @@ pub fn create_group_handler(
         members: group.members.clone(),
         creator: group.creator.clone(),
         created: group.created.clone(),
+        avatar: group.avatar.clone(),
     };
 
     // link the group admin to the group

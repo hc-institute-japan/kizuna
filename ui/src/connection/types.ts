@@ -80,6 +80,7 @@ export const FUNCTIONS: FunctionNameType = {
     ADD_MEMBERS: "add_members",
     REMOVE_MEMBERS: "remove_members",
     UPDATE_GROUP_NAME: "update_group_name",
+    UPDATE_GROUP_AVATAR: "update_group_avatar",
     SEND_MESSAGE: "send_message",
     GET_ALL_MY_GROUPS: "get_all_my_groups",
     GET_PREVIOUS_GROUP_MESSAGES: "get_previous_group_messages",

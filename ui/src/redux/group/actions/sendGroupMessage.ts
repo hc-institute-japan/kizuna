@@ -200,10 +200,10 @@ const sendGroupMessage =
         getState,
         dispatch
       );
-      // return false;
+      return false;
     } catch (e) {
       try {
-        if (!e.message.includes("Timed out")) {
+        if (!(e as any).message.includes("Timed out")) {
           const sendGroupMessageOutput = retry({
             zomeName: ZOMES.GROUP,
             fnName: FUNCTIONS[ZOMES.GROUP].SEND_MESSAGE,
@@ -223,7 +223,7 @@ const sendGroupMessage =
         }
       } catch (e) {
         handleError(e, dispatch, groupMessageData);
-        console.log("sending of group message has failed", e);
+        // console.log("sending of group message has failed", e);
         return false;
       }
     }
