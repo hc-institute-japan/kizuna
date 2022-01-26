@@ -20,7 +20,7 @@ pub fn get_adjacent_group_messages_handler(
 
     let days: String = timestamp_to_days(filter.message_timestamp.clone()).to_string();
     let pivot_path_hash =
-        path_from_str(&[filter.group_id.clone().to_string(), days].join("."))?.hash()?;
+        path_from_str(&[filter.group_id.clone().to_string(), days].join("."))?.path_entry_hash()?;
 
     // targets are group message entryhash
     let mut linked_messages = get_linked_messages_hash(

@@ -9,5 +9,5 @@ name = "joining_code"
 crate-type = [ "cdylib", "rlib" ]
 
 [dependencies]
-hdk = "0.0.115"
+hdk = "0.0.118"
 hc_joining_code = {git = "https://github.com/holochain/elemental-chat", package = "hc_joining_code", rev =  "c4842945880338512b110d31e80f979ba0f03f02"}

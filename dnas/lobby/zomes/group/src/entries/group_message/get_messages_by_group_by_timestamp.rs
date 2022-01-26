@@ -24,7 +24,7 @@ pub fn get_messages_by_group_by_timestamp_handler(
     );
 
     let message_links = get_links(
-        path.hash()?,
+        path.path_entry_hash()?,
         match group_chat_filter.payload_type {
             PayloadType::Text => Some(LinkTag::new("text".to_owned())),
             PayloadType::File => Some(LinkTag::new("file".to_owned())),
