@@ -44,7 +44,7 @@ pub struct GroupOutput {
     pub members: Vec<AgentPubKey>,
     pub creator: AgentPubKey,
     pub created: Timestamp,
-    // group_versions: Vec<Group>,
+    pub avatar: Option<String>, // group_versions: Vec<Group>,
 }
 
 // for group chat

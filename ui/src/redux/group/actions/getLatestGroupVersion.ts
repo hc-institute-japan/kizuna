@@ -68,6 +68,7 @@ const getLatestGroupVersion =
         pinnedMessages: Object.values(groupPinnedMessages).map((message: any) =>
           serializeHash(message.entry.messageId)
         ),
+        avatar: latestGroupVersionRes.avatar,
       };
 
       const membersUsernames = await fetchUsernameOfMembers(

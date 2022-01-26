@@ -23,8 +23,9 @@ pub fn update_group_name_handler(
     let created: Timestamp = sys_time()?;
     let creator: AgentPubKey = agent_info()?.agent_latest_pubkey;
     let members: Vec<AgentPubKey> = latest_group_version.members;
+    let avatar: Option<String> = latest_group_version.avatar;
 
-    let updated_group: Group = Group::new(new_group_name, created, creator, members);
+    let updated_group: Group = Group::new(new_group_name, created, creator, members, avatar);
 
     /*
     we always update the entry from the root_group_header_hash,

@@ -188,18 +188,18 @@ const sendGroupMessage =
     };
 
     try {
-      // const sendGroupMessageOutput = await callZome({
-      //   zomeName: ZOMES.GROUP,
-      //   fnName: FUNCTIONS[ZOMES.GROUP].SEND_MESSAGE,
-      //   payload: input,
-      // });
-      // return await setGroupMessage(
-      //   sendGroupMessageOutput,
-      //   groupMessageData,
-      //   callZome,
-      //   getState,
-      //   dispatch
-      // );
+      const sendGroupMessageOutput = await callZome({
+        zomeName: ZOMES.GROUP,
+        fnName: FUNCTIONS[ZOMES.GROUP].SEND_MESSAGE,
+        payload: input,
+      });
+      return await setGroupMessage(
+        sendGroupMessageOutput,
+        groupMessageData,
+        callZome,
+        getState,
+        dispatch
+      );
       return false;
     } catch (e) {
       try {
@@ -223,7 +223,7 @@ const sendGroupMessage =
         }
       } catch (e) {
         handleError(e, dispatch, groupMessageData);
-        console.log("sending of group message has failed", e);
+        // console.log("sending of group message has failed", e);
         return false;
       }
     }

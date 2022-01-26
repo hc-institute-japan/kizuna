@@ -60,7 +60,7 @@ pub fn validate_create_agent(data: ValidateData) -> ExternResult<ValidateCallbac
                         }
                     },
                     Err(e) => {
-                        debug!("Error on get when validating agent entry: {:?}; treating as unresolved dependency",e);
+                        //  debug!("Error on get when validating agent entry: {:?}; treating as unresolved dependency",e);
                         return Ok(ValidateCallbackResult::UnresolvedDependencies(vec![
                             (header.clone()).into(),
                         ]));

@@ -27,9 +27,16 @@ pub fn remove_members_handler(
     // update_entry the Group with new members field using the  original HeaderHash
     let creator: AgentPubKey = agent_info()?.agent_latest_pubkey;
     let group_name: String = latest_group_version.latest_name;
+    let avatar: Option<String> = latest_group_version.avatar;
     let created: Timestamp = sys_time()?;
 
-    let updated_group: Group = Group::new(group_name, created, creator, group_members.clone());
+    let updated_group: Group = Group::new(
+        group_name,
+        created,
+        creator,
+        group_members.clone(),
+        avatar.clone(),
+    );
 
     update_entry(group_revision_id, &updated_group)?;
 

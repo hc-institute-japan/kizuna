@@ -16,6 +16,7 @@ import setErrGroupMessage from "./setErrGroupMessage";
 import removeErrGroupMessage from "./removeErrGroupMessage";
 import { fetchFilesBytes, setFilesBytes } from "./setFilesBytes";
 import updateGroupName from "./updateGroupName";
+import updateGroupAvatar from "./updateGroupAvatar";
 
 export {
   addMembers,
@@ -37,4 +38,5 @@ export {
   fetchFilesBytes,
   setFilesBytes,
   updateGroupName,
+  updateGroupAvatar,
 };

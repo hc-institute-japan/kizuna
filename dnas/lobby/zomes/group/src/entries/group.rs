@@ -6,6 +6,7 @@ pub mod create_group;
 pub mod get_all_my_groups;
 pub mod group_helpers;
 pub mod remove_members;
+pub mod update_group_avatar;
 pub mod update_group_name;
 pub mod validations;
 
@@ -17,6 +18,7 @@ pub struct Group {
     pub created: Timestamp,
     pub creator: AgentPubKey,
     pub members: Vec<AgentPubKey>,
+    pub avatar: Option<String>,
 }
 
 impl Group {
@@ -25,12 +27,14 @@ impl Group {
         created: Timestamp,
         creator: AgentPubKey,
         members: Vec<AgentPubKey>,
+        avatar: Option<String>,
     ) -> Self {
         Group {
             name,
             created,
             creator,
             members,
+            avatar,
         }
     }
     // GETTERS
@@ -72,6 +76,14 @@ pub struct UpdateGroupNameIO {
     group_id: EntryHash,
     group_revision_id: HeaderHash,
 }
+
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct UpdateGroupAvatarIO {
+    avatar: String,
+    group_id: EntryHash,
+    group_revision_id: HeaderHash,
+}
 /* END OF IO TYPES DEFINITION */
 
 /* INPUT TYPES DEFINITION */
@@ -100,7 +112,7 @@ pub struct GroupOutput {
     pub members: Vec<AgentPubKey>,
     pub creator: AgentPubKey,
     pub created: Timestamp,
-    // group_versions: Vec<Group>,
+    pub avatar: Option<String>, // group_versions: Vec<Group>,
 }
 
 impl GroupOutput {
@@ -112,6 +124,7 @@ impl GroupOutput {
             members: group.members,
             creator: group.creator,
             created: group.created,
+            avatar: group.avatar,
         }
     }
 }
