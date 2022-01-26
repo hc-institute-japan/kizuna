@@ -45,7 +45,7 @@ const Register: React.FC = () => {
   };
 
   useEffect(() => {
-    if (error || nickname.length === 0 || binary === null) setIsDisabled(true);
+    if (error || nickname.length === 0) setIsDisabled(true);
     else setIsDisabled(false);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

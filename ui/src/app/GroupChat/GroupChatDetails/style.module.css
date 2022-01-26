@@ -44,6 +44,14 @@
   border: 1px solid rgb(var(--ion-color-primary-rgb));
 }
 
+.image-container-set {
+  position: relative;
+  border-radius: 50%;
+  width: 100px;
+  height: 100%;
+  overflow: hidden;
+}
+
 .icon-overlay {
   position: absolute;
   display: flex;

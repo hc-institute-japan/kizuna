@@ -17,7 +17,6 @@ import {
 } from "@ionic/react";
 import {
   arrowBackSharp,
-  image,
   imageOutline,
   peopleCircleOutline,
 } from "ionicons/icons";
@@ -28,7 +27,6 @@ import { useHistory, useParams } from "react-router";
 import ImageCropper from "../../../components/ImageCropper";
 import FileBox from "../../../components/Slides/FileBox";
 import MediaBox from "../../../components/Slides/MediaBox";
-import UpdateAvatar from "../../../components/UpdateAvatar";
 import { FetchPayloadType, FilePayload } from "../../../redux/commons/types";
 import {
   fetchFilesBytes,
@@ -349,8 +347,8 @@ const GroupChatDetails: React.FC = () => {
               ></UpdateAvatar> */}
               <div className={styles["avatar-content"]}>
                 <div className={styles["avatar"]}>
-                  <div className={styles["image-container"]}>
-                    {groupData.avatar ? (
+                  {groupData.avatar ? (
+                    <div className={styles["image-container-set"]}>
                       <img
                         ref={groupPicture}
                         src={URL.createObjectURL(
@@ -359,14 +357,16 @@ const GroupChatDetails: React.FC = () => {
                           })
                         )}
                       />
-                    ) : (
+                    </div>
+                  ) : (
+                    <div className={styles["image-container"]}>
                       <img
                         ref={groupPicture}
                         src={peopleCircleOutline}
                         className={styles.img}
                       ></img>
-                    )}
-                  </div>
+                    </div>
+                  )}
                   <div
                     onClick={() => file.current?.click()}
                     className={styles.overlay}
