@@ -242,7 +242,7 @@ export const sendMessage =
         }
         return false;
       } catch (e) {
-        // console.log("sending automatically retried message has failed", e);
+        console.log("sending automatically retried message has failed", e);
         return false;
       }
     }

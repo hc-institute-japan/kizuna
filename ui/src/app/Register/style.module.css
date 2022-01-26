@@ -34,27 +34,8 @@
   --ion-color-base: transparent !important;
 }
 
-.avatar-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.avatar {
-  width: 100%;
-  max-width: 100px;
-  object-fit: cover;
-  border-radius: 50%;
-}
-
-@media (prefers-color-scheme: dark) {
-  .default {
-    filter: invert(100%);
-  }
-}
-
 .buttons {
-  display: fle;
+  display: flex;
 }
 
 /* .profile-picture {
@@ -64,27 +45,11 @@
   margin-bottom: 4rem; 
 } */
 
-.profile-picture-content {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
-}
-
-.button-label {
-  font-size: 0.8rem;
-}
-
 .icon {
   position: absolute;
   border-radius: 50%;
   right: -10px;
   bottom: -5px;
-}
-
-.profile-picture:hover {
-  cursor: pointer;
 }
 
 /* .profile-picture img {
@@ -93,6 +58,10 @@
   object-fit: cover;
   border-radius: 50%;
 } */
+
+.avatar-button:hover {
+  cursor: pointer;
+}
 
 .modal .modal-wrapper {
   --min-height: 100vh !important;

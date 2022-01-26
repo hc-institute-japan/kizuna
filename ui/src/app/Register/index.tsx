@@ -4,18 +4,17 @@ import {
   IonButtons,
   IonContent,
   IonHeader,
-  IonIcon,
   IonLabel,
   IonLoading,
   IonPage,
   IonToolbar,
   useIonModal,
 } from "@ionic/react";
-import { close, imageOutline, personCircleOutline } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import ImageCropper from "../../components/ImageCropper";
 import HomeInput from "../../components/Input/HomeInput";
+import UpdateAvatar from "../../components/UpdateAvatar";
 import { createProfile } from "../../redux/profile/actions";
 import { useAppDispatch } from "../../utils/helpers";
 import { isUsernameFormatValid } from "../../utils/regex";
@@ -27,7 +26,7 @@ const Register: React.FC = () => {
   const [isDisabled, setIsDisabled] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
   const dispatch = useAppDispatch();
-  const file = useRef<HTMLInputElement>(null);
+
   const [binary, setBinary] = useState<Uint8Array | null>(null);
   const profilePicture = useRef<HTMLImageElement>(null);
 
@@ -69,24 +68,8 @@ const Register: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [binary]);
 
-  const handleOnFileChange = () => {
-    Array.from(file.current ? file.current.files! : new FileList()).forEach(
-      (file) => {
-        file.arrayBuffer().then((_arrBuffer) => {
-          const reader = new FileReader();
-          const encoder = new TextEncoder();
-
-          reader.readAsDataURL(file);
-          reader.onload = (readerEvent) => {
-            const encoded = encoder.encode(
-              readerEvent.target?.result as string
-            );
-
-            setBinary(encoded);
-          };
-        });
-      }
-    );
+  const handleOnFileChange = (binary: Uint8Array) => {
+    setBinary(binary);
   };
 
   const onDismiss = () => {
@@ -104,11 +87,13 @@ const Register: React.FC = () => {
     src: decodeSrc(),
     prevPath: "/register",
     dismiss: onDismiss,
-    onComplete: (binary: Uint8Array) => {
-      if (binary) {
-        const blob = new Blob([binary], { type: "image/jpeg" });
-        profilePicture.current!.src = URL.createObjectURL(blob);
-        setBinary(binary);
+    onComplete: (cropperBinary: Uint8Array) => {
+      if (cropperBinary) {
+        const blob = new Blob([cropperBinary!], { type: "image/jpeg" });
+        const url = URL.createObjectURL(blob);
+
+        profilePicture.current!.src = url;
+        setBinary(cropperBinary);
       }
     },
   });
@@ -140,11 +125,6 @@ const Register: React.FC = () => {
   //   return canvas.toDataURL();
   // };
 
-  const onAvatarChange = () => {
-    file.current!.value = "";
-    file.current?.click();
-  };
-
   // const onRemoveAvatar = () => {
   //   file!.current!.value = "";
   //   setBinary(null);
@@ -163,54 +143,17 @@ const Register: React.FC = () => {
       <IonContent>
         <div className={styles.register}>
           <div className={styles.form}>
-            <div className={styles["profile-picture"]}>
-              <IonLabel className={styles.label}>
-                {intl.formatMessage({
-                  id: "app.register.avatar-label",
-                })}
-              </IonLabel>
-              <div className={styles["profile-picture-content"]}>
-                <div className={styles["avatar-container"]}>
-                  <img
-                    alt="avatar"
-                    ref={profilePicture}
-                    src={personCircleOutline}
-                    className={`${styles.avatar} ${
-                      binary ? "" : styles.default
-                    }`}
-                  />
-                </div>
-                <div className="ion-padding-start">
-                  <IonButtons>
-                    <IonButton
-                      onClick={onAvatarChange}
-                      fill="solid"
-                      type="button"
-                      color="primary"
-                    >
-                      <IonLabel className={styles["button-label"]}>
-                        {intl.formatMessage({
-                          id: "app.register.button-avatar-label",
-                        })}
-                      </IonLabel>
-                    </IonButton>
-                  </IonButtons>
-                </div>
-              </div>
-            </div>
+            <UpdateAvatar
+              imageRef={profilePicture}
+              onChange={handleOnFileChange}
+            />
             <div>
               <IonLabel className={styles.label}>
                 {intl.formatMessage({
                   id: "app.register.username-label",
                 })}
               </IonLabel>
-              <input
-                ref={file}
-                accept="image/png, image/jpeg"
-                type="file"
-                hidden
-                onChange={handleOnFileChange}
-              />
+
               <HomeInput
                 value={nickname}
                 onIonChange={handleOnChange}

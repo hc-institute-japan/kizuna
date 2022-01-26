@@ -156,7 +156,6 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
   };
 
   const onKeyDown = (event: KeyboardEvent) => {
-    console.log(onComposition);
     if (onSend && event.key === "Enter" && !event.shiftKey && !onComposition) {
       if (message.trim().length !== 0 || files.length > 0) {
         onSend({

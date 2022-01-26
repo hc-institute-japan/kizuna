@@ -55,6 +55,7 @@
   "app.group-chat.pinned-message-title": "掲示板",
   "app.group-chat.remove-member": "グループ退会",
   "app.group-chat.sending": "送信中...",
+  "app.group-chat.change-avatar": "アバターを変更する",
   "app.group-chat.update-group-name-cancel": "キャンセル",
   "app.group-chat.update-group-name-placeholder": "グループ名",
   "app.group-chat.update-group-name-save": "保存",

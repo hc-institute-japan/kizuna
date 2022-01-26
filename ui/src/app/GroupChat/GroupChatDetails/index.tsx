@@ -1,6 +1,5 @@
 import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
 import {
-  IonAvatar,
   IonButton,
   IonButtons,
   IonContent,
@@ -11,17 +10,25 @@ import {
   IonPage,
   IonSlide,
   IonSlides,
+  IonText,
   IonTitle,
   IonToolbar,
   useIonModal,
 } from "@ionic/react";
-import { arrowBackSharp, peopleCircleOutline } from "ionicons/icons";
+import {
+  arrowBackSharp,
+  image,
+  imageOutline,
+  peopleCircleOutline,
+} from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
+import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router";
 import ImageCropper from "../../../components/ImageCropper";
 import FileBox from "../../../components/Slides/FileBox";
 import MediaBox from "../../../components/Slides/MediaBox";
+import UpdateAvatar from "../../../components/UpdateAvatar";
 import { FetchPayloadType, FilePayload } from "../../../redux/commons/types";
 import {
   fetchFilesBytes,
@@ -313,6 +320,8 @@ const GroupChatDetails: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [binary]);
 
+  const intl = useIntl();
+
   return (
     <>
       {groupData ? (
@@ -333,29 +342,45 @@ const GroupChatDetails: React.FC = () => {
                 disabled={groupData.creator !== myProfile.id ? true : false}
               />
             </IonToolbar>
-            <div className={styles["profile-picture"]}>
-              <div
-                className={styles["image-container"]}
-                onClick={() => file.current?.click()}
-              >
-                {/* <IonAvatar> */}
-                {groupData.avatar ? (
-                  <img
-                    ref={groupPicture}
-                    src={URL.createObjectURL(
-                      new Blob([deserializeHash(groupData.avatar)], {
-                        type: "image/jpeg",
-                      })
+            <div className={styles["avatar-container"]}>
+              {/* <UpdateAvatar
+                imageRef={groupPicture}
+                onChange={() => {}}
+              ></UpdateAvatar> */}
+              <div className={styles["avatar-content"]}>
+                <div className={styles["avatar"]}>
+                  <div className={styles["image-container"]}>
+                    {groupData.avatar ? (
+                      <img
+                        ref={groupPicture}
+                        src={URL.createObjectURL(
+                          new Blob([deserializeHash(groupData.avatar)], {
+                            type: "image/jpeg",
+                          })
+                        )}
+                      />
+                    ) : (
+                      <img
+                        ref={groupPicture}
+                        src={peopleCircleOutline}
+                        className={styles.img}
+                      ></img>
                     )}
-                  ></img>
-                ) : (
-                  <img
-                    ref={groupPicture}
-                    src={peopleCircleOutline}
-                    className={styles.img}
-                  ></img>
-                )}
-                {/* </IonAvatar> */}
+                  </div>
+                  <div
+                    onClick={() => file.current?.click()}
+                    className={styles.overlay}
+                  >
+                    <IonText className="ion-text-center">
+                      {intl.formatMessage({
+                        id: "app.group-chat.change-avatar",
+                      })}
+                    </IonText>
+                  </div>
+                </div>
+                <div className={styles["icon-overlay"]}>
+                  <IonIcon size="large" icon={imageOutline}></IonIcon>
+                </div>
               </div>
               <input
                 ref={file}
