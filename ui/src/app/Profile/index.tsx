@@ -18,6 +18,7 @@ import {
 import React, { useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
 import { useHistory, useLocation } from "react-router";
+import Identicon from "../../components/Identicon";
 import ImageCropper from "../../components/ImageCropper";
 import ProfileInfo from "../../components/ProfileInfo";
 import updateAvatar from "../../redux/profile/actions/updateAvatar";
@@ -107,7 +108,7 @@ const Profile: React.FC = () => {
       }
     );
   };
-
+  console.log(profile?.fields.avatar, profile);
   return (
     <IonPage>
       <IonHeader className={styles.header}>
@@ -136,11 +137,7 @@ const Profile: React.FC = () => {
                     {profile.fields.avatar ? (
                       <img ref={img} src={profile.fields.avatar} />
                     ) : (
-                      <img
-                        ref={img}
-                        src={peopleCircleOutline}
-                        className={styles.img}
-                      />
+                      <Identicon size={100} hash={profile.id}></Identicon>
                     )}
                   </div>
                   <div
