@@ -48,7 +48,7 @@
   "app.group-chat.media.no-media": "There is no media sent in the chat yet...",
   "app.group-chat.member-role": "member",
   "app.group-chat.members": "{length} members",
-  "app.group-chat.change-avatar": "Change Avatar",
+  "app.group-chat.change-avatar": "Upload Avatar",
 
   "app.group-chat.members-label": "Members",
   "app.group-chat.minimum-member-required-reached": "The group must at leaset have 3 members",
