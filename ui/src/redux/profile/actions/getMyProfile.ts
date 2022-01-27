@@ -24,7 +24,7 @@ const getMyProfile =
           id: myAgentIdB64,
           fields: res.profile.fields.avatar
             ? {
-                avatar: binaryToUrl(res.profile.fields.avatar),
+                avatar: res.profile.fields.avatar,
               }
             : {},
         });

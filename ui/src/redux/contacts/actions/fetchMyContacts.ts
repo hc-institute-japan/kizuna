@@ -30,7 +30,7 @@ const fetchMyContacts =
             username: agentProfile.profile.nickname,
             fields: agentProfile.profile.fields.avatar
               ? {
-                  avatar: binaryToUrl(agentProfile.profile.fields.avatar),
+                  avatar: agentProfile.profile.fields.avatar,
                 }
               : {},
           };

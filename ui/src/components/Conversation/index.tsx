@@ -7,6 +7,7 @@ import {
   Conversation as ConversationDetail,
   Message,
 } from "../../redux/commons/types";
+import { binaryToUrl } from "../../utils/helpers";
 import AgentIdentifier from "../AgentIdentifier";
 import styles from "./style.module.css";
 
@@ -42,20 +43,7 @@ const Conversation: React.FC<Props> = ({
 
   const renderAvatar = () => {
     if (conversation.avatar)
-      return (
-        <img
-          src={
-            conversation.type === "group"
-              ? URL.createObjectURL(
-                  new Blob([deserializeHash(conversation.avatar!)], {
-                    type: "image/jpeg",
-                  })
-                )
-              : conversation.avatar
-          }
-          alt="avatar"
-        />
-      );
+      return <img src={binaryToUrl(conversation.avatar)} alt="avatar" />;
     else
       return (
         <img

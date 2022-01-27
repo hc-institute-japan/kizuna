@@ -19,7 +19,7 @@ import {
   isTextPayload,
   TextPayload,
 } from "../../../redux/commons/types";
-import { usePressHandlers } from "../../../utils/helpers";
+import { binaryToUrl, usePressHandlers } from "../../../utils/helpers";
 import Identicon from "../../Identicon";
 import Spinner from "../../Spinner";
 import ChatPopover from "../ChatPopover";
@@ -143,7 +143,10 @@ const Me: React.FC<ChatProps> = ({
             {showProfilePicture ? (
               profile.fields.avatar ? (
                 <IonAvatar className={common["avatar-container"]}>
-                  <img src={profile.fields.avatar} alt="avatar"></img>
+                  <img
+                    src={binaryToUrl(profile.fields.avatar)}
+                    alt="avatar"
+                  ></img>
                 </IonAvatar>
               ) : (
                 <IonAvatar className={common["avatar-container"]}>
