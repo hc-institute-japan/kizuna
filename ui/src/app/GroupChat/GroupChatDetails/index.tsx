@@ -347,8 +347,8 @@ const GroupChatDetails: React.FC = () => {
               ></UpdateAvatar> */}
               <div className={styles["avatar-content"]}>
                 <div className={styles["avatar"]}>
-                  {groupData.avatar ? (
-                    <div className={styles["image-container-set"]}>
+                  <div className={styles["image-container"]}>
+                    {groupData.avatar ? (
                       <img
                         ref={groupPicture}
                         src={URL.createObjectURL(
@@ -357,16 +357,14 @@ const GroupChatDetails: React.FC = () => {
                           })
                         )}
                       />
-                    </div>
-                  ) : (
-                    <div className={styles["image-container"]}>
+                    ) : (
                       <img
                         ref={groupPicture}
                         src={peopleCircleOutline}
                         className={styles.img}
                       ></img>
-                    </div>
-                  )}
+                    )}
+                  </div>
                   <div
                     onClick={() => file.current?.click()}
                     className={styles.overlay}
