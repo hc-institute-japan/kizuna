@@ -320,6 +320,96 @@ const GroupChatDetails: React.FC = () => {
 
   const intl = useIntl();
 
+  const renderGroupAvatar = () => {
+    if (groupData.creator === myProfile.id) {
+      return (
+        <div className={styles["avatar-container"]}>
+          {/* <UpdateAvatar
+                imageRef={groupPicture}
+                onChange={() => {}}
+              ></UpdateAvatar> */}
+          <div className={styles["avatar-content"]}>
+            <div className={styles["avatar"]}>
+              <div className={styles["image-container"]}>
+                {groupData.avatar ? (
+                  <img
+                    ref={groupPicture}
+                    alt={groupData.name}
+                    src={URL.createObjectURL(
+                      new Blob([deserializeHash(groupData.avatar)], {
+                        type: "image/jpeg",
+                      })
+                    )}
+                  />
+                ) : (
+                  <img
+                    ref={groupPicture}
+                    alt={groupData.name}
+                    src={peopleCircleOutline}
+                    className={styles.img}
+                  ></img>
+                )}
+              </div>
+              <div
+                onClick={() => file.current?.click()}
+                className={styles.overlay}
+              >
+                <IonText className="ion-text-center">
+                  {intl.formatMessage({
+                    id: "app.group-chat.change-avatar",
+                  })}
+                </IonText>
+              </div>
+            </div>
+            <div className={styles["icon-overlay"]}>
+              <IonIcon size="large" icon={imageOutline}></IonIcon>
+            </div>
+          </div>
+          <input
+            ref={file}
+            type="file"
+            hidden
+            accept="image/png, image/jpeg"
+            onChange={handleOnFileChange}
+          />
+        </div>
+      );
+    } else {
+      return (
+        <div className={styles["avatar-container"]}>
+          {/* <UpdateAvatar
+                imageRef={groupPicture}
+                onChange={() => {}}
+              ></UpdateAvatar> */}
+          <div className={styles["avatar-content"]}>
+            <div className={styles["avatar"]}>
+              <div className={styles["image-container"]}>
+                {groupData.avatar ? (
+                  <img
+                    ref={groupPicture}
+                    alt={groupData.name}
+                    src={URL.createObjectURL(
+                      new Blob([deserializeHash(groupData.avatar)], {
+                        type: "image/jpeg",
+                      })
+                    )}
+                  />
+                ) : (
+                  <img
+                    ref={groupPicture}
+                    alt={groupData.name}
+                    src={peopleCircleOutline}
+                    className={styles.img}
+                  ></img>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+  };
+
   return (
     <>
       {groupData ? (
@@ -340,54 +430,7 @@ const GroupChatDetails: React.FC = () => {
                 disabled={groupData.creator !== myProfile.id ? true : false}
               />
             </IonToolbar>
-            <div className={styles["avatar-container"]}>
-              {/* <UpdateAvatar
-                imageRef={groupPicture}
-                onChange={() => {}}
-              ></UpdateAvatar> */}
-              <div className={styles["avatar-content"]}>
-                <div className={styles["avatar"]}>
-                  <div className={styles["image-container"]}>
-                    {groupData.avatar ? (
-                      <img
-                        ref={groupPicture}
-                        src={URL.createObjectURL(
-                          new Blob([deserializeHash(groupData.avatar)], {
-                            type: "image/jpeg",
-                          })
-                        )}
-                      />
-                    ) : (
-                      <img
-                        ref={groupPicture}
-                        src={peopleCircleOutline}
-                        className={styles.img}
-                      ></img>
-                    )}
-                  </div>
-                  <div
-                    onClick={() => file.current?.click()}
-                    className={styles.overlay}
-                  >
-                    <IonText className="ion-text-center">
-                      {intl.formatMessage({
-                        id: "app.group-chat.change-avatar",
-                      })}
-                    </IonText>
-                  </div>
-                </div>
-                <div className={styles["icon-overlay"]}>
-                  <IonIcon size="large" icon={imageOutline}></IonIcon>
-                </div>
-              </div>
-              <input
-                ref={file}
-                type="file"
-                hidden
-                accept="image/png, image/jpeg"
-                onChange={handleOnFileChange}
-              />
-            </div>
+            {renderGroupAvatar()}
             <IonTitle className={styles.groupname}>{groupData!.name}</IonTitle>
 
             <SegmentTabs
