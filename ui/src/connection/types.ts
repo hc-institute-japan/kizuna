@@ -56,6 +56,7 @@ export const FUNCTIONS: FunctionNameType = {
     GET_AGENTS_PROFILES: "get_agents_profile",
     GET_MY_PROFILE: "get_my_profile",
     GET_ALL_PROFILES: "get_all_profiles",
+    UPDATE_PROFILE: "update_profile",
   },
   [ZOMES.CONTACTS]: {
     ADD_CONTACTS: "add_contacts",
