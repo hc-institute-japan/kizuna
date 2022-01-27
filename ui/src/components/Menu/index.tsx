@@ -95,7 +95,10 @@ const Menu: React.FC = () => {
       <IonContent className={`${styles.menu} ion-padding-top`}>
         <IonList id="inbox-list" lines="none">
           <IonItemGroup className="ion-no-margin">
-            <div className={`${styles.container} ion-padding`}>
+            <div
+              onClick={handleOnClick}
+              className={`${styles.container} ion-padding`}
+            >
               {fields.avatar ? (
                 <IonAvatar>
                   <img src={fields.avatar} alt="avatar"></img>

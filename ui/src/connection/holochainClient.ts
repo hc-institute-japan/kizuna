@@ -71,7 +71,7 @@ const createClient = async (
       });
       const cellData = appInfo.cell_data[0];
 
-      return new HolochainClient(appWs, cellData);
+      return new HolochainClient(appWs as any, cellData);
     }
     default: {
       return null;
