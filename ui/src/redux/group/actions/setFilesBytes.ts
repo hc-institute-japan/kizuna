@@ -28,7 +28,7 @@ export const fetchFilesBytes =
       // console.log(res);
       return res;
     } catch (e) {
-      if (e.message.includes("The file bytes were not found")) {
+      if ((e as any).message.includes("The file bytes were not found")) {
         return dispatch(
           pushError("TOAST", {}, { id: "redux.err.group.set-files-bytes.1" })
         );

@@ -23,7 +23,7 @@ const blockContact =
 
       return true;
     } catch (e) {
-      if (e.message.includes("this agent is already blocked")) {
+      if ((e as any).message.includes("this agent is already blocked")) {
         dispatch(
           pushError(
             "TOAST",

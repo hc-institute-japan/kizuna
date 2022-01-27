@@ -209,7 +209,7 @@ export const sendMessage =
       }
     } catch (e) {
       try {
-        if (!e.message.includes("Timed out")) {
+        if (!(e as any).message.includes("Timed out")) {
           const retriedSend = await retry({
             zomeName: ZOMES.P2PMESSAGE,
             fnName: FUNCTIONS[ZOMES.P2PMESSAGE].SEND_MESSAGE,
@@ -242,7 +242,7 @@ export const sendMessage =
         }
         return false;
       } catch (e) {
-        // console.log("sending automatically retried message has failed", e);
+        console.log("sending automatically retried message has failed", e);
         return false;
       }
     }

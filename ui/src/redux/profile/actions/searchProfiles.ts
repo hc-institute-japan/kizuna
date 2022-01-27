@@ -10,15 +10,16 @@ const searchProfiles =
     const contacts = { ...state.contacts.contacts };
     const id = state.profile.id;
     try {
-      const res: AgentProfile[] = await callZome({
+      let res: AgentProfile[] = await callZome({
         zomeName: ZOMES.PROFILES,
         fnName: FUNCTIONS[ZOMES.PROFILES].SEARCH_PROFILES,
         payload: { nickname_prefix: nicknamePrefix },
       });
       /*
       filter the contacts that are already added
-      and remove yourself from the searched result
+      and remove yourself from the searched result as well as duplicates
       */
+      // console.log("searched profiles", res);
 
       const filteredMappedProfiles: Profile[] = res
         .filter(
@@ -37,6 +38,7 @@ const searchProfiles =
               : {},
           };
         });
+      // console.log(filteredMappedProfiles);
       return filteredMappedProfiles;
     } catch (e) {}
     return false;

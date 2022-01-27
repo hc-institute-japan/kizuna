@@ -13,6 +13,7 @@ import {
   SET_GROUP_TYPING_INDICATOR,
   SET_LATEST_GROUP_STATE,
   SET_PINNED_MESSAGES,
+  UPDATE_GROUP_AVATAR,
   UPDATE_GROUP_NAME,
 } from "./types";
 
@@ -55,6 +56,11 @@ const reducer = (
     case UPDATE_GROUP_NAME: {
       return { ...state, conversations: action.conversations };
     }
+    case UPDATE_GROUP_AVATAR:
+      return {
+        ...state,
+        conversations: action.conversations,
+      };
     case SET_GROUP_MESSAGE: {
       return {
         ...state,

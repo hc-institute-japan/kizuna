@@ -18,6 +18,9 @@
   --background: var(--ion-item-background) !important;
   cursor: pointer;
 }
+.menu {
+  display: flex;
+}
 
 .container {
   align-items: center;
@@ -40,4 +43,9 @@
     max-height: 150%;
     max-width: 150%;
   }
+}
+
+.version {
+  font-size: small;
+  color: var(--ion-color-medium);
 }

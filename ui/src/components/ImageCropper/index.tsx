@@ -1,5 +1,12 @@
-import { IonButton, IonIcon, IonPage, useIonPopover } from "@ionic/react";
-import { arrowBack, checkmarkOutline } from "ionicons/icons";
+import {
+  IonButton,
+  IonButtons,
+  IonLabel,
+  IonPage,
+  IonSpinner,
+  IonTitle,
+  useIonPopover,
+} from "@ionic/react";
 import React, { useEffect, useRef, useState } from "react";
 import ReactCrop, { Crop } from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
@@ -19,44 +26,82 @@ const ImageCropper: React.FC<Props> = ({
   dismiss,
   onComplete,
 }) => {
-  const [crop, setCrop] = useState<Partial<Crop>>({ x: 0, y: 0, aspect: 1 });
+  const [crop, setCrop] = useState<Partial<Crop>>({
+    x: 0,
+    y: 0,
+    aspect: 1,
+  });
   const [binary, setBinary] = useState<Uint8Array | null>(null);
   const imageContainer = useRef<HTMLDivElement | null>(null);
   const [style, setStyle] = useState({});
 
   useEffect(() => {
     const img = new Image();
-
     img.onload = () => {
       setTimeout(() => {
+        // mobile if innerHeight is greater than innerWidth
+
         if (window.innerHeight >= window.innerWidth) {
           const percentage =
             imageContainer.current!.getBoundingClientRect().width /
             img.naturalWidth;
+
+          if (img.naturalWidth * percentage >= img.naturalHeight * percentage)
+            setCrop((currCrop) => ({
+              ...currCrop,
+              width: percentage * img.naturalHeight,
+              height: percentage * img.naturalHeight,
+            }));
+          else
+            setCrop((currCrop) => ({
+              ...currCrop,
+              width: percentage * img.naturalWidth,
+              height: percentage * img.naturalWidth,
+            }));
+
           if (
             img.naturalHeight * percentage <=
             imageContainer.current!.getBoundingClientRect().height
-          ) {
+          )
+            // Set to 100vw because height can never be greater than container height
             setStyle({ width: "100vw" });
-          } else {
+          else
             setStyle({
-              height: "100vh",
+              height: `calc(100vh - ${
+                header.current?.getBoundingClientRect().height
+              }px - ${footer.current?.getBoundingClientRect().height}px)`,
               width:
                 (imageContainer.current!.getBoundingClientRect().height /
                   img.naturalHeight) *
                 img.naturalWidth,
             });
-          }
         } else {
           const percentage =
             imageContainer.current!.getBoundingClientRect().height /
             img.naturalHeight;
+
+          if (img.naturalWidth * percentage >= img.naturalHeight * percentage)
+            setCrop((currCrop) => ({
+              ...currCrop,
+              width: percentage * img.naturalHeight,
+              height: percentage * img.naturalHeight,
+            }));
+          else
+            setCrop((currCrop) => ({
+              ...currCrop,
+              width: percentage * img.naturalWidth,
+              height: percentage * img.naturalWidth,
+            }));
           if (
             img.naturalWidth * percentage <=
             imageContainer.current!.getBoundingClientRect().width
-          ) {
-            setStyle({ height: "100vh" });
-          } else {
+          )
+            setStyle({
+              height: `calc(100vh - ${
+                header.current?.getBoundingClientRect().height
+              }px - ${footer.current?.getBoundingClientRect().height}px)`,
+            });
+          else
             setStyle({
               width: "100vw",
               height:
@@ -64,16 +109,14 @@ const ImageCropper: React.FC<Props> = ({
                   img.naturalWidth) *
                 img.naturalHeight,
             });
-          }
         }
       }, 500);
     };
-
     img.src = src;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const header = useRef<HTMLDivElement>(null);
-  // const footer = useRef<HTMLIonFooterElement>(null);
+  const footer = useRef<HTMLDivElement>(null);
 
   const onChange = (crop: number) => {
     setCrop((currCrop) => {
@@ -150,32 +193,51 @@ const ImageCropper: React.FC<Props> = ({
 
   const cropRef = useRef<ReactCrop | null>(null);
 
+  const onChangeCrop = (crop: Crop) => setCrop(crop);
+
   return (
     <IonPage>
       <div className={styles.content}>
         <div className={styles.header} ref={header}>
+          <IonTitle>Crop Image</IonTitle>
+          {/* 
           <IonButton fill="clear" href={prevPath}>
             <IonIcon icon={arrowBack} />
           </IonButton>
 
           <IonButton fill="clear" onClick={onConfirm}>
             <IonIcon icon={checkmarkOutline} />
-          </IonButton>
+          </IonButton> */}
         </div>
         <div className={styles["image-cropper"]} ref={imageContainer}>
-          <ReactCrop
-            circularCrop
-            ref={cropRef}
-            imageStyle={{
-              ...style,
-              objectFit: "contain",
-            }}
-            src={src}
-            onChange={(crop) => setCrop(crop)}
-            keepSelection={true}
-            crop={crop}
-          />
+          {Object.keys(style).length > 0 ? (
+            <ReactCrop
+              circularCrop
+              ref={cropRef}
+              imageStyle={{
+                // ...(Object.keys(style).length === 0 ? {} : style),
+                ...style,
+                objectFit: "contain",
+              }}
+              src={src}
+              onChange={onChangeCrop}
+              keepSelection={true}
+              crop={crop}
+            />
+          ) : (
+            <IonSpinner></IonSpinner>
+          )}
         </div>
+      </div>
+      <div className={styles.footer} ref={footer}>
+        <IonButtons>
+          <IonButton href={prevPath} fill="outline" color="danger">
+            <IonLabel>Cancel</IonLabel>
+          </IonButton>
+          <IonButton onClick={onConfirm} fill="solid" color="success">
+            <IonLabel>Confirm</IonLabel>
+          </IonButton>
+        </IonButtons>
       </div>
       {/* <IonFooter ref={footer}>
         <IonToolbar>

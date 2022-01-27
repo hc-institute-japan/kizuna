@@ -116,7 +116,7 @@ const ChatHeader: React.FC<Props> = ({
     pathname,
     intl,
   });
-  const handleOnBack = () => history.push({ pathname: `/home` });
+  const handleOnBack = () => history.goBack();
 
   const handleOnProfileClick = () =>
     history.push({

@@ -1,16 +1,15 @@
-import { HolochainClient, HoloClient } from "@holochain-open-dev/cell-client";
 import {
-  AgentPubKey,
-  AppSignalCb,
-  AppWebsocket,
-} from "@holochain/conductor-api";
+  HolochainClient,
+  HoloClient,
+  WebSdkClient,
+} from "@holochain-open-dev/cell-client";
+import { AgentPubKey, AppSignalCb, AppWebsocket } from "@holochain/client";
 import { store } from "../containers/ReduxContainer";
 import { handleSignal } from "../redux/signal/actions";
 import { CallZomeConfig } from "../redux/types";
 import { appId, appUrl, ENV } from "./constants";
 // @ts-ignore
 global.COMB = undefined;
-const { Connection } = require("@holo-host/web-sdk");
 // @ts-ignore
 window.COMB = require("@holo-host/comb").COMB;
 
@@ -32,18 +31,20 @@ const createClient = async (
         app_name: "Kizuna Messaging App",
         skip_registration: true,
       };
+      const client = new WebSdkClient(appUrl()!, branding);
 
-      const connection = new Connection(appUrl(), signalHandler, branding);
+      await client.connection.ready();
+      await client.connection.signIn();
 
-      await connection.ready();
-      await connection.signIn();
+      const appInfo = await client.connection.appInfo(appId());
 
-      const appInfo = await connection.appInfo(appId());
+      console.log("here is the appInfo, ", appInfo);
 
       if (!appInfo.cell_data)
         throw new Error(`Holo appInfo() failed: ${JSON.stringify(appInfo)}`);
 
       const cellData = appInfo.cell_data[0];
+      console.log("the cell data is: ", cellData);
 
       // TODO: remove this when chaperone is fixed
       if (!(cellData.cell_id[0] instanceof Uint8Array)) {
@@ -53,7 +54,9 @@ const createClient = async (
         ] as any;
       }
 
-      return new HoloClient(connection, cellData, branding);
+      const holoClient = new HoloClient(client, cellData);
+      holoClient.addSignalHandler(signalHandler);
+      return holoClient;
     }
     case "HCDEV":
     case "HC": {
@@ -68,7 +71,7 @@ const createClient = async (
       });
       const cellData = appInfo.cell_data[0];
 
-      return new HolochainClient(appWs, cellData);
+      return new HolochainClient(appWs as any, cellData);
     }
     default: {
       return null;
@@ -82,7 +85,7 @@ export const init: () => any = async () => {
     client = await createClient(ENV);
     return client;
   } catch (error) {
-    Object.values(error).forEach((e) => console.error(e));
+    Object.values(error as object).forEach((e) => console.error(e));
     console.error(error);
     throw error;
   }
@@ -135,7 +138,7 @@ export const retry: (config: CallZomeConfig) => Promise<any> = async (
       );
     } catch (e) {
       console.warn(e);
-      const { type = null, data = null } = { ...e };
+      const { type = null, data = null } = { ...(e as any) };
       if (type === "error") {
         switch (data?.type) {
           case "ribosome_error":
@@ -205,7 +208,7 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
       payload,
       process.env.REACT_APP_ENV === "HC" ||
         process.env.REACT_APP_ENV === "HCDEV"
-        ? 30000
+        ? 60000
         : undefined
     );
   } catch (e) {
@@ -217,7 +220,7 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
       ". Error: ",
       e
     );
-    const { type = null, data = null } = { ...e };
+    const { type = null, data = null } = { ...(e as any) };
     if (type === "error") {
       switch (data?.type) {
         case "ribosome_error": {

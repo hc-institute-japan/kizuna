@@ -1,6 +1,7 @@
 import { IonText } from "@ionic/react";
 import React, { useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
+import styles from "./style.module.css";
 
 interface Props {
   timestamp: Date;
@@ -39,7 +40,7 @@ const MessageTimestamp: React.FC<Props> = ({ timestamp, onSeen }) => {
 
   return (
     <IonText ref={ref}>
-      <h6 className="ion-no-margin ion-text-end">
+      <h6 className={`ion-no-margin ion-text-end ${styles["message-text"]}`}>
         {intl.formatTime(timestamp)}
       </h6>
     </IonText>

@@ -40,11 +40,17 @@ const fetchBlocked =
         });
         return blocked;
       } catch (e) {
-        if (e.message.includes("Failed to get the username for this agent"))
+        if (
+          (e as any).message.includes(
+            "Failed to get the username for this agent"
+          )
+        )
           dispatch(
             pushError("TOAST", {}, { id: "redux.err.contacts.fetch-blocked.1" })
           );
-        else if (e.message.includes("No username for this agent exists"))
+        else if (
+          (e as any).message.includes("No username for this agent exists")
+        )
           dispatch(
             pushError("TOAST", {}, { id: "redux.err.contacts.fetch-blocked.2" })
           );

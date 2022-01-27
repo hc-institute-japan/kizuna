@@ -68,6 +68,7 @@ const getLatestGroupVersion =
         pinnedMessages: Object.values(groupPinnedMessages).map((message: any) =>
           serializeHash(message.entry.messageId)
         ),
+        avatar: latestGroupVersionRes.avatar,
       };
 
       const membersUsernames = await fetchUsernameOfMembers(
@@ -103,7 +104,7 @@ const getLatestGroupVersion =
 
       return groupData;
     } catch (e) {
-      if (e?.message?.includes("failed to get the given group id")) {
+      if ((e as any)?.message?.includes("failed to get the given group id")) {
         return dispatch(
           pushError(
             "TOAST",

@@ -56,6 +56,7 @@ export const FUNCTIONS: FunctionNameType = {
     GET_AGENTS_PROFILES: "get_agents_profile",
     GET_MY_PROFILE: "get_my_profile",
     GET_ALL_PROFILES: "get_all_profiles",
+    UPDATE_PROFILE: "update_profile",
   },
   [ZOMES.CONTACTS]: {
     ADD_CONTACTS: "add_contacts",
@@ -80,6 +81,7 @@ export const FUNCTIONS: FunctionNameType = {
     ADD_MEMBERS: "add_members",
     REMOVE_MEMBERS: "remove_members",
     UPDATE_GROUP_NAME: "update_group_name",
+    UPDATE_GROUP_AVATAR: "update_group_avatar",
     SEND_MESSAGE: "send_message",
     GET_ALL_MY_GROUPS: "get_all_my_groups",
     GET_PREVIOUS_GROUP_MESSAGES: "get_previous_group_messages",

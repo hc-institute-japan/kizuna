@@ -14,6 +14,7 @@ export function groupTypingIndicatorTest(config) {
       const [alice_lobby_happ] = await installAgents(alice, ["alice"]);
       const [bobby_lobby_happ] = await installAgents(bobby, ["bobby"]);
       const [charlie_lobby_happ] = await installAgents(charlie, ["charlie"]);
+      s.shareAllNodes([alice, bobby, charlie]);
       const [alice_conductor] = alice_lobby_happ.cells;
 
       const alicePubKey = alice_lobby_happ.agent;

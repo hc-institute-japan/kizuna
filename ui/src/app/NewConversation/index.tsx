@@ -9,7 +9,10 @@ import { warningOutline } from "ionicons/icons";
 import React, { useEffect, useState } from "react";
 import { useIntl } from "react-intl";
 import { useHistory, useLocation } from "react-router";
-import MessageInput, { FileContent } from "../../components/MessageInput";
+import MessageInput, {
+  FileContent,
+  MessageInputOnSendParams,
+} from "../../components/MessageInput";
 import { useToast } from "../../containers/ToastContainer/context";
 import { FilePayloadInput } from "../../redux/commons/types";
 import { sendInitialGroupMessage } from "../../redux/group/actions";
@@ -55,13 +58,14 @@ const NewConversation: React.FC = () => {
     });
   };
 
-  const handleOnSend = () => {
+  const handleOnSend = (opt?: MessageInputOnSendParams) => {
     const contacts = Object.values(selectedContacts);
+    let { message: message2 } = { ...opt };
 
     if (contacts.length === 1) {
-      if (message !== "") {
+      if (message2 && message2 !== "") {
         setIsLoading(true);
-        dispatch(sendMessage(contacts[0].id, message, "TEXT", undefined)).then(
+        dispatch(sendMessage(contacts[0].id, message2, "TEXT", undefined)).then(
           (res: boolean) => {
             if (!res && files.length <= 0) {
               setIsLoading(false);
@@ -166,7 +170,13 @@ const NewConversation: React.FC = () => {
         };
         return filePayloadInput;
       });
-      dispatch(sendInitialGroupMessage(contacts, message, fileInputs)).then(
+      dispatch(
+        sendInitialGroupMessage(
+          contacts,
+          message2 ? message2 : message,
+          fileInputs
+        )
+      ).then(
         (
           res: { groupResult: GroupConversation; messageResults: any[] } | false
         ) => {
