@@ -24,7 +24,7 @@ import ProfileInfo from "../../components/ProfileInfo";
 import updateAvatar from "../../redux/profile/actions/updateAvatar";
 import { Profile as ProfileType } from "../../redux/profile/types";
 import { RootState } from "../../redux/types";
-import { useAppDispatch } from "../../utils/helpers";
+import { binaryToUrl, useAppDispatch } from "../../utils/helpers";
 import ProfileMenuItems from "./ProfileMenuItems";
 import styles from "./style.module.css";
 
@@ -79,14 +79,21 @@ const Profile: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (currProfile.id && currProfile.username)
+    if (state?.profile) setProfile(state?.profile);
+  }, [state?.profile]);
+
+  useEffect(() => {
+    if (
+      currProfile.id &&
+      currProfile.username &&
+      currProfile.id === state.profile.id
+    )
       setProfile({
         id: currProfile.id!,
         username: currProfile.username,
         fields: currProfile.fields,
       });
-    else setProfile(state?.profile);
-  }, [state?.profile, currProfile]);
+  }, [currProfile, state.profile.id]);
 
   const file = useRef<HTMLInputElement>(null);
   const img = useRef<HTMLImageElement>(null);
@@ -117,6 +124,82 @@ const Profile: React.FC = () => {
     );
   };
 
+  const renderAvatar = () => {
+    console.log(profile);
+    if (profile) {
+      if (profile.id === currProfile.id) {
+        return (
+          <div className={styles["avatar-content"]}>
+            <div className={styles["avatar"]}>
+              <div className={styles["image-container"]}>
+                <img
+                  ref={img}
+                  alt={profile.username}
+                  src={
+                    profile.fields.avatar
+                      ? binaryToUrl(profile.fields.avatar)
+                      : personCircleOutline
+                  }
+                  style={{
+                    display: profile.fields.avatar ? "block" : "none",
+                  }}
+                />
+
+                {profile.fields.avatar ? null : (
+                  <Identicon size={100} hash={profile.id}></Identicon>
+                )}
+              </div>
+              <div
+                onClick={() => file.current?.click()}
+                className={styles.overlay}
+              >
+                <IonText className="ion-text-center">
+                  {intl.formatMessage({
+                    id: "app.group-chat.change-avatar",
+                  })}
+                </IonText>
+              </div>
+            </div>
+            <div className={styles["icon-overlay"]}>
+              <IonIcon size="large" icon={imageOutline}></IonIcon>
+            </div>
+            <input
+              ref={file}
+              type="file"
+              hidden
+              accept="image/png, image/jpeg"
+              onChange={handleOnFileChange}
+            />
+          </div>
+        );
+      } else {
+        return (
+          <div className={styles["avatar-content"]}>
+            <div className={styles["image-container"]}>
+              <img
+                ref={img}
+                alt={profile.username}
+                src={
+                  profile.fields.avatar
+                    ? binaryToUrl(profile.fields.avatar)
+                    : personCircleOutline
+                }
+                style={{
+                  display: profile.fields.avatar ? "block" : "none",
+                }}
+              />
+
+              {profile.fields.avatar ? null : (
+                <Identicon size={100} hash={profile.id}></Identicon>
+              )}
+            </div>
+          </div>
+        );
+      }
+    }
+    return null;
+  };
+
   return (
     <IonPage>
       <IonHeader className={styles.header}>
@@ -137,51 +220,7 @@ const Profile: React.FC = () => {
         </IonToolbar>
 
         <div className={styles["profile-picture-toolbar"]}>
-          <div className={styles["toolbar-container"]}>
-            {profile ? (
-              <div className={styles["avatar-content"]}>
-                <div className={styles["avatar"]}>
-                  <div className={styles["image-container"]}>
-                    <img
-                      ref={img}
-                      src={
-                        profile.fields.avatar
-                          ? profile.fields.avatar
-                          : personCircleOutline
-                      }
-                      style={{
-                        display: profile.fields.avatar ? "block" : "none",
-                      }}
-                    />
-
-                    {profile.fields.avatar ? null : (
-                      <Identicon size={100} hash={profile.id}></Identicon>
-                    )}
-                  </div>
-                  <div
-                    onClick={() => file.current?.click()}
-                    className={styles.overlay}
-                  >
-                    <IonText className="ion-text-center">
-                      {intl.formatMessage({
-                        id: "app.group-chat.change-avatar",
-                      })}
-                    </IonText>
-                  </div>
-                </div>
-                <div className={styles["icon-overlay"]}>
-                  <IonIcon size="large" icon={imageOutline}></IonIcon>
-                </div>
-                <input
-                  ref={file}
-                  type="file"
-                  hidden
-                  accept="image/png, image/jpeg"
-                  onChange={handleOnFileChange}
-                />
-              </div>
-            ) : null}
-          </div>
+          <div className={styles["toolbar-container"]}>{renderAvatar()}</div>
         </div>
         <IonToolbar className={styles["profile-toolbar"]}>
           <IonTitle className={styles["nickname"]}>

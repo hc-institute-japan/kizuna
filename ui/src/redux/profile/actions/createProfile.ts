@@ -30,7 +30,7 @@ const createProfile =
         type: SET_PROFILE,
         id: myAgentIdB64,
         nickname: res.profile.nickname,
-        fields: image ? { avatar: binaryToUrl(serializeHash(image)) } : {},
+        fields: image ? { avatar: serializeHash(image) } : {},
       });
       return res;
     } catch (e) {

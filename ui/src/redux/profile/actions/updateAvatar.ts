@@ -29,7 +29,7 @@ export const updateAvatar =
       id: myAgentIdB64,
       /* assert that nickname is non-nullable */
       nickname: username!,
-      fields: { ...updatedFields, avatar: binaryToUrl(serializedAvatar) },
+      fields: { ...updatedFields, avatar: serializedAvatar },
     });
   };
 
