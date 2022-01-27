@@ -14,6 +14,7 @@ import {
   arrowBackSharp,
   imageOutline,
   peopleCircleOutline,
+  personCircleOutline,
 } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
@@ -57,7 +58,9 @@ const Profile: React.FC = () => {
     onComplete: (binary: Uint8Array) => {
       if (binary) {
         const blob = new Blob([binary], { type: "image/jpeg" });
+
         dispatch(updateAvatar(binary));
+
         img.current!.src = URL.createObjectURL(blob);
         setBinary(binary);
       }
@@ -108,7 +111,7 @@ const Profile: React.FC = () => {
       }
     );
   };
-  console.log(profile?.fields.avatar, profile);
+
   return (
     <IonPage>
       <IonHeader className={styles.header}>
@@ -134,6 +137,18 @@ const Profile: React.FC = () => {
               <div className={styles["avatar-content"]}>
                 <div className={styles["avatar"]}>
                   <div className={styles["image-container"]}>
+                    <img
+                      ref={img}
+                      src={
+                        profile.fields.avatar
+                          ? profile.fields.avatar
+                          : personCircleOutline
+                      }
+                      style={{
+                        display: profile.fields.avatar ? "block" : "none",
+                      }}
+                    />
+
                     {profile.fields.avatar ? (
                       <img ref={img} src={profile.fields.avatar} />
                     ) : (
