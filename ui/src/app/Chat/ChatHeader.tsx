@@ -116,13 +116,23 @@ const ChatHeader: React.FC<Props> = ({
     pathname,
     intl,
   });
-  const handleOnBack = () => history.goBack();
+  const handleOnBack = () =>
+    history.push({
+      pathname: "/home/messaging",
+    });
 
   const handleOnProfileClick = () =>
     history.push({
-      pathname: `/p/${id}`,
+      pathname: `/p/${conversant.id}`,
       //   state: { profile: { username: state?.username, id } },
-      state: { profile: { username, id }, prev: `/u/${id}` },
+      state: {
+        profile: {
+          username: conversant.username,
+          id: conversant.id,
+          fields: conversant.fields,
+        },
+        prev: `/u/${conversant.id}`,
+      },
     });
 
   // const handleOnClick = () => {

@@ -27,15 +27,6 @@ const Blocked = () => {
 
   const indexedContacts = indexContacts(Object.values(blocked));
 
-  const onClick = (profile: Profile) =>
-    history.push({
-      pathname: `/p/${profile.id}`,
-      state: {
-        profile,
-        prev: "/blocked",
-      },
-    });
-
   return (
     <IonPage>
       <IonHeader>

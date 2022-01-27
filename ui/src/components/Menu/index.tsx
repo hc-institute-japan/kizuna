@@ -25,7 +25,7 @@ import { isHoloEnv } from "../../connection/constants";
 import { logout } from "../../redux/profile/actions";
 import { Profile } from "../../redux/profile/types";
 import { RootState } from "../../redux/types";
-import { useAppDispatch } from "../../utils/helpers";
+import { binaryToUrl, useAppDispatch } from "../../utils/helpers";
 import Identicon from "../Identicon";
 import styles from "./style.module.css";
 
@@ -101,7 +101,7 @@ const Menu: React.FC = () => {
             >
               {fields.avatar ? (
                 <IonAvatar>
-                  <img src={fields.avatar} alt="avatar"></img>
+                  <img src={binaryToUrl(fields.avatar)} alt="avatar"></img>
                 </IonAvatar>
               ) : (
                 <Identicon hash={id!} size={60} />
