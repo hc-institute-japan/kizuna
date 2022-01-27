@@ -41,7 +41,7 @@
   width: 100px;
   height: 100%;
   overflow: hidden;
-  border: 1px solid rgb(var(--ion-color-primary-rgb));
+  /* border: 1px solid rgb(var(--ion-color-primary-rgb)); */
 }
 
 .image-container-set {
