@@ -1,5 +1,4 @@
 import {
-  IonAvatar,
   IonButton,
   IonButtons,
   IonHeader,
@@ -13,17 +12,18 @@ import {
 import {
   arrowBackSharp,
   imageOutline,
-  peopleCircleOutline,
   personCircleOutline,
 } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import { useIntl } from "react-intl";
+import { useSelector } from "react-redux";
 import { useHistory, useLocation } from "react-router";
 import Identicon from "../../components/Identicon";
 import ImageCropper from "../../components/ImageCropper";
 import ProfileInfo from "../../components/ProfileInfo";
 import updateAvatar from "../../redux/profile/actions/updateAvatar";
 import { Profile as ProfileType } from "../../redux/profile/types";
+import { RootState } from "../../redux/types";
 import { useAppDispatch } from "../../utils/helpers";
 import ProfileMenuItems from "./ProfileMenuItems";
 import styles from "./style.module.css";
@@ -36,6 +36,7 @@ interface LocationProps {
 const Profile: React.FC = () => {
   const _isMounted = useRef(true);
   const { state } = useLocation<LocationProps>();
+  const currProfile = useSelector((state: RootState) => state.profile);
   const history = useHistory();
   const [profile, setProfile] = useState<null | ProfileType>(null);
   const [binary, setBinary] = useState<Uint8Array | null>(null);
@@ -58,11 +59,9 @@ const Profile: React.FC = () => {
     onComplete: (binary: Uint8Array) => {
       if (binary) {
         const blob = new Blob([binary], { type: "image/jpeg" });
-
         dispatch(updateAvatar(binary));
-
         img.current!.src = URL.createObjectURL(blob);
-        setBinary(binary);
+        // setBinary(binary);
       }
     },
   });
@@ -80,8 +79,14 @@ const Profile: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    setProfile(state.profile);
-  }, [state?.profile]);
+    if (currProfile.id && currProfile.username)
+      setProfile({
+        id: currProfile.id!,
+        username: currProfile.username,
+        fields: currProfile.fields,
+      });
+    else setProfile(state?.profile);
+  }, [state?.profile, currProfile]);
 
   const file = useRef<HTMLInputElement>(null);
   const img = useRef<HTMLImageElement>(null);
@@ -149,9 +154,7 @@ const Profile: React.FC = () => {
                       }}
                     />
 
-                    {profile.fields.avatar ? (
-                      <img ref={img} src={profile.fields.avatar} />
-                    ) : (
+                    {profile.fields.avatar ? null : (
                       <Identicon size={100} hash={profile.id}></Identicon>
                     )}
                   </div>
