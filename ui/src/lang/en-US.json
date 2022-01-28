@@ -83,6 +83,7 @@
   "app.profile.to-be-implemented-header": "Oops!",
   "app.register.error-existing-username": "Sorry! That username is already taken",
   "app.register.error-invalid-username": "Nickname must be at least 3 characters and contain 1 alphanumeric character",
+  "app.register.error-username-with-space": "Nickname must not contain any spaces",
   "app.register.error-no-image": "No image selected",
   "app.register.register": "Register nickname",
   "app.register.username-label": "Nickname",

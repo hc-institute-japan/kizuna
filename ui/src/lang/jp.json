@@ -82,6 +82,7 @@
   "app.profile.to-be-implemented-header": "おっと!",
   "app.register.error-existing-username": "このユーザー名はすでに登録されています",
   "app.register.error-invalid-username": "ニックネームは3英数字以上で、最低1英字を含める必要があります",
+  "app.register.error-username-with-space": "ニックネームにスペースは使えません",
   "app.register.error-no-image": "画像が選択されていません",
   "app.register.register": "プロフィールを登録する",
   "app.register.username-label": "ニックネーム",
