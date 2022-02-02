@@ -34,6 +34,7 @@ interface LocationProps {
 }
 
 const Profile: React.FC = () => {
+  const intl = useIntl();
   const _isMounted = useRef(true);
   const { state } = useLocation<LocationProps>();
   const currProfile = useSelector((state: RootState) => state.profile);
@@ -64,6 +65,7 @@ const Profile: React.FC = () => {
         // setBinary(binary);
       }
     },
+    intl,
   });
   useEffect(() => {
     if (binary) present({ cssClass: `cropper ${styles.modal}` });
@@ -97,7 +99,6 @@ const Profile: React.FC = () => {
 
   const file = useRef<HTMLInputElement>(null);
   const img = useRef<HTMLImageElement>(null);
-  const intl = useIntl();
 
   const handleOnFileChange = () => {
     Array.from(file.current ? file.current.files! : new FileList()).forEach(

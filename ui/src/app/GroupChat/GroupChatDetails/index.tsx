@@ -49,6 +49,7 @@ interface GroupChatParams {
 }
 
 const GroupChatDetails: React.FC = () => {
+  const intl = useIntl();
   const history = useHistory();
   const { group } = useParams<GroupChatParams>();
   const dispatch = useAppDispatch();
@@ -286,6 +287,7 @@ const GroupChatDetails: React.FC = () => {
         // setBinary(binary);
       }
     },
+    intl,
   });
 
   const handleOnFileChange = () => {
@@ -317,8 +319,6 @@ const GroupChatDetails: React.FC = () => {
     if (binary) present({ cssClass: `cropper ${styles.modal}` });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [binary]);
-
-  const intl = useIntl();
 
   const renderGroupAvatar = () => {
     if (groupData.creator === myProfile.id) {

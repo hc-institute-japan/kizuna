@@ -100,6 +100,7 @@ const Register: React.FC = () => {
         setBinary(cropperBinary);
       }
     },
+    intl,
   });
 
   const handleOnKeyDown = (event: React.KeyboardEvent) =>

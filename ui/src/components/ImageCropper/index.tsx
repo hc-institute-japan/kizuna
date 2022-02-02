@@ -1,3 +1,4 @@
+import { IntlShape } from "@formatjs/intl";
 import {
   IonButton,
   IonButtons,
@@ -18,6 +19,7 @@ interface Props {
   prevPath: string;
   dismiss(): any;
   onComplete(binary: Uint8Array | null): any;
+  intl: IntlShape;
 }
 
 const ImageCropper: React.FC<Props> = ({
@@ -25,6 +27,7 @@ const ImageCropper: React.FC<Props> = ({
   prevPath,
   dismiss,
   onComplete,
+  intl,
 }) => {
   const [crop, setCrop] = useState<Partial<Crop>>({
     x: 0,
@@ -194,12 +197,13 @@ const ImageCropper: React.FC<Props> = ({
   const cropRef = useRef<ReactCrop | null>(null);
 
   const onChangeCrop = (crop: Crop) => setCrop(crop);
-
   return (
     <IonPage>
       <div className={styles.content}>
         <div className={styles.header} ref={header}>
-          <IonTitle>Crop Image</IonTitle>
+          <IonTitle>
+            {intl.formatMessage({ id: "components.image-cropper.label" })}
+          </IonTitle>
           {/* 
           <IonButton fill="clear" href={prevPath}>
             <IonIcon icon={arrowBack} />
@@ -232,10 +236,14 @@ const ImageCropper: React.FC<Props> = ({
       <div className={styles.footer} ref={footer}>
         <IonButtons>
           <IonButton href={prevPath} fill="outline" color="danger">
-            <IonLabel>Cancel</IonLabel>
+            <IonLabel>
+              {intl.formatMessage({ id: "components.image-cropper.cancel" })}
+            </IonLabel>
           </IonButton>
           <IonButton onClick={onConfirm} fill="solid" color="success">
-            <IonLabel>Confirm</IonLabel>
+            <IonLabel>
+              {intl.formatMessage({ id: "components.image-cropper.confirm" })}
+            </IonLabel>
           </IonButton>
         </IonButtons>
       </div>
