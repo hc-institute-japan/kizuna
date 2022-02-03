@@ -1,5 +1,5 @@
 import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
-import { AgentPubKey } from "@holochain/conductor-api";
+import { AgentPubKey } from "@holochain/client";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
 import { deserializeAgentPubKey } from "../../../utils/helpers";
 import { pushError } from "../../error/actions";
