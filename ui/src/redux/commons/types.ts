@@ -10,7 +10,7 @@ import { P2PMessage } from "../p2pmessages/types";
 import { Profile } from "../profile/types";
 
 /* 
-  We are avoiding the usage of Buffer (as these are typed in the @holochain/conductor-api) in the ui
+  We are avoiding the usage of Buffer (as these are typed in the @holochain/client) in the ui
   as it is cumbersome to translate data types among Buffer, Uint8Array, and string. 
   TODO: This may be a temporary solution that may have better fix in the future
 */

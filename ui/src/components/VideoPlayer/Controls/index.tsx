@@ -14,21 +14,21 @@ interface Props {
   video: RefObject<HTMLVideoElement>;
   isPlaying: boolean;
   duration: number;
-  modal: [boolean, React.Dispatch<SetStateAction<boolean>>];
+  present(args: any): any;
   hasError: boolean;
   onPlayPauseErrorHandler?(): any;
 }
 
 const Controls: React.FC<Props> = ({
   video,
+  present,
   isPlaying,
   duration,
-  modal,
   hasError,
   onPlayPauseErrorHandler,
 }) => {
   const [visible, setVisible] = useState(isPlatform("mobile"));
-  const [isOpen, setIsOpen] = modal;
+
   const timeout = useRef<NodeJS.Timeout>();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -57,7 +57,7 @@ const Controls: React.FC<Props> = ({
   };
 
   const handleOnDoubleClick = () => {
-    setIsOpen(isOpen ? false : true);
+    present({ cssClass: `video-view` });
   };
 
   const onPlayPause = () => {
@@ -77,7 +77,6 @@ const Controls: React.FC<Props> = ({
       onMouseEnter={handleOnMouseEnter}
       onMouseLeave={resetTimeout}
       onClick={handleOnClick}
-      onDoubleClick={handleOnDoubleClick}
       className={styles.controls}
       style={{ opacity: visible ? 1 : 0 }}
     >
