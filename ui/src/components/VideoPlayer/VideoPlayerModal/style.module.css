@@ -8,6 +8,7 @@
   box-sizing: border-box;
   width: 100%;
   overflow: hidden;
+  color: white;
 }
 
 .play-pause {
@@ -33,6 +34,10 @@
   background: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.75));
 }
 
+.modal-control:hover {
+  opacity: 1 !important;
+}
+
 .slider-volume {
   width: 100%;
   padding-left: 10px;
@@ -46,4 +51,8 @@
 .toolbar {
   --background: rgb(0, 0, 0) !important;
   color: var(--ion-color-primary-contrast);
+}
+
+.footer {
+  --background: var(--ion-color-medium);
 }

@@ -177,7 +177,7 @@ const VideoPlayerModal: React.FC<Props> = ({
       </div>
 
       <IonFooter>
-        <IonToolbar ref={footer}>
+        <IonToolbar ref={footer} className={styles.footer}>
           <div className={styles["slider-volume"]}>
             <input
               step={currentTime * 100}

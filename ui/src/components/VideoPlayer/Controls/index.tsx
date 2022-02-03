@@ -28,7 +28,6 @@ const Controls: React.FC<Props> = ({
   onPlayPauseErrorHandler,
 }) => {
   const [visible, setVisible] = useState(isPlatform("mobile"));
-
   const timeout = useRef<NodeJS.Timeout>();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -60,12 +59,22 @@ const Controls: React.FC<Props> = ({
     present({ cssClass: `video-view` });
   };
 
+  const clickTimeout = useRef<NodeJS.Timeout | null>();
+
+  const onTimeoutClick = (callback: () => any) => {
+    if (clickTimeout.current) {
+      clearTimeout(clickTimeout.current);
+      clickTimeout.current = null;
+    }
+    clickTimeout.current = setTimeout(() => {
+      callback();
+    }, 200);
+  };
+
   const onPlayPause = () => {
     if (!hasError) {
       if (!isPlaying) video.current?.play();
-      else {
-        video.current?.pause();
-      }
+      else video.current?.pause();
     } else {
       setIsLoading(true);
       if (onPlayPauseErrorHandler) onPlayPauseErrorHandler();
@@ -82,8 +91,8 @@ const Controls: React.FC<Props> = ({
     >
       <div
         className={styles["play-pause"]}
-        onClick={onPlayPause}
-        onTouchEnd={onPlayPause}
+        onClick={() => onTimeoutClick(onPlayPause)}
+        onTouchEnd={() => onTimeoutClick(onPlayPause)}
       >
         {isLoading ? (
           <IonSpinner />
