@@ -1,13 +1,7 @@
 import { isPlatform } from "@ionic/core";
 import { IonIcon, IonSpinner } from "@ionic/react";
-import { expandOutline, pause, play, download } from "ionicons/icons";
-import React, {
-  RefObject,
-  SetStateAction,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { download, expandOutline, pause, play } from "ionicons/icons";
+import React, { RefObject, useEffect, useRef, useState } from "react";
 import styles from "./style.module.css";
 
 interface Props {
@@ -59,18 +53,6 @@ const Controls: React.FC<Props> = ({
     present({ cssClass: `video-view` });
   };
 
-  const clickTimeout = useRef<NodeJS.Timeout | null>();
-
-  const onTimeoutClick = (callback: () => any) => {
-    if (clickTimeout.current) {
-      clearTimeout(clickTimeout.current);
-      clickTimeout.current = null;
-    }
-    clickTimeout.current = setTimeout(() => {
-      callback();
-    }, 200);
-  };
-
   const onPlayPause = () => {
     if (!hasError) {
       if (!isPlaying) video.current?.play();
@@ -91,8 +73,8 @@ const Controls: React.FC<Props> = ({
     >
       <div
         className={styles["play-pause"]}
-        onClick={() => onTimeoutClick(onPlayPause)}
-        onTouchEnd={() => onTimeoutClick(onPlayPause)}
+        onClick={onPlayPause}
+        onTouchEnd={onPlayPause}
       >
         {isLoading ? (
           <IonSpinner />
