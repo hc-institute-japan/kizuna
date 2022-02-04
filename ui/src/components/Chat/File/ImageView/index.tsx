@@ -1,6 +1,9 @@
-import { IonImg } from "@ionic/react";
+import { IonImg, useIonModal } from "@ionic/react";
 import React, { useRef, useState } from "react";
+import { useIntl } from "react-intl";
+import { useSelector } from "react-redux";
 import { FilePayload } from "../../../../redux/commons/types";
+import { RootState } from "../../../../redux/types";
 
 import ImageModal from "./ImageModal";
 import styles from "./style.module.css";
@@ -14,24 +17,40 @@ interface Props {
 }
 
 const Image: React.FC<Props> = ({ src, file, className, onDownload, err }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const intl = useIntl();
+  const fileBytes = useSelector((state: RootState) =>
+    // state.groups.groupFiles[`u${file.fileHash}`]
+    {
+      const fileSet = Object.assign(
+        {},
+        state.groups.groupFiles,
+        state.p2pmessages.files
+      );
+      return fileSet[file.fileHash!];
+    }
+  );
+
   const handleOnImageOnClick = () => {
     if (!err) {
-      setIsOpen(true);
+      present({ cssClass: "image-view" });
     }
   };
+  const onDismiss = () => dismiss();
+
+  const [present, dismiss] = useIonModal(ImageModal, {
+    onDownload,
+    onDismiss,
+    src,
+    file,
+    fileBytes,
+    intl,
+  });
 
   const container = useRef<HTMLDivElement>(null);
   const [maxHeight, setMaxHeight] = useState("auto");
 
   return (
     <>
-      <ImageModal
-        onDownload={onDownload}
-        state={[isOpen, setIsOpen]}
-        src={src}
-        file={file}
-      />
       <div
         ref={container}
         className={`${styles.image} ${className ? className : ""}`}

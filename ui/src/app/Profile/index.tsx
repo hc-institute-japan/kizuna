@@ -126,7 +126,6 @@ const Profile: React.FC = () => {
   };
 
   const renderAvatar = () => {
-    console.log(profile);
     if (profile) {
       if (profile.id === currProfile.id) {
         return (
