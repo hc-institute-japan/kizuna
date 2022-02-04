@@ -1,34 +1,27 @@
 import { isPlatform } from "@ionic/core";
 import { IonIcon, IonSpinner } from "@ionic/react";
-import { expandOutline, pause, play, download } from "ionicons/icons";
-import React, {
-  RefObject,
-  SetStateAction,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { download, expandOutline, pause, play } from "ionicons/icons";
+import React, { RefObject, useEffect, useRef, useState } from "react";
 import styles from "./style.module.css";
 
 interface Props {
   video: RefObject<HTMLVideoElement>;
   isPlaying: boolean;
   duration: number;
-  modal: [boolean, React.Dispatch<SetStateAction<boolean>>];
+  present(args: any): any;
   hasError: boolean;
   onPlayPauseErrorHandler?(): any;
 }
 
 const Controls: React.FC<Props> = ({
   video,
+  present,
   isPlaying,
   duration,
-  modal,
   hasError,
   onPlayPauseErrorHandler,
 }) => {
   const [visible, setVisible] = useState(isPlatform("mobile"));
-  const [isOpen, setIsOpen] = modal;
   const timeout = useRef<NodeJS.Timeout>();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -57,15 +50,13 @@ const Controls: React.FC<Props> = ({
   };
 
   const handleOnDoubleClick = () => {
-    setIsOpen(isOpen ? false : true);
+    present({ cssClass: `video-view` });
   };
 
   const onPlayPause = () => {
     if (!hasError) {
       if (!isPlaying) video.current?.play();
-      else {
-        video.current?.pause();
-      }
+      else video.current?.pause();
     } else {
       setIsLoading(true);
       if (onPlayPauseErrorHandler) onPlayPauseErrorHandler();
@@ -77,7 +68,6 @@ const Controls: React.FC<Props> = ({
       onMouseEnter={handleOnMouseEnter}
       onMouseLeave={resetTimeout}
       onClick={handleOnClick}
-      onDoubleClick={handleOnDoubleClick}
       className={styles.controls}
       style={{ opacity: visible ? 1 : 0 }}
     >

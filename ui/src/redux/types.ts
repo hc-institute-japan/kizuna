@@ -1,5 +1,5 @@
 import { HolochainClient, HoloClient } from "@holochain-open-dev/cell-client";
-import { AgentPubKey, CellId } from "@holochain/conductor-api";
+import { AgentPubKey, CellId } from "@holochain/client";
 import { Action, AnyAction } from "redux";
 import { ThunkAction as Thunk, ThunkDispatch } from "redux-thunk";
 
