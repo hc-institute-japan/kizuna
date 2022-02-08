@@ -7,7 +7,6 @@ import {
   IonItem,
   IonLabel,
   IonList,
-  IonModal,
   IonPage,
   IonPopover,
   IonSpinner,
@@ -19,8 +18,8 @@ import {
   pause,
   play,
 } from "ionicons/icons";
-import React, { SetStateAction, useEffect, useRef, useState } from "react";
-import { IntlShape, useIntl } from "react-intl";
+import React, { useEffect, useRef, useState } from "react";
+import { IntlShape } from "react-intl";
 import styles from "./style.module.css";
 
 interface Props {

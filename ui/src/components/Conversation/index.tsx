@@ -1,4 +1,3 @@
-import { deserializeHash } from "@holochain-open-dev/core-types";
 import { IonAvatar, IonBadge, IonItem, IonLabel } from "@ionic/react";
 import { peopleCircleOutline, personCircleOutline } from "ionicons/icons";
 import React from "react";

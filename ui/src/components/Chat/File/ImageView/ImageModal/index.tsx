@@ -7,17 +7,14 @@ import {
   IonItem,
   IonLabel,
   IonList,
-  IonModal,
   IonPage,
   IonPopover,
   IonToolbar,
 } from "@ionic/react";
 import { arrowBack, ellipsisVerticalOutline } from "ionicons/icons";
-import React, { SetStateAction, useEffect, useRef, useState } from "react";
-import { IntlShape, useIntl } from "react-intl";
-import { useSelector } from "react-redux";
+import React, { useEffect, useRef, useState } from "react";
+import { IntlShape } from "react-intl";
 import { FilePayload } from "../../../../../redux/commons/types";
-import { RootState } from "../../../../../redux/types";
 import styles from "./style.module.css";
 
 interface Props {

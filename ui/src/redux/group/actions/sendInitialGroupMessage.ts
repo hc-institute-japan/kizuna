@@ -1,4 +1,3 @@
-import { serializeHash } from "@holochain-open-dev/core-types";
 import { FilePayloadInput } from "../../commons/types";
 import { pushError } from "../../error/actions";
 import { Profile } from "../../profile/types";

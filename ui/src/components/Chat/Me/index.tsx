@@ -12,7 +12,7 @@ import {
   checkmarkDoneCircle,
   radioButtonOff,
 } from "ionicons/icons";
-import React, { MouseEventHandler, useState } from "react";
+import React, { useState } from "react";
 import { useIntl } from "react-intl";
 import {
   FilePayload,

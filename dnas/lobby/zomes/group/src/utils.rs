@@ -6,7 +6,7 @@ pub(crate) fn get_my_blocked_list() -> ExternResult<Vec<AgentPubKey>> {
     let function_name: FunctionName = FunctionName("list_blocked".to_owned());
 
     let my_blocked_list_call_response: ZomeCallResponse = call(
-        None, // The cell you want to call (If None will call the current cell).
+        CallTargetCell::Local, // The cell you want to call (If None will call the current cell).
         zome_name,
         function_name,
         None, //The capability secret if required.

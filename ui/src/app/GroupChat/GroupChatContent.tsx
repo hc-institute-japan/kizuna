@@ -1,5 +1,5 @@
 import { IonContent, IonPage } from "@ionic/react";
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router";
 // Components
@@ -18,7 +18,7 @@ import {
   setErrGroupMessage,
 } from "../../redux/group/actions";
 import { fetchPinnedMessages } from "../../redux/group/actions/fetchPinnedMessages";
-import { GroupConversation, GroupMessageInput } from "../../redux/group/types";
+import { GroupMessageInput } from "../../redux/group/types";
 import { RootState } from "../../redux/types";
 // Utils
 import { useAppDispatch } from "../../utils/helpers";

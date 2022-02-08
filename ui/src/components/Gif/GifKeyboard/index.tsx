@@ -127,7 +127,11 @@ const GifKeyboard: React.FC<Props> = ({ onSend, onChange, onSelect }) => {
               {category.name.replace("#", "").toUpperCase()}
             </IonText>
           </div>
-          <img className={styles.categorypreview} src={category.image} />
+          <img
+            alt={category.name}
+            className={styles.categorypreview}
+            src={category.image}
+          />
         </div>
       );
     });

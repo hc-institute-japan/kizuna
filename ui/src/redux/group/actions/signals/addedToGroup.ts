@@ -79,7 +79,7 @@ const addedToGroup =
         payload: nonAddedProfilesB64,
       });
       profiles.forEach((agentProfile: AgentProfile) => {
-        const id = agentProfile.agent_pub_key;
+        const id = agentProfile.agentPubKey;
         membersProfile[id] = {
           id,
           username: agentProfile.profile.nickname,
