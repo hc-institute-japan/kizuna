@@ -153,22 +153,6 @@ const GroupChat: React.FC = () => {
   }, [isTyping]);
 
   useEffect(() => {
-    // setInterval(() => {
-    //   const members = [...groupData.members, groupData.creator].filter(
-    //     (member) => member !== myProfile.id
-    //   );
-    //   dispatch(
-    //     indicateGroupTyping({
-    //       groupId: groupData.originalGroupId,
-    //       indicatedBy: myProfile.id!,
-    //       members,
-    //       isTyping: true,
-    //     })
-    //   );
-    // }, 10);
-  }, []);
-
-  useEffect(() => {
     if (typingIndicator) {
       // Remove self from the recipient of typing signal
 
@@ -177,7 +161,7 @@ const GroupChat: React.FC = () => {
 
       if (inputTimeout.current) clearTimeout(inputTimeout.current);
 
-      inputTimeout.current = setTimeout(() => setIsTyping(false), 500);
+      inputTimeout.current = setTimeout(() => setIsTyping(false), 1500);
     }
   }, [message]);
 
