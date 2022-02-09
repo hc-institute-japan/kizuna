@@ -12,7 +12,7 @@ import { useIntl } from "react-intl";
 import { FilePayload } from "../../../redux/commons/types";
 import { GroupMessage } from "../../../redux/group/types";
 import { P2PMessage } from "../../../redux/p2pmessages/types";
-import { monthToString } from "../../../utils/helpers";
+import { monthToString } from "../../../utils/services/DateService";
 import FileView from "../../Chat/File/FileView";
 import styles from "../style.module.css";
 

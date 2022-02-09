@@ -18,9 +18,9 @@ import {
 import { getGifs } from "../../../redux/gif/actions/getGifs";
 import { getCategories } from "../../../redux/gif/actions/getCategories";
 import styles from "./style.module.css";
-import { useAppDispatch } from "../../../utils/helpers";
 import Spinner from "../../../components/Spinner";
 import { getGifsState } from "../../../redux/gif/actions/getGifsState";
+import { useAppDispatch } from "../../../utils/services/ReduxService";
 
 export interface FileContent {
   metadata: {

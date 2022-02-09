@@ -1,6 +1,7 @@
 import { serializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
-import { binaryToUrl } from "../../../utils/helpers";
+import { binaryToUrl } from "../../../utils/services/ConversionService";
+
 import { pushError } from "../../error/actions";
 import { ThunkAction } from "../../types";
 import { ProfileActionTypes, SET_PROFILE } from "../types";

@@ -1,15 +1,13 @@
 import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
 import { AgentPubKey } from "@holochain/client";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
-import { deserializeAgentPubKey } from "../../../utils/helpers";
+import { deserializeAgentPubKey } from "../../../utils/services/ConversionService";
 import { pushError } from "../../error/actions";
 import { ThunkAction } from "../../types";
 import {
   GroupConversation,
   RemoveMembersAction,
   REMOVE_MEMBERS,
-
-  // IO
   UpdateGroupMembersData,
 } from "../types";
 

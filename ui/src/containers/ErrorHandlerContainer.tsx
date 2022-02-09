@@ -4,7 +4,7 @@ import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { shiftError } from "../redux/error/actions";
 import { RootState } from "../redux/types";
-import { useAppDispatch } from "../utils/helpers";
+import { useAppDispatch } from "../utils/services/ReduxService";
 import { useToast } from "./ToastContainer/context";
 
 const ErrorHandler: React.FC = ({ children }) => {

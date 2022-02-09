@@ -14,7 +14,6 @@ import { FilePayload } from "../../../redux/commons/types";
 import { P2PHashMap, P2PMessage } from "../../../redux/p2pmessages/types";
 import { getPreviousMessages } from "../../../redux/p2pmessages/actions/getPreviousMessages";
 import { getFileBytes } from "../../../redux/p2pmessages/actions/getFileBytes";
-import { useAppDispatch } from "../../../utils/helpers";
 // import { useIntl } from "react-intl";
 
 import ContactHeader from "./ContactHeader";
@@ -23,6 +22,7 @@ import SegmentTabs from "./SegmentTabs";
 import MediaBox from "../../../components/Slides/MediaBox";
 import FileBox from "../../../components/Slides/FileBox";
 import ProfileInfo from "../../../components/ProfileInfo";
+import { useAppDispatch } from "../../../utils/services/ReduxService";
 
 interface Props {
   location: RouteComponentProps<{}, {}, { conversant: Profile }>;

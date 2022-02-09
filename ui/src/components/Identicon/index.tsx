@@ -2,7 +2,7 @@ import renderIcon from "@holo-host/identicon";
 import { deserializeHash } from "@holochain-open-dev/core-types";
 import { IonAvatar } from "@ionic/react";
 import React, { useEffect, useRef } from "react";
-import { binaryToUrl } from "../../utils/helpers";
+import { binaryToUrl } from "../../utils/services/ConversionService";
 import styles from "./style.module.css";
 
 interface Props {

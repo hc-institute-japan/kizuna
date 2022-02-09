@@ -25,7 +25,8 @@ import { isHoloEnv } from "../../connection/constants";
 import { logout } from "../../redux/profile/actions";
 import { Profile } from "../../redux/profile/types";
 import { RootState } from "../../redux/types";
-import { binaryToUrl, useAppDispatch } from "../../utils/helpers";
+import { binaryToUrl } from "../../utils/services/ConversionService";
+import { useAppDispatch } from "../../utils/services/ReduxService";
 import Identicon from "../Identicon";
 import styles from "./style.module.css";
 

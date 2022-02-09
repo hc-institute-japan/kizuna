@@ -24,7 +24,8 @@ import ProfileInfo from "../../components/ProfileInfo";
 import updateAvatar from "../../redux/profile/actions/updateAvatar";
 import { Profile as ProfileType } from "../../redux/profile/types";
 import { RootState } from "../../redux/types";
-import { binaryToUrl, useAppDispatch } from "../../utils/helpers";
+import { binaryToUrl } from "../../utils/services/ConversionService";
+import { useAppDispatch } from "../../utils/services/ReduxService";
 import ProfileMenuItems from "./ProfileMenuItems";
 import styles from "./style.module.css";
 

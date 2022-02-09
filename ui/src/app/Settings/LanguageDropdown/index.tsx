@@ -13,7 +13,7 @@ import { useHistory } from "react-router";
 import { setLanguage } from "../../../redux/language/actions";
 import { Languages } from "../../../redux/language/types";
 import { RootState } from "../../../redux/types";
-import { useAppDispatch } from "../../../utils/helpers";
+import { useAppDispatch } from "../../../utils/services/ReduxService";
 
 const languages: Languages[] = [
   { language: "English", code: "en" },

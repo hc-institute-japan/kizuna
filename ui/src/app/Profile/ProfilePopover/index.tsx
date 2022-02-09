@@ -15,7 +15,7 @@ import {
 } from "../../../redux/contacts/actions";
 import { Profile } from "../../../redux/profile/types";
 import { RootState } from "../../../redux/types";
-import { useAppDispatch } from "../../../utils/helpers";
+import { useAppDispatch } from "../../../utils/services/ReduxService";
 import styles from "./style.module.css";
 
 interface Props {

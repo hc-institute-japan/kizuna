@@ -16,7 +16,7 @@ import { useHistory, useParams } from "react-router";
 import PinnedMessages from "../../../components/PinnedMessages";
 import { getPinnedMessages } from "../../../redux/p2pmessages/actions/getPinnedMessages";
 import { RootState } from "../../../redux/types";
-import { useAppDispatch } from "../../../utils/helpers";
+import { useAppDispatch } from "../../../utils/services/ReduxService";
 
 const ChatPinnedMessage: React.FC = () => {
   const { id } = useParams<{ id: string }>();

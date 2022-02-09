@@ -1,5 +1,6 @@
 import { serializeHash } from "@holochain-open-dev/core-types";
-import { timestampToDate } from "../../../../utils/helpers";
+import { timestampToDate } from "../../../../utils/services/DateService";
+
 import {
   FilePayload,
   FilePayloadInput,

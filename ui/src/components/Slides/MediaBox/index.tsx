@@ -17,7 +17,8 @@ import { GroupMessage } from "../../../redux/group/types";
 import { getFileBytes } from "../../../redux/p2pmessages/actions/getFileBytes";
 import { P2PMessage } from "../../../redux/p2pmessages/types";
 import { RootState } from "../../../redux/types";
-import { monthToString, useAppDispatch } from "../../../utils/helpers";
+import { monthToString } from "../../../utils/services/DateService";
+import { useAppDispatch } from "../../../utils/services/ReduxService";
 import VideoPlayer from "../../VideoPlayer";
 import styles from "../style.module.css";
 

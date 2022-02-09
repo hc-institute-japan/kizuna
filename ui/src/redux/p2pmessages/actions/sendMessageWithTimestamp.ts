@@ -1,14 +1,16 @@
 import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
-import { ThunkAction } from "../../types";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
 import { pushError } from "../../../redux/error/actions";
 import {
   P2PMessage,
   P2PMessageReceipt,
 } from "../../../redux/p2pmessages/types";
-import { dateToTimestamp, timestampToDate } from "../../../utils/helpers";
+import {
+  dateToTimestamp,
+  timestampToDate,
+} from "../../../utils/services/DateService";
 import { FilePayloadInput, FileType, TextPayload } from "../../commons/types";
-import { MessageInput } from "../types";
+import { ThunkAction } from "../../types";
 import { appendMessage } from "../actions/appendMessage";
 
 /* SENDER */

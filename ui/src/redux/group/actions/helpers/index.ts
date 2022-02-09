@@ -4,8 +4,9 @@ import { FUNCTIONS, ZOMES } from "../../../../connection/types";
 import {
   deserializeAgentPubKey,
   objectMap,
-  timestampToDate,
-} from "../../../../utils/helpers";
+} from "../../../../utils/services/ConversionService";
+import { timestampToDate } from "../../../../utils/services/DateService";
+
 import {
   isOther,
   // type guards
