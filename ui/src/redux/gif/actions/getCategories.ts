@@ -1,9 +1,8 @@
 import { ThunkAction } from "../../types";
-import { returnValue } from "../types";
 import { setCategories } from "./setCategories";
 
 const apikey = "9QL1R5ZGUNGM";
-const searchLimit = 20;
+// const searchLimit = 20;
 let baseUrl = "https://g.tenor.com/v1";
 
 export const getCategories = (): ThunkAction => (dispatch, getState) => {

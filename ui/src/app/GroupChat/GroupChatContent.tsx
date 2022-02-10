@@ -18,7 +18,7 @@ import {
   setErrGroupMessage,
 } from "../../redux/group/actions";
 import { fetchPinnedMessages } from "../../redux/group/actions/fetchPinnedMessages";
-import { GroupConversation, GroupMessageInput } from "../../redux/group/types";
+import { GroupMessageInput } from "../../redux/group/types";
 import { RootState } from "../../redux/types";
 // Utils
 import { useAppDispatch } from "../../utils/helpers";
@@ -32,6 +32,7 @@ interface GroupChatParams {
 const GroupChat: React.FC = () => {
   const dispatch = useAppDispatch();
   const { group } = useParams<GroupChatParams>();
+  const [isTyping, setIsTyping] = useState(false);
 
   /* local states */
   const [files, setFiles] = useState<FileContent[]>([]);
@@ -135,39 +136,50 @@ const GroupChat: React.FC = () => {
       handle change in message input. indicate typing as the user types 
       but debounce with 500ms to indicate false in
     */
-  const handleOnChange = (message: string, groupInfo: GroupConversation) => {
+
+  useEffect(() => {
+    const members = [...groupData.members, groupData.creator].filter(
+      (member) => member !== myProfile.id
+    );
+
+    dispatch(
+      indicateGroupTyping({
+        groupId: groupData.originalGroupId,
+        indicatedBy: myProfile.id!,
+        members,
+        isTyping,
+      })
+    );
+  }, [isTyping]);
+
+  useEffect(() => {
+    // setInterval(() => {
+    //   const members = [...groupData.members, groupData.creator].filter(
+    //     (member) => member !== myProfile.id
+    //   );
+    //   dispatch(
+    //     indicateGroupTyping({
+    //       groupId: groupData.originalGroupId,
+    //       indicatedBy: myProfile.id!,
+    //       members,
+    //       isTyping: true,
+    //     })
+    //   );
+    // }, 10);
+  }, []);
+
+  useEffect(() => {
     if (typingIndicator) {
       // Remove self from the recipient of typing signal
-      let members = [...groupInfo.members, groupInfo.creator].filter(
-        (member) => member !== myProfile.id
-      );
 
-      dispatch(
-        indicateGroupTyping({
-          groupId: groupInfo.originalGroupId,
-          indicatedBy: myProfile.id!,
-          members,
-          isTyping: message.length !== 0 ? true : false,
-        })
-      );
+      if (isTyping !== (message.length !== 0))
+        setIsTyping(message.length !== 0);
 
       if (inputTimeout.current) clearTimeout(inputTimeout.current);
 
-      inputTimeout.current = setTimeout(
-        () =>
-          dispatch(
-            indicateGroupTyping({
-              groupId: groupInfo.originalGroupId,
-              indicatedBy: myProfile.id!,
-              members,
-              isTyping: false,
-            })
-          ),
-        500
-      );
+      inputTimeout.current = setTimeout(() => setIsTyping(false), 500);
     }
-    return setMessage(message);
-  };
+  }, [message]);
 
   return groupData ? (
     <IonPage>
@@ -196,7 +208,7 @@ const GroupChat: React.FC = () => {
       <MessageInput
         ref={messageInput}
         onSend={handleOnSend}
-        onChange={(message: string) => handleOnChange(message, groupData)}
+        onChange={(message: string) => setMessage(message)}
         onFileSelect={(files) => setFiles(files)}
       />
     </IonPage>

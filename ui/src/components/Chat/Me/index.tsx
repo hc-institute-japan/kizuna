@@ -86,7 +86,9 @@ const Me: React.FC<ChatProps> = ({
       <IonItem
         lines="none"
         className={`${common["me-container"]} ${fileMaxWidth}`}
-        onClick={(e: any) => (err ? onLongPress(e) : null)}
+        onClick={(e) => {
+          if (err) onLongPress(e);
+        }}
         {...pressHandlers}
       >
         <div
@@ -136,17 +138,14 @@ const Me: React.FC<ChatProps> = ({
               className={common.picture}
               style={{ marginLeft: "0.5rem" }}
               icon={alertCircleOutline}
-            ></IonIcon>
+            />
           )
         ) : isP2P ? null : (
           <div className={common["picture"]} style={{ marginLeft: "0.5rem" }}>
             {showProfilePicture ? (
               profile.fields.avatar ? (
                 <IonAvatar className={common["avatar-container"]}>
-                  <img
-                    src={binaryToUrl(profile.fields.avatar)}
-                    alt="avatar"
-                  ></img>
+                  <img src={binaryToUrl(profile.fields.avatar)} alt="avatar" />
                 </IonAvatar>
               ) : (
                 <IonAvatar className={common["avatar-container"]}>
@@ -166,14 +165,6 @@ const Me: React.FC<ChatProps> = ({
           </IonItem>
         )
       ) : null}
-      {/* <ChatModal
-        isPinned={isPinned}
-        onPin={onPinMessage as () => any}
-        onReply={() => {
-          if (onReply) onReply({ author, payload, id });
-        }}
-        open={[isModalOpen, setIsModalOpen]}
-      ></ChatModal> */}
     </>
   );
 };

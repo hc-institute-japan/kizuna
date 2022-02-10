@@ -2,7 +2,7 @@ export const SET_USERNAME = "SET_USERNAME";
 export const SET_PROFILE = "SET_PROFILE";
 
 export interface AgentProfile {
-  agent_pub_key: string;
+  agentPubKey: string;
   profile: {
     fields: {
       [key: string]: any;

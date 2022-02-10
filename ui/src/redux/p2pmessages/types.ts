@@ -1,4 +1,4 @@
-import { AgentPubKey } from "@holochain/conductor-api";
+import { AgentPubKey } from "@holochain/client";
 import { HoloHash } from "../commons/types";
 import {
   MessageID,

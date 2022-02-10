@@ -1,6 +1,5 @@
 import { serializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
-import { binaryToUrl } from "../../../utils/helpers";
 import { pushError } from "../../error/actions";
 import { AgentProfile, Profile } from "../../profile/types";
 import { ThunkAction } from "../../types";
@@ -24,7 +23,7 @@ const fetchMyContacts =
           payload: idsB64,
         });
         profilesOutput.forEach((agentProfile: AgentProfile) => {
-          const id = agentProfile.agent_pub_key;
+          const id = agentProfile.agentPubKey;
           contacts[id] = {
             id,
             username: agentProfile.profile.nickname,

@@ -1,5 +1,4 @@
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
-import { binaryToUrl } from "../../../utils/helpers";
 import { ThunkAction } from "../../types";
 import { AgentProfile, Profile } from "../types";
 
@@ -13,7 +12,7 @@ const searchProfiles =
       let res: AgentProfile[] = await callZome({
         zomeName: ZOMES.PROFILES,
         fnName: FUNCTIONS[ZOMES.PROFILES].SEARCH_PROFILES,
-        payload: { nickname_prefix: nicknamePrefix },
+        payload: { nicknamePrefix },
       });
       /*
       filter the contacts that are already added
@@ -24,12 +23,12 @@ const searchProfiles =
       const filteredMappedProfiles: Profile[] = res
         .filter(
           (res: AgentProfile) =>
-            !Object.keys(contacts).includes(res.agent_pub_key) &&
-            res.agent_pub_key !== id
+            !Object.keys(contacts).includes(res.agentPubKey) &&
+            res.agentPubKey !== id
         )
         .map((v: AgentProfile) => {
           return {
-            id: v.agent_pub_key,
+            id: v.agentPubKey,
             username: v.profile.nickname,
             fields: v.profile.fields.avatar
               ? {

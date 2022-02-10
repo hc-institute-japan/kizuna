@@ -1,4 +1,6 @@
+import { useIonModal } from "@ionic/react";
 import React, { useRef, useState } from "react";
+import { useIntl } from "react-intl";
 import Controls from "./Controls";
 import styles from "./style.module.css";
 import VideoPlayerModal from "./VideoPlayerModal";
@@ -25,7 +27,6 @@ const VideoPlayer: React.FC<Props> = ({
   const video = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [hasError, setHasError] = useState(false);
   const container = useRef<HTMLDivElement>(null);
@@ -44,14 +45,28 @@ const VideoPlayer: React.FC<Props> = ({
     if (onPlayPauseErrorHandler) onPlayPauseErrorHandler(setHasError);
   };
 
+  const intl = useIntl();
+
+  const onDismiss = () => dismiss();
+
+  const [present, dismiss] = useIonModal(VideoPlayerModal, {
+    download,
+    onPlayPauseErrorHandler,
+    src,
+    intl,
+    onDismiss,
+  });
+
+  const onDoubleClick = () => {
+    setIsPlaying(false);
+    present({ cssClass: "video-view" });
+  };
+
   return (
     <div
       ref={container}
       className={style.join(" ")}
-      onDoubleClick={() => {
-        setIsPlaying(false);
-        setIsModalOpen(true);
-      }}
+      onDoubleClick={onDoubleClick}
     >
       <video
         className={styles.video}
@@ -72,7 +87,6 @@ const VideoPlayer: React.FC<Props> = ({
         src={src}
         onError={handleError}
       />
-      {/* {video.current ? ( */}
       {!err ? (
         <Controls
           isPlaying={isPlaying}
@@ -80,16 +94,9 @@ const VideoPlayer: React.FC<Props> = ({
           onPlayPauseErrorHandler={errorHandler}
           duration={currentTime}
           video={video}
-          modal={[isModalOpen, setIsModalOpen]}
+          present={present}
         />
       ) : null}
-      {/* ) : null} */}
-      <VideoPlayerModal
-        download={download}
-        onPlayPauseErrorHandler={onPlayPauseErrorHandler}
-        src={src}
-        open={[isModalOpen, setIsModalOpen]}
-      />
     </div>
   );
 };

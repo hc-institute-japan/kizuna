@@ -43,13 +43,12 @@ export const installAgents = async (
     const agent = agentNames[i];
     console.log(`generating key for: ${agent}:`);
     const agent_key = await admin.generateAgentPubKey();
-    console.log(`${agent} pubkey:`, agent_key.toString("base64"));
 
     let dna = {
       hash: dnaHash,
       role_id: "lobby",
-      nick: "kizuna",
     };
+
     if (memProofArray) {
       dna["membrane_proof"] = Array.from(memProofArray[i]);
     }

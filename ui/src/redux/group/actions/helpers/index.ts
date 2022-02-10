@@ -1,5 +1,5 @@
 import { serializeHash } from "@holochain-open-dev/core-types";
-import { AgentPubKey } from "@holochain/conductor-api";
+import { AgentPubKey } from "@holochain/client";
 import { FUNCTIONS, ZOMES } from "../../../../connection/types";
 import {
   deserializeAgentPubKey,
@@ -146,7 +146,7 @@ export const fetchUsernameOfMembers = async (
       payload: undefinedProfilesB64,
     });
     res.forEach((agentProfile: AgentProfile) => {
-      let id = agentProfile.agent_pub_key;
+      let id = agentProfile.agentPubKey;
       membersUsernames[id] = {
         id,
         username: agentProfile.profile.nickname,

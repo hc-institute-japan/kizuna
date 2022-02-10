@@ -14,8 +14,7 @@ export default (config) => {
     async (s: ScenarioApi, t) => {
       const [conductor] = await s.players([config]);
       const [alice_lobby_happ] = await installAgents(conductor, ["alice"]);
-      const [alice_conductor] = alice_lobby_happ.cells;
-
+      const alice_conductor = alice_lobby_happ.cells[0];
       await createProfile({
         nickname: "alice_nick",
         fields: {},

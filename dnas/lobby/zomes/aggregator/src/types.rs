@@ -12,26 +12,10 @@ pub struct Profile {
 }
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct AgentProfile {
     pub agent_pub_key: AgentPubKey,
     pub profile: Profile,
-}
-
-#[derive(Clone, Serialize, Deserialize, Debug)]
-#[serde(rename_all = "camelCase")]
-// Is there a way not to do this ugly thing? :(
-pub struct AgentProfileCamel {
-    pub agent_pub_key: AgentPubKey,
-    pub profile: Profile,
-}
-
-impl From<AgentProfile> for AgentProfileCamel {
-    fn from(profile: AgentProfile) -> Self {
-        AgentProfileCamel {
-            agent_pub_key: profile.agent_pub_key,
-            profile: profile.profile,
-        }
-    }
 }
 
 // for group
@@ -168,14 +152,14 @@ pub struct PerGroupPreference {
 #[derive(Serialize, Deserialize, Debug, SerializedBytes)]
 #[serde(rename_all = "camelCase")]
 pub struct AggregatedLatestData {
-    pub user_info: AgentProfileCamel,
+    pub user_info: Option<AgentProfile>,
     // for contacts
-    pub added_contacts: Vec<AgentProfileCamel>,
-    pub blocked_contacts: Vec<AgentProfileCamel>,
+    pub added_contacts: Vec<AgentProfile>,
+    pub blocked_contacts: Vec<AgentProfile>,
     // for group
     pub groups: Vec<GroupOutput>,
     pub latest_group_messages: GroupMessagesOutput,
-    pub member_profiles: Vec<AgentProfileCamel>,
+    pub member_profiles: Vec<AgentProfile>,
     // for p2pmessage
     pub latest_p2p_messages: P2PMessageHashTables,
     // for preference

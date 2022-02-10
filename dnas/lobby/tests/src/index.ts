@@ -11,7 +11,7 @@ const network = {
   bootstrap_service: "https://bootstrap-staging.holo.host/",
 };
 
-const config = Config.gen({ network });
+const config = Config.gen();
 
 group(config);
 contacts(config);

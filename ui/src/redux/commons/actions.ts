@@ -1,6 +1,6 @@
-import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
+import { serializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../connection/types";
-import { binaryToUrl, timestampToDate } from "../../utils/helpers";
+import { timestampToDate } from "../../utils/helpers";
 import { SET_BLOCKED, SET_CONTACTS } from "../contacts/types";
 import { pushError } from "../error/actions";
 import { convertFetchedResToGroupMessagesOutput } from "../group/actions/helpers";

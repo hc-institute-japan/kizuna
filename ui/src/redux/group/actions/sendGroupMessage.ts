@@ -200,7 +200,7 @@ const sendGroupMessage =
         getState,
         dispatch
       );
-      return false;
+      // return false;
     } catch (e) {
       try {
         if (!(e as any).message.includes("Timed out")) {

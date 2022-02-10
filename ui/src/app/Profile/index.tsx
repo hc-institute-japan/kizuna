@@ -105,7 +105,7 @@ const Profile: React.FC = () => {
       (file) => {
         file.arrayBuffer().then((arrBuffer) => {
           const fileSize = file.size;
-          const fileName = file.name;
+          // const fileName = file.name;
           // 15mb = 15728640b, file.size is of type bytes
           if (fileSize < 15728640) {
             const encoder = new TextEncoder();
@@ -126,7 +126,6 @@ const Profile: React.FC = () => {
   };
 
   const renderAvatar = () => {
-    console.log(profile);
     if (profile) {
       if (profile.id === currProfile.id) {
         return (

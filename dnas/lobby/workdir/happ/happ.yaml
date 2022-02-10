@@ -3,7 +3,7 @@ manifest_version: "1"
 name: kizuna
 description: ~
 roles:
-  - id: kizuna
+  - id: kizuna-lobby
     provisioning:
       strategy: create
       deferred: false

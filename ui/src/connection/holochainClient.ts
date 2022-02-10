@@ -1,9 +1,10 @@
+import { HolochainClient, HoloClient } from "@holochain-open-dev/cell-client";
 import {
-  HolochainClient,
-  HoloClient,
-  WebSdkClient,
-} from "@holochain-open-dev/cell-client";
-import { AgentPubKey, AppSignalCb, AppWebsocket } from "@holochain/client";
+  AdminWebsocket,
+  AgentPubKey,
+  AppSignalCb,
+  CellId,
+} from "@holochain/client";
 import { store } from "../containers/ReduxContainer";
 import { handleSignal } from "../redux/signal/actions";
 import { CallZomeConfig } from "../redux/types";
@@ -14,6 +15,7 @@ global.COMB = undefined;
 window.COMB = require("@holo-host/comb").COMB;
 
 export let client: null | HolochainClient | HoloClient = null;
+export let adminWs: AdminWebsocket | null = null;
 
 let signalHandler: AppSignalCb = (signal) =>
   store?.dispatch(
@@ -31,47 +33,36 @@ const createClient = async (
         app_name: "Kizuna Messaging App",
         skip_registration: true,
       };
-      const client = new WebSdkClient(appUrl()!, branding);
 
-      await client.connection.ready();
-      await client.connection.signIn();
+      const client: HoloClient = await HoloClient.connect(
+        appUrl()!,
+        appId()!,
+        branding
+      );
 
-      const appInfo = await client.connection.appInfo(appId());
+      client.addSignalHandler(signalHandler);
 
-      console.log("here is the appInfo, ", appInfo);
+      await client.signIn();
 
-      if (!appInfo.cell_data)
-        throw new Error(`Holo appInfo() failed: ${JSON.stringify(appInfo)}`);
-
-      const cellData = appInfo.cell_data[0];
-      console.log("the cell data is: ", cellData);
-
-      // TODO: remove this when chaperone is fixed
-      if (!(cellData.cell_id[0] instanceof Uint8Array)) {
-        cellData.cell_id = [
-          new Uint8Array((cellData.cell_id[0] as any).data),
-          new Uint8Array((cellData.cell_id[1] as any).data),
-        ] as any;
-      }
-
-      const holoClient = new HoloClient(client, cellData);
-      holoClient.addSignalHandler(signalHandler);
-      return holoClient;
+      return client;
     }
     case "HCDEV":
     case "HC": {
-      const appWs = await AppWebsocket.connect(
+      const client: HolochainClient = await HolochainClient.connect(
         appUrl() as string,
-        60000,
-        signalHandler
+        appId() as string
       );
 
-      const appInfo = await appWs.appInfo({
-        installed_app_id: appId() as string,
-      });
-      const cellData = appInfo.cell_data[0];
+      // if (!adminWs) {
+      //   adminWs = await AdminWebsocket.connect(adminUrl()!, 60000);
+      //   adminWs.client.socket.addEventListener("close", () => {
+      //     console.log("admin websocket closed");
+      //   });
+      // }
 
-      return new HolochainClient(appWs as any, cellData);
+      client.addSignalHandler(signalHandler);
+
+      return client;
     }
     default: {
       return null;
@@ -85,7 +76,7 @@ export const init: () => any = async () => {
     client = await createClient(ENV);
     return client;
   } catch (error) {
-    Object.values(error as object).forEach((e) => console.error(e));
+    Object.values(error as any).forEach((e) => console.error(e));
     console.error(error);
     throw error;
   }
@@ -98,7 +89,8 @@ export const getAgentId: () => Promise<AgentPubKey | null> = async () => {
   if (myAgentId) return myAgentId;
   await init();
   try {
-    const info = await client?.cellId[1];
+    const info = await client?.appInfo.cell_data[0].cell_id[1];
+    console.log("this is the agent id, ", info);
     if (info) return info;
     return null;
   } catch (e) {
@@ -119,7 +111,12 @@ export const retry: (config: CallZomeConfig) => Promise<any> = async (
   console.log("entering backoff");
   await init();
 
-  const { zomeName, fnName, payload = null } = config;
+  const {
+    cellId = await getLobbyCellId(),
+    zomeName,
+    fnName,
+    payload = null,
+  } = config;
 
   const max_retries = 5;
   let retryCount = 0;
@@ -128,6 +125,7 @@ export const retry: (config: CallZomeConfig) => Promise<any> = async (
   while (callFailed && retryCount < max_retries) {
     try {
       return await client?.callZome(
+        cellId!,
         zomeName,
         fnName,
         payload,
@@ -193,9 +191,8 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
   config
 ) => {
   await init();
-
   const {
-    // cellId = info?.cell_data[0].cell_id,
+    cellId = await getLobbyCellId(), // by default get the lobby cell Id.
     zomeName,
     fnName,
     // provenance = info?.cell_data[0].cell_id[1],
@@ -203,6 +200,7 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
   } = config;
   try {
     return await client?.callZome(
+      cellId!, // expecting cell id to be non-nullable.
       zomeName,
       fnName,
       payload,
@@ -250,4 +248,10 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
 
     throw e;
   }
+};
+
+// only for lobby
+export const getLobbyCellId = async (): Promise<CellId | undefined> => {
+  await init();
+  return client?.cellDataByRoleId("kizuna-lobby")?.cell_id;
 };
