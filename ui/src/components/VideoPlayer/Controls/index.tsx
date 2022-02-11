@@ -1,13 +1,7 @@
 import { isPlatform } from "@ionic/core";
 import { IonIcon, IonSpinner } from "@ionic/react";
-import { expandOutline, pause, play, download } from "ionicons/icons";
-import React, {
-  RefObject,
-  SetStateAction,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { download, expandOutline, pause, play } from "ionicons/icons";
+import React, { RefObject, useEffect, useRef, useState } from "react";
 import styles from "./style.module.css";
 
 interface Props {
@@ -28,7 +22,6 @@ const Controls: React.FC<Props> = ({
   onPlayPauseErrorHandler,
 }) => {
   const [visible, setVisible] = useState(isPlatform("mobile"));
-
   const timeout = useRef<NodeJS.Timeout>();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -63,9 +56,7 @@ const Controls: React.FC<Props> = ({
   const onPlayPause = () => {
     if (!hasError) {
       if (!isPlaying) video.current?.play();
-      else {
-        video.current?.pause();
-      }
+      else video.current?.pause();
     } else {
       setIsLoading(true);
       if (onPlayPauseErrorHandler) onPlayPauseErrorHandler();

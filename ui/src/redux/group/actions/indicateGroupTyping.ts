@@ -6,7 +6,8 @@ import { GroupTypingDetailData } from "../types";
 
 const indicateGroupTyping =
   (groupTypingDetailData: GroupTypingDetailData): ThunkAction =>
-  async (_dispatch, _getState, { callZome }) => {
+  
+  (_dispatch, _getState, { callZome }) => {
     /* deserialize fields for zome fn */
 
     const input = {
@@ -18,7 +19,7 @@ const indicateGroupTyping =
       isTyping: groupTypingDetailData.isTyping,
     };
 
-    await callZome({
+    callZome({
       zomeName: ZOMES.GROUP,
       fnName: FUNCTIONS[ZOMES.GROUP].INDICATE_GROUP_TYPING,
       payload: input,
