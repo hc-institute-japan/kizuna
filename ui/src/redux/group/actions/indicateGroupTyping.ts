@@ -18,7 +18,7 @@ const indicateGroupTyping =
       isTyping: groupTypingDetailData.isTyping,
     };
 
-    await callZome({
+    callZome({
       zomeName: ZOMES.GROUP,
       fnName: FUNCTIONS[ZOMES.GROUP].INDICATE_GROUP_TYPING,
       payload: input,
