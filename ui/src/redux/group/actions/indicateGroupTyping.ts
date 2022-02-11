@@ -6,7 +6,7 @@ import { GroupTypingDetailData } from "../types";
 
 const indicateGroupTyping =
   (groupTypingDetailData: GroupTypingDetailData): ThunkAction =>
-  async (dispatch, getState, { callZome }) => {
+  (dispatch, getState, { callZome }) => {
     /* deserialize fields for zome fn */
 
     const input = {
