@@ -161,7 +161,7 @@ const GroupChat: React.FC = () => {
 
       if (inputTimeout.current) clearTimeout(inputTimeout.current);
 
-      inputTimeout.current = setTimeout(() => setIsTyping(false), 1500);
+      inputTimeout.current = setTimeout(() => setIsTyping(false), 500);
     }
   }, [message]);
 
