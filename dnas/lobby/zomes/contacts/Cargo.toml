@@ -9,7 +9,7 @@ name = "contacts"
 crate-type = [ "cdylib", "rlib" ]
 
 [dependencies]
-derive_more = "0"
-serde = "1"
 hdk = {version = "0.0.121", features = ["encoding"]}
+serde = "1"
+derive_more = "0"
 hc_contacts = {git = "https://github.com/holochain-open-dev/contacts", package = "contacts", branch="main"}

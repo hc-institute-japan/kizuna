@@ -9,6 +9,10 @@ use super::{GroupMessageContent, GroupMessagesOutput, GroupMsgBatchFetchFilter};
 pub fn get_previous_group_messages_handler(
     filter: GroupMsgBatchFetchFilter,
 ) -> ExternResult<GroupMessagesOutput> {
+    debug!(
+        "nicko get previous messages by agent {:?}",
+        agent_info()?.agent_latest_pubkey
+    );
     let mut linked_messages: Vec<Link> = Vec::default();
 
     let mut messages_hashes: Vec<EntryHash> = vec![];
@@ -27,7 +31,7 @@ pub fn get_previous_group_messages_handler(
             .path_entry_hash()?;
         pivot_path = Some(path_hash.clone());
 
-        // get the messages linked to this path (this list was sorted & filtered inside the method)
+        // get the messages linked to this path (this list wa1s sorted & filtered inside the method)
         linked_messages = get_linked_messages_hash(
             path_hash,
             filter.payload_type.clone(),
@@ -61,15 +65,23 @@ pub fn get_previous_group_messages_handler(
     linked_messages.sort_by(|a, b| b.timestamp.cmp(&a.timestamp));
     linked_messages.truncate(filter.batch_size.into());
 
+    debug!(
+        "nicko get previous messages # of links {:?}",
+        linked_messages.clone().len()
+    );
+
     // finally retrieve the messages from all links gathered
-    collect_and_insert_messages(
+    collect_decrypt_and_insert_messages(
         linked_messages,
         &mut messages_hashes,
         &mut group_messages_contents,
+        filter.group_id.clone(),
     )?;
 
     // and the read_list
     collect_and_insert_read_list(&mut group_messages_contents)?;
+
+    debug!("nicko get previos messages done collecting read list");
 
     let hashes_in_contents: Vec<String> = group_messages_contents.clone().into_keys().collect();
     let messages_hashes_string: Vec<String> = messages_hashes
@@ -91,6 +103,7 @@ pub fn get_previous_group_messages_handler(
     });
     messages_by_group.insert(filter.group_id.to_string(), messages_hashes);
 
+    debug!("nicko get previous messages returning");
     Ok(GroupMessagesOutput {
         messages_by_group,
         group_messages_contents,

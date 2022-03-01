@@ -1,12 +1,19 @@
 use hdk::prelude::*;
 
-use super::{GroupFileBytes, GroupMessage, GroupMessageInput, GroupMessageWithId};
+use super::{
+    EncryptedGroupMessage, GroupFileBytes, GroupMessage, GroupMessageInput, GroupMessageWithId,
+};
 // use crate::group_helpers::get_group_latest_version;
 // use crate::signals::{SignalDetails, SignalName, SignalPayload};
+use crate::group_encryption::{encrypt_message::encrypt_message_handler, EncryptMessageInput};
 use crate::utils::*;
 use file_types::{FileMetadata, FileType, Payload, PayloadInput};
 
 pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<GroupMessageWithId> {
+    debug!(
+        "nicko send message by agent {:?}",
+        agent_info()?.agent_latest_pubkey
+    );
     let payload = match message_input.payload_input.clone() {
         PayloadInput::Text { payload } => Payload::Text { payload },
         PayloadInput::File {
@@ -67,17 +74,25 @@ pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<Gr
         }
     }
 
-    // commit GroupMessage entry
+    // encrypt message
+    let encrypt_input = EncryptMessageInput {
+        group_id: message_input.group_hash.clone(),
+        message: message.clone(),
+    };
+    let encrypted_message: EncryptedGroupMessage = encrypt_message_handler(encrypt_input)?;
+    // debug!("nicko group send message encrypt complete");
+    // commit GroupMessage e1ntry
 
     // create_entry(&message)?;
     host_call::<CreateInput, HeaderHash>(
         __create,
         CreateInput::new(
-            GroupMessage::entry_def().id,
-            Entry::App(message.clone().try_into()?),
+            EncryptedGroupMessage::entry_def().id,
+            Entry::App(encrypted_message.clone().try_into()?),
             ChainTopOrdering::Relaxed,
         ),
     )?;
+    // debug!("nicko group send message commit complete");
 
     let group_hash = message.group_hash.clone().to_string(); // message's group hash as string
     let days = timestamp_to_days(message.created.clone()).to_string(); // group message's timestamp into days as string
@@ -87,7 +102,7 @@ pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<Gr
         __create_link,
         CreateLinkInput::new(
             group_hash_timestamp_path_hash,
-            hash_entry(&message)?,
+            hash_entry(&encrypted_message)?,
             LinkTag::new(match message.payload.clone() {
                 Payload::Text { payload: _ } => "text".to_owned(),
                 Payload::File {
@@ -103,11 +118,14 @@ pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<Gr
         ),
     )?;
 
+    debug!("nicko send message link created");
     let message_hash = hash_entry(&message)?;
     let group_message_with_id = GroupMessageWithId {
         id: message_hash,
         content: message,
     };
+
+    debug!("nicko send message returning");
 
     Ok(group_message_with_id)
 }

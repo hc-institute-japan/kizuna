@@ -3,12 +3,13 @@ import { ScenarioApi } from "@holochain/tryorama/lib/api";
 import * as fs from "fs";
 import * as path from "path";
 import { installAgents } from "../../../install";
-import { delay } from "../../../utils";
+import { delay, serializeHash } from "../../../utils";
 import { sendMessageSignalHandler, strToUtf8Bytes } from "../utils";
 import {
   createGroup,
   getPreviousGroupMessages,
   sendMessage,
+  init,
 } from "../zome_fns";
 export function sendMessageTest(config) {
   let orchestrator = new Orchestrator();
@@ -16,10 +17,36 @@ export function sendMessageTest(config) {
   orchestrator.registerScenario(
     "Tests for text send_message",
     async (s: ScenarioApi, t) => {
+      const [conductor] = await s.players([config]);
+
+      // const [alice, bobby, charlie] = await installAgents(conductor, [
+      //   "alice",
+      //   "bobby",
+      //   "charlie",
+      // ]);
+
+      // const [alice_conductor] = alice.cells;
+      // const [bobby_conductor] = bobby.cells;
+      // const [charlie_conductor] = bobby.cells;
+
+      // const alicePubKey = alice.agent;
+      // const bobbyPubKey = bobby.agent;
+      // const charliePubKey = charlie.agent;
+
+      // console.log("nicko tryorama alice key", serializeHash(alicePubKey));
+      // console.log("nicko tryorama bobby key", serializeHash(bobbyPubKey));
+      // console.log("nicko tryorama charlie key", serializeHash(charliePubKey));
       const [alice, bobby, charlie] = await s.players([config, config, config]);
+
+      console.log("nicko 0");
+
       const [alice_lobby_happ] = await installAgents(alice, ["alice"]);
+      await delay(1000);
       const [bobby_lobby_happ] = await installAgents(bobby, ["bobby"]);
+      await delay(1000);
       const [charlie_lobby_happ] = await installAgents(charlie, ["charlie"]);
+      await delay(1000);
+
       s.shareAllNodes([alice, bobby, charlie]);
       const [alice_conductor] = alice_lobby_happ.cells;
       const [bobby_conductor] = bobby_lobby_happ.cells;
@@ -33,24 +60,34 @@ export function sendMessageTest(config) {
       const messagesSent: any[] = [];
 
       // set signal hanlders
-      alice.setSignalHandler((signal) =>
-        sendMessageSignalHandler(signal, signals)(alicePubKey)
-      );
-      bobby.setSignalHandler((signal) =>
-        sendMessageSignalHandler(signal, signals)(bobbyPubKey)
-      );
-      charlie.setSignalHandler((signal) =>
-        sendMessageSignalHandler(signal, signals)(charliePubKey)
-      );
+      // alice.setSignalHandler((signal) =>
+      //   sendMessageSignalHandler(signal, signals)(alicePubKey)
+      // );
+      // bobby.setSignalHandler((signal) =>
+      //   sendMessageSignalHandler(signal, signals)(bobbyPubKey)
+      // );
+      // charlie.setSignalHandler((signal) =>
+      //   sendMessageSignalHandler(signal, signals)(charliePubKey)
+      // );
 
-      await delay(2000);
+      // await init()(alice_conductor);
+      // await delay(2000);
+      // await init()(bobby_conductor);
+      // await delay(2000);
+      // await init()(charlie_conductor);
+      // await delay(2000);
+
+      await delay(10000);
 
       let create_group_input = {
         name: "Group_name",
         members: [bobbyPubKey, charliePubKey],
       };
 
+      console.log("nicko 1");
+
       let { groupId } = await createGroup(create_group_input)(alice_conductor);
+      console.log("nicko created group id", groupId);
       await delay(1000);
 
       messagesSent.push(

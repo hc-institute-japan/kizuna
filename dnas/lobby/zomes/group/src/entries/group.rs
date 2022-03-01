@@ -19,6 +19,7 @@ pub struct Group {
     pub creator: AgentPubKey,
     pub members: Vec<AgentPubKey>,
     pub avatar: Option<String>,
+    pub session: u32,
 }
 
 impl Group {
@@ -28,6 +29,7 @@ impl Group {
         creator: AgentPubKey,
         members: Vec<AgentPubKey>,
         avatar: Option<String>,
+        session: u32,
     ) -> Self {
         Group {
             name,
@@ -35,6 +37,7 @@ impl Group {
             creator,
             members,
             avatar,
+            session,
         }
     }
     // GETTERS
@@ -46,6 +49,9 @@ impl Group {
     }
     pub fn get_group_members(&self) -> Vec<AgentPubKey> {
         self.members.clone()
+    }
+    pub fn get_group_current_session(&self) -> u32 {
+        self.session.clone()
     }
 }
 
@@ -102,7 +108,9 @@ pub struct CreateGroupOutput {
     pub content: Group,
     pub group_revision_id: HeaderHash,
     pub group_id: EntryHash,
+    pub session: u32,
 }
+
 #[derive(Deserialize, Serialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct GroupOutput {
@@ -113,6 +121,7 @@ pub struct GroupOutput {
     pub creator: AgentPubKey,
     pub created: Timestamp,
     pub avatar: Option<String>, // group_versions: Vec<Group>,
+    pub session: u32,
 }
 
 impl GroupOutput {
@@ -125,6 +134,7 @@ impl GroupOutput {
             creator: group.creator,
             created: group.created,
             avatar: group.avatar,
+            session: group.session,
         }
     }
 }

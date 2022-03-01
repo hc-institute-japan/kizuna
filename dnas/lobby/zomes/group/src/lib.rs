@@ -7,6 +7,7 @@ mod signals;
 mod utils;
 
 use entries::group::{self, GroupOutput};
+use entries::group_encryption;
 use entries::group_message;
 
 use group::{
@@ -41,9 +42,10 @@ use group_message::{
 use signals::{SignalDetails, SignalPayload};
 
 use group_message::{
-    GroupChatFilter, GroupFileBytes, GroupMessage, GroupMessageElement, GroupMessageInput,
-    GroupMessageInputWithDate, GroupMessageReadData, GroupMessageWithId, GroupMessagesOutput,
-    GroupMsgAdjacentFetchFilter, GroupMsgBatchFetchFilter, GroupTypingDetailData, PinDetail,
+    EncryptedGroupMessage, GroupChatFilter, GroupFileBytes, GroupMessage, GroupMessageElement,
+    GroupMessageInput, GroupMessageInputWithDate, GroupMessageReadData, GroupMessageWithId,
+    GroupMessagesOutput, GroupMsgAdjacentFetchFilter, GroupMsgBatchFetchFilter,
+    GroupTypingDetailData, PinDetail,
 };
 
 use group::{
@@ -51,33 +53,77 @@ use group::{
     UpdateMembersIO,
 };
 
+use group_encryption::{
+    create_key::create_key_handler, decrypt_key::decrypt_key_handler,
+    decrypt_message::decrypt_message_handler, encrypt_key::encrypt_key_handler,
+    encrypt_message::encrypt_message_handler, get_my_group_keys::get_my_group_keys_handler,
+    DecryptInput, DecryptMessageInput, EncryptInput, EncryptMessageInput, EncryptedGroupKey,
+    IdentityKey,
+};
+
 entry_defs![
     Group::entry_def(),
     Path::entry_def(),
     GroupMessage::entry_def(),
     GroupFileBytes::entry_def(),
-    PathEntry::entry_def()
+    PathEntry::entry_def(),
+    IdentityKey::entry_def(),
+    EncryptedGroupKey::entry_def(),
+    EncryptedGroupMessage::entry_def()
 ];
 
 // this is only exposed outside of WASM for testing purposes.
 #[hdk_extern]
 pub fn init(_: ()) -> ExternResult<InitCallbackResult> {
-    let mut fuctions = BTreeSet::new();
+    let mut functions = BTreeSet::new();
 
     // TODO: name may be changed to better suit the context of cap grant.s
     let tag: String = "group_zome_cap_grant".into();
     let access: CapAccess = CapAccess::Unrestricted;
     let zome_name: ZomeName = zome_info()?.name;
 
-    fuctions.insert((zome_name.clone(), FunctionName("recv_remote_signal".into())));
+    functions.insert((zome_name.clone(), FunctionName("recv_remote_signal".into())));
 
     let cap_grant_entry: CapGrantEntry = CapGrantEntry::new(
         tag,    // A string by which to later query for saved grants.
         access, // Unrestricted access means any external agent can call the extern
-        fuctions,
+        functions,
     );
 
     create_cap_grant(cap_grant_entry)?;
+
+    // init handler of group encryption
+    // creates an x25519 encryption key for the agent
+    // init_handler()?;
+    debug!(
+        "nicko group init agent {:?}",
+        agent_info()?.agent_latest_pubkey
+    );
+    let identity_key = IdentityKey {
+        agent: agent_info()?.agent_latest_pubkey.into(),
+        key: create_x25519_keypair()?,
+    };
+
+    let identity_key_entry = Entry::App(identity_key.clone().try_into()?);
+
+    let _identity_key_hash = host_call::<CreateInput, HeaderHash>(
+        __create,
+        CreateInput::new(
+            IdentityKey::entry_def().id,
+            identity_key_entry.clone(),
+            ChainTopOrdering::Relaxed,
+        ),
+    )?;
+
+    host_call::<CreateLinkInput, HeaderHash>(
+        __create_link,
+        CreateLinkInput::new(
+            agent_info()?.agent_latest_pubkey.into(),
+            hash_entry(identity_key_entry)?,
+            LinkTag::new("identity_key".to_owned()),
+            ChainTopOrdering::Relaxed,
+        ),
+    )?;
 
     Ok(InitCallbackResult::Pass)
 }
@@ -247,6 +293,37 @@ fn validate_create_entry_group(data: ValidateData) -> ExternResult<ValidateCallb
 #[hdk_extern]
 fn validate_update_entry_group(data: ValidateData) -> ExternResult<ValidateCallbackResult> {
     return validate_update_group_handler(data);
+}
+
+// encryption
+#[hdk_extern]
+fn encrypt_key(input: EncryptInput) -> ExternResult<XSalsa20Poly1305EncryptedData> {
+    return encrypt_key_handler(input);
+}
+
+#[hdk_extern]
+fn decrypt_key(input: DecryptInput) -> ExternResult<XSalsa20Poly1305Data> {
+    return decrypt_key_handler(input);
+}
+
+#[hdk_extern]
+fn create_key(group_id: EntryHash) -> ExternResult<()> {
+    return create_key_handler(group_id);
+}
+
+#[hdk_extern]
+fn get_my_group_keys(group_id: EntryHash) -> ExternResult<HashMap<u32, EncryptedGroupKey>> {
+    return get_my_group_keys_handler(group_id);
+}
+
+#[hdk_extern]
+fn encrypt_message(input: EncryptMessageInput) -> ExternResult<EncryptedGroupMessage> {
+    return encrypt_message_handler(input);
+}
+
+#[hdk_extern]
+fn decrypt_message(input: DecryptMessageInput) -> ExternResult<GroupMessage> {
+    return decrypt_message_handler(input);
 }
 
 /*

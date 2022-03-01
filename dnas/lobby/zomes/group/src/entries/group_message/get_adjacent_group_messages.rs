@@ -112,10 +112,11 @@ pub fn get_adjacent_group_messages_handler(
     linked_messages = subsequent_linked_messages;
 
     // finally retrieve the messages from all links gathered
-    collect_and_insert_messages(
+    collect_decrypt_and_insert_messages(
         linked_messages,
         &mut messages_hashes,
         &mut group_messages_contents,
+        filter.group_id.clone(),
     )?;
 
     // and the read_list

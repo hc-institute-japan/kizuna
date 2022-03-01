@@ -5,6 +5,7 @@ use super::{CreateGroupInput, CreateGroupOutput, Group, GroupOutput};
 use crate::signals::SignalPayload;
 
 use super::group_helpers::link_and_emit_added_to_group_signals;
+use crate::group_encryption::create_key::create_key_handler;
 use crate::utils;
 use crate::utils::error;
 
@@ -16,7 +17,7 @@ pub fn create_group_handler(
     // let avatar = create_group_input.avatar;
     let created: Timestamp = sys_time()?;
     let creator: AgentPubKey = agent_info()?.agent_latest_pubkey;
-    // let avatar =
+    let session: u32 = 0;
 
     // get my blocked list from the contacs zome
     let my_blocked_list: Vec<AgentPubKey> = utils::get_my_blocked_list()?;
@@ -34,6 +35,7 @@ pub fn create_group_handler(
         creator.clone(),
         group_members.clone(),
         None,
+        session.clone(),
     );
 
     // commit group entry
@@ -47,6 +49,7 @@ pub fn create_group_handler(
         creator: group.creator.clone(),
         created: group.created.clone(),
         avatar: group.avatar.clone(),
+        session,
     };
 
     // link the group admin to the group
@@ -64,9 +67,12 @@ pub fn create_group_handler(
         signal_payload,
     )?;
 
+    create_key_handler(group_id.clone())?;
+
     Ok(CreateGroupOutput {
         content: group,
         group_id: group_id,
         group_revision_id: group_revision_id,
+        session: 0,
     })
 }

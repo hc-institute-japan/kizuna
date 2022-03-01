@@ -34,7 +34,7 @@ export default (config) => {
   // validateUpdateGroupTest(config); // ok
 
   // GroupMessage related tests
-  // sendMessageTest(config); // ok
+  sendMessageTest(config); // ok
   // pinMessageTest(config); // ok
   // sendMessageswithFilesTest(config); // ok
   // sendLargeSetOfFilesTest(config); //ok
@@ -43,5 +43,5 @@ export default (config) => {
   // getLatestMessagesForAllGroupsTest(config); // ok
   // fetchFilesForAParticularDateTest(config); // ok
   // groupTypingIndicatorTest(config); //ok
-  readGroupMessageTest(config); // ok
+  // readGroupMessageTest(config); // ok
 };

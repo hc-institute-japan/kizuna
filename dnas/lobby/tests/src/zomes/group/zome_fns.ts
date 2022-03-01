@@ -1,7 +1,7 @@
 import { Cell } from "@holochain/tryorama";
 
-export function init(conductor: Cell) {
-  conductor.call("group", "init");
+export function init() {
+  return (conductor: Cell) => conductor.call("group", "init");
 }
 
 // group CRUD

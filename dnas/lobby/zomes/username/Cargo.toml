@@ -9,7 +9,7 @@ name = "username"
 crate-type = [ "cdylib", "rlib" ]
 
 [dependencies]
-derive_more = "0"
-serde = "1"
-username = {git = "https://github.com/holochain-open-dev/username-zome", branch = "bump-hdk-0.0.100", package = "username"}
 hdk = {version = "0.0.121", features = ["encoding"]}
+serde = "1"
+derive_more = "0"
+username = {git = "https://github.com/holochain-open-dev/username-zome", branch = "bump-hdk-0.0.100", package = "username"}

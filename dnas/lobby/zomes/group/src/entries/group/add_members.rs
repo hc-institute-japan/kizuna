@@ -44,6 +44,7 @@ pub fn add_members_handler(add_members_input: UpdateMembersIO) -> ExternResult<U
 
     let group_name: String = latest_group_version.latest_name;
     let created: Timestamp = sys_time()?;
+    let session: u32 = latest_group_version.session + 1;
 
     let updated_group: Group = Group::new(
         group_name,
@@ -51,6 +52,7 @@ pub fn add_members_handler(add_members_input: UpdateMembersIO) -> ExternResult<U
         creator,
         group_members.clone(),
         avatar.clone(),
+        session.clone(),
     );
 
     // update_entry the Group with new members field with original HeaderHash
@@ -64,6 +66,7 @@ pub fn add_members_handler(add_members_input: UpdateMembersIO) -> ExternResult<U
         creator: updated_group.creator.clone(),
         created: updated_group.created.clone(),
         avatar,
+        session,
     };
 
     let signal_payload: SignalPayload = SignalPayload::AddedToGroup(group_output);

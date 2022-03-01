@@ -43,6 +43,25 @@ entry_def!(GroupMessage
     }
 );
 
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct EncryptedGroupMessage {
+    // EntryHash of first ver of Group
+    pub group_hash: EntryHash,
+    pub session_id: u32,
+    pub data: XSalsa20Poly1305EncryptedData,
+}
+
+entry_def!(EncryptedGroupMessage
+    EntryDef {
+        id: "encrypted_group_message".into(),
+        visibility: EntryVisibility::Public,
+        crdt_type: CrdtType,
+        required_validations: RequiredValidations::default(),
+        required_validation_type: RequiredValidationType::Element
+    }
+);
+
 #[hdk_entry(id = "group_file_bytes", visibility = "public")]
 #[derive(Clone)]
 #[serde(rename_all = "camelCase")]

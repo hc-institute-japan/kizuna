@@ -45,6 +45,7 @@ pub fn get_all_my_groups_handler() -> ExternResult<Vec<GroupOutput>> {
                         group.name = latest_group.latest_name; // latest group name
                         group.members = latest_group.members; // latest group members
                         group.avatar = latest_group.avatar;
+                        group.session = latest_group.session;
                     }
 
                     my_linked_groups_entries.push(GroupOutput::new(
@@ -53,7 +54,7 @@ pub fn get_all_my_groups_handler() -> ExternResult<Vec<GroupOutput>> {
                         group_revision_id.clone(),
                     ));
                 } else {
-                    return error("this is a fatal error. Something is wrong with holochain.");
+                    return error("this is a fatal error. Something is wrong with holochain [get all my groups].");
                 }
             }
             _ => (),

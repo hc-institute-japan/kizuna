@@ -6,8 +6,11 @@ use file_types::PayloadType;
 use std::collections::hash_map::HashMap;
 
 use super::{
-    GroupMessage, GroupMessageContent, GroupMessageData, GroupMessageElement, GroupMessageWithId,
+    EncryptedGroupMessage, GroupMessage, GroupMessageContent, GroupMessageData,
+    GroupMessageElement, GroupMessageWithId,
 };
+
+use crate::group_encryption::{decrypt_message::decrypt_message_handler, DecryptMessageInput};
 
 pub enum Direction {
     Previous,
@@ -67,7 +70,7 @@ pub fn get_linked_messages_hash(
     return Ok(linked_messages);
 }
 
-pub fn collect_and_insert_messages(
+pub fn _collect_and_insert_messages(
     linked_messages: Vec<Link>,
     messages_hashes: &mut Vec<EntryHash>,
     group_messages_contents: &mut HashMap<String, GroupMessageContent>,
@@ -138,9 +141,103 @@ pub fn collect_and_insert_messages(
     Ok(())
 }
 
+pub fn collect_decrypt_and_insert_messages(
+    linked_messages: Vec<Link>,
+    messages_hashes: &mut Vec<EntryHash>,
+    group_messages_contents: &mut HashMap<String, GroupMessageContent>,
+    group_hash: EntryHash,
+) -> ExternResult<()> {
+    // collect values to fill the group_message_content.
+    // - message entry_hash (aka link target)
+    // - GroupMessageData (constructed from the element fetched from entry hash of the message )
+
+    debug!("nicko collect decrypt and insert messages");
+    let message_hashes: Vec<EntryHash> = linked_messages
+        .into_iter()
+        .map(|link| link.target)
+        .collect();
+    let get_input = message_hashes
+        .into_iter()
+        .map(|eh| GetInput::new(eh.clone().into(), GetOptions::latest()))
+        .collect::<Vec<GetInput>>();
+
+    // TODO: add a debugger here to solve the "Entry Not Found" error
+    let get_output = HDK.with(|h| h.borrow().get(get_input))?;
+    let messages_with_header: Vec<(SignedHeaderHashed, GroupMessage)> = get_output
+        .into_iter()
+        .filter_map(|maybe_option| maybe_option)
+        .map(
+            |e| match try_from_element_with_header::<EncryptedGroupMessage>(e) {
+                Ok(res) => {
+                    // decrypt here
+                    let decrypt_message_input = DecryptMessageInput {
+                        group_id: group_hash.clone(),
+                        message: res.1,
+                    };
+                    debug!("nicko collect message helper calling decrypt");
+                    if let Ok(decrypted_message) = decrypt_message_handler(decrypt_message_input) {
+                        debug!("nicko collect message helper appending message");
+                        Some((res.0, decrypted_message))
+                    } else {
+                        debug!("nicko collect message helper cannot decrypt message");
+                        None
+                    }
+
+                    // let decrypted_message = decrypt_message_handler(decrypt_message_input).ok()?;
+                    // Some((res.0, decrypted_message))
+                }
+                _ => None,
+            },
+        )
+        .filter_map(|maybe_message| maybe_message)
+        .collect();
+
+    for message_with_header in messages_with_header {
+        let message = message_with_header.1;
+        let signed_header = message_with_header.0;
+        let message_hash = signed_header.header().entry_hash().unwrap(); // safely unwraps as all headers here are of create variant
+        let mut group_message_data = GroupMessageData {
+            message_id: message_hash.clone(),
+            group_hash: message.group_hash.clone(),
+            sender: message.sender.clone(),
+            payload: message.payload.clone(),
+            created: message.created.clone(),
+            reply_to: None,
+        };
+
+        // TODO: refactor to be a multi get
+        if let Some(reply_to_hash) = message.reply_to.clone() {
+            let replied_message: GroupMessage =
+                try_get_and_convert(reply_to_hash.clone(), GetOptions::latest())?;
+            group_message_data.reply_to = Some(GroupMessageWithId {
+                id: reply_to_hash,
+                content: replied_message,
+            });
+        }
+
+        let group_message_element: GroupMessageElement = GroupMessageElement {
+            entry: group_message_data,
+            signed_header: signed_header.clone(),
+        };
+
+        group_messages_contents.insert(
+            message_hash.clone().to_string(),
+            GroupMessageContent {
+                group_message_element,
+                read_list: HashMap::new(), // read list will be collected in a separate helper
+            },
+        );
+        messages_hashes.push(message_hash.clone());
+    }
+    debug!("nicko collect message helper returning");
+
+    Ok(())
+}
+
 pub fn collect_and_insert_read_list(
     group_messages_contents: &mut HashMap<String, GroupMessageContent>,
 ) -> ExternResult<()> {
+    debug!("nicko collect and insert read list");
     let mut all_read_list: HashMap<String, HashMap<String, Timestamp>> = HashMap::new();
 
     let message_hashes = group_messages_contents

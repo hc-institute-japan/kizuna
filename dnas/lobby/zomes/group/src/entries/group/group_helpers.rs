@@ -39,6 +39,7 @@ pub fn get_group_latest_version(group_id: EntryHash) -> ExternResult<GroupOutput
                             creator: latest_group_version.creator,
                             created: latest_group_version.created,
                             avatar: latest_group_version.avatar,
+                            session: latest_group_version.session,
                         };
 
                         return Ok(group_output);
@@ -79,6 +80,7 @@ pub fn get_group_latest_version(group_id: EntryHash) -> ExternResult<GroupOutput
                         creator: latest_group.creator,
                         created: latest_group.created,
                         avatar: latest_group.avatar,
+                        session: latest_group.session,
                     };
                     return Ok(group_output);
                 }

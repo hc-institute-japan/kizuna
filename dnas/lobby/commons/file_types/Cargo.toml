@@ -10,6 +10,6 @@ name = "file_types"
 crate-type = [ "cdylib", "rlib" ]
 
 [dependencies]
-derive_more = "0"
-serde = "1"
 hdk = {version = "0.0.121", features = ["encoding"]}
+serde = "1"
+derive_more = "0"

@@ -59,10 +59,11 @@ pub fn get_subsequent_group_messages_handler(
     linked_messages.sort_by(|a, b| a.timestamp.cmp(&b.timestamp));
     linked_messages.truncate(filter.batch_size.into());
 
-    collect_and_insert_messages(
+    collect_decrypt_and_insert_messages(
         linked_messages,
         &mut messages_hashes,
         &mut group_messages_contents,
+        filter.group_id.clone(),
     )?;
 
     // and the read_list
