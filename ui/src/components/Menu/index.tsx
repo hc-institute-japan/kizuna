@@ -131,7 +131,7 @@ const Menu: React.FC = () => {
       <IonFooter className="ion-no-border">
         <IonToolbar>
           <IonText className={`ion-padding ${styles["version"]}`}>
-            {intl.formatMessage({ id: "app.menu.version" })} 0.2.0
+            {intl.formatMessage({ id: "app.menu.version" })} 0.2.1
           </IonText>
         </IonToolbar>
       </IonFooter>
