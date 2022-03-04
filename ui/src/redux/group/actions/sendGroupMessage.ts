@@ -1,7 +1,7 @@
 import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
 import { CombinedState } from "redux";
 import { FUNCTIONS, ZOMES } from "../../../utils/HolochainService/types";
-import { timestampToDate } from "../../../utils/helpers";
+import { timestampToDate } from "../../../utils/services/DateService";
 import {
   FilePayload,
   FileType,

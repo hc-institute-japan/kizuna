@@ -2,15 +2,15 @@ import { deserializeHash } from "@holochain-open-dev/core-types";
 import { ThunkAction } from "../../types";
 import { FUNCTIONS, ZOMES } from "../../../utils/HolochainService/types";
 import { pushError } from "../../../redux/error/actions";
-import { dateToTimestamp } from "../../../utils/helpers";
 import { transformZomeDataToUIData } from "./helpers/transformZomeDateToUIData";
+import {} from "../../../utils/services/DateService";
 
 export const getMessagesByAgentByTimestamp =
   (id: string, date: Date, payload_type: String): ThunkAction =>
   async (dispatch, getState, { callZome }) => {
     let zome_input = {
       conversant: deserializeHash(id),
-      date: dateToTimestamp(date),
+      date: date,
       payload_type: payload_type,
     };
 

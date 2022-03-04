@@ -20,8 +20,9 @@ import {
 import { fetchPinnedMessages } from "../../redux/group/actions/fetchPinnedMessages";
 import { GroupMessageInput } from "../../redux/group/types";
 import { RootState } from "../../redux/types";
+import { useAppDispatch } from "../../utils/services/ReduxService";
 // Utils
-import { useAppDispatch } from "../../utils/helpers";
+
 import ChatBox from "./ChatBox";
 import GroupChatHeader from "./GroupChatHeader";
 
@@ -151,22 +152,6 @@ const GroupChat: React.FC = () => {
       })
     );
   }, [isTyping]);
-
-  useEffect(() => {
-    // setInterval(() => {
-    //   const members = [...groupData.members, groupData.creator].filter(
-    //     (member) => member !== myProfile.id
-    //   );
-    //   dispatch(
-    //     indicateGroupTyping({
-    //       groupId: groupData.originalGroupId,
-    //       indicatedBy: myProfile.id!,
-    //       members,
-    //       isTyping: true,
-    //     })
-    //   );
-    // }, 10);
-  }, []);
 
   useEffect(() => {
     if (typingIndicator) {

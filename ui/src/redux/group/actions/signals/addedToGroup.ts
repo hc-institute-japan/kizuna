@@ -1,10 +1,8 @@
 import { serializeHash } from "@holochain-open-dev/core-types";
 import { AgentPubKey } from "@holochain/client";
 import { FUNCTIONS, ZOMES } from "../../../../utils/HolochainService/types";
-import {
-  deserializeAgentPubKey,
-  timestampToDate,
-} from "../../../../utils/helpers";
+import { deserializeAgentPubKey } from "../../../../utils/services/ConversionService";
+import { timestampToDate } from "../../../../utils/services/DateService";
 import { AgentProfile, Profile } from "../../../profile/types";
 import { ThunkAction } from "../../../types";
 import { AddGroupAction, ADD_GROUP, GroupConversation } from "../../types";

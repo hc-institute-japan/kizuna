@@ -19,7 +19,8 @@ import {
   isTextPayload,
   TextPayload,
 } from "../../../redux/commons/types";
-import { binaryToUrl, usePressHandlers } from "../../../utils/helpers";
+import { binaryToUrl } from "../../../utils/services/ConversionService";
+import { usePressHandlers } from "../../../utils/services/EventService";
 import Identicon from "../../Identicon";
 import Spinner from "../../Spinner";
 import ChatPopover from "../ChatPopover";

@@ -20,7 +20,7 @@ import { GroupConversation } from "../../../../redux/group/types";
 // Redux
 import { Profile } from "../../../../redux/profile/types";
 import { RootState } from "../../../../redux/types";
-import { useAppDispatch } from "../../../../utils/helpers";
+import { useAppDispatch } from "../../../../utils/services/ReduxService";
 import AddMemberModal from "./AddMemberModal";
 import styles from "./style.module.css";
 

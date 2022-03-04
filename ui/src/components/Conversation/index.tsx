@@ -6,7 +6,7 @@ import {
   Conversation as ConversationDetail,
   Message,
 } from "../../redux/commons/types";
-import { binaryToUrl } from "../../utils/helpers";
+import { binaryToUrl } from "../../utils/services/ConversionService";
 import AgentIdentifier from "../AgentIdentifier";
 import styles from "./style.module.css";
 

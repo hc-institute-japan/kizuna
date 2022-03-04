@@ -17,7 +17,7 @@ import PinnedMessages from "../../../components/PinnedMessages";
 import { Payload } from "../../../redux/commons/types";
 import { getPinnedMessages } from "../../../redux/group/actions/getPinnedMessages";
 import { RootState } from "../../../redux/types";
-import { useAppDispatch } from "../../../utils/helpers";
+import { useAppDispatch } from "../../../utils/services/ReduxService";
 
 const GroupPinnedMessages: React.FC = () => {
   const { group } = useParams<{ group: string }>();

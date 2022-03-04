@@ -1,8 +1,8 @@
 import { serializeHash } from "@holochain-open-dev/core-types";
-import { timestampToDate } from "../../../../utils/helpers";
 import { ThunkAction } from "../../../types";
 import { P2PMessage, P2PMessageReceipt } from "../../types";
 import { appendMessage } from "../../actions/appendMessage";
+import { timestampToDate } from "../../../../utils/services/DateService";
 
 const receiveP2PMessage =
   (payload: any): ThunkAction =>

@@ -7,7 +7,8 @@ import {
   TextPayload,
 } from "../../../redux/commons/types";
 import { Profile } from "../../../redux/profile/types";
-import { isTextPayload } from "../../../utils/helpers";
+import { isTextPayload } from "../../../utils/services/ConversionService";
+
 import styles from "./style.module.css";
 
 interface Props {

@@ -13,7 +13,7 @@ import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import ContactsList from "../../components/ContactList";
 import { RootState } from "../../redux/types";
-import { indexContacts } from "../../utils/helpers";
+import { indexContacts } from "../../utils/services/ConversionService";
 import EmptyBlocked from "./EmptyBlocked";
 
 const Blocked = () => {

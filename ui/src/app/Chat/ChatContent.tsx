@@ -30,9 +30,10 @@ import {
 } from "../../redux/p2pmessages/types";
 import { Profile } from "../../redux/profile/types";
 import { RootState } from "../../redux/types";
-import { useAppDispatch } from "../../utils/helpers";
+
 import ChatHeader from "./ChatHeader";
 import recommitMessage from "../../redux/p2pmessages/actions/signals/recommitMessage";
+import { useAppDispatch } from "../../utils/services/ReduxService";
 
 const Chat: React.FC = () => {
   const dispatch = useAppDispatch();

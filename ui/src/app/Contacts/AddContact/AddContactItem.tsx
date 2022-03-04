@@ -10,7 +10,7 @@ import React, { useState } from "react";
 import AgentIdentifier from "../../../components/AgentIdentifier";
 import { addContact } from "../../../redux/contacts/actions";
 import { Profile } from "../../../redux/profile/types";
-import { useAppDispatch } from "../../../utils/helpers";
+import { useAppDispatch } from "../../../utils/services/ReduxService";
 
 interface Props {
   contact: Profile;

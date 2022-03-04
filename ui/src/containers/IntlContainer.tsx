@@ -5,7 +5,7 @@ import LanguageSelector from "../app/LanguageSelector";
 import messages from "../lang";
 import { setLanguage } from "../redux/language/actions";
 import { RootState } from "../redux/types";
-import { useAppDispatch } from "../utils/helpers";
+import { useAppDispatch } from "../utils/services/ReduxService";
 
 const IntlContainer: React.FC = ({ children }) => {
   const dispatch = useAppDispatch();

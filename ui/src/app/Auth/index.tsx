@@ -6,7 +6,7 @@ import { useSelector } from "react-redux";
 import Spinner from "../../components/Spinner";
 import { getMyProfile } from "../../redux/profile/actions";
 import { RootState } from "../../redux/types";
-import { useAppDispatch } from "../../utils/helpers";
+import { useAppDispatch } from "../../utils/services/ReduxService";
 import Authenticated from "../Authenticated";
 import Unauthenticated from "../Unauthenticated";
 import styles from "./style.module.css";

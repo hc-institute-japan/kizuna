@@ -4,13 +4,13 @@ import { FUNCTIONS, ZOMES } from "../../../utils/HolochainService/types";
 
 export const isTyping =
   (agent: string, isTyping: boolean): ThunkAction =>
-  async (dispatch, _getState, { callZome }) => {
+  (dispatch, _getState, { callZome }) => {
     let payload = {
       agent: Buffer.from(deserializeHash(agent)),
       isTyping: isTyping,
     };
 
-    await callZome({
+    callZome({
       zomeName: ZOMES.P2PMESSAGE,
       fnName: FUNCTIONS[ZOMES.P2PMESSAGE].TYPING,
       payload: payload,

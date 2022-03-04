@@ -20,7 +20,7 @@ import { GroupConversation } from "../../redux/group/types";
 import { sendMessage } from "../../redux/p2pmessages/actions/sendMessage";
 import { setErrorMessage } from "../../redux/p2pmessages/actions/setErrMessage";
 import { Profile, ProfileListType } from "../../redux/profile/types";
-import { useAppDispatch } from "../../utils/helpers";
+import { useAppDispatch } from "../../utils/services/ReduxService";
 import ContactList from "./ContactList";
 import { ContactsContext } from "./context";
 import NewConversationHeader from "./NewConversationHeader";
