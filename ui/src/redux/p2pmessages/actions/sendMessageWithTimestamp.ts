@@ -1,6 +1,6 @@
 import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
 import { ThunkAction } from "../../types";
-import { FUNCTIONS, ZOMES } from "../../../connection/types";
+import { FUNCTIONS, ZOMES } from "../../../utils/HolochainService/types";
 import { pushError } from "../../../redux/error/actions";
 import {
   P2PMessage,

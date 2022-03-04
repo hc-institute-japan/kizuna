@@ -1,5 +1,5 @@
 import { deserializeHash } from "@holochain-open-dev/core-types";
-import { FUNCTIONS, ZOMES } from "../../../connection/types";
+import { FUNCTIONS, ZOMES } from "../../../utils/HolochainService/types";
 import { pushError } from "../../error/actions";
 import { Profile } from "../../profile/types";
 import { ThunkAction } from "../../types";

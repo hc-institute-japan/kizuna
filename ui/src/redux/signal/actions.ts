@@ -1,6 +1,6 @@
 import { AnyAction } from "redux";
 import { ThunkDispatch } from "redux-thunk";
-import { SIGNALS, ZOMES } from "../../connection/types";
+import { SIGNALS, ZOMES } from "../../utils/HolochainService/types";
 import addedToGroup from "../group/actions/signals/addedToGroup";
 import groupMessageData from "../group/actions/signals/groupMessageData";
 import groupMessageRead from "../group/actions/signals/groupMessageRead";
