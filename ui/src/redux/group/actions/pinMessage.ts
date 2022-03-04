@@ -1,4 +1,7 @@
-import { FUNCTIONS, ZOMES } from "../../../utils/HolochainService/types";
+import {
+  FUNCTIONS,
+  ZOMES,
+} from "../../../utils/services/HolochainService/types";
 import { pushError } from "../../error/actions";
 import { ThunkAction } from "../../types";
 import { SetPinnedMessages, SET_PINNED_MESSAGES } from "../types";

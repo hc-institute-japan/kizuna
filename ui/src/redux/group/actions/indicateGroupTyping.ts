@@ -1,5 +1,8 @@
 import { deserializeHash } from "@holochain-open-dev/core-types";
-import { FUNCTIONS, ZOMES } from "../../../utils/HolochainService/types";
+import {
+  FUNCTIONS,
+  ZOMES,
+} from "../../../utils/services/HolochainService/types";
 import { deserializeAgentPubKey } from "../../../utils/services/ConversionService";
 import { ThunkAction } from "../../types";
 import { GroupTypingDetailData } from "../types";

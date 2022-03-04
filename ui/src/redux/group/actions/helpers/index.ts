@@ -1,6 +1,9 @@
 import { serializeHash } from "@holochain-open-dev/core-types";
 import { AgentPubKey } from "@holochain/client";
-import { FUNCTIONS, ZOMES } from "../../../../utils/HolochainService/types";
+import {
+  FUNCTIONS,
+  ZOMES,
+} from "../../../../utils/services/HolochainService/types";
 import {
   deserializeAgentPubKey,
   objectMap,

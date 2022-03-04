@@ -1,5 +1,8 @@
 import { ThunkAction } from "../../types";
-import { FUNCTIONS, ZOMES } from "../../../utils/HolochainService/types";
+import {
+  FUNCTIONS,
+  ZOMES,
+} from "../../../utils/services/HolochainService/types";
 import { SET_FILES } from "../types";
 
 /* 

@@ -1,4 +1,7 @@
-import { FUNCTIONS, ZOMES } from "../../../utils/HolochainService/types";
+import {
+  FUNCTIONS,
+  ZOMES,
+} from "../../../utils/services/HolochainService/types";
 import { ThunkAction } from "../../types";
 import { AgentProfile, Profile } from "../types";
 

@@ -1,5 +1,8 @@
 import { ThunkAction } from "../../types";
-import { FUNCTIONS, ZOMES } from "../../../utils/HolochainService/types";
+import {
+  FUNCTIONS,
+  ZOMES,
+} from "../../../utils/services/HolochainService/types";
 import { pushError } from "../../../redux/error/actions";
 import { transformZomeDataToUIData } from "./helpers/transformZomeDateToUIData";
 import { BatchSize } from "../types";

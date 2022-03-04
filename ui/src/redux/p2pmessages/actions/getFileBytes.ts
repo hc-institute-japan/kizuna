@@ -1,6 +1,9 @@
 import { deserializeHash } from "@holochain-open-dev/core-types";
 import { ThunkAction } from "../../types";
-import { FUNCTIONS, ZOMES } from "../../../utils/HolochainService/types";
+import {
+  FUNCTIONS,
+  ZOMES,
+} from "../../../utils/services/HolochainService/types";
 import { HoloHashBase64, SET_FILES } from "../types";
 import { pushError } from "../../../redux/error/actions";
 

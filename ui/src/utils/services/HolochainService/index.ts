@@ -5,9 +5,9 @@ import {
   AppSignalCb,
   CellId,
 } from "@holochain/client";
-import { store } from "../../containers/ReduxContainer";
-import { handleSignal } from "../../redux/signal/actions";
-import { CallZomeConfig } from "../../redux/types";
+import { store } from "../../../containers/ReduxContainer";
+import { handleSignal } from "../../../redux/signal/actions";
+import { CallZomeConfig } from "../../../redux/types";
 // @ts-ignore
 global.COMB = undefined;
 // @ts-ignore

@@ -1,5 +1,8 @@
 import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
-import { FUNCTIONS, ZOMES } from "../../../utils/HolochainService/types";
+import {
+  FUNCTIONS,
+  ZOMES,
+} from "../../../utils/services/HolochainService/types";
 import { dateToTimestamp } from "../../../utils/services/DateService";
 
 import { ThunkAction } from "../../types";
