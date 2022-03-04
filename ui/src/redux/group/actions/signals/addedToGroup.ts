@@ -1,6 +1,6 @@
 import { serializeHash } from "@holochain-open-dev/core-types";
 import { AgentPubKey } from "@holochain/client";
-import { FUNCTIONS, ZOMES } from "../../../../connection/types";
+import { FUNCTIONS, ZOMES } from "../../../../utils/connection/types";
 import {
   deserializeAgentPubKey,
   timestampToDate,

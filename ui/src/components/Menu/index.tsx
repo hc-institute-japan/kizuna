@@ -21,7 +21,6 @@ import React, { useRef } from "react";
 import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
-import { isHoloEnv } from "../../connection/constants";
 import { logout } from "../../redux/profile/actions";
 import { Profile } from "../../redux/profile/types";
 import { RootState } from "../../redux/types";
@@ -78,7 +77,11 @@ const Menu: React.FC = () => {
       },
       label: intl.formatMessage({ id: "app.menu.logout-label" }),
       icon: logOutOutline,
-      disabled: isHoloEnv() ? false : true,
+      disabled:
+        process.env.REACT_APP_ENVENV === "HCC" ||
+        process.env.REACT_APP_ENVENV === "HOLO"
+          ? false
+          : true,
     },
   ];
 

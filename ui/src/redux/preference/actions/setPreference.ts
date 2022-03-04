@@ -1,4 +1,4 @@
-import { FUNCTIONS, ZOMES } from "../../../connection/types";
+import { FUNCTIONS, ZOMES } from "../../../utils/connection/types";
 import { ThunkAction } from "../../types";
 import { PreferenceParameter, SET_PREFERENCE } from "../types";
 

@@ -1,6 +1,6 @@
 import { deserializeHash } from "@holochain-open-dev/core-types";
 import { ThunkAction } from "../../types";
-import { FUNCTIONS, ZOMES } from "../../../connection/types";
+import { FUNCTIONS, ZOMES } from "../../../utils/connection/types";
 
 export const isTyping =
   (agent: string, isTyping: boolean): ThunkAction =>
