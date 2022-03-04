@@ -6,7 +6,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { dateToString, stringToDate } from "../../utils/helpers";
+import { dateToString, stringToDate } from "../../utils/services/DateService";
 
 interface Props {
   // shows/hides date time item

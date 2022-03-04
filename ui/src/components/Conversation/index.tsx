@@ -1,4 +1,3 @@
-import { deserializeHash } from "@holochain-open-dev/core-types";
 import { IonAvatar, IonBadge, IonItem, IonLabel } from "@ionic/react";
 import { peopleCircleOutline, personCircleOutline } from "ionicons/icons";
 import React from "react";
@@ -7,7 +6,7 @@ import {
   Conversation as ConversationDetail,
   Message,
 } from "../../redux/commons/types";
-import { binaryToUrl } from "../../utils/helpers";
+import { binaryToUrl } from "../../utils/services/ConversionService";
 import AgentIdentifier from "../AgentIdentifier";
 import styles from "./style.module.css";
 

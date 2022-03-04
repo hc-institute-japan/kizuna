@@ -13,7 +13,9 @@ import { addMembers } from "../../../../../redux/group/actions";
 import { UpdateGroupMembersData } from "../../../../../redux/group/types";
 // redux
 import { Profile, ProfileListType } from "../../../../../redux/profile/types";
-import { indexContacts, useAppDispatch } from "../../../../../utils/helpers";
+import { indexContacts } from "../../../../../utils/services/ConversionService";
+import { useAppDispatch } from "../../../../../utils/services/ReduxService";
+
 import AddMemberHeader from "./AddMemberHeader";
 import AddMemberIndex from "./AddMemberIndex";
 import styles from "./style.module.css";

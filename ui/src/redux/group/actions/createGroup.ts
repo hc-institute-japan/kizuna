@@ -10,7 +10,7 @@ import {
   AddGroupAction, // action payload type
 } from "../types";
 import { fetchUsernameOfMembers } from "./helpers";
-import { deserializeAgentPubKey } from "../../../utils/helpers";
+import { deserializeAgentPubKey } from "../../../utils/services/ConversionService";
 
 const createGroup =
   (createGroupInput: CreateGroupInput): ThunkAction =>

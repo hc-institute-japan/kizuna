@@ -4,7 +4,7 @@ import { Redirect, Route, Switch } from "react-router";
 import Menu from "../../components/Menu";
 import Spinner from "../../components/Spinner";
 import { getLatestData } from "../../redux/commons/actions";
-import { useAppDispatch } from "../../utils/helpers";
+import { useAppDispatch } from "../../utils/services/ReduxService";
 import Blocked from "../Blocked";
 import Chat from "../Chat";
 import GroupChat from "../GroupChat";

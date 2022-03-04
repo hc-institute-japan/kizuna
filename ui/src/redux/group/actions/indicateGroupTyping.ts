@@ -1,12 +1,12 @@
 import { deserializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
-import { deserializeAgentPubKey } from "../../../utils/helpers";
+import { deserializeAgentPubKey } from "../../../utils/services/ConversionService";
 import { ThunkAction } from "../../types";
 import { GroupTypingDetailData } from "../types";
 
 const indicateGroupTyping =
   (groupTypingDetailData: GroupTypingDetailData): ThunkAction =>
-  async (dispatch, getState, { callZome }) => {
+  (_dispatch, _getState, { callZome }) => {
     /* deserialize fields for zome fn */
 
     const input = {
@@ -18,7 +18,7 @@ const indicateGroupTyping =
       isTyping: groupTypingDetailData.isTyping,
     };
 
-    await callZome({
+    callZome({
       zomeName: ZOMES.GROUP,
       fnName: FUNCTIONS[ZOMES.GROUP].INDICATE_GROUP_TYPING,
       payload: input,

@@ -9,7 +9,7 @@ import {
   P2PMessageConversationState,
 } from "../../../redux/p2pmessages/types";
 import { Profile } from "../../../redux/profile/types";
-import { useAppDispatch } from "../../../utils/helpers";
+import { useAppDispatch } from "../../../utils/services/ReduxService";
 
 const ChatSearch: React.FC = () => {
   const [messages, setMessages] = useState<

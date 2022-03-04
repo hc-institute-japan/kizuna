@@ -4,7 +4,7 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { FilePayload } from "../../../../redux/commons/types";
 import { RootState } from "../../../../redux/types";
-import { convertSizeToReadableSize } from "../../../../utils/helpers";
+import { convertSizeToReadableSize } from "../../../../utils/services/ConversionService";
 import styles from "./style.module.css";
 
 interface Props {

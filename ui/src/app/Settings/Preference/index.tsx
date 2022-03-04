@@ -10,7 +10,7 @@ import { useIntl } from "react-intl";
 import { useSelector } from "react-redux";
 import { setPreference } from "../../../redux/preference/actions";
 import { RootState } from "../../../redux/types";
-import { useAppDispatch } from "../../../utils/helpers";
+import { useAppDispatch } from "../../../utils/services/ReduxService";
 
 const Preference: React.FC = () => {
   const { typingIndicator, readReceipt } = useSelector(

@@ -1,5 +1,4 @@
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
-import { binaryToUrl } from "../../../utils/helpers";
 import { ThunkAction } from "../../types";
 import { AgentProfile, Profile } from "../types";
 

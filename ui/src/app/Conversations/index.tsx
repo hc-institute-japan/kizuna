@@ -23,7 +23,7 @@ import { GroupConversationsState } from "../../redux/group/types";
 import { countUnread } from "../../redux/p2pmessages/actions/countUnread";
 import { P2PMessageConversationState } from "../../redux/p2pmessages/types";
 import { RootState } from "../../redux/types";
-import { useAppDispatch } from "../../utils/helpers";
+import { useAppDispatch } from "../../utils/services/ReduxService";
 import EmptyConversations from "./EmptyConversations";
 import styles from "./style.module.css";
 
@@ -147,7 +147,6 @@ const Conversations: React.FC = () => {
             badgeCount: dispatch(countUnread(conversant.id)),
           };
         }
-
         if (conversation) conversationsArray.push(conversation);
       }
     }

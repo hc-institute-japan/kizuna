@@ -8,7 +8,7 @@ import fetchMembers from "../../../redux/group/actions/fetchMembers";
 import { GroupMessagesOutput } from "../../../redux/group/types";
 import { Profile } from "../../../redux/profile/types";
 import { RootState } from "../../../redux/types";
-import { useAppDispatch } from "../../../utils/helpers";
+import { useAppDispatch } from "../../../utils/services/ReduxService";
 
 const GroupSearch: React.FC = () => {
   const [messages, setMessages] = useState<
