@@ -5,7 +5,7 @@ import {
   P2PMessage,
   P2PMessageReceipt,
 } from "../../../redux/p2pmessages/types";
-import { timestampToDate } from "../../../utils/helpers";
+import { timestampToDate } from "../../../utils/services/DateService";
 import {
   FilePayload,
   FilePayloadInput,

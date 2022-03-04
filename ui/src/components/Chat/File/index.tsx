@@ -2,7 +2,7 @@ import React from "react";
 import { FilePayload } from "../../../redux/commons/types";
 import { fetchFilesBytes } from "../../../redux/group/actions";
 import { getFileBytes } from "../../../redux/p2pmessages/actions/getFileBytes";
-import { useAppDispatch } from "../../../utils/helpers";
+import { useAppDispatch } from "../../../utils/services/ReduxService";
 import FileView from "./FileView";
 import ImageView from "./ImageView";
 import VideoView from "./VideoView";

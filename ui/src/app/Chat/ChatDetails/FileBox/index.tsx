@@ -19,7 +19,8 @@ import { getPreviousMessages } from "../../../../redux/p2pmessages/actions/getPr
 import { P2PMessage } from "../../../../redux/p2pmessages/types";
 import { Profile } from "../../../../redux/profile/types";
 import { RootState } from "../../../../redux/types";
-import { monthToString, useAppDispatch } from "../../../../utils/helpers";
+import { monthToString } from "../../../../utils/services/DateService";
+import { useAppDispatch } from "../../../../utils/services/ReduxService";
 import styles from "../style.module.css";
 
 interface Props {

@@ -20,8 +20,9 @@ import {
 import { fetchPinnedMessages } from "../../redux/group/actions/fetchPinnedMessages";
 import { GroupConversation, GroupMessageInput } from "../../redux/group/types";
 import { RootState } from "../../redux/types";
+import { useAppDispatch } from "../../utils/services/ReduxService";
 // Utils
-import { useAppDispatch } from "../../utils/helpers";
+
 import ChatBox from "./ChatBox";
 import GroupChatHeader from "./GroupChatHeader";
 

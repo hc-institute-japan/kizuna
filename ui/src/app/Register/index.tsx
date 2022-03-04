@@ -16,8 +16,8 @@ import ImageCropper from "../../components/ImageCropper";
 import HomeInput from "../../components/Input/HomeInput";
 import UpdateAvatar from "../../components/UpdateAvatar";
 import { createProfile } from "../../redux/profile/actions";
-import { useAppDispatch } from "../../utils/helpers";
-import { isUsernameFormatValid } from "../../utils/regex";
+import { useAppDispatch } from "../../utils/services/ReduxService";
+import { isUsernameFormatValid } from "../../utils/services/RegexService";
 import styles from "./style.module.css";
 
 const Register: React.FC = () => {

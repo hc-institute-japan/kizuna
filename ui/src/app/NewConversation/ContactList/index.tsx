@@ -1,7 +1,8 @@
 import { IonList } from "@ionic/react";
 import React from "react";
 import { Profile } from "../../../redux/profile/types";
-import { indexContacts } from "../../../utils/helpers";
+import { indexContacts } from "../../../utils/services/ConversionService";
+
 import styles from "../style.module.css";
 import IndexSection from "./IndexSection";
 

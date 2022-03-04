@@ -1,12 +1,11 @@
 import { deserializeHash } from "@holochain-open-dev/core-types";
 import { FUNCTIONS, ZOMES } from "../../../connection/types";
-import { deserializeAgentPubKey } from "../../../utils/helpers";
+import { deserializeAgentPubKey } from "../../../utils/services/ConversionService";
 import { ThunkAction } from "../../types";
 import { GroupTypingDetailData } from "../types";
 
 const indicateGroupTyping =
   (groupTypingDetailData: GroupTypingDetailData): ThunkAction =>
-  
   (_dispatch, _getState, { callZome }) => {
     /* deserialize fields for zome fn */
 

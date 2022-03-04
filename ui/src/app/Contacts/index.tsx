@@ -6,7 +6,9 @@ import Spinner from "../../components/Spinner";
 import Toolbar from "../../components/Toolbar";
 import { fetchMyContacts } from "../../redux/contacts/actions";
 import { RootState } from "../../redux/types";
-import { indexContacts, useAppDispatch } from "../../utils/helpers";
+import { indexContacts } from "../../utils/services/ConversionService";
+import { useAppDispatch } from "../../utils/services/ReduxService";
+
 import AddContactFAB from "./AddContact/AddContactFAB";
 import AddContactModal from "./AddContact/AddContactModal";
 import EmptyContacts from "./EmptyContacts";

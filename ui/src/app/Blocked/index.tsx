@@ -4,8 +4,6 @@ import {
   IonContent,
   IonHeader,
   IonIcon,
-  IonItem,
-  IonLabel,
   IonPage,
   IonToolbar,
 } from "@ionic/react";
@@ -14,9 +12,8 @@ import React from "react";
 import { useSelector } from "react-redux";
 import { useHistory } from "react-router";
 import ContactsList from "../../components/ContactList";
-import { Profile } from "../../redux/profile/types";
 import { RootState } from "../../redux/types";
-import { indexContacts } from "../../utils/helpers";
+import { indexContacts } from "../../utils/services/ConversionService";
 import EmptyBlocked from "./EmptyBlocked";
 
 const Blocked = () => {

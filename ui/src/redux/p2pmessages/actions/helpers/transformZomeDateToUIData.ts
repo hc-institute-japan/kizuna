@@ -5,9 +5,9 @@ import {
   P2PMessageConversationState,
   P2PMessageReceipt,
 } from "../../types";
-import { timestampToDate } from "../../../../utils/helpers";
 import { MessageID } from "../../../commons/types";
 import { Profile } from "../../../profile/types";
+import { timestampToDate } from "../../../../utils/services/DateService";
 
 export const transformZomeDataToUIData = (
   zomeResults: P2PMessageConversationState,
