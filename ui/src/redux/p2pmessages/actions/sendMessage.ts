@@ -1,6 +1,6 @@
 import { deserializeHash, serializeHash } from "@holochain-open-dev/core-types";
 import { FileContent } from "../../../components/MessageInput";
-import { FUNCTIONS, ZOMES } from "../../../utils/connection/types";
+import { FUNCTIONS, ZOMES } from "../../../utils/HolochainService/types";
 import {
   P2PMessage,
   P2PMessageReceipt,

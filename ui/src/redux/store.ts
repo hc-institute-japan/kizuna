@@ -6,7 +6,7 @@ import {
   getAgentId,
   init,
   retry,
-} from "../utils/connection/holochainClient";
+} from "../utils/HolochainService";
 import rootReducer from "./reducers";
 import { RootState } from "./types";
 

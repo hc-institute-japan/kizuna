@@ -1,5 +1,5 @@
 import { serializeHash } from "@holochain-open-dev/core-types";
-import { FUNCTIONS, ZOMES } from "../../utils/connection/types";
+import { FUNCTIONS, ZOMES } from "../../utils/HolochainService/types";
 import { timestampToDate } from "../../utils/helpers";
 import { SET_BLOCKED, SET_CONTACTS } from "../contacts/types";
 import { pushError } from "../error/actions";
