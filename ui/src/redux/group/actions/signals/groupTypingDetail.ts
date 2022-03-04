@@ -1,31 +1,11 @@
 import { serializeHash } from "@holochain-open-dev/core-types";
-import { FUNCTIONS, ZOMES } from "../../../../connection/types";
-import { AgentProfile, Profile } from "../../../profile/types";
-import { CallZomeConfig, ThunkAction } from "../../../types";
+import { Profile } from "../../../profile/types";
+import { ThunkAction } from "../../../types";
 import {
   GroupTypingDetail,
   SetGroupTypingIndicator,
   SET_GROUP_TYPING_INDICATOR,
 } from "../../types";
-
-const fetchProfile = async (
-  indicatedBy: string,
-  callZome: (config: CallZomeConfig) => Promise<any>
-) => {
-  let fetchedProfile: AgentProfile = await callZome({
-    zomeName: ZOMES.PROFILES,
-    fnName: FUNCTIONS[ZOMES.PROFILES].GET_AGENT_PROFILE,
-    payload: indicatedBy,
-  });
-  let id = fetchedProfile.agentPubKey;
-  return {
-    id: id,
-    username: fetchedProfile.profile.nickname,
-    fields: fetchedProfile.profile.fields.avatar
-      ? { avatar: fetchedProfile.profile.fields.avatar }
-      : {},
-  };
-};
 
 const groupTypingDetail =
   (signalPayload: any): ThunkAction =>
@@ -36,7 +16,6 @@ const groupTypingDetail =
     const groupTyping = state.groups.typing[groupIdB64]
       ? state.groups.typing[groupIdB64]
       : [];
-    const { contacts } = state.contacts;
     const memberId = serializeHash(payload.indicatedBy);
     const currTypers = groupTyping.map((profile: Profile) => profile.id);
 
@@ -50,9 +29,8 @@ const groupTypingDetail =
       (payload.isTyping && !currTypers.includes(memberId)) ||
       (!payload.isTyping && currTypers.includes(memberId))
     ) {
-      let indicatedBy: Profile = contacts[memberId]
-        ? contacts[memberId]
-        : await fetchProfile(memberId, callZome);
+      let indicatedBy: Profile = getState().groups.members[memberId];
+
       let GroupTypingDetail: GroupTypingDetail = {
         groupId: groupIdB64,
         indicatedBy: indicatedBy,
