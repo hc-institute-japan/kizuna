@@ -23,7 +23,7 @@ pub fn send_message_in_target_date_handler(
             file_bytes,
         } => {
             let group_file_bytes = GroupFileBytes(file_bytes);
-            create_entry(&group_file_bytes)?;
+            // create_entry(&group_file_bytes)?;
             match hash_entry(&group_file_bytes) {
                 Ok(hash) => Ok(Payload::File {
                     file_type: file_type,

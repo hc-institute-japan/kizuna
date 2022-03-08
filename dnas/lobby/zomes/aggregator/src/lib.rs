@@ -164,7 +164,6 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
 
     // debug!("Kizuna log: Current latest data {:?}", aggregated_data);
 
-    debug!("nicko aggregator returning");
     Ok(aggregated_data)
 }
 

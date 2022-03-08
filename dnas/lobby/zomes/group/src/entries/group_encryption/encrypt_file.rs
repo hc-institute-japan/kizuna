@@ -3,13 +3,13 @@ use std::collections::HashMap;
 
 use super::{
     decrypt_key::decrypt_key_handler, get_my_group_keys::get_my_group_keys_handler, DecryptInput,
-    EncryptMessageInput, EncryptedGroupKey, GroupKey,
+    EncryptFileInput, EncryptedGroupKey, GroupKey,
 };
 use crate::group::group_helpers::get_group_latest_version;
-use crate::group_message::EncryptedGroupMessage;
+use crate::group_message::EncryptedGroupFileBytes;
 use crate::utils::error;
 
-pub fn encrypt_message_handler(input: EncryptMessageInput) -> ExternResult<EncryptedGroupMessage> {
+pub fn encrypt_file_handler(input: EncryptFileInput) -> ExternResult<EncryptedGroupFileBytes> {
     // get encrypting keys
     let keys: HashMap<u32, EncryptedGroupKey> = get_my_group_keys_handler(input.group_id.clone())?;
 
@@ -35,14 +35,11 @@ pub fn encrypt_message_handler(input: EncryptMessageInput) -> ExternResult<Encry
                     session_id: group.session,
                     key: decrypted_key,
                 };
-                let encrypted_message: XSalsa20Poly1305EncryptedData =
-                    x_salsa20_poly1305_encrypt(group_key.key, encode(&input.message)?.into())?;
-                let encrypted_group_message = EncryptedGroupMessage {
-                    group_hash: input.group_id,
-                    session_id: current_group_key.session_id,
-                    data: encrypted_message,
-                };
-                Ok(encrypted_group_message)
+                let encrypted_file_bytes_data: XSalsa20Poly1305EncryptedData =
+                    x_salsa20_poly1305_encrypt(group_key.key, encode(&input.file_bytes)?.into())?;
+
+                let encrypted_file_bytes = EncryptedGroupFileBytes(encrypted_file_bytes_data);
+                Ok(encrypted_file_bytes)
             } else {
                 return error("Cannot fetch group key");
             }

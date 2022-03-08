@@ -28,12 +28,7 @@ pub fn get_latest_messages_for_all_groups_handler(
 
     // for each group in the list call fetch_next_batch_group_messages() with payload_type All last_fetched/last_message_timestamp as None
 
-    debug!(
-        "nicko get latest messages # of groups: {:?}",
-        linked_groups_to_the_agent.clone().len()
-    );
     for group_id in linked_groups_to_the_agent.into_iter() {
-        debug!("nicko fetching messages from group {:?}", group_id.clone());
         let batch_filter: GroupMsgBatchFetchFilter = GroupMsgBatchFetchFilter {
             group_id: group_id,
             last_fetched: None,
@@ -61,7 +56,6 @@ pub fn get_latest_messages_for_all_groups_handler(
         messages_by_group: messages_by_group,
         group_messages_contents: messages_contents,
     };
-    debug!("nicko get latest messages returning");
 
     Ok(output)
 }

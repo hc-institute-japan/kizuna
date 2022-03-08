@@ -151,7 +151,6 @@ pub fn collect_decrypt_and_insert_messages(
     // - message entry_hash (aka link target)
     // - GroupMessageData (constructed from the element fetched from entry hash of the message )
 
-    debug!("nicko collect decrypt and insert messages");
     let message_hashes: Vec<EntryHash> = linked_messages
         .into_iter()
         .map(|link| link.target)
@@ -174,12 +173,9 @@ pub fn collect_decrypt_and_insert_messages(
                         group_id: group_hash.clone(),
                         message: res.1,
                     };
-                    debug!("nicko collect message helper calling decrypt");
                     if let Ok(decrypted_message) = decrypt_message_handler(decrypt_message_input) {
-                        debug!("nicko collect message helper appending message");
                         Some((res.0, decrypted_message))
                     } else {
-                        debug!("nicko collect message helper cannot decrypt message");
                         None
                     }
 
@@ -229,7 +225,6 @@ pub fn collect_decrypt_and_insert_messages(
         );
         messages_hashes.push(message_hash.clone());
     }
-    debug!("nicko collect message helper returning");
 
     Ok(())
 }
@@ -237,7 +232,6 @@ pub fn collect_decrypt_and_insert_messages(
 pub fn collect_and_insert_read_list(
     group_messages_contents: &mut HashMap<String, GroupMessageContent>,
 ) -> ExternResult<()> {
-    debug!("nicko collect and insert read list");
     let mut all_read_list: HashMap<String, HashMap<String, Timestamp>> = HashMap::new();
 
     let message_hashes = group_messages_contents

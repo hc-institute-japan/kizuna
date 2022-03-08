@@ -65,7 +65,12 @@ entry_def!(EncryptedGroupMessage
 #[hdk_entry(id = "group_file_bytes", visibility = "public")]
 #[derive(Clone)]
 #[serde(rename_all = "camelCase")]
-pub struct GroupFileBytes(SerializedBytes);
+pub struct GroupFileBytes(pub SerializedBytes);
+
+#[hdk_entry(id = "encrypted_group_file_bytes", visibility = "public")]
+#[derive(Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct EncryptedGroupFileBytes(pub XSalsa20Poly1305EncryptedData);
 /* END OF GROUP MESSAGE TYPE DEFINITION */
 
 /* START OF INPUTS TYPES DEFINITION */
@@ -193,4 +198,12 @@ pub struct GroupMessageWithId {
     pub id: EntryHash,
     pub content: GroupMessage,
 }
+
+#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct GetFilesInput {
+    pub group_id: EntryHash,
+    pub file_hashes_by_session: HashMap<EntryHash, u32>,
+}
+
 /* END OF OUTPUTS TYPES DEFINITION */

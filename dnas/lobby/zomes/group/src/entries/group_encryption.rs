@@ -1,7 +1,9 @@
 use hdk::prelude::*;
 pub mod create_key;
+pub mod decrypt_file;
 pub mod decrypt_key;
 pub mod decrypt_message;
+pub mod encrypt_file;
 pub mod encrypt_key;
 pub mod encrypt_message;
 pub mod get_agent_key;
@@ -73,4 +75,17 @@ pub struct EncryptMessageInput {
 pub struct DecryptMessageInput {
     pub group_id: EntryHash,
     pub message: EncryptedGroupMessage,
+}
+
+#[derive(Serialize, Deserialize, Clone, SerializedBytes, Debug)]
+pub struct EncryptFileInput {
+    pub group_id: EntryHash,
+    pub file_bytes: SerializedBytes,
+}
+
+#[derive(Serialize, Deserialize, Clone, SerializedBytes, Debug)]
+pub struct DecryptFileInput {
+    pub group_id: EntryHash,
+    pub session_id: u32,
+    pub encrypted_file_bytes: XSalsa20Poly1305EncryptedData,
 }

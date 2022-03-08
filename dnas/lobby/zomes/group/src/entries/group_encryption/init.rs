@@ -2,11 +2,7 @@ use hdk::prelude::*;
 
 use super::IdentityKey;
 
-pub fn _init_handler() -> ExternResult<InitCallbackResult> {
-    debug!(
-        "nicko group init agent {:?}",
-        agent_info()?.agent_latest_pubkey
-    );
+pub fn init_handler() -> ExternResult<InitCallbackResult> {
     let identity_key = IdentityKey {
         agent: agent_info()?.agent_latest_pubkey.into(),
         key: create_x25519_keypair()?,

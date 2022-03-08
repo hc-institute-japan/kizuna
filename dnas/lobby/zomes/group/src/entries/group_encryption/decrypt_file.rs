@@ -2,19 +2,19 @@ use hdk::prelude::*;
 use std::collections::HashMap;
 
 use super::{
-    decrypt_key::decrypt_key_handler, get_my_group_keys::get_my_group_keys_handler, DecryptInput,
-    DecryptMessageInput, EncryptedGroupKey, GroupKey,
+    decrypt_key::decrypt_key_handler, get_my_group_keys::get_my_group_keys_handler,
+    DecryptFileInput, DecryptInput, EncryptedGroupKey, GroupKey,
 };
 use crate::group::group_helpers::get_group_latest_version;
-use crate::group_message::GroupMessage;
+use crate::group_message::GroupFileBytes;
 use crate::utils::error;
 
-pub fn decrypt_message_handler(input: DecryptMessageInput) -> ExternResult<GroupMessage> {
+pub fn decrypt_file_handler(input: DecryptFileInput) -> ExternResult<GroupFileBytes> {
     // get decrypting keys
     let keys: HashMap<u32, EncryptedGroupKey> = get_my_group_keys_handler(input.group_id.clone())?;
 
     // check if the session key of the message matches any of the decrypting keys
-    let message_session = input.message.session_id;
+    let message_session = input.session_id;
     if let Some(decrypting_key) = keys.get(&message_session) {
         let group = get_group_latest_version(input.group_id.clone())?;
         let decrypt_input = DecryptInput {
@@ -29,11 +29,11 @@ pub fn decrypt_message_handler(input: DecryptMessageInput) -> ExternResult<Group
             key: decrypted_key,
         };
 
-        if let Some(decrypted_encoded_message) =
-            x_salsa20_poly1305_decrypt(group_key.key, input.message.data)?
+        if let Some(decrypted_file_bytes) =
+            x_salsa20_poly1305_decrypt(group_key.key, input.encrypted_file_bytes)?
         {
-            let decrypted_message: GroupMessage = decode(&decrypted_encoded_message)?;
-            Ok(decrypted_message)
+            let decrypted_file_bytes: SerializedBytes = decode(&decrypted_file_bytes)?;
+            Ok(GroupFileBytes(decrypted_file_bytes))
         } else {
             return error("Cannot decrypt message");
         }

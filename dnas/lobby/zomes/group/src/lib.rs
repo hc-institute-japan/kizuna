@@ -42,10 +42,10 @@ use group_message::{
 use signals::{SignalDetails, SignalPayload};
 
 use group_message::{
-    EncryptedGroupMessage, GroupChatFilter, GroupFileBytes, GroupMessage, GroupMessageElement,
-    GroupMessageInput, GroupMessageInputWithDate, GroupMessageReadData, GroupMessageWithId,
-    GroupMessagesOutput, GroupMsgAdjacentFetchFilter, GroupMsgBatchFetchFilter,
-    GroupTypingDetailData, PinDetail,
+    EncryptedGroupFileBytes, EncryptedGroupMessage, GetFilesInput, GroupChatFilter, GroupFileBytes,
+    GroupMessage, GroupMessageElement, GroupMessageInput, GroupMessageInputWithDate,
+    GroupMessageReadData, GroupMessageWithId, GroupMessagesOutput, GroupMsgAdjacentFetchFilter,
+    GroupMsgBatchFetchFilter, GroupTypingDetailData, PinDetail,
 };
 
 use group::{
@@ -57,8 +57,8 @@ use group_encryption::{
     create_key::create_key_handler, decrypt_key::decrypt_key_handler,
     decrypt_message::decrypt_message_handler, encrypt_key::encrypt_key_handler,
     encrypt_message::encrypt_message_handler, get_my_group_keys::get_my_group_keys_handler,
-    DecryptInput, DecryptMessageInput, EncryptInput, EncryptMessageInput, EncryptedGroupKey,
-    IdentityKey,
+    init::init_handler, DecryptInput, DecryptMessageInput, EncryptInput, EncryptMessageInput,
+    EncryptedGroupKey, IdentityKey,
 };
 
 entry_defs![
@@ -69,7 +69,8 @@ entry_defs![
     PathEntry::entry_def(),
     IdentityKey::entry_def(),
     EncryptedGroupKey::entry_def(),
-    EncryptedGroupMessage::entry_def()
+    EncryptedGroupMessage::entry_def(),
+    EncryptedGroupFileBytes::entry_def()
 ];
 
 // this is only exposed outside of WASM for testing purposes.
@@ -93,37 +94,7 @@ pub fn init(_: ()) -> ExternResult<InitCallbackResult> {
     create_cap_grant(cap_grant_entry)?;
 
     // init handler of group encryption
-    // creates an x25519 encryption key for the agent
-    // init_handler()?;
-    debug!(
-        "nicko group init agent {:?}",
-        agent_info()?.agent_latest_pubkey
-    );
-    let identity_key = IdentityKey {
-        agent: agent_info()?.agent_latest_pubkey.into(),
-        key: create_x25519_keypair()?,
-    };
-
-    let identity_key_entry = Entry::App(identity_key.clone().try_into()?);
-
-    let _identity_key_hash = host_call::<CreateInput, HeaderHash>(
-        __create,
-        CreateInput::new(
-            IdentityKey::entry_def().id,
-            identity_key_entry.clone(),
-            ChainTopOrdering::Relaxed,
-        ),
-    )?;
-
-    host_call::<CreateLinkInput, HeaderHash>(
-        __create_link,
-        CreateLinkInput::new(
-            agent_info()?.agent_latest_pubkey.into(),
-            hash_entry(identity_key_entry)?,
-            LinkTag::new("identity_key".to_owned()),
-            ChainTopOrdering::Relaxed,
-        ),
-    )?;
+    init_handler()?;
 
     Ok(InitCallbackResult::Pass)
 }
@@ -252,8 +223,8 @@ fn get_messages_by_group_by_timestamp(
 }
 
 #[hdk_extern]
-fn get_files_bytes(file_hashes: Vec<EntryHash>) -> ExternResult<HashMap<String, SerializedBytes>> {
-    return get_files_bytes_handler(file_hashes);
+fn get_files_bytes(input: GetFilesInput) -> ExternResult<HashMap<String, SerializedBytes>> {
+    return get_files_bytes_handler(input);
 }
 
 #[hdk_extern]
