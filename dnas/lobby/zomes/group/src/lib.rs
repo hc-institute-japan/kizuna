@@ -1,4 +1,3 @@
-#![allow(dead_code)]
 use std::collections::{BTreeSet, HashMap};
 
 use entries::group::validations::create_group;
@@ -195,15 +194,14 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
         Op::RegisterDelete { .. } => Ok(ValidateCallbackResult::Invalid(
             "deleting entries isn't valid".to_string(),
         )),
-        // Op::RegisterAgentActivity { header } => {
-        //     // the old_entry’s header is not a Create (we update the same create entry )
-        //     // author of Create Header doesn't match the author of the Update Header
-        //     match header.header() {
-        //         Header::Update(header) => update_group::register_agetnt_activity(header.to_owned()),
-        //         _ => Ok(ValidateCallbackResult::Valid),
-        //     }
-        // }
-        Op::RegisterAgentActivity { .. } => Ok(ValidateCallbackResult::Valid),
+        Op::RegisterAgentActivity { header } => {
+            // the old_entry’s header is not a Create (we update the same create entry )
+            // author of Create Header doesn't match the author of the Update Header
+            match header.header() {
+                Header::Update(header) => update_group::register_agetnt_activity(header.to_owned()),
+                _ => Ok(ValidateCallbackResult::Valid),
+            }
+        }
     }
 }
 
