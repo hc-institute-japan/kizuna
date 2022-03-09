@@ -130,10 +130,7 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
                     let group_id = ZomeId::new(4);
                     if app_entry_type.zome_id == group_id {
                         return match app_entry_type.id {
-                            EntryDefIndex(0) => create_group::store_group_element(
-                                element.clone(),
-                                header.to_owned(),
-                            ),
+                            EntryDefIndex(0) => create_group::store_group_element(element.clone()),
                             _ => Ok(ValidateCallbackResult::Valid),
                         };
                     } else {

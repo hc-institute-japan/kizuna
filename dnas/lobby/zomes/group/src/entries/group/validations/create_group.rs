@@ -16,16 +16,9 @@ use crate::{
  * group creator AgentPubKey is included in the group members
 */
 
-pub fn store_group_element(
-    element: Element,
-    header: Create,
-) -> ExternResult<ValidateCallbackResult> {
-    debug!("validating create group store element");
-    debug!("element {:#?}", element.clone());
-    debug!("header {:#?}", header.clone());
+pub fn store_group_element(element: Element) -> ExternResult<ValidateCallbackResult> {
     let entry_author_pub_key: AgentPubKey = element.header().author().clone();
     let entry: Group = try_from_element(element)?;
-    debug!("element converted...");
     return Ok(validate_group_content(entry, entry_author_pub_key)?);
 }
 
