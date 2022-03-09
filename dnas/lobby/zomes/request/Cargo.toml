@@ -11,4 +11,4 @@ crate-type = [ "cdylib", "rlib" ]
 [dependencies]
 derive_more = "0"
 serde = "1"
-hdk = {version = "0.0.124", features = ["encoding"]}
+hdk = {version = "0.0.123", features = ["encoding"]}

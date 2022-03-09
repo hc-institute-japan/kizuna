@@ -104,7 +104,7 @@ checksum = "245097e9a4535ee1e3e3931fcfcd55a796a44c643e8596ff6566d68f09b87bbc"
 name = "contacts"
 version = "0.0.1"
 dependencies = [
- "contacts 0.0.1 (git+https://github.com/holochain-open-dev/contacts?branch=main)",
+ "contacts 0.0.1 (git+https://github.com/holochain-open-dev/contacts?branch=hc-0.0.127)",
  "derive_more",
  "hdk",
  "serde",
@@ -113,7 +113,7 @@ dependencies = [
 [[package]]
 name = "contacts"
 version = "0.0.1"
-source = "git+https://github.com/holochain-open-dev/contacts?branch=main#918925b18f412809129eaa7baec5e0de9710331a"
+source = "git+https://github.com/holochain-open-dev/contacts?branch=hc-0.0.127#d5f7b1aa7d8542e5cb784f359782dfa4885e6b4c"
 dependencies = [
  "derive_more",
  "hdk",
@@ -151,7 +151,7 @@ dependencies = [
 [[package]]
 name = "file_types"
 version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop#c730abbbd2ddb975326a7776590b47061e8bd136"
+source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hc-0.0.127#07005d4288c25c517be04fb2db9473935748209b"
 dependencies = [
  "derive_more",
  "hdk",
@@ -189,7 +189,7 @@ checksum = "ab5ef0d4909ef3724cc8cce6ccc8572c5c817592e9285f5464f8e86f8bd3726e"
 [[package]]
 name = "hc_zome_profiles"
 version = "0.0.1"
-source = "git+https://github.com/tatssato/profiles?branch=main#2785adb54041895694c1e19d7e18db9dd5565a53"
+source = "git+https://github.com/holochain-open-dev/profiles?rev=4ce7408602be4d850779025eb665df3c16c77662#4ce7408602be4d850779025eb665df3c16c77662"
 dependencies = [
  "derive_more",
  "hc_zome_profiles_types",
@@ -200,7 +200,7 @@ dependencies = [
 [[package]]
 name = "hc_zome_profiles_types"
 version = "0.0.1"
-source = "git+https://github.com/tatssato/profiles?branch=main#2785adb54041895694c1e19d7e18db9dd5565a53"
+source = "git+https://github.com/holochain-open-dev/profiles?rev=4ce7408602be4d850779025eb665df3c16c77662#4ce7408602be4d850779025eb665df3c16c77662"
 dependencies = [
  "derive_more",
  "hdk",
@@ -209,9 +209,9 @@ dependencies = [
 
 [[package]]
 name = "hdk"
-version = "0.0.124"
+version = "0.0.123"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b3ac26c39ff5c824046f6c3192dfcf91eb19111569ae67547f4c86e810bba2cd"
+checksum = "ef6a85565285d19223b72265868abc2413e530328d6ae0f4013a0455d203feab"
 dependencies = [
  "hdk_derive",
  "holo_hash",
@@ -227,9 +227,9 @@ dependencies = [
 
 [[package]]
 name = "hdk_derive"
-version = "0.0.26"
+version = "0.0.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ff276a067b2a6cc6c8e11f40b72151ffdab235f4e9746ab0d91f99a56bbbd50d"
+checksum = "9f30170490dc1b0468512cdcb72ada813d7cbf44e126fa6ab39a0b79165dd224"
 dependencies = [
  "holochain_zome_types",
  "paste",
@@ -240,9 +240,9 @@ dependencies = [
 
 [[package]]
 name = "holo_hash"
-version = "0.0.21"
+version = "0.0.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0d0ccc68b3c7b63b82fc41ec03d4e921ab144102c6af763f8ce729709ca54ad2"
+checksum = "1996c797ac295d79f884d263781c6ef3e0c63183af7d9f4e1d666c75e0d889ce"
 dependencies = [
  "base64",
  "blake2b_simd",
@@ -306,9 +306,9 @@ dependencies = [
 
 [[package]]
 name = "holochain_zome_types"
-version = "0.0.26"
+version = "0.0.25"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3941d7e413be0a0298dfd9b31c4d9a87b0d89aca3eadbd00b379f2d4f5478d40"
+checksum = "2d51f55ac58054a6c87d046cda5c5e71c15cfcd9f11e9889817119c8218e3a7d"
 dependencies = [
  "chrono",
  "holo_hash",
@@ -363,9 +363,9 @@ checksum = "1aab8fc367588b89dcee83ab0fd66b72b50b72fa1904d7095045ace2b0c81c35"
 
 [[package]]
 name = "kitsune_p2p_dht_arc"
-version = "0.0.10"
+version = "0.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3203925b13eb83d95825025eb1f4a97f5a4e049e5d8e480783bc30b5a1b3cd2f"
+checksum = "a7459dbef2eef419984efb6bef5d1ff2ab1836ca7ca8f506b84b5982580b1bc9"
 dependencies = [
  "derive_more",
  "gcollections",
@@ -376,9 +376,9 @@ dependencies = [
 
 [[package]]
 name = "kitsune_p2p_timestamp"
-version = "0.0.7"
+version = "0.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f1528a9d36c33444a8d70b3264e72df64351d41afd76ceebf0d2103ca81dad6c"
+checksum = "2a7427a44837a60ccf063898340da6f8ef8c0e41812189b63d7775d8822863e7"
 dependencies = [
  "chrono",
  "derive_more",
@@ -432,17 +432,17 @@ version = "0.0.1"
 dependencies = [
  "derive_more",
  "hdk",
- "p2pmessage 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop)",
+ "p2pmessage 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hc-0.0.127)",
  "serde",
 ]
 
 [[package]]
 name = "p2pmessage"
 version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop#c730abbbd2ddb975326a7776590b47061e8bd136"
+source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hc-0.0.127#07005d4288c25c517be04fb2db9473935748209b"
 dependencies = [
  "derive_more",
- "file_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=develop)",
+ "file_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hc-0.0.127)",
  "hdk",
  "serde",
 ]
