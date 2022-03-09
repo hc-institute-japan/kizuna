@@ -1,5 +1,8 @@
+#![allow(dead_code)]
 use std::collections::{BTreeSet, HashMap};
 
+use entries::group::validations::create_group;
+use entries::group::validations::update_group;
 use hdk::prelude::*;
 
 mod entries;
@@ -10,17 +13,10 @@ use entries::group::{self, GroupOutput};
 use entries::group_message;
 
 use group::{
-    add_members::add_members_handler,
-    create_group::create_group_handler,
-    get_all_my_groups::get_all_my_groups_handler,
-    group_helpers,
-    remove_members::remove_members_handler,
-    update_group_avatar::update_group_avatar_handler,
+    add_members::add_members_handler, create_group::create_group_handler,
+    get_all_my_groups::get_all_my_groups_handler, group_helpers,
+    remove_members::remove_members_handler, update_group_avatar::update_group_avatar_handler,
     update_group_name::update_group_name_handler,
-    validations::{
-        validate_create_group::validate_create_group_handler,
-        validate_update_group::validate_update_group_handler,
-    },
 };
 
 use group_message::{
@@ -123,6 +119,91 @@ fn post_commit(signed_headers: Vec<SignedHeaderHashed>) {
             },
             _ => (),
         }
+    }
+}
+
+#[hdk_extern]
+pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
+    match op {
+        Op::StoreElement { element } => match element.header() {
+            Header::Create(header) => match header.to_owned().entry_type {
+                EntryType::App(app_entry_type) => {
+                    let group_id = ZomeId::new(4);
+                    if app_entry_type.zome_id == group_id {
+                        return match app_entry_type.id {
+                            EntryDefIndex(0) => create_group::store_group_element(
+                                element.clone(),
+                                header.to_owned(),
+                            ),
+                            _ => Ok(ValidateCallbackResult::Valid),
+                        };
+                    } else {
+                        Ok(ValidateCallbackResult::Valid)
+                    }
+                }
+                _ => Ok(ValidateCallbackResult::Valid),
+            },
+            Header::Update(header) => match header.to_owned().entry_type {
+                EntryType::App(app_entry_type) => {
+                    return match app_entry_type.id {
+                        EntryDefIndex(0) => {
+                            update_group::store_group_element(element.clone(), header.to_owned())
+                        }
+                        _ => Ok(ValidateCallbackResult::Invalid(
+                            ("Updating this entry is invalid").to_string(),
+                        )),
+                    };
+                }
+                _ => Ok(ValidateCallbackResult::Valid),
+            },
+            Header::Delete(_) => Ok(ValidateCallbackResult::Invalid(
+                "deleting entry isn't valid".to_string(),
+            )),
+            Header::DeleteLink(_) => Ok(ValidateCallbackResult::Invalid(
+                "deleting link isn't valid".to_string(),
+            )),
+            _ => Ok(ValidateCallbackResult::Valid),
+        },
+        Op::StoreEntry { header, entry } => match header.hashed.into_content() {
+            EntryCreationHeader::Create(create) => match create.clone().entry_type {
+                EntryType::App(app_entry_type) => match app_entry_type.id {
+                    EntryDefIndex(0) => create_group::store_group_entry(entry, create.to_owned()),
+                    _ => Ok(ValidateCallbackResult::Valid),
+                },
+                _ => Ok(ValidateCallbackResult::Valid),
+            },
+            EntryCreationHeader::Update(update) => match update.clone().entry_type {
+                EntryType::App(app_entry_type) => match app_entry_type.id {
+                    EntryDefIndex(0) => update_group::store_group_entry(entry, update.to_owned()),
+                    _ => Ok(ValidateCallbackResult::Invalid(
+                        ("Updating this entry is invalid").to_string(),
+                    )),
+                },
+                _ => Ok(ValidateCallbackResult::Valid),
+            },
+        },
+        Op::RegisterCreateLink { .. } => Ok(ValidateCallbackResult::Valid),
+        Op::RegisterUpdate {
+            update,
+            new_entry,
+            original_entry: _,
+            original_header: _,
+        } => update_group::register_group_update(update, new_entry),
+        Op::RegisterDeleteLink { create_link: _, .. } => Ok(ValidateCallbackResult::Invalid(
+            "deleting links isn't valid".to_string(),
+        )),
+        Op::RegisterDelete { .. } => Ok(ValidateCallbackResult::Invalid(
+            "deleting entries isn't valid".to_string(),
+        )),
+        // Op::RegisterAgentActivity { header } => {
+        //     // the old_entry’s header is not a Create (we update the same create entry )
+        //     // author of Create Header doesn't match the author of the Update Header
+        //     match header.header() {
+        //         Header::Update(header) => update_group::register_agetnt_activity(header.to_owned()),
+        //         _ => Ok(ValidateCallbackResult::Valid),
+        //     }
+        // }
+        Op::RegisterAgentActivity { .. } => Ok(ValidateCallbackResult::Valid),
     }
 }
 
@@ -239,15 +320,15 @@ fn indicate_group_typing(group_typing_detail_data: GroupTypingDetailData) -> Ext
     return indicate_group_typing_handler(group_typing_detail_data);
 }
 
-#[hdk_extern]
-fn validate_create_entry_group(data: ValidateData) -> ExternResult<ValidateCallbackResult> {
-    return validate_create_group_handler(data);
-}
+// #[hdk_extern]
+// fn validate_create_entry_group(data: ValidateData) -> ExternResult<ValidateCallbackResult> {
+//     return validate_create_group_handler(data);
+// }
 
-#[hdk_extern]
-fn validate_update_entry_group(data: ValidateData) -> ExternResult<ValidateCallbackResult> {
-    return validate_update_group_handler(data);
-}
+// #[hdk_extern]
+// fn validate_update_entry_group(data: ValidateData) -> ExternResult<ValidateCallbackResult> {
+//     return validate_update_group_handler(data);
+// }
 
 /*
 These function are only used for testing purposes
