@@ -144,14 +144,20 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
             },
             Header::Update(header) => match header.to_owned().entry_type {
                 EntryType::App(app_entry_type) => {
-                    return match app_entry_type.id {
-                        EntryDefIndex(0) => {
-                            update_group::store_group_element(element.clone(), header.to_owned())
-                        }
-                        _ => Ok(ValidateCallbackResult::Invalid(
-                            ("Updating this entry is invalid").to_string(),
-                        )),
-                    };
+                    let group_id = ZomeId::new(4);
+                    if app_entry_type.zome_id == group_id {
+                        return match app_entry_type.id {
+                            EntryDefIndex(0) => update_group::store_group_element(
+                                element.clone(),
+                                header.to_owned(),
+                            ),
+                            _ => Ok(ValidateCallbackResult::Invalid(
+                                ("Updating this entry is invalid").to_string(),
+                            )),
+                        };
+                    } else {
+                        Ok(ValidateCallbackResult::Valid)
+                    }
                 }
                 _ => Ok(ValidateCallbackResult::Valid),
             },
@@ -165,19 +171,37 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
         },
         Op::StoreEntry { header, entry } => match header.hashed.into_content() {
             EntryCreationHeader::Create(create) => match create.clone().entry_type {
-                EntryType::App(app_entry_type) => match app_entry_type.id {
-                    EntryDefIndex(0) => create_group::store_group_entry(entry, create.to_owned()),
-                    _ => Ok(ValidateCallbackResult::Valid),
-                },
+                EntryType::App(app_entry_type) => {
+                    let group_id = ZomeId::new(4);
+                    if app_entry_type.zome_id == group_id {
+                        match app_entry_type.id {
+                            EntryDefIndex(0) => {
+                                create_group::store_group_entry(entry, create.to_owned())
+                            }
+                            _ => Ok(ValidateCallbackResult::Valid),
+                        }
+                    } else {
+                        Ok(ValidateCallbackResult::Valid)
+                    }
+                }
                 _ => Ok(ValidateCallbackResult::Valid),
             },
             EntryCreationHeader::Update(update) => match update.clone().entry_type {
-                EntryType::App(app_entry_type) => match app_entry_type.id {
-                    EntryDefIndex(0) => update_group::store_group_entry(entry, update.to_owned()),
-                    _ => Ok(ValidateCallbackResult::Invalid(
-                        ("Updating this entry is invalid").to_string(),
-                    )),
-                },
+                EntryType::App(app_entry_type) => {
+                    let group_id = ZomeId::new(4);
+                    if app_entry_type.zome_id == group_id {
+                        match app_entry_type.id {
+                            EntryDefIndex(0) => {
+                                update_group::store_group_entry(entry, update.to_owned())
+                            }
+                            _ => Ok(ValidateCallbackResult::Invalid(
+                                ("Updating this entry is invalid").to_string(),
+                            )),
+                        }
+                    } else {
+                        Ok(ValidateCallbackResult::Valid)
+                    }
+                }
                 _ => Ok(ValidateCallbackResult::Valid),
             },
         },
@@ -187,7 +211,16 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
             new_entry,
             original_entry: _,
             original_header: _,
-        } => update_group::register_group_update(update, new_entry),
+        } => {
+            let group_id = ZomeId::new(4);
+            let updated_group_header: Update = update.hashed.into_content();
+            if let EntryType::App(app_entry_type) = updated_group_header.entry_type.clone() {
+                if app_entry_type.zome_id == group_id {
+                    return update_group::register_group_update(updated_group_header, new_entry);
+                }
+            }
+            Ok(ValidateCallbackResult::Valid)
+        }
         Op::RegisterDeleteLink { create_link: _, .. } => Ok(ValidateCallbackResult::Invalid(
             "deleting links isn't valid".to_string(),
         )),
@@ -198,7 +231,15 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
             // the old_entry’s header is not a Create (we update the same create entry )
             // author of Create Header doesn't match the author of the Update Header
             match header.header() {
-                Header::Update(header) => update_group::register_agetnt_activity(header.to_owned()),
+                Header::Update(header) => {
+                    let group_id = ZomeId::new(4);
+                    if let EntryType::App(app_entry_type) = header.to_owned().entry_type.clone() {
+                        if app_entry_type.zome_id == group_id {
+                            return update_group::register_agetnt_activity(header.to_owned());
+                        }
+                    }
+                    Ok(ValidateCallbackResult::Valid)
+                }
                 _ => Ok(ValidateCallbackResult::Valid),
             }
         }

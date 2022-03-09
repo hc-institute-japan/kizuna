@@ -31,16 +31,12 @@ pub fn store_group_entry(entry: Entry, update: Update) -> ExternResult<ValidateC
 }
 
 pub fn register_group_update(
-    update: SignedHashed<Update>,
+    update: Update,
     new_entry: Entry,
 ) -> ExternResult<ValidateCallbackResult> {
     let updated_group_entry: Group = try_from_entry(new_entry)?;
-    let updated_group_header: Update = update.hashed.into_content();
     // This is the header address used to update this Group. May or may not be the correct header(create).
-    Ok(validate_group_content(
-        updated_group_entry,
-        updated_group_header.clone(),
-    )?)
+    Ok(validate_group_content(updated_group_entry, update)?)
 }
 
 pub fn register_agetnt_activity(update: Update) -> ExternResult<ValidateCallbackResult> {
