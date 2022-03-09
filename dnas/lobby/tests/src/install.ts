@@ -24,7 +24,7 @@ export const MEM_PROOF5 = Buffer.from(
 
 export const MEM_PROOF_READ_ONLY = Buffer.from([0]);
 
-const lobbyDna = path.join(__dirname, "../../workdir/dna/lobby.dna");
+const lobbyDna = path.join(__dirname, "../../workdir/dna/kizuna-lobby.dna");
 
 export const installAgents = async (
   conductor: Player,
