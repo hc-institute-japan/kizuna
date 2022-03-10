@@ -8,7 +8,11 @@ interface Props {
   disabled: boolean;
 }
 
-const EndButtons: React.FC<Props> = ({onClickEdit, onClickNotif, disabled}) => (
+const EndButtons: React.FC<Props> = ({
+  onClickEdit,
+  onClickNotif,
+  disabled,
+}) => (
   <IonButtons slot="end">
     <>
       <IonButton onClick={onClickEdit} disabled={disabled ? true : false}>
