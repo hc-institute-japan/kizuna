@@ -35,6 +35,7 @@ export const convertFetchedResToGroupMessagesOutput = (
     (message_ids: Uint8Array[]): string[] =>
       message_ids.map((message_id) => serializeHash(message_id))
   );
+  console.log(fetchedRes);
 
   const groupMessagesContents: GroupMessagesContents = objectMap(
     fetchedRes.groupMessagesContents,
@@ -45,10 +46,11 @@ export const convertFetchedResToGroupMessagesOutput = (
         msg_content.readList,
         (timestamp): Date => timestampToDate(timestamp)
       );
+      console.log(msg_content);
 
       return {
         groupMessageId: serializeHash(
-          msg_content.groupMessageElement.signedHeader.header.content.entry_hash
+          msg_content.groupMessageElement.signedHeader.hashed.content.entry_hash
         ),
         groupId: serializeHash(msg_content.groupMessageElement.entry.groupHash),
         author: serializeHash(msg_content.groupMessageElement.entry.sender),
