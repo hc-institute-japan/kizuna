@@ -98,6 +98,7 @@
   "components.chat.chat-modal-delete": "Delete",
   "components.chat.chat-modal-pin": "Pin",
   "components.chat.chat-modal-reply": "Reply",
+  "components.chat.chat-modal-copy": "Copy",
   "components.chat.chat-modal-resend": "Resend",
   "components.chat.chat-modal-unpin": "Unpin",
   "components.chat.media-modal-download": "Download",

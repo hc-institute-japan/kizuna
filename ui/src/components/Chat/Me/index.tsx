@@ -49,6 +49,7 @@ const Me: React.FC<ChatProps> = ({
 }) => {
   const intl = useIntl();
   const [loading, setLoading] = useState(false);
+  const isText = isTextPayload(payload);
 
   const onLongPress = (e: any) =>
     present({
@@ -66,14 +67,22 @@ const Me: React.FC<ChatProps> = ({
     onRetry: () => {
       if (onRetry) onRetry(setLoading);
     },
+    onCopy: () => {
+      if (isText) onCopy((payload as TextPayload).payload.payload);
+    },
     isPinned,
+    isText,
     intl,
     err,
   });
 
-  // const [isModalOpen, setIsModalOpen] = useState(false);
+  const onCopy = (message: string) => {
+    navigator.clipboard.writeText(message);
+  };
+
+  // const [isModalOpen, setIsModalOpen] = useState(false);F
   const pressHandlers = usePressHandlers(onLongPress, () => {});
-  const isText = isTextPayload(payload);
+
   const isP2P = type === "p2p";
 
   const fileMaxWidth = isText

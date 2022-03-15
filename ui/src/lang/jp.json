@@ -97,6 +97,7 @@
   "components.chat.chat-modal-delete": "削除",
   "components.chat.chat-modal-pin": "ピン留め",
   "components.chat.chat-modal-reply": "返信",
+  "components.chat.chat-modal-copy": "コピー",
   "components.chat.chat-modal-resend": "再送信",
   "components.chat.chat-modal-unpin": "ピン留め解除",
   "components.chat.media-modal-download": "ダウンロード",
