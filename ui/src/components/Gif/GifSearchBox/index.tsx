@@ -1,11 +1,10 @@
+import { IonInput } from "@ionic/react";
 import React, {
-  useState,
+  forwardRef,
   ForwardRefRenderFunction,
   useRef,
-  useCallback,
-  forwardRef,
+  useState,
 } from "react";
-import { IonInput } from "@ionic/react";
 
 interface Props {
   onChange?: (searchTerm: string) => any;

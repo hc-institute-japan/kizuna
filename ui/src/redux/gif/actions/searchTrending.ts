@@ -1,5 +1,4 @@
-import { useSelector } from "react-redux";
-import { RootState, ThunkAction } from "../../types";
+import { ThunkAction } from "../../types";
 import { getGifs } from "./getGifs";
 
 export const searchTrending = (): ThunkAction => async (dispatch, getState) => {

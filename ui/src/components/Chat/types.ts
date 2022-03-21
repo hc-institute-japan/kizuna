@@ -1,6 +1,5 @@
 import { ReactElement } from "react";
 import { FilePayload, Payload } from "../../redux/commons/types";
-import { GroupMessageInput } from "../../redux/group/types";
 import { Profile } from "../../redux/profile/types";
 
 export interface ChatListProps {

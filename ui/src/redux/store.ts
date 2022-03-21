@@ -8,7 +8,7 @@ import {
   retry,
 } from "../utils/services/HolochainService";
 import rootReducer from "./reducers";
-import { RootState } from "./types";
+// import { RootState } from "./types";
 
 const createStore = (args?: Object) => {
   const modifiedThunk = thunk.withExtraArgument({
@@ -20,10 +20,7 @@ const createStore = (args?: Object) => {
     ...args,
   });
 
-  return create(
-    rootReducer,
-    applyMiddleware(modifiedThunk as ThunkMiddleware<RootState, AnyAction>)
-  );
+  return create(rootReducer, applyMiddleware(modifiedThunk));
 };
 
 export default createStore;
