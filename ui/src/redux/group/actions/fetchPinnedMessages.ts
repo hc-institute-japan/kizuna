@@ -27,7 +27,10 @@ export const fetchPinnedMessages =
       } else {
         const rawResultArr = Object.values(res as Object);
         const pinnedMessages: { [key: string]: GroupMessage } = {};
-        const myAgentId = await getAgentId();
+        // const myAgentId = await getAgentId();
+        let myAgentId = getState().conductor.agentID;
+        myAgentId = myAgentId !== null ? myAgentId : await getAgentId();
+
         const pinnedMessageIds = rawResultArr.map(async (raw) => {
           const rawResult = raw.entry;
 

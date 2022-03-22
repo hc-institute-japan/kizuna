@@ -21,14 +21,17 @@ export const getPinnedMessages =
           const message = getState().groups.messages[pinnedMessage];
           return message.author;
         });
-        const id = await getAgentId();
+        // const id = await getAgentId();
+        let myAgentId = getState().conductor.agentID;
+        console.log("get pinned agent id", myAgentId);
+        myAgentId = myAgentId !== null ? myAgentId : await getAgentId();
 
-        if (id) {
+        if (myAgentId) {
           const authorProfiles = await fetchUsernameOfMembers(
             getState(),
             authors,
             callZome,
-            serializeHash(id)
+            serializeHash(myAgentId)
           );
 
           return pinnedMessages.map((messageId) => {

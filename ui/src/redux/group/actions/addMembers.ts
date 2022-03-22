@@ -26,7 +26,10 @@ const addMembers =
     { callZome, getAgentId }
   ): Promise<UpdateGroupMembersData | boolean> => {
     const state = getState();
-    const myAgentId = await getAgentId();
+    // const myAgentId = await getAgentId();
+    let myAgentId = getState().conductor.agentID;
+    myAgentId = myAgentId !== null ? myAgentId : await getAgentId();
+
     const input = {
       members: updateGroupMembersData.members
         /* dedup */

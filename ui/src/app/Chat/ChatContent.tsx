@@ -50,6 +50,7 @@ const Chat: React.FC = () => {
   >([]);
   const [messageReceipts, setMessageReceipts] = useState<P2PMessage[]>([]);
   const [disableGetPrevious, setDisableGetPrevious] = useState<boolean>(false);
+  const [typingNow, setTypingNow] = useState<boolean>(false);
   const {
     conversations,
     messages,
@@ -140,6 +141,25 @@ const Chat: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messageReceipts]);
 
+  // dispatches typing when status changes
+  useEffect(() => {
+    if (typingIndicator) {
+      dispatch(isTyping(conversant.id, typingNow));
+    }
+  }, [typingNow]);
+
+  useEffect(() => {
+    if (didMountRef.current === true) {
+      if (typingNow !== (message.length !== 0))
+        setTypingNow(message.length !== 0);
+
+      if (inputTimeout.current) clearTimeout(inputTimeout.current);
+
+      inputTimeout.current = setTimeout(() => setTypingNow(false), 500);
+    } else {
+      didMountRef.current = true;
+    }
+  }, [message]);
   /* HANDLERS */
   /*
     dispatches a typing indicator when the user types.
@@ -147,21 +167,22 @@ const Chat: React.FC = () => {
   */
   const handleOnChange = (message: string, conversant: Profile) => {
     if (didMountRef.current === true) {
-      if (typingIndicator) {
-        dispatch(
-          isTyping(
-            conversant.id,
-            message && message.length !== 0 ? true : false
-          )
-        );
-
+      if (typingNow !== (message.length !== 0)) {
+        // dispatch(
+        //   isTyping(
+        //     conversant.id,
+        //     message && message.length !== 0 ? true : false
+        //   )
+        // );
+        setTypingNow(message.length !== 0);
         if (inputTimeout.current) clearTimeout(inputTimeout.current);
-
-        inputTimeout.current = setTimeout(
-          () => dispatch(isTyping(conversant.id, false)),
-          500
-        );
       }
+
+      inputTimeout.current = setTimeout(
+        // () => dispatch(isTyping(conversant.id, false)),
+        () => setTypingNow(false),
+        500
+      );
       setMessage(message);
     } else {
       didMountRef.current = true;
@@ -510,7 +531,7 @@ const Chat: React.FC = () => {
       <MessageInput
         ref={messageInputRef}
         onSend={handleOnSubmit}
-        onChange={(message: string) => handleOnChange(message, conversant)}
+        onChange={(message: string) => setMessage(message)}
         onFileSelect={(files) => setFiles(files)}
       />
     </IonPage>

@@ -8,6 +8,7 @@ import {
 import { store } from "../../../containers/ReduxContainer";
 import { handleSignal } from "../../../redux/signal/actions";
 import { CallZomeConfig } from "../../../redux/types";
+
 // @ts-ignore
 global.COMB = undefined;
 // @ts-ignore
@@ -118,6 +119,8 @@ export const getAgentId: () => Promise<AgentPubKey | null> = async () => {
   await init();
   try {
     const info = await client?.appInfo.cell_data[0].cell_id[1];
+    console.log("this is the agent id, ", info);
+
     if (info) return info;
     return null;
   } catch (e) {
@@ -226,6 +229,7 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
     payload = null,
   } = config;
   try {
+    console.log("callZome calling ", fnName);
     return await client?.callZome(
       cellId!, // expecting cell id to be non-nullable.
       zomeName,

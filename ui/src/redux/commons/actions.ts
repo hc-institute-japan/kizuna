@@ -20,13 +20,21 @@ export const getLatestData =
   (): ThunkAction =>
   async (dispatch, getState, { callZome, getAgentId }) => {
     try {
+      console.time("Execution Time");
+
+      for (var i = 0; i < 100000000; i++);
+
+      console.log("calling getAgentId from getLatestData");
       // TODO: error handling
       const latestData = await callZome({
         zomeName: ZOMES.AGGREGATOR,
         fnName: FUNCTIONS[ZOMES.AGGREGATOR].RETRIEVE_LATEST_DATA,
       });
 
-      const myAgentId = await getAgentId();
+      // const myAgentId = await getAgentId();
+      let myAgentId = getState().conductor.agentID;
+      myAgentId = myAgentId !== null ? myAgentId : await getAgentId();
+
       /* assume that getAgentId() is non-nullable */
       const myAgentIdB64 = serializeHash(myAgentId!);
 
@@ -163,6 +171,9 @@ export const getLatestData =
       );
       // console.log("latest p2p messages", toDispatch);
       dispatch(setMessages(toDispatch));
+      // task ends
+
+      console.timeEnd("Execution Time");
 
       return null;
     } catch (e) {

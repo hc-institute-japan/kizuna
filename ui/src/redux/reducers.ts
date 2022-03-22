@@ -7,8 +7,10 @@ import p2pmessagesReducer from "./p2pmessages/reducer";
 import languageReducer from "./language/reducer";
 import errorReducer from "./error/reducer";
 import gifReducer from "./gif/reducer";
+import conductorReducer from "./conductor/reducer";
 
 const rootReducer = combineReducers({
+  conductor: conductorReducer,
   profile: profileReducer,
   contacts: contactsReducer,
   preference: preferenceReducer,

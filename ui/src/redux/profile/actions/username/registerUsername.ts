@@ -10,9 +10,11 @@ import { ProfileActionTypes, SET_USERNAME } from "../../types";
 /* CURRENTLY UNUSED */
 const registerUsername =
   (username: string): ThunkAction =>
-  async (dispatch, _getState, { callZome, getAgentId }) => {
+  async (dispatch, getState, { callZome, getAgentId }) => {
     try {
-      const myAgentId = await getAgentId();
+      // const myAgentId = await getAgentId();
+      let myAgentId = getState().conductor.agentID;
+      myAgentId = myAgentId !== null ? myAgentId : await getAgentId();
       /* assume that getAgentId() is non-nullable */
       const myAgentIdB64 = serializeHash(myAgentId!);
 

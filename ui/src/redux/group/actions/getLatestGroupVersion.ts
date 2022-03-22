@@ -21,7 +21,10 @@ import {
 const getLatestGroupVersion =
   (groupId: string): ThunkAction =>
   async (dispatch, getState, { callZome, getAgentId }) => {
-    const myAgentId = await getAgentId();
+    // const myAgentId = await getAgentId();
+    let myAgentId = getState().conductor.agentID;
+    myAgentId = myAgentId !== null ? myAgentId : await getAgentId();
+
     const state = getState();
     try {
       const latestGroupVersionRes = await callZome({

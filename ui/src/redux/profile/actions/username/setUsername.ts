@@ -5,8 +5,10 @@ import { ProfileActionTypes, SET_USERNAME } from "../../types";
 /* CURRENTLY UNUSED */
 export const setUsername =
   (username: string | null): ThunkAction =>
-  async (dispatch, _getState, { getAgentId }) => {
-    const myAgentId = await getAgentId();
+  async (dispatch, getState, { getAgentId }) => {
+    // const myAgentId = await getAgentId();
+    let myAgentId = getState().conductor.agentID;
+    myAgentId = myAgentId !== null ? myAgentId : await getAgentId();
     /* assume that getAgentId() is non-nullable */
     const myAgentIdB64 = serializeHash(myAgentId!);
 

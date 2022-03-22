@@ -23,7 +23,9 @@ const createGroup =
     { callZome, getAgentId }
   ): Promise<GroupConversation> => {
     const state = getState();
-    const myAgentId = await getAgentId();
+    // const myAgentId = await getAgentId();
+    let myAgentId = getState().conductor.agentID;
+    myAgentId = myAgentId !== null ? myAgentId : await getAgentId();
 
     const input = {
       name: createGroupInput.name,
