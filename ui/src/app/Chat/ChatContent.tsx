@@ -379,6 +379,7 @@ const Chat: React.FC = () => {
       dispatch(recommitMessage(message)).then((res: any) => setLoading(false));
     }
   };
+
   /* 
     renders the appropriate chat bubble
   */

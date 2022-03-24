@@ -41,6 +41,7 @@ const Others: React.FC<ChatProps> = ({
   onDownload,
 }) => {
   const intl = useIntl();
+  const isText = isTextPayload(payload);
 
   const [show, dismiss] = useIonPopover(ChatPopover, {
     onHide: () => dismiss(),
@@ -48,6 +49,10 @@ const Others: React.FC<ChatProps> = ({
     onReply: () => {
       if (onReply) onReply({ author: profile.username, payload, id });
     },
+    onCopy: () => {
+      if (isText) onCopy((payload as TextPayload).payload.payload);
+    },
+    isText,
     isPinned,
     intl,
   });
@@ -56,9 +61,13 @@ const Others: React.FC<ChatProps> = ({
   const onLongPress = (e: any) => {
     show({ event: e.nativeEvent });
   };
+
+  const onCopy = (message: string) => {
+    navigator.clipboard.writeText(message);
+  };
+
   const pressHandlers = usePressHandlers(onLongPress, () => {});
 
-  const isText = isTextPayload(payload);
   const isP2P = type === "p2p";
   const fileMaxWidth = isText
     ? ""

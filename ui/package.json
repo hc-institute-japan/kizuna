@@ -31,6 +31,7 @@
     "cordova-plugin-file-transfer": "^1.7.1",
     "diceware-word": "^1.0.0",
     "dotenv": "^10.0.0",
+    "emoji-picker-react": "^3.5.1",
     "ionicons": "^5.0.0",
     "node-pre-gyp": "^0.17.0",
     "path": "^0.12.7",

@@ -5,8 +5,11 @@ import {
   IonIcon,
   IonTextarea,
   IonToolbar,
+  IonPopover,
+  useIonPopover,
+  IonContent,
 } from "@ionic/react";
-import { attachOutline } from "ionicons/icons";
+import { attachOutline, happyOutline } from "ionicons/icons";
 import React, {
   forwardRef,
   ForwardRefRenderFunction,
@@ -24,6 +27,7 @@ import EndButtons from "./EndButtons";
 import FileView from "./FileView";
 import ReplyView from "./ReplyView";
 import GifKeyboard from "../Gif/GifKeyboard";
+import EmojiPicker from "../EmojiPicker";
 import styles from "./style.module.css";
 
 export interface FileContent {
@@ -91,9 +95,11 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
   const file = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<FileContent[]>([]);
   const [selectedGif, setSelectedGif] = useState("");
+  const [selectedEmoji, setSelectedEmoji] = useState({});
   const handleOnFileClick = () => file?.current?.click();
 
   const [showGifs, setShowGifs] = useState<boolean>(false);
+  const [showEmoji, setShowEmoji] = useState<boolean>(false);
 
   const onFileSelectCallback = useCallback(() => {
     if (onFileSelect) onFileSelect(files);
@@ -132,18 +138,26 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
 
   const handleOnGifClick = () => {
     setShowGifs(!showGifs);
+    if (!showGifs === true && showEmoji === true) {
+      setShowEmoji(!showEmoji);
+    }
+  };
+
+  const handleOnEmojiClick = () => {
+    setShowEmoji(!showEmoji);
+    if (!showEmoji === true && showGifs === true) {
+      setShowGifs(!showEmoji);
+    }
   };
 
   const handleOnGifSelect = (url: string) => {
     setSelectedGif(url);
-    // if (onSend && message.trim().length !== 0) {
-    //   onSend({
-    //     message: url,
-    //     // reply: isReply?.id,
-    //     setIsLoading: setLoading,
-    //   });
-    //   reset();
-    // }
+  };
+
+  const handleOnEmojiSelect = (emoji: any) => {
+    console.log(emoji);
+    setSelectedEmoji(emoji);
+    setMessage(message + emoji.emoji);
   };
 
   const handleComposition = (event: CompositionEvent) => {
@@ -316,10 +330,22 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
     [files]
   );
 
+  const [presentEmojiPicker, dismissEmojiPicker] = useIonPopover(
+    <EmojiPicker onSelect={handleOnEmojiSelect} />,
+    {
+      onHide: () => dismissEmojiPicker,
+    }
+  );
+
   return (
     <>
       <IonFooter>
         {showGifs ? <GifKeyboard onSelect={handleOnGifSelect} /> : null}
+        {showEmoji ? (
+          <IonPopover isOpen={showEmoji}>
+            <EmojiPicker onSelect={handleOnEmojiSelect} />{" "}
+          </IonPopover>
+        ) : null}
         {isReply ? <ReplyView messageState={[isReply, setIsReply]} /> : null}
         {renderFileView}
         <IonToolbar className={styles.toolbar}>
@@ -331,6 +357,12 @@ const MessageInput: ForwardRefRenderFunction<MessageInputMethods, Props> = (
             )}
             <IonButton onClick={handleOnGifClick}>
               <IonIcon color="medium" icon="assets/icon/gif.svg" />
+            </IonButton>
+            <IonButton
+              // onClick={handleOnEmojiClick}
+              onClick={(e) => presentEmojiPicker({ event: e.nativeEvent })}
+            >
+              <IonIcon color="medium" icon={happyOutline} />
             </IonButton>
           </IonButtons>
           <IonTextarea

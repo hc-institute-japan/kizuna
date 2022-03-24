@@ -2,6 +2,7 @@ import { IonIcon, IonItem, IonLabel, IonList } from "@ionic/react";
 import {
   arrowUndoOutline,
   closeCircleOutline,
+  copyOutline,
   gitCompareOutline,
   pin,
 } from "ionicons/icons";
@@ -13,10 +14,12 @@ interface Props {
   onPin(): any;
   onReply(): any;
   isPinned: boolean;
+  isText: boolean;
   intl: IntlShape;
   onHide(): any;
   onDelete(): any;
   onRetry(): any;
+  onCopy(): any;
   err?: boolean;
 }
 
@@ -25,9 +28,11 @@ const ChatPopover: React.FC<Props> = ({
   onReply,
   onDelete,
   isPinned,
+  isText,
   intl,
   onRetry,
   onHide,
+  onCopy,
   err,
 }) => {
   const renderItems = () => (
@@ -61,6 +66,22 @@ const ChatPopover: React.FC<Props> = ({
         </IonLabel>
         <IonIcon icon={pin} slot="end" />
       </IonItem>
+
+      {isText ? (
+        <IonItem
+          button
+          lines="none"
+          onClick={() => {
+            onCopy();
+            onHide();
+          }}
+        >
+          <IonLabel>
+            {intl.formatMessage({ id: "components.chat.chat-modal-copy" })}
+          </IonLabel>
+          <IonIcon icon={copyOutline} className={styles["icon"]} />
+        </IonItem>
+      ) : null}
     </IonList>
   );
   const renderErrItems = () => (

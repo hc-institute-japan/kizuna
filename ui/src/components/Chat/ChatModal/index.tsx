@@ -15,12 +15,20 @@ interface Props {
   open: [boolean, React.Dispatch<SetStateAction<boolean>>];
   onReply: () => any;
   onPin: () => any;
+  onCopy?: () => any;
   isPinned: boolean;
 }
 
-const ChatModal: React.FC<Props> = ({ open, onReply, onPin, isPinned }) => {
+const ChatModal: React.FC<Props> = ({
+  open,
+  onReply,
+  onPin,
+  onCopy,
+  isPinned,
+}) => {
   const intl = useIntl();
   const [isOpen, setIsOpen] = open;
+
   return (
     <IonModal
       cssClass={styles.modal}
@@ -59,6 +67,21 @@ const ChatModal: React.FC<Props> = ({ open, onReply, onPin, isPinned }) => {
             </IonLabel>
             <IonIcon icon={pinOutline} className={styles["icon"]} />
           </IonItem>
+          {onCopy ? (
+            <IonItem
+              button
+              lines="none"
+              onClick={() => {
+                onCopy();
+                setIsOpen(false);
+              }}
+            >
+              <IonLabel>
+                {intl.formatMessage({ id: "components.chat.chat-modal-copy" })}
+              </IonLabel>
+              <IonIcon icon={arrowUndoOutline} className={styles["icon"]} />
+            </IonItem>
+          ) : null}
         </IonList>
       </IonContent>
     </IonModal>

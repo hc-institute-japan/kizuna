@@ -1,0 +1,11 @@
+.popover {
+    height: auto !important;
+    width: 1000px !important;
+}
+.popover ion-header-bar {
+    position: relative;
+}
+.popover ion-content {
+    top: 0;
+    position: relative;
+}
