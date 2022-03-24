@@ -26,6 +26,8 @@ export const getLatestData =
         fnName: FUNCTIONS[ZOMES.AGGREGATOR].RETRIEVE_LATEST_DATA,
       });
 
+      console.log(latestData);
+
       const myAgentId = await getAgentId();
       /* assume that getAgentId() is non-nullable */
       const myAgentIdB64 = serializeHash(myAgentId!);
@@ -41,8 +43,8 @@ export const getLatestData =
 
       let contacts: { [key: string]: Profile } = {};
       let blocked: { [key: string]: Profile } = {};
-      latestData.addedContacts.forEach((agentProfile: any) => {
-        const agentId = serializeHash(agentProfile.agentPubKey);
+      latestData.addedProfiles.forEach((agentProfile: any) => {
+        const agentId = agentProfile.agentPubKey;
         contacts[agentId] = {
           id: agentId,
           username: agentProfile.profile.nickname,
@@ -53,9 +55,9 @@ export const getLatestData =
             : {},
         };
       });
-      if (latestData.blockedContacts)
-        latestData.blockedContacts.forEach((agentProfile: any) => {
-          const agentId = serializeHash(agentProfile.agentPubKey);
+      if (latestData.blockedProfiles)
+        latestData.blockedProfiles.forEach((agentProfile: any) => {
+          const agentId = agentProfile.agentPubKey;
           blocked[agentId] = {
             id: agentId,
             username: agentProfile.profile.nickname,
@@ -166,6 +168,7 @@ export const getLatestData =
 
       return null;
     } catch (e) {
+      console.log(e);
       dispatch(
         pushError("TOAST", {}, { id: "redux.err.commons-get-latest-data" })
       );

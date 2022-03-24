@@ -1,6 +1,7 @@
 use file_types::Payload;
 use hdk::prelude::*;
 use hdk::prelude::{element::SignedHeaderHashed, timestamp::Timestamp};
+use holo_hash::{AgentPubKeyB64, EntryHashB64};
 use std::collections::{hash_map::HashMap, BTreeMap};
 
 // for profiles
@@ -14,8 +15,25 @@ pub struct Profile {
 #[derive(Clone, Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct AgentProfile {
-    pub agent_pub_key: AgentPubKey,
+    pub agent_pub_key: AgentPubKeyB64,
     pub profile: Profile,
+}
+
+// for contacts
+#[derive(Clone, Deserialize, PartialEq, Serialize, SerializedBytes, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct CategoryWithId {
+    id: EntryHashB64,
+    name: String,
+}
+
+#[derive(Clone, Deserialize, PartialEq, Serialize, SerializedBytes, Debug)]
+#[serde(rename_all = "camelCase")]
+pub struct ContactOutput {
+    pub id: AgentPubKeyB64,
+    pub first_name: Option<String>,
+    pub last_name: Option<String>,
+    pub category: Option<CategoryWithId>,
 }
 
 // for group
@@ -154,8 +172,10 @@ pub struct PerGroupPreference {
 pub struct AggregatedLatestData {
     pub user_info: Option<AgentProfile>,
     // for contacts
-    pub added_contacts: Vec<AgentProfile>,
-    pub blocked_contacts: Vec<AgentProfile>,
+    pub added_contacts: Vec<ContactOutput>,
+    pub blocked_contacts: Vec<ContactOutput>,
+    pub added_profiles: Vec<AgentProfile>,
+    pub blocked_profiles: Vec<AgentProfile>,
     // for group
     pub groups: Vec<GroupOutput>,
     pub latest_group_messages: GroupMessagesOutput,

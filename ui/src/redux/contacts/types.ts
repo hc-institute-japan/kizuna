@@ -1,4 +1,3 @@
-import { AgentPubKey } from "@holochain/client";
 import { Profile } from "../profile/types";
 
 export const SET_CONTACTS = "SET_CONTACTS";
@@ -8,6 +7,18 @@ export interface IndexedContacts {
   [key: string]: Profile[];
 }
 
+export interface Category {
+  id: string;
+  name: string;
+}
+
+export interface ContactOutput {
+  id: string; // AgentPubKkeyb64
+  firstName?: string;
+  lastName?: string;
+  category?: Category;
+}
+
 export interface ContactsState {
   contacts: {
     [key: string]: Profile;
@@ -15,6 +26,9 @@ export interface ContactsState {
   blocked: {
     [key: string]: Profile;
   };
+  // categories: {
+  //   [key: string]: Category;
+  // };
 }
 
 interface SetContactsAction {
@@ -32,7 +46,14 @@ interface SetBlockedAction {
 }
 export type ContactsActionType = SetContactsAction | SetBlockedAction;
 
-export interface Contact {
-  agentPubKey: AgentPubKey;
-  username: string;
-}
+// use this type for contacts once alias an categories are implemented
+// export interface Contact {
+//   id: AgentPubKey;
+//   username: string;
+//   fields: {
+//     [key: string]: any;
+//   };
+//   firstName?: string;
+//   lastName?: string;
+//   category?: Category;
+// }
