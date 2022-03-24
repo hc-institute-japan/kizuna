@@ -1,4 +1,3 @@
-import { serializeHash } from "@holochain-open-dev/core-types";
 import {
   FUNCTIONS,
   ZOMES,
@@ -6,17 +5,17 @@ import {
 import { pushError } from "../../error/actions";
 import { AgentProfile, Profile } from "../../profile/types";
 import { ThunkAction } from "../../types";
-import { SET_BLOCKED } from "../types";
+import { ContactOutput, SET_BLOCKED } from "../types";
 
 const fetchBlocked =
   (): ThunkAction =>
   async (dispatch, _, { callZome }) => {
     try {
-      const ids: Uint8Array[] = await callZome({
+      const contactOutputs: ContactOutput[] = await callZome({
         zomeName: ZOMES.CONTACTS,
         fnName: FUNCTIONS[ZOMES.CONTACTS].LIST_BLOCKED,
       });
-      const idsB64 = ids.map((id) => serializeHash(id));
+      const idsB64 = contactOutputs.map((contact) => contact.id);
 
       let blocked: { [key: string]: Profile } = {};
       try {

@@ -84,8 +84,6 @@ const Chat: React.FC = () => {
     if (state?.username) return state?.username;
     if (rootState.contacts?.contacts[id]?.username)
       return rootState.contacts?.contacts[id]?.username;
-
-    fetchMyContacts();
     return "";
   });
   /* REFS */

@@ -158,12 +158,8 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
                 }
                 _ => Ok(ValidateCallbackResult::Valid),
             },
-            Header::Delete(_) => Ok(ValidateCallbackResult::Invalid(
-                "deleting entry isn't valid".to_string(),
-            )),
-            Header::DeleteLink(_) => Ok(ValidateCallbackResult::Invalid(
-                "deleting link isn't valid".to_string(),
-            )),
+            Header::Delete(_) => Ok(ValidateCallbackResult::Valid), // NOTE: We need an entry type for Delete Header as well so that we can run per zome validations
+            Header::DeleteLink(_) => Ok(ValidateCallbackResult::Valid), // NOTE: We at least need the zome ID in the header.
             _ => Ok(ValidateCallbackResult::Valid),
         },
         Op::StoreEntry { header, entry } => match header.hashed.into_content() {
@@ -218,12 +214,8 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
             }
             Ok(ValidateCallbackResult::Valid)
         }
-        Op::RegisterDeleteLink { create_link: _, .. } => Ok(ValidateCallbackResult::Invalid(
-            "deleting links isn't valid".to_string(),
-        )),
-        Op::RegisterDelete { .. } => Ok(ValidateCallbackResult::Invalid(
-            "deleting entries isn't valid".to_string(),
-        )),
+        Op::RegisterDeleteLink { create_link: _, .. } => Ok(ValidateCallbackResult::Valid), // this can be expanded to only make deleting of links invalid in group zome since CreateLink is available.
+        Op::RegisterDelete { .. } => Ok(ValidateCallbackResult::Valid),
         Op::RegisterAgentActivity { header } => {
             // the old_entry’s header is not a Create (we update the same create entry )
             // author of Create Header doesn't match the author of the Update Header
