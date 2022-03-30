@@ -1,3 +1,4 @@
+import { binaryToUrl } from "../../../utils/services/ConversionService";
 import {
   FUNCTIONS,
   ZOMES,
@@ -35,7 +36,7 @@ const searchProfiles =
             username: v.profile.nickname,
             fields: v.profile.fields.avatar
               ? {
-                  avatar: v.profile.fields.avatar,
+                  avatar: binaryToUrl(v.profile.fields.avatar),
                 }
               : {},
           };

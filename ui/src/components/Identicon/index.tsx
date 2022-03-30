@@ -1,8 +1,7 @@
 import renderIcon from "@holo-host/identicon";
 import { deserializeHash } from "@holochain-open-dev/core-types";
 import { IonAvatar } from "@ionic/react";
-import React, { useEffect, useRef } from "react";
-import { binaryToUrl } from "../../utils/services/ConversionService";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "./style.module.css";
 
 interface Props {
@@ -40,7 +39,7 @@ const Identicon: React.FC<Props> = ({
         />
       ) : (
         <IonAvatar className={styles["avatar"]}>
-          <img src={binaryToUrl(avatar)} alt="avatar"></img>
+          <img src={avatar} alt="avatar"></img>
         </IonAvatar>
       )}
     </div>

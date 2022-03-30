@@ -139,6 +139,7 @@ const GroupChat: React.FC = () => {
     */
 
   useEffect(() => {
+    console.log(groupData)
     const members = [...groupData.members, groupData.creator].filter(
       (member) => member !== myProfile.id
     );

@@ -15,6 +15,7 @@ import { setMessages } from "../p2pmessages/actions/setMessages";
 import { SET_PREFERENCE } from "../preference/types";
 import { Profile, ProfileActionTypes, SET_PROFILE } from "../profile/types";
 import { ThunkAction } from "../types";
+import { binaryToUrl } from "../../utils/services/ConversionService";
 
 export const getLatestData =
   (): ThunkAction =>
@@ -37,7 +38,7 @@ export const getLatestData =
         id: myAgentIdB64,
         nickname: latestData.userInfo.profile.nickname,
         fields: latestData.userInfo.profile.fields.avatar
-          ? { avatar: latestData.userInfo.profile.fields.avatar }
+          ? { avatar: binaryToUrl(latestData.userInfo.profile.fields.avatar) }
           : {},
       });
 
@@ -50,7 +51,7 @@ export const getLatestData =
           username: agentProfile.profile.nickname,
           fields: agentProfile.profile.fields.avatar
             ? {
-                avatar: agentProfile.profile.fields.avatar,
+                avatar: binaryToUrl(agentProfile.profile.fields.avatar),
               }
             : {},
         };
@@ -63,7 +64,7 @@ export const getLatestData =
             username: agentProfile.profile.nickname,
             fields: agentProfile.profile.fields.avatar
               ? {
-                  avatar: agentProfile.profile.fields.avatar,
+                  avatar: binaryToUrl(agentProfile.profile.fields.avatar),
                 }
               : {},
           };
@@ -108,11 +109,11 @@ export const getLatestData =
       const groupMembers: Profile[] = latestData.memberProfiles.map(
         (agentProfile: any): Profile => {
           return {
-            id: serializeHash(agentProfile.agentPubKey),
+            id: agentProfile.agentPubKey,
             username: agentProfile.profile.nickname,
             fields: agentProfile.profile.fields.avatar
               ? {
-                  avatar: agentProfile.profile.fields.avatar,
+                  avatar: binaryToUrl(agentProfile.profile.fields.avatar),
                 }
               : {},
           };

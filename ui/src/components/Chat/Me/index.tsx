@@ -4,22 +4,21 @@ import {
   IonItem,
   IonText,
   isPlatform,
-  useIonPopover,
+  useIonPopover
 } from "@ionic/react";
 import {
   alertCircleOutline,
   checkmarkCircleOutline,
   checkmarkDoneCircle,
-  radioButtonOff,
+  radioButtonOff
 } from "ionicons/icons";
 import React, { useState } from "react";
 import { useIntl } from "react-intl";
 import {
   FilePayload,
   isTextPayload,
-  TextPayload,
+  TextPayload
 } from "../../../redux/commons/types";
-import { binaryToUrl } from "../../../utils/services/ConversionService";
 import { usePressHandlers } from "../../../utils/services/EventService";
 import Identicon from "../../Identicon";
 import Spinner from "../../Spinner";
@@ -155,7 +154,7 @@ const Me: React.FC<ChatProps> = ({
             {showProfilePicture ? (
               profile.fields.avatar ? (
                 <IonAvatar className={common["avatar-container"]}>
-                  <img src={binaryToUrl(profile.fields.avatar)} alt="avatar" />
+                  <img src={profile.fields.avatar} alt="avatar" />
                 </IonAvatar>
               ) : (
                 <IonAvatar className={common["avatar-container"]}>

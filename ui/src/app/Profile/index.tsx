@@ -24,7 +24,6 @@ import ProfileInfo from "../../components/ProfileInfo";
 import updateAvatar from "../../redux/profile/actions/updateAvatar";
 import { Profile as ProfileType } from "../../redux/profile/types";
 import { RootState } from "../../redux/types";
-import { binaryToUrl } from "../../utils/services/ConversionService";
 import { useAppDispatch } from "../../utils/services/ReduxService";
 import ProfileMenuItems from "./ProfileMenuItems";
 import styles from "./style.module.css";
@@ -138,7 +137,7 @@ const Profile: React.FC = () => {
                   alt={profile.username}
                   src={
                     profile.fields.avatar
-                      ? binaryToUrl(profile.fields.avatar)
+                      ? profile.fields.avatar
                       : personCircleOutline
                   }
                   style={{
@@ -182,7 +181,7 @@ const Profile: React.FC = () => {
                 alt={profile.username}
                 src={
                   profile.fields.avatar
-                    ? binaryToUrl(profile.fields.avatar)
+                    ? profile.fields.avatar
                     : personCircleOutline
                 }
                 style={{

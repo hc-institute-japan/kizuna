@@ -36,6 +36,7 @@ import {
 } from "../../../redux/group/actions";
 import { GroupMessage } from "../../../redux/group/types";
 import { RootState } from "../../../redux/types";
+import { binaryToUrl } from "../../../utils/services/ConversionService";
 import { useAppDispatch } from "../../../utils/services/ReduxService";
 import EndButtons from "./EndButtons";
 import Members from "./Members";
@@ -335,11 +336,7 @@ const GroupChatDetails: React.FC = () => {
                   <img
                     ref={groupPicture}
                     alt={groupData.name}
-                    src={URL.createObjectURL(
-                      new Blob([deserializeHash(groupData.avatar)], {
-                        type: "image/jpeg",
-                      })
-                    )}
+                    src={binaryToUrl(groupData.avatar)}
                   />
                 ) : (
                   <img
@@ -388,11 +385,7 @@ const GroupChatDetails: React.FC = () => {
                   <img
                     ref={groupPicture}
                     alt={groupData.name}
-                    src={URL.createObjectURL(
-                      new Blob([deserializeHash(groupData.avatar)], {
-                        type: "image/jpeg",
-                      })
-                    )}
+                    src={binaryToUrl(groupData.avatar)}
                   />
                 ) : (
                   <img

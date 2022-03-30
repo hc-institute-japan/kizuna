@@ -1,4 +1,5 @@
 import { serializeHash } from "@holochain-open-dev/core-types";
+import { binaryToUrl } from "../../../utils/services/ConversionService";
 import {
   FUNCTIONS,
   ZOMES,
@@ -32,7 +33,7 @@ const createProfile =
         type: SET_PROFILE,
         id: myAgentIdB64,
         nickname: res.profile.nickname,
-        fields: image ? { avatar: serializeHash(image) } : {},
+        fields: image ? { avatar: binaryToUrl(serializeHash(image)) } : {},
       });
       return res;
     } catch (e) {

@@ -1,4 +1,5 @@
 import { serializeHash } from "@holochain-open-dev/core-types";
+import { binaryToUrl } from "../../../utils/services/ConversionService";
 import {
   FUNCTIONS,
   ZOMES,
@@ -31,7 +32,7 @@ export const updateAvatar =
       id: myAgentIdB64,
       /* assert that nickname is non-nullable */
       nickname: username!,
-      fields: { ...updatedFields, avatar: serializedAvatar },
+      fields: { ...updatedFields, avatar: binaryToUrl(serializedAvatar) },
     });
   };
 

@@ -11,8 +11,7 @@ import {
   FilePayload,
   isTextPayload,
   TextPayload,
-} from "../../../redux/commons/types";
-import { binaryToUrl } from "../../../utils/services/ConversionService";
+} from "../../../redux/commons/types"; 
 import { usePressHandlers } from "../../../utils/services/EventService";
 import Identicon from "../../Identicon";
 import ChatPopover from "../ChatPopover";
@@ -94,7 +93,7 @@ const Others: React.FC<ChatProps> = ({
               profile.fields.avatar ? (
                 <IonAvatar className={common["avatar-container"]}>
                   <img
-                    src={binaryToUrl(profile.fields.avatar)}
+                    src={profile.fields.avatar}
                     alt="avatar"
                   ></img>
                 </IonAvatar>

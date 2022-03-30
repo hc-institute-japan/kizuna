@@ -77,7 +77,7 @@ export const binaryToUrl = (hash: string) =>
   );
 
 const ConversionService = {
-  binaryToUrl,
+  // binaryToUrl,
   isTextPayload,
   searchContacts,
   convertCamelToSnake,

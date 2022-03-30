@@ -24,6 +24,7 @@ import React from "react";
 import { IntlShape, useIntl } from "react-intl";
 import { useHistory } from "react-router";
 import { GroupConversation } from "../../redux/group/types";
+import { binaryToUrl } from "../../utils/services/ConversionService";
 import styles from "./style.module.css";
 
 interface Props {
@@ -115,11 +116,7 @@ const GroupChatHeader: React.FC<Props> = ({ groupData }) => {
             {/* TODO: Display an actual avatar set by the group creator */}
             {groupData.avatar ? (
               <img
-                src={URL.createObjectURL(
-                  new Blob([deserializeHash(groupData.avatar)], {
-                    type: "image/jpeg",
-                  })
-                )}
+                src={binaryToUrl(groupData.avatar)}
                 alt={groupData!.name}
               ></img>
             ) : (

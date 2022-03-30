@@ -24,7 +24,6 @@ import { useHistory } from "react-router-dom";
 import { logout } from "../../redux/profile/actions";
 import { Profile } from "../../redux/profile/types";
 import { RootState } from "../../redux/types";
-import { binaryToUrl } from "../../utils/services/ConversionService";
 import { useAppDispatch } from "../../utils/services/ReduxService";
 import Identicon from "../Identicon";
 import styles from "./style.module.css";
@@ -105,7 +104,7 @@ const Menu: React.FC = () => {
             >
               {fields.avatar ? (
                 <IonAvatar>
-                  <img src={binaryToUrl(fields.avatar)} alt="avatar"></img>
+                  <img src={fields.avatar} alt="avatar"></img>
                 </IonAvatar>
               ) : (
                 <Identicon hash={id!} size={60} />
