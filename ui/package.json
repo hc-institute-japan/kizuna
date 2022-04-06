@@ -59,7 +59,6 @@
     "build:hc": "REACT_APP_ENV=HC react-scripts build",
     "build:happ": "cd ../dnas/lobby && CARGO_TARGET_DIR=target cargo build --release --target wasm32-unknown-unknown && hc dna pack workdir/dna && hc app pack workdir/happ && rm -rf ~/tmp && mkdir ~/tmp && hc s clean",
     "build:webhapp": "cd ../dnas/lobby/workdir/webhapp && hc web-app pack .",
-    
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "start:holochain": "cd ../dnas/lobby && hc sandbox generate workdir/happ/ -r=$HC_PORT --app-id=$APP_ID network mdns",
@@ -108,7 +107,11 @@
     "@types/react": "^17.0.0",
     "@types/react-redux": "^7.1.15",
     "@types/redux-logger": "^3.0.8",
-    "poetic": "^1.7.0"
+    "poetic": "^1.7.0",
+    "react-error-overlay": "^6.0.9"
   },
-  "description": "An Ionic project"
+  "description": "An Ionic project",
+  "resolutions": {
+    "react-error-overlay": "6.0.9"
+  }
 }
