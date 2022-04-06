@@ -34,6 +34,7 @@ pub fn read_group_message_handler(
                 CreateLinkInput::new(
                     message_entry_hash,
                     my_agent_pubkey.clone().into(),
+                    LinkType::from(HdkLinkType::Any),
                     LinkTag::new("read".to_owned()),
                     ChainTopOrdering::Relaxed,
                 ),

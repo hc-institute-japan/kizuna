@@ -97,7 +97,7 @@ pub fn link_and_emit_added_to_group_signals(
     signal_payload: SignalPayload,
 ) -> ExternResult<()> {
     for agent in agents.clone() {
-        create_link(agent.into(), link_target.clone(), link_tag.clone())?;
+        create_link(agent.into(), link_target.clone(), LinkType::from(HdkLinkType::Any), link_tag.clone())?;
     }
 
     let signal: SignalDetails = SignalDetails {

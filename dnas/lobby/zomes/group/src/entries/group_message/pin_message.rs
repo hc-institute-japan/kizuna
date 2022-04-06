@@ -21,6 +21,7 @@ pub fn pin_message_handler(pin_detail: PinDetail) -> ExternResult<()> {
         create_link(
             pin_detail.group_hash.clone(),
             pin_detail.group_message_hash.clone(),
+            LinkType::from(HdkLinkType::Any),
             LinkTag::new("pinned".to_owned()),
         )?;
     } else {

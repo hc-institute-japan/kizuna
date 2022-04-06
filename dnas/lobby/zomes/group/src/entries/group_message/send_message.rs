@@ -88,6 +88,7 @@ pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<Gr
         CreateLinkInput::new(
             group_hash_timestamp_path_hash,
             hash_entry(&message)?,
+            LinkType::from(HdkLinkType::Any),
             LinkTag::new(match message.payload.clone() {
                 Payload::Text { payload: _ } => "text".to_owned(),
                 Payload::File {

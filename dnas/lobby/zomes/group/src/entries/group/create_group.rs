@@ -50,7 +50,7 @@ pub fn create_group_handler(
     };
 
     // link the group admin to the group
-    create_link(creator.into(), group_id.clone(), LinkTag::new("member"))?;
+    create_link(creator.into(), group_id.clone(), LinkType::from(HdkLinkType::Any), LinkTag::new("member"))?;
 
     let signal_payload: SignalPayload = SignalPayload::AddedToGroup(group_output);
     /*

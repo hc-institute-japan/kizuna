@@ -63,6 +63,7 @@ pub fn send_message_in_target_date_handler(
                     create_link(
                         hash.clone(),
                         hash_entry(&message.clone())?,
+                        LinkType::from(HdkLinkType::Any),
                         LinkTag::new(match message.payload {
                             Payload::Text { payload: _ } => "text".to_owned(),
                             Payload::File {

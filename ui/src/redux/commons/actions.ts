@@ -27,8 +27,6 @@ export const getLatestData =
         fnName: FUNCTIONS[ZOMES.AGGREGATOR].RETRIEVE_LATEST_DATA,
       });
 
-      console.log(latestData);
-
       const myAgentId = await getAgentId();
       /* assume that getAgentId() is non-nullable */
       const myAgentIdB64 = serializeHash(myAgentId!);
