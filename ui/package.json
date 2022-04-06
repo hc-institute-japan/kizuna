@@ -6,7 +6,6 @@
     "@capacitor/core": "2.5.0",
     "@capacitor/ios": "^2.4.5",
     "@holo-host/chaperone": "^9.0.0",
-    "@holo-host/identicon": "git+https://github.com/holo-host/identicon.git#types",
     "@holo-host/web-sdk": "^0.5.3",
     "@holochain-open-dev/cell-client": "^0.3.2",
     "@holochain-open-dev/core-types": "^0.1.1",
@@ -103,10 +102,13 @@
   },
   "devDependencies": {
     "@capacitor/cli": "2.4.5",
+    "@holo-host/identicon": "^0.1.0",
     "@ionic/core": "^5.5.4",
     "@types/react": "^17.0.0",
     "@types/react-redux": "^7.1.15",
     "@types/redux-logger": "^3.0.8",
+    "eslint": "^8.12.0",
+    "eslint-config-react-app": "^7.0.0",
     "poetic": "^1.7.0",
     "react-error-overlay": "^6.0.9"
   },

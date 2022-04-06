@@ -1,3 +1,4 @@
+// @ts-ignore
 import renderIcon from "@holo-host/identicon";
 import { deserializeHash } from "@holochain-open-dev/core-types";
 import { IonAvatar } from "@ionic/react";
