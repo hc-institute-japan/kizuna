@@ -1,0 +1,7 @@
+---
+manifest_version: "1"
+name: kizuna
+ui:
+  bundled: "./kizuna-ui.zip"
+happ_manifest:
+  bundled: "../happ/kizuna.happ"

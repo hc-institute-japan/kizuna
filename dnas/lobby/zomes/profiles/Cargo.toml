@@ -11,5 +11,5 @@ crate-type = [ "cdylib", "rlib" ]
 [dependencies]
 derive_more = "0"
 serde = "1"
-profiles = {git = "https://github.com/tatssato/profiles", branch ="main", package = "hc_zome_profiles"}
-hdk = {version = "0.0.126", features = ["encoding"]}
+profiles = {git = "https://github.com/holochain-open-dev/profiles", branch ="main", package = "hc_zome_profiles"}
+hdk = {version = "0.0.127", features = ["encoding"]}
