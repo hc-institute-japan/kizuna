@@ -13,15 +13,15 @@ const blockContact =
     const { contacts, blocked } = getState().contacts;
 
     try {
-      blocked[profile.id] = profile;
+      const newBlocked = { [profile.id]: profile, ...blocked };
       await callZome({
         zomeName: ZOMES.CONTACTS,
         fnName: FUNCTIONS[ZOMES.CONTACTS].BLOCK_CONTACTS,
         payload: [profile.id],
       });
-      delete contacts[profile.id];
-      dispatch({ type: SET_BLOCKED, blocked });
-      dispatch({ type: SET_CONTACTS, contacts });
+      const { [profile.id]: _, ...newContacts } = contacts;
+      dispatch({ type: SET_BLOCKED, blocked: newBlocked });
+      dispatch({ type: SET_CONTACTS, contacts: newContacts });
 
       return true;
     } catch (e) {

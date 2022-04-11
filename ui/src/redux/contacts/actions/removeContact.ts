@@ -20,8 +20,8 @@ const removeContact =
         payload: [deserializeHash(profile.id)],
       });
 
-      delete contacts[profile.id];
-      dispatch({ type: SET_CONTACTS, contacts });
+      const {[profile.id]: _, ...newContacts} = contacts;
+      dispatch({ type: SET_CONTACTS, contacts: newContacts });
       return true;
     } catch (e) {
       dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));

@@ -49,8 +49,8 @@ const NewConversation: React.FC = () => {
   /* Handlers */
   const handleOnRemove = (contact: Profile) => {
     setSelectedContacts((currContacts) => {
-      delete currContacts[contact.id];
-      return { ...currContacts };
+      const { [contact.id]: _, ...newCurrContacts } = currContacts;
+      return newCurrContacts;
     });
     setContacts((currContacts) => {
       currContacts[contact.id] = contact;

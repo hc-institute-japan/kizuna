@@ -20,7 +20,12 @@ const AddMemberItem: React.FC<Props> = ({ contact, selected, onSelected }) => {
       color={selected ? "primary" : ""}
       key={JSON.stringify(contact.id)}
     >
-      <AgentIdentifier nickname={contact.username} id={contact.id} />
+      <AgentIdentifier
+        displayAvatar={true}
+        avatar={contact.fields.avatar}
+        nickname={contact.username}
+        id={contact.id}
+      />
     </IonItem>
   );
 };

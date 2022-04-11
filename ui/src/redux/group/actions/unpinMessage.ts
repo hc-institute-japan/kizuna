@@ -26,7 +26,7 @@ export const unpinMessage =
       };
       const conversation = conversations[groupId];
 
-      delete pinnedMessages[groupMessageId];
+      const {[groupMessageId]: _, ...newPinnedMessages} = pinnedMessages;
 
       conversation.pinnedMessages = conversation.pinnedMessages
         ? conversation.pinnedMessages!.filter(
@@ -40,7 +40,7 @@ export const unpinMessage =
           ...conversations,
           [groupId]: conversation,
         },
-        pinnedMessages,
+        pinnedMessages: newPinnedMessages,
       });
     } catch (e) {
       return dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));

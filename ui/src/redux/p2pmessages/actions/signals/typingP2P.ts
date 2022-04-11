@@ -21,7 +21,8 @@ const typingP2P =
         currentState[profile.id] = profile;
       } else {
         if (!payload.is_typing) {
-          delete currentState[profile.id];
+          const {[profile.id]: _, ...newState} = currentState
+          currentState = {...newState};
         }
       }
 

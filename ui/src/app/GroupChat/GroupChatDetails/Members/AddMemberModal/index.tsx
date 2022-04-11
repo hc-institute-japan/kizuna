@@ -64,7 +64,11 @@ const AddMemberModal: React.FC<Props> = ({
 
   /* Handlers */
   const handleOnSelected = (contact: Profile) =>
-    setSelected([...selected, contact]);
+    setSelected(
+      selected.includes(contact)
+        ? selected.filter((p) => p.id !== contact.id)
+        : [...selected, contact]
+    );
 
   const handleOnAdd = () => {
     setLoading(true);

@@ -72,6 +72,7 @@
     "demo:alice": "concurrently \"HC_PORT=8888 APP_ID=kizuna RUST_LOG=debug npm run start:holochain\" \"ENV=HCDEV DNA_INTERFACE=ws://localhost:8888 UI_PORT=8100 npm run start:ui\"",
     "demo:bob": "concurrently \"HC_PORT=8889 APP_ID=kizuna npm run start:holochain\" \"ENV=HCDEV DNA_INTERFACE=ws://localhost:8889 UI_PORT=8200 npm run start:ui\"",
     "demo:charlie": "concurrently \"HC_PORT=8899 APP_ID=kizuna npm run start:holochain\" \"ENV=HCDEV DNA_INTERFACE=ws://localhost:8899 UI_PORT=8300 npm run start:ui\"",
+    "demo:david": "concurrently \"HC_PORT=8999 APP_ID=kizuna npm run start:holochain\" \"ENV=HCDEV DNA_INTERFACE=ws://localhost:8999 UI_PORT=8400 npm run start:ui\"",
     "demo-rmt-prxy": "concurrently \"npm run start:hc-prxy\" \"ENV=HCDEV DNA_INTERFACE=ws://localhost:8888 UI_PORT=8100 npm run start:ui\"",
     "start-holo-alice": "concurrently -k \"npm:chaperone-alice\" \"ADMIN_PORT=9000 APP_ID=uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL HC_PORT=8888 npm run start:holo\"  \"ENV=HCC CHAPERONE_PORT=24273 UI_PORT=8100 npm run start:ui\"",
     "start-holo-bob": "concurrently -k \"npm:chaperone-bob\" \"ADMIN_PORT=9001 APP_ID=uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL HC_PORT=8889 npm run start:holo\"  \"ENV=HCC CHAPERONE_PORT=24274 UI_PORT=8200 npm run start:ui\"",

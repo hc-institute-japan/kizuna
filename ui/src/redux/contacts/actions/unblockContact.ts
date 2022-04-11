@@ -19,8 +19,8 @@ const unblockContact =
         payload: [deserializeHash(profile.id)],
       });
 
-      delete blocked[profile.id];
-      dispatch({ type: SET_BLOCKED, blocked });
+      const {[profile.id]: _, ...newBlocked} = blocked
+      dispatch({ type: SET_BLOCKED, blocked: newBlocked });
       return true;
     } catch (e) {
       dispatch(pushError("TOAST", {}, { id: "redux.err.generic" }));
