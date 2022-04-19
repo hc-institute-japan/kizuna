@@ -25,8 +25,6 @@ const Auth: React.FC = () => {
     });
   }, [dispatch]);
 
-  console.log({ ENV: process.env });
-
   const renderErrPage = () => (
     <div className={styles["err"]}>
       <IonIcon icon={sadOutline} />

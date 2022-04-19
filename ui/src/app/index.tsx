@@ -16,6 +16,8 @@ import React from "react";
 /* Theme variables */
 import "../theme/variables.css";
 
+import * as Profiles from "@holochain-open-dev/profiles";
+
 import Auth from "./Auth";
 setupConfig({ mode: "md" });
 const App: React.FC = () => <Auth />;

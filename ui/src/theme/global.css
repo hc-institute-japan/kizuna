@@ -27,3 +27,45 @@ div {
   -webkit-hyphens: auto;
   hyphens: auto;
 }
+
+:root {
+  --primary: #e48221;
+
+  --primary-10: #e5c8ab;
+
+  --primary-gradient: linear-gradient(180deg, #e47221 0%, #f5c31a 100%);
+
+  /* Light Mode */
+
+  --primary-text: #404040;
+
+  --secondary-text: #838383;
+
+  /* Dark Mode */
+
+  --dark-primary-text: #cfcfcf;
+
+  --dark-secondary-text: #979797;
+
+  --dark-primary-bg: #23252e;
+
+  --dark-secondary-bg: #292b33;
+
+  /* Colors */
+
+  --white: #ffff;
+
+  --black: #0000;
+
+  --red: #f10404;
+
+  --green: #11d30d;
+
+  --gray: #f3f3f3;
+}
+
+/* Overrides */
+.md {
+  width: 100%;
+  height: 100%;
+}
