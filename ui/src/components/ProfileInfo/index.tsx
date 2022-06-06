@@ -34,14 +34,14 @@ const ProfileInfo: React.FC<Props> = ({ nickname, id }) => {
           <IonText>{trimmedId}</IonText>
         </IonItem>
 
-        <IonItem lines="none">
+        {/* <IonItem lines="none">
           <h3>
             {intl.formatMessage({ id: "components.profile-info.identicon" })}
           </h3>
         </IonItem>
         <IonItem className={styles["avatar"]} lines="none">
           <Identicon hash={id} size={40} />
-        </IonItem>
+        </IonItem> */}
       </IonItemGroup>
     </>
   );

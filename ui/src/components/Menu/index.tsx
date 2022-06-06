@@ -10,6 +10,7 @@ import {
   IonMenu,
   IonText,
   IonToolbar,
+  IonImg,
 } from "@ionic/react";
 import {
   banOutline,
@@ -107,7 +108,13 @@ const Menu: React.FC = () => {
                   <img src={fields.avatar} alt="avatar"></img>
                 </IonAvatar>
               ) : (
-                <Identicon hash={id!} size={60} />
+                // <Identicon hash={id!} size={60} />
+                <IonAvatar>
+                  <img
+                    src="assets/icon/person-circle-outline.png"
+                    alt="avtar"
+                  ></img>
+                </IonAvatar>
               )}
             </div>
 

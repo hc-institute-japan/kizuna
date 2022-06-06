@@ -1,6 +1,7 @@
 import renderIcon from "@holo-host/identicon";
 import { deserializeHash } from "@holochain-open-dev/core-types";
-import { IonAvatar } from "@ionic/react";
+import { IonAvatar, IonIcon, IonImg } from "@ionic/react";
+import { personCircle, personCircleOutline } from "ionicons/icons";
 import React, { useEffect, useRef, useState } from "react";
 import styles from "./style.module.css";
 
@@ -30,14 +31,21 @@ const Identicon: React.FC<Props> = ({
   return (
     <div>
       {!avatar ? (
-        <canvas
-          ref={canvas}
+        // <canvas
+        //   ref={canvas}
+        //   className={`${styles["icon"]} ${className}`}
+        //   id="identicon"
+        //   width={size}
+        //   height={size}
+        // />
+        // <IonAvatar className={styles["avatar"]}>
+        <IonImg
+          src="assets/icon/person-circle-outline.svg"
+          alt="avatar"
           className={`${styles["icon"]} ${className}`}
-          id="identicon"
-          width={size}
-          height={size}
         />
       ) : (
+        // </IonAvatar>
         <IonAvatar className={styles["avatar"]}>
           <img src={avatar} alt="avatar"></img>
         </IonAvatar>
