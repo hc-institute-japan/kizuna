@@ -11,7 +11,7 @@ import {
   FilePayload,
   isTextPayload,
   TextPayload,
-} from "../../../redux/commons/types"; 
+} from "../../../redux/commons/types";
 import { usePressHandlers } from "../../../utils/services/EventService";
 import Identicon from "../../Identicon";
 import ChatPopover from "../ChatPopover";
@@ -92,13 +92,16 @@ const Others: React.FC<ChatProps> = ({
             {showProfilePicture ? (
               profile.fields.avatar ? (
                 <IonAvatar className={common["avatar-container"]}>
+                  <img src={profile.fields.avatar} alt="avatar"></img>
+                </IonAvatar>
+              ) : (
+                // <Identicon hash={profile.id!} size={35} />
+                <IonAvatar>
                   <img
-                    src={profile.fields.avatar}
+                    src="assets/icon/person-circle-outline.png"
                     alt="avatar"
                   ></img>
                 </IonAvatar>
-              ) : (
-                <Identicon hash={profile.id!} size={35} />
               )
             ) : null}
           </div>

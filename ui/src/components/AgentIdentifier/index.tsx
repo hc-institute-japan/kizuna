@@ -1,4 +1,5 @@
 import React from "react";
+import { IonAvatar } from "@ionic/react";
 import Identicon from "../Identicon";
 import styles from "./style.module.css";
 
@@ -33,7 +34,10 @@ const AgentIdentifier: React.FC<Props> = ({
   );
   const renderAvatar = (id: string) => (
     <div className={styles["avatar"]}>
-      <Identicon hash={id} avatar={avatar} size={50} />
+      {/* <Identicon hash={id} avatar={avatar} size={50} /> */}
+      <IonAvatar>
+        <img src="assets/icon/person-circle-outline.png" alt="avatar"></img>
+      </IonAvatar>
     </div>
   );
 

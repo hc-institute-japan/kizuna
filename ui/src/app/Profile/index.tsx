@@ -7,6 +7,7 @@ import {
   IonText,
   IonTitle,
   IonToolbar,
+  IonAvatar,
   useIonModal,
 } from "@ionic/react";
 import {
@@ -190,7 +191,13 @@ const Profile: React.FC = () => {
               />
 
               {profile.fields.avatar ? null : (
-                <Identicon size={100} hash={profile.id}></Identicon>
+                // <Identicon size={100} hash={profile.id}></Identicon>
+                <IonAvatar>
+                  <img
+                    src="assets/icon/person-circle-outline.png"
+                    alt="avatar"
+                  ></img>
+                </IonAvatar>
               )}
             </div>
           </div>
