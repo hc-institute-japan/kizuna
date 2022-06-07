@@ -112,7 +112,7 @@ const Menu: React.FC = () => {
                 <IonAvatar>
                   <img
                     src="assets/icon/person-circle-outline.png"
-                    alt="avtar"
+                    alt="avatar"
                   ></img>
                 </IonAvatar>
               )}
@@ -140,7 +140,7 @@ const Menu: React.FC = () => {
       <IonFooter className="ion-no-border">
         <IonToolbar>
           <IonText className={`ion-padding ${styles["version"]}`}>
-            {intl.formatMessage({ id: "app.menu.version" })} 0.2.2
+            {intl.formatMessage({ id: "app.menu.version" })} 0.2.4
           </IonText>
         </IonToolbar>
       </IonFooter>

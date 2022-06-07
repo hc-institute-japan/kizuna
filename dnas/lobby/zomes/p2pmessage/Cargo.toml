@@ -11,5 +11,5 @@ crate-type = [ "cdylib", "rlib" ]
 [dependencies]
 derive_more = "0"
 serde = "1"
-hdk = {version = "0.0.127", features = ["encoding"]}
-p2pmessage = {git = "https://github.com/hc-institute-japan/p2pmessage-zome", branch = "develop", package = "p2pmessage"}
+hdk = {version = "0.0.126", features = ["encoding"]}
+p2pmessage = {git = "https://github.com/hc-institute-japan/p2pmessage-zome", rev = "241195477cb0577803918ced8bdd12b3c898314e", package = "p2pmessage"}
