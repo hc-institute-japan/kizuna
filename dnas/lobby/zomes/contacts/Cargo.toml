@@ -12,4 +12,4 @@ crate-type = [ "cdylib", "rlib" ]
 derive_more = "0"
 serde = "1"
 hdk = {version = "0.0.126", features = ["encoding"]}
-hc_contacts = {git = "https://github.com/holochain-open-dev/contacts", package = "contacts", branch="main"}
+hc_contacts = {git = "https://github.com/holochain-open-dev/contacts", package = "contacts", rev="56425a98c52ac4d03dadef8b518ba74df0c172ef"}
