@@ -96,7 +96,7 @@ const Others: React.FC<ChatProps> = ({
                 </IonAvatar>
               ) : (
                 // <Identicon hash={profile.id!} size={35} />
-                <IonAvatar>
+                <IonAvatar className={common["avatar-container"]}>
                   <img
                     src="assets/icon/person-circle-outline.png"
                     alt="avatar"
