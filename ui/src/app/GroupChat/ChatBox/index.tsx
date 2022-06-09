@@ -55,11 +55,14 @@ const ChatBox: React.FC<Props> = ({
     errMsgs: groupErrMessages,
     pinnedMessages,
   } = useSelector((state: RootState) => state.groups);
-  const membersProfile = useSelector(
-    (state: RootState) => state.groups.members
-  );
-  const profile = useSelector((state: RootState) => state.profile);
-
+  const membersProfile = useSelector((state: RootState) => {
+    console.log("members from state ", state.groups.members);
+    return state.groups.members;
+  });
+  const profile = useSelector((state: RootState) => {
+    console.log("profile from state ", state.profile);
+    return state.profile;
+  });
   /* LOCAL STATE */
   const [messages, setMessages] = useState<GroupMessageBundle[]>([]);
   const [messagesReceipt, setMessagesReceipt] = useState<string[]>([]);
@@ -250,6 +253,14 @@ const ChatBox: React.FC<Props> = ({
         type="group"
       >
         {messages!.map((message, i) => {
+          console.log(
+            "group message ",
+            message.payload,
+            "\nself ",
+            profile,
+            "\nand message author is ",
+            message.author
+          );
           if (message.author.id === profile.id)
             return (
               <Chat.Me
