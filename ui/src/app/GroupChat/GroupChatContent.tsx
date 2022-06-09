@@ -143,6 +143,7 @@ const GroupChat: React.FC = () => {
       (member) => member !== myProfile.id
     );
 
+    console.log("dispatching group typing action");
     dispatch(
       indicateGroupTyping({
         groupId: groupData.originalGroupId,
@@ -162,7 +163,7 @@ const GroupChat: React.FC = () => {
 
       if (inputTimeout.current) clearTimeout(inputTimeout.current);
 
-      inputTimeout.current = setTimeout(() => setIsTyping(false), 500);
+      inputTimeout.current = setTimeout(() => setIsTyping(false), 2500);
     }
   }, [message]);
 
