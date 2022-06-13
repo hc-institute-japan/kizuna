@@ -10,11 +10,12 @@ import { ProfileActionTypes, SET_PROFILE } from "../types";
 
 const createProfile =
   (nickname: string, image: Uint8Array | null): ThunkAction =>
-  async (dispatch, _getState, { callZome, getAgentId }) => {
+  async (dispatch, getState, { callZome, getAgentId }) => {
     try {
-      const myAgentId = await getAgentId();
-      /* assume that getAgentId() is non-nullable */
-      const myAgentIdB64 = serializeHash(myAgentId!);
+      // const myAgentId = await getAgentId();
+      // /* assume that getAgentId() is non-nullable */
+      // const myAgentIdB64 = serializeHash(myAgentId!);
+      const myAgentIdB64 = getState().profile.id!;
 
       const payload = image
         ? {

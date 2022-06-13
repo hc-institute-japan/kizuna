@@ -26,7 +26,8 @@ const addMembers =
     { callZome, getAgentId }
   ): Promise<UpdateGroupMembersData | boolean> => {
     const state = getState();
-    const myAgentId = await getAgentId();
+    // const myAgentId = await getAgentId();
+    const myAgentId = getState().profile.id!;
     const input = {
       members: updateGroupMembersData.members
         /* dedup */
@@ -60,7 +61,7 @@ const addMembers =
         state,
         membersBase64,
         callZome,
-        serializeHash(myAgentId!)
+        myAgentId!
       );
 
       let groupEntryHash: string = updateGroupMembersDataFromRes.groupId;

@@ -1,4 +1,4 @@
-import { serializeHash } from "@holochain-open-dev/core-types";
+import { serializeHash, deserializeHash } from "@holochain-open-dev/core-types";
 import { ThunkAction } from "../../types";
 import { fetchPinnedMessages } from "./fetchPinnedMessages";
 import getLatestGroupVersion from "./getLatestGroupVersion";
@@ -21,7 +21,8 @@ export const getPinnedMessages =
           const message = getState().groups.messages[pinnedMessage];
           return message.author;
         });
-        const id = await getAgentId();
+        // const id = await getAgentId();
+        const id = deserializeHash(getState().profile.id!);
 
         if (id) {
           const authorProfiles = await fetchUsernameOfMembers(

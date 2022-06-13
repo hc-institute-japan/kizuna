@@ -18,8 +18,9 @@ const addedToGroup =
     const state = getState();
     const contacts = state.contacts.contacts;
     const { username, fields } = state.profile; // At this point, username is non-nullable
-    const id = await getAgentId();
-    const myAgentId = serializeHash(id!); // AgentPubKey should be non-nullable here
+    // const id = await getAgentId();
+    // const myAgentId = serializeHash(id!); // AgentPubKey should be non-nullable here
+    const myAgentId = getState().profile.id!;
 
     const groupData: GroupConversation = {
       originalGroupId: serializeHash(payload.groupId),

@@ -27,7 +27,8 @@ export const fetchPinnedMessages =
       } else {
         const rawResultArr = Object.values(res as Object);
         const pinnedMessages: { [key: string]: GroupMessage } = {};
-        const myAgentId = await getAgentId();
+        // const myAgentId = await getAgentId();
+        const myAgentId = getState().profile.id!;
         const pinnedMessageIds = rawResultArr.map(async (raw) => {
           const rawResult = raw.entry;
 
@@ -37,7 +38,7 @@ export const fetchPinnedMessages =
               getState(),
               [serializeHash(rawResult.sender)],
               callZome,
-              serializeHash(myAgentId!)
+              myAgentId!
             )
           )[0].username;
 

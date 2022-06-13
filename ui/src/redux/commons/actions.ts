@@ -29,13 +29,13 @@ export const getLatestData =
 
       console.log("latest data ", latestData);
 
-      const myAgentId = await getAgentId();
-      /* assume that getAgentId() is non-nullable */
-      const myAgentIdB64 = serializeHash(myAgentId!);
+      // const myAgentId = await getAgentId();
+      // /* assume that getAgentId() is non-nullable */
+      // const myAgentIdB64 = serializeHash(myAgentId!);
 
       dispatch<ProfileActionTypes>({
         type: SET_PROFILE,
-        id: myAgentIdB64,
+        id: latestData.userInfo.agentPubKey,
         nickname: latestData.userInfo.profile.nickname,
         fields: latestData.userInfo.profile.fields.avatar
           ? { avatar: binaryToUrl(latestData.userInfo.profile.fields.avatar) }

@@ -9,15 +9,16 @@ import { SET_USERNAME } from "../../types";
 /* CURRENTLY UNUSED */
 const fetchMyUsername =
   (): ThunkAction =>
-  async (dispatch, _getState, { callZome, getAgentId }) => {
+  async (dispatch, getState, { callZome, getAgentId }) => {
     try {
       const res = await callZome({
         zomeName: ZOMES.USERNAME,
         fnName: FUNCTIONS[ZOMES.USERNAME].GET_MY_USERNAME,
       });
-      const myAgentId = await getAgentId();
+      // const myAgentId = await getAgentId();
+      const myAgentIdB64 = getState().profile.id!;
       /* assume that getAgentId() is non-nullable */
-      const myAgentIdB64 = serializeHash(myAgentId!);
+      // const myAgentIdB64 = serializeHash(myAgentId!);
       if (res?.type !== "error") {
         dispatch({
           type: SET_USERNAME,

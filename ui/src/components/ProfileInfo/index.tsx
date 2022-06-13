@@ -10,6 +10,7 @@ interface Props {
 }
 
 const ProfileInfo: React.FC<Props> = ({ nickname, id }) => {
+  console.log("this is profile info", nickname, id);
   const intl = useIntl();
   const trimmedId = id.slice(5);
 

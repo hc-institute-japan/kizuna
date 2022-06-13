@@ -21,7 +21,8 @@ import {
 const getLatestGroupVersion =
   (groupId: string): ThunkAction =>
   async (dispatch, getState, { callZome, getAgentId }) => {
-    const myAgentId = await getAgentId();
+    // const myAgentId = await getAgentId();
+    const myAgentId = getState().profile.id!;
     const state = getState();
     try {
       const latestGroupVersionRes = await callZome({
@@ -79,7 +80,7 @@ const getLatestGroupVersion =
         getState(),
         groupData.members,
         callZome,
-        serializeHash(myAgentId!)
+        myAgentId!
       );
 
       let conversations = state.groups.conversations;

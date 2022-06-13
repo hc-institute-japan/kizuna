@@ -10,10 +10,11 @@ import { ProfileActionTypes, SET_PROFILE } from "../types";
 export const updateAvatar =
   (avatar: Uint8Array): ThunkAction =>
   async (dispatch, getState, { getAgentId, callZome }) => {
-    const myAgentId = await getAgentId();
+    // const myAgentId = await getAgentId();
+    const myAgentIdB64 = getState().profile.id!;
     const { username, fields } = getState().profile;
     /* assume that getAgentId() is non-nullable */
-    const myAgentIdB64 = serializeHash(myAgentId!);
+    // const myAgentIdB64 = serializeHash(myAgentId!);
     const serializedAvatar = serializeHash(avatar);
 
     const updatedFields = { ...fields, avatar: serializedAvatar };

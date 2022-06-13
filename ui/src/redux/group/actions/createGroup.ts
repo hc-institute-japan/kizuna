@@ -23,7 +23,8 @@ const createGroup =
     { callZome, getAgentId }
   ): Promise<GroupConversation> => {
     const state = getState();
-    const myAgentId = await getAgentId();
+    // const myAgentId = await getAgentId();
+    const myAgentId = getState().profile.id!;
 
     const input = {
       name: createGroupInput.name,
@@ -60,7 +61,7 @@ const createGroup =
         state,
         groupMembers,
         callZome,
-        serializeHash(myAgentId!)
+        myAgentId!
       );
 
       let groupEntryHash: string = groupData.originalGroupId;

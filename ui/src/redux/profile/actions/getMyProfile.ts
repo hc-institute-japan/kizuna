@@ -9,16 +9,16 @@ import { ProfileActionTypes, SET_PROFILE } from "../types";
 
 const getMyProfile =
   (): ThunkAction =>
-  async (dispatch, _getState, { callZome, getAgentId }) => {
+  async (dispatch, getState, { callZome, getAgentId }) => {
     try {
       const res = await callZome({
         zomeName: ZOMES.PROFILES,
         fnName: FUNCTIONS[ZOMES.PROFILES].GET_MY_PROFILE,
       });
-      const myAgentId = await getAgentId();
-      /* assume that getAgentId() is non-nullable */
-      const myAgentIdB64 = serializeHash(myAgentId!);
-
+      // const myAgentId = await getAgentId();
+      // /* assume that getAgentId() is non-nullable */
+      // const myAgentIdB64 = serializeHash(myAgentId!);
+      const myAgentIdB64 = getState().profile.id!;
       if (res) {
         dispatch<ProfileActionTypes>({
           type: SET_PROFILE,
