@@ -19,13 +19,13 @@ import WebSdk from "@holo-host/web-sdk";
 window.WebSdk = WebSdk;
 
 // CONSTANTS
-export const ENV: "HCDEV" | "HC" | "HCC" | "HOLO" = process.env
+export const ENV: "HCDEV" | "HC" | "HOLODEV" | "HOLO" = process.env
   .REACT_APP_ENV as any;
 
 export const appId = (): string | undefined => {
   if (ENV === "HC" || ENV === "HCDEV") {
     return "kizuna";
-  } else if (ENV === "HCC") {
+  } else if (ENV === "HOLODEV") {
     return "uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL";
   } else if (ENV === "HOLO") {
     return undefined;
@@ -36,14 +36,14 @@ export const appUrl = () => {
   // for launcher
   if (ENV === "HC") return `ws://localhost:8888`;
   else if (ENV === "HCDEV") return process.env.REACT_APP_DNA_INTERFACE_URL;
-  else if (ENV === "HCC")
+  else if (ENV === "HOLODEV")
     return `http://localhost:${process.env.REACT_APP_CHAPERONE_PORT}`;
   else if (ENV === "HOLO") return "https://devnet-chaperone.holo.host";
   else return null;
 };
 
 export const isHoloEnv = () => {
-  return ENV === "HCC" || ENV === "HOLO";
+  return ENV === "HOLODEV" || ENV === "HOLO";
 };
 
 // export let client: null | HolochainClient | HoloClient = null;
@@ -60,21 +60,16 @@ const createClient = async (
 ): Promise<HoloClient | HolochainClient | null> => {
   switch (env) {
     case "HOLO":
-    case "HCC": {
+    case "HOLODEV": {
       const branding = {
-        anonymousAllowed: true,
-        logo_url: "assets/icon/kizuna_logo.png",
-        app_name: "Kizuna Messaging App",
-        skip_registration: true,
+        logoUrl: "assets/icon/kizuna_logo.png",
+        appName: "Kizuna Messaging App",
+        requireRegistrationCode: false,
       };
 
       // client.addSignalHandler(signalHandler);
 
       console.log("holo environment");
-
-      // await new Promise((f) => setTimeout(f, 5000));
-
-      console.log("resuming after pause");
 
       // client = await HoloClient.connect(
       //   "http://127.0.0.1:24274",
@@ -89,19 +84,19 @@ const createClient = async (
 
       console.log("connecting to client");
 
-      // const sleep = (ms: any) =>
-      //   new Promise((resolve) => setTimeout(resolve, ms));
-      // while (!client.agent.isAvailable) {
-      //   await sleep(50);
-      // }
+      const sleep = (ms: any) =>
+        new Promise((resolve) => setTimeout(resolve, ms));
+      while (!client.agent.isAvailable) {
+        await sleep(50);
+      }
 
-      // await client.signIn();
+      await client.signIn();
 
-      // while (client.agent.isAnonymous || !client.agent.isAvailable) {
-      //   await sleep(50);
-      // }
+      while (client.agent.isAnonymous || !client.agent.isAvailable) {
+        await sleep(50);
+      }
 
-      // console.log("client finished signing in");
+      console.log("client finished signing in");
 
       return client;
     }
@@ -137,6 +132,7 @@ export const init: () => any = async () => {
   if (client) return client;
   try {
     client = await createClient(ENV);
+    console.log("client", client);
     return client;
   } catch (error) {
     Object.values(error as any).forEach((e) => console.error(e));
@@ -254,23 +250,34 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
 ) => {
   await init();
   const {
-    cellId = await getLobbyCellId(), // by default get the lobby cell Id.
+    // cellId = await getLobbyCellId(), // by default get the lobby cell Id.
     zomeName,
     fnName,
     // provenance = info?.cell_data[0].cell_id[1],
     payload = null,
   } = config;
   try {
-    return await client?.callZome(
-      cellId!, // expecting cell id to be non-nullable.
-      zomeName,
-      fnName,
-      payload,
-      process.env.REACT_APP_ENV === "HC" ||
-        process.env.REACT_APP_ENV === "HCDEV"
-        ? 60000
-        : undefined
-    );
+    // roleId: string
+    // zomeName: string
+    // fnName: string
+    console.log("client", client);
+    const res = await client?.zomeCall({
+      roleId: "kizuna-lobby",
+      zomeName: zomeName,
+      fnName: fnName,
+      payload: payload,
+    });
+    // cellId!, // expecting cell id to be non-nullable.
+    // zomeName,
+    // fnName,
+    // payload
+    // process.env.REACT_APP_ENV === "HC" ||
+    //   process.env.REACT_APP_ENV === "HCDEV"
+    //   ? 60000
+    //   : undefined
+    // );
+    console.log("zomeCall res", res);
+    return res.data;
   } catch (e) {
     console.log(
       "zome call has failed in zome: ",

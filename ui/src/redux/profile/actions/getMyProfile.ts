@@ -11,10 +11,12 @@ const getMyProfile =
   (): ThunkAction =>
   async (dispatch, getState, { callZome, getAgentId }) => {
     try {
+      console.log("calling getMyProfile");
       const res = await callZome({
         zomeName: ZOMES.PROFILES,
         fnName: FUNCTIONS[ZOMES.PROFILES].GET_MY_PROFILE,
       });
+      console.log("getMyProfile res", res);
       // const myAgentId = await getAgentId();
       // /* assume that getAgentId() is non-nullable */
       // const myAgentIdB64 = serializeHash(myAgentId!);

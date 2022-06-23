@@ -80,7 +80,7 @@
     "chaperone-alice": "npx chaperone-server --config ./src/chaperone/alice.json",
     "chaperone-bob": "npx chaperone-server --config ./src/chaperone/bob.json",
     "chaperone-charlie": "npx chaperone-server --config ./src/chaperone/charlie.json",
-    "start-holo-dev-server-alice": "concurrently -k \"ENV=HCC CHAPERONE_PORT=24274 UI_PORT=8100 npm run start:ui\"",
+    "start-holo-dev-server-alice": "concurrently -k \"ENV=HOLODEV CHAPERONE_PORT=24274 UI_PORT=8100 npm run start:ui\"",
     "ios": "npx cap sync ios && npx cap copy ios && npx cap open ios",
     "code:check": "yarn code:lint; yarn code:format --check",
     "code:clean": "yarn code:lint --fix; yarn code:format --write",
