@@ -4,14 +4,19 @@ import {
   AgentPubKey,
   AppSignalCb,
   CellId,
+  RoleId,
+  AppWebsocket,
 } from "@holochain/client";
 import { store } from "../../../containers/ReduxContainer";
 import { handleSignal } from "../../../redux/signal/actions";
 import { CallZomeConfig } from "../../../redux/types";
+import WebSdk from "@holo-host/web-sdk";
+
 // @ts-ignore
-global.COMB = undefined;
+// global.COMB = undefined;
 // @ts-ignore
-window.COMB = require("@holo-host/comb").COMB;
+// window.COMB = require("@holo-host/comb").COMB;
+window.WebSdk = WebSdk;
 
 // CONSTANTS
 export const ENV: "HCDEV" | "HC" | "HCC" | "HOLO" = process.env
@@ -41,7 +46,8 @@ export const isHoloEnv = () => {
   return ENV === "HCC" || ENV === "HOLO";
 };
 
-export let client: null | HolochainClient | HoloClient = null;
+// export let client: null | HolochainClient | HoloClient = null;
+export let client: any;
 export let adminWs: AdminWebsocket | null = null;
 
 let signalHandler: AppSignalCb = (signal) =>
@@ -56,29 +62,59 @@ const createClient = async (
     case "HOLO":
     case "HCC": {
       const branding = {
+        anonymousAllowed: true,
         logo_url: "assets/icon/kizuna_logo.png",
         app_name: "Kizuna Messaging App",
         skip_registration: true,
       };
 
-      const client: HoloClient = await HoloClient.connect(
-        appUrl()!,
-        appId()!,
-        branding
-      );
+      // client.addSignalHandler(signalHandler);
 
-      client.addSignalHandler(signalHandler);
+      console.log("holo environment");
 
-      await client.signIn();
+      // await new Promise((f) => setTimeout(f, 5000));
+
+      console.log("resuming after pause");
+
+      // client = await HoloClient.connect(
+      //   "http://127.0.0.1:24274",
+      //   "kizuna-messaging-app",
+      //   branding
+      // );
+      // client.addSignalHandler(signalHandler);
+      client = await WebSdk.connect({
+        chaperoneUrl: "http://localhost:24274",
+        authFormCustomization: branding,
+      });
+
+      console.log("connecting to client");
+
+      // const sleep = (ms: any) =>
+      //   new Promise((resolve) => setTimeout(resolve, ms));
+      // while (!client.agent.isAvailable) {
+      //   await sleep(50);
+      // }
+
+      // await client.signIn();
+
+      // while (client.agent.isAnonymous || !client.agent.isAvailable) {
+      //   await sleep(50);
+      // }
+
+      // console.log("client finished signing in");
 
       return client;
     }
+
     case "HCDEV":
     case "HC": {
-      const client: HolochainClient = await HolochainClient.connect(
-        appUrl() as string,
-        appId() as string
-      );
+      // const client: HolochainClient = await HolochainClient.connect(
+      //   appUrl() as string,
+      //   appId() as string
+      // );
+
+      // const appWebSocket: any = await AppWebsocket.connect(appUrl() as string);
+      // client = new HolochainClient(appWebSocket);
 
       // if (!adminWs) {
       //   adminWs = await AdminWebsocket.connect(adminUrl()!, 60000);
