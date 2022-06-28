@@ -1,24 +1,28 @@
 ---
 manifest_version: "1"
 name: kizuna-lobby
-uuid: 00000000-0000-0000-0000-000000000000
-properties: ~
-zomes: 
-  - name: aggregator
-    bundled: ../../target/wasm32-unknown-unknown/release/aggregator.wasm
-  - name: contacts
-    bundled: ../../target/wasm32-unknown-unknown/release/contacts.wasm
-  - name: p2pmessage
-    bundled: ../../target/wasm32-unknown-unknown/release/p2pmessage.wasm
-  - name: preference
-    bundled: ../../target/wasm32-unknown-unknown/release/preference.wasm
-  # - name: request
-  #   bundled: ../../target/wasm32-unknown-unknown/release/request.wasm
-  # - name: username
-  #   bundled: ../../target/wasm32-unknown-unknown/release/username.wasm  
-  - name : group
-    bundled: ../../target/wasm32-unknown-unknown/release/group.wasm 
-  - name : profiles
-    bundled: ../../target/wasm32-unknown-unknown/release/profiles.wasm
-  # - name : joining_code
-  #   bundled: ../../target/wasm32-unknown-unknown/release/joining_code.wasm 
+integrity:
+  uuid: 00000000-0000-0000-0000-000000000000
+  properties: ~
+  origin_time: 2022-02-11T23:05:19.470323Z
+  zomes:
+    - name: contacts
+      bundled: ../../target/wasm32-unknown-unknown/release/contacts.wasm
+    - name: p2pmessage
+      bundled: ../../target/wasm32-unknown-unknown/release/p2pmessage.wasm
+    - name : group
+      bundled: ../../target/wasm32-unknown-unknown/release/group.wasm 
+    - name: preference
+      bundled: ../../target/wasm32-unknown-unknown/release/preference.wasm
+coordinator:
+  zomes:
+    - name: aggregator
+      bundled: ../../target/wasm32-unknown-unknown/release/aggregator.wasm
+    - name : profiles
+      bundled: ../../target/wasm32-unknown-unknown/release/profiles.wasm
+    # - name : joining_code
+    #   bundled: ../../target/wasm32-unknown-unknown/release/joining_code.wasm 
+    # - name: request
+    #   bundled: ../../target/wasm32-unknown-unknown/release/request.wasm
+    # - name: username
+    #   bundled: ../../target/wasm32-unknown-unknown/release/username.wasm  
