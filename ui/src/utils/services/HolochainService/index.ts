@@ -1,12 +1,12 @@
-import { HolochainClient, HoloClient } from "@holochain-open-dev/cell-client";
 import {
-  AdminWebsocket,
-  AgentPubKey,
+  // AdminWebsocket,
+  // AgentPubKey,
   AppSignalCb,
-  CellId,
-  RoleId,
+  // CellId,
+  // RoleId,
   AppWebsocket,
-} from "@holochain/client";
+} from "@holochain/client/lib/api";
+import { AgentPubKey } from "@holochain/client";
 import { store } from "../../../containers/ReduxContainer";
 import { handleSignal } from "../../../redux/signal/actions";
 import { CallZomeConfig } from "../../../redux/types";
@@ -48,7 +48,7 @@ export const isHoloEnv = () => {
 
 // export let client: null | HolochainClient | HoloClient = null;
 export let client: any;
-export let adminWs: AdminWebsocket | null = null;
+// export let adminWs: AdminWebsocket | null = null;
 
 let signalHandler: AppSignalCb = (signal) =>
   store?.dispatch(
@@ -59,7 +59,8 @@ const sleep = (ms: any) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const createClient = async (
   env: string
-): Promise<HoloClient | HolochainClient | null> => {
+  // ): Promise<HoloClient | HolochainClient | AppWebsocket | null> => {
+): Promise<any> => {
   switch (env) {
     case "HOLO":
     case "HOLODEV":
@@ -96,16 +97,23 @@ const createClient = async (
       return holoclient;
     case "HCDEV":
     case "HC":
+      console.log("creating client for holochain");
+
       // TODO: WHEN THIS CODE BLOCK GETS COMMENTED IN WE GET THE IFRAME IS UNDEFINED ERROR
+
+      // CELL-CLIENT 0.5.3
       // const hcclient: HolochainClient = await HolochainClient.connect(
       //   appUrl() as string,
       //   appId() as string
       // );
+      // const hcclient = new HolochainClient(appWebSocket);
 
-      /* CELL-CLIENT 0.5.3
-      const appWebSocket: any = await AppWebsocket.connect(appUrl() as string);
-      client = new HolochainClient(appWebSocket);
-      */
+      // HOLOCHAIN/CLIENT
+      const hcclient: any = await AppWebsocket.connect(
+        appUrl() as string,
+        30000,
+        signalHandler
+      );
 
       // if (!adminWs) {
       //   adminWs = await AdminWebsocket.connect(adminUrl()!, 60000);
@@ -113,10 +121,10 @@ const createClient = async (
       //     console.log("admin websocket closed");
       //   });
       // }
-
       // hcclient.addSignalHandler(signalHandler);
-      // return hcclient;
-      return null;
+
+      return hcclient;
+    // return null;
     default:
       return null;
   }
@@ -163,7 +171,7 @@ export const retry: (config: CallZomeConfig) => Promise<any> = async (
   await init();
 
   const {
-    cellId = await getLobbyCellId(),
+    // cellId = await getLobbyCellId(),
     zomeName,
     fnName,
     payload = null,
@@ -176,7 +184,7 @@ export const retry: (config: CallZomeConfig) => Promise<any> = async (
   while (callFailed && retryCount < max_retries) {
     try {
       return await client?.callZome(
-        cellId!,
+        // cellId!,
         zomeName,
         fnName,
         payload,
@@ -266,6 +274,7 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
       case "HCDEV":
         const hcres = await client?.callZome(
           // cellId!, // expecting cell id to be non-nullable.
+          null,
           undefined,
           zomeName,
           fnName,
@@ -319,7 +328,7 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
 };
 
 // only for lobby
-export const getLobbyCellId = async (): Promise<CellId | undefined> => {
-  await init();
-  return client?.cellDataByRoleId("kizuna-lobby")?.cell_id;
-};
+// export const getLobbyCellId = async (): Promise<CellId | undefined> => {
+//   await init();
+//   return client?.cellDataByRoleId("kizuna-lobby")?.cell_id;
+// };
