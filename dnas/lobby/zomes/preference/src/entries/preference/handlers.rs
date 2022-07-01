@@ -2,21 +2,21 @@ use hdk::prelude::*;
 
 use super::*;
 
-pub(crate) fn fetch_preference() -> ExternResult<(SignedHeaderHashed, Preference)> {
+pub(crate) fn fetch_preference() -> ExternResult<(SignedActionHashed, Preference)> {
     let filter: QueryFilter = filter_for(QueryTarget::Preference, true)?;
     let mut query_result = query(filter)?;
     query_result.reverse();
 
     if query_result.get(0).is_some() {
         //this unwrap is safe here, we check first the value on the condition above
-        let element = query_result.get(0).unwrap();
+        let record = query_result.get(0).unwrap();
 
-        let element_entry: Option<Preference> = element.entry().to_app_option()?;
-        let element_signed_header_hashed: SignedHeaderHashed = element.signed_header().to_owned();
+        let record_entry: Option<Preference> = record.entry().to_app_option()?;
+        let record_signed_action_hashed: SignedActionHashed = record.signed_action().to_owned();
 
-        match element_entry {
+        match record_entry {
             Some(preference_entry) => {
-                return Ok((element_signed_header_hashed, preference_entry));
+                return Ok((record_signed_action_hashed, preference_entry));
             }
             None => (),
         }
@@ -60,7 +60,7 @@ pub(crate) fn set_preference(preference_io: PreferenceIO) -> ExternResult<Prefer
     }
 }
 
-pub(crate) fn fetch_per_agent_preference() -> ExternResult<(SignedHeaderHashed, PerAgentPreference)>
+pub(crate) fn fetch_per_agent_preference() -> ExternResult<(SignedActionHashed, PerAgentPreference)>
 {
     let filter: QueryFilter = filter_for(QueryTarget::AgentPreference, true)?;
     let mut query_result = query(filter)?;
@@ -68,14 +68,14 @@ pub(crate) fn fetch_per_agent_preference() -> ExternResult<(SignedHeaderHashed, 
 
     if query_result.get(0).is_some() {
         //this unwrap is safe here, we check first the value on the condition above
-        let element = query_result.get(0).unwrap();
+        let record = query_result.get(0).unwrap();
 
-        let element_entry: Option<PerAgentPreference> = element.entry().to_app_option()?;
-        let element_signed_header_hashed: SignedHeaderHashed = element.signed_header().to_owned();
+        let record_entry: Option<PerAgentPreference> = record.entry().to_app_option()?;
+        let record_signed_action_hashed: SignedActionHashed = record.signed_action().to_owned();
 
-        match element_entry {
+        match record_entry {
             Some(per_agent_preference_entry) => {
-                return Ok((element_signed_header_hashed, per_agent_preference_entry));
+                return Ok((record_signed_action_hashed, per_agent_preference_entry));
             }
             None => (),
         }
@@ -127,7 +127,7 @@ pub(crate) fn set_per_agent_preference(
     }
 }
 
-pub(crate) fn fetch_per_group_preference() -> ExternResult<(SignedHeaderHashed, PerGroupPreference)>
+pub(crate) fn fetch_per_group_preference() -> ExternResult<(SignedActionHashed, PerGroupPreference)>
 {
     let filter: QueryFilter = filter_for(QueryTarget::GroupPreference, true)?;
     let mut query_result = query(filter)?;
@@ -135,14 +135,14 @@ pub(crate) fn fetch_per_group_preference() -> ExternResult<(SignedHeaderHashed, 
 
     if query_result.get(0).is_some() {
         //this unwrap is safe here, we check first the value on the condition above
-        let element = query_result.get(0).unwrap();
+        let record = query_result.get(0).unwrap();
 
-        let element_entry: Option<PerGroupPreference> = element.entry().to_app_option()?;
-        let element_signed_header_hashed: SignedHeaderHashed = element.signed_header().to_owned();
+        let record_entry: Option<PerGroupPreference> = record.entry().to_app_option()?;
+        let record_signed_action_hashed: SignedActionHashed = record.signed_action().to_owned();
 
-        match element_entry {
+        match record_entry {
             Some(per_group_preference_entry) => {
-                return Ok((element_signed_header_hashed, per_group_preference_entry));
+                return Ok((record_signed_action_hashed, per_group_preference_entry));
             }
             None => (),
         }

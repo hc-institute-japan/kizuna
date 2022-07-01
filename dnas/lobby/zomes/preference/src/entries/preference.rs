@@ -1,50 +1,50 @@
 use hdk::prelude::*;
 pub mod handlers;
 
-#[derive(Serialize, Deserialize, SerializedBytes, PartialEq, Debug )]
 #[serde(rename_all = "camelCase")]
+#[hdk_entry_helper]
 pub struct Preference {
     pub typing_indicator: bool,
     pub read_receipt: bool,
 }
 
-entry_def!(Preference EntryDef {
-    id: "preference".into(),
-    visibility: EntryVisibility::Private,
-    crdt_type: CrdtType,
-    required_validations: RequiredValidations::default(),
-    required_validation_type: RequiredValidationType::Element
-});
+// entry_def!(Preference EntryDef {
+//     id: "preference".into(),
+//     visibility: EntryVisibility::Private,
+//     crdt_type: CrdtType,
+//     required_validations: RequiredValidations::default(),
+//     required_validation_type: RequiredValidationType::Element
+// });
 
-#[derive(Serialize, Deserialize, SerializedBytes, PartialEq, Debug )]
 #[serde(rename_all = "camelCase")]
+#[hdk_entry_helper]
 pub struct PerAgentPreference {
     pub typing_indicator: Vec<AgentPubKey>,
     pub read_receipt: Vec<AgentPubKey>,
 }
 
-entry_def!(PerAgentPreference EntryDef {
-    id: "per_agent_preference".into(),
-    visibility: EntryVisibility::Private,
-    crdt_type: CrdtType,
-    required_validations: RequiredValidations::default(),
-    required_validation_type: RequiredValidationType::Element
-});
+// entry_def!(PerAgentPreference EntryDef {
+//     id: "per_agent_preference".into(),
+//     visibility: EntryVisibility::Private,
+//     crdt_type: CrdtType,
+//     required_validations: RequiredValidations::default(),
+//     required_validation_type: RequiredValidationType::Element
+// });
 
-#[derive(Serialize, Deserialize, SerializedBytes, PartialEq, Debug)]
 #[serde(rename_all = "camelCase")]
+#[hdk_entry_helper]
 pub struct PerGroupPreference {
     pub typing_indicator: Vec<String>,
     pub read_receipt: Vec<String>,
 }
 
-entry_def!(PerGroupPreference EntryDef {
-    id: "per_group_preference".into(),
-    visibility: EntryVisibility::Private,
-    crdt_type: CrdtType,
-    required_validations: RequiredValidations::default(),
-    required_validation_type: RequiredValidationType::Element
-});
+// entry_def!(PerGroupPreference EntryDef {
+//     id: "per_group_preference".into(),
+//     visibility: EntryVisibility::Private,
+//     crdt_type: CrdtType,
+//     required_validations: RequiredValidations::default(),
+//     required_validation_type: RequiredValidationType::Element
+// });
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, PartialEq, Debug)]
 #[serde(rename_all = "camelCase")]

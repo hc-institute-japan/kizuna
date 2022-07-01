@@ -11,7 +11,7 @@ entry_defs![
 ];
 
 pub fn error<T>(reason: &str) -> ExternResult<T> {
-    Err(WasmError::Guest(String::from(reason)))
+    Err(wasm_error!(WasmErrorInner::Guest(String::from(reason))))
 }
 
 #[hdk_extern]
