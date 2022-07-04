@@ -1,7 +1,8 @@
 use hdk::prelude::*;
 pub mod handlers;
 
-#[serde(rename_all = "camelCase")]
+// #[serde(rename_all = "camelCase")]
+#[derive(PartialEq, Clone)]
 #[hdk_entry_helper]
 pub struct Preference {
     pub typing_indicator: bool,
@@ -16,7 +17,8 @@ pub struct Preference {
 //     required_validation_type: RequiredValidationType::Element
 // });
 
-#[serde(rename_all = "camelCase")]
+// #[serde(rename_all = "camelCase")]
+#[derive(PartialEq, Clone)]
 #[hdk_entry_helper]
 pub struct PerAgentPreference {
     pub typing_indicator: Vec<AgentPubKey>,
@@ -31,7 +33,8 @@ pub struct PerAgentPreference {
 //     required_validation_type: RequiredValidationType::Element
 // });
 
-#[serde(rename_all = "camelCase")]
+// #[serde(rename_all = "camelCase")]
+#[derive(PartialEq, Clone)]
 #[hdk_entry_helper]
 pub struct PerGroupPreference {
     pub typing_indicator: Vec<String>,
@@ -45,6 +48,17 @@ pub struct PerGroupPreference {
 //     required_validations: RequiredValidations::default(),
 //     required_validation_type: RequiredValidationType::Element
 // });
+
+#[hdk_entry_defs]
+#[unit_enum(UnitEntryTypes)]
+pub enum EntryTypes {
+    #[entry_def(required_validations = 5, visibility = "private")]
+    Preference(Preference),
+    #[entry_def(required_validations = 5, visibility = "private")]
+    PerAgentPreference(PerAgentPreference),
+    #[entry_def(required_validations = 5, visibility = "private")]
+    PerGroupPreference(PerGroupPreference),
+}
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, PartialEq, Debug)]
 #[serde(rename_all = "camelCase")]

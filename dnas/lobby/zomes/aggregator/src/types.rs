@@ -1,6 +1,6 @@
 use file_types::Payload;
 use hdk::prelude::*;
-use hdk::prelude::{element::SignedHeaderHashed, timestamp::Timestamp};
+use hdk::prelude::{timestamp::Timestamp};
 use holo_hash::{AgentPubKeyB64, EntryHashB64};
 use std::collections::{hash_map::HashMap, BTreeMap};
 
@@ -41,7 +41,7 @@ pub struct ContactOutput {
 #[serde(rename_all = "camelCase")]
 pub struct GroupOutput {
     pub group_id: EntryHash,
-    pub group_revision_id: HeaderHash,
+    pub group_revision_id: ActionHash,
     pub latest_name: String,
     pub members: Vec<AgentPubKey>,
     pub creator: AgentPubKey,
@@ -84,7 +84,7 @@ pub struct GroupMessageData {
 #[serde(rename_all = "camelCase")]
 pub struct GroupMessageElement {
     pub entry: GroupMessageData,
-    pub signed_header: SignedHeaderHashed,
+    pub signed_header: SignedActionHashed,
 }
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]

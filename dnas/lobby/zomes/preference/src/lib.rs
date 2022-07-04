@@ -4,11 +4,11 @@ use entries::preference::{self, handlers};
 
 use preference::*;
 
-entry_defs![
-    Preference::entry_def(),
-    PerAgentPreference::entry_def(),
-    PerGroupPreference::entry_def()
-];
+// entry_defs![
+//     Preference::entry_def(),
+//     PerAgentPreference::entry_def(),
+//     PerGroupPreference::entry_def()
+// ];
 
 pub fn error<T>(reason: &str) -> ExternResult<T> {
     Err(wasm_error!(WasmErrorInner::Guest(String::from(reason))))
@@ -16,20 +16,20 @@ pub fn error<T>(reason: &str) -> ExternResult<T> {
 
 #[hdk_extern]
 fn init(_: ()) -> ExternResult<InitCallbackResult> {
-    create_entry(&Preference {
+    create_entry(&EntryTypes::Preference(Preference {
         typing_indicator: true,
         read_receipt: true,
-    })?;
+    }))?;
 
-    create_entry(&PerAgentPreference {
+    create_entry(&EntryTypes::PerAgentPreference(PerAgentPreference {
         typing_indicator: Vec::new(),
         read_receipt: Vec::new(),
-    })?;
+    }))?;
 
-    create_entry(&PerGroupPreference {
+    create_entry(&EntryTypes::PerGroupPreference(PerGroupPreference {
         typing_indicator: Vec::new(),
         read_receipt: Vec::new(),
-    })?;
+    }))?;
 
     Ok(InitCallbackResult::Pass)
 }

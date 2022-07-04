@@ -11,5 +11,5 @@ crate-type = [ "cdylib", "rlib" ]
 [dependencies]
 serde = "1"
 derive_more = "0"
-hdk = {version = "0.0.138", features = ["encoding"]}
+hdk = {version = "0.0.126", features = ["encoding"]}
 file_types = { version = "0.0.1", path = "../../commons/file_types" }
