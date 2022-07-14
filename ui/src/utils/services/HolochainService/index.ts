@@ -5,7 +5,7 @@ import {
   // CellId,
   // RoleId,
   AppWebsocket,
-} from "@holochain/client/lib/api";
+} from "@holochain/client";
 import { AgentPubKey } from "@holochain/client";
 import { store } from "../../../containers/ReduxContainer";
 import { handleSignal } from "../../../redux/signal/actions";
@@ -22,40 +22,64 @@ window.WebSdk = WebSdk;
 export const ENV: "HCDEV" | "HC" | "HOLODEV" | "HOLO" = process.env
   .REACT_APP_ENV as any;
 
+export const HOLO_DEV_SERVER_PORT = process.env.HOLO_DEV_SERVER_PORT;
+
 export const appId = (): string | undefined => {
-  if (ENV === "HC" || ENV === "HCDEV") {
-    return "kizuna";
-  } else if (ENV === "HOLODEV") {
-    return "uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL";
-  } else if (ENV === "HOLO") {
-    return undefined;
+  switch (ENV) {
+    case "HC":
+    case "HCDEV":
+      return "kizuna";
+    case "HOLODEV":
+      return "uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL";
+    case "HOLO":
+    default:
+      return undefined;
   }
+  // if (ENV === "HC" || ENV === "HCDEV") {
+  //   return "kizuna";
+  // } else if (ENV === "HOLODEV") {
+  //   return "uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL";
+  // } else if (ENV === "HOLO") {
+  //   return undefined;
+  // }
 };
 
 export const appUrl = () => {
+  switch (ENV) {
+    case "HC":
+      return `ws://localhost:8888`;
+    case "HCDEV":
+      return process.env.REACT_APP_DNA_INTERFACE_URL;
+    case "HOLO":
+      return "https://devnet-chaperone.holo.host";
+    case "HOLODEV":
+      return `http://localhost:${process.env.REACT_APP_CHAPERONE_PORT}`;
+    default:
+      return null;
+  }
   // for launcher
-  if (ENV === "HC") return `ws://localhost:8888`;
-  else if (ENV === "HCDEV") return process.env.REACT_APP_DNA_INTERFACE_URL;
-  else if (ENV === "HOLODEV")
-    return `http://localhost:${process.env.REACT_APP_CHAPERONE_PORT}`;
-  else if (ENV === "HOLO") return "https://devnet-chaperone.holo.host";
-  else return null;
+  // if (ENV === "HC") return `ws://localhost:8888`;
+  // else if (ENV === "HCDEV") return process.env.REACT_APP_DNA_INTERFACE_URL;
+  // else if (ENV === "HOLODEV")
+  //   return `http://localhost:${process.env.REACT_APP_CHAPERONE_PORT}`;
+  // else if (ENV === "HOLO") return "https://devnet-chaperone.holo.host";
+  // else return null;
 };
 
-export const isHoloEnv = () => {
-  return ENV === "HOLODEV" || ENV === "HOLO";
-};
-
-// export let client: null | HolochainClient | HoloClient = null;
 export let client: any;
+// export let client: null | HolochainClient | HoloClient = null;
 // export let adminWs: AdminWebsocket | null = null;
 
-let signalHandler: AppSignalCb = (signal) =>
-  store?.dispatch(
-    handleSignal(signal.data.payload.name, signal.data.payload.payload)
-  );
+let myAgentId: AgentPubKey | null;
+
+let signalHandler: AppSignalCb = (signal: any) => {
+  console.log("signal payload", signal);
+  return store?.dispatch(handleSignal(signal.data.name, signal.data.payload));
+};
 
 const sleep = (ms: any) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// REDUX
 
 const createClient = async (
   env: string
@@ -72,28 +96,33 @@ const createClient = async (
 
       /* CELL-CLIENT 0.5.3
       client = await HoloClient.connect(
-        "http://127.0.0.1:24274",
+        "http://127.0.0.1:" + HOLO_DEV_SERVER_PORT,
         "kizuna-messaging-app",
         branding
       );
       */
 
       const holoclient = await WebSdk.connect({
-        chaperoneUrl: "http://localhost:24274",
+        chaperoneUrl: appUrl(),
         authFormCustomization: branding,
       });
 
-      // client.addSignalHandler(signalHandler);
+      holoclient.on("agent-state", (agent_state: any) => {
+        myAgentId = agent_state.id;
+      });
+
+      holoclient.on("signal", (payload: any) => signalHandler(payload));
 
       while (!holoclient.agent.isAvailable) {
         await sleep(50);
       }
 
-      await holoclient.signIn();
+      if (holoclient.agent.isAnonymous) await holoclient.signIn();
 
-      while (holoclient.agent.isAnonymous || !holoclient.agent.isAvailable) {
-        await sleep(50);
-      }
+      // while (holoclient.agent.isAnonymous || !holoclient.agent.isAvailable) {
+      //   await sleep(50);
+      // }
+
       return holoclient;
     case "HCDEV":
     case "HC":
@@ -141,8 +170,6 @@ export const init: () => any = async () => {
     throw error;
   }
 };
-
-let myAgentId: AgentPubKey | null;
 
 /* DO NOT USE THIS AS IT IS BUT INSTEAD USE THE getAgentId() ACTION FROM PROFILE INSTEAD */
 export const getAgentId: () => Promise<AgentPubKey | null> = async () => {
