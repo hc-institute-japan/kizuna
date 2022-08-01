@@ -1,1 +1,2 @@
-extern crate p2pmessage;
+extern crate p2pmessage_integrity;
+extern crate p2pmessage_coordinator;

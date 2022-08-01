@@ -1,6 +1,8 @@
 use hdk::prelude::*;
 
-use super::*;
+use preference_integrity::*;
+use preference_integrity_types::*;
+use preference_coordinator_types::*;
 
 pub(crate) fn fetch_preference() -> ExternResult<(SignedActionHashed, Preference)> {
     let filter: QueryFilter = filter_for(QueryTarget::Preference, true)?;
@@ -222,7 +224,7 @@ fn filter_for(query_target: QueryTarget, include_entries: bool) -> ExternResult<
     let query_filter: QueryFilter = QueryFilter::new()
         .entry_type(EntryType::App(AppEntryType::new(
             EntryDefIndex::from(entry_index),
-            // zome_info()?.id,
+            zome_info()?.id,
             EntryVisibility::Private,
         )))
         .include_entries(include_entries);
