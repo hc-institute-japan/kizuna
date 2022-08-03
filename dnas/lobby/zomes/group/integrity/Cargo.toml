@@ -1,0 +1,18 @@
+[package]
+authors = ["nickolie.pangarungan@gmail.com", "tats@beyonder.systems"]
+description = "Integrity for group zome"
+edition = "2021"
+license = "MIT"
+name = "group_integrity"
+version = "0.0.1"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+name = "group_integrity"
+
+[dependencies]
+derive_more = "0"
+serde = "1"
+
+group_integrity_types = {path = "../types/integrity_types"}
+hdi = "0.0.14"

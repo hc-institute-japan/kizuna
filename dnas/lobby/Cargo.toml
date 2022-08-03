@@ -1,6 +1,6 @@
 [workspace]
 members = [
-    "zomes/group",
+    # "zomes/group",
     # "zomes/request",
     "zomes/profiles",
     "zomes/contacts",
@@ -10,6 +10,10 @@ members = [
     "zomes/p2pmessage",
     # "zomes/joining_code",
     "commons/file_types", 
+    "zomes/group/integrity",
+    "zomes/group/coordinator",
+    "zomes/group/types/integrity_types",
+    "zomes/group/types/coordinator_types",
 ]
 
 [profile.dev]

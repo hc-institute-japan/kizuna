@@ -17,19 +17,19 @@ pub fn read_group_message_handler(
         https://forum.holochain.org/t/problem-that-may-occur-when-creating-a-link-between-two-entries-when-the-said-entries-are-literally-just-created-in-the-dht/6316/3
         TODO: use https://docs.rs/hdk/0.0.100/hdk/time/fn.sleep.html to lessen burden.
         */
-        let mut message_element: Option<Element> = None;
+        let mut message_record: Option<Record> = None;
         let mut n = 0;
         // only try to get the message entry fixed number of times
-        while n < 3 && message_element == None {
+        while n < 3 && message_record == None {
             let options = GetOptions::latest();
-            message_element = get(message_entry_hash.clone(), options)?;
+            message_record = get(message_entry_hash.clone(), options)?;
             n += 1
         }
         // link GroupMessage -> AgentPubKey to indicate that it is read
         // with ChainTopOrdering::Relaxed because order doesn't matter
         // only create link if the message entry was retrieved
-        if let Some(_) = message_element {
-            host_call::<CreateLinkInput, HeaderHash>(
+        if let Some(_) = message_record {
+            host_call::<CreateLinkInput, ActionHash>(
                 __create_link,
                 CreateLinkInput::new(
                     message_entry_hash,

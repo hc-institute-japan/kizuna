@@ -7,7 +7,7 @@ pub fn update_group_avatar_handler(
     update_group_avatar_input: UpdateGroupAvatarIO,
 ) -> ExternResult<UpdateGroupAvatarIO> {
     let new_avatar: Option<String> = Some(update_group_avatar_input.avatar.clone());
-    let group_revision_id: HeaderHash = update_group_avatar_input.group_revision_id.clone();
+    let group_revision_id: ActionHash = update_group_avatar_input.group_revision_id.clone();
     let group_id: EntryHash = update_group_avatar_input.group_id.clone();
 
     // 1 - we've to get the latest group entry version for the recived entryhash (group_id)
@@ -28,10 +28,10 @@ pub fn update_group_avatar_handler(
     let updated_group: Group = Group::new(name, created, creator, members, new_avatar);
 
     /*
-    we always update the entry from the root_group_header_hash,
-    the header hash for this entry is provided as arg (group_revision_id)
+    we always update the entry from the root_group_action_hash,
+    the action hash for this entry is provided as arg (group_revision_id)
     */
-    // 3 - update_entry the Group with new name field using original HeaderHash
+    // 3 - update_entry the Group with new name field using original ActionHash
 
     update_entry(group_revision_id, &updated_group)?;
 

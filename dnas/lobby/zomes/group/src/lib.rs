@@ -36,7 +36,7 @@ use group_message::{
 use signals::{SignalDetails, SignalPayload};
 
 use group_message::{
-    GroupChatFilter, GroupFileBytes, GroupMessage, GroupMessageElement, GroupMessageInput,
+    GroupChatFilter, GroupFileBytes, GroupMessage, GroupMessageRecord, GroupMessageInput,
     GroupMessageInputWithDate, GroupMessageReadData, GroupMessageWithId, GroupMessagesOutput,
     GroupMsgAdjacentFetchFilter, GroupMsgBatchFetchFilter, GroupTypingDetailData, PinDetail,
 };
@@ -46,13 +46,16 @@ use group::{
     UpdateMembersIO,
 };
 
-entry_defs![
-    Group::entry_def(),
-    Path::entry_def(),
-    GroupMessage::entry_def(),
-    GroupFileBytes::entry_def(),
-    PathEntry::entry_def()
-];
+#[hdk_entry_defs]
+#[unit_enum(UnitEntryTypes)]
+pub enum EntryTypes {
+    #[entry_def(name="group" required_validations = 5, visibility = "public")]
+    Group(Group),
+    #[entry_def(name="group_message" required_validations = 5, visibility = "public")]
+    GroupMessage(GroupMessage),
+    #[entry_def(name="group_file_bytes" required_validations = 5, visibility = "public")]
+    GroupFileBytes(GroupFileBytes),
+}
 
 // this is only exposed outside of WASM for testing purposes.
 #[hdk_extern]
@@ -101,14 +104,14 @@ fn recv_remote_signal(signal: ExternIO) -> ExternResult<()> {
 }
 
 #[hdk_extern(infallible)]
-fn post_commit(signed_headers: Vec<SignedHeaderHashed>) {
-    let headers = signed_headers
+fn post_commit(signed_actions: Vec<SignedActionHashed>) {
+    let actions = signed_actions
         .into_iter()
-        .map(|sh| sh.header().to_owned())
-        .collect::<Vec<Header>>();
-    for header in headers {
-        match header {
-            Header::Create(create) => match create.clone().entry_type {
+        .map(|sh| sh.action().to_owned())
+        .collect::<Vec<Action>>();
+    for action in actions {
+        match action {
+            Action::Create(create) => match create.clone().entry_type {
                 EntryType::App(app_entry_type) => match app_entry_type.id() {
                     // group message
                     EntryDefIndex(2) => group_message_post_commit(create).unwrap(),
@@ -124,13 +127,13 @@ fn post_commit(signed_headers: Vec<SignedHeaderHashed>) {
 #[hdk_extern]
 pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
     match op {
-        Op::StoreElement { element } => match element.header() {
-            Header::Create(header) => match header.to_owned().entry_type {
+        Op::StoreRecord { record } => match record.action() {
+            Action::Create(action) => match action.to_owned().entry_type {
                 EntryType::App(app_entry_type) => {
                     let group_id = ZomeId::new(4);
                     if app_entry_type.zome_id == group_id {
                         return match app_entry_type.id {
-                            EntryDefIndex(0) => create_group::store_group_element(element.clone()),
+                            EntryDefIndex(0) => create_group::store_group_record(record.clone()),
                             _ => Ok(ValidateCallbackResult::Valid),
                         };
                     } else {
@@ -139,14 +142,14 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
                 }
                 _ => Ok(ValidateCallbackResult::Valid),
             },
-            Header::Update(header) => match header.to_owned().entry_type {
+            Action::Update(action) => match action.to_owned().entry_type {
                 EntryType::App(app_entry_type) => {
                     let group_id = ZomeId::new(4);
                     if app_entry_type.zome_id == group_id {
                         return match app_entry_type.id {
-                            EntryDefIndex(0) => update_group::store_group_element(
-                                element.clone(),
-                                header.to_owned(),
+                            EntryDefIndex(0) => update_group::store_group_record(
+                                record.clone(),
+                                action.to_owned(),
                             ),
                             _ => Ok(ValidateCallbackResult::Invalid(
                                 ("Updating this entry is invalid").to_string(),
@@ -158,12 +161,12 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
                 }
                 _ => Ok(ValidateCallbackResult::Valid),
             },
-            Header::Delete(_) => Ok(ValidateCallbackResult::Valid), // NOTE: We need an entry type for Delete Header as well so that we can run per zome validations
-            Header::DeleteLink(_) => Ok(ValidateCallbackResult::Valid), // NOTE: We at least need the zome ID in the header.
+            Action::Delete(_) => Ok(ValidateCallbackResult::Valid), // NOTE: We need an entry type for Delete Action as well so that we can run per zome validations
+            Action::DeleteLink(_) => Ok(ValidateCallbackResult::Valid), // NOTE: We at least need the zome ID in the action.
             _ => Ok(ValidateCallbackResult::Valid),
         },
-        Op::StoreEntry { header, entry } => match header.hashed.into_content() {
-            EntryCreationHeader::Create(create) => match create.clone().entry_type {
+        Op::StoreEntry { action, entry } => match action.hashed.into_content() {
+            EntryCreationAction::Create(create) => match create.clone().entry_type {
                 EntryType::App(app_entry_type) => {
                     let group_id = ZomeId::new(4);
                     if app_entry_type.zome_id == group_id {
@@ -179,7 +182,7 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
                 }
                 _ => Ok(ValidateCallbackResult::Valid),
             },
-            EntryCreationHeader::Update(update) => match update.clone().entry_type {
+            EntryCreationAction::Update(update) => match update.clone().entry_type {
                 EntryType::App(app_entry_type) => {
                     let group_id = ZomeId::new(4);
                     if app_entry_type.zome_id == group_id {
@@ -203,28 +206,28 @@ pub fn validate(op: Op) -> ExternResult<ValidateCallbackResult> {
             update,
             new_entry,
             original_entry: _,
-            original_header: _,
+            original_action: _,
         } => {
             let group_id = ZomeId::new(4);
-            let updated_group_header: Update = update.hashed.into_content();
-            if let EntryType::App(app_entry_type) = updated_group_header.entry_type.clone() {
+            let updated_group_action: Update = update.hashed.into_content();
+            if let EntryType::App(app_entry_type) = updated_group_action.entry_type.clone() {
                 if app_entry_type.zome_id == group_id {
-                    return update_group::register_group_update(updated_group_header, new_entry);
+                    return update_group::register_group_update(updated_group_action, new_entry);
                 }
             }
             Ok(ValidateCallbackResult::Valid)
         }
         Op::RegisterDeleteLink { create_link: _, .. } => Ok(ValidateCallbackResult::Valid), // this can be expanded to only make deleting of links invalid in group zome since CreateLink is available.
         Op::RegisterDelete { .. } => Ok(ValidateCallbackResult::Valid),
-        Op::RegisterAgentActivity { header } => {
-            // the old_entry’s header is not a Create (we update the same create entry )
-            // author of Create Header doesn't match the author of the Update Header
-            match header.header() {
-                Header::Update(header) => {
+        Op::RegisterAgentActivity { action } => {
+            // the old_entry’s action is not a Create (we update the same create entry )
+            // author of Create Action doesn't match the author of the Update Action
+            match action.action() {
+                Action::Update(action) => {
                     let group_id = ZomeId::new(4);
-                    if let EntryType::App(app_entry_type) = header.to_owned().entry_type.clone() {
+                    if let EntryType::App(app_entry_type) = action.to_owned().entry_type.clone() {
                         if app_entry_type.zome_id == group_id {
-                            return update_group::register_agetnt_activity(header.to_owned());
+                            return update_group::register_agetnt_activity(action.to_owned());
                         }
                     }
                     Ok(ValidateCallbackResult::Valid)
@@ -332,7 +335,7 @@ fn unpin_message(pin_detail: PinDetail) -> ExternResult<()> {
 #[hdk_extern]
 fn get_pinned_messages(
     group_hash: EntryHash,
-) -> ExternResult<HashMap<String, GroupMessageElement>> {
+) -> ExternResult<HashMap<String, GroupMessageRecord>> {
     return get_pinned_messages_handler(group_hash);
 }
 

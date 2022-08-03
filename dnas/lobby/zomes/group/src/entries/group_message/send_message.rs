@@ -16,7 +16,7 @@ pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<Gr
         } => {
             let group_file_bytes = GroupFileBytes(file_bytes);
             // create_entry(&group_file_bytes)?;
-            host_call::<CreateInput, HeaderHash>(
+            host_call::<CreateInput, ActionHash>(
                 __create,
                 CreateInput::new(
                     GroupFileBytes::entry_def().id,
@@ -48,16 +48,16 @@ pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<Gr
     let mut _replied_message_with_id: Option<GroupMessageWithId> = None;
     if let Some(hash) = message_input.reply_to.clone() {
         let mut n = 0;
-        let mut message_element: Option<Element> = None;
+        let mut message_record: Option<Record> = None;
         // try to retrieve the message being replied to before proceeding.
         // return error if it can't be retrieved.
-        while n < 3 && message_element == None {
+        while n < 3 && message_record == None {
             let options = GetOptions::latest();
-            message_element = get(hash.clone(), options)?;
+            message_record = get(hash.clone(), options)?;
             n += 1
         }
-        if let Some(e) = message_element {
-            let replied_message = try_from_element(e)?;
+        if let Some(e) = message_record {
+            let replied_message = try_from_record(e)?;
             _replied_message_with_id = Some(GroupMessageWithId {
                 id: hash,
                 content: replied_message,
@@ -70,7 +70,7 @@ pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<Gr
     // commit GroupMessage entry
 
     // create_entry(&message)?;
-    host_call::<CreateInput, HeaderHash>(
+    host_call::<CreateInput, ActionHash>(
         __create,
         CreateInput::new(
             GroupMessage::entry_def().id,
@@ -83,7 +83,7 @@ pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<Gr
     let days = timestamp_to_days(message.created.clone()).to_string(); // group message's timestamp into days as string
     let group_hash_timestamp_path_hash =
         path_from_str(&[group_hash, days].join("."))?.path_entry_hash()?;
-    host_call::<CreateLinkInput, HeaderHash>(
+    host_call::<CreateLinkInput, ActionHash>(
         __create_link,
         CreateLinkInput::new(
             group_hash_timestamp_path_hash,

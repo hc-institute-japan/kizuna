@@ -6,27 +6,27 @@ use crate::utils::*;
 // implement unit test
 /**
  * validate the update of group entry; returning error if,
- * the old_entry’s header is not a Create (we update the same create entry )
- * author of Create Header doesn't match the author of the Update Header (only the creator of group can update)
+ * the old_entry’s action is not a Create (we update the same create entry )
+ * author of Create Action doesn't match the author of the Update Action (only the creator of group can update)
  * members < 2
  * new name is empty || more than 50 characters
  * members field cannot include the creator's key
 */
 
-pub fn store_group_element(
-    element: Element,
+pub fn store_group_record(
+    record: Record,
     update: Update,
 ) -> ExternResult<ValidateCallbackResult> {
-    let updated_group_entry: Group = try_from_element(element.clone())?;
+    let updated_group_entry: Group = try_from_record(record.clone())?;
 
-    // This is the header address used to update this Group. May or may not be the correct header(create).
+    // This is the action address used to update this Group. May or may not be the correct action(create).
     Ok(validate_group_content(updated_group_entry, update.clone())?)
 }
 
 pub fn store_group_entry(entry: Entry, update: Update) -> ExternResult<ValidateCallbackResult> {
     let updated_group_entry: Group = try_from_entry(entry.clone())?;
 
-    // This is the header address used to update this Group. May or may not be the correct header(create).
+    // This is the action address used to update this Group. May or may not be the correct action(create).
     Ok(validate_group_content(updated_group_entry, update.clone())?)
 }
 
@@ -35,16 +35,16 @@ pub fn register_group_update(
     new_entry: Entry,
 ) -> ExternResult<ValidateCallbackResult> {
     let updated_group_entry: Group = try_from_entry(new_entry)?;
-    // This is the header address used to update this Group. May or may not be the correct header(create).
+    // This is the action address used to update this Group. May or may not be the correct action(create).
     Ok(validate_group_content(updated_group_entry, update)?)
 }
 
 pub fn register_agetnt_activity(update: Update) -> ExternResult<ValidateCallbackResult> {
-    let group_revision_id = update.to_owned().original_header_address;
-    let maybe_group_create_header = must_get_header(group_revision_id)?.header().to_owned();
-    match maybe_group_create_header.header_type() {
-        HeaderType::Create => {
-            if !maybe_group_create_header
+    let group_revision_id = update.to_owned().original_action_address;
+    let maybe_group_create_action = must_get_action(group_revision_id)?.action().to_owned();
+    match maybe_group_create_action.action_type() {
+        ActionType::Create => {
+            if !maybe_group_create_action
                 .author()
                 .to_owned()
                 .eq(&update.author)
@@ -67,16 +67,16 @@ fn validate_group_content(
     updated_group_entry: Group,
     update: Update,
 ) -> ExternResult<ValidateCallbackResult> {
-    let maybe_group_create_header = must_get_header(update.original_header_address)?
-        .header()
+    let maybe_group_create_action = must_get_action(update.original_action_address)?
+        .action()
         .to_owned();
-    match maybe_group_create_header.header_type() {
-        HeaderType::Create => {
+    match maybe_group_create_action.action_type() {
+        ActionType::Create => {
             let updated_group_name_length: usize = updated_group_entry.name.clone().len();
             let updated_group_members_length: usize = updated_group_entry.get_group_members().len();
             let update_author = update.author;
 
-            if !maybe_group_create_header
+            if !maybe_group_create_action
                 .author()
                 .to_owned()
                 .eq(&update_author)

@@ -33,11 +33,11 @@ pub fn get_all_my_groups_handler() -> ExternResult<Vec<GroupOutput>> {
 
                     let mut group = first_ver_group;
 
-                    // This is the SignedHeaderHashed of the sole Create Header of Group
-                    let group_signed_header_hashed: SignedHeaderHashed =
-                        group_entry_details.headers[0].to_owned();
+                    // This is the SignedActionHashed of the sole Create Action of Group
+                    let group_signed_action_hashed: SignedActionHashed =
+                        group_entry_details.actions[0].to_owned();
 
-                    let group_revision_id = group_signed_header_hashed.header_address().to_owned(); // This is the create header hash of Group
+                    let group_revision_id = group_signed_action_hashed.action_address().to_owned(); // This is the create action hash of Group
 
                     if !group_entry_details.updates.is_empty() {
                         let latest_group: GroupOutput = get_group_latest_version(group_id.clone())?;

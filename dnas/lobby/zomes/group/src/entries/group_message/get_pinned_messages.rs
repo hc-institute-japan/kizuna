@@ -1,23 +1,23 @@
 use hdk::prelude::*;
 use std::collections::HashMap;
 
-use super::{GroupMessage, GroupMessageData, GroupMessageElement, GroupMessageWithId};
-use crate::utils::{try_get_and_convert, try_get_and_convert_with_header};
+use super::{GroupMessage, GroupMessageData, GroupMessageRecord, GroupMessageWithId};
+use crate::utils::{try_get_and_convert, try_get_and_convert_with_action};
 
 pub fn get_pinned_messages_handler(
     group_hash: EntryHash,
-) -> ExternResult<HashMap<String, GroupMessageElement>> {
-    let mut pin_contents: HashMap<String, GroupMessageElement> = HashMap::new();
+) -> ExternResult<HashMap<String, GroupMessageRecord>> {
+    let mut pin_contents: HashMap<String, GroupMessageRecord> = HashMap::new();
 
     // the target of the link being the group message
     let links = get_links(group_hash, Some(LinkTag::new("pinned".to_owned())))?;
 
     for link in links {
         // We try to hit the cache with content() before reaching the network
-        let pinned_message_element: (SignedHeaderHashed, GroupMessage) =
-            try_get_and_convert_with_header(link.target.clone(), GetOptions::latest())?;
-        let pinned_message_header: SignedHeaderHashed = pinned_message_element.0;
-        let pinned_message: GroupMessage = pinned_message_element.1;
+        let pinned_message_record: (SignedActionHashed, GroupMessage) =
+            try_get_and_convert_with_action(link.target.clone(), GetOptions::latest())?;
+        let pinned_message_action: SignedActionHashed = pinned_message_record.0;
+        let pinned_message: GroupMessage = pinned_message_record.1;
 
         let mut group_message_data = GroupMessageData {
             message_id: link.target.clone(),
@@ -37,12 +37,12 @@ pub fn get_pinned_messages_handler(
             });
         }
 
-        let group_message_element: GroupMessageElement = GroupMessageElement {
+        let group_message_record: GroupMessageRecord = GroupMessageRecord {
             entry: group_message_data,
-            signed_header: pinned_message_header,
+            signed_action: pinned_message_action,
         };
 
-        pin_contents.insert(link.target.clone().to_string(), group_message_element);
+        pin_contents.insert(link.target.clone().to_string(), group_message_record);
     }
 
     Ok(pin_contents)

@@ -514,12 +514,43 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "78cc372d058dcf6d5ecd98510e7fbc9e5aec4d21de70f65fea8fecebcd881bd4"
 
 [[package]]
-name = "group"
+name = "group_coordinator"
 version = "0.0.1"
 dependencies = [
  "derive_more",
- "file_types",
- "hdk 0.0.126",
+ "group_coordinator_types",
+ "group_integrity",
+ "group_integrity_types",
+ "hdk 0.0.142",
+ "serde",
+]
+
+[[package]]
+name = "group_coordinator_types"
+version = "0.0.1"
+dependencies = [
+ "derive_more",
+ "group_integrity_types",
+ "hdk 0.0.142",
+ "serde",
+]
+
+[[package]]
+name = "group_integrity"
+version = "0.0.1"
+dependencies = [
+ "derive_more",
+ "group_integrity_types",
+ "hdi",
+ "serde",
+]
+
+[[package]]
+name = "group_integrity_types"
+version = "0.0.1"
+dependencies = [
+ "derive_more",
+ "hdi",
  "serde",
 ]
 
