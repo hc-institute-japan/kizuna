@@ -21,7 +21,7 @@
 
 .footer {
   padding: 0.5rem;
-
+  padding-bottom: 8rem;
   width: 100%;
   display: flex;
   justify-content: flex-end;
