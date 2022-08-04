@@ -1,5 +1,4 @@
 use hdk::prelude::*;
-use holo_hash::AgentPubKeyB64;
 mod types;
 use crate::types::*;
 
@@ -16,7 +15,7 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
     let blocked_contacts_output: Vec<ContactOutput> =
         call_response_handler(blocked_contacts_call_response)?.decode()?;
 
-    let blocked_contacts_b64: Vec<AgentPubKeyB64> =
+    let blocked_contacts: Vec<AgentPubKey> =
         get_pk_from_contact_output(blocked_contacts_output.clone());
 
     let blocked_profiles_call_response: ZomeCallResponse = call(
@@ -24,7 +23,7 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
         "profiles".into(),
         "get_agents_profile".into(),
         None,
-        &blocked_contacts_b64,
+        &blocked_contacts,
     )?;
 
     let blocked_profiles: Vec<AgentProfile> =
@@ -41,7 +40,7 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
     let added_contacts_output: Vec<ContactOutput> =
         call_response_handler(added_contacts_call_response)?.decode()?;
 
-    let added_contacts_b64: Vec<AgentPubKeyB64> =
+    let added_contacts: Vec<AgentPubKey> =
         get_pk_from_contact_output(added_contacts_output.clone());
 
     let added_profiles_call_response: ZomeCallResponse = call(
@@ -49,7 +48,7 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
         "profiles".into(),
         "get_agents_profile".into(),
         None,
-        &added_contacts_b64,
+        &added_contacts,
     )?;
     let added_profiles: Vec<AgentProfile> =
         call_response_handler(added_profiles_call_response)?.decode()?;
@@ -68,7 +67,7 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
 
     /* group */
     let batch_size: u8 = 21;
-    let mut group_member_keys: Vec<AgentPubKeyB64> = Vec::new(); // agentPubKeys of members
+    let mut group_member_keys: Vec<AgentPubKey> = Vec::new(); // agentPubKeys of members
     let groups_call_response: ZomeCallResponse = call(
         CallTargetCell::Local,
         "group".into(),
@@ -79,10 +78,11 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
     let groups: Vec<GroupOutput> = call_response_handler(groups_call_response)?.decode()?;
 
     for group in &groups {
-        let member_keys_b64 = agent_pub_key_to_b64(group.members.clone());
-        let creator_key_b64: AgentPubKeyB64 = group.creator.clone().into();
-        group_member_keys.extend(member_keys_b64.iter().cloned());
-        group_member_keys.push(creator_key_b64);
+        // let member_keys = agent_pub_key_to_b64(group.members.clone());
+        let member_keys = group.members.clone();
+        let creator_key: AgentPubKey = group.creator.clone().into();
+        group_member_keys.extend(member_keys.iter().cloned());
+        group_member_keys.push(creator_key);
     }
     group_member_keys.sort_unstable();
     group_member_keys.dedup();
@@ -192,15 +192,15 @@ fn call_response_handler(call_response: ZomeCallResponse) -> ExternResult<Extern
     }
 }
 
-fn agent_pub_key_to_b64(keys: Vec<AgentPubKey>) -> Vec<AgentPubKeyB64> {
+fn agent_pub_key_to_b64(keys: Vec<AgentPubKey>) -> Vec<AgentPubKey> {
     keys.into_iter()
         .map(|key| {
-            let b64: AgentPubKeyB64 = key.into();
+            let b64: AgentPubKey = key.into();
             return b64;
         })
         .collect()
 }
 
-fn get_pk_from_contact_output(contacts: Vec<ContactOutput>) -> Vec<AgentPubKeyB64> {
+fn get_pk_from_contact_output(contacts: Vec<ContactOutput>) -> Vec<AgentPubKey> {
     contacts.into_iter().map(|contact| contact.id).collect()
 }
