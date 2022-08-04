@@ -1,7 +1,7 @@
 use file_types::Payload;
 use hdk::prelude::*;
 use hdk::prelude::{element::SignedHeaderHashed, timestamp::Timestamp};
-use holo_hash::{AgentPubKeyB64, EntryHashB64};
+// use holo_hash::{AgentPubKeyB64, EntryHashB64};
 use std::collections::{hash_map::HashMap, BTreeMap};
 
 // for profiles
@@ -15,7 +15,8 @@ pub struct Profile {
 #[derive(Clone, Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct AgentProfile {
-    pub agent_pub_key: AgentPubKeyB64,
+    // pub agent_pub_key: AgentPubKeyB64,
+    pub agent_pub_key: AgentPubKey,
     pub profile: Profile,
 }
 
@@ -23,14 +24,16 @@ pub struct AgentProfile {
 #[derive(Clone, Deserialize, PartialEq, Serialize, SerializedBytes, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct CategoryWithId {
-    id: EntryHashB64,
+    // id: EntryHashB64,
+    id: EntryHash,
     name: String,
 }
 
 #[derive(Clone, Deserialize, PartialEq, Serialize, SerializedBytes, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct ContactOutput {
-    pub id: AgentPubKeyB64,
+    // pub id: AgentPubKeyB64,
+    pub id: AgentPubKey,
     pub first_name: Option<String>,
     pub last_name: Option<String>,
     pub category: Option<CategoryWithId>,

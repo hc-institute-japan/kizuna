@@ -192,7 +192,7 @@ fn call_response_handler(call_response: ZomeCallResponse) -> ExternResult<Extern
     }
 }
 
-fn agent_pub_key_to_b64(keys: Vec<AgentPubKey>) -> Vec<AgentPubKey> {
+fn _agent_pub_key_to_b64(keys: Vec<AgentPubKey>) -> Vec<AgentPubKey> {
     keys.into_iter()
         .map(|key| {
             let b64: AgentPubKey = key.into();
