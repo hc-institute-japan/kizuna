@@ -1,5 +1,5 @@
-use hdk::prelude::{timestamp::Timestamp, *};
 use group_integrity_types::Group;
+use hdk::prelude::{timestamp::Timestamp, *};
 
 // IO type definitions
 
@@ -14,17 +14,17 @@ pub struct UpdateMembersIO {
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateGroupNameIO {
-    name: String,
-    group_id: EntryHash,
-    group_revision_id: ActionHash,
+    pub name: String,
+    pub group_id: EntryHash,
+    pub group_revision_id: ActionHash,
 }
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct UpdateGroupAvatarIO {
-    avatar: String,
-    group_id: EntryHash,
-    group_revision_id: ActionHash,
+    pub avatar: String,
+    pub group_id: EntryHash,
+    pub group_revision_id: ActionHash,
 }
 
 // input type definitions
@@ -32,8 +32,8 @@ pub struct UpdateGroupAvatarIO {
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateGroupInput {
-    name: String,
-    members: Vec<AgentPubKey>,
+    pub name: String,
+    pub members: Vec<AgentPubKey>,
 }
 
 // output type definitions
@@ -55,7 +55,7 @@ pub struct GroupOutput {
     pub members: Vec<AgentPubKey>,
     pub creator: AgentPubKey,
     pub created: Timestamp,
-    pub avatar: Option<String>, 
+    pub avatar: Option<String>,
     // group_versions: Vec<Group>, // TODO: implement this
 }
 
@@ -72,5 +72,3 @@ impl GroupOutput {
         }
     }
 }
-
-

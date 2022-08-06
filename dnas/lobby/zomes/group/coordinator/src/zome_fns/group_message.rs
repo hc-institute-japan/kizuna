@@ -8,7 +8,6 @@ pub mod get_subsequent_group_messages;
 pub mod group_message_helpers;
 pub mod indicate_group_typing;
 pub mod pin_message;
-pub mod post_commit;
 pub mod read_group_message;
 pub mod send_message;
 pub mod send_message_in_target_date;

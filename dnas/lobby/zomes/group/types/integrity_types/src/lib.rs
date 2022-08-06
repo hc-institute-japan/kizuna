@@ -1,5 +1,5 @@
 use hdi::prelude::*;
-/** 
+/**
  * Structs and related types for group entries
  */
 
@@ -14,8 +14,13 @@ pub struct Group {
 }
 
 impl Group {
-    pub fn new(name: String, created: Timestamp, creator: AgentPubKey, members: Vec<AgentPubKey>, avatar: Option<String>) 
-    -> Self {
+    pub fn new(
+        name: String,
+        created: Timestamp,
+        creator: AgentPubKey,
+        members: Vec<AgentPubKey>,
+        avatar: Option<String>,
+    ) -> Self {
         Group {
             name,
             created,
@@ -36,7 +41,7 @@ impl Group {
     }
 }
 
- /**
+/**
  * Entry structure related structs for group message entries
  */
 
@@ -44,16 +49,16 @@ impl Group {
 #[hdk_entry_helper]
 pub struct GroupMessage {
     // EntryHash of first ver of Group
-    group_hash: EntryHash,
-    payload: Payload,
-    created: Timestamp,
-    sender: AgentPubKey,
-    reply_to: Option<EntryHash>,
+    pub group_hash: EntryHash,
+    pub payload: Payload,
+    pub created: Timestamp,
+    pub sender: AgentPubKey,
+    pub reply_to: Option<EntryHash>,
 }
 
 #[derive(Clone)]
 #[hdk_entry_helper]
-pub struct GroupFileBytes(SerializedBytes);
+pub struct GroupFileBytes(pub SerializedBytes);
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(tag = "type", rename_all = "SCREAMING_SNAKE_CASE", content = "payload")]

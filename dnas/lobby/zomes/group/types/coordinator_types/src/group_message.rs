@@ -1,16 +1,16 @@
+use group_integrity_types::{FileType, GroupMessage, Payload};
 use hdk::prelude::{timestamp::Timestamp, *};
 use std::collections::HashMap;
-use group_integrity_types::{Payload, GroupMessage};
 
 // input type definitions
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct GroupMessageInput {
-    group_hash: EntryHash,
-    payload_input: PayloadInput,
-    sender: AgentPubKey,
-    reply_to: Option<EntryHash>,
+    pub group_hash: EntryHash,
+    pub payload_input: PayloadInput,
+    pub sender: AgentPubKey,
+    pub reply_to: Option<EntryHash>,
 }
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
@@ -28,22 +28,22 @@ pub struct GroupMsgBatchFetchFilter {
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct GroupMsgAdjacentFetchFilter {
-    group_id: EntryHash,
+    pub group_id: EntryHash,
     // the message EntryHash that has previous and later adjacent messages
-    adjacent_message: EntryHash,
-    message_timestamp: Timestamp,
+    pub adjacent_message: EntryHash,
+    pub message_timestamp: Timestamp,
     // This batch size goes for both previou and later messages of adjacent message
-    batch_size: u8,
+    pub batch_size: u8,
 }
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct GroupChatFilter {
     // has to be the original EntryHash of Group
-    group_id: EntryHash,
+    pub group_id: EntryHash,
     // has to be divideable to result in YYYY/MM/DD/00:00
-    date: Timestamp,
-    payload_type: PayloadType,
+    pub date: Timestamp,
+    pub payload_type: PayloadType,
 }
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
@@ -68,18 +68,18 @@ pub struct GroupMessageReadData {
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct GroupMessageInputWithDate {
-    group_hash: EntryHash,
-    payload: PayloadInput,
-    sender: AgentPubKey,
-    reply_to: Option<EntryHash>,
-    date: u64,
+    pub group_hash: EntryHash,
+    pub payload: PayloadInput,
+    pub sender: AgentPubKey,
+    pub reply_to: Option<EntryHash>,
+    pub date: u64,
 }
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct PinDetail {
-    group_hash: EntryHash,
-    group_message_hash: EntryHash,
+    pub group_hash: EntryHash,
+    pub group_message_hash: EntryHash,
 }
 
 // file type definitions
@@ -103,14 +103,6 @@ pub struct FileMetadataInput {
     pub file_name: String,
     pub file_size: usize,
     pub file_type: String,
-}
-
-#[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
-#[serde(tag = "type", rename_all = "SCREAMING_SNAKE_CASE", content = "payload")]
-pub enum FileType {
-    Image { thumbnail: SerializedBytes },
-    Video { thumbnail: SerializedBytes },
-    Other,
 }
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
@@ -156,8 +148,8 @@ pub struct GroupMessageData {
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct GroupMessagesOutput {
-    messages_by_group: HashMap<String, Vec<EntryHash>>,
-    group_messages_contents: HashMap<String, GroupMessageContent>,
+    pub messages_by_group: HashMap<String, Vec<EntryHash>>,
+    pub group_messages_contents: HashMap<String, GroupMessageContent>,
 }
 
 #[derive(Serialize, Deserialize, SerializedBytes, Clone, Debug)]

@@ -22,7 +22,6 @@ name = "aggregator"
 version = "0.0.1"
 dependencies = [
  "derive_more",
- "file_types",
  "hdk 0.0.138",
  "serde",
 ]
@@ -456,15 +455,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c3fcf0cee53519c866c09b5de1f6c56ff9d647101f81c1964fa632e148896cdf"
 dependencies = [
  "instant",
-]
-
-[[package]]
-name = "file_types"
-version = "0.0.1"
-dependencies = [
- "derive_more",
- "hdk 0.0.138",
- "serde",
 ]
 
 [[package]]
