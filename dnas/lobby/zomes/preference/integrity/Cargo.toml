@@ -1,5 +1,5 @@
 [package]
-authors = ["nickolie.pangarungan@gmail.com", "tatsuya.g.sato@yumeville.com"]
+authors = ["nickolie.pangarungan@gmail.com", "tats@beyonder.systems"]
 description = "Integrity for preference zome"
 edition = "2021"
 license = "MIT"
