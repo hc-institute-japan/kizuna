@@ -4,13 +4,21 @@ members = [
     "zomes/contacts/coordinator",
     "zomes/contacts/types/integrity_types",
     "zomes/contacts/types/coordinator_types",
+
+    "zomes/p2pmessage/integrity",
+    "zomes/p2pmessage/coordinator",
+    "zomes/p2pmessage/types/integrity_types",
+    "zomes/p2pmessage/types/coordinator_types",
+
     "zomes/profiles/integrity",
     "zomes/profiles/coordinator",
     "zomes/profiles/types",
+
     "zomes/aggregator",
+    
     "zomes/preference/integrity",
     "zomes/preference/coordinator",
-    "zomes/p2pmessage",
+    
     "zomes/group/integrity",
     "zomes/group/coordinator",
     "zomes/group/types/integrity_types",
