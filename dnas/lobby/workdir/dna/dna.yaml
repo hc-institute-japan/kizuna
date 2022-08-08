@@ -10,6 +10,8 @@ integrity:
       bundled: ../../target/wasm32-unknown-unknown/release/preference_integrity.wasm
     - name: profiles_integrity
       bundles: ../../target/wasm32-unknown-unknown/release/profiles_integrity.wasm
+    - name: contacts_integrity
+      bundles: ../../target/wasm32-unknown-unknown/release/contacts_integrity.wasm
 coordinator:
   zomes: 
     - name: preference_coordinator
@@ -20,3 +22,7 @@ coordinator:
       bundled: ../../target/wasm32-unknown-unknown/release/profiles_coordinator.wasm
       dependencies:
         - name: profiles_integrity
+    - name: contacts_coordinator
+      bundled: ../../target/wasm32-unknown-unknown/release/contacts_coordinator.wasm
+      dependencies:
+        - name: contacts_integrity
