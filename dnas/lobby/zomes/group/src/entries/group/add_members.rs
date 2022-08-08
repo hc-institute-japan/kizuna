@@ -12,7 +12,7 @@ use crate::utils::get_my_blocked_list;
 pub fn add_members_handler(add_members_input: UpdateMembersIO) -> ExternResult<UpdateMembersIO> {
     let mut new_group_members_from_input: Vec<AgentPubKey> = add_members_input.members.clone();
     let group_id: EntryHash = add_members_input.group_id.clone();
-    let group_revision_id: HeaderHash = add_members_input.group_revision_id.clone();
+    let group_revision_id: ActionHash = add_members_input.group_revision_id.clone();
 
     // check whether members field is empty
     if new_group_members_from_input.is_empty() {
@@ -53,7 +53,7 @@ pub fn add_members_handler(add_members_input: UpdateMembersIO) -> ExternResult<U
         avatar.clone(),
     );
 
-    // update_entry the Group with new members field with original HeaderHash
+    // update_entry the Group with new members field with original ActionHash
     update_entry(group_revision_id.clone(), &updated_group)?;
 
     let group_output = GroupOutput {

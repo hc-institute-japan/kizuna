@@ -10,7 +10,7 @@ pub fn remove_members_handler(
 ) -> ExternResult<UpdateMembersIO> {
     let members_to_remove: Vec<AgentPubKey> = remove_members_input.members.clone();
     let group_id: EntryHash = remove_members_input.group_id.clone();
-    let group_revision_id: HeaderHash = remove_members_input.group_revision_id.clone();
+    let group_revision_id: ActionHash = remove_members_input.group_revision_id.clone();
 
     // check whether members field is empty
     if members_to_remove.is_empty() {
@@ -24,7 +24,7 @@ pub fn remove_members_handler(
     // remove the members for the group members list
     group_members.retain(|member| !members_to_remove.contains(&member));
 
-    // update_entry the Group with new members field using the  original HeaderHash
+    // update_entry the Group with new members field using the  original ActionHash
     let creator: AgentPubKey = agent_info()?.agent_latest_pubkey;
     let group_name: String = latest_group_version.latest_name;
     let avatar: Option<String> = latest_group_version.avatar;

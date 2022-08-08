@@ -3,11 +3,11 @@ use hdk::prelude::*;
 use std::collections::HashMap;
 use timestamp::Timestamp;
 
-use crate::utils::{timestamp_to_days, try_from_element, try_get_and_convert};
+use crate::utils::{timestamp_to_days, try_from_record, try_get_and_convert};
 
 use super::GroupMessageData;
 use super::{
-    GroupChatFilter, GroupMessage, GroupMessageContent, GroupMessageElement, GroupMessageWithId,
+    GroupChatFilter, GroupMessage, GroupMessageContent, GroupMessageRecord, GroupMessageWithId,
     GroupMessagesOutput, PayloadType,
 };
 
@@ -78,13 +78,13 @@ pub fn get_messages_by_group_by_timestamp_handler(
 
     // parallel get messages
     let get_output = HDK.with(|h| h.borrow().get(get_input))?;
-    let get_output_result: Vec<Element> = get_output
+    let get_output_result: Vec<Record> = get_output
         .into_iter()
         .filter_map(|maybe_option| maybe_option)
         .collect();
 
-    for element in get_output_result {
-        let group_message: GroupMessage = try_from_element(element.clone())?;
+    for record in get_output_result {
+        let group_message: GroupMessage = try_from_record(record.clone())?;
 
         let message_hash = hash_entry(group_message.clone())?;
 
@@ -106,14 +106,14 @@ pub fn get_messages_by_group_by_timestamp_handler(
             });
         }
 
-        let group_message_element: GroupMessageElement = GroupMessageElement {
+        let group_message_record: GroupMessageRecord = GroupMessageRecord {
             entry: group_message_data,
-            signed_header: element.signed_header().to_owned(),
+            signed_action: record.signed_action().to_owned(),
         };
         group_messages_content.insert(
             message_hash.clone().to_string(),
             GroupMessageContent {
-                group_message_element,
+                group_message_record,
                 // read_list: read_list,
                 read_list: match all_read_list.get(&message_hash.clone().to_string()) {
                     Some(hashmap) => hashmap.to_owned(),

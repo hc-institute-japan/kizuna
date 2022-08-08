@@ -37,7 +37,7 @@ pub fn create_group_handler(
     );
 
     // commit group entry
-    let group_revision_id: HeaderHash = create_entry(&group.clone())?;
+    let group_revision_id: ActionHash = create_entry(&group.clone())?;
     let group_id: EntryHash = hash_entry(&group.clone())?;
     let group_output = GroupOutput {
         group_id: group_id.clone(),

@@ -34,7 +34,7 @@ pub(crate) fn timestamp_to_days(timestamp: Timestamp) -> i64 {
 }
 
 pub fn error<T>(reason: &str) -> ExternResult<T> {
-    Err(WasmError::Guest(String::from(reason)))
+    Err(wasm_error!(WasmErrorInner::Guest(String::from(reason))))
 }
 
 pub fn call_response_handler(call_response: ZomeCallResponse) -> ExternResult<ExternIO> {
@@ -43,32 +43,32 @@ pub fn call_response_handler(call_response: ZomeCallResponse) -> ExternResult<Ex
             return Ok(extern_io);
         }
         ZomeCallResponse::Unauthorized(_, _, function_name, _) => {
-            return Err(WasmError::Guest(
+            return Err(wasm_error!(WasmErrorInner::Guest(
                 String::from("Unauthorized Call to : ") + function_name.as_ref(),
-            ));
+            )));
         }
         ZomeCallResponse::NetworkError(error) => {
-            return Err(WasmError::Guest(
+            return Err(wasm_error!(WasmErrorInner::Guest(
                 String::from("Network Error : ") + error.as_ref(),
-            ));
+            )));
         }
         ZomeCallResponse::CountersigningSession(error) => {
-            return Err(WasmError::Guest(
+            return Err(wasm_error!(WasmErrorInner::Guest(
                 String::from("countersigning error : ") + error.as_ref(),
-            ));
+            )));
         }
     }
 }
 
-// slight modification of try_get_and_convert to retrieve the header together with the entry
-pub fn try_get_and_convert_with_header<T: TryFrom<SerializedBytes>>(
+// slight modification of try_get_and_convert to retrieve the action together with the entry
+pub fn try_get_and_convert_with_action<T: TryFrom<SerializedBytes>>(
     entry_hash: EntryHash,
     option: GetOptions,
-) -> ExternResult<(SignedHeaderHashed, T)> {
+) -> ExternResult<(SignedActionHashed, T)> {
     match get(entry_hash.clone(), option)? {
-        Some(element) => Ok((
-            element.signed_header().to_owned(),
-            try_from_element(element)?,
+        Some(record) => Ok((
+            record.signed_action().to_owned(),
+            try_from_record(record)?,
         )),
         None => error("Entry not found"),
     }
@@ -79,27 +79,27 @@ pub fn try_get_and_convert<T: TryFrom<SerializedBytes>>(
     option: GetOptions,
 ) -> ExternResult<T> {
     match get(entry_hash.clone(), option)? {
-        Some(element) => try_from_element(element),
+        Some(record) => try_from_record(record),
         None => error("Entry not found"),
     }
 }
 
-pub fn try_from_element<T: TryFrom<SerializedBytes>>(element: Element) -> ExternResult<T> {
-    match element.entry() {
-        element::ElementEntry::Present(entry) => try_from_entry::<T>(entry.clone()),
-        _ => error("Could not convert element"),
+pub fn try_from_record<T: TryFrom<SerializedBytes>>(record: Record) -> ExternResult<T> {
+    match record.entry() {
+        record::RecordEntry::Present(entry) => try_from_entry::<T>(entry.clone()),
+        _ => error("Could not convert record"),
     }
 }
 
-pub fn try_from_element_with_header<T: TryFrom<SerializedBytes>>(
-    element: Element,
-) -> ExternResult<(SignedHeaderHashed, T)> {
-    match element.entry() {
-        element::ElementEntry::Present(entry) => Ok((
-            element.signed_header().to_owned(),
+pub fn try_from_record_with_action<T: TryFrom<SerializedBytes>>(
+    record: Record,
+) -> ExternResult<(SignedActionHashed, T)> {
+    match record.entry() {
+        record::RecordEntry::Present(entry) => Ok((
+            record.signed_action().to_owned(),
             try_from_entry::<T>(entry.clone())?,
         )),
-        _ => error("Could not convert element"),
+        _ => error("Could not convert record"),
     }
 }
 

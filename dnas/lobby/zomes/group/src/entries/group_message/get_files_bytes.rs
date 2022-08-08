@@ -16,13 +16,13 @@ pub fn get_files_bytes_handler(
 
     let get_output = HDK.with(|h| h.borrow().get(get_input))?;
 
-    let get_output_result: Vec<Element> = get_output
+    let get_output_result: Vec<Record> = get_output
         .into_iter()
         .filter_map(|maybe_option| maybe_option)
         .collect();
 
-    for file_bytes_element in get_output_result {
-        match file_bytes_element.entry().to_app_option::<GroupFileBytes>() {
+    for file_bytes_record in get_output_result {
+        match file_bytes_record.entry().to_app_option::<GroupFileBytes>() {
             Ok(option) => match option {
                 Some(file_bytes) => {
                     let file_hash = hash_entry(file_bytes.clone())?;
@@ -31,7 +31,7 @@ pub fn get_files_bytes_handler(
                 None => (),
             },
             Err(_) => {
-                return error("the group file bytes ElementEntry enum is not of Present variant");
+                return error("the group file bytes RecordEntry enum is not of Present variant");
             }
         }
     }

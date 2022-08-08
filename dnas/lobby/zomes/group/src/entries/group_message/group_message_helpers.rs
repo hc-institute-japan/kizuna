@@ -1,12 +1,12 @@
 use hdk::prelude::*;
 
-use crate::utils::{error, try_from_element_with_header, try_get_and_convert};
+use crate::utils::{error, try_from_record_with_action, try_get_and_convert};
 
 use file_types::PayloadType;
 use std::collections::hash_map::HashMap;
 
 use super::{
-    GroupMessage, GroupMessageContent, GroupMessageData, GroupMessageElement, GroupMessageWithId,
+    GroupMessage, GroupMessageContent, GroupMessageData, GroupMessageRecord, GroupMessageWithId,
 };
 
 pub enum Direction {
@@ -74,7 +74,7 @@ pub fn collect_and_insert_messages(
 ) -> ExternResult<()> {
     // collect values to fill the group_message_content.
     // - message entry_hash (aka link target)
-    // - GroupMessageData (constructed from the element fetched from entry hash of the message )
+    // - GroupMessageData (constructed from the record fetched from entry hash of the message )
 
     let message_hashes: Vec<EntryHash> = linked_messages
         .into_iter()
@@ -87,20 +87,20 @@ pub fn collect_and_insert_messages(
 
     // TODO: add a debugger here to solve the "Entry Not Found" error
     let get_output = HDK.with(|h| h.borrow().get(get_input))?;
-    let messages_with_header: Vec<(SignedHeaderHashed, GroupMessage)> = get_output
+    let messages_with_action: Vec<(SignedActionHashed, GroupMessage)> = get_output
         .into_iter()
         .filter_map(|maybe_option| maybe_option)
-        .map(|e| match try_from_element_with_header::<GroupMessage>(e) {
+        .map(|e| match try_from_record_with_action::<GroupMessage>(e) {
             Ok(res) => Some(res),
             _ => None,
         })
         .filter_map(|maybe_message| maybe_message)
         .collect();
 
-    for message_with_header in messages_with_header {
-        let message = message_with_header.1;
-        let signed_header = message_with_header.0;
-        let message_hash = signed_header.header().entry_hash().unwrap(); // safely unwraps as all headers here are of create variant
+    for message_with_action in messages_with_action {
+        let message = message_with_action.1;
+        let signed_action = message_with_action.0;
+        let message_hash = signed_action.action().entry_hash().unwrap(); // safely unwraps as all actions here are of create variant
         let mut group_message_data = GroupMessageData {
             message_id: message_hash.clone(),
             group_hash: message.group_hash.clone(),
@@ -120,15 +120,15 @@ pub fn collect_and_insert_messages(
             });
         }
 
-        let group_message_element: GroupMessageElement = GroupMessageElement {
+        let group_message_record: GroupMessageRecord = GroupMessageRecord {
             entry: group_message_data,
-            signed_header: signed_header.clone(),
+            signed_action: signed_action.clone(),
         };
 
         group_messages_contents.insert(
             message_hash.clone().to_string(),
             GroupMessageContent {
-                group_message_element,
+                group_message_record,
                 read_list: HashMap::new(), // read list will be collected in a separate helper
             },
         );
@@ -145,7 +145,7 @@ pub fn collect_and_insert_read_list(
 
     let message_hashes = group_messages_contents
         .values()
-        .map(|msg| msg.group_message_element.entry.message_id.clone())
+        .map(|msg| msg.group_message_record.entry.message_id.clone())
         .collect::<Vec<EntryHash>>();
 
     // create input for getting the read links => input: Vec<(message_hash, "read")>

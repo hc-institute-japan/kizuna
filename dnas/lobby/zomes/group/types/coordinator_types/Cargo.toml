@@ -1,0 +1,18 @@
+[package]
+authors = ["nickolie.pangarungan@gmail.com", "tatsuya.g.sato@yumeville.com"]
+description = "Coordinator types for the Kizuna group zome"
+edition = "2021"
+license = "MIT"
+name = "group_coordinator_types"
+version = "0.0.1"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+name = "group_coordinator_types"
+
+[dependencies]
+derive_more = "0"
+serde = "1"
+
+group_integrity_types = {path = "../integrity_types"}
+hdk = "0.0.142"

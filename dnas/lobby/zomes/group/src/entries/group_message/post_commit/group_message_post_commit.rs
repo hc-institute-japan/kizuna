@@ -4,20 +4,20 @@ use crate::{
     group::group_helpers::get_group_latest_version,
     group_message::{GroupMessage, GroupMessageData, GroupMessageWithId},
     signals::{SignalDetails, SignalName, SignalPayload},
-    utils::{try_from_element, try_get_and_convert},
+    utils::{try_from_record, try_get_and_convert},
 };
 
-pub fn group_message_post_commit(create_header: Create) -> ExternResult<()> {
+pub fn group_message_post_commit(create_action: Create) -> ExternResult<()> {
     // this should always hit the cache
     let group_message: GroupMessage =
-        try_get_and_convert(create_header.entry_hash.clone(), GetOptions::latest())?;
+        try_get_and_convert(create_action.entry_hash.clone(), GetOptions::latest())?;
     let mut replied_message_with_id: Option<GroupMessageWithId> = None;
     if let Some(hash) = group_message.reply_to.clone() {
         // this should not hit None assuming that the prior send_message call
         // was able to fetch the replied message
-        let message_element: Option<Element> = get(hash.clone(), GetOptions::latest())?;
-        if let Some(e) = message_element {
-            let replied_message = try_from_element(e)?;
+        let message_record: Option<Record> = get(hash.clone(), GetOptions::latest())?;
+        if let Some(e) = message_record {
+            let replied_message = try_from_record(e)?;
             replied_message_with_id = Some(GroupMessageWithId {
                 id: hash,
                 content: replied_message,
@@ -26,7 +26,7 @@ pub fn group_message_post_commit(create_header: Create) -> ExternResult<()> {
     }
     let sender = group_message.sender.clone();
     let mut group_message_data: GroupMessageData = GroupMessageData {
-        message_id: create_header.entry_hash,
+        message_id: create_action.entry_hash,
         group_hash: group_message.group_hash.clone(),
         payload: group_message.payload.clone(),
         created: group_message.created.clone(),

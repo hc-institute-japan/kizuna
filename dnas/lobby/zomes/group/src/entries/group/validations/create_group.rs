@@ -2,7 +2,7 @@ use hdk::prelude::*;
 
 use crate::{
     group::Group,
-    utils::{try_from_element, try_from_entry},
+    utils::{try_from_record, try_from_entry},
 };
 
 // TODO: implement unit test
@@ -16,14 +16,14 @@ use crate::{
  * group creator AgentPubKey is included in the group members
 */
 
-pub fn store_group_element(element: Element) -> ExternResult<ValidateCallbackResult> {
-    let entry_author_pub_key: AgentPubKey = element.header().author().clone();
-    let entry: Group = try_from_element(element)?;
+pub fn store_group_record(record: Record) -> ExternResult<ValidateCallbackResult> {
+    let entry_author_pub_key: AgentPubKey = record.action().author().clone();
+    let entry: Group = try_from_record(record)?;
     return Ok(validate_group_content(entry, entry_author_pub_key)?);
 }
 
-pub fn store_group_entry(entry: Entry, header: Create) -> ExternResult<ValidateCallbackResult> {
-    let entry_author_pub_key: AgentPubKey = header.author.clone();
+pub fn store_group_entry(entry: Entry, action: Create) -> ExternResult<ValidateCallbackResult> {
+    let entry_author_pub_key: AgentPubKey = action.author.clone();
     let group: Group = try_from_entry(entry)?;
     Ok(validate_group_content(group, entry_author_pub_key)?)
 }
@@ -38,7 +38,7 @@ fn validate_group_content(
 
     if !group_creator_pub_key.eq(&entry_author_pub_key) {
         return Ok(ValidateCallbackResult::Invalid(
-            "the group creator pubkey dosent match with the header signature".into(),
+            "the group creator pubkey dosent match with the action signature".into(),
         ));
     }
 
