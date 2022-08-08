@@ -6,6 +6,7 @@ import { pushError } from "../../error/actions";
 import { AgentProfile, Profile } from "../../profile/types";
 import { ThunkAction } from "../../types";
 import { ContactOutput, SET_BLOCKED } from "../types";
+import { serializeHash } from "@holochain-open-dev/core-types";
 
 const fetchBlocked =
   (): ThunkAction =>
@@ -15,7 +16,7 @@ const fetchBlocked =
         zomeName: ZOMES.CONTACTS,
         fnName: FUNCTIONS[ZOMES.CONTACTS].LIST_BLOCKED,
       });
-      const idsB64 = contactOutputs.map((contact) => contact.id);
+      const idsB64 = contactOutputs.map((contact) => serializeHash(contact.id));
 
       let blocked: { [key: string]: Profile } = {};
       try {
@@ -26,7 +27,7 @@ const fetchBlocked =
         });
 
         profilesOutput.forEach((agentProfile: AgentProfile) => {
-          const id = agentProfile.agentPubKey;
+          const id = serializeHash(agentProfile.agentPubKey);
           blocked[id] = {
             id,
             username: agentProfile.profile.nickname,

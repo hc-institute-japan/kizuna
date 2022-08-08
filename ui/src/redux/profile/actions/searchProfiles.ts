@@ -3,6 +3,7 @@ import {
   FUNCTIONS,
   ZOMES,
 } from "../../../utils/services/HolochainService/types";
+import { serializeHash } from "@holochain-open-dev/core-types";
 import { ThunkAction } from "../../types";
 import { AgentProfile, Profile } from "../types";
 
@@ -27,12 +28,12 @@ const searchProfiles =
       const filteredMappedProfiles: Profile[] = res
         .filter(
           (res: AgentProfile) =>
-            !Object.keys(contacts).includes(res.agentPubKey) &&
-            res.agentPubKey !== id
+            !Object.keys(contacts).includes(serializeHash(res.agentPubKey)) &&
+            serializeHash(res.agentPubKey) !== id
         )
         .map((v: AgentProfile) => {
           return {
-            id: v.agentPubKey,
+            id: serializeHash(v.agentPubKey),
             username: v.profile.nickname,
             fields: v.profile.fields.avatar
               ? {

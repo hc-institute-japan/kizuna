@@ -35,7 +35,7 @@ export const getLatestData =
 
       dispatch<ProfileActionTypes>({
         type: SET_PROFILE,
-        id: latestData.userInfo.agentPubKey,
+        id: serializeHash(latestData.userInfo.agentPubKey),
         nickname: latestData.userInfo.profile.nickname,
         fields: latestData.userInfo.profile.fields.avatar
           ? { avatar: binaryToUrl(latestData.userInfo.profile.fields.avatar) }
@@ -45,7 +45,7 @@ export const getLatestData =
       let contacts: { [key: string]: Profile } = {};
       let blocked: { [key: string]: Profile } = {};
       latestData.addedProfiles.forEach((agentProfile: any) => {
-        const agentId = agentProfile.agentPubKey;
+        const agentId = serializeHash(agentProfile.agentPubKey);
         contacts[agentId] = {
           id: agentId,
           username: agentProfile.profile.nickname,
@@ -58,7 +58,7 @@ export const getLatestData =
       });
       if (latestData.blockedProfiles)
         latestData.blockedProfiles.forEach((agentProfile: any) => {
-          const agentId = agentProfile.agentPubKey;
+          const agentId = serializeHash(agentProfile.agentPubKey);
           blocked[agentId] = {
             id: agentId,
             username: agentProfile.profile.nickname,
