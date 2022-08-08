@@ -1,0 +1,15 @@
+[package]
+name = "contacts_integrity"
+version = "0.0.1"
+authors = ["nickolie.pangarungan@gmail.com", "tats@beyonder.systems"]
+edition = "2018"
+
+[lib]
+name = "contacts_integrity"
+crate-type = [ "cdylib", "rlib" ]
+
+[dependencies]
+derive_more = "0"
+serde = "1"
+hdk = {version = "0.0.142", features = ["encoding"]}
+hc_contacts_integrity = {git = "https://github.com/holochain-open-dev/contacts", branch = "hdk-0.0.145", package = "contacts_integrity"}

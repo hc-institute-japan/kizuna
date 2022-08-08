@@ -1,6 +1,9 @@
 [workspace]
 members = [
-    "zomes/contacts",
+    "zomes/contacts/integrity",
+    "zomes/contacts/coordinator",
+    "zomes/contacts/types/integrity_types",
+    "zomes/contacts/types/coordinator_types",
     "zomes/profiles/integrity",
     "zomes/profiles/coordinator",
     "zomes/profiles/types",
