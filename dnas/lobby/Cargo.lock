@@ -1396,14 +1396,32 @@ dependencies = [
 ]
 
 [[package]]
-name = "profiles"
+name = "profiles_coordinator"
 version = "0.0.1"
 dependencies = [
  "derive_more",
  "hc_zome_profiles_coordinator",
+ "hdk 0.0.142",
+ "serde",
+]
+
+[[package]]
+name = "profiles_integrity"
+version = "0.0.1"
+dependencies = [
+ "derive_more",
  "hc_zome_profiles_integrity",
  "hdi",
- "hdk 0.0.142",
+ "serde",
+]
+
+[[package]]
+name = "profiles_types"
+version = "0.0.1"
+dependencies = [
+ "derive_more",
+ "hc_zome_profiles_types",
+ "hdi",
  "serde",
 ]
 
