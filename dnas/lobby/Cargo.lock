@@ -223,7 +223,7 @@ version = "0.0.1"
 dependencies = [
  "contacts_integrity 0.0.1 (git+https://github.com/holochain-open-dev/contacts?branch=hdk-0.0.145)",
  "derive_more",
- "hdk 0.0.142",
+ "hdi",
  "serde",
 ]
 
@@ -244,7 +244,7 @@ version = "0.0.1"
 dependencies = [
  "contacts_integrity_types 0.0.1 (git+https://github.com/holochain-open-dev/contacts?branch=hdk-0.0.145)",
  "derive_more",
- "hdk 0.0.142",
+ "hdi",
  "serde",
 ]
 

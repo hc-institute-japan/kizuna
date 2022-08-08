@@ -11,5 +11,5 @@ crate-type = [ "cdylib", "rlib" ]
 [dependencies]
 derive_more = "0"
 serde = "1"
-hdk = {version = "0.0.142", features = ["encoding"]}
+hdi = "0.0.14"
 hc_contacts_integrity_types = {git = "https://github.com/holochain-open-dev/contacts", branch = "hdk-0.0.145", package = "contacts_integrity_types"}
