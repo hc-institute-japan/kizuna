@@ -1,14 +1,14 @@
 [workspace]
 members = [
     "zomes/group",
-    # "zomes/request",
-    "zomes/profiles",
+    "zomes/profiles/integrity",
+    "zomes/profiles/coordinator",
+    "zomes/profiles/types",
     "zomes/contacts",
     "zomes/aggregator",
     "zomes/preference/integrity",
     "zomes/preference/coordinator",
     "zomes/p2pmessage",
-    # "zomes/joining_code",
     "commons/file_types", 
 ]
 

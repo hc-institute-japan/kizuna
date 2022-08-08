@@ -1,17 +1,16 @@
 [package]
-name = "profiles"
+name = "profiles_coordinator"
+description = "Coordinator zome for profiles"
 version = "0.0.1"
 authors = [ "hcij" ]
 edition = "2018"
 
 [lib]
-name = "profiles"
+name = "profiles_coordinator"
 crate-type = [ "cdylib", "rlib" ]
 
 [dependencies]
 derive_more = "0"
 serde = "1"
-hdi = "0.0.14"
 hdk = {version = "0.0.142", features = ["encoding"]}
-hc_zome_profiles_integrity = {git = "https://github.com/holochain-open-dev/profiles", rev = "72f411561beeec350c77441d655a24618847068d", pacakge = "hc_zome_profiles_integrity"}
 hc_zome_profiles_coordinator = {git = "https://github.com/holochain-open-dev/profiles", rev = "72f411561beeec350c77441d655a24618847068d", pacakge = "hc_zome_profiles_coordinator"}
