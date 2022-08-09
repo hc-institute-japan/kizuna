@@ -1,1 +1,1 @@
-extern crate hc_contacts_coordinator_types;
+pub extern crate hc_contacts_coordinator_types;
