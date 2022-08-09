@@ -10,13 +10,13 @@ integrity:
     - name: preference_integrity
       bundled: ../../target/wasm32-unknown-unknown/release/preference_integrity.wasm
     - name: profiles_integrity
-      bundles: ../../target/wasm32-unknown-unknown/release/profiles_integrity.wasm
+      bundled: ../../target/wasm32-unknown-unknown/release/profiles_integrity.wasm
     - name: contacts_integrity
-      bundles: ../../target/wasm32-unknown-unknown/release/contacts_integrity.wasm
+      bundled: ../../target/wasm32-unknown-unknown/release/contacts_integrity.wasm
     - name: group_integrity
-      bundles: ../../target/wasm32-unknown-unknown/release/group_integrity.wasm
+      bundled: ../../target/wasm32-unknown-unknown/release/group_integrity.wasm
     - name: p2pmessage_integrity
-      bundles: ../../target/wasm32-unknown-unknown/release/p2pmessage_integrity.wasm
+      bundled: ../../target/wasm32-unknown-unknown/release/p2pmessage_integrity.wasm
 
 coordinator:
   zomes: 
