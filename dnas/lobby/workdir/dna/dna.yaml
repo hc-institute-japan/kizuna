@@ -1,6 +1,7 @@
 ---
 manifest_version: "1"
 name: kizuna-lobby
+
 integrity:
   uuid: 00000000-0000-0000-0000-000000000000
   properties: ~
@@ -16,6 +17,7 @@ integrity:
       bundles: ../../target/wasm32-unknown-unknown/release/group_integrity.wasm
     - name: p2pmessage_integrity
       bundles: ../../target/wasm32-unknown-unknown/release/p2pmessage_integrity.wasm
+
 coordinator:
   zomes: 
     - name: preference_coordinator
@@ -38,3 +40,6 @@ coordinator:
       bundled: ../../target/wasm32-unknown-unknown/release/p2pmessage_coordinator.wasm
       dependencies:
         - name: p2pmessage_integrity
+    - name: aggregator_coordinator
+      bundled: ../../target/wasm32-unknown-unknown/release/aggregator_coordinator.wasm
+      dependencies:
