@@ -1,0 +1,27 @@
+[package]
+name = "aggregator_coordinator"
+description = "Coordinator for aggregator zome"
+version = "0.0.1"
+authors = ["nickolie.pangarungan@gmail.com", "tats@beyonder.systems"]
+edition = "2018"
+
+[lib]
+name = "aggregator_coordinator"
+crate-type = [ "cdylib", "rlib" ]
+
+[dependencies]
+derive_more = "0"
+serde = "1"
+hdk = {version = "0.0.142", features = ["encoding"]}
+
+
+contacts_coordinator_types = { path = "../../contacts/types/coordinator_types" }
+
+group_coordinator_types = { path = "../../group/types/coordinator_types" }
+group_integrity_types = { path = "../../group/types/integrity_types" }
+
+preference_integrity_types = { path = "../../preference/types/integrity_types" }
+
+p2pmessage_coordinator_types = { path = "../../p2pmessage/types/coordinator_types" }
+
+profiles_types = { path = "../../profiles/types/" }

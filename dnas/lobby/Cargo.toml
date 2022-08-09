@@ -14,10 +14,12 @@ members = [
     "zomes/profiles/coordinator",
     "zomes/profiles/types",
 
-    "zomes/aggregator",
+    "zomes/aggregator/coordinator",
     
     "zomes/preference/integrity",
     "zomes/preference/coordinator",
+    "zomes/preference/types/integrity_types",
+    "zomes/preference/types/coordinator_types",
     
     "zomes/group/integrity",
     "zomes/group/coordinator",
