@@ -1,0 +1,18 @@
+[package]
+authors = ["nickolie.pangarungan@gmail.com", "tatsuya.g.sato@yumeville.com"]
+description = "Coordinator types for the Kizuna preference zome"
+edition = "2021"
+license = "MIT"
+name = "preference_coordinator_types"
+version = "0.0.1"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+name = "preference_coordinator_types"
+
+[dependencies]
+derive_more = "0"
+serde = "1"
+
+preference_integrity_types = {path = "../integrity_types"}
+hdk = "0.0.142"

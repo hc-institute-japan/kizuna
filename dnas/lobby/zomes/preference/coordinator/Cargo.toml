@@ -1,0 +1,20 @@
+[package]
+authors = ["nickolie.pangarungan@gmail.com", "tatsuya.g.sato@yumeville.com"]
+description = "Coordinator for preference zome"
+edition = "2021"
+license = "MIT"
+name = "preference_coordinator"
+version = "0.0.1"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+name = "preference_coordinator"
+
+[dependencies]
+derive_more = "0"
+serde = "1"
+
+preference_integrity = {path = "../integrity"}
+preference_integrity_types = {path = "../types/integrity_types"}
+preference_coordinator_types = {path = "../types/coordinator_types"}
+hdk = "0.0.142"
