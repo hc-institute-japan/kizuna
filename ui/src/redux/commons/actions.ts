@@ -13,14 +13,24 @@ import {
 import { transformZomeDataToUIData } from "../p2pmessages/actions/helpers/transformZomeDateToUIData";
 import { setMessages } from "../p2pmessages/actions/setMessages";
 import { SET_PREFERENCE } from "../preference/types";
-import { Profile, ProfileActionTypes, SET_PROFILE } from "../profile/types";
+import {
+  Profile,
+  ProfileRaw,
+  ProfileActionTypes,
+  SET_PROFILE,
+} from "../profile/types";
 import { ThunkAction } from "../types";
-import { binaryToUrl } from "../../utils/services/ConversionService";
+import {
+  binaryToUrl,
+  getEntryFromRecord,
+} from "../../utils/services/ConversionService";
+import { decode } from "@msgpack/msgpack";
 
 export const getLatestData =
   (): ThunkAction =>
   async (dispatch, getState, { callZome, getAgentId }) => {
     try {
+      console.log("getting latest data");
       // TODO: error handling
       const latestData = await callZome({
         zomeName: ZOMES.AGGREGATOR,
@@ -33,39 +43,41 @@ export const getLatestData =
       // /* assume that getAgentId() is non-nullable */
       // const myAgentIdB64 = serializeHash(myAgentId!);
 
+      const userInfoProfileRaw = decode(
+        getEntryFromRecord(latestData.userInfo)
+      ) as ProfileRaw;
       dispatch<ProfileActionTypes>({
         type: SET_PROFILE,
-        id: serializeHash(latestData.userInfo.agentPubKey),
-        nickname: latestData.userInfo.profile.nickname,
-        fields: latestData.userInfo.profile.fields.avatar
-          ? { avatar: binaryToUrl(latestData.userInfo.profile.fields.avatar) }
+        id: serializeHash(latestData.userInfo.signed_action.Create.author),
+        nickname: userInfoProfileRaw.nickname,
+        fields: userInfoProfileRaw.fields.avatar
+          ? { avatar: binaryToUrl(userInfoProfileRaw.fields.avatar) }
           : {},
       });
 
       let contacts: { [key: string]: Profile } = {};
       let blocked: { [key: string]: Profile } = {};
-      latestData.addedProfiles.forEach((agentProfile: any) => {
-        const agentId = serializeHash(agentProfile.agentPubKey);
-        contacts[agentId] = {
-          id: agentId,
-          username: agentProfile.profile.nickname,
-          fields: agentProfile.profile.fields.avatar
-            ? {
-                avatar: binaryToUrl(agentProfile.profile.fields.avatar),
-              }
+      latestData.addedProfiles.forEach((rec: any) => {
+        const raw = decode(getEntryFromRecord(rec)) as ProfileRaw;
+        const id = serializeHash(rec.signed_action.Create.author);
+        contacts[id] = {
+          id,
+          username: raw.nickname,
+          fields: raw.fields.avatar
+            ? { avatar: binaryToUrl(raw.fields.avatar) }
             : {},
         };
       });
+
       if (latestData.blockedProfiles)
-        latestData.blockedProfiles.forEach((agentProfile: any) => {
-          const agentId = serializeHash(agentProfile.agentPubKey);
-          blocked[agentId] = {
-            id: agentId,
-            username: agentProfile.profile.nickname,
-            fields: agentProfile.profile.fields.avatar
-              ? {
-                  avatar: binaryToUrl(agentProfile.profile.fields.avatar),
-                }
+        latestData.blockedProfiles.forEach((rec: any) => {
+          const raw = decode(getEntryFromRecord(rec)) as ProfileRaw;
+          const id = serializeHash(rec.signed_action.Create.author);
+          blocked[id] = {
+            id,
+            username: raw.nickname,
+            fields: raw.fields.avatar
+              ? { avatar: binaryToUrl(raw.fields.avatar) }
               : {},
           };
         });
@@ -107,14 +119,14 @@ export const getLatestData =
       );
 
       const groupMembers: Profile[] = latestData.memberProfiles.map(
-        (agentProfile: any): Profile => {
+        (rec: any): Profile => {
+          const raw = decode(getEntryFromRecord(rec)) as ProfileRaw;
+          const id = serializeHash(rec.signed_action.Create.author);
           return {
-            id: agentProfile.agentPubKey,
-            username: agentProfile.profile.nickname,
-            fields: agentProfile.profile.fields.avatar
-              ? {
-                  avatar: binaryToUrl(agentProfile.profile.fields.avatar),
-                }
+            id,
+            username: raw.nickname,
+            fields: raw.fields.avatar
+              ? { avatar: binaryToUrl(raw.fields.avatar) }
               : {},
           };
         }
