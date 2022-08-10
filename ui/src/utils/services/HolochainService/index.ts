@@ -1,12 +1,11 @@
 import {
   // AdminWebsocket,
-  // AgentPubKey,
+  AgentPubKey,
   AppSignalCb,
   // CellId,
   // RoleId,
   AppWebsocket,
 } from "@holochain/client";
-import { AgentPubKey } from "@holochain/client";
 import { store } from "../../../containers/ReduxContainer";
 import { handleSignal } from "../../../redux/signal/actions";
 import { CallZomeConfig } from "../../../redux/types";
@@ -138,11 +137,11 @@ const createClient = async (
       // const hcclient = new HolochainClient(appWebSocket);
 
       // HOLOCHAIN/CLIENT
-      const hcclient: any = await AppWebsocket.connect(
-        appUrl() as string,
-        30000,
-        signalHandler
-      );
+      // const hcclient: any = await AppWebsocket.connect(
+      //   appUrl() as string,
+      //   30000,
+      //   signalHandler
+      // );
 
       // if (!adminWs) {
       //   adminWs = await AdminWebsocket.connect(adminUrl()!, 60000);
@@ -152,8 +151,8 @@ const createClient = async (
       // }
       // hcclient.addSignalHandler(signalHandler);
 
-      return hcclient;
-    // return null;
+      // return hcclient;
+      return null;
     default:
       return null;
   }
