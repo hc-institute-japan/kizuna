@@ -17,7 +17,7 @@ import {
   Payload,
   TextPayload,
 } from "../../../commons/types";
-import { AgentProfile, Profile } from "../../../profile/types";
+import { Profile, ProfileRaw } from "../../../profile/types";
 import { CallZomeConfig, RootState } from "../../../types";
 import {
   GroupMessage,
@@ -25,6 +25,8 @@ import {
   GroupMessagesOutput,
   MessagesByGroup,
 } from "../../types";
+import { decode } from "@msgpack/msgpack";
+import { getEntryFromRecord } from "../../../../utils/services/HolochainService";
 
 // helper function
 export const convertFetchedResToGroupMessagesOutput = (
@@ -141,24 +143,21 @@ export const fetchUsernameOfMembers = async (
   });
 
   if (undefinedProfiles?.length) {
-    const undefinedProfilesB64 = undefinedProfiles.map((undefinedProfile) =>
-      serializeHash(undefinedProfile)
-    );
-    const res = await callZome({
+    // const undefinedProfilesB64 = undefinedProfiles.map((undefinedProfile) =>
+    //   serializeHash(undefinedProfile)
+    // );
+    const res: [] = await callZome({
       zomeName: ZOMES.PROFILES,
       fnName: FUNCTIONS[ZOMES.PROFILES].GET_AGENTS_PROFILES,
-      payload: undefinedProfilesB64,
+      payload: undefinedProfiles,
     });
-    res.forEach((agentProfile: AgentProfile) => {
-      let id = serializeHash(agentProfile.agentPubKey);
+    res.forEach((rec: any) => {
+      const raw = decode(getEntryFromRecord(rec)) as ProfileRaw;
+      let id = serializeHash(rec.signed_action.Create.author);
       membersUsernames[id] = {
         id,
-        username: agentProfile.profile.nickname,
-        fields: agentProfile.profile.fields.avatar
-          ? {
-              avatar: agentProfile.profile.fields.avatar,
-            }
-          : {},
+        username: raw.nickname,
+        fields: raw.fields.avatar ? { avatar: raw.fields.avatar } : {},
       };
     });
   }

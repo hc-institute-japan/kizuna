@@ -28,23 +28,19 @@ const searchProfiles =
        */
 
       const filteredMappedProfiles: Profile[] = res
-        .map((v: any) => decode(getEntryFromRecord(res)) as ProfileRaw)
-        .filter(
-          (res: ProfileRaw) =>
-            !Object.keys(contacts).includes(serializeHash(res.agentPubKey)) &&
-            serializeHash(res.agentPubKey) !== id
-        )
-        .map((v: AgentProfile) => {
-          return {
-            id: serializeHash(v.agentPubKey),
-            username: v.profile.nickname,
-            fields: v.profile.fields.avatar
-              ? {
-                  avatar: binaryToUrl(v.profile.fields.avatar),
-                }
-              : {},
+        .map((rec: any) => {
+          const raw = decode(getEntryFromRecord(rec)) as ProfileRaw;
+          const profile = {
+            id: serializeHash(rec.signed_action.Create.author),
+            username: raw.nickname,
+            fields: raw.fields.avatar ? { avatar: raw.fields.avatar } : {},
           };
-        });
+          return profile;
+        })
+        .filter(
+          (res: Profile) =>
+            !Object.keys(contacts).includes(res.id) && res.id !== id
+        );
       // console.log(filteredMappedProfiles);
       return filteredMappedProfiles;
     } catch (e) {}

@@ -3,10 +3,12 @@ import {
   ZOMES,
 } from "../../../utils/services/HolochainService/types";
 import { pushError } from "../../error/actions";
-import { AgentProfile, Profile } from "../../profile/types";
+import { Profile, ProfileRaw } from "../../profile/types";
 import { ThunkAction } from "../../types";
 import { ContactOutput, SET_BLOCKED } from "../types";
 import { serializeHash } from "@holochain-open-dev/core-types";
+import { getEntryFromRecord } from "../../../utils/services/HolochainService";
+import { decode } from "@msgpack/msgpack";
 
 const fetchBlocked =
   (): ThunkAction =>
@@ -20,20 +22,19 @@ const fetchBlocked =
 
       let blocked: { [key: string]: Profile } = {};
       try {
-        const profilesOutput = await callZome({
+        const res: [] = await callZome({
           zomeName: ZOMES.PROFILES,
           fnName: FUNCTIONS[ZOMES.PROFILES].GET_AGENTS_PROFILES,
           payload: idsB64,
         });
 
-        profilesOutput.forEach((agentProfile: AgentProfile) => {
-          const id = serializeHash(agentProfile.agentPubKey);
+        res.forEach((rec: any) => {
+          const raw = decode(getEntryFromRecord(rec)) as ProfileRaw;
+          const id = serializeHash(rec.signed_action.Create.author);
           blocked[id] = {
             id,
-            username: agentProfile.profile.nickname,
-            fields: agentProfile.profile.fields.avatar
-              ? { avatar: agentProfile.profile.fields.avatar }
-              : {},
+            username: raw.nickname,
+            fields: raw.fields.avatar ? { avatar: raw.fields.avatar } : {},
           };
         });
         dispatch({
