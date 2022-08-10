@@ -1,84 +1,147 @@
-import { HolochainClient, HoloClient } from "@holochain-open-dev/cell-client";
 import {
-  AdminWebsocket,
+  // AdminWebsocket,
   AgentPubKey,
   AppSignalCb,
-  CellId,
+  // CellId,
+  // RoleId,
+  AppWebsocket,
 } from "@holochain/client";
 import { store } from "../../../containers/ReduxContainer";
 import { handleSignal } from "../../../redux/signal/actions";
 import { CallZomeConfig } from "../../../redux/types";
+import WebSdk from "@holo-host/web-sdk";
+
 // @ts-ignore
-global.COMB = undefined;
+// global.COMB = undefined;
 // @ts-ignore
-window.COMB = require("@holo-host/comb").COMB;
+// window.COMB = require("@holo-host/comb").COMB;
+window.WebSdk = WebSdk;
 
 // CONSTANTS
-export const ENV: "HCDEV" | "HC" | "HCC" | "HOLO" = process.env
+export const ENV: "HCDEV" | "HC" | "HOLODEV" | "HOLO" = process.env
   .REACT_APP_ENV as any;
 
+export const HOLO_DEV_SERVER_PORT = process.env.HOLO_DEV_SERVER_PORT;
+
 export const appId = (): string | undefined => {
-  if (ENV === "HC" || ENV === "HCDEV") {
-    return "kizuna";
-  } else if (ENV === "HCC") {
-    return "uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL";
-  } else if (ENV === "HOLO") {
-    return undefined;
+  switch (ENV) {
+    case "HC":
+    case "HCDEV":
+      return "kizuna";
+    case "HOLODEV":
+      return "uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL";
+    case "HOLO":
+    default:
+      return undefined;
   }
+  // if (ENV === "HC" || ENV === "HCDEV") {
+  //   return "kizuna";
+  // } else if (ENV === "HOLODEV") {
+  //   return "uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL";
+  // } else if (ENV === "HOLO") {
+  //   return undefined;
+  // }
 };
 
 export const appUrl = () => {
+  switch (ENV) {
+    case "HC":
+      return `ws://localhost:8888`;
+    case "HCDEV":
+      return process.env.REACT_APP_DNA_INTERFACE_URL;
+    case "HOLO":
+      return "https://devnet-chaperone.holo.host";
+    case "HOLODEV":
+      return `http://localhost:${process.env.REACT_APP_CHAPERONE_PORT}`;
+    default:
+      return null;
+  }
   // for launcher
-  if (ENV === "HC") return `ws://localhost:8888`;
-  else if (ENV === "HCDEV") return process.env.REACT_APP_DNA_INTERFACE_URL;
-  else if (ENV === "HCC")
-    return `http://localhost:${process.env.REACT_APP_CHAPERONE_PORT}`;
-  else if (ENV === "HOLO") return "https://devnet-chaperone.holo.host";
-  else return null;
+  // if (ENV === "HC") return `ws://localhost:8888`;
+  // else if (ENV === "HCDEV") return process.env.REACT_APP_DNA_INTERFACE_URL;
+  // else if (ENV === "HOLODEV")
+  //   return `http://localhost:${process.env.REACT_APP_CHAPERONE_PORT}`;
+  // else if (ENV === "HOLO") return "https://devnet-chaperone.holo.host";
+  // else return null;
 };
 
-export const isHoloEnv = () => {
-  return ENV === "HCC" || ENV === "HOLO";
+export let client: any;
+// export let client: null | HolochainClient | HoloClient = null;
+// export let adminWs: AdminWebsocket | null = null;
+
+let myAgentId: AgentPubKey | null;
+
+let signalHandler: AppSignalCb = (signal: any) => {
+  console.log("signal payload", signal);
+  return store?.dispatch(handleSignal(signal.data.name, signal.data.payload));
 };
 
-export let client: null | HolochainClient | HoloClient = null;
-export let adminWs: AdminWebsocket | null = null;
+const sleep = (ms: any) => new Promise((resolve) => setTimeout(resolve, ms));
 
-let signalHandler: AppSignalCb = (signal) =>
-  store?.dispatch(
-    handleSignal(signal.data.payload.name, signal.data.payload.payload)
-  );
+// REDUX
 
 const createClient = async (
   env: string
-): Promise<HoloClient | HolochainClient | null> => {
+  // ): Promise<HoloClient | HolochainClient | AppWebsocket | null> => {
+): Promise<any> => {
   switch (env) {
     case "HOLO":
-    case "HCC": {
+    case "HOLODEV":
       const branding = {
-        logo_url: "assets/icon/kizuna_logo.png",
-        app_name: "Kizuna Messaging App",
-        skip_registration: true,
+        logoUrl: "assets/icon/kizuna_logo.png",
+        appName: "Kizuna Messaging App",
+        requireRegistrationCode: false,
       };
 
-      const client: HoloClient = await HoloClient.connect(
-        appUrl()!,
-        appId()!,
+      /* CELL-CLIENT 0.5.3
+      client = await HoloClient.connect(
+        "http://127.0.0.1:" + HOLO_DEV_SERVER_PORT,
+        "kizuna-messaging-app",
         branding
       );
+      */
 
-      client.addSignalHandler(signalHandler);
+      const holoclient = await WebSdk.connect({
+        chaperoneUrl: appUrl(),
+        authFormCustomization: branding,
+      });
 
-      await client.signIn();
+      holoclient.on("agent-state", (agent_state: any) => {
+        myAgentId = agent_state.id;
+      });
 
-      return client;
-    }
+      holoclient.on("signal", (payload: any) => signalHandler(payload));
+
+      while (!holoclient.agent.isAvailable) {
+        await sleep(50);
+      }
+
+      if (holoclient.agent.isAnonymous) await holoclient.signIn();
+
+      // while (holoclient.agent.isAnonymous || !holoclient.agent.isAvailable) {
+      //   await sleep(50);
+      // }
+
+      return holoclient;
     case "HCDEV":
-    case "HC": {
-      const client: HolochainClient = await HolochainClient.connect(
-        appUrl() as string,
-        appId() as string
-      );
+    case "HC":
+      console.log("creating client for holochain");
+
+      // TODO: WHEN THIS CODE BLOCK GETS COMMENTED IN WE GET THE IFRAME IS UNDEFINED ERROR
+
+      // CELL-CLIENT 0.5.3
+      // const hcclient: HolochainClient = await HolochainClient.connect(
+      //   appUrl() as string,
+      //   appId() as string
+      // );
+      // const hcclient = new HolochainClient(appWebSocket);
+
+      // HOLOCHAIN/CLIENT
+      // const hcclient: any = await AppWebsocket.connect(
+      //   appUrl() as string,
+      //   30000,
+      //   signalHandler
+      // );
 
       // if (!adminWs) {
       //   adminWs = await AdminWebsocket.connect(adminUrl()!, 60000);
@@ -86,14 +149,12 @@ const createClient = async (
       //     console.log("admin websocket closed");
       //   });
       // }
+      // hcclient.addSignalHandler(signalHandler);
 
-      client.addSignalHandler(signalHandler);
-
-      return client;
-    }
-    default: {
+      // return hcclient;
       return null;
-    }
+    default:
+      return null;
   }
 };
 
@@ -108,8 +169,6 @@ export const init: () => any = async () => {
     throw error;
   }
 };
-
-let myAgentId: AgentPubKey | null;
 
 /* DO NOT USE THIS AS IT IS BUT INSTEAD USE THE getAgentId() ACTION FROM PROFILE INSTEAD */
 export const getAgentId: () => Promise<AgentPubKey | null> = async () => {
@@ -138,7 +197,7 @@ export const retry: (config: CallZomeConfig) => Promise<any> = async (
   await init();
 
   const {
-    cellId = await getLobbyCellId(),
+    // cellId = await getLobbyCellId(),
     zomeName,
     fnName,
     payload = null,
@@ -151,7 +210,7 @@ export const retry: (config: CallZomeConfig) => Promise<any> = async (
   while (callFailed && retryCount < max_retries) {
     try {
       return await client?.callZome(
-        cellId!,
+        // cellId!,
         zomeName,
         fnName,
         payload,
@@ -218,23 +277,41 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
 ) => {
   await init();
   const {
-    cellId = await getLobbyCellId(), // by default get the lobby cell Id.
+    // calling getLobbyCellId() results in getMyProfile error (unclear error yet)
+    // cellId = await getLobbyCellId(), // by default get the lobby cell Id.
     zomeName,
     fnName,
     // provenance = info?.cell_data[0].cell_id[1],
     payload = null,
   } = config;
   try {
-    return await client?.callZome(
-      cellId!, // expecting cell id to be non-nullable.
-      zomeName,
-      fnName,
-      payload,
-      process.env.REACT_APP_ENV === "HC" ||
-        process.env.REACT_APP_ENV === "HCDEV"
-        ? 60000
-        : undefined
-    );
+    switch (ENV) {
+      case "HOLO":
+      case "HOLODEV":
+        const holores = await client?.zomeCall({
+          roleId: "kizuna-lobby",
+          zomeName: zomeName,
+          fnName: fnName,
+          payload: payload,
+        });
+        console.log("res", holores);
+        return holores.data;
+      case "HC":
+      case "HCDEV":
+        const hcres = await client?.callZome(
+          // cellId!, // expecting cell id to be non-nullable.
+          null,
+          undefined,
+          zomeName,
+          fnName,
+          payload,
+          process.env.REACT_APP_ENV === "HC" ||
+            process.env.REACT_APP_ENV === "HCDEV"
+            ? 60000
+            : undefined
+        );
+        return hcres;
+    }
   } catch (e) {
     console.log(
       "zome call has failed in zome: ",
@@ -277,7 +354,7 @@ export const callZome: (config: CallZomeConfig) => Promise<any> = async (
 };
 
 // only for lobby
-export const getLobbyCellId = async (): Promise<CellId | undefined> => {
-  await init();
-  return client?.cellDataByRoleId("kizuna-lobby")?.cell_id;
-};
+// export const getLobbyCellId = async (): Promise<CellId | undefined> => {
+//   await init();
+//   return client?.cellDataByRoleId("kizuna-lobby")?.cell_id;
+// };

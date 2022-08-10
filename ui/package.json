@@ -7,10 +7,9 @@
     "@capacitor/ios": "^2.4.5",
     "@holo-host/chaperone": "^9.0.0",
     "@holo-host/identicon": "git+https://github.com/holo-host/identicon.git#types",
-    "@holo-host/web-sdk": "^0.5.3",
-    "@holochain-open-dev/cell-client": "^0.3.2",
+    "@holo-host/web-sdk": "^0.6.6-prerelease",
     "@holochain-open-dev/core-types": "^0.1.1",
-    "@holochain/client": "^0.3.2",
+    "@holochain/client": "^0.4.3",
     "@ionic-native/core": "^5.31.1",
     "@ionic-native/file": "^5.31.1",
     "@ionic-native/file-transfer": "^5.31.1",
@@ -43,7 +42,7 @@
     "react-redux": "^7.2.2",
     "react-router": "^5.1.2",
     "react-router-dom": "^5.1.2",
-    "react-scripts": "^4.0.1",
+    "react-scripts": "4.0.3",
     "redux": "^4.0.5",
     "redux-logger": "^3.0.6",
     "redux-thunk": "^2.3.0",
@@ -75,13 +74,16 @@
     "demo:charlie": "concurrently \"HC_PORT=8899 APP_ID=kizuna npm run start:holochain\" \"ENV=HCDEV DNA_INTERFACE=ws://localhost:8899 UI_PORT=8300 npm run start:ui\"",
     "demo:david": "concurrently \"HC_PORT=8999 APP_ID=kizuna npm run start:holochain\" \"ENV=HCDEV DNA_INTERFACE=ws://localhost:8999 UI_PORT=8400 npm run start:ui\"",
     "demo-rmt-prxy": "concurrently \"npm run start:hc-prxy\" \"ENV=HCDEV DNA_INTERFACE=ws://localhost:8888 UI_PORT=8100 npm run start:ui\"",
-    "start-holo-alice": "concurrently -k \"npm:chaperone-alice\" \"ADMIN_PORT=9000 APP_ID=uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL HC_PORT=8888 npm run start:holo\"  \"ENV=HCC CHAPERONE_PORT=24273 UI_PORT=8100 npm run start:ui\"",
+    "start-holo-alice": "concurrently -k \"npm:chaperone-alice\" \"ADMIN_PORT=9000 APP_ID=uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL HC_PORT=8888 npm run start:holo\"  \"ENV=HCC CHAPERONE_PORT=24274 UI_PORT=8100 npm run start:ui\"",
     "start-holo-bob": "concurrently -k \"npm:chaperone-bob\" \"ADMIN_PORT=9001 APP_ID=uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL HC_PORT=8889 npm run start:holo\"  \"ENV=HCC CHAPERONE_PORT=24274 UI_PORT=8200 npm run start:ui\"",
     "start-holo-charlie": "concurrently -k \"npm:chaperone-charlie\" \"ADMIN_PORT=9002 APP_ID=uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL HC_PORT=8890 npm run start:holo\"  \"ENV=HCC CHAPERONE_PORT=24275 UI_PORT=8300 npm run start:ui\"",
     "start-holo": "concurrently -k \"npm:start-holo-alice\" \"npm:start-holo-bob\"  \"npm:start-holo-charlie\"",
     "chaperone-alice": "npx chaperone-server --config ./src/chaperone/alice.json",
     "chaperone-bob": "npx chaperone-server --config ./src/chaperone/bob.json",
     "chaperone-charlie": "npx chaperone-server --config ./src/chaperone/charlie.json",
+    "start-holo-dev-server-alice": "concurrently -k \"ENV=HOLODEV CHAPERONE_PORT=24274 UI_PORT=8100 npm run start:ui\"",
+    "start-holo-dev-server-bobby": "concurrently -k \"ENV=HOLODEV CHAPERONE_PORT=24274 UI_PORT=8200 npm run start:ui\"",
+    "start-holo-dev-server-charlie": "concurrently -k \"ENV=HOLODEV CHAPERONE_PORT=24274 UI_PORT=8300 npm run start:ui\"",
     "ios": "npx cap sync ios && npx cap copy ios && npx cap open ios",
     "code:check": "yarn code:lint; yarn code:format --check",
     "code:clean": "yarn code:lint --fix; yarn code:format --write",
@@ -92,18 +94,11 @@
   "eslintConfig": {
     "extends": "react-app"
   },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not op_mini all"
+  ],
   "devDependencies": {
     "@capacitor/cli": "2.4.5",
     "@ionic/core": "^5.5.4",

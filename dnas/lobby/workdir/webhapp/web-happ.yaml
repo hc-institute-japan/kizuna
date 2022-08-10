@@ -2,6 +2,6 @@
 manifest_version: "1"
 name: kizuna
 ui:
-  bundled: "./kizuna-ui.zip"
+  bundled: "./path/to/my/ui.zip"
 happ_manifest:
-  bundled: "../happ/kizuna.happ"
+  bundled: "./path/to/my/happ-bundle.happ"

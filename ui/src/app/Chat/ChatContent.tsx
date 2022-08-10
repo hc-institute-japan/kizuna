@@ -68,11 +68,9 @@ const Chat: React.FC = () => {
   });
   const conversant = useSelector((state: RootState) => {
     const contacts = state.contacts.contacts;
-    console.log("contacts state is ", contacts);
     const conversant = Object.values(contacts).filter(
       (contact) => contact.id === id
     );
-    console.log("conversant from state is ", conversant);
     return conversant[0];
   });
   const { readReceipt, typingIndicator } = useSelector(
@@ -421,7 +419,6 @@ const Chat: React.FC = () => {
       dispatch(getFileBytes([payload.fileHash!]));
     }
 
-    console.log("p2p conversant is ", conversant, "and author is ", author);
     return conversant.id !== author.id ? (
       <Me
         id={messageBundle.message.p2pMessageEntryHash}

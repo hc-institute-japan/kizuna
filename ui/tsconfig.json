@@ -22,6 +22,6 @@
     "downlevelIteration": true
   },
   "include": [
-    "src"
+    "src", "decs.d.ts"
   ]
 }
