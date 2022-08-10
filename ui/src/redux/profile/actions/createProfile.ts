@@ -1,10 +1,12 @@
 import { serializeHash } from "@holochain-open-dev/core-types";
-import { binaryToUrl } from "../../../utils/services/ConversionService";
+import {
+  binaryToUrl,
+  getEntryFromRecord,
+} from "../../../utils/services/ConversionService";
 import {
   FUNCTIONS,
   ZOMES,
 } from "../../../utils/services/HolochainService/types";
-import { getEntryFromRecord } from "../../../utils/services/HolochainService";
 import { pushError } from "../../error/actions";
 import { ThunkAction } from "../../types";
 import { ProfileActionTypes, ProfileRaw, SET_PROFILE } from "../types";

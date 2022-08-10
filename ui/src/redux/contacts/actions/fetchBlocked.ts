@@ -7,7 +7,7 @@ import { Profile, ProfileRaw } from "../../profile/types";
 import { ThunkAction } from "../../types";
 import { ContactOutput, SET_BLOCKED } from "../types";
 import { serializeHash } from "@holochain-open-dev/core-types";
-import { getEntryFromRecord } from "../../../utils/services/HolochainService";
+import { getEntryFromRecord } from "../../../utils/services/ConversionService";
 import { decode } from "@msgpack/msgpack";
 
 const fetchBlocked =

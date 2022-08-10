@@ -1,4 +1,7 @@
-import { binaryToUrl } from "../../../utils/services/ConversionService";
+import {
+  binaryToUrl,
+  getEntryFromRecord,
+} from "../../../utils/services/ConversionService";
 import {
   FUNCTIONS,
   ZOMES,
@@ -7,7 +10,6 @@ import { serializeHash } from "@holochain-open-dev/core-types";
 import { ThunkAction } from "../../types";
 import { Profile, ProfileRaw } from "../types";
 import { decode } from "@msgpack/msgpack";
-import { getEntryFromRecord } from "../../../utils/services/HolochainService";
 
 const searchProfiles =
   (nicknamePrefix: string): ThunkAction =>

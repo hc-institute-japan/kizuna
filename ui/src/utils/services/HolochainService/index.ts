@@ -109,7 +109,7 @@ export const init: () => any = async () => {
   }
 };
 
-export const getEntryFromRecord = (record: any) => record.entry.Present.entry;
+// export const getEntryFromRecord = (record: any) => record.entry.Present.entry;
 
 let myAgentId: AgentPubKey | null;
 

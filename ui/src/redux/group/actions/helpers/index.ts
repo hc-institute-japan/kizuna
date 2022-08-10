@@ -7,6 +7,7 @@ import {
 import {
   deserializeAgentPubKey,
   objectMap,
+  getEntryFromRecord,
 } from "../../../../utils/services/ConversionService";
 import { timestampToDate } from "../../../../utils/services/DateService";
 
@@ -26,7 +27,6 @@ import {
   MessagesByGroup,
 } from "../../types";
 import { decode } from "@msgpack/msgpack";
-import { getEntryFromRecord } from "../../../../utils/services/HolochainService";
 
 // helper function
 export const convertFetchedResToGroupMessagesOutput = (

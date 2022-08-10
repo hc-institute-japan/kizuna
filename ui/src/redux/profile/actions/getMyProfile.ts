@@ -1,7 +1,9 @@
 import { serializeHash } from "@holochain-open-dev/core-types";
 import { decode } from "@msgpack/msgpack";
-import { binaryToUrl } from "../../../utils/services/ConversionService";
-import { getEntryFromRecord } from "../../../utils/services/HolochainService";
+import {
+  binaryToUrl,
+  getEntryFromRecord,
+} from "../../../utils/services/ConversionService";
 import {
   FUNCTIONS,
   ZOMES,
@@ -12,13 +14,18 @@ import { ProfileActionTypes, ProfileRaw, SET_PROFILE } from "../types";
 const getMyProfile =
   (): ThunkAction =>
   async (dispatch, getState, { callZome, getAgentId }) => {
+    console.log("calling get my profile");
     try {
       const res = await callZome({
         zomeName: ZOMES.PROFILES,
         fnName: FUNCTIONS[ZOMES.PROFILES].GET_MY_PROFILE,
       });
 
-      const myAgentIdB64 = getState().profile.id!;
+      const myAgentIdB64 = getState().profile.id!; // find another source for this
+      const id = serializeHash(res.signed_action.Create.author);
+
+      console.log("myAgentId", id);
+
       if (res) {
         const profileRaw = decode(getEntryFromRecord(res)) as ProfileRaw;
         dispatch<ProfileActionTypes>({
