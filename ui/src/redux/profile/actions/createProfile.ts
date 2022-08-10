@@ -4,9 +4,11 @@ import {
   FUNCTIONS,
   ZOMES,
 } from "../../../utils/services/HolochainService/types";
+import { getEntryFromRecord } from "../../../utils/services/HolochainService";
 import { pushError } from "../../error/actions";
 import { ThunkAction } from "../../types";
-import { ProfileActionTypes, SET_PROFILE } from "../types";
+import { ProfileActionTypes, ProfileRaw, SET_PROFILE } from "../types";
+import { decode } from "@msgpack/msgpack";
 
 const createProfile =
   (nickname: string, image: Uint8Array | null): ThunkAction =>
@@ -30,10 +32,11 @@ const createProfile =
         fnName: FUNCTIONS[ZOMES.PROFILES].CREATE_PROFILE,
         payload,
       });
+      const profileRaw = decode(getEntryFromRecord(res)) as ProfileRaw;
       dispatch<ProfileActionTypes>({
         type: SET_PROFILE,
         id: myAgentIdB64,
-        nickname: res.profile.nickname,
+        nickname: profileRaw.nickname,
         fields: image ? { avatar: binaryToUrl(serializeHash(image)) } : {},
       });
       return res;

@@ -91,8 +91,8 @@ export const pinMessage =
             }
             // remove hash from pinned
             if (currentState.pinned[messageHash]) {
-              const {[messageHash]: _, ...newPinned} = currentState.pinned
-              currentState.pinned = {...newPinned}
+              const { [messageHash]: _, ...newPinned } = currentState.pinned;
+              currentState.pinned = { ...newPinned };
             }
           }
         }

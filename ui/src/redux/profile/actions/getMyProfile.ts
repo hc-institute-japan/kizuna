@@ -1,11 +1,13 @@
 import { serializeHash } from "@holochain-open-dev/core-types";
+import { decode } from "@msgpack/msgpack";
 import { binaryToUrl } from "../../../utils/services/ConversionService";
+import { getEntryFromRecord } from "../../../utils/services/HolochainService";
 import {
   FUNCTIONS,
   ZOMES,
 } from "../../../utils/services/HolochainService/types";
 import { ThunkAction } from "../../types";
-import { ProfileActionTypes, SET_PROFILE } from "../types";
+import { ProfileActionTypes, ProfileRaw, SET_PROFILE } from "../types";
 
 const getMyProfile =
   (): ThunkAction =>
@@ -15,18 +17,17 @@ const getMyProfile =
         zomeName: ZOMES.PROFILES,
         fnName: FUNCTIONS[ZOMES.PROFILES].GET_MY_PROFILE,
       });
-      // const myAgentId = await getAgentId();
-      // /* assume that getAgentId() is non-nullable */
-      // const myAgentIdB64 = serializeHash(myAgentId!);
+
       const myAgentIdB64 = getState().profile.id!;
       if (res) {
+        const profileRaw = decode(getEntryFromRecord(res)) as ProfileRaw;
         dispatch<ProfileActionTypes>({
           type: SET_PROFILE,
-          nickname: res.profile.nickname,
+          nickname: profileRaw.nickname,
           id: myAgentIdB64,
-          fields: res.profile.fields.avatar
+          fields: profileRaw.fields.avatar
             ? {
-                avatar: binaryToUrl(res.profile.fields.avatar),
+                avatar: binaryToUrl(profileRaw.fields.avatar),
               }
             : {},
         });

@@ -20,7 +20,7 @@ const removeContact =
         payload: [deserializeHash(profile.id)],
       });
 
-      const {[profile.id]: _, ...newContacts} = contacts;
+      const { [profile.id]: _, ...newContacts } = contacts;
       dispatch({ type: SET_CONTACTS, contacts: newContacts });
       return true;
     } catch (e) {

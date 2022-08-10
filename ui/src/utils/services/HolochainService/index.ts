@@ -109,6 +109,8 @@ export const init: () => any = async () => {
   }
 };
 
+export const getEntryFromRecord = (record: any) => record.entry.Present.entry;
+
 let myAgentId: AgentPubKey | null;
 
 /* DO NOT USE THIS AS IT IS BUT INSTEAD USE THE getAgentId() ACTION FROM PROFILE INSTEAD */
