@@ -1,4 +1,4 @@
-use hdi::prelude::*;
+use holochain_deterministic_integrity::prelude::*;
 
 use group_integrity_types::Group;
 use crate::utils::*;

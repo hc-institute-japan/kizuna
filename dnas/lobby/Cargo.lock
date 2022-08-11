@@ -582,7 +582,7 @@ dependencies = [
  "group_coordinator_types",
  "group_integrity",
  "group_integrity_types",
- "hdk 0.0.142",
+ "hdk 0.0.138",
  "serde",
 ]
 
@@ -592,7 +592,7 @@ version = "0.0.1"
 dependencies = [
  "derive_more",
  "group_integrity_types",
- "hdk 0.0.142",
+ "hdk 0.0.138",
  "serde",
 ]
 
@@ -602,7 +602,7 @@ version = "0.0.1"
 dependencies = [
  "derive_more",
  "group_integrity_types",
- "hdi",
+ "holochain_deterministic_integrity",
  "serde",
 ]
 
@@ -611,7 +611,7 @@ name = "group_integrity_types"
 version = "0.0.1"
 dependencies = [
  "derive_more",
- "hdi",
+ "holochain_deterministic_integrity",
  "serde",
 ]
 

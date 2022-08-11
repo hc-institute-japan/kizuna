@@ -6,7 +6,6 @@ use group_integrity::LinkTypes;
 use group_integrity_types::{FileMetadata, FileType, GroupFileBytes, GroupMessage, Payload};
 
 pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<GroupMessageWithId> {
-    let zome_info = zome_info()?;
     let payload = match message_input.payload_input.clone() {
         PayloadInput::Text { payload } => Payload::Text { payload },
         PayloadInput::File {
@@ -15,11 +14,10 @@ pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<Gr
             file_bytes,
         } => {
             let group_file_bytes = GroupFileBytes(file_bytes);
-            // create_entry(&group_file_bytes)?;
             host_call::<CreateInput, ActionHash>(
                 __create,
                 CreateInput::new(
-                    EntryDefLocation::app(zome_info.id, 2), // TODO: is there no way to not hardcode this?
+                    EntryDefLocation::app(2), // TODO: is there no way to not hardcode this?
                     EntryVisibility::Public,
                     Entry::App(group_file_bytes.clone().try_into()?),
                     ChainTopOrdering::Relaxed,
@@ -72,7 +70,7 @@ pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<Gr
     host_call::<CreateInput, ActionHash>(
         __create,
         CreateInput::new(
-            EntryDefLocation::app(zome_info.id, 1), // TODO: Find a way to not hardcode this
+            EntryDefLocation::app(1), // TODO: Find a way to not hardcode this
             EntryVisibility::Public,
             Entry::App(message.clone().try_into()?),
             ChainTopOrdering::Relaxed,

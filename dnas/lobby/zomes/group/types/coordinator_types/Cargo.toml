@@ -15,4 +15,4 @@ derive_more = "0"
 serde = "1"
 
 group_integrity_types = {path = "../integrity_types"}
-hdk = "0.0.142"
+hdk = "0.0.138"

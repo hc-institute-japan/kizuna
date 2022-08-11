@@ -1,4 +1,4 @@
-use hdi::prelude::*;
+use holochain_deterministic_integrity::prelude::*;
 /**
  * Structs and related types for group entries
  */

@@ -17,4 +17,4 @@ serde = "1"
 group_integrity = {path = "../integrity"}
 group_integrity_types = {path = "../types/integrity_types"}
 group_coordinator_types = {path = "../types/coordinator_types"}
-hdk = "0.0.142"
+hdk = "0.0.138"
