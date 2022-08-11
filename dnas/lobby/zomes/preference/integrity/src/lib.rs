@@ -1,4 +1,4 @@
-use hdi::prelude::*;
+use holochain_deterministic_integrity::prelude::*;
 use preference_integrity_types::*;
 
 #[hdk_entry_defs]
