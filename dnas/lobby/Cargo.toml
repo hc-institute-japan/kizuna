@@ -12,7 +12,8 @@ members = [
 
     "zomes/profiles/integrity",
     "zomes/profiles/coordinator",
-    "zomes/profiles/types",
+    "zomes/profiles/types/integrity_types",
+    "zomes/profiles/types/coordinator_types",
 
     "zomes/aggregator/coordinator",
     
