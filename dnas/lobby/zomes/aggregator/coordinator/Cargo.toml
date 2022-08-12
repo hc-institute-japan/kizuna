@@ -12,8 +12,7 @@ crate-type = [ "cdylib", "rlib" ]
 [dependencies]
 derive_more = "0"
 serde = "1"
-hdk = {version = "0.0.142", features = ["encoding"]}
-
+hdk = {version = "0.0.138", features = ["encoding"]}
 
 contacts_coordinator_types = { path = "../../contacts/types/coordinator_types" }
 
@@ -24,4 +23,5 @@ preference_integrity_types = { path = "../../preference/types/integrity_types" }
 
 p2pmessage_coordinator_types = { path = "../../p2pmessage/types/coordinator_types" }
 
-profiles_types = { path = "../../profiles/types/" }
+hc_zome_profiles_integrity_types = { path = "../../profiles/types/integrity_types" }
+hc_zome_profiles_coordinator_types = { path = "../../profiles/types/coordinator_types" }
