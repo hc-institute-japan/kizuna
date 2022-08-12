@@ -1,0 +1,16 @@
+[package]
+name = "hc_zome_profiles_coordinator_types"
+description = "types declaration for profiles"
+version = "0.0.1"
+authors = [ "hcij" ]
+edition = "2018"
+
+[lib]
+name = "hc_zome_profiles_coordinator_types"
+crate-type = [ "cdylib", "rlib" ]
+
+[dependencies]
+derive_more = "0"
+serde = "1"
+hdk = "0.0.138"
+hc_zome_profiles_coordinator_types = {git = "https://github.com/tatssato/profiles", rev = "619589b6b1a84a6fc3d24bdfb34f39ee86a90d0f"}
