@@ -60,7 +60,8 @@ pub fn get_messages_by_group_by_timestamp_handler(
             all_read_list.insert(link.target.clone().to_string(), HashMap::new());
             Ok(GetLinksInput::new(
                 link.target.into(),
-                LinkTypes::GroupMessageToAgent.try_into_filter()?,
+                // LinkTypes::GroupMessageToAgent.try_into_filter()?,
+                LinkType(5).into(), // TODO: do not hardcode
                 Some(LinkTag::new("read".to_owned())),
             ))
         })

@@ -18,12 +18,12 @@ pub enum EntryTypes {
 
 #[hdk_link_types]
 pub enum LinkTypes {
-    GroupHashTimestampPath,
-    TimestampPathToGroupMessage,
-    GroupToGroupMessage,
-    GroupPath,
-    AgentToGroup,
-    GroupMessageToAgent,
+    GroupHashTimestampPath,         // 0
+    TimestampPathToGroupMessage,    // 1
+    GroupToGroupMessage,            // 2
+    GroupPath,                      // 3
+    AgentToGroup,                   // 4
+    GroupMessageToAgent,            // 5
 }
 
 #[hdk_extern]

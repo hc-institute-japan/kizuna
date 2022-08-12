@@ -167,7 +167,8 @@ pub fn collect_and_insert_read_list(
             all_read_list.insert(eh.clone().to_string(), HashMap::new());
             Ok(GetLinksInput::new(
                 eh.into(),
-                LinkTypes::GroupMessageToAgent.try_into_filter()?,
+                // LinkTypes::GroupMessageToAgent.try_into_filter()?,
+                LinkType(5).into(), // TODO: do not hardcode
                 Some(LinkTag::new("read".to_owned())),
             ))
         })

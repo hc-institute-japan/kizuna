@@ -84,14 +84,16 @@ pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<Gr
         LinkTypes::GroupHashTimestampPath,
     )?
     .path_entry_hash()?;
-    let scoped_link_type: ScopedLinkType = LinkTypes::TimestampPathToGroupMessage.try_into()?;
+    // let scoped_link_type: ScopedLinkType = LinkTypes::TimestampPathToGroupMessage.try_into()?;
+    let link_type: LinkType = LinkTypes::TimestampPathToGroupMessage.try_into()?;
     host_call::<CreateLinkInput, ActionHash>(
         __create_link,
         CreateLinkInput::new(
             group_hash_timestamp_path_hash.into(),
             hash_entry(&message)?.into(),
-            scoped_link_type.zome_id,
-            scoped_link_type.zome_type,
+            // scoped_link_type.zome_id,
+            // scoped_link_type.zome_type,
+            link_type,
             LinkTag::new(match message.payload.clone() {
                 Payload::Text { payload: _ } => "text".to_owned(),
                 Payload::File {

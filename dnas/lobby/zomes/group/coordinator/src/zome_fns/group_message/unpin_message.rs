@@ -5,7 +5,8 @@ use hdk::prelude::*;
 pub fn unpin_message_handler(pin_detail: PinDetail) -> ExternResult<()> {
     let mut links = get_links(
         pin_detail.group_hash.clone(),
-        LinkTypes::GroupToGroupMessage.try_into_filter()?,
+        // LinkTypes::GroupToGroupMessage.try_into_filter()?,
+        LinkTypeRange::from(LinkType::try_from(LinkTypes::GroupToGroupMessage)?),
         Some(LinkTag::new("pinned".to_owned())),
     )?;
 
