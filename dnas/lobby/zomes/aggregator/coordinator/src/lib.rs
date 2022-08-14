@@ -32,7 +32,7 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
     /* contacts */
     let blocked_contacts_call_response: ZomeCallResponse = call(
         CallTargetCell::Local,
-        "contacts",
+        "contacts_coordinator",
         "list_blocked".into(),
         None,
         &(),
@@ -45,7 +45,7 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
 
     let blocked_profiles_call_response: ZomeCallResponse = call(
         CallTargetCell::Local,
-        "profiles",
+        "profiles_coordinator",
         "get_agents_profile".into(),
         None,
         &blocked_contacts,
@@ -56,7 +56,7 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
 
     let added_contacts_call_response: ZomeCallResponse = call(
         CallTargetCell::Local,
-        "contacts",
+        "contacts_coordinator",
         "list_added".into(),
         None,
         &(),
@@ -70,7 +70,7 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
 
     let added_profiles_call_response: ZomeCallResponse = call(
         CallTargetCell::Local,
-        "profiles",
+        "profiles_coordinator",
         "get_agents_profile".into(),
         None,
         &added_contacts,
@@ -81,7 +81,7 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
     /* profiles */
     let user_info_call_response: ZomeCallResponse = call(
         CallTargetCell::Local,
-        "profiles",
+        "profiles_coordinator",
         "get_my_profile".into(),
         None,
         &(),
@@ -96,7 +96,7 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
     let mut group_member_keys: Vec<AgentPubKey> = Vec::new(); // agentPubKeys of members
     let groups_call_response: ZomeCallResponse = call(
         CallTargetCell::Local,
-        "group",
+        "group_coordinator",
         "get_all_my_groups".into(),
         None,
         &(),
@@ -115,7 +115,7 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
 
     let member_profiles_call_response: ZomeCallResponse = call(
         CallTargetCell::Local,
-        "profiles",
+        "profiles_coordinator",
         "get_agents_profile".into(),
         None,
         &group_member_keys,
@@ -125,7 +125,7 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
 
     let latest_group_messages_call_response: ZomeCallResponse = call(
         CallTargetCell::Local,
-        "group",
+        "group_coordinator",
         "get_latest_messages_for_all_groups".into(),
         None,
         &batch_size,
@@ -136,7 +136,7 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
     /* p2pmessage */
     let latest_p2p_messages_call_response: ZomeCallResponse = call(
         CallTargetCell::Local,
-        "p2pmessage",
+        "p2pmessage_coordinator",
         "get_latest_messages".into(),
         None,
         &batch_size,
@@ -147,7 +147,7 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
     /* preference */
     let global_preference_call_response: ZomeCallResponse = call(
         CallTargetCell::Local,
-        "preference",
+        "preference_coordinator",
         "get_preference".into(),
         None,
         &(),
@@ -157,7 +157,7 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
 
     let per_agent_preference_call_response: ZomeCallResponse = call(
         CallTargetCell::Local,
-        "preference",
+        "preference_coordinator",
         "get_per_agent_preference".into(),
         None,
         &(),
@@ -167,7 +167,7 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
 
     let per_group_preference_call_response: ZomeCallResponse = call(
         CallTargetCell::Local,
-        "preference",
+        "preference_coordinator",
         "get_per_group_preference".into(),
         None,
         &(),

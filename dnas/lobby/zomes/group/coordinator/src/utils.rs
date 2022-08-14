@@ -4,7 +4,7 @@ use std::borrow::Cow;
 
 pub(crate) fn get_my_blocked_list() -> ExternResult<Vec<AgentPubKey>> {
     //call list_blocked() to contacts zome
-    let zome_name: ZomeName = ZomeName(Cow::Borrowed("contacts"));
+    let zome_name: ZomeName = ZomeName(Cow::Borrowed("contacts_coordinator"));
     let function_name: FunctionName = FunctionName("list_blocked".to_owned());
 
     let my_blocked_list_call_response: ZomeCallResponse = call(
