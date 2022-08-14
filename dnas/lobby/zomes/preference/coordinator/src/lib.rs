@@ -2,9 +2,9 @@ use hdk::prelude::*;
 
 mod handlers;
 
+use preference_coordinator_types::*;
 use preference_integrity::*;
 use preference_integrity_types::*;
-use preference_coordinator_types::*;
 
 pub fn error<T>(reason: &str) -> ExternResult<T> {
     Err(wasm_error!(WasmErrorInner::Guest(String::from(reason))))

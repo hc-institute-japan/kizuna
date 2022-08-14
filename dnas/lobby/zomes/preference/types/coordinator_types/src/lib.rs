@@ -21,7 +21,7 @@ pub struct PerGroupPreferenceIO {
     pub read_receipt: Option<Vec<String>>,
 }
 
-pub enum QueryTarget{
+pub enum QueryTarget {
     Preference,
     AgentPreference,
     GroupPreference,

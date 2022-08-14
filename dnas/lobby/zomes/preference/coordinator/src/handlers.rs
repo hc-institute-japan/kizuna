@@ -1,8 +1,8 @@
 use hdk::prelude::*;
 
+use preference_coordinator_types::*;
 use preference_integrity::*;
 use preference_integrity_types::*;
-use preference_coordinator_types::*;
 
 pub(crate) fn fetch_preference() -> ExternResult<(SignedActionHashed, Preference)> {
     let filter: QueryFilter = filter_for(QueryTarget::Preference, true)?;
@@ -13,10 +13,12 @@ pub(crate) fn fetch_preference() -> ExternResult<(SignedActionHashed, Preference
         //this unwrap is safe here, we check first the value on the condition above
         let record = query_result.get(0).unwrap();
 
-        let record_entry_result: Result<Option<Preference>, SerializedBytesError> = record.entry().to_app_option();
+        let record_entry_result: Result<Option<Preference>, SerializedBytesError> =
+            record.entry().to_app_option();
         match record_entry_result {
             Ok(record_entry) => {
-                let record_signed_action_hashed: SignedActionHashed = record.signed_action().to_owned();
+                let record_signed_action_hashed: SignedActionHashed =
+                    record.signed_action().to_owned();
 
                 match record_entry {
                     Some(preference_entry) => {
@@ -24,8 +26,8 @@ pub(crate) fn fetch_preference() -> ExternResult<(SignedActionHashed, Preference
                     }
                     None => (),
                 }
-            },
-            Err(_e) => return crate::error("no entry found for global preference")
+            }
+            Err(_e) => return crate::error("no entry found for global preference"),
         }
     }
     crate::error("no entry found for global preference")
@@ -77,10 +79,12 @@ pub(crate) fn fetch_per_agent_preference() -> ExternResult<(SignedActionHashed, 
         //this unwrap is safe here, we check first the value on the condition above
         let record = query_result.get(0).unwrap();
 
-        let record_entry_result: Result<Option<PerAgentPreference>, SerializedBytesError> = record.entry().to_app_option();
+        let record_entry_result: Result<Option<PerAgentPreference>, SerializedBytesError> =
+            record.entry().to_app_option();
         match record_entry_result {
             Ok(record_entry) => {
-                let record_signed_action_hashed: SignedActionHashed = record.signed_action().to_owned();
+                let record_signed_action_hashed: SignedActionHashed =
+                    record.signed_action().to_owned();
 
                 match record_entry {
                     Some(per_agent_preference_entry) => {
@@ -88,8 +92,8 @@ pub(crate) fn fetch_per_agent_preference() -> ExternResult<(SignedActionHashed, 
                     }
                     None => (),
                 }
-            },
-            Err(_e) => return crate::error("no entry found for global preference")
+            }
+            Err(_e) => return crate::error("no entry found for global preference"),
         }
     }
     crate::error("no entry found for global preference.")
@@ -148,10 +152,12 @@ pub(crate) fn fetch_per_group_preference() -> ExternResult<(SignedActionHashed, 
         //this unwrap is safe here, we check first the value on the condition above
         let record = query_result.get(0).unwrap();
 
-        let record_entry_result: Result<Option<PerGroupPreference>, SerializedBytesError> = record.entry().to_app_option();
+        let record_entry_result: Result<Option<PerGroupPreference>, SerializedBytesError> =
+            record.entry().to_app_option();
         match record_entry_result {
             Ok(record_entry) => {
-                let record_signed_action_hashed: SignedActionHashed = record.signed_action().to_owned();
+                let record_signed_action_hashed: SignedActionHashed =
+                    record.signed_action().to_owned();
 
                 match record_entry {
                     Some(per_group_preference_entry) => {
@@ -159,10 +165,9 @@ pub(crate) fn fetch_per_group_preference() -> ExternResult<(SignedActionHashed, 
                     }
                     None => (),
                 }
-            },
-            Err(_e) => return crate::error("no entry found for global preference")
+            }
+            Err(_e) => return crate::error("no entry found for global preference"),
         }
-           
     }
 
     crate::error("no entry found for global preference.")
