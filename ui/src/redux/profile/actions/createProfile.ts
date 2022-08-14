@@ -14,14 +14,14 @@ import { decode } from "@msgpack/msgpack";
 
 const createProfile =
   (nickname: string, image: Uint8Array | null): ThunkAction =>
-    async (dispatch, getState, { callZome, getAgentId }) => {
-      try {
-        // const myAgentId = await getAgentId();
-        // /* assume that getAgentId() is non-nullable */
-        const myAgentIdB64 = getState().profile.id!;
+  async (dispatch, getState, { callZome, getAgentId }) => {
+    try {
+      // const myAgentId = await getAgentId();
+      // /* assume that getAgentId() is non-nullable */
+      const myAgentIdB64 = getState().profile.id!;
 
-        const payload = image
-          ? {
+      const payload = image
+        ? {
             nickname,
             fields: {
               avatar: serializeHash(image),

@@ -12,31 +12,31 @@ import { ProfileActionTypes, ProfileRaw, SET_PROFILE } from "../types";
 
 const getMyProfile =
   (): ThunkAction =>
-    async (dispatch, getState, { callZome, getAgentId }) => {
-      console.log("calling get my profile");
-      try {
-        const res = await callZome({
-          zomeName: ZOMES.PROFILES,
-          fnName: FUNCTIONS[ZOMES.PROFILES].GET_MY_PROFILE,
-        });
+  async (dispatch, getState, { callZome, getAgentId }) => {
+    console.log("calling get my profile");
+    try {
+      const res = await callZome({
+        zomeName: ZOMES.PROFILES,
+        fnName: FUNCTIONS[ZOMES.PROFILES].GET_MY_PROFILE,
+      });
 
-        const myAgentIdB64 = getState().profile.id!; // find another source for this
-        if (res) {
-          const profileRaw = decode(getEntryFromRecord(res)) as ProfileRaw;
-          dispatch<ProfileActionTypes>({
-            type: SET_PROFILE,
-            nickname: profileRaw.nickname,
-            id: myAgentIdB64,
-            fields: profileRaw.fields.avatar
-              ? {
+      const myAgentIdB64 = getState().profile.id!; // find another source for this
+      if (res) {
+        const profileRaw = decode(getEntryFromRecord(res)) as ProfileRaw;
+        dispatch<ProfileActionTypes>({
+          type: SET_PROFILE,
+          nickname: profileRaw.nickname,
+          id: myAgentIdB64,
+          fields: profileRaw.fields.avatar
+            ? {
                 avatar: binaryToUrl(profileRaw.fields.avatar),
               }
-              : {},
-          });
-        }
-        return true;
-      } catch (e) { }
-      return false;
-    };
+            : {},
+        });
+      }
+      return true;
+    } catch (e) {}
+    return false;
+  };
 
 export default getMyProfile;
