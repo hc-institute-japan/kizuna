@@ -48,7 +48,9 @@ export const getLatestData =
       ) as ProfileRaw;
       dispatch<ProfileActionTypes>({
         type: SET_PROFILE,
-        id: serializeHash(latestData.userInfo.signed_action.Create.author),
+        id: serializeHash(
+          latestData.userInfo.signed_action.hashed.content.author
+        ),
         nickname: userInfoProfileRaw.nickname,
         fields: userInfoProfileRaw.fields.avatar
           ? { avatar: binaryToUrl(userInfoProfileRaw.fields.avatar) }
@@ -59,7 +61,7 @@ export const getLatestData =
       let blocked: { [key: string]: Profile } = {};
       latestData.addedProfiles.forEach((rec: any) => {
         const raw = decode(getEntryFromRecord(rec)) as ProfileRaw;
-        const id = serializeHash(rec.signed_action.Create.author);
+        const id = serializeHash(rec.signed_action.hashed.content.author);
         contacts[id] = {
           id,
           username: raw.nickname,
@@ -72,7 +74,7 @@ export const getLatestData =
       if (latestData.blockedProfiles)
         latestData.blockedProfiles.forEach((rec: any) => {
           const raw = decode(getEntryFromRecord(rec)) as ProfileRaw;
-          const id = serializeHash(rec.signed_action.Create.author);
+          const id = serializeHash(rec.signed_action.hashed.content.author);
           blocked[id] = {
             id,
             username: raw.nickname,
@@ -121,7 +123,7 @@ export const getLatestData =
       const groupMembers: Profile[] = latestData.memberProfiles.map(
         (rec: any): Profile => {
           const raw = decode(getEntryFromRecord(rec)) as ProfileRaw;
-          const id = serializeHash(rec.signed_action.Create.author);
+          const id = serializeHash(rec.signed_action.hashed.content.author);
           return {
             id,
             username: raw.nickname,

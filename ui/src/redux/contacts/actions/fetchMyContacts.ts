@@ -28,7 +28,7 @@ const fetchMyContacts =
         });
         res.forEach((rec: any) => {
           const raw = decode(getEntryFromRecord(rec)) as ProfileRaw;
-          const id = serializeHash(rec.signed_action.Create.author);
+          const id = serializeHash(rec.signed_action.hashed.content.author);
           contacts[id] = {
             id,
             username: raw.nickname,

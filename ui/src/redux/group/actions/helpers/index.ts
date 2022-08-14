@@ -153,7 +153,7 @@ export const fetchUsernameOfMembers = async (
     });
     res.forEach((rec: any) => {
       const raw = decode(getEntryFromRecord(rec)) as ProfileRaw;
-      let id = serializeHash(rec.signed_action.Create.author);
+      let id = serializeHash(rec.signed_action.hashed.content.author);
       membersUsernames[id] = {
         id,
         username: raw.nickname,

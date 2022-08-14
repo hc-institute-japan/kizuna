@@ -33,7 +33,7 @@ const searchProfiles =
         .map((rec: any) => {
           const raw = decode(getEntryFromRecord(rec)) as ProfileRaw;
           const profile = {
-            id: serializeHash(rec.signed_action.Create.author),
+            id: serializeHash(rec.signed_action.hashed.content.author),
             username: raw.nickname,
             fields: raw.fields.avatar ? { avatar: raw.fields.avatar } : {},
           };
