@@ -1,3 +1,4 @@
+import { deserializeHash } from "@holochain-open-dev/core-types";
 import {
   FUNCTIONS,
   ZOMES,
@@ -16,7 +17,7 @@ const addContact =
       await callZome({
         zomeName: ZOMES.CONTACTS,
         fnName: FUNCTIONS[ZOMES.CONTACTS].ADD_CONTACTS,
-        payload: [profile.id],
+        payload: [deserializeHash(profile.id)],
       });
 
       contacts[profile.id] = profile;

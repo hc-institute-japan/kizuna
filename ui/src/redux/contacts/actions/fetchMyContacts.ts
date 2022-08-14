@@ -17,7 +17,7 @@ const fetchMyContacts =
         zomeName: ZOMES.CONTACTS,
         fnName: FUNCTIONS[ZOMES.CONTACTS].LIST_ADDED,
       });
-      const ids = contactOuputs.map((contact) => serializeHash(contact.id));
+      const ids = contactOuputs.map((contact) => contact.id);
 
       let contacts: { [key: string]: Profile } = {};
       try {
