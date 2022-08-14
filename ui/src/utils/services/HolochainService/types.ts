@@ -16,12 +16,12 @@ interface SignalNameType {
 
 export const ZOMES: ZomeNameType = {
   USERNAME: "username",
-  PROFILES: "profiles",
-  PREFERENCE: "preference",
-  P2PMESSAGE: "p2pmessage",
-  CONTACTS: "contacts",
-  GROUP: "group",
-  AGGREGATOR: "aggregator",
+  PROFILES: "profiles_coordinator",
+  PREFERENCE: "preference_coordinator",
+  P2PMESSAGE: "p2pmessage_coordinator",
+  CONTACTS: "contacts_coordinator",
+  GROUP: "group_coordinator",
+  AGGREGATOR: "aggregator_coordinator",
 };
 export const SIGNALS: SignalNameType = {
   [ZOMES.GROUP]: {

@@ -1,8 +1,7 @@
-use holochain_deterministic_integrity::prelude::*;
+#[allow(dead_code)]
+use crate::utils::{try_from_entry, try_from_record};
 use group_integrity_types::Group;
-use crate::{
-    utils::{try_from_record, try_from_entry},
-};
+use holochain_deterministic_integrity::prelude::*;
 
 // TODO: implement unit test
 /**
