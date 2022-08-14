@@ -12,5 +12,5 @@ crate-type = [ "cdylib", "rlib" ]
 derive_more = "0"
 serde = "1"
 
-hdk = {version = "0.0.142", features = ["encoding"]}
-hc_p2pmessage_coordinator_types = {git = "https://github.com/hc-institute-japan/p2pmessage-zome", branch = "hdk-0.0.145", package = "p2pmessage_coordinator_types"}
+hdk = {version = "0.0.138", features = ["encoding"]}
+hc_p2pmessage_coordinator_types = {git = "https://github.com/hc-institute-japan/p2pmessage-zome", branch = "hdk-0.0.138", package = "p2pmessage_coordinator_types"}

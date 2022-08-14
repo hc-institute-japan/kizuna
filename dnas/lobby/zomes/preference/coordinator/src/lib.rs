@@ -12,17 +12,17 @@ pub fn error<T>(reason: &str) -> ExternResult<T> {
 
 #[hdk_extern]
 fn init(_: ()) -> ExternResult<InitCallbackResult> {
-    create_entry(&EntryTypes::Preference(Preference {
+    create_entry(EntryTypes::Preference(Preference {
         typing_indicator: true,
         read_receipt: true,
     }))?;
 
-    create_entry(&EntryTypes::PerAgentPreference(PerAgentPreference {
+    create_entry(EntryTypes::PerAgentPreference(PerAgentPreference {
         typing_indicator: Vec::new(),
         read_receipt: Vec::new(),
     }))?;
 
-    create_entry(&EntryTypes::PerGroupPreference(PerGroupPreference {
+    create_entry(EntryTypes::PerGroupPreference(PerGroupPreference {
         typing_indicator: Vec::new(),
         read_receipt: Vec::new(),
     }))?;

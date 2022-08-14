@@ -1,7 +1,8 @@
-use hdi::prelude::*;
+#[allow(dead_code)]
+use holochain_deterministic_integrity::prelude::*;
 
-use group_integrity_types::Group;
 use crate::utils::*;
+use group_integrity_types::Group;
 
 // implement unit test
 /**
@@ -13,10 +14,7 @@ use crate::utils::*;
  * members field cannot include the creator's key
 */
 
-pub fn store_group_record(
-    record: Record,
-    update: Update,
-) -> ExternResult<ValidateCallbackResult> {
+pub fn store_group_record(record: Record, update: Update) -> ExternResult<ValidateCallbackResult> {
     let updated_group_entry: Group = try_from_record(record.clone())?;
 
     // This is the action address used to update this Group. May or may not be the correct action(create).

@@ -15,4 +15,4 @@ derive_more = "0"
 serde = "1"
 
 preference_integrity_types = {path = "../types/integrity_types"}
-hdi = "0.0.14"
+holochain_deterministic_integrity = "=0.0.10"

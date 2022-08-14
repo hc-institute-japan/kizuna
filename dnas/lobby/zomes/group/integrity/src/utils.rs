@@ -1,4 +1,4 @@
-use hdi::prelude::*;
+use holochain_deterministic_integrity::prelude::*;
 
 pub fn error<T>(reason: &str) -> ExternResult<T> {
     Err(wasm_error!(WasmErrorInner::Guest(String::from(reason))))

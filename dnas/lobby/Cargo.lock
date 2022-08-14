@@ -25,10 +25,11 @@ dependencies = [
  "derive_more",
  "group_coordinator_types",
  "group_integrity_types",
+ "hc_zome_profiles_coordinator_types 0.0.1",
+ "hc_zome_profiles_integrity_types 0.0.1",
  "hdk",
  "p2pmessage_coordinator_types 0.0.1",
  "preference_integrity_types",
- "profiles_types",
  "serde",
 ]
 
@@ -183,7 +184,7 @@ checksum = "245097e9a4535ee1e3e3931fcfcd55a796a44c643e8596ff6566d68f09b87bbc"
 name = "contacts_coordinator"
 version = "0.0.1"
 dependencies = [
- "contacts_coordinator 0.0.1 (git+https://github.com/holochain-open-dev/contacts?branch=hdk-0.0.145)",
+ "contacts_coordinator 0.0.1 (git+https://github.com/holochain-open-dev/contacts?branch=hdk-0.0.138)",
  "derive_more",
  "hdk",
  "serde",
@@ -192,11 +193,11 @@ dependencies = [
 [[package]]
 name = "contacts_coordinator"
 version = "0.0.1"
-source = "git+https://github.com/holochain-open-dev/contacts?branch=hdk-0.0.145#a7356ef2e2f99336468ff968271db7c7a32428f7"
+source = "git+https://github.com/holochain-open-dev/contacts?branch=hdk-0.0.138#b4dcd0d459e9046f6ce9a338cf21f2df5c05bd5c"
 dependencies = [
- "contacts_coordinator_types 0.0.1 (git+https://github.com/holochain-open-dev/contacts?branch=hdk-0.0.145)",
- "contacts_integrity 0.0.1 (git+https://github.com/holochain-open-dev/contacts?branch=hdk-0.0.145)",
- "contacts_integrity_types 0.0.1 (git+https://github.com/holochain-open-dev/contacts?branch=hdk-0.0.145)",
+ "contacts_coordinator_types 0.0.1 (git+https://github.com/holochain-open-dev/contacts?branch=hdk-0.0.138)",
+ "contacts_integrity 0.0.1 (git+https://github.com/holochain-open-dev/contacts?branch=hdk-0.0.138)",
+ "contacts_integrity_types 0.0.1 (git+https://github.com/holochain-open-dev/contacts?branch=hdk-0.0.138)",
  "derive_more",
  "hdk",
  "serde",
@@ -206,7 +207,7 @@ dependencies = [
 name = "contacts_coordinator_types"
 version = "0.0.1"
 dependencies = [
- "contacts_coordinator_types 0.0.1 (git+https://github.com/holochain-open-dev/contacts?branch=hdk-0.0.145)",
+ "contacts_coordinator_types 0.0.1 (git+https://github.com/holochain-open-dev/contacts?branch=hdk-0.0.138)",
  "derive_more",
  "hdk",
  "serde",
@@ -215,9 +216,9 @@ dependencies = [
 [[package]]
 name = "contacts_coordinator_types"
 version = "0.0.1"
-source = "git+https://github.com/holochain-open-dev/contacts?branch=hdk-0.0.145#a7356ef2e2f99336468ff968271db7c7a32428f7"
+source = "git+https://github.com/holochain-open-dev/contacts?branch=hdk-0.0.138#b4dcd0d459e9046f6ce9a338cf21f2df5c05bd5c"
 dependencies = [
- "contacts_integrity_types 0.0.1 (git+https://github.com/holochain-open-dev/contacts?branch=hdk-0.0.145)",
+ "contacts_integrity_types 0.0.1 (git+https://github.com/holochain-open-dev/contacts?branch=hdk-0.0.138)",
  "derive_more",
  "hdk",
  "serde",
@@ -227,20 +228,20 @@ dependencies = [
 name = "contacts_integrity"
 version = "0.0.1"
 dependencies = [
- "contacts_integrity 0.0.1 (git+https://github.com/holochain-open-dev/contacts?branch=hdk-0.0.145)",
+ "contacts_integrity 0.0.1 (git+https://github.com/holochain-open-dev/contacts?branch=hdk-0.0.138)",
  "derive_more",
- "hdi",
+ "holochain_deterministic_integrity",
  "serde",
 ]
 
 [[package]]
 name = "contacts_integrity"
 version = "0.0.1"
-source = "git+https://github.com/holochain-open-dev/contacts?branch=hdk-0.0.145#a7356ef2e2f99336468ff968271db7c7a32428f7"
+source = "git+https://github.com/holochain-open-dev/contacts?branch=hdk-0.0.138#b4dcd0d459e9046f6ce9a338cf21f2df5c05bd5c"
 dependencies = [
- "contacts_integrity_types 0.0.1 (git+https://github.com/holochain-open-dev/contacts?branch=hdk-0.0.145)",
+ "contacts_integrity_types 0.0.1 (git+https://github.com/holochain-open-dev/contacts?branch=hdk-0.0.138)",
  "derive_more",
- "hdi",
+ "holochain_deterministic_integrity",
  "serde",
 ]
 
@@ -248,19 +249,19 @@ dependencies = [
 name = "contacts_integrity_types"
 version = "0.0.1"
 dependencies = [
- "contacts_integrity_types 0.0.1 (git+https://github.com/holochain-open-dev/contacts?branch=hdk-0.0.145)",
+ "contacts_integrity_types 0.0.1 (git+https://github.com/holochain-open-dev/contacts?branch=hdk-0.0.138)",
  "derive_more",
- "hdi",
+ "holochain_deterministic_integrity",
  "serde",
 ]
 
 [[package]]
 name = "contacts_integrity_types"
 version = "0.0.1"
-source = "git+https://github.com/holochain-open-dev/contacts?branch=hdk-0.0.145#a7356ef2e2f99336468ff968271db7c7a32428f7"
+source = "git+https://github.com/holochain-open-dev/contacts?branch=hdk-0.0.138#b4dcd0d459e9046f6ce9a338cf21f2df5c05bd5c"
 dependencies = [
  "derive_more",
- "hdi",
+ "holochain_deterministic_integrity",
  "serde",
 ]
 
@@ -602,7 +603,7 @@ version = "0.0.1"
 dependencies = [
  "derive_more",
  "group_integrity_types",
- "hdi",
+ "holochain_deterministic_integrity",
  "serde",
 ]
 
@@ -611,7 +612,7 @@ name = "group_integrity_types"
 version = "0.0.1"
 dependencies = [
  "derive_more",
- "hdi",
+ "holochain_deterministic_integrity",
  "serde",
 ]
 
@@ -636,63 +637,76 @@ dependencies = [
 [[package]]
 name = "hc_zome_profiles_coordinator"
 version = "0.0.1"
-source = "git+https://github.com/holochain-open-dev/profiles?rev=72f411561beeec350c77441d655a24618847068d#72f411561beeec350c77441d655a24618847068d"
+source = "git+https://github.com/tatssato/profiles?rev=619589b6b1a84a6fc3d24bdfb34f39ee86a90d0f#619589b6b1a84a6fc3d24bdfb34f39ee86a90d0f"
 dependencies = [
  "derive_more",
+ "hc_zome_profiles_coordinator_types 0.0.1 (git+https://github.com/tatssato/profiles?rev=619589b6b1a84a6fc3d24bdfb34f39ee86a90d0f)",
  "hc_zome_profiles_integrity",
- "hc_zome_profiles_types",
+ "hc_zome_profiles_integrity_types 0.0.1 (git+https://github.com/tatssato/profiles?rev=619589b6b1a84a6fc3d24bdfb34f39ee86a90d0f)",
  "hdk",
+ "serde",
+]
+
+[[package]]
+name = "hc_zome_profiles_coordinator_types"
+version = "0.0.1"
+dependencies = [
+ "derive_more",
+ "hc_zome_profiles_coordinator_types 0.0.1 (git+https://github.com/tatssato/profiles?rev=619589b6b1a84a6fc3d24bdfb34f39ee86a90d0f)",
+ "hdk",
+ "serde",
+]
+
+[[package]]
+name = "hc_zome_profiles_coordinator_types"
+version = "0.0.1"
+source = "git+https://github.com/tatssato/profiles?rev=619589b6b1a84a6fc3d24bdfb34f39ee86a90d0f#619589b6b1a84a6fc3d24bdfb34f39ee86a90d0f"
+dependencies = [
+ "derive_more",
  "serde",
 ]
 
 [[package]]
 name = "hc_zome_profiles_integrity"
 version = "0.0.1"
-source = "git+https://github.com/holochain-open-dev/profiles?rev=72f411561beeec350c77441d655a24618847068d#72f411561beeec350c77441d655a24618847068d"
+source = "git+https://github.com/tatssato/profiles?rev=619589b6b1a84a6fc3d24bdfb34f39ee86a90d0f#619589b6b1a84a6fc3d24bdfb34f39ee86a90d0f"
 dependencies = [
  "derive_more",
- "hc_zome_profiles_types",
- "hdi",
+ "hc_zome_profiles_integrity_types 0.0.1 (git+https://github.com/tatssato/profiles?rev=619589b6b1a84a6fc3d24bdfb34f39ee86a90d0f)",
+ "holochain_deterministic_integrity",
  "serde",
 ]
 
 [[package]]
-name = "hc_zome_profiles_types"
+name = "hc_zome_profiles_integrity_types"
 version = "0.0.1"
-source = "git+https://github.com/holochain-open-dev/profiles?rev=72f411561beeec350c77441d655a24618847068d#72f411561beeec350c77441d655a24618847068d"
 dependencies = [
  "derive_more",
- "hdi",
+ "hc_zome_profiles_integrity_types 0.0.1 (git+https://github.com/tatssato/profiles?rev=619589b6b1a84a6fc3d24bdfb34f39ee86a90d0f)",
+ "holochain_deterministic_integrity",
  "serde",
 ]
 
 [[package]]
-name = "hdi"
-version = "0.0.14"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7fe4766117a038486b2b287e4f2ed549d28e1f2c3931da9ec2972eaf108b843b"
+name = "hc_zome_profiles_integrity_types"
+version = "0.0.1"
+source = "git+https://github.com/tatssato/profiles?rev=619589b6b1a84a6fc3d24bdfb34f39ee86a90d0f#619589b6b1a84a6fc3d24bdfb34f39ee86a90d0f"
 dependencies = [
- "hdk_derive",
- "holo_hash",
- "holochain_integrity_types",
- "holochain_wasmer_guest",
- "paste",
+ "derive_more",
+ "holochain_deterministic_integrity",
  "serde",
- "serde_bytes",
- "tracing",
- "tracing-core",
 ]
 
 [[package]]
 name = "hdk"
-version = "0.0.142"
+version = "0.0.138"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3a3b6572cdee6ff8cae9aecff42c759c2db9f6e148a242d34546905bed2a4214"
+checksum = "187ae183ddd5cd381a6f2a0c4a9dbe9048fbdbff4fc72316f69d927d5c3e0b32"
 dependencies = [
  "getrandom",
- "hdi",
  "hdk_derive",
  "holo_hash",
+ "holochain_deterministic_integrity",
  "holochain_wasmer_guest",
  "holochain_zome_types",
  "paste",
@@ -705,9 +719,9 @@ dependencies = [
 
 [[package]]
 name = "hdk_derive"
-version = "0.0.41"
+version = "0.0.37"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1b935438549aa521a0a5349448114e32ac3fb786606c804d2ee18570349483b2"
+checksum = "81ebeefd67938656e6fc9482f552d3e5526af8ff82714d6041c1f46dbce602e6"
 dependencies = [
  "darling 0.14.1",
  "heck",
@@ -736,9 +750,9 @@ dependencies = [
 
 [[package]]
 name = "holo_hash"
-version = "0.0.30"
+version = "0.0.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "75be53c89cbd03f6c06643e5947ebe88986228ba66243bc62ae869ccac32da3e"
+checksum = "dabbace9f53558b8e858701e78733f47c78e4ef5bfb052aebafa323214192de2"
 dependencies = [
  "base64",
  "blake2b_simd",
@@ -751,10 +765,27 @@ dependencies = [
 ]
 
 [[package]]
-name = "holochain_integrity_types"
-version = "0.0.12"
+name = "holochain_deterministic_integrity"
+version = "0.0.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a94f20b08e52475648aa76a80bb70a288936f4b93de6f21417461807f3089bef"
+checksum = "a05da70e7054c69825250c6fde4fd9681def1f00557b79e9ef1968df6c11fcd3"
+dependencies = [
+ "hdk_derive",
+ "holo_hash",
+ "holochain_integrity_types",
+ "holochain_wasmer_guest",
+ "paste",
+ "serde",
+ "serde_bytes",
+ "tracing",
+ "tracing-core",
+]
+
+[[package]]
+name = "holochain_integrity_types"
+version = "0.0.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "4bd76c76feb26c255f0886da841c69c005ebf0d6f50deba4520b272fcce0c720"
 dependencies = [
  "holo_hash",
  "holochain_serialized_bytes",
@@ -819,9 +850,9 @@ dependencies = [
 
 [[package]]
 name = "holochain_zome_types"
-version = "0.0.41"
+version = "0.0.37"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "87bc55a6a914db9cfb1432e37fb38a141d3c98b00272db0c42b7403c2efb3e38"
+checksum = "0ec72c24d61eb81d562aea4db82573976e0c21c0fbf3dba6676b40614ef79fa9"
 dependencies = [
  "holo_hash",
  "holochain_integrity_types",
@@ -892,9 +923,9 @@ dependencies = [
 
 [[package]]
 name = "kitsune_p2p_dht_arc"
-version = "0.0.13"
+version = "0.0.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ecc1c9795a4d49f469c273d5a3637fdfb53cd0316ed03e55faf6a79a4751e828"
+checksum = "57c515a2482bf7aaa67e8b2ba478aef332c27369e5a747f4c487a66dbce1e273"
 dependencies = [
  "derive_more",
  "gcollections",
@@ -905,12 +936,11 @@ dependencies = [
 
 [[package]]
 name = "kitsune_p2p_timestamp"
-version = "0.0.11"
+version = "0.0.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c6dac98e0bcb576db4a728937210f9211839a644d7d6843263ceef62a583c47f"
+checksum = "3de953329d6030118db10584dd982cfa37bfe8e9c6c14f8387b7973d4c5639b1"
 dependencies = [
  "chrono",
- "derive_more",
  "serde",
 ]
 
@@ -1083,20 +1113,20 @@ version = "0.0.1"
 dependencies = [
  "derive_more",
  "hdk",
- "p2pmessage_coordinator 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.145)",
+ "p2pmessage_coordinator 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.138)",
  "serde",
 ]
 
 [[package]]
 name = "p2pmessage_coordinator"
 version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.145#f15601552683120387c148870c6d0851284a237e"
+source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.138#3430d7435e895f88f8259b8c007fcc8e5cf52bce"
 dependencies = [
  "derive_more",
  "hdk",
- "p2pmessage_coordinator_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.145)",
- "p2pmessage_integrity 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.145)",
- "p2pmessage_integrity_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.145)",
+ "p2pmessage_coordinator_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.138)",
+ "p2pmessage_integrity 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.138)",
+ "p2pmessage_integrity_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.138)",
  "serde",
 ]
 
@@ -1106,18 +1136,18 @@ version = "0.0.1"
 dependencies = [
  "derive_more",
  "hdk",
- "p2pmessage_coordinator_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.145)",
+ "p2pmessage_coordinator_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.138)",
  "serde",
 ]
 
 [[package]]
 name = "p2pmessage_coordinator_types"
 version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.145#f15601552683120387c148870c6d0851284a237e"
+source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.138#3430d7435e895f88f8259b8c007fcc8e5cf52bce"
 dependencies = [
  "derive_more",
  "hdk",
- "p2pmessage_integrity_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.145)",
+ "p2pmessage_integrity_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.138)",
  "serde",
 ]
 
@@ -1126,19 +1156,19 @@ name = "p2pmessage_integrity"
 version = "0.0.1"
 dependencies = [
  "derive_more",
- "hdi",
- "p2pmessage_integrity 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.145)",
+ "holochain_deterministic_integrity",
+ "p2pmessage_integrity 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.138)",
  "serde",
 ]
 
 [[package]]
 name = "p2pmessage_integrity"
 version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.145#f15601552683120387c148870c6d0851284a237e"
+source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.138#3430d7435e895f88f8259b8c007fcc8e5cf52bce"
 dependencies = [
  "derive_more",
- "hdi",
- "p2pmessage_integrity_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.145)",
+ "holochain_deterministic_integrity",
+ "p2pmessage_integrity_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.138)",
  "serde",
 ]
 
@@ -1147,18 +1177,18 @@ name = "p2pmessage_integrity_types"
 version = "0.0.1"
 dependencies = [
  "derive_more",
- "hdi",
- "p2pmessage_integrity_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.145)",
+ "holochain_deterministic_integrity",
+ "p2pmessage_integrity_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.138)",
  "serde",
 ]
 
 [[package]]
 name = "p2pmessage_integrity_types"
 version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.145#f15601552683120387c148870c6d0851284a237e"
+source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.138#3430d7435e895f88f8259b8c007fcc8e5cf52bce"
 dependencies = [
  "derive_more",
- "hdi",
+ "holochain_deterministic_integrity",
  "serde",
 ]
 
@@ -1226,7 +1256,7 @@ name = "preference_integrity"
 version = "0.0.1"
 dependencies = [
  "derive_more",
- "hdi",
+ "holochain_deterministic_integrity",
  "preference_integrity_types",
  "serde",
 ]
@@ -1236,7 +1266,7 @@ name = "preference_integrity_types"
 version = "0.0.1"
 dependencies = [
  "derive_more",
- "hdi",
+ "holochain_deterministic_integrity",
  "serde",
 ]
 
@@ -1289,17 +1319,7 @@ version = "0.0.1"
 dependencies = [
  "derive_more",
  "hc_zome_profiles_integrity",
- "hdi",
- "serde",
-]
-
-[[package]]
-name = "profiles_types"
-version = "0.0.1"
-dependencies = [
- "derive_more",
- "hc_zome_profiles_types",
- "hdi",
+ "holochain_deterministic_integrity",
  "serde",
 ]
 

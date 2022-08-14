@@ -1,4 +1,4 @@
-use hdi::prelude::*;
+use holochain_deterministic_integrity::prelude::*;
 
 // #[serde(rename_all = "camelCase")]
 #[derive(PartialEq, Clone)]

@@ -32,7 +32,7 @@ pub(crate) fn fetch_preference() -> ExternResult<(SignedActionHashed, Preference
 }
 
 fn create_preference(preference: Preference) -> ExternResult<Preference> {
-    match create_entry(&EntryTypes::Preference(preference.clone())) {
+    match create_entry(EntryTypes::Preference(preference.clone())) {
         Ok(_) => Ok(preference),
         Err(_) => crate::error("problems were encountered during creation of entry"),
     }
@@ -96,7 +96,7 @@ pub(crate) fn fetch_per_agent_preference() -> ExternResult<(SignedActionHashed, 
 }
 
 fn create_per_agent_preference(preference: PerAgentPreference) -> ExternResult<PerAgentPreference> {
-    match create_entry(&EntryTypes::PerAgentPreference(preference.clone())) {
+    match create_entry(EntryTypes::PerAgentPreference(preference.clone())) {
         Ok(_) => Ok(preference),
         Err(_) => crate::error("problems were encountered during creation of entry"),
     }
@@ -169,7 +169,7 @@ pub(crate) fn fetch_per_group_preference() -> ExternResult<(SignedActionHashed, 
 }
 
 fn create_per_group_preference(preference: PerGroupPreference) -> ExternResult<PerGroupPreference> {
-    match create_entry(&EntryTypes::PerGroupPreference(preference.clone())) {
+    match create_entry(EntryTypes::PerGroupPreference(preference.clone())) {
         Ok(_) => Ok(preference),
         Err(_) => crate::error("problems were encountered during creation of entry"),
     }
@@ -224,7 +224,7 @@ fn filter_for(query_target: QueryTarget, include_entries: bool) -> ExternResult<
     let query_filter: QueryFilter = QueryFilter::new()
         .entry_type(EntryType::App(AppEntryType::new(
             EntryDefIndex::from(entry_index),
-            zome_info()?.id,
+            // zome_info()?.id,
             EntryVisibility::Private,
         )))
         .include_entries(include_entries);

@@ -1,4 +1,4 @@
-use group_integrity::LinkTypes;
+// use group_integrity::LinkTypes;
 use hdk::prelude::*;
 
 use group_coordinator_types::group::{GroupOutput, UpdateMembersIO};
@@ -47,7 +47,8 @@ pub fn remove_members_handler(
         .map(|member| {
             Ok(GetLinksInput::new(
                 member.into(),
-                LinkTypes::AgentToGroup.try_into_filter()?,
+                // LinkTypes::AgentToGroup.try_into_filter()?,
+                LinkType(4).into(), // TODO: do not hardcode
                 Some(LinkTag::new("member")),
             ))
         })
