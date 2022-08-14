@@ -46,7 +46,7 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
     let blocked_profiles_call_response: ZomeCallResponse = call(
         CallTargetCell::Local,
         "profiles_coordinator",
-        "get_agents_profile".into(),
+        "get_agents_profiles".into(),
         None,
         &blocked_contacts,
     )?;
@@ -71,7 +71,7 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
     let added_profiles_call_response: ZomeCallResponse = call(
         CallTargetCell::Local,
         "profiles_coordinator",
-        "get_agents_profile".into(),
+        "get_agents_profiles".into(),
         None,
         &added_contacts,
     )?;
@@ -116,7 +116,7 @@ fn retrieve_latest_data(_: ()) -> ExternResult<AggregatedLatestData> {
     let member_profiles_call_response: ZomeCallResponse = call(
         CallTargetCell::Local,
         "profiles_coordinator",
-        "get_agents_profile".into(),
+        "get_agents_profiles".into(),
         None,
         &group_member_keys,
     )?;
