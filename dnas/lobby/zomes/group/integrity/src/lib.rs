@@ -9,11 +9,11 @@ pub mod validations;
 #[unit_enum(UnitEntryTypes)]
 pub enum EntryTypes {
     #[entry_def(name = "group", visibility = "public")]
-    Group(Group),
+    Group(Group), // 10
     #[entry_def(name = "group_message", visibility = "public")]
-    GroupMessage(GroupMessage),
+    GroupMessage(GroupMessage), // 11
     #[entry_def(name = "group_file_bytes", visibility = "public")]
-    GroupFileBytes(GroupFileBytes),
+    GroupFileBytes(GroupFileBytes), // 12
 }
 
 #[hdk_link_types]

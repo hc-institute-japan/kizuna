@@ -72,7 +72,7 @@ fn post_commit(signed_actions: Vec<SignedActionHashed>) {
             Action::Create(create) => match create.clone().entry_type {
                 EntryType::App(app_entry_type) => match app_entry_type.id() {
                     // group message
-                    EntryDefIndex(2) => group_message_post_commit(create).unwrap(),
+                    EntryDefIndex(11) => group_message_post_commit(create).unwrap(),
                     _ => (),
                 },
                 _ => (),
