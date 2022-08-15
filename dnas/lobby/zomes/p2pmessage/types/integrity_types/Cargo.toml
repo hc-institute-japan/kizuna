@@ -13,4 +13,4 @@ derive_more = "0"
 serde = "1"
 
 holochain_deterministic_integrity = "=0.0.10"
-hc_p2pmessage_integrity_types = {git = "https://github.com/hc-institute-japan/p2pmessage-zome", branch = "hdk-0.0.138", package = "p2pmessage_integrity_types"}
+hc_p2pmessage_integrity_types = {git = "https://github.com/hc-institute-japan/p2pmessage-zome", rev = "89b87244987e2ae989300ff8eb8d27a2cd0d2fab", package = "p2pmessage_integrity_types"}
