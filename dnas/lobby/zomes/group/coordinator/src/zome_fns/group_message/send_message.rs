@@ -17,7 +17,7 @@ pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<Gr
             host_call::<CreateInput, ActionHash>(
                 __create,
                 CreateInput::new(
-                    EntryDefLocation::app(2), // TODO: is there no way to not hardcode this?
+                    EntryDefLocation::app(12), // TODO: is there no way to not hardcode this?
                     EntryVisibility::Public,
                     Entry::App(group_file_bytes.clone().try_into()?),
                     ChainTopOrdering::Relaxed,
@@ -70,7 +70,7 @@ pub fn send_message_handler(message_input: GroupMessageInput) -> ExternResult<Gr
     host_call::<CreateInput, ActionHash>(
         __create,
         CreateInput::new(
-            EntryDefLocation::app(1), // TODO: Find a way to not hardcode this
+            EntryDefLocation::app(11), // TODO: Find a way to not hardcode this
             EntryVisibility::Public,
             Entry::App(message.clone().try_into()?),
             ChainTopOrdering::Relaxed,
