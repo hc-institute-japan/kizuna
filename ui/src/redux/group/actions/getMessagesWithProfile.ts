@@ -29,7 +29,7 @@ const getMessagesWithProfile =
             },
       };
     });
-    console.log("these are the group messages", messageBundles);
+    // console.log("these are the group messages", messageBundles);
     // append error messages if there are any
     if (errMsgs[groupId]) {
       messageBundles = messageBundles.concat(errMsgs[groupId]);

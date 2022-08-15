@@ -50,31 +50,31 @@ export const convertFetchedResToGroupMessagesOutput = (
 
       return {
         groupMessageId: serializeHash(
-          msg_content.groupMessageElement.signedHeader.hashed.content.entry_hash
+          msg_content.groupMessageRecord.signedAction.hashed.content.entry_hash
         ),
-        groupId: serializeHash(msg_content.groupMessageElement.entry.groupHash),
-        author: serializeHash(msg_content.groupMessageElement.entry.sender),
-        payload: convertPayload(msg_content.groupMessageElement.entry.payload),
+        groupId: serializeHash(msg_content.groupMessageRecord.entry.groupHash),
+        author: serializeHash(msg_content.groupMessageRecord.entry.sender),
+        payload: convertPayload(msg_content.groupMessageRecord.entry.payload),
         timestamp: timestampToDate(
-          msg_content.groupMessageElement.entry.created
+          msg_content.groupMessageRecord.entry.created
         ),
-        replyTo: msg_content.groupMessageElement.entry.replyTo
+        replyTo: msg_content.groupMessageRecord.entry.replyTo
           ? {
               groupId: serializeHash(
-                msg_content.groupMessageElement.entry.replyTo.content.groupHash
+                msg_content.groupMessageRecord.entry.replyTo.content.groupHash
               ),
               author: serializeHash(
-                msg_content.groupMessageElement.entry.replyTo.content.sender
+                msg_content.groupMessageRecord.entry.replyTo.content.sender
               ),
               payload: convertPayload(
-                msg_content.groupMessageElement.entry.replyTo.content.payload
+                msg_content.groupMessageRecord.entry.replyTo.content.payload
               ),
               timestamp: timestampToDate(
-                msg_content.groupMessageElement.entry.replyTo.content.created
+                msg_content.groupMessageRecord.entry.replyTo.content.created
               ),
 
-              replyTo: msg_content.groupMessageElement.entry.replyTo
-                ? serializeHash(msg_content.groupMessageElement.entry.replyTo)
+              replyTo: msg_content.groupMessageRecord.entry.replyTo
+                ? serializeHash(msg_content.groupMessageRecord.entry.replyTo)
                 : undefined,
               readList: {},
             }
