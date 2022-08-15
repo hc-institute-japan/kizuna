@@ -41,53 +41,42 @@ export const pinMessage =
       });
 
       const pin: any = Object.values(pinnedMessages)[0];
-      const pinStatus = pin.status;
+      const pinStatus = pin.status.pinstatus;
 
       const conversant =
-        getState().profile.id === pin.conversants[0]
-          ? serializeHash(pin.conversants[0])
-          : serializeHash(pin.conversants[1]);
+        getState().profile.id === serializeHash(pin.conversants[0])
+          ? serializeHash(pin.conversants[1])
+          : serializeHash(pin.conversants[0]);
 
       pin.id.forEach((id: Uint8Array) => {
         const messageHash = serializeHash(id);
         const pinnedMessage = currentState.messages[messageHash];
+        const currentConversations = currentState.conversations;
 
-        if (currentState.conversations[conversant]) {
+        if (currentConversations[conversant]) {
           // initialize any undefined values
-          if (!currentState.conversations[conversant].pinned) {
-            currentState.conversations[conversant].pinned = [];
-          }
+          if (!currentConversations[conversant].pinned)
+            currentConversations[conversant].pinned = [];
 
           // pinned
           if (pinStatus === "pinned") {
             // push hash into conversations.pinned
-            if (
-              !currentState.conversations[conversant].pinned.includes(
-                messageHash
-              )
-            ) {
-              currentState.conversations[conversant].pinned.push(messageHash);
-            }
+            if (!currentConversations[conversant].pinned.includes(messageHash))
+              currentConversations[conversant].pinned.push(messageHash);
+
             // push message into pinned
-            if (!currentState.pinned[messageHash]) {
+            if (!currentState.pinned[messageHash])
               currentState.pinned[messageHash] = pinnedMessage;
-            }
           }
 
           // unpinned
-          if (pinStatus === "unpined") {
+          if (pinStatus === "unpinned") {
             // remove hash from conversations.pinned
-            if (
-              currentState.conversations[conversant].pinned.includes(
-                messageHash
-              )
-            ) {
+            if (currentConversations[conversant].pinned.includes(messageHash)) {
               const index =
-                currentState.conversations[conversant].pinned.indexOf(
-                  messageHash
-                );
+                currentConversations[conversant].pinned.indexOf(messageHash);
               if (index > -1)
-                currentState.conversations[conversant].pinned.splice(index, 1);
+                currentConversations[conversant].pinned.splice(index, 1);
             }
             // remove hash from pinned
             if (currentState.pinned[messageHash]) {
@@ -97,18 +86,6 @@ export const pinMessage =
           }
         }
       });
-
-      // if (pinStatus.pinstatus === "pinned") {
-      //   dispatch({
-      //     type: PIN_MESSAGE,
-      //     state: { conversant, messages: pinMessages },
-      //   });
-      // } else {
-      //   dispatch({
-      //     type: UNPIN_MESSAGE,
-      //     state: { conversant, messages: pinMessages },
-      //   });
-      // }
 
       dispatch({
         type: SET_PINNED,

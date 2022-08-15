@@ -11,7 +11,6 @@ import MessageInput, {
   MessageInputOnSendParams,
 } from "../../components/MessageInput";
 import { FilePayload } from "../../redux/commons/types";
-import { fetchMyContacts } from "../../redux/contacts/actions";
 import { getFileBytes } from "../../redux/p2pmessages/actions/getFileBytes";
 import { getPreviousMessages } from "../../redux/p2pmessages/actions/getPreviousMessages";
 import { getPinnedMessages } from "../../redux/p2pmessages/actions/getPinnedMessages";
@@ -443,9 +442,7 @@ const Chat: React.FC = () => {
           if (messageInputRef.current) messageInputRef?.current?.reply(message);
           setReplyTo(message.id);
         }}
-        onPinMessage={() => {
-          dispatch(pinMessage([messageBundle.message]));
-        }}
+        onPinMessage={() => dispatch(pinMessage([messageBundle.message]))}
         isPinned={
           pinned[messageBundle.message.p2pMessageEntryHash] ? true : false
         }
