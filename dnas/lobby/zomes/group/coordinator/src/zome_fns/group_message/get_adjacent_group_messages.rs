@@ -53,7 +53,7 @@ pub fn get_adjacent_group_messages_handler(
     }
 
     // construct the group id path which has all the unix timestamp paths as children
-    let group_path = path_from_str(&filter.group_id.to_string(), LinkTypes::GroupPath)?;
+    let group_path = path_from_str(&filter.group_id.to_string(), LinkTypes::GroupHashTimestampPath)?;
     // This is so that we don't get the children paths just in case it is gathered in the first loop
     let mut maybe_children_paths: Option<Vec<Link>> = None;
 

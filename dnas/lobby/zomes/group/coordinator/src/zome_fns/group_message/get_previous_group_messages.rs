@@ -46,7 +46,7 @@ pub fn get_previous_group_messages_handler(
     if linked_messages.len() < filter.batch_size.into() {
         // generate the group path
         let group_path: TypedPath =
-            path_from_str(&filter.group_id.to_string(), LinkTypes::GroupPath)?;
+            path_from_str(&filter.group_id.to_string(), LinkTypes::GroupHashTimestampPath)?;
 
         // get the list of childrens for this path
         let mut children_paths: Vec<Link> = group_path.children()?;

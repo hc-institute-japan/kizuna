@@ -168,7 +168,7 @@ pub fn collect_and_insert_read_list(
             Ok(GetLinksInput::new(
                 eh.into(),
                 // LinkTypes::GroupMessageToAgent.try_into_filter()?,
-                LinkType(8).into(), // TODO: do not hardcode
+                LinkType(7).into(), // TODO: do not hardcode
                 Some(LinkTag::new("read".to_owned())),
             ))
         })
