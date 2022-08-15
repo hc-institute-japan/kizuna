@@ -13,4 +13,4 @@ derive_more = "0"
 serde = "1"
 
 hdk = {version = "0.0.138", features = ["encoding"]}
-hc_p2pmessage_coordinator = {git = "https://github.com/hc-institute-japan/p2pmessage-zome", branch = "hdk-0.0.138", package = "p2pmessage_coordinator"}
+hc_p2pmessage_coordinator = {git = "https://github.com/hc-institute-japan/p2pmessage-zome", rev="8e0468d011cab1526b8bd1a4f31f4f70bfcfc011", package = "p2pmessage_coordinator"}

@@ -1145,20 +1145,20 @@ version = "0.0.1"
 dependencies = [
  "derive_more",
  "hdk",
- "p2pmessage_coordinator 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.138)",
+ "p2pmessage_coordinator 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?rev=8e0468d011cab1526b8bd1a4f31f4f70bfcfc011)",
  "serde",
 ]
 
 [[package]]
 name = "p2pmessage_coordinator"
 version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.138#3430d7435e895f88f8259b8c007fcc8e5cf52bce"
+source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?rev=8e0468d011cab1526b8bd1a4f31f4f70bfcfc011#8e0468d011cab1526b8bd1a4f31f4f70bfcfc011"
 dependencies = [
  "derive_more",
  "hdk",
- "p2pmessage_coordinator_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.138)",
- "p2pmessage_integrity 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.138)",
- "p2pmessage_integrity_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.138)",
+ "p2pmessage_coordinator_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?rev=8e0468d011cab1526b8bd1a4f31f4f70bfcfc011)",
+ "p2pmessage_integrity 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?rev=8e0468d011cab1526b8bd1a4f31f4f70bfcfc011)",
+ "p2pmessage_integrity_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?rev=8e0468d011cab1526b8bd1a4f31f4f70bfcfc011)",
  "serde",
 ]
 
@@ -1168,18 +1168,18 @@ version = "0.0.1"
 dependencies = [
  "derive_more",
  "hdk",
- "p2pmessage_coordinator_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.138)",
+ "p2pmessage_coordinator_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?rev=8e0468d011cab1526b8bd1a4f31f4f70bfcfc011)",
  "serde",
 ]
 
 [[package]]
 name = "p2pmessage_coordinator_types"
 version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.138#3430d7435e895f88f8259b8c007fcc8e5cf52bce"
+source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?rev=8e0468d011cab1526b8bd1a4f31f4f70bfcfc011#8e0468d011cab1526b8bd1a4f31f4f70bfcfc011"
 dependencies = [
  "derive_more",
  "hdk",
- "p2pmessage_integrity_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.138)",
+ "p2pmessage_integrity_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?rev=8e0468d011cab1526b8bd1a4f31f4f70bfcfc011)",
  "serde",
 ]
 
@@ -1189,18 +1189,18 @@ version = "0.0.1"
 dependencies = [
  "derive_more",
  "holochain_deterministic_integrity",
- "p2pmessage_integrity 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.138)",
+ "p2pmessage_integrity 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?rev=8e0468d011cab1526b8bd1a4f31f4f70bfcfc011)",
  "serde",
 ]
 
 [[package]]
 name = "p2pmessage_integrity"
 version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.138#3430d7435e895f88f8259b8c007fcc8e5cf52bce"
+source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?rev=8e0468d011cab1526b8bd1a4f31f4f70bfcfc011#8e0468d011cab1526b8bd1a4f31f4f70bfcfc011"
 dependencies = [
  "derive_more",
  "holochain_deterministic_integrity",
- "p2pmessage_integrity_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.138)",
+ "p2pmessage_integrity_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?rev=8e0468d011cab1526b8bd1a4f31f4f70bfcfc011)",
  "serde",
 ]
 
@@ -1210,24 +1210,14 @@ version = "0.0.1"
 dependencies = [
  "derive_more",
  "holochain_deterministic_integrity",
- "p2pmessage_integrity_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?rev=89b87244987e2ae989300ff8eb8d27a2cd0d2fab)",
+ "p2pmessage_integrity_types 0.0.1 (git+https://github.com/hc-institute-japan/p2pmessage-zome?rev=8e0468d011cab1526b8bd1a4f31f4f70bfcfc011)",
  "serde",
 ]
 
 [[package]]
 name = "p2pmessage_integrity_types"
 version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?branch=hdk-0.0.138#3430d7435e895f88f8259b8c007fcc8e5cf52bce"
-dependencies = [
- "derive_more",
- "holochain_deterministic_integrity",
- "serde",
-]
-
-[[package]]
-name = "p2pmessage_integrity_types"
-version = "0.0.1"
-source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?rev=89b87244987e2ae989300ff8eb8d27a2cd0d2fab#89b87244987e2ae989300ff8eb8d27a2cd0d2fab"
+source = "git+https://github.com/hc-institute-japan/p2pmessage-zome?rev=8e0468d011cab1526b8bd1a4f31f4f70bfcfc011#8e0468d011cab1526b8bd1a4f31f4f70bfcfc011"
 dependencies = [
  "derive_more",
  "holochain_deterministic_integrity",
