@@ -5,6 +5,7 @@ use holochain_deterministic_integrity::prelude::*;
 
 #[derive(Clone)]
 #[hdk_entry_helper]
+#[serde(rename_all = "camelCase")]
 pub struct Group {
     pub name: String,
     pub created: Timestamp,
@@ -47,6 +48,7 @@ impl Group {
 
 #[derive(Clone)]
 #[hdk_entry_helper]
+#[serde(rename_all = "camelCase")]
 pub struct GroupMessage {
     // EntryHash of first ver of Group
     pub group_hash: EntryHash,
