@@ -53,7 +53,7 @@ export const FUNCTIONS: FunctionNameType = {
     CREATE_PROFILE: "create_profile",
     SEARCH_PROFILES: "search_profiles",
     GET_AGENT_PROFILE: "get_agent_profile",
-    GET_AGENTS_PROFILES: "get_agents_profile",
+    GET_AGENTS_PROFILES: "get_agents_profiles",
     GET_MY_PROFILE: "get_my_profile",
     GET_ALL_PROFILES: "get_all_profiles",
     UPDATE_PROFILE: "update_profile",
