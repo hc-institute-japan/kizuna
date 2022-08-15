@@ -21,9 +21,8 @@ pub enum LinkTypes {
     GroupHashTimestampPath,      // 3
     TimestampPathToGroupMessage, // 4
     GroupToGroupMessage,         // 5
-    GroupPath,                   // 6
-    AgentToGroup,                // 7
-    GroupMessageToAgent,         // 8
+    AgentToGroup,                // 6
+    GroupMessageToAgent,         // 7
 }
 
 #[hdk_extern]
