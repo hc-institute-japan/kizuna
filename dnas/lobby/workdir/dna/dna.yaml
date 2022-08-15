@@ -13,10 +13,11 @@ integrity:
       bundled: ../../target/wasm32-unknown-unknown/release/preference_integrity.wasm
     - name: contacts_integrity
       bundled: ../../target/wasm32-unknown-unknown/release/contacts_integrity.wasm
-    - name: group_integrity
-      bundled: ../../target/wasm32-unknown-unknown/release/group_integrity.wasm
     - name: profiles_integrity
       bundled: ../../target/wasm32-unknown-unknown/release/profiles_integrity.wasm
+    - name: group_integrity
+      bundled: ../../target/wasm32-unknown-unknown/release/group_integrity.wasm
+
 
 coordinator:
   zomes: 
