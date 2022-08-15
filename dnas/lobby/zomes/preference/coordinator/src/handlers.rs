@@ -27,7 +27,10 @@ pub(crate) fn fetch_preference() -> ExternResult<(SignedActionHashed, Preference
                     None => (),
                 }
             }
-            Err(_e) => return crate::error("no entry found for global preference"),
+            Err(e) => {
+                let error = e.to_string();
+                return Err(wasm_error!(WasmErrorInner::Guest(String::from(error))))
+            },
         }
     }
     crate::error("no entry found for global preference")
@@ -221,9 +224,9 @@ fn filter_for(query_target: QueryTarget, include_entries: bool) -> ExternResult<
     let entry_index: u8;
 
     match query_target {
-        QueryTarget::Preference => entry_index = 0,
-        QueryTarget::AgentPreference => entry_index = 1,
-        QueryTarget::GroupPreference => entry_index = 2,
+        QueryTarget::Preference => entry_index = 4,
+        QueryTarget::AgentPreference => entry_index = 5,
+        QueryTarget::GroupPreference => entry_index = 6,
     }
 
     let query_filter: QueryFilter = QueryFilter::new()

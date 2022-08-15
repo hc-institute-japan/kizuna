@@ -7,16 +7,16 @@ integrity:
   properties: ~
   origin_time: 2022-02-11T23:05:19.470323Z
   zomes:
+    - name: p2pmessage_integrity
+      bundled: ../../target/wasm32-unknown-unknown/release/p2pmessage_integrity.wasm
     - name: preference_integrity
       bundled: ../../target/wasm32-unknown-unknown/release/preference_integrity.wasm
-    - name: profiles_integrity
-      bundled: ../../target/wasm32-unknown-unknown/release/profiles_integrity.wasm
     - name: contacts_integrity
       bundled: ../../target/wasm32-unknown-unknown/release/contacts_integrity.wasm
     - name: group_integrity
       bundled: ../../target/wasm32-unknown-unknown/release/group_integrity.wasm
-    - name: p2pmessage_integrity
-      bundled: ../../target/wasm32-unknown-unknown/release/p2pmessage_integrity.wasm
+    - name: profiles_integrity
+      bundled: ../../target/wasm32-unknown-unknown/release/profiles_integrity.wasm
 
 coordinator:
   zomes: 
