@@ -48,7 +48,7 @@ pub fn remove_members_handler(
             Ok(GetLinksInput::new(
                 member.into(),
                 // LinkTypes::AgentToGroup.try_into_filter()?,
-                LinkType(4).into(), // TODO: do not hardcode
+                LinkType(7).into(), // TODO: do not hardcode
                 Some(LinkTag::new("member")),
             ))
         })
