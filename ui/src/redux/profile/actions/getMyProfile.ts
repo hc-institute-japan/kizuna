@@ -15,6 +15,7 @@ const getMyProfile =
   async (dispatch, getState, { callZome, getAgentId }) => {
     console.log("calling get my profile");
     try {
+      console.log("calling getMyProfile");
       const res = await callZome({
         zomeName: ZOMES.PROFILES,
         fnName: FUNCTIONS[ZOMES.PROFILES].GET_MY_PROFILE,
