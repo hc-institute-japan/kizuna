@@ -1,3 +1,4 @@
+import { deserializeHash } from "@holochain-open-dev/core-types";
 import {
   FUNCTIONS,
   ZOMES,
@@ -17,7 +18,7 @@ const blockContact =
       await callZome({
         zomeName: ZOMES.CONTACTS,
         fnName: FUNCTIONS[ZOMES.CONTACTS].BLOCK_CONTACTS,
-        payload: [profile.id],
+        payload: [deserializeHash(profile.id)],
       });
       const { [profile.id]: _, ...newContacts } = contacts;
       dispatch({ type: SET_BLOCKED, blocked: newBlocked });

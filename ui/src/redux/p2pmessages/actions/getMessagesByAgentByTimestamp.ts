@@ -6,14 +6,14 @@ import {
 } from "../../../utils/services/HolochainService/types";
 import { pushError } from "../../../redux/error/actions";
 import { transformZomeDataToUIData } from "./helpers/transformZomeDateToUIData";
-import {} from "../../../utils/services/DateService";
+import { dateToTimestamp } from "../../../utils/services/DateService";
 
 export const getMessagesByAgentByTimestamp =
   (id: string, date: Date, payload_type: String): ThunkAction =>
   async (dispatch, getState, { callZome }) => {
     let zome_input = {
       conversant: deserializeHash(id),
-      date: date,
+      date: dateToTimestamp(date),
       payload_type: payload_type,
     };
 

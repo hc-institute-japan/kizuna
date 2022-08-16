@@ -59,10 +59,10 @@ const removeMembers =
         [groupEntryHash]: groupConversation,
       };
       let members = state.groups.members;
-      let {...newMembers} = members;
+      let { ...newMembers } = members;
       removedMembers.forEach((memberId: any) => {
-        const {[memberId]: _, ...updatedMembers} = newMembers;
-        newMembers = {...updatedMembers}
+        const { [memberId]: _, ...updatedMembers } = newMembers;
+        newMembers = { ...updatedMembers };
       });
 
       dispatch<RemoveMembersAction>({

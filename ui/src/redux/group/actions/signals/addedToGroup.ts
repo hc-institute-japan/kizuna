@@ -4,11 +4,15 @@ import {
   FUNCTIONS,
   ZOMES,
 } from "../../../../utils/services/HolochainService/types";
-import { deserializeAgentPubKey } from "../../../../utils/services/ConversionService";
+import {
+  deserializeAgentPubKey,
+  getEntryFromRecord,
+} from "../../../../utils/services/ConversionService";
 import { timestampToDate } from "../../../../utils/services/DateService";
-import { AgentProfile, Profile } from "../../../profile/types";
+import { Profile, ProfileRaw } from "../../../profile/types";
 import { ThunkAction } from "../../../types";
 import { AddGroupAction, ADD_GROUP, GroupConversation } from "../../types";
+import { decode } from "@msgpack/msgpack";
 
 const addedToGroup =
   (signalPayload: any): ThunkAction =>
@@ -30,21 +34,21 @@ const addedToGroup =
       createdAt: timestampToDate(payload.created),
       creator: serializeHash(payload.creator),
       /* 
-        Messages are empty at the creation of group
-        This creates a tad bit of delay in rendering group in Conversations page
-        as group conversation is created first and then the first message
-        arrives with signal
-      */
+          Messages are empty at the creation of group
+          This creates a tad bit of delay in rendering group in Conversations page
+          as group conversation is created first and then the first message
+          arrives with signal
+        */
       messages: [],
       pinnedMessages: [],
       avatar: payload.avatar,
     };
 
     /* 
-    Attempt to get the profile of group members from own contacts list.
-    If not found from contacts nor own AgentPubKey, then push it to
-    undefinedProfiles
-    */
+      Attempt to get the profile of group members from own contacts list.
+      If not found from contacts nor own AgentPubKey, then push it to
+      undefinedProfiles
+      */
     const groupMembers = [...groupData.members, groupData.creator];
     const membersProfile: { [key: string]: Profile } = {};
     const nonAddedProfiles: AgentPubKey[] = groupMembers.reduce(
@@ -72,24 +76,18 @@ const addedToGroup =
     // get the profiles not in contacts from HC
     // TODO: change for profiles module
     if (nonAddedProfiles?.length) {
-      const nonAddedProfilesB64 = nonAddedProfiles.map((nonAddedProfile) =>
-        serializeHash(nonAddedProfile)
-      );
-      const profiles = await callZome({
+      const res: [] = await callZome({
         zomeName: ZOMES.PROFILES,
         fnName: FUNCTIONS[ZOMES.PROFILES].GET_AGENTS_PROFILES,
-        payload: nonAddedProfilesB64,
+        payload: nonAddedProfiles,
       });
-      profiles.forEach((agentProfile: AgentProfile) => {
-        const id = agentProfile.agentPubKey;
+      res.forEach((rec: any) => {
+        const raw = decode(getEntryFromRecord(rec)) as ProfileRaw;
+        const id = serializeHash(rec.signed_action.hashed.content.author);
         membersProfile[id] = {
           id,
-          username: agentProfile.profile.nickname,
-          fields: agentProfile.profile.fields.avatar
-            ? {
-                avatar: agentProfile.profile.fields.avatar,
-              }
-            : {},
+          username: raw.nickname,
+          fields: raw.fields.avatar ? { avatar: raw.fields.avatar } : {},
         };
       });
     }

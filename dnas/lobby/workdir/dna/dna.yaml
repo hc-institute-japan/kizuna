@@ -1,24 +1,46 @@
 ---
 manifest_version: "1"
 name: kizuna-lobby
-uuid: 00000000-0000-0000-0000-000000000000
-properties: ~
-zomes: 
-  - name: aggregator
-    bundled: ../../target/wasm32-unknown-unknown/release/aggregator.wasm
-  - name: contacts
-    bundled: ../../target/wasm32-unknown-unknown/release/contacts.wasm
-  - name: p2pmessage
-    bundled: ../../target/wasm32-unknown-unknown/release/p2pmessage.wasm
-  - name: preference
-    bundled: ../../target/wasm32-unknown-unknown/release/preference.wasm
-  # - name: request
-  #   bundled: ../../target/wasm32-unknown-unknown/release/request.wasm
-  # - name: username
-  #   bundled: ../../target/wasm32-unknown-unknown/release/username.wasm  
-  - name : group
-    bundled: ../../target/wasm32-unknown-unknown/release/group.wasm 
-  - name : profiles
-    bundled: ../../target/wasm32-unknown-unknown/release/profiles.wasm
-  # - name : joining_code
-  #   bundled: ../../target/wasm32-unknown-unknown/release/joining_code.wasm 
+
+integrity:
+  uuid: 00000000-0000-0000-0000-000000000000
+  properties: ~
+  origin_time: 2022-02-11T23:05:19.470323Z
+  zomes:
+    - name: p2pmessage_integrity
+      bundled: ../../target/wasm32-unknown-unknown/release/p2pmessage_integrity.wasm
+    - name: preference_integrity
+      bundled: ../../target/wasm32-unknown-unknown/release/preference_integrity.wasm
+    - name: contacts_integrity
+      bundled: ../../target/wasm32-unknown-unknown/release/contacts_integrity.wasm
+    - name: profiles_integrity
+      bundled: ../../target/wasm32-unknown-unknown/release/profiles_integrity.wasm
+    - name: group_integrity
+      bundled: ../../target/wasm32-unknown-unknown/release/group_integrity.wasm
+
+
+coordinator:
+  zomes: 
+    - name: preference_coordinator
+      bundled: ../../target/wasm32-unknown-unknown/release/preference_coordinator.wasm
+      dependencies:
+        - name: preference_integrity
+    - name: profiles_coordinator
+      bundled: ../../target/wasm32-unknown-unknown/release/profiles_coordinator.wasm
+      dependencies:
+        - name: profiles_integrity
+    - name: contacts_coordinator
+      bundled: ../../target/wasm32-unknown-unknown/release/contacts_coordinator.wasm
+      dependencies:
+        - name: contacts_integrity
+    - name: group_coordinator
+      bundled: ../../target/wasm32-unknown-unknown/release/group_coordinator.wasm
+      dependencies:
+        - name: group_integrity
+    - name: p2pmessage_coordinator
+      bundled: ../../target/wasm32-unknown-unknown/release/p2pmessage_coordinator.wasm
+      dependencies:
+        - name: p2pmessage_integrity
+    - name: aggregator_coordinator
+      bundled: ../../target/wasm32-unknown-unknown/release/aggregator_coordinator.wasm
+      dependencies:

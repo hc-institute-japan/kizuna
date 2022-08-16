@@ -31,13 +31,13 @@ const ContactHeader: React.FC<Props> = ({ profile }) => {
       </IonToolbar>
 
       <div className={styles.titlebar}>
-        <p className={styles.title}>
+        <div className={styles.title}>
           <AgentIdentifier
             displayId={false}
             nickname={profile.username}
             id={profile.id}
           />
-        </p>
+        </div>
       </div>
     </div>
   );

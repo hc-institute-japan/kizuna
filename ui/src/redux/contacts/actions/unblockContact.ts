@@ -19,7 +19,7 @@ const unblockContact =
         payload: [deserializeHash(profile.id)],
       });
 
-      const {[profile.id]: _, ...newBlocked} = blocked
+      const { [profile.id]: _, ...newBlocked } = blocked;
       dispatch({ type: SET_BLOCKED, blocked: newBlocked });
       return true;
     } catch (e) {

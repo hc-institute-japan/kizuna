@@ -1,4 +1,3 @@
-import { serializeHash } from "@holochain-open-dev/core-types";
 import { ThunkAction } from "../../../types";
 import { ProfileActionTypes, SET_USERNAME } from "../../types";
 

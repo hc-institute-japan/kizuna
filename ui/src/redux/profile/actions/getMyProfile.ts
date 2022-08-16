@@ -1,34 +1,36 @@
-import { serializeHash } from "@holochain-open-dev/core-types";
-import { binaryToUrl } from "../../../utils/services/ConversionService";
+import { decode } from "@msgpack/msgpack";
+import {
+  binaryToUrl,
+  getEntryFromRecord,
+} from "../../../utils/services/ConversionService";
 import {
   FUNCTIONS,
   ZOMES,
 } from "../../../utils/services/HolochainService/types";
 import { ThunkAction } from "../../types";
-import { ProfileActionTypes, SET_PROFILE } from "../types";
+import { ProfileActionTypes, ProfileRaw, SET_PROFILE } from "../types";
 
 const getMyProfile =
   (): ThunkAction =>
   async (dispatch, getState, { callZome, getAgentId }) => {
+    console.log("calling get my profile");
     try {
       console.log("calling getMyProfile");
       const res = await callZome({
         zomeName: ZOMES.PROFILES,
         fnName: FUNCTIONS[ZOMES.PROFILES].GET_MY_PROFILE,
       });
-      console.log("getMyProfile res", res);
-      // const myAgentId = await getAgentId();
-      // /* assume that getAgentId() is non-nullable */
-      // const myAgentIdB64 = serializeHash(myAgentId!);
-      const myAgentIdB64 = getState().profile.id!;
+
+      const myAgentIdB64 = getState().profile.id!; // find another source for this
       if (res) {
+        const profileRaw = decode(getEntryFromRecord(res)) as ProfileRaw;
         dispatch<ProfileActionTypes>({
           type: SET_PROFILE,
-          nickname: res.profile.nickname,
+          nickname: profileRaw.nickname,
           id: myAgentIdB64,
-          fields: res.profile.fields.avatar
+          fields: profileRaw.fields.avatar
             ? {
-                avatar: binaryToUrl(res.profile.fields.avatar),
+                avatar: binaryToUrl(profileRaw.fields.avatar),
               }
             : {},
         });

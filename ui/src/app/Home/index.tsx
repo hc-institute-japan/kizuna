@@ -14,12 +14,27 @@ import Contacts from "../Contacts";
 import Conversations from "../Conversations";
 import styles from "./style.module.css";
 
+const RedeclaredRedirect = Redirect as any;
+const RedeclaredRoute = Route as any;
+
 const HomeTabBar: React.FC = () => (
   <IonTabs>
     <IonRouterOutlet id="home">
-      <Redirect exact path="/home" to="/home/messaging"></Redirect>
-      <Route path="/home/messaging" render={() => <Conversations />} exact />
-      <Route path="/home/contacts" render={() => <Contacts />} exact />
+      <RedeclaredRedirect
+        exact
+        path="/home"
+        to="/home/messaging"
+      ></RedeclaredRedirect>
+      <RedeclaredRoute
+        path="/home/messaging"
+        render={() => <Conversations />}
+        exact
+      />
+      <RedeclaredRoute
+        path="/home/contacts"
+        render={() => <Contacts />}
+        exact
+      />
     </IonRouterOutlet>
     <IonTabBar slot="bottom" className={styles["home-tab-bar"]}>
       <IonTabButton tab="messaging" href="/home/messaging">

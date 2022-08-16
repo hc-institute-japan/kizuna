@@ -113,7 +113,7 @@ export function getPreviousGroupMessagesTest(config) {
       Object.values(output.groupMessagesContents).map(
         (message_content: any) => {
           messages_contents.push(
-            message_content.groupMessageElement.signedHeader.header.content
+            message_content.groupMessageRecord.signedAction.action.content
           );
           messages_read_list.push(message_content.readList);
         }
@@ -174,7 +174,7 @@ export function getPreviousGroupMessagesTest(config) {
       Object.values(output.groupMessagesContents).map(
         (message_content: any) => {
           messages_contents.push(
-            message_content.groupMessageElement.signedHeader.header.content
+            message_content.groupMessageRecord.signedAction.action.content
           );
           messages_read_list.push(message_content.readList);
         }
@@ -205,7 +205,7 @@ export function getPreviousGroupMessagesTest(config) {
       Object.values(output.groupMessagesContents).map(
         (message_content: any) => {
           messages_contents.push(
-            message_content.groupMessageElement.signedHeader.header.content
+            message_content.groupMessageRecord.signedAction.action.content
           );
           messages_read_list.push(message_content.readList);
         }
@@ -236,7 +236,7 @@ export function getPreviousGroupMessagesTest(config) {
       Object.values(output.groupMessagesContents).map(
         (message_content: any) => {
           messages_contents.push(
-            message_content.groupMessageElement.signedHeader.header.content
+            message_content.groupMessageRecord.signedAction.action.content
           );
           messages_read_list.push(message_content.readList);
         }
@@ -267,7 +267,7 @@ export function getPreviousGroupMessagesTest(config) {
       Object.values(output.groupMessagesContents).map(
         (message_content: any) => {
           messages_contents.push(
-            message_content.groupMessageElement.signedHeader.header.content
+            message_content.groupMessageRecord.signedAction.action.content
           );
           messages_read_list.push(message_content.readList);
         }

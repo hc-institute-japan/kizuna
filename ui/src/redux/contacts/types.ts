@@ -13,7 +13,8 @@ export interface Category {
 }
 
 export interface ContactOutput {
-  id: string; // AgentPubKkeyb64
+  // id: string; // AgentPubKkeyb64
+  id: Uint8Array;
   firstName?: string;
   lastName?: string;
   category?: Category;

@@ -1,0 +1,17 @@
+[package]
+authors = ["nickolie.pangarungan@gmail.com", "tatsuya.g.sato@yumeville.com"]
+description = "Integrity types for the Kizuna group zome"
+edition = "2018"
+license = "MIT"
+name = "group_integrity_types"
+version = "0.0.1"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+name = "group_integrity_types"
+
+[dependencies]
+derive_more = "0"
+serde = "1"
+
+holochain_deterministic_integrity = "=0.0.10"

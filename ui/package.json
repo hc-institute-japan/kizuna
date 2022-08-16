@@ -16,10 +16,7 @@
     "@ionic/cli": "^6.20.1",
     "@ionic/react": "^5.5.4",
     "@ionic/react-router": "^5.5.4",
-    "@testing-library/dom": "^7.29.6",
-    "@testing-library/jest-dom": "^4.2.4",
-    "@testing-library/react": "^9.4.0",
-    "@testing-library/user-event": "^8.0.3",
+    "@msgpack/msgpack": "^2.7.2",
     "@types/jest": "^24.0.25",
     "@types/node": "^12.12.24",
     "@types/react-dom": "^16.9.4",
@@ -68,10 +65,10 @@
     "start:hc-prxy": "cd .. && RUST_LOG=info hc sandbox generate workdir-fixed/happ/ -r=8888 network --bootstrap https://bootstrap-staging.holo.host/ quic -p=kitsune-proxy://0B0aIe8BtorZ2mY1TvxpZsyNgZ72yhqx9-WIeqUJN2Y/kitsune-quic/h/52.194.238.234/p/33548/--",
     "demo": "concurrently \"HC_PORT=8888 APP_ID=kizuna npm run start:holochain\" \"HC_PORT=8889 APP_ID=kizuna npm run start:holochain\" \"HC_PORT=8899 APP_ID=kizuna npm run start:holochain\" \"ENV=HCDEV DNA_INTERFACE=ws://localhost:8888 UI_PORT=8100 npm run start:ui\" \"ENV=HCDEV DNA_INTERFACE=ws://localhost:8889 UI_PORT=8200 npm run start:ui\" \"ENV=HCDEV DNA_INTERFACE=ws://localhost:8899 UI_PORT=8300 npm run start:ui\"",
     "demo-1": "concurrently \"HC_PORT=8888 APP_ID=kizuna npm run start:holochain\" \"ENV=HCDEV DNA_INTERFACE=ws://localhost:8888 UI_PORT=8100 npm run start:ui\"",
-    "demo-2": "concurrently \"HC_PORT=8888 APP_ID=kizuna npm run start:holochain\" \"HC_PORT=8889 APP_ID=kizuna npm run start:holochain\" \"ENV=HCDEV DNA_INTERFACE=ws://localhost:8888 UI_PORT=8100 npm run start:ui\" \"ENV=HCDEV DNA_INTERFACE=ws://localhost:8889 UI_PORT=8200 npm run start:ui\"",
+    "demo-2": "concurrently \"HC_PORT=8889 APP_ID=kizuna npm run start:holochain\" \"HC_PORT=8899 APP_ID=kizuna npm run start:holochain\" \"ENV=HCDEV DNA_INTERFACE=ws://localhost:8889 UI_PORT=8200 npm run start:ui\" \"ENV=HCDEV DNA_INTERFACE=ws://localhost:8899 UI_PORT=8300 npm run start:ui\"",
     "demo:alice": "concurrently \"HC_PORT=8888 APP_ID=kizuna RUST_LOG=debug npm run start:holochain\" \"ENV=HCDEV DNA_INTERFACE=ws://localhost:8888 UI_PORT=8100 npm run start:ui\"",
-    "demo:bob": "concurrently \"HC_PORT=8889 APP_ID=kizuna npm run start:holochain\" \"ENV=HCDEV DNA_INTERFACE=ws://localhost:8889 UI_PORT=8200 npm run start:ui\"",
-    "demo:charlie": "concurrently \"HC_PORT=8899 APP_ID=kizuna npm run start:holochain\" \"ENV=HCDEV DNA_INTERFACE=ws://localhost:8899 UI_PORT=8300 npm run start:ui\"",
+    "demo:bob": "concurrently \"HC_PORT=8889 APP_ID=kizuna RUST_LOG=debug npm run start:holochain\" \"ENV=HCDEV DNA_INTERFACE=ws://localhost:8889 UI_PORT=8200 npm run start:ui\"",
+    "demo:charlie": "concurrently \"HC_PORT=8899 APP_ID=kizuna RUST_LOG=debug npm run start:holochain\" \"ENV=HCDEV DNA_INTERFACE=ws://localhost:8899 UI_PORT=8300 npm run start:ui\"",
     "demo:david": "concurrently \"HC_PORT=8999 APP_ID=kizuna npm run start:holochain\" \"ENV=HCDEV DNA_INTERFACE=ws://localhost:8999 UI_PORT=8400 npm run start:ui\"",
     "demo-rmt-prxy": "concurrently \"npm run start:hc-prxy\" \"ENV=HCDEV DNA_INTERFACE=ws://localhost:8888 UI_PORT=8100 npm run start:ui\"",
     "start-holo-alice": "concurrently -k \"npm:chaperone-alice\" \"ADMIN_PORT=9000 APP_ID=uhCkkHSLbocQFSn5hKAVFc_L34ssLD52E37kq6Gw9O3vklQ3Jv7eL HC_PORT=8888 npm run start:holo\"  \"ENV=HCC CHAPERONE_PORT=24274 UI_PORT=8100 npm run start:ui\"",
@@ -105,7 +102,11 @@
     "@types/react": "^17.0.0",
     "@types/react-redux": "^7.1.15",
     "@types/redux-logger": "^3.0.8",
-    "poetic": "^1.7.0"
+    "poetic": "^1.7.0",
+    "@testing-library/dom": "^7.29.6",
+    "@testing-library/jest-dom": "^4.2.4",
+    "@testing-library/react": "^9.4.0",
+    "@testing-library/user-event": "^8.0.3"
   },
   "description": "An Ionic project"
 }
