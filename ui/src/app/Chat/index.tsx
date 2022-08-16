@@ -5,16 +5,23 @@ import ChatDetails from "./ChatDetails";
 import ChatSearch from "./ChatSearch";
 import ChatPinnedMessages from "./ChatPinnedMessages";
 
+const RedeclaredSwitch = Switch as any;
+const RedeclaredRoute = Route as any;
+
 const Chat: React.FC = () => {
   return (
-    <Switch>
-      <Route path="/u/:id" exact>
+    <RedeclaredSwitch>
+      <RedeclaredRoute path="/u/:id" exact>
         <ChatContent />
-      </Route>
-      <Route path="/u/:id/details" exact component={ChatDetails} />
-      <Route path="/u/:id/search" exact component={ChatSearch} />
-      <Route path="/u/:id/pinned" exact component={ChatPinnedMessages} />
-    </Switch>
+      </RedeclaredRoute>
+      <RedeclaredRoute path="/u/:id/details" exact component={ChatDetails} />
+      <RedeclaredRoute path="/u/:id/search" exact component={ChatSearch} />
+      <RedeclaredRoute
+        path="/u/:id/pinned"
+        exact
+        component={ChatPinnedMessages}
+      />
+    </RedeclaredSwitch>
   );
 };
 
