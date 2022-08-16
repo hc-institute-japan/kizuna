@@ -5,11 +5,13 @@ import Landing from "../Landing";
 import Login from "../Login";
 import Register from "../Register";
 
+const RedeclaredRoute = Route as any;
+
 const Unauthenticated: React.FC = () => (
   <IonReactRouter>
-    <Route path="/" component={Landing} />
-    <Route path="/register" component={Register} />
-    <Route path="/login" component={Login} />
+    <RedeclaredRoute path="/" component={Landing} />
+    <RedeclaredRoute path="/register" component={Register} />
+    <RedeclaredRoute path="/login" component={Login} />
   </IonReactRouter>
 );
 
