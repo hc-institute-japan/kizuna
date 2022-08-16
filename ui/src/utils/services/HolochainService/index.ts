@@ -50,7 +50,7 @@ export const appUrl = () => {
     case "HCDEV":
       return process.env.REACT_APP_DNA_INTERFACE_URL;
     case "HOLO":
-      return "https://devnet-chaperone.holo.host";
+      return "https://chaperone-rsm.qa.holotest.net";
     case "HOLODEV":
       return `http://localhost:${process.env.REACT_APP_CHAPERONE_PORT}`;
     default:
