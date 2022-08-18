@@ -10,8 +10,8 @@
 
 # production
 /build
-!build/_headers
-!/build/_headers
+!build/_headers.txt
+!/build/_headers.txt
 
 # misc
 .DS_Store
