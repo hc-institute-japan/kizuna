@@ -1,0 +1,1 @@
+pub extern crate hc_p2pmessage_coordinator_types;

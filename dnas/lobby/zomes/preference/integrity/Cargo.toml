@@ -1,0 +1,18 @@
+[package]
+authors = ["nickolie.pangarungan@gmail.com", "tats@beyonder.systems"]
+description = "Integrity for preference zome"
+edition = "2021"
+license = "MIT"
+name = "preference_integrity"
+version = "0.0.1"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+name = "preference_integrity"
+
+[dependencies]
+derive_more = "0"
+serde = "1"
+
+preference_integrity_types = {path = "../types/integrity_types"}
+holochain_deterministic_integrity = "=0.0.10"

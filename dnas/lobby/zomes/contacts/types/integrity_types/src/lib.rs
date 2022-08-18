@@ -1,0 +1,1 @@
+extern crate hc_contacts_integrity_types;

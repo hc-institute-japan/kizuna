@@ -124,12 +124,12 @@ const ImageCropper: React.FC<Props> = ({
   const onChange = (crop: number) => {
     setCrop((currCrop) => {
       const newCrop: Partial<Crop> = { ...currCrop };
-      
+
       if (crop === 0) {
         const { aspect: _, ...newCurrCrop } = currCrop;
         return newCurrCrop;
       } else {
-        const  newCurrCrop = { aspect: crop, ...currCrop};
+        const newCurrCrop = { aspect: crop, ...currCrop };
         return newCurrCrop;
       }
     });

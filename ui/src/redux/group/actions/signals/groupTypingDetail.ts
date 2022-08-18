@@ -43,7 +43,10 @@ const groupTypingDetail =
         : [];
       const id = groupTyping.map((profile: Profile) => profile.id);
       if (GroupTypingDetail.isTyping) {
-        if (GroupTypingDetail.indicatedBy.id && !id.includes(GroupTypingDetail.indicatedBy.id)) {
+        if (
+          GroupTypingDetail.indicatedBy.id &&
+          !id.includes(GroupTypingDetail.indicatedBy.id)
+        ) {
           groupTyping.push(GroupTypingDetail.indicatedBy);
         }
       } else {

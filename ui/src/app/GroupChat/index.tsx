@@ -5,22 +5,25 @@ import GroupChatDetails from "./GroupChatDetails";
 import GroupPinnedMessages from "./GroupPinnedMessages";
 import GroupSearch from "./GroupSearch";
 
+const RedeclaredSwitch = Switch as any;
+const RedeclaredRoute = Route as any;
+
 const GroupChat: React.FC = () => {
   return (
-    <Switch>
-      <Route path="/g/:group" exact>
+    <RedeclaredSwitch>
+      <RedeclaredRoute path="/g/:group" exact>
         <GroupChatContent />
-      </Route>
-      <Route path="/g/:group/details" exact>
+      </RedeclaredRoute>
+      <RedeclaredRoute path="/g/:group/details" exact>
         <GroupChatDetails />
-      </Route>
-      <Route path="/g/:group/search" exact>
+      </RedeclaredRoute>
+      <RedeclaredRoute path="/g/:group/search" exact>
         <GroupSearch />
-      </Route>
-      <Route path="/g/:group/pinned" exact>
+      </RedeclaredRoute>
+      <RedeclaredRoute path="/g/:group/pinned" exact>
         <GroupPinnedMessages />
-      </Route>
-    </Switch>
+      </RedeclaredRoute>
+    </RedeclaredSwitch>
   );
 };
 

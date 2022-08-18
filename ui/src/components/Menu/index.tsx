@@ -79,8 +79,8 @@ const Menu: React.FC = () => {
       label: intl.formatMessage({ id: "app.menu.logout-label" }),
       icon: logOutOutline,
       disabled:
-        process.env.REACT_APP_ENVENV === "HCC" ||
-        process.env.REACT_APP_ENVENV === "HOLO"
+        process.env.REACT_APP_ENV === "HOLODEV" ||
+        process.env.REACT_APP_ENV === "HOLO"
           ? false
           : true,
     },
@@ -140,7 +140,7 @@ const Menu: React.FC = () => {
       <IonFooter className="ion-no-border">
         <IonToolbar>
           <IonText className={`ion-padding ${styles["version"]}`}>
-            {intl.formatMessage({ id: "app.menu.version" })} 0.2.4
+            {intl.formatMessage({ id: "app.menu.version" })} 0.3
           </IonText>
         </IonToolbar>
       </IonFooter>

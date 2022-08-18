@@ -16,12 +16,12 @@ interface SignalNameType {
 
 export const ZOMES: ZomeNameType = {
   USERNAME: "username",
-  PROFILES: "profiles",
-  PREFERENCE: "preference",
-  P2PMESSAGE: "p2pmessage",
-  CONTACTS: "contacts",
-  GROUP: "group",
-  AGGREGATOR: "aggregator",
+  PROFILES: "profiles_coordinator",
+  PREFERENCE: "preference_coordinator",
+  P2PMESSAGE: "p2pmessage_coordinator",
+  CONTACTS: "contacts_coordinator",
+  GROUP: "group_coordinator",
+  AGGREGATOR: "aggregator_coordinator",
 };
 export const SIGNALS: SignalNameType = {
   [ZOMES.GROUP]: {
@@ -53,7 +53,7 @@ export const FUNCTIONS: FunctionNameType = {
     CREATE_PROFILE: "create_profile",
     SEARCH_PROFILES: "search_profiles",
     GET_AGENT_PROFILE: "get_agent_profile",
-    GET_AGENTS_PROFILES: "get_agents_profile",
+    GET_AGENTS_PROFILES: "get_agents_profiles",
     GET_MY_PROFILE: "get_my_profile",
     GET_ALL_PROFILES: "get_all_profiles",
     UPDATE_PROFILE: "update_profile",

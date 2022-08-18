@@ -1,15 +1,31 @@
 [workspace]
 members = [
-    "zomes/group",
-    # "zomes/request",
-    # "zomes/username",
-    "zomes/profiles",
-    "zomes/contacts",
-    "zomes/aggregator",
-    "zomes/preference",
-    "zomes/p2pmessage",
-    # "zomes/joining_code",
-    "commons/file_types", 
+    "zomes/contacts/integrity",
+    "zomes/contacts/coordinator",
+    "zomes/contacts/types/integrity_types",
+    "zomes/contacts/types/coordinator_types",
+
+    "zomes/p2pmessage/integrity",
+    "zomes/p2pmessage/coordinator",
+    "zomes/p2pmessage/types/integrity_types",
+    "zomes/p2pmessage/types/coordinator_types",
+
+    "zomes/profiles/integrity",
+    "zomes/profiles/coordinator",
+    "zomes/profiles/types/integrity_types",
+    "zomes/profiles/types/coordinator_types",
+
+    "zomes/aggregator/coordinator",
+    
+    "zomes/preference/integrity",
+    "zomes/preference/coordinator",
+    "zomes/preference/types/integrity_types",
+    "zomes/preference/types/coordinator_types",
+    
+    "zomes/group/integrity",
+    "zomes/group/coordinator",
+    "zomes/group/types/integrity_types",
+    "zomes/group/types/coordinator_types",
 ]
 
 [profile.dev]

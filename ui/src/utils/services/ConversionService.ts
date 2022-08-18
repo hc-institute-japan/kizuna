@@ -76,6 +76,8 @@ export const binaryToUrl = (hash: string) =>
     new Blob([deserializeHash(hash)], { type: "image/jpeg" })
   );
 
+export const getEntryFromRecord = (record: any) => record.entry.Present.entry;
+
 const ConversionService = {
   // binaryToUrl,
   isTextPayload,
@@ -86,6 +88,7 @@ const ConversionService = {
   deserializeAgentPubKey,
   indexContacts,
   objectMap,
+  getEntryFromRecord,
 };
 
 export default ConversionService;

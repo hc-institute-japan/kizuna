@@ -26,7 +26,7 @@ export const unpinMessage =
       };
       const conversation = conversations[groupId];
 
-      const {[groupMessageId]: _, ...newPinnedMessages} = pinnedMessages;
+      const { [groupMessageId]: _, ...newPinnedMessages } = pinnedMessages;
 
       conversation.pinnedMessages = conversation.pinnedMessages
         ? conversation.pinnedMessages!.filter(

@@ -1,15 +1,15 @@
 export const SET_USERNAME = "SET_USERNAME";
 export const SET_PROFILE = "SET_PROFILE";
 
-export interface AgentProfile {
-  agentPubKey: string;
-  profile: {
-    fields: {
-      [key: string]: any;
-    };
-    nickname: string;
-  };
-}
+// export interface AgentProfile {
+//   agentPubKey: Uint8Array;
+//   profile: {
+//     fields: {
+//       [key: string]: any;
+//     };
+//     nickname: string;
+//   };
+// }
 
 // TODO: change username to nickname in the next clean up
 export interface Profile {
@@ -18,6 +18,11 @@ export interface Profile {
   fields: {
     [key: string]: any;
   };
+}
+
+export interface ProfileRaw {
+  nickname: string;
+  fields: Record<string, string>;
 }
 
 // TODO: change username to nickname in the next clean up

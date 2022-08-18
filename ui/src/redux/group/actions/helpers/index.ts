@@ -7,6 +7,7 @@ import {
 import {
   deserializeAgentPubKey,
   objectMap,
+  getEntryFromRecord,
 } from "../../../../utils/services/ConversionService";
 import { timestampToDate } from "../../../../utils/services/DateService";
 
@@ -17,7 +18,7 @@ import {
   Payload,
   TextPayload,
 } from "../../../commons/types";
-import { AgentProfile, Profile } from "../../../profile/types";
+import { Profile, ProfileRaw } from "../../../profile/types";
 import { CallZomeConfig, RootState } from "../../../types";
 import {
   GroupMessage,
@@ -25,6 +26,7 @@ import {
   GroupMessagesOutput,
   MessagesByGroup,
 } from "../../types";
+import { decode } from "@msgpack/msgpack";
 
 // helper function
 export const convertFetchedResToGroupMessagesOutput = (
@@ -48,31 +50,31 @@ export const convertFetchedResToGroupMessagesOutput = (
 
       return {
         groupMessageId: serializeHash(
-          msg_content.groupMessageElement.signedHeader.hashed.content.entry_hash
+          msg_content.groupMessageRecord.signedAction.hashed.content.entry_hash
         ),
-        groupId: serializeHash(msg_content.groupMessageElement.entry.groupHash),
-        author: serializeHash(msg_content.groupMessageElement.entry.sender),
-        payload: convertPayload(msg_content.groupMessageElement.entry.payload),
+        groupId: serializeHash(msg_content.groupMessageRecord.entry.groupHash),
+        author: serializeHash(msg_content.groupMessageRecord.entry.sender),
+        payload: convertPayload(msg_content.groupMessageRecord.entry.payload),
         timestamp: timestampToDate(
-          msg_content.groupMessageElement.entry.created
+          msg_content.groupMessageRecord.entry.created
         ),
-        replyTo: msg_content.groupMessageElement.entry.replyTo
+        replyTo: msg_content.groupMessageRecord.entry.replyTo
           ? {
               groupId: serializeHash(
-                msg_content.groupMessageElement.entry.replyTo.content.groupHash
+                msg_content.groupMessageRecord.entry.replyTo.content.groupHash
               ),
               author: serializeHash(
-                msg_content.groupMessageElement.entry.replyTo.content.sender
+                msg_content.groupMessageRecord.entry.replyTo.content.sender
               ),
               payload: convertPayload(
-                msg_content.groupMessageElement.entry.replyTo.content.payload
+                msg_content.groupMessageRecord.entry.replyTo.content.payload
               ),
               timestamp: timestampToDate(
-                msg_content.groupMessageElement.entry.replyTo.content.created
+                msg_content.groupMessageRecord.entry.replyTo.content.created
               ),
 
-              replyTo: msg_content.groupMessageElement.entry.replyTo
-                ? serializeHash(msg_content.groupMessageElement.entry.replyTo)
+              replyTo: msg_content.groupMessageRecord.entry.replyTo
+                ? serializeHash(msg_content.groupMessageRecord.entry.replyTo)
                 : undefined,
               readList: {},
             }
@@ -141,24 +143,21 @@ export const fetchUsernameOfMembers = async (
   });
 
   if (undefinedProfiles?.length) {
-    const undefinedProfilesB64 = undefinedProfiles.map((undefinedProfile) =>
-      serializeHash(undefinedProfile)
-    );
-    const res = await callZome({
+    // const undefinedProfilesB64 = undefinedProfiles.map((undefinedProfile) =>
+    //   serializeHash(undefinedProfile)
+    // );
+    const res: [] = await callZome({
       zomeName: ZOMES.PROFILES,
       fnName: FUNCTIONS[ZOMES.PROFILES].GET_AGENTS_PROFILES,
-      payload: undefinedProfilesB64,
+      payload: undefinedProfiles,
     });
-    res.forEach((agentProfile: AgentProfile) => {
-      let id = agentProfile.agentPubKey;
+    res.forEach((rec: any) => {
+      const raw = decode(getEntryFromRecord(rec)) as ProfileRaw;
+      let id = serializeHash(rec.signed_action.hashed.content.author);
       membersUsernames[id] = {
         id,
-        username: agentProfile.profile.nickname,
-        fields: agentProfile.profile.fields.avatar
-          ? {
-              avatar: agentProfile.profile.fields.avatar,
-            }
-          : {},
+        username: raw.nickname,
+        fields: raw.fields.avatar ? { avatar: raw.fields.avatar } : {},
       };
     });
   }
