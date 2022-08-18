@@ -1,2 +1,5 @@
 /static/*
 	Cache-Control: no-cache
+
+https://hosted-ui-preview.kizuna.pages.dev/static/*
+	Cache-Control: no-cache
