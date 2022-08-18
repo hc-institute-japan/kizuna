@@ -79,8 +79,8 @@ const Menu: React.FC = () => {
       label: intl.formatMessage({ id: "app.menu.logout-label" }),
       icon: logOutOutline,
       disabled:
-        process.env.REACT_APP_ENVENV === "HCC" ||
-        process.env.REACT_APP_ENVENV === "HOLO"
+        process.env.REACT_APP_ENV === "HOLODEV" ||
+        process.env.REACT_APP_ENV === "HOLO"
           ? false
           : true,
     },
