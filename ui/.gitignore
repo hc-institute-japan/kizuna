@@ -9,9 +9,9 @@
 /coverage
 
 # production
-/build
-!build/_headers.txt
+/build/*
 !/build/_headers.txt
+
 
 # misc
 .DS_Store

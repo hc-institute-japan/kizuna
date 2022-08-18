@@ -1,0 +1,2 @@
+/static/*
+	Cache-Control: no-cache
