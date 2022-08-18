@@ -10,6 +10,7 @@
 
 # production
 /build
+!/build/_headers
 
 # misc
 .DS_Store
