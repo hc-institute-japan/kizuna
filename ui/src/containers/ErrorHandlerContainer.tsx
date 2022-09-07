@@ -14,6 +14,7 @@ const ErrorHandler: React.FC = ({ children }) => {
   const intl = useIntl();
 
   useEffect(() => {
+    console.log("calling ErrorHandler");
     if (errors.length > 0) {
       const error = errors[0];
       const intlMessage = error.intl

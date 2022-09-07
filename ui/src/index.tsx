@@ -5,11 +5,14 @@ import Container from "./containers";
 import "./theme/global.css";
 
 import { ErrorBoundary } from "react-error-boundary";
-// import ErrorHandler from "./containers/ErrorHandlerContainer";
-import { errorBoundaryHandler } from "./components/ErrorBoundary";
+import ErrorHandler from "./containers/ErrorHandlerContainer";
+import {
+  errorBoundaryHandler,
+  errorBoundaryFallback,
+} from "./components/ErrorBoundary";
 
 ReactDOM.render(
-  <ErrorBoundary onError={errorBoundaryHandler}>
+  <ErrorBoundary fallback={<div>Oh no</div>} onError={errorBoundaryHandler}>
     <Container>
       <meta http-equiv="Pragma" content="no-cache" />
       <meta

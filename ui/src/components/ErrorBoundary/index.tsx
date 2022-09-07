@@ -1,5 +1,7 @@
 import * as React from "react";
 // import ReactDOM from "react-dom";
+import { pushError } from "../../redux/error/actions";
+import { ThunkAction } from "../../redux/types";
 
 const PageHasBeenForceRefreshed = "page-has-been-force-refreshed";
 
@@ -49,3 +51,10 @@ export const errorBoundaryHandler = (
   console.log("error boundary: ", error);
   retryPageLoading();
 };
+
+export const errorBoundaryFallback =
+  (error: Error, info: { componentStack: string }): ThunkAction =>
+  async (dispatch, _, { callZome }) => {
+    console.log("error boundary fallback: ", error);
+    dispatch(pushError("TOAST", {}));
+  };
