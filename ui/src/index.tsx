@@ -5,23 +5,20 @@ import Container from "./containers";
 import "./theme/global.css";
 
 import { ErrorBoundary } from "react-error-boundary";
-import ErrorHandler from "./containers/ErrorHandlerContainer";
+// import ErrorHandler from "./containers/ErrorHandlerContainer";
 import { errorBoundaryHandler } from "./components/ErrorBoundary";
 
 ReactDOM.render(
-  <Container>
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta
-      http-equiv="cache-control"
-      content="no-cache, no-store, must-revalidate"
-    />
-    <ErrorBoundary
-      FallbackComponent={ErrorHandler}
-      onError={errorBoundaryHandler}
-    >
+  <ErrorBoundary onError={errorBoundaryHandler}>
+    <Container>
+      <meta http-equiv="Pragma" content="no-cache" />
+      <meta
+        http-equiv="cache-control"
+        content="no-cache, no-store, must-revalidate"
+      />
       <App />
-    </ErrorBoundary>
-  </Container>,
+    </Container>
+  </ErrorBoundary>,
   document.getElementById("root")
 );
 
