@@ -4,6 +4,7 @@ import * as React from "react";
 const PageHasBeenForceRefreshed = "page-has-been-force-refreshed";
 
 const retryPageLoading = () => {
+  console.log("reloading page");
   const pageHasAlreadyBeenForceRefreshed = JSON.parse(
     window.localStorage.getItem(PageHasBeenForceRefreshed) || "false"
   ) as boolean;
@@ -45,5 +46,6 @@ export const errorBoundaryHandler = (
   error: Error,
   info: { componentStack: string }
 ) => {
+  console.log("error boundary: ", error);
   retryPageLoading();
 };
