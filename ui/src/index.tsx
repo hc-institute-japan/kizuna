@@ -12,7 +12,10 @@ import {
 } from "./components/ErrorBoundary";
 
 ReactDOM.render(
-  <ErrorBoundary fallback={<div>Oh no</div>} onError={errorBoundaryHandler}>
+  <ErrorBoundary
+    fallback={<div>Oh no. An error occurred. Please refresh the page.</div>}
+    onError={errorBoundaryHandler}
+  >
     <Container>
       <meta http-equiv="Pragma" content="no-cache" />
       <meta
