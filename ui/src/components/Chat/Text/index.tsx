@@ -9,7 +9,7 @@ interface Props {
 }
 
 const Text: React.FC<Props> = ({ message, type }) => {
-  const linkExp = new RegExp("https://media.tenor.com/images/.*/tenor.gif");
+  const linkExp = new RegExp("https://media.tenor.com/*.gif");
   const match = linkExp.test(message.payload.payload);
 
   return !match ? (
