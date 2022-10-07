@@ -23,7 +23,7 @@ const HomeTabBar: React.FC = () => (
       <RedeclaredRedirect
         exact
         path="/home"
-        to="/home/messaging"
+        to="/home/contacts"
       ></RedeclaredRedirect>
       <RedeclaredRoute
         path="/home/messaging"
